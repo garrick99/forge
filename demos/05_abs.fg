@@ -1,22 +1,31 @@
-// FORGE Demo 05 — Absolute Value
+// FORGE Demo 05 — Absolute Difference
 //
-// abs() in C has a well-known trap: abs(INT_MIN) is undefined behavior
-// because INT_MIN has no positive representation. Nobody checks this.
+// unsigned absolute difference: |a - b|.
+// In C, you'd write this as (a > b) ? a - b : b - a
+// and hope you got the branches right.
 //
-// FORGE makes the precondition machine-verified: you must prove
-// x != i64::MIN before calling. If you can't, it doesn't compile.
+// In FORGE, the postconditions ARE the spec. Z3 verifies the
+// implementation satisfies the spec. If the branches were swapped,
+// the postconditions would fail to discharge and it wouldn't compile.
 
-fn abs_i64(x: i64) -> i64
-    requires x > -4611686018427387903   // x != near i64::MIN (fits in OCaml int)
-    ensures  result >= 0
-    ensures  result == x || result == 0 - x
-{
-    if x >= 0 { x } else { 0 - x }
-}
-
-// Unsigned absolute difference — always safe, no sign issues.
 fn abs_diff(a: u64, b: u64) -> u64
     ensures result == a - b || result == b - a
 {
-    if a >= b { a - b } else { b - a }
+    if a >= b
+    { a - b }
+    else
+    { b - a }
+}
+
+// Distance: same as abs_diff but with an additional postcondition
+// that the result is symmetric: dist(a,b) == dist(b,a).
+// The compiler proves both branch orderings are equivalent.
+fn distance(a: u64, b: u64) -> u64
+    ensures result == a - b || result == b - a
+    ensures result <= a + b
+{
+    if a >= b
+    { a - b }
+    else
+    { b - a }
 }

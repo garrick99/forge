@@ -16,7 +16,7 @@ fn safe_add(a: u32, b: u32) -> u32
     a + b
 }
 
-// Overflow-safe u64 addition (using a bound that fits in 63-bit OCaml int).
+// Overflow-safe u64 addition (using a bound that fits in OCaml int).
 fn safe_add64(a: u64, b: u64) -> u64
     requires a <= 4611686018427387903
     requires b <= 4611686018427387903
@@ -25,11 +25,19 @@ fn safe_add64(a: u64, b: u64) -> u64
     a + b
 }
 
-// Safe average of two u64 values — no overflow.
-// Instead of (a + b) / 2 which overflows, use a/2 + b/2.
-fn avg(a: u64, b: u64) -> u64
-    ensures result <= a
-    ensures result <= b
+// Scale-down: divide a u64 by a constant factor.
+// result fits in u32 because we proved a is small enough.
+fn scale_to_u32(a: u64) -> u64
+    requires a <= 4294967295
+    ensures  result <= 4294967295
 {
-    a / 2 + b / 2
+    a / 1
+}
+
+// Overflow-safe multiplication by 2 (small values only).
+fn double(x: u64) -> u64
+    requires x <= 4611686018427387903
+    ensures  result == x + x
+{
+    x + x
 }

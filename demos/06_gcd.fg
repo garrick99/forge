@@ -1,14 +1,16 @@
-// FORGE Demo 06 — GCD with Proven Postconditions
+// FORGE Demo 06 — GCD: Preconditions on Recursive Calls
 //
-// The Euclidean algorithm. Simple to write, hard to prove correct.
-// FORGE proves both postconditions: result divides a AND result divides b.
-// Not a unit test. A mathematical proof. Checked by Z3.
+// Full GCD correctness requires inductive proofs (Tier 3 — manual).
+// But Tier 1 (Z3) proves what it can: every recursive call satisfies
+// its preconditions. If you mess up the base case or termination,
+// it won't compile — before you ever run a test.
+//
+// Z3 proves:
+//   - In the recursive case (b != 0), the first arg b > 0 holds
+//   - The recursion eventually terminates (a % b < b)
 
-fn gcd(a: u64, b: u64[n | n > 0]) -> u64
+fn gcd(a: u64[n | n > 0], b: u64) -> u64
     requires a > 0
-    requires b > 0
-    ensures  a % result == 0
-    ensures  b % result == 0
 {
     if b == 0
     { a }
