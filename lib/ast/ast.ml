@@ -57,6 +57,7 @@ type pred =
   | PApp    of ident * pred list            (* predicate application *)
   | POld    of pred                         (* old(expr) — pre-state value *)
   | PResult                                 (* 'result' — return value *)
+  | PIte    of pred * pred * pred           (* if cond then t else e — for SMT ite *)
   | PForall of ident * ty * pred           (* forall x: T, P *)
   | PExists of ident * ty * pred           (* exists x: T, P *)
 
@@ -100,7 +101,7 @@ and fn_ty = {
 and expr = {
   expr_desc: expr_desc;
   expr_loc:  loc;
-  expr_ty:   ty option;           (* filled in by type checker *)
+  mutable expr_ty: ty option;     (* filled in by type checker *)
 }
 
 and expr_desc =

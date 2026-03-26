@@ -169,7 +169,11 @@ let rec expr_to_pred_simple e =
   | EVar id             -> PVar id
   | EBinop (op, l, r)   -> PBinop (op, expr_to_pred_simple l, expr_to_pred_simple r)
   | EUnop (op, e)       -> PUnop (op, expr_to_pred_simple e)
-  | EBlock (_, Some ret) -> expr_to_pred_simple ret   (* trailing expression *)
+  | EBlock (_, Some ret) -> expr_to_pred_simple ret
+  | EIf (cond, then_, Some else_) ->
+      PIte (expr_to_pred_simple cond,
+            expr_to_pred_simple then_,
+            expr_to_pred_simple else_)
   | EBlock (stmts, None) ->
       (* last SReturn in stmts, if any *)
       let rec last_return = function
@@ -195,6 +199,7 @@ and subst_pred (subst : (string * pred) list) pred =
   | PUnop (op, p)     -> PUnop (op, subst_pred subst p)
   | PForall (x, t, p) -> PForall (x, t, subst_pred (List.remove_assoc x.name subst) p)
   | PExists (x, t, p) -> PExists (x, t, subst_pred (List.remove_assoc x.name subst) p)
+  | PIte (c, t, e)    -> PIte (subst_pred subst c, subst_pred subst t, subst_pred subst e)
   | POld p            -> POld (subst_pred subst p)
   | PApp (f, args)    -> PApp (f, List.map (subst_pred subst) args)
   | _                 -> pred
@@ -265,6 +270,7 @@ let format_obligation_kind = function
 
 let rec check_expr env expr : ty =
   let ty = infer_expr env expr in
+  expr.expr_ty <- Some ty;
   ty
 
 and infer_expr env expr : ty =

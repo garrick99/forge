@@ -109,6 +109,9 @@ module Z3Bridge = struct
         Printf.sprintf "(forall ((%s Int)) %s)" x.name (pred_to_smtlib ctx body)
     | PExists (x, _ty, body) ->
         Printf.sprintf "(exists ((%s Int)) %s)" x.name (pred_to_smtlib ctx body)
+    | PIte (c, t, e) ->
+        Printf.sprintf "(ite %s %s %s)"
+          (pred_to_smtlib ctx c) (pred_to_smtlib ctx t) (pred_to_smtlib ctx e)
     | PResult -> "result__"
     | POld p  -> Printf.sprintf "old__%s" (pred_to_smtlib ctx p)
     | PApp (f, args) ->

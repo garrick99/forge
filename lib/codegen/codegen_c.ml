@@ -97,12 +97,12 @@ let rec emit_expr depth e =
       Printf.sprintf "((%s)%s)" (emit_ty ty) (emit_expr depth e)
   | EIf (cond, then_, None) ->
       Printf.sprintf "(%s ? %s : 0)"
-        (emit_expr depth cond) (emit_expr depth then_)
+        (emit_expr depth cond) (emit_expr_value depth then_)
   | EIf (cond, then_, Some else_) ->
       Printf.sprintf "(%s ? %s : %s)"
         (emit_expr depth cond)
-        (emit_expr depth then_)
-        (emit_expr depth else_)
+        (emit_expr_value depth then_)
+        (emit_expr_value depth else_)
   | EBlock (stmts, ret) ->
       let buf = Buffer.create 256 in
       Buffer.add_string buf "{\n";
@@ -127,6 +127,14 @@ let rec emit_expr depth e =
       ) rb.rb_stmts;
       Buffer.contents buf
   | EAssume _ -> "/* assume erased */"  (* proof artifact — gone at codegen *)
+
+(* Unwrap EBlock([], Some e) to just e — for use in expression positions
+   like ternary arms where a compound statement is not valid C *)
+and emit_expr_value depth e =
+  match e.expr_desc with
+  | EBlock ([], Some ret) -> emit_expr depth ret
+  | EBlock ([], None)     -> "0"
+  | _                     -> emit_expr depth e
 
 and emit_match depth scrutinee arms =
   (* Emit as C switch where possible, else if-else chain *)
@@ -164,7 +172,11 @@ and emit_stmt depth s =
   | SLet (id, ty, e, _lin) ->
       let ty_str = match ty with
         | Some t -> emit_ty t
-        | None   -> "auto"   (* C23 — or use __auto_type *)
+        | None   ->
+            (* Use expr's inferred type if available, else __typeof__ *)
+            (match e.expr_ty with
+             | Some t -> emit_ty t
+             | None   -> Printf.sprintf "__typeof__(%s)" (emit_expr depth e))
       in
       Printf.sprintf "%s%s %s = %s;"
         (indent depth) ty_str id.name (emit_expr depth e)
