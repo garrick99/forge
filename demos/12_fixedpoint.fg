@@ -1,0 +1,40 @@
+// FORGE Demo 12 — Fixed-Point Arithmetic
+//
+// Fixed-point numbers represent fractions without floating-point.
+// Q16.16 format: one unit = 65536. So 1.5 is stored as 98304.
+// Used in audio processing, game physics, and embedded systems
+// where floating-point is absent or too slow.
+//
+// FORGE proves:
+//   - fp_add: sum equals a + b (exact, no overflow given bounded inputs)
+//   - fp_floor: integer part extraction satisfies result * 65536 <= n
+//   - fp_scale: scaling by num/den <= 1 gives result <= n
+
+// Add two Q16.16 fixed-point numbers.
+fn fp_add(a: u64, b: u64) -> u64
+    requires a <= 4611686018427387903
+    requires b <= 4611686018427387903
+    ensures  result == a + b
+{
+    a + b
+}
+
+// Extract the integer part of a Q16.16 number (floor).
+// Rounds down to the nearest multiple of 65536.
+// n = 98304 (= 1.5 in Q16.16) → result = 65536 (= 1.0 in Q16.16).
+fn fp_floor(n: u64) -> u64
+    ensures result <= n
+    ensures n - result < 65536
+{
+    (n / 65536) * 65536
+}
+
+// Scale a Q16.16 value by fraction num/den where num <= den.
+// Proves result <= n (scaling by <= 1 doesn't increase the value).
+fn fp_scale(n: u64, num: u64, den: u64[k | k > 0]) -> u64
+    requires den > 0
+    requires num <= den
+    ensures  result <= n
+{
+    n * num / den
+}

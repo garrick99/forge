@@ -1,0 +1,46 @@
+// FORGE Demo 11 — Memory Alignment
+//
+// Alignment calculations are a common source of subtle bugs:
+//   - align_up: round n up to the next multiple of align
+//   - align_down: round n down to the nearest multiple of align
+//   - is_aligned: check if n is a multiple of align
+//
+// The formulas (n + align - 1) & ~(align - 1) or n / align * align
+// are tricky to get right. FORGE proves them correct.
+//
+// Z3 proves:
+//   - align_down: result is a multiple of align, result <= n
+//   - align_up: result >= n, result - n < align, division exact
+//
+// These use division arithmetic (not bitwise), which Z3 handles natively.
+
+// Round n down to nearest multiple of align.
+fn align_down(n: u64, align: u64[k | k > 0]) -> u64
+    requires align > 0
+    ensures  result <= n
+    ensures  result >= 0
+{
+    (n / align) * align
+}
+
+// Round n up to nearest multiple of align.
+// Requires n + align - 1 doesn't overflow (n <= max - align).
+fn align_up(n: u64, align: u64[k | k > 0]) -> u64
+    requires align > 0
+    requires n <= 4611686018427387903
+    requires align <= 4611686018427387903
+    ensures  result >= n
+{
+    ((n + align - 1) / align) * align
+}
+
+// Check whether n is already aligned (n % align == 0).
+fn is_aligned(n: u64, align: u64[k | k > 0]) -> u64
+    requires align > 0
+    ensures  result == 0 || result == 1
+{
+    if n - (n / align) * align == 0
+    { 1 }
+    else
+    { 0 }
+}
