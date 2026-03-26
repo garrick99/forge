@@ -1,0 +1,4 @@
+(executable
+ (name main)
+ (public_name forge)
+ (libraries ast lexer proof codegen fmt))

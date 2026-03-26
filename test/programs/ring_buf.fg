@@ -1,0 +1,33 @@
+// FORGE test program 02 — ring_buf.fg
+// A ring buffer where push/pop correctness is proven,
+// not just tested.
+
+struct RingBuf {
+    data:  own<[u64; 256]>,
+    head:  usize { n | n < 256 },
+    tail:  usize { n | n < 256 },
+    count: usize { n | n <= 256 },
+}
+
+// Push — caller must prove there is space.
+// No runtime capacity check. Proven by type.
+fn push(buf: refmut<RingBuf>, val: u64)
+    requires buf.count < 256
+    ensures  buf.count == old(buf.count) + 1
+{
+    buf.data[buf.tail] = val
+    buf.tail = (buf.tail + 1) % 256
+    buf.count = buf.count + 1
+}
+
+// Pop — caller must prove there is data.
+// No runtime empty check. Proven by type.
+fn pop(buf: refmut<RingBuf>) -> u64
+    requires buf.count > 0
+    ensures  buf.count == old(buf.count) - 1
+{
+    let val = buf.data[buf.head]
+    buf.head = (buf.head + 1) % 256
+    buf.count = buf.count - 1
+    val
+}

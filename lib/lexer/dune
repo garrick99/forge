@@ -1,0 +1,4 @@
+(library
+ (name lexer)
+ (libraries ast)
+ (ocamllex lexer))

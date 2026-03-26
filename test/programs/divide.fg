@@ -1,0 +1,34 @@
+// FORGE test program 01 — divide.fg
+// The simplest proof that means something:
+// division by zero is a compile error, not a runtime crash.
+
+// Safe division — caller must PROVE b != 0.
+// Not a runtime check. Not an assertion. A proof obligation.
+// If you can't prove it, it doesn't compile.
+fn divide(a: u64, b: u64 { n | n != 0 }) -> u64
+    requires b != 0
+    ensures  result <= a
+{
+    a / b
+}
+
+// Safe array index — caller must PROVE i < arr.len.
+// No bounds check emitted. Proven away.
+fn get(arr: ref<[u64]>, i: usize { n | n < arr.len }) -> u64
+    requires i < arr.len
+{
+    arr[i]
+}
+
+// Overflow-safe add — caller must PROVE no overflow.
+fn safe_add(a: u32, b: u32) -> u32
+    requires a + b <= 4294967295   // u32::MAX
+    ensures  result == a + b
+{
+    a + b
+}
+
+// This should FAIL to compile:
+// fn bad_divide(a: u64, b: u64) -> u64 {
+//     a / b   // ERROR: cannot prove b != 0
+// }

@@ -1,0 +1,23 @@
+// FORGE test program 03 — memcpy.fg
+// Safe memcpy: no-alias and length constraints are proven,
+// not assumed. The C version trusts the caller.
+// FORGE doesn't.
+
+fn memcpy(
+    dst: refmut<[u8]>,
+    src: ref<[u8]>
+) -> ()
+    requires dst.len >= src.len    // destination has room — proven by caller
+    requires noalias(dst, src)     // no overlap — proven by ownership system
+    ensures  forall i: usize, i < src.len => dst[i] == src[i]
+{
+    let i: usize = 0
+    while i < src.len
+        invariant i <= src.len
+        invariant forall j: usize, j < i => dst[j] == src[j]
+        decreases src.len - i
+    {
+        dst[i] = src[i]
+        i = i + 1
+    }
+}

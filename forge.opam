@@ -1,0 +1,20 @@
+opam-version: "2.0"
+name: "forge"
+version: "0.1.0"
+synopsis: "FORGE: Formally verified systems programming language"
+description: """
+FORGE is a systems programming language where the compiler is a theorem prover.
+Nothing ships without a proof. Every assumption is auditable.
+"""
+maintainer: "garrick99"
+authors: ["garrick99"]
+license: "MIT"
+depends: [
+  "ocaml"       { >= "5.0.0" }
+  "dune"        { >= "3.0" }
+  "menhir"      { >= "20231231" }
+  "z3"          { >= "4.12.0" }
+  "fmt"         { >= "0.9.0" }
+  "alcotest"    { with-test }
+  "ppx_deriving" { >= "5.0" }
+]
