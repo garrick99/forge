@@ -208,6 +208,44 @@ let check_preconditions fn_name reqs args params loc ctx =
   ) reqs
 
 (* ------------------------------------------------------------------ *)
+(* Format helpers                                                       *)
+(* ------------------------------------------------------------------ *)
+
+let rec format_ty = function
+  | TPrim (TUint U8)   -> "u8"   | TPrim (TUint U16)  -> "u16"
+  | TPrim (TUint U32)  -> "u32"  | TPrim (TUint U64)  -> "u64"
+  | TPrim (TUint U128) -> "u128" | TPrim (TUint USize)-> "usize"
+  | TPrim (TInt I8)    -> "i8"   | TPrim (TInt I16)   -> "i16"
+  | TPrim (TInt I32)   -> "i32"  | TPrim (TInt I64)   -> "i64"
+  | TPrim (TInt I128)  -> "i128" | TPrim (TInt ISize) -> "isize"
+  | TPrim (TFloat F32) -> "f32"  | TPrim (TFloat F64) -> "f64"
+  | TPrim TBool        -> "bool" | TPrim TUnit        -> "()"
+  | TPrim TNever       -> "Never"
+  | TRefined (p, id, _) ->
+      Printf.sprintf "%s { %s | ... }" (format_ty (TPrim p)) id.name
+  | TRef t    -> Printf.sprintf "ref<%s>" (format_ty t)
+  | TRefMut t -> Printf.sprintf "refmut<%s>" (format_ty t)
+  | TOwn t    -> Printf.sprintf "own<%s>" (format_ty t)
+  | TRaw t    -> Printf.sprintf "raw<%s>" (format_ty t)
+  | TSlice t  -> Printf.sprintf "[%s]" (format_ty t)
+  | TArray (t, _) -> Printf.sprintf "[%s; N]" (format_ty t)
+  | TNamed (id, []) -> id.name
+  | TNamed (id, args) ->
+      Printf.sprintf "%s<%s>" id.name
+        (String.concat ", " (List.map format_ty args))
+  | TFn _     -> "fn(...)"
+  | TDepArr _ -> "(...) -> ..."
+
+let format_obligation_kind = function
+  | OPrecondition f  -> "precondition of " ^ f
+  | OPostcondition f -> "postcondition of " ^ f
+  | OBoundsCheck a   -> "bounds check: " ^ a
+  | ONoOverflow op   -> "no overflow: " ^ op
+  | OTermination f   -> "termination: " ^ f
+  | OLinear v        -> "linear: " ^ v
+  | OInvariant i     -> "invariant: " ^ i
+
+(* ------------------------------------------------------------------ *)
 (* Type checking expressions                                            *)
 (* ------------------------------------------------------------------ *)
 
@@ -660,44 +698,6 @@ let discharge_all (obs : obligation list) (prog_env : env) =
     ds_failed  = !failed;
     ds_failures = List.rev !failures;
   }
-
-(* ------------------------------------------------------------------ *)
-(* Format helpers                                                       *)
-(* ------------------------------------------------------------------ *)
-
-and format_ty = function
-  | TPrim (TUint U8)   -> "u8"   | TPrim (TUint U16)  -> "u16"
-  | TPrim (TUint U32)  -> "u32"  | TPrim (TUint U64)  -> "u64"
-  | TPrim (TUint U128) -> "u128" | TPrim (TUint USize)-> "usize"
-  | TPrim (TInt I8)    -> "i8"   | TPrim (TInt I16)   -> "i16"
-  | TPrim (TInt I32)   -> "i32"  | TPrim (TInt I64)   -> "i64"
-  | TPrim (TInt I128)  -> "i128" | TPrim (TInt ISize) -> "isize"
-  | TPrim (TFloat F32) -> "f32"  | TPrim (TFloat F64) -> "f64"
-  | TPrim TBool        -> "bool" | TPrim TUnit        -> "()"
-  | TPrim TNever       -> "Never"
-  | TRefined (p, id, _) ->
-      Printf.sprintf "%s { %s | ... }" (format_ty (TPrim p)) id.name
-  | TRef t    -> Printf.sprintf "ref<%s>" (format_ty t)
-  | TRefMut t -> Printf.sprintf "refmut<%s>" (format_ty t)
-  | TOwn t    -> Printf.sprintf "own<%s>" (format_ty t)
-  | TRaw t    -> Printf.sprintf "raw<%s>" (format_ty t)
-  | TSlice t  -> Printf.sprintf "[%s]" (format_ty t)
-  | TArray (t, _) -> Printf.sprintf "[%s; N]" (format_ty t)
-  | TNamed (id, []) -> id.name
-  | TNamed (id, args) ->
-      Printf.sprintf "%s<%s>" id.name
-        (String.concat ", " (List.map format_ty args))
-  | TFn _     -> "fn(...)"
-  | TDepArr _ -> "(...) -> ..."
-
-and format_obligation_kind = function
-  | OPrecondition f  -> "precondition of " ^ f
-  | OPostcondition f -> "postcondition of " ^ f
-  | OBoundsCheck a   -> "bounds check: " ^ a
-  | ONoOverflow op   -> "no overflow: " ^ op
-  | OTermination f   -> "termination: " ^ f
-  | OLinear v        -> "linear: " ^ v
-  | OInvariant i     -> "invariant: " ^ i
 
 (* ------------------------------------------------------------------ *)
 (* Main entry point                                                     *)
