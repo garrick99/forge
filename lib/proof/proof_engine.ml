@@ -117,18 +117,29 @@ module Z3Bridge = struct
 
   (* Emit an SMT-LIB2 query to check validity of pred given ctx.
      Valid(P) iff Unsat(not P) under assumptions. *)
+  let is_unsigned = function
+    | TPrim (TUint _) | TPrim (TUint USize) -> true
+    | TRefined (TUint _, _, _)               -> true
+    | _                                      -> false
+
   let build_query ctx pred =
     let decls = List.map (fun (name, _ty) ->
       (* For FORGE-0: all variables are Int in SMT land.
          Later: proper bitvector sorts per integer width. *)
       Printf.sprintf "(declare-const %s Int)" name
     ) ctx.pc_vars in
+    (* Non-negativity constraints for unsigned integers *)
+    let nonneg = List.filter_map (fun (name, ty) ->
+      if is_unsigned ty then
+        Some (Printf.sprintf "(assert (>= %s 0))" name)
+      else None
+    ) ctx.pc_vars in
     let assumes = List.map (fun p ->
       Printf.sprintf "(assert %s)" (pred_to_smtlib ctx p)
     ) ctx.pc_assumes in
     let negated = Printf.sprintf "(assert (not %s))" (pred_to_smtlib ctx pred) in
     let check = "(check-sat)" in
-    String.concat "\n" (decls @ assumes @ [negated; check])
+    String.concat "\n" (decls @ nonneg @ assumes @ [negated; check])
 
   let check_valid ctx pred : z3_result =
     let query = build_query ctx pred in
