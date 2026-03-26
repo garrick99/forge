@@ -598,7 +598,7 @@ let check_fn env fn =
            fn.fn_name.loc env'
        ) fn.fn_ensures)
 
-let check_item env item =
+let rec check_item env item =
   match item.item_desc with
   | IFn fn ->
       let sig_ = collect_fn_sig fn in
