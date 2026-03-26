@@ -169,6 +169,15 @@ let rec expr_to_pred_simple e =
   | EVar id             -> PVar id
   | EBinop (op, l, r)   -> PBinop (op, expr_to_pred_simple l, expr_to_pred_simple r)
   | EUnop (op, e)       -> PUnop (op, expr_to_pred_simple e)
+  | EBlock (_, Some ret) -> expr_to_pred_simple ret   (* trailing expression *)
+  | EBlock (stmts, None) ->
+      (* last SReturn in stmts, if any *)
+      let rec last_return = function
+        | [] -> PVar { name = "__expr"; loc = e.expr_loc }
+        | [{ stmt_desc = SReturn (Some r); _ }] -> expr_to_pred_simple r
+        | _ :: rest -> last_return rest
+      in
+      last_return stmts
   | _                   -> PVar { name = "__expr"; loc = e.expr_loc }
 
 (* Substitute variables in a pred *)
