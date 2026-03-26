@@ -522,84 +522,34 @@ block_expr:
       mk_expr (EBlock (ss, ret)) $startpos
     }
 
-(* A block's body is a list of stmts optionally ending in an expr *)
+(* A block's body: stmts followed by an optional trailing expression.
+   LR shift/reduce resolution handles the ambiguity correctly:
+   - shift SEMI  → expression statement, continue
+   - reduce at } → trailing expression                                 *)
 block_stmts:
   | (* empty *)
     { ([], None) }
-  | e = expr_no_block
+  | e = expr
     { ([], Some e) }
-  | s = stmt rest = block_stmts
-    { let (ss, ret) = rest in (s :: ss, ret) }
-  | e = block_or_control_expr rest = block_stmts_after_block
-    { let (ss, ret) = rest in
-      match ss, ret with
-      | [], None -> ([], Some e)
-      | _        -> ([mk_stmt (SExpr e) $startpos] @ ss, ret) }
-
-block_stmts_after_block:
-  | { ([], None) }
-  | e = expr_no_block
-    { ([], Some e) }
-  | s = stmt rest = block_stmts
-    { let (ss, ret) = rest in (s :: ss, ret) }
-
-(* Expressions that can appear in statement position without ambiguity *)
-block_or_control_expr:
-  | e = block_expr  { e }
-  | e = if_expr     { e }
-  | e = match_expr  { e }
-  | e = loop_expr   { e }
-  | e = proof_expr  { e }
-  | e = raw_expr    { e }
-
-(* Non-block expressions — used as final expr in blocks and as stmt values *)
-expr_no_block:
-  | l = expr_no_block IFF     r = expr_no_block  { mk_expr (EBinop (Iff,     l, r)) $startpos }
-  | l = expr_no_block IMPLIES r = expr_no_block  { mk_expr (EBinop (Implies, l, r)) $startpos }
-  | l = expr_no_block LOR     r = expr_no_block  { mk_expr (EBinop (Or,      l, r)) $startpos }
-  | l = expr_no_block LAND    r = expr_no_block  { mk_expr (EBinop (And,     l, r)) $startpos }
-  | l = expr_no_block EQEQ    r = expr_no_block  { mk_expr (EBinop (Eq,      l, r)) $startpos }
-  | l = expr_no_block NEQ     r = expr_no_block  { mk_expr (EBinop (Ne,      l, r)) $startpos }
-  | l = expr_no_block LT      r = expr_no_block  { mk_expr (EBinop (Lt,      l, r)) $startpos }
-  | l = expr_no_block LE      r = expr_no_block  { mk_expr (EBinop (Le,      l, r)) $startpos }
-  | l = expr_no_block GT      r = expr_no_block  { mk_expr (EBinop (Gt,      l, r)) $startpos }
-  | l = expr_no_block GE      r = expr_no_block  { mk_expr (EBinop (Ge,      l, r)) $startpos }
-  | l = expr_no_block PIPE    r = expr_no_block  { mk_expr (EBinop (BitOr,   l, r)) $startpos }
-  | l = expr_no_block CARET   r = expr_no_block  { mk_expr (EBinop (BitXor,  l, r)) $startpos }
-  | l = expr_no_block AMP     r = expr_no_block  { mk_expr (EBinop (BitAnd,  l, r)) $startpos }
-  | l = expr_no_block SHL     r = expr_no_block  { mk_expr (EBinop (Shl,     l, r)) $startpos }
-  | l = expr_no_block SHR     r = expr_no_block  { mk_expr (EBinop (Shr,     l, r)) $startpos }
-  | l = expr_no_block PLUS    r = expr_no_block  { mk_expr (EBinop (Add,     l, r)) $startpos }
-  | l = expr_no_block MINUS   r = expr_no_block  { mk_expr (EBinop (Sub,     l, r)) $startpos }
-  | l = expr_no_block STAR    r = expr_no_block  { mk_expr (EBinop (Mul,     l, r)) $startpos }
-  | l = expr_no_block SLASH   r = expr_no_block  { mk_expr (EBinop (Div,     l, r)) $startpos }
-  | l = expr_no_block PERCENT r = expr_no_block  { mk_expr (EBinop (Mod,     l, r)) $startpos }
-  | l = expr_no_block EQ      r = expr_no_block  { mk_expr (EAssign (l, r))          $startpos }
-  | l = expr_no_block PLUSEQ  r = expr_no_block  { desugar_aug_assign l Add r $startpos }
-  | l = expr_no_block MINUSEQ r = expr_no_block  { desugar_aug_assign l Sub r $startpos }
-  | l = expr_no_block STAREQ  r = expr_no_block  { desugar_aug_assign l Mul r $startpos }
-  | l = expr_no_block SLASHEQ r = expr_no_block  { desugar_aug_assign l Div r $startpos }
-  | MINUS e = expr_no_block %prec UMINUS  { mk_expr (EUnop (Neg,    e)) $startpos }
-  | BANG  e = expr_no_block %prec UBANG   { mk_expr (EUnop (Not,    e)) $startpos }
-  | TILDE e = expr_no_block %prec UTILDE  { mk_expr (EUnop (BitNot, e)) $startpos }
-  | STAR  e = expr_no_block %prec UDEREF  { mk_expr (EDeref e)          $startpos }
-  | AMP   e = expr_no_block %prec UREF    { mk_expr (ERef   e)          $startpos }
-  | e = expr_no_block DOT name = ident
-    { mk_expr (EField (e, name)) $startpos }
-  | e = expr_no_block LBRACKET idx = expr_no_block RBRACKET
-    { mk_expr (EIndex (e, idx)) $startpos }
-  | f = expr_no_block LPAREN args = separated_list(COMMA, expr) RPAREN
-    { mk_expr (ECall (f, args)) $startpos }
-  | e = assume_expr   { e }
-  | e = return_expr   { e }
-  | e = atom_expr     { e }
+  | e = expr SEMI rest = block_stmts
+    { let (ss, ret) = rest in (mk_stmt (SExpr e) $startpos :: ss, ret) }
+  | LET lin = linearity name = ident ann = option(preceded(COLON, ty))
+    EQ e = expr SEMI rest = block_stmts
+    { let (ss, ret) = rest in (mk_stmt (SLet (name, ann, e, lin)) $startpos :: ss, ret) }
+  | LET name = ident ann = option(preceded(COLON, ty))
+    EQ e = expr SEMI rest = block_stmts
+    { let (ss, ret) = rest in (mk_stmt (SLet (name, ann, e, Unr)) $startpos :: ss, ret) }
+  | BREAK SEMI rest = block_stmts
+    { let (ss, ret) = rest in (mk_stmt SBreak $startpos :: ss, ret) }
+  | CONTINUE SEMI rest = block_stmts
+    { let (ss, ret) = rest in (mk_stmt SContinue $startpos :: ss, ret) }
 
 (* ------------------------------------------------------------------ *)
 (* Control flow expressions                                             *)
 (* ------------------------------------------------------------------ *)
 
 if_expr:
-  | IF cond = expr_no_block
+  | IF cond = expr
     then_ = block_expr
     else_ = option(preceded(ELSE, else_branch))
     { mk_expr (EIf (cond, then_, else_)) $startpos }
@@ -609,7 +559,7 @@ else_branch:
   | e = if_expr    { e }
 
 match_expr:
-  | MATCH scrut = expr_no_block LBRACE
+  | MATCH scrut = expr LBRACE
       arms = list(match_arm)
     RBRACE
     { mk_expr (EMatch (scrut, arms)) $startpos }
@@ -621,8 +571,8 @@ match_arm:
 arm_body:
   | e = block_expr COMMA { e }
   | e = block_expr       { e }
-  | e = expr_no_block COMMA { e }
-  | e = expr_no_block       { e }
+  | e = expr COMMA { e }
+  | e = expr       { e }
 
 loop_expr:
   | LOOP body = block_expr
@@ -633,7 +583,7 @@ loop_expr:
             [mk_stmt (SExpr body) $startpos]
           )) $startpos],
         None)) $startpos }
-  | WHILE cond = expr_no_block
+  | WHILE cond = expr
     inv = option(preceded(INVARIANT, pred))
     dec = option(preceded(DECREASES, pred))
     body = block_expr
@@ -646,7 +596,7 @@ loop_expr:
         [mk_stmt (SWhile (cond, inv, dec, stmts)) $startpos],
         None)) $startpos
     }
-  | FOR name = ident IN iter = expr_no_block
+  | FOR name = ident IN iter = expr
     dec = option(preceded(DECREASES, pred))
     body = block_expr
     {
@@ -660,7 +610,7 @@ loop_expr:
     }
 
 return_expr:
-  | RETURN e = option(expr_no_block)
+  | RETURN e = option(expr)
     { mk_expr (EBlock (
         [mk_stmt (SReturn e) $startpos],
         None)) $startpos }
