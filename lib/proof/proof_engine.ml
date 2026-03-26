@@ -34,7 +34,7 @@ type obligation = {
   ob_pred:    pred;
   ob_kind:    obligation_kind;
   ob_loc:     loc;
-  ob_ctx:     (ident * ty) list;   (* variables in scope *)
+  ob_ctx:     (string * ty) list;   (* variables in scope — name -> type *)
   ob_status:  proof_status;
 }
 
