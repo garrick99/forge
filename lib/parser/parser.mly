@@ -5,66 +5,8 @@
 open Ast
 open Parse_util
 open Lexing
+open Token
 %}
-
-(* ------------------------------------------------------------------ *)
-(* Token declarations                                                   *)
-(* ------------------------------------------------------------------ *)
-
-%token <int>    INT
-%token <float>  FLOAT
-%token <string> STRING
-%token <string> IDENT
-
-(* Declaration keywords *)
-%token FN TYPE STRUCT ENUM IMPL USE EXTERN TASK CHAN
-
-(* Control flow *)
-%token LET MUT RETURN IF ELSE MATCH FOR WHILE LOOP IN BREAK CONTINUE
-%token OR_RETURN OR_FAIL
-
-(* Proof keywords *)
-%token REQUIRES ENSURES DECREASES INVARIANT
-%token PROOF ASSUME LEMMA WITNESS BY AUTO
-%token RAW FORALL EXISTS OLD RESULT
-
-(* Linearity *)
-%token LIN AFF
-
-(* Literals *)
-%token TRUE FALSE
-
-(* Ownership type keywords *)
-%token REF REFMUT OWN RAW_TY
-
-(* Primitive types *)
-%token U8 U16 U32 U64 U128 USIZE
-%token I8 I16 I32 I64 I128 ISIZE
-%token F32 F64
-%token BOOL_TY NEVER
-
-(* Grouping *)
-%token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET
-
-(* Punctuation *)
-%token COMMA SEMI COLON DCOLON DOT DOTDOT
-%token PIPE AT HASH UNDERSCORE
-%token ARROW FATARROW
-
-(* Comparison *)
-%token LT LE GT GE EQEQ NEQ
-
-(* Assignment *)
-%token EQ PLUSEQ MINUSEQ STAREQ SLASHEQ
-
-(* Arithmetic / bitwise *)
-%token PLUS MINUS STAR SLASH PERCENT
-%token AMP CARET TILDE SHL SHR
-
-(* Logical *)
-%token BANG LAND LOR IMPLIES IFF
-
-%token EOF
 
 (* ------------------------------------------------------------------ *)
 (* Operator precedence — lowest to highest                             *)
