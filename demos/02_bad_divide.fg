@@ -1,0 +1,14 @@
+// FORGE Demo 02 — What Doesn't Compile
+//
+// This is the same function WITHOUT the proof.
+// FORGE refuses to emit a binary. There is no flag to suppress this.
+// The proof either exists or the program doesn't compile.
+//
+// Expected output:
+//   proof obligation failed: precondition of __div__
+//   hint: cannot automatically prove b != 0 —
+//         refine the type or add a precondition
+
+fn bad_divide(a: u64, b: u64) -> u64 {
+    a / b
+}

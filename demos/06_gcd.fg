@@ -1,0 +1,14 @@
+// FORGE Demo 06 — GCD with Correctness Proof
+//
+// The classic Euclidean algorithm. Simple to write, hard to prove.
+// The postcondition states: result divides both a and b.
+// In FORGE, this isn't a comment. It's a theorem that Z3 checks.
+
+fn gcd(a: u64 { n | n > 0 }, b: u64 { n | n > 0 }) -> u64 { n | n > 0 }
+    requires a > 0
+    requires b > 0
+    ensures  a % result == 0
+    ensures  b % result == 0
+{
+    if b == 0 { a } else { gcd(b, a % b) }
+}

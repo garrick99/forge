@@ -1,0 +1,33 @@
+// FORGE Demo 04 — Min/Max with Proven Postconditions
+//
+// Every C programmer has written min/max. Nobody formally proves them.
+// FORGE does. The postconditions are theorems, not comments.
+
+fn max(a: u64, b: u64) -> u64
+    ensures result >= a
+    ensures result >= b
+    ensures result == a || result == b
+{
+    if a >= b { a } else { b }
+}
+
+fn min(a: u64, b: u64) -> u64
+    ensures result <= a
+    ensures result <= b
+    ensures result == a || result == b
+{
+    if a <= b { a } else { b }
+}
+
+// Clamp: guaranteed lo <= result <= hi.
+// No if-chains that might have an off-by-one bug.
+// The postconditions ARE the spec. Z3 verifies the implementation
+// satisfies the spec. Done.
+fn clamp(x: u64, lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures  result >= lo
+    ensures  result <= hi
+{
+    let y: u64 = if x < lo { lo } else { x };
+    if y > hi { hi } else { y }
+}

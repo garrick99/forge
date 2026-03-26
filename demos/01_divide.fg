@@ -1,0 +1,17 @@
+// FORGE Demo 01 — Safe Division
+//
+// In C:     uint64_t divide(uint64_t a, uint64_t b) { return a / b; }
+//           ^ undefined behavior if b == 0. Your problem. Good luck.
+//
+// In FORGE: the type b: u64 { n | n != 0 } makes b == 0 a type error.
+//           The requires clause is a formal proof obligation.
+//           Z3 discharges it automatically from the refinement type.
+//           The compiled output is identical to the C version — no checks,
+//           no overhead — but it is mathematically proven correct.
+
+fn divide(a: u64, b: u64 { n | n != 0 }) -> u64
+    requires b != 0
+    ensures  result <= a
+{
+    a / b
+}

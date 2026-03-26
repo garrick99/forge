@@ -1,0 +1,23 @@
+// FORGE Demo 05 — Absolute Value
+//
+// abs() in C has a well-known trap: abs(INT_MIN) is undefined behavior
+// because INT_MIN has no positive representation. Nobody checks this.
+//
+// FORGE makes the precondition explicit and machine-verified:
+// you must prove x != i64::MIN before calling. If you can't prove it,
+// it doesn't compile. No UB escapes into production.
+
+fn abs_i64(x: i64) -> i64
+    requires x > -9223372036854775808   // x != i64::MIN
+    ensures  result >= 0
+    ensures  result == x || result == 0 - x
+{
+    if x >= 0 { x } else { 0 - x }
+}
+
+// Unsigned absolute difference — always safe, no sign issues.
+fn abs_diff(a: u64, b: u64) -> u64
+    ensures result == a - b || result == b - a
+{
+    if a >= b { a - b } else { b - a }
+}
