@@ -241,8 +241,10 @@ and infer_expr env expr : ty =
            vi.vi_ty
        | None ->
            (match env_lookup_fn env id.name with
-            | Some sig_ -> TFn (mk_fn_ty sig_.fs_params sig_.fs_ret
-                                         sig_.fs_requires sig_.fs_ensures)
+            | Some sig_ -> TFn { params   = sig_.fs_params;
+                                   ret      = sig_.fs_ret;
+                                   requires = sig_.fs_requires;
+                                   ensures  = sig_.fs_ensures; }
             | None ->
                 fail id.loc (Printf.sprintf "unbound variable '%s'" id.name);
                 TPrim (TUint U64)))  (* error recovery type *)
