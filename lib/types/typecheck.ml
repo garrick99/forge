@@ -24,7 +24,7 @@ type var_info = {
 }
 
 type fn_sig = {
-  fs_params:   (string * ty) list;
+  fs_params:   (ident * ty) list;
   fs_ret:      ty;
   fs_requires: pred list;
   fs_ensures:  pred list;
@@ -199,7 +199,9 @@ let check_bounds arr_expr idx_expr loc ctx =
 
 (* Check preconditions at a call site *)
 let check_preconditions fn_name reqs args params loc ctx =
-  let subst = List.combine (List.map fst params) (List.map expr_to_pred_simple args) in
+  let subst = List.combine
+    (List.map (fun (id, _) -> id.name) params)
+    (List.map expr_to_pred_simple args) in
   List.iter (fun req ->
     let pred = subst_pred subst req in
     add_obligation pred (OPrecondition fn_name) loc ctx
@@ -526,7 +528,7 @@ and check_proof_block env pb =
 
 let collect_fn_sig (fn : fn_def) : fn_sig =
   {
-    fs_params   = List.map (fun (id, ty) -> (id.name, ty)) fn.fn_params;
+    fs_params   = fn.fn_params;
     fs_ret      = fn.fn_ret;
     fs_requires = fn.fn_requires;
     fs_ensures  = fn.fn_ensures;
@@ -575,7 +577,7 @@ let check_item env item =
       (match ex.ex_ty with
        | TFn fty ->
            let sig_ = {
-             fs_params   = List.map (fun (id, ty) -> (id.name, ty)) fty.params;
+             fs_params   = fty.params;
              fs_ret      = fty.ret;
              fs_requires = fty.requires;
              fs_ensures  = fty.ensures;
@@ -715,7 +717,7 @@ let typecheck_program prog =
         (match ex.ex_ty with
          | TFn fty ->
              let sig_ = {
-               fs_params   = List.map (fun (id, ty) -> (id.name, ty)) fty.params;
+               fs_params   = fty.params;
                fs_ret      = fty.ret;
                fs_requires = fty.requires;
                fs_ensures  = fty.ensures;
