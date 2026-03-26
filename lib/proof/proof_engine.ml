@@ -251,15 +251,13 @@ let discharge ctx ob : discharge_result =
   (* Try Tier 1 first *)
   match try_smt ctx ob with
   | Discharged t -> Proved t
-  | Failed msg ->
-      (* Check if this is a Tier 3 (manual proof term) obligation *)
-      (match ob.ob_kind with
-       | OTermination _ | OInvariant _ ->
-           NeedsHint (suggest_hint ob)
-       | _ ->
-           (* Give the user a useful hint *)
-           let hint = suggest_hint ob in
-           NeedsHint hint)
+  | Failed _msg ->
+      let hint = suggest_hint ob in
+      NeedsHint hint
+  | Pending ->
+      (* Not yet attempted — escalate to hint *)
+      let hint = suggest_hint ob in
+      NeedsHint hint
 
 (* ------------------------------------------------------------------ *)
 (* Proof checker for Tier 3 manual proof terms                        *)
@@ -297,11 +295,11 @@ let rec check_proof _ctx prop term : (unit, string) result =
        | Ok (), Ok () -> Ok ()
        | Error e, _   -> Error e
        | _, Error e   -> Error e)
-  | PImpl (p, q), _ ->
+  | PImpl (_p, q), _ ->
       (* Assume p, prove q *)
       check_proof _ctx q term
-  | PExistsP (_, body), PTWitness _w ->
-      (* Check body holds for witness w *)
+  | PExistsP (_, _body), PTWitness _w ->
+      (* Check body holds for witness w — TODO: substitute and verify *)
       check_proof _ctx (PAtom PTrue) (PTBy ({ name="witness"; loc=dummy_loc }, []))
   | _, PTBy (lemma_name, _args) ->
       (* Look up lemma in context — TODO *)
