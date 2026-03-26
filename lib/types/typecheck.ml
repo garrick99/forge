@@ -169,7 +169,14 @@ let rec expr_to_pred_simple e =
   | EVar id             -> PVar id
   | EBinop (op, l, r)   -> PBinop (op, expr_to_pred_simple l, expr_to_pred_simple r)
   | EUnop (op, e)       -> PUnop (op, expr_to_pred_simple e)
-  | EBlock (_, Some ret) -> expr_to_pred_simple ret
+  | EBlock (stmts, Some ret) ->
+      (* Inline let bindings: substitute each let-bound variable in the result *)
+      let subst = List.filter_map (fun s ->
+        match s.stmt_desc with
+        | SLet (id, _, rhs, _) -> Some (id.name, expr_to_pred_simple rhs)
+        | _ -> None
+      ) stmts in
+      subst_pred subst (expr_to_pred_simple ret)
   | EIf (cond, then_, Some else_) ->
       PIte (expr_to_pred_simple cond,
             expr_to_pred_simple then_,

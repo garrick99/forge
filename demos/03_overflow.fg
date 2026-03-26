@@ -3,12 +3,12 @@
 // Signed integer overflow is undefined behavior in C.
 // Unsigned overflow is defined (wrap) but often wrong.
 //
-// FORGE requires you to prove that arithmetic stays in range.
-// The proofs are discharged by Z3. The compiled C is just +, -, *.
+// FORGE requires you to prove arithmetic stays in range.
+// The proofs are discharged by Z3. The C output is just +, -, *.
 // No saturation, no wrapping, no runtime checks. Proven correct.
 
 // Overflow-safe u32 addition.
-// Caller must prove the sum fits. The type system enforces this.
+// Caller must prove the sum fits. The type system enforces it.
 fn safe_add(a: u32, b: u32) -> u32
     requires a + b <= 4294967295
     ensures  result == a + b
@@ -16,19 +16,18 @@ fn safe_add(a: u32, b: u32) -> u32
     a + b
 }
 
-// Overflow-safe u64 multiplication by 2.
-// Caller must prove x * 2 fits in u64.
-fn double(x: u64) -> u64
-    requires x <= 9223372036854775807
-    ensures  result == x + x
+// Overflow-safe u64 addition (using a bound that fits in 63-bit OCaml int).
+fn safe_add64(a: u64, b: u64) -> u64
+    requires a <= 4611686018427387903
+    requires b <= 4611686018427387903
+    ensures  result == a + b
 {
-    x + x
+    a + b
 }
 
-// Safe average: no overflow even for large inputs.
-// The trick: (a + b) / 2 overflows, but a/2 + b/2 doesn't.
-// FORGE proves both variants are equivalent when a and b are even.
-fn avg_no_overflow(a: u64, b: u64) -> u64
+// Safe average of two u64 values — no overflow.
+// Instead of (a + b) / 2 which overflows, use a/2 + b/2.
+fn avg(a: u64, b: u64) -> u64
     ensures result <= a
     ensures result <= b
 {

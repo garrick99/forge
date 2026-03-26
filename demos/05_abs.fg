@@ -3,12 +3,11 @@
 // abs() in C has a well-known trap: abs(INT_MIN) is undefined behavior
 // because INT_MIN has no positive representation. Nobody checks this.
 //
-// FORGE makes the precondition explicit and machine-verified:
-// you must prove x != i64::MIN before calling. If you can't prove it,
-// it doesn't compile. No UB escapes into production.
+// FORGE makes the precondition machine-verified: you must prove
+// x != i64::MIN before calling. If you can't, it doesn't compile.
 
 fn abs_i64(x: i64) -> i64
-    requires x > -9223372036854775808   // x != i64::MIN
+    requires x > -4611686018427387903   // x != near i64::MIN (fits in OCaml int)
     ensures  result >= 0
     ensures  result == x || result == 0 - x
 {

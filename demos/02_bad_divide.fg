@@ -6,9 +6,9 @@
 //
 // Expected output:
 //   proof obligation failed: precondition of __div__
-//   hint: cannot automatically prove b != 0 —
-//         refine the type or add a precondition
+//   hint: cannot automatically prove b != 0
 
-fn bad_divide(a: u64, b: u64) -> u64 {
+fn bad_divide(a: u64, b: u64) -> u64
+{
     a / b
 }
