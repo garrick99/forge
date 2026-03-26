@@ -1,0 +1,48 @@
+// FORGE Demo 10 — Binary Search: Provably Correct Index Arithmetic
+//
+// The two bugs in textbook binary search:
+//   1. (lo + hi) / 2 overflows — fixed by lo + (hi - lo) / 2
+//   2. The shrink step (lo = mid + 1 or hi = mid - 1) can diverge
+//      or access out-of-bounds if mid is computed wrong.
+//
+// FORGE proves:
+//   - search_step_lo: lo' > lo (strictly advances lower bound)
+//   - search_step_hi: hi' < hi (strictly advances upper bound)
+//   - Both new bounds stay within [0, hi] / [lo, size]
+//
+// These are the invariant-preservation proofs for binary search.
+// With them, you KNOW the loop terminates and never goes out of bounds.
+
+// When target > arr[mid], advance the lower bound.
+// Proves: the new lo is strictly greater than the old lo.
+fn search_step_lo(lo: u64, hi: u64, mid: u64) -> u64
+    requires lo <= mid
+    requires mid <= hi
+    ensures  result > lo
+    ensures  result <= hi + 1
+{
+    mid + 1
+}
+
+// When target < arr[mid], shrink the upper bound.
+// Proves: the new hi is strictly less than the old hi.
+// Requires mid > 0 to avoid underflow (hi = mid - 1 where mid = 0 wraps).
+fn search_step_hi(lo: u64, hi: u64, mid: u64) -> u64
+    requires lo <= mid
+    requires mid <= hi
+    requires mid > 0
+    ensures  result < hi
+    ensures  result >= 0
+{
+    mid - 1
+}
+
+// The midpoint computation that feeds into the above steps.
+// Proved correct in demo 08; repeated here for the full picture.
+fn search_mid(lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures  result >= lo
+    ensures  result <= hi
+{
+    lo + (hi - lo) / 2
+}

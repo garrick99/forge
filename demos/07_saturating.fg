@@ -1,0 +1,39 @@
+// FORGE Demo 07 — Saturating Arithmetic
+//
+// Saturating add/sub: instead of overflowing, clamp to the type boundary.
+// Standard in audio DSP, image processing, and SIMD code — but usually
+// written with undefined behavior lurking in the naive C version.
+//
+// FORGE proves:
+//   sat_add_u32: result ∈ [max(a,b), U32_MAX]
+//   sat_sub_u32: result ∈ [0, a]
+//
+// Z3 discharges all obligations automatically using:
+//   - type bounds: a,b ∈ [0, 4294967295] from u32
+//   - branch conditioning: proof context split at the if condition
+//
+// The C output is a single ternary per function.
+// No branches, no runtime checks, no UB.
+
+// Saturating add: clamp to U32_MAX on overflow.
+fn sat_add_u32(a: u32, b: u32) -> u32
+    ensures result >= a
+    ensures result >= b
+    ensures result <= 4294967295
+{
+    if a <= 4294967295 - b
+    { a + b }
+    else
+    { 4294967295 }
+}
+
+// Saturating subtract: clamp to 0 on underflow.
+fn sat_sub_u32(a: u32, b: u32) -> u32
+    ensures result <= a
+    ensures result >= 0
+{
+    if a >= b
+    { a - b }
+    else
+    { 0 }
+}

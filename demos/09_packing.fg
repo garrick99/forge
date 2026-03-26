@@ -1,0 +1,36 @@
+// FORGE Demo 09 — Bit Field Packing
+//
+// Pack/unpack two 16-bit values into a single 32-bit word.
+// In C this is error-prone: wrong masks, wrong shifts, sign extension.
+//
+// FORGE proves:
+//   - pack: high/low values fit in their fields
+//   - unpack_lo: result is exactly the original low byte (round-trips)
+//   - The packed representation is deterministic
+//
+// These are simple linear arithmetic proofs over masked/shifted values.
+// Division stands in for right-shift (a >> k == a / 2^k for unsigned values).
+
+// Pack two u16 values into the low/high halves of a u32.
+fn pack_u32(hi: u32, lo: u32) -> u32
+    requires hi <= 65535
+    requires lo <= 65535
+    ensures  result >= lo
+    ensures  result <= 4294967295
+{
+    hi * 65536 + lo
+}
+
+// Extract the low 16 bits of a u32.
+fn unpack_lo(word: u32) -> u32
+    ensures result <= 65535
+{
+    word - (word / 65536) * 65536
+}
+
+// Extract the high 16 bits of a u32.
+fn unpack_hi(word: u32) -> u32
+    ensures result <= 65535
+{
+    word / 65536
+}

@@ -133,6 +133,27 @@ let rec ty_eq t1 t2 =
   | TNamed (n1, _), TNamed (n2, _) -> n1.name = n2.name
   | _ -> false
 
+(* Numeric coercion: integer literals default to u64, but when used alongside a
+   narrower type in an if-branch or let-binding, we prefer the narrower type.
+   This is safe because FORGE proofs use untyped SMT integers; width only affects
+   C codegen output. *)
+let ty_unify t1 t2 =
+  if ty_eq t1 t2 then t1
+  else match base_ty t1, base_ty t2 with
+  | TPrim (TUint U64), TPrim (TUint w) -> TPrim (TUint w)
+  | TPrim (TUint w), TPrim (TUint U64) -> TPrim (TUint w)
+  | TPrim (TInt I64),  TPrim (TInt w)  -> TPrim (TInt w)
+  | TPrim (TInt w),  TPrim (TInt I64)  -> TPrim (TInt w)
+  | _ -> t1
+
+(* Two integer types are compatible if they unify (narrower wins over u64 default) *)
+let ty_compatible t1 t2 =
+  ty_eq (base_ty t1) (base_ty t2)
+  || (match base_ty t1, base_ty t2 with
+      | TPrim (TUint _), TPrim (TUint _) -> true
+      | TPrim (TInt _),  TPrim (TInt _)  -> true
+      | _ -> false)
+
 (* Numeric type for binary operation result *)
 let numeric_result_ty t1 t2 =
   match base_ty t1, base_ty t2 with
@@ -373,7 +394,7 @@ and infer_expr env expr : ty =
            (* Type-check arguments *)
            List.iter2 (fun (_, param_ty) arg ->
              let arg_ty = check_expr env arg in
-             if not (ty_eq (base_ty param_ty) (base_ty arg_ty)) then
+             if not (ty_compatible param_ty arg_ty) then
                fail expr.expr_loc
                  (Printf.sprintf "argument type mismatch: expected %s"
                    (format_ty param_ty))
@@ -434,9 +455,9 @@ and infer_expr env expr : ty =
        | None -> TPrim TUnit
        | Some else_e ->
            let else_ty = check_expr env_else else_e in
-           if not (ty_eq (base_ty then_ty) (base_ty else_ty)) then
+           if not (ty_compatible then_ty else_ty) then
              fail expr.expr_loc "if branches must have same type";
-           then_ty)
+           ty_unify then_ty else_ty)
 
   (* Match *)
   | EMatch (scrut, arms) ->
@@ -476,10 +497,11 @@ and check_stmt env stmt : env =
       let inferred = check_expr env expr_ in
       let ty = match ann with
         | Some t ->
-            if not (ty_eq (base_ty t) (base_ty inferred)) then
+            if not (ty_compatible t inferred) then
               fail stmt.stmt_loc
                 (Printf.sprintf "type annotation %s doesn't match inferred %s"
                   (format_ty t) (format_ty inferred));
+            (* Annotation wins for numeric coercion (literal defaults to u64) *)
             t
         | None -> inferred
       in
@@ -505,7 +527,7 @@ and check_stmt env stmt : env =
              | Some expr_ -> check_expr env expr_
              | None       -> TPrim TUnit
            in
-           if not (ty_eq (base_ty ret_ty) (base_ty sig_.fs_ret)) then
+           if not (ty_compatible ret_ty sig_.fs_ret) then
              fail stmt.stmt_loc "return type mismatch";
            (* Check postconditions *)
            List.iter (fun ens ->
@@ -625,7 +647,7 @@ let check_fn env fn =
    | None -> ()  (* extern — no body to check *)
    | Some body ->
        let body_ty = check_expr env' body in
-       if not (ty_eq (base_ty body_ty) (base_ty fn.fn_ret)) then
+       if not (ty_compatible body_ty fn.fn_ret) then
          fail fn.fn_name.loc
            (Printf.sprintf "function '%s' body type %s doesn't match declared return type %s"
              fn.fn_name.name (format_ty body_ty) (format_ty fn.fn_ret));

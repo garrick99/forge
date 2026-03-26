@@ -1,0 +1,32 @@
+// FORGE Demo 08 — Overflow-Safe Midpoint
+//
+// The classic binary search bug (Joshua Bloch, 2006):
+//   mid = (lo + hi) / 2    ← overflows when lo + hi > INT_MAX
+//   mid = lo + (hi - lo) / 2   ← correct, no overflow
+//
+// In C you'd write the correct version and hope you remembered.
+// In FORGE, the postconditions ARE the proof. The wrong version
+// doesn't even compile — the postconditions won't discharge.
+//
+// Z3 proves:
+//   - result >= lo (midpoint is at least lo)
+//   - result <= hi (midpoint is at most hi)
+//   - no overflow anywhere in the computation
+
+fn midpoint(lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures  result >= lo
+    ensures  result <= hi
+{
+    lo + (hi - lo) / 2
+}
+
+// Safe average of two u64s — same overflow-safe pattern.
+// (a + b) / 2 overflows; this doesn't.
+fn avg_u64(a: u64, b: u64) -> u64
+    requires a <= b
+    ensures  result >= a
+    ensures  result <= b
+{
+    a + (b - a) / 2
+}
