@@ -159,13 +159,9 @@ let add_obligation pred kind loc ctx =
     ob_status = Pending;
   } :: !obligations
 
-(* Generate division-by-zero obligation *)
-let check_division divisor fn_name loc ctx =
-  let pred = PBinop (Ne, expr_to_pred_simple divisor, PInt 0) in
-  add_obligation pred (OPrecondition fn_name) loc ctx
-
-(* Translate expression to pred for obligation generation *)
-and expr_to_pred_simple e =
+(* Translate expression to pred for obligation generation — defined first,
+   used by check_division / check_bounds / check_preconditions below *)
+let rec expr_to_pred_simple e =
   match e.expr_desc with
   | ELit (LInt (n, _))  -> PInt n
   | ELit (LBool b)      -> PBool b
@@ -173,26 +169,6 @@ and expr_to_pred_simple e =
   | EBinop (op, l, r)   -> PBinop (op, expr_to_pred_simple l, expr_to_pred_simple r)
   | EUnop (op, e)       -> PUnop (op, expr_to_pred_simple e)
   | _                   -> PVar { name = "__expr"; loc = e.expr_loc }
-
-(* Generate array bounds obligation *)
-let check_bounds arr_expr idx_expr loc ctx =
-  (* idx < arr.len *)
-  let idx_pred = expr_to_pred_simple idx_expr in
-  let len_pred = PApp (
-    { name = "len"; loc },
-    [expr_to_pred_simple arr_expr]
-  ) in
-  let pred = PBinop (Lt, idx_pred, len_pred) in
-  add_obligation pred (OBoundsCheck "array") loc ctx
-
-(* Check preconditions at a call site *)
-let check_preconditions fn_name reqs args params loc ctx =
-  (* Substitute actual arguments for formal parameters in each requires pred *)
-  let subst = List.combine (List.map fst params) (List.map expr_to_pred_simple args) in
-  List.iter (fun req ->
-    let pred = subst_pred subst req in
-    add_obligation pred (OPrecondition fn_name) loc ctx
-  ) reqs
 
 (* Substitute variables in a pred *)
 and subst_pred (subst : (string * pred) list) pred =
@@ -208,6 +184,26 @@ and subst_pred (subst : (string * pred) list) pred =
   | POld p            -> POld (subst_pred subst p)
   | PApp (f, args)    -> PApp (f, List.map (subst_pred subst) args)
   | _                 -> pred
+
+(* Generate division-by-zero obligation *)
+let check_division divisor fn_name loc ctx =
+  let pred = PBinop (Ne, expr_to_pred_simple divisor, PInt 0) in
+  add_obligation pred (OPrecondition fn_name) loc ctx
+
+(* Generate array bounds obligation *)
+let check_bounds arr_expr idx_expr loc ctx =
+  let idx_pred = expr_to_pred_simple idx_expr in
+  let len_pred = PApp ({ name = "len"; loc }, [expr_to_pred_simple arr_expr]) in
+  let pred = PBinop (Lt, idx_pred, len_pred) in
+  add_obligation pred (OBoundsCheck "array") loc ctx
+
+(* Check preconditions at a call site *)
+let check_preconditions fn_name reqs args params loc ctx =
+  let subst = List.combine (List.map fst params) (List.map expr_to_pred_simple args) in
+  List.iter (fun req ->
+    let pred = subst_pred subst req in
+    add_obligation pred (OPrecondition fn_name) loc ctx
+  ) reqs
 
 (* ------------------------------------------------------------------ *)
 (* Type checking expressions                                            *)
