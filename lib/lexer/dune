@@ -1,5 +1,6 @@
 (library
  (name lexer)
+ (wrapped false)
  (libraries ast))
 
 (ocamllex

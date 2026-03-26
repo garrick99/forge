@@ -1,3 +1,4 @@
 (library
  (name codegen)
+ (wrapped false)
  (libraries ast proof fmt))

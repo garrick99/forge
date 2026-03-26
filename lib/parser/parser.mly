@@ -108,26 +108,6 @@ open Parse_util
 %%
 
 (* ------------------------------------------------------------------ *)
-(* Helpers                                                              *)
-(* ------------------------------------------------------------------ *)
-
-(* Zero or more, separated by sep, no trailing sep *)
-%inline separated_list0(sep, X):
-  | { [] }
-  | x = X { [x] }
-  | x = X sep xs = separated_list0(sep, X) { x :: xs }
-
-(* One or more, separated by sep *)
-%inline separated_list1(sep, X):
-  | x = X { [x] }
-  | x = X sep xs = separated_list1(sep, X) { x :: xs }
-
-(* Optional — returns option *)
-%inline opt(X):
-  | { None }
-  | x = X { Some x }
-
-(* ------------------------------------------------------------------ *)
 (* Program                                                              *)
 (* ------------------------------------------------------------------ *)
 
@@ -152,7 +132,7 @@ item:
     { mk_item (IImpl i) $startpos }
   | e = extern_def
     { mk_item (IExtern e) $startpos }
-  | USE path = separated_list1(DCOLON, ident) SEMI
+  | USE path = separated_nonempty_list(DCOLON, ident) SEMI
     { mk_item (IUse path) $startpos }
 
 (* ------------------------------------------------------------------ *)
@@ -160,12 +140,12 @@ item:
 (* ------------------------------------------------------------------ *)
 
 fn_def:
-  | TASK? FN name = ident
-    LPAREN params = separated_list0(COMMA, param) RPAREN
-    ret = opt(preceded(ARROW, ty))
+  | FN name = ident
+    LPAREN params = separated_list(COMMA, param) RPAREN
+    ret = option(preceded(ARROW, ty))
     reqs  = list(requires_clause)
     enss  = list(ensures_clause)
-    dec   = opt(decreases_clause)
+    dec   = option(decreases_clause)
     body  = fn_body
     {
       let ret_ty = match ret with Some t -> t | None -> TPrim TUnit in
@@ -214,7 +194,7 @@ type_def:
 
 type_params:
   | { [] }
-  | LT ps = separated_list1(COMMA, ident) GT { ps }
+  | LT ps = separated_nonempty_list(COMMA, ident) GT { ps }
 
 (* ------------------------------------------------------------------ *)
 (* Struct definition                                                    *)
@@ -247,7 +227,7 @@ invariant_clause:
 
 kind_params:
   | { [] }
-  | LT ps = separated_list1(COMMA, kind_param) GT { ps }
+  | LT ps = separated_nonempty_list(COMMA, kind_param) GT { ps }
 
 kind_param:
   | name = ident                   { (name, KType) }
@@ -271,11 +251,11 @@ enum_def:
 enum_variant:
   | name = ident COMMA
     { (name, []) }
-  | name = ident LPAREN fields = separated_list1(COMMA, ty) RPAREN COMMA
+  | name = ident LPAREN fields = separated_nonempty_list(COMMA, ty) RPAREN COMMA
     { (name, fields) }
   | name = ident
     { (name, []) }
-  | name = ident LPAREN fields = separated_list1(COMMA, ty) RPAREN
+  | name = ident LPAREN fields = separated_nonempty_list(COMMA, ty) RPAREN
     { (name, fields) }
 
 (* ------------------------------------------------------------------ *)
@@ -297,9 +277,9 @@ impl_def:
 
 extern_def:
   | EXTERN FN name = ident
-    LPAREN params = separated_list0(COMMA, param) RPAREN
-    ret = opt(preceded(ARROW, ty))
-    link = opt(extern_link)
+    LPAREN params = separated_list(COMMA, param) RPAREN
+    ret = option(preceded(ARROW, ty))
+    link = option(extern_link)
     SEMI
     {
       let ret_ty = match ret with Some t -> t | None -> TPrim TUnit in
@@ -362,7 +342,7 @@ ty:
 
 type_args:
   | { [] }
-  | LT args = separated_list1(COMMA, ty) GT { args }
+  | LT args = separated_nonempty_list(COMMA, ty) GT { args }
 
 prim_ty_kw:
   | U8    { TUint U8  }  | U16   { TUint U16  }
@@ -432,7 +412,7 @@ pred:
   | TRUE              { PBool true }
   | FALSE             { PBool false }
   | n = INT           { PInt n }
-  | name = ident LPAREN args = separated_list0(COMMA, pred) RPAREN
+  | name = ident LPAREN args = separated_list(COMMA, pred) RPAREN
     { PApp (name, args) }
   | name = ident
     { PVar name }
@@ -485,7 +465,7 @@ expr:
     { mk_expr (EField (e, name)) $startpos }
   | e = expr LBRACKET idx = expr RBRACKET
     { mk_expr (EIndex (e, idx)) $startpos }
-  | f = expr LPAREN args = separated_list0(COMMA, expr) RPAREN
+  | f = expr LPAREN args = separated_list(COMMA, expr) RPAREN
     { mk_expr (ECall (f, args)) $startpos }
 
   (* or_return / or_fail *)
@@ -497,10 +477,6 @@ expr:
     { mk_expr (ECall (
         mk_expr (EVar (mk_ident "__or_fail__" $startpos)) $startpos,
         [e; alt])) $startpos }
-
-  (* Cast *)
-  | e = expr AS t = ty
-    { mk_expr (ECast (e, t)) $startpos }
 
   (* Block, control flow, proof, raw *)
   | e = block_expr    { e }
@@ -514,8 +490,6 @@ expr:
 
   (* Atomic expressions *)
   | e = atom_expr     { e }
-
-%inline AS: IDENT { (* handled as keyword in context *) }
 
 atom_expr:
   | n = INT
@@ -612,7 +586,7 @@ expr_no_block:
     { mk_expr (EField (e, name)) $startpos }
   | e = expr_no_block LBRACKET idx = expr_no_block RBRACKET
     { mk_expr (EIndex (e, idx)) $startpos }
-  | f = expr_no_block LPAREN args = separated_list0(COMMA, expr) RPAREN
+  | f = expr_no_block LPAREN args = separated_list(COMMA, expr) RPAREN
     { mk_expr (ECall (f, args)) $startpos }
   | e = assume_expr   { e }
   | e = return_expr   { e }
@@ -625,7 +599,7 @@ expr_no_block:
 if_expr:
   | IF cond = expr_no_block
     then_ = block_expr
-    else_ = opt(preceded(ELSE, else_branch))
+    else_ = option(preceded(ELSE, else_branch))
     { mk_expr (EIf (cond, then_, else_)) $startpos }
 
 else_branch:
@@ -639,11 +613,12 @@ match_expr:
     { mk_expr (EMatch (scrut, arms)) $startpos }
 
 match_arm:
-  | pat = pattern guard = opt(preceded(IF, pred)) FATARROW body = arm_body
+  | pat = pattern guard = option(preceded(IF, pred)) FATARROW body = arm_body
     { { pattern = pat; guard; body } }
 
 arm_body:
-  | e = block_expr COMMA? { e }
+  | e = block_expr COMMA { e }
+  | e = block_expr       { e }
   | e = expr_no_block COMMA { e }
   | e = expr_no_block       { e }
 
@@ -657,8 +632,8 @@ loop_expr:
           )) $startpos],
         None)) $startpos }
   | WHILE cond = expr_no_block
-    inv = opt(preceded(INVARIANT, pred))
-    dec = opt(preceded(DECREASES, pred))
+    inv = option(preceded(INVARIANT, pred))
+    dec = option(preceded(DECREASES, pred))
     body = block_expr
     {
       let stmts = match body.expr_desc with
@@ -670,7 +645,7 @@ loop_expr:
         None)) $startpos
     }
   | FOR name = ident IN iter = expr_no_block
-    dec = opt(preceded(DECREASES, pred))
+    dec = option(preceded(DECREASES, pred))
     body = block_expr
     {
       let stmts = match body.expr_desc with
@@ -683,7 +658,7 @@ loop_expr:
     }
 
 return_expr:
-  | RETURN e = opt(expr_no_block)
+  | RETURN e = option(expr_no_block)
     { mk_expr (EBlock (
         [mk_stmt (SReturn e) $startpos],
         None)) $startpos }
@@ -708,7 +683,7 @@ proof_contents:
 
 lemma_def:
   | LEMMA name = ident
-    LPAREN params = separated_list0(COMMA, param) RPAREN
+    LPAREN params = separated_list(COMMA, param) RPAREN
     COLON stmt = pred
     LBRACE pt = proof_term RBRACE
     {
@@ -722,7 +697,7 @@ lemma_def:
     }
 
 assume_in_proof:
-  | ASSUME LPAREN p = pred RPAREN ctx = opt(STRING) SEMI
+  | ASSUME LPAREN p = pred RPAREN ctx = option(STRING) SEMI
     {
       {
         as_pred    = p;
@@ -738,7 +713,7 @@ proof_term:
     { PTRefl }
   | WITNESS LPAREN e = expr RPAREN
     { PTWitness e }
-  | BY name = ident LPAREN args = separated_list0(COMMA, proof_term) RPAREN
+  | BY name = ident LPAREN args = separated_list(COMMA, proof_term) RPAREN
     { PTBy (name, args) }
   | LBRACE pts = list(proof_term) RBRACE
     { PTCong pts }
@@ -761,7 +736,7 @@ raw_expr:
 (* ------------------------------------------------------------------ *)
 
 assume_expr:
-  | ASSUME LPAREN p = pred RPAREN ctx = opt(STRING)
+  | ASSUME LPAREN p = pred RPAREN ctx = option(STRING)
     { mk_expr (EAssume (p, ctx)) $startpos }
 
 (* ------------------------------------------------------------------ *)
@@ -769,10 +744,10 @@ assume_expr:
 (* ------------------------------------------------------------------ *)
 
 stmt:
-  | LET lin = linearity name = ident ann = opt(preceded(COLON, ty))
+  | LET lin = linearity name = ident ann = option(preceded(COLON, ty))
     EQ e = expr SEMI
     { mk_stmt (SLet (name, ann, e, lin)) $startpos }
-  | LET name = ident ann = opt(preceded(COLON, ty))
+  | LET name = ident ann = option(preceded(COLON, ty))
     EQ e = expr SEMI
     { mk_stmt (SLet (name, ann, e, Unr)) $startpos }
   | e = expr SEMI
@@ -801,12 +776,12 @@ pattern:
     { PLit (LBool true) }
   | FALSE
     { PLit (LBool false) }
-  | name = ident LPAREN pats = separated_list0(COMMA, pattern) RPAREN
+  | name = ident LPAREN pats = separated_list(COMMA, pattern) RPAREN
     { PCtor (name, pats) }
   | pat = pattern IDENT (* "as" — handled as ident since 'as' is not reserved yet *)
     name = ident
     { PAs (pat, name) }
-  | LPAREN pats = separated_list0(COMMA, pattern) RPAREN
+  | LPAREN pats = separated_list(COMMA, pattern) RPAREN
     { PTuple pats }
 
 (* ------------------------------------------------------------------ *)
