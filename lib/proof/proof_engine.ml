@@ -143,6 +143,8 @@ module Z3Bridge = struct
 
   let check_valid ctx pred : z3_result =
     let query = build_query ctx pred in
+    (* Debug: print query *)
+    Printf.eprintf "[SMT query]\n%s\n[/SMT]\n%!" query;
     (* Write to temp file, call Z3, read result *)
     let tmp = Filename.temp_file "forge_smt" ".smt2" in
     let oc = open_out tmp in
