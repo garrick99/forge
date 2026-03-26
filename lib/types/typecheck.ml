@@ -425,11 +425,15 @@ and infer_expr env expr : ty =
       let cond_ty = check_expr env cond in
       if not (is_bool cond_ty) then
         fail expr.expr_loc "if condition must be bool";
-      let then_ty = check_expr env then_ in
+      let cond_pred = expr_to_pred_simple cond in
+      (* Add branch condition to proof context for each branch *)
+      let env_then = env_add_fact env cond_pred in
+      let env_else = env_add_fact env (PUnop (Not, cond_pred)) in
+      let then_ty = check_expr env_then then_ in
       (match else_ with
        | None -> TPrim TUnit
        | Some else_e ->
-           let else_ty = check_expr env else_e in
+           let else_ty = check_expr env_else else_e in
            if not (ty_eq (base_ty then_ty) (base_ty else_ty)) then
              fail expr.expr_loc "if branches must have same type";
            then_ty)
