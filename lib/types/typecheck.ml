@@ -183,6 +183,10 @@ let rec expr_to_pred_simple e =
 (* Substitute variables in a pred *)
 and subst_pred (subst : (string * pred) list) pred =
   match pred with
+  | PResult ->
+      (match List.assoc_opt "result" subst with
+       | Some p -> p
+       | None   -> pred)
   | PVar id ->
       (match List.assoc_opt id.name subst with
        | Some p -> p
