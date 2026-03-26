@@ -118,7 +118,7 @@ module Z3Bridge = struct
   (* Emit an SMT-LIB2 query to check validity of pred given ctx.
      Valid(P) iff Unsat(not P) under assumptions. *)
   let is_unsigned = function
-    | TPrim (TUint _) | TPrim (TUint USize) -> true
+    | TPrim (TUint _) -> true
     | TRefined (TUint _, _, _)               -> true
     | _                                      -> false
 
