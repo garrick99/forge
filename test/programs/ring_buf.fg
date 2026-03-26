@@ -4,9 +4,9 @@
 
 struct RingBuf {
     data:  own<[u64; 256]>,
-    head:  usize { n | n < 256 },
-    tail:  usize { n | n < 256 },
-    count: usize { n | n <= 256 },
+    head:  usize [n | n < 256 },
+    tail:  usize [n | n < 256 },
+    count: usize [n | n <= 256 },
 }
 
 // Push — caller must prove there is space.

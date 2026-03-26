@@ -305,7 +305,7 @@ ty:
   (* Primitive with optional refinement *)
   | b = prim_ty_kw
     { TPrim b }
-  | b = prim_ty_kw LBRACE binder = ident PIPE p = pred RBRACE
+  | b = prim_ty_kw LBRACKET binder = ident PIPE p = pred RBRACKET
     { TRefined (b, binder, p) }
 
   (* Ownership types *)

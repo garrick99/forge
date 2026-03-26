@@ -4,7 +4,7 @@
 // FORGE proves both postconditions: result divides a AND result divides b.
 // Not a unit test. A mathematical proof. Checked by Z3.
 
-fn gcd(a: u64, b: u64 { n | n > 0 }) -> u64
+fn gcd(a: u64, b: u64[n | n > 0]) -> u64
     requires a > 0
     requires b > 0
     ensures  a % result == 0
