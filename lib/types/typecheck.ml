@@ -579,6 +579,14 @@ let check_fn env fn =
   let env' = List.fold_left (fun e (id, ty) ->
     env_add_var e id.name ty Unr id.loc
   ) { env with current_fn = Some sig_ } fn.fn_params in
+  (* Extract refinement predicates from param types as known facts *)
+  let env' = List.fold_left (fun e (id, ty) ->
+    match ty with
+    | TRefined (_, binder, pred) ->
+        let fact = subst_pred [(binder.name, PVar { name = id.name; loc = id.loc })] pred in
+        env_add_fact e fact
+    | _ -> e
+  ) env' fn.fn_params in
   (* Add requires as known facts *)
   let env' = List.fold_left env_add_fact env' fn.fn_requires in
   (* Check body *)
