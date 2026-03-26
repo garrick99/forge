@@ -5,7 +5,6 @@
 open Ast
 open Parse_util
 open Lexing
-open Token
 %}
 
 (* ------------------------------------------------------------------ *)
