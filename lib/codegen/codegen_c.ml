@@ -218,7 +218,21 @@ let emit_fn fn =
        Buffer.add_string buf ";"  (* extern declaration *)
    | Some body ->
        Buffer.add_string buf " ";
-       Buffer.add_string buf (emit_expr 0 body));
+       (* Emit function body: trailing expression becomes return *)
+       (match body.expr_desc with
+        | EBlock (stmts, ret) ->
+            Buffer.add_string buf "{\n";
+            List.iter (fun s ->
+              Buffer.add_string buf (emit_stmt 1 s);
+              Buffer.add_char buf '\n'
+            ) stmts;
+            (match ret with
+             | Some e ->
+                 Buffer.add_string buf (Printf.sprintf "  return %s;\n" (emit_expr 1 e))
+             | None -> ());
+            Buffer.add_string buf "}"
+        | _ ->
+            Buffer.add_string buf (Printf.sprintf "{ return %s; }" (emit_expr 0 body))));
   Buffer.add_char buf '\n';
   Buffer.contents buf
 
