@@ -35,6 +35,7 @@ type obligation = {
   ob_kind:    obligation_kind;
   ob_loc:     loc;
   ob_ctx:     (string * ty) list;   (* variables in scope — name -> type *)
+  ob_assumes: pred list;            (* known-true facts at obligation site *)
   ob_status:  proof_status;
 }
 

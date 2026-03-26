@@ -152,11 +152,12 @@ let obligations : obligation list ref = ref []
 
 let add_obligation pred kind loc ctx =
   obligations := {
-    ob_pred   = pred;
-    ob_kind   = kind;
-    ob_loc    = loc;
-    ob_ctx    = ctx.proof_ctx.pc_vars;
-    ob_status = Pending;
+    ob_pred    = pred;
+    ob_kind    = kind;
+    ob_loc     = loc;
+    ob_ctx     = ctx.proof_ctx.pc_vars;
+    ob_assumes = ctx.proof_ctx.pc_assumes;
+    ob_status  = Pending;
   } :: !obligations
 
 (* Translate expression to pred for obligation generation — defined first,
@@ -657,7 +658,7 @@ let discharge_all (obs : obligation list) (prog_env : env) =
   List.iter (fun ob ->
     let ctx = { empty_ctx with
       pc_vars    = ob.ob_ctx;
-      pc_assumes = prog_env.proof_ctx.pc_assumes;
+      pc_assumes = ob.ob_assumes @ prog_env.proof_ctx.pc_assumes;
     } in
     match discharge ctx ob with
     | Proved Tier1_SMT ->
