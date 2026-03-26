@@ -14,6 +14,8 @@ let kw_table = Hashtbl.of_seq @@ List.to_seq [
   "impl",       IMPL;
   "use",        USE;
   "extern",     EXTERN;
+  "task",       TASK;
+  "chan",        CHAN;
   "let",        LET;
   "mut",        MUT;
   "return",     RETURN;
@@ -26,6 +28,8 @@ let kw_table = Hashtbl.of_seq @@ List.to_seq [
   "in",         IN;
   "break",      BREAK;
   "continue",   CONTINUE;
+  "or_return",  OR_RETURN;
+  "or_fail",    OR_FAIL;
   "requires",   REQUIRES;
   "ensures",    ENSURES;
   "decreases",  DECREASES;
@@ -35,36 +39,24 @@ let kw_table = Hashtbl.of_seq @@ List.to_seq [
   "lemma",      LEMMA;
   "witness",    WITNESS;
   "by",         BY;
+  "auto",       AUTO;
   "raw",        RAW;
   "forall",     FORALL;
   "exists",     EXISTS;
   "old",        OLD;
   "result",     RESULT;
-  "true",       TRUE;
-  "false",      FALSE;
-  "or_return",  OR_RETURN;
-  "or_fail",    OR_FAIL;
   "lin",        LIN;
   "aff",        AFF;
-  "task",       TASK;
-  "chan",        CHAN;
+  "true",       TRUE;
+  "false",      FALSE;
   "ref",        REF;
   "refmut",     REFMUT;
   "own",        OWN;
-  "u8",         U8;
-  "u16",        U16;
-  "u32",        U32;
-  "u64",        U64;
-  "u128",       U128;
-  "usize",      USIZE;
-  "i8",         I8;
-  "i16",        I16;
-  "i32",        I32;
-  "i64",        I64;
-  "i128",       I128;
-  "isize",      ISIZE;
-  "f32",        F32;
-  "f64",        F64;
+  "u8",         U8;   "u16", U16; "u32", U32; "u64", U64;
+  "u128",       U128; "usize", USIZE;
+  "i8",         I8;   "i16", I16; "i32", I32; "i64", I64;
+  "i128",       I128; "isize", ISIZE;
+  "f32",        F32;  "f64", F64;
   "bool",       BOOL_TY;
   "Never",      NEVER;
 ]
@@ -74,7 +66,7 @@ let ident_or_kw s =
   | Some tok -> tok
   | None     -> IDENT s
 
-let newline lexbuf =
+let advance_line lexbuf =
   let pos = lexbuf.lex_curr_p in
   lexbuf.lex_curr_p <- {
     pos with
@@ -84,102 +76,90 @@ let newline lexbuf =
 }
 
 let digit     = ['0'-'9']
-let hex_digit = ['0'-'9' 'a'-'f' 'A'-'F']
+let hex       = ['0'-'9' 'a'-'f' 'A'-'F']
 let alpha     = ['a'-'z' 'A'-'Z']
 let alnum     = alpha | digit | '_'
 let ident     = (alpha | '_') alnum*
 let ws        = [' ' '\t' '\r']
 let newline   = '\n' | "\r\n"
-let int_lit   = digit+ | "0x" hex_digit+
-let float_lit = digit+ '.' digit* | '.' digit+
+let int_lit   = digit+ | "0x" hex+
+let float_lit = digit+ '.' digit* (['e' 'E'] ['+' '-']? digit+)?
+              | digit+ ['e' 'E'] ['+' '-']? digit+
 
 rule token = parse
-  (* Whitespace and comments *)
-  | ws+       { token lexbuf }
-  | newline   { newline lexbuf; token lexbuf }
-  | "//" [^'\n']* { token lexbuf }   (* line comment *)
-  | "/*"      { block_comment 1 lexbuf }
+  | ws+     { token lexbuf }
+  | newline { advance_line lexbuf; token lexbuf }
+  | "//" [^'\n']* { token lexbuf }
+  | "/*"    { block_comment 1 lexbuf }
 
   (* Literals *)
   | int_lit as n   { INT (int_of_string n) }
   | float_lit as f { FLOAT (float_of_string f) }
-  | '"'            { string_lit (Buffer.create 64) lexbuf }
+  | '"'            { string_tok (Buffer.create 64) lexbuf }
 
-  (* Identifiers and keywords *)
+  (* Identifiers / keywords *)
   | ident as s { ident_or_kw s }
 
-  (* Two-character symbols — must come before single-char *)
-  | "::"  { DCOLON }
-  | ".."  { DOTDOT }
-  | "->"  { ARROW }
-  | "=>"  { FATARROW }
-  | "=="  { EQEQ }
-  | "!="  { NEQ }
-  | "<="  { LE }
-  | ">="  { GE }
-  | "<<"  { SHL }
-  | ">>"  { SHR }
-  | "&&"  { LAND }
-  | "||"  { LOR }
+  (* Three-character tokens *)
+  | "==>" { IMPLIES }
   | "<=>" { IFF }
-  | "+="  { PLUSEQ }
-  | "-="  { MINUSEQ }
-  | "*="  { STAREQ }
-  | "/="  { SLASHEQ }
 
-  (* Single-character symbols *)
-  | '('  { LPAREN }
-  | ')'  { RPAREN }
-  | '{'  { LBRACE }
-  | '}'  { RBRACE }
-  | '['  { LBRACKET }
-  | ']'  { RBRACKET }
-  | '<'  { LANGLE }
-  | '>'  { RANGLE }
-  | ','  { COMMA }
-  | ';'  { SEMI }
-  | ':'  { COLON }
-  | '.'  { DOT }
-  | '|'  { PIPE }
-  | '&'  { AMP }
-  | '*'  { STAR }
-  | '!'  { BANG }
-  | '?'  { QUESTION }
-  | '@'  { AT }
-  | '#'  { HASH }
-  | '_'  { UNDERSCORE }
-  | '='  { EQ }
-  | '+'  { PLUS }
-  | '-'  { MINUS }
-  | '/'  { SLASH }
-  | '%'  { PERCENT }
-  | '^'  { CARET }
-  | '~'  { TILDE }
+  (* Two-character tokens *)
+  | "::" { DCOLON }
+  | ".." { DOTDOT }
+  | "->" { ARROW }
+  | "=>" { FATARROW }
+  | "==" { EQEQ }
+  | "!=" { NEQ }
+  | "<=" { LE }
+  | ">=" { GE }
+  | "<<" { SHL }
+  | ">>" { SHR }
+  | "&&" { LAND }
+  | "||" { LOR }
+  | "+=" { PLUSEQ }
+  | "-=" { MINUSEQ }
+  | "*=" { STAREQ }
+  | "/=" { SLASHEQ }
 
-  | eof  { EOF }
+  (* Single-character tokens *)
+  | '(' { LPAREN }   | ')' { RPAREN }
+  | '{' { LBRACE }   | '}' { RBRACE }
+  | '[' { LBRACKET } | ']' { RBRACKET }
+  | '<' { LT }       | '>' { GT }
+  | ',' { COMMA }    | ';' { SEMI }
+  | ':' { COLON }    | '.' { DOT }
+  | '|' { PIPE }     | '&' { AMP }
+  | '*' { STAR }     | '!' { BANG }
+  | '+' { PLUS }     | '-' { MINUS }
+  | '/' { SLASH }    | '%' { PERCENT }
+  | '^' { CARET }    | '~' { TILDE }
+  | '=' { EQ }       | '@' { AT }
+  | '#' { HASH }     | '_' { UNDERSCORE }
 
+  | eof { EOF }
   | _ as c {
       raise (LexError (
-        Printf.sprintf "unexpected character '%c'" c,
+        Printf.sprintf "unexpected character '%c' (0x%02X)" c (Char.code c),
         lexbuf.lex_curr_p))
     }
 
 and block_comment depth = parse
-  | "/*"      { block_comment (depth + 1) lexbuf }
-  | "*/"      { if depth = 1 then token lexbuf
-                else block_comment (depth - 1) lexbuf }
-  | newline   { newline lexbuf; block_comment depth lexbuf }
-  | eof       { raise (LexError ("unterminated block comment",
-                                  lexbuf.lex_curr_p)) }
-  | _         { block_comment depth lexbuf }
+  | "/*"    { block_comment (depth + 1) lexbuf }
+  | "*/"    { if depth = 1 then token lexbuf
+              else block_comment (depth - 1) lexbuf }
+  | newline { advance_line lexbuf; block_comment depth lexbuf }
+  | eof     { raise (LexError ("unterminated block comment", lexbuf.lex_curr_p)) }
+  | _       { block_comment depth lexbuf }
 
-and string_lit buf = parse
+and string_tok buf = parse
   | '"'        { STRING (Buffer.contents buf) }
-  | '\\' 'n'  { Buffer.add_char buf '\n'; string_lit buf lexbuf }
-  | '\\' 't'  { Buffer.add_char buf '\t'; string_lit buf lexbuf }
-  | '\\' '"'  { Buffer.add_char buf '"';  string_lit buf lexbuf }
-  | '\\' '\\' { Buffer.add_char buf '\\'; string_lit buf lexbuf }
-  | newline    { newline lexbuf; Buffer.add_char buf '\n';
-                 string_lit buf lexbuf }
-  | eof        { raise (LexError ("unterminated string", lexbuf.lex_curr_p)) }
-  | _ as c    { Buffer.add_char buf c; string_lit buf lexbuf }
+  | '\\' 'n'  { Buffer.add_char buf '\n'; string_tok buf lexbuf }
+  | '\\' 't'  { Buffer.add_char buf '\t'; string_tok buf lexbuf }
+  | '\\' '"'  { Buffer.add_char buf '"';  string_tok buf lexbuf }
+  | '\\' '\\' { Buffer.add_char buf '\\'; string_tok buf lexbuf }
+  | '\\' 'r'  { Buffer.add_char buf '\r'; string_tok buf lexbuf }
+  | '\\' '0'  { Buffer.add_char buf '\000'; string_tok buf lexbuf }
+  | newline   { advance_line lexbuf; Buffer.add_char buf '\n'; string_tok buf lexbuf }
+  | eof       { raise (LexError ("unterminated string literal", lexbuf.lex_curr_p)) }
+  | _ as c   { Buffer.add_char buf c; string_tok buf lexbuf }

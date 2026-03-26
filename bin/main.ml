@@ -1,43 +1,182 @@
-(* FORGE compiler driver — forge-0 *)
+(* FORGE compiler driver
+   Pipeline: source -> lex -> parse -> typecheck -> prove -> erase -> emit C *)
+
+open Typecheck
+open Proof_engine
+open Codegen_c
+
+let version = "forge-0.1.0"
 
 let usage = {|
 FORGE compiler (forge-0)
 
 Usage:
-  forge build <file.fg>        compile and discharge all proofs
-  forge check <file.fg>        proof check only, no codegen
-  forge audit <binary>         dump assume log from compiled binary
-  forge version                print version
+  forge build <file.fg>      compile: prove all obligations, emit C
+  forge check <file.fg>      proof check only — no codegen
+  forge audit <file.c>       dump assume log from generated C
+  forge version              print version info
 |}
 
-let version = "forge-0.1.0"
+(* ------------------------------------------------------------------ *)
+(* Parse a source file                                                  *)
+(* ------------------------------------------------------------------ *)
 
-let compile_file path mode =
-  Printf.printf "[forge] reading %s\n%!" path;
-  (* TODO: wire up lexer -> parser -> type checker -> proof engine -> codegen *)
-  (* For forge-0 milestone: stub that proves the pipeline compiles *)
-  (match mode with
-   | `Build ->
-       Printf.printf "[forge] type checking...\n%!";
-       Printf.printf "[forge] discharging proof obligations (Tier 1: SMT)...\n%!";
-       Printf.printf "[forge] all obligations discharged\n%!";
-       Printf.printf "[forge] erasing proofs...\n%!";
-       Printf.printf "[forge] emitting C...\n%!";
-       let out_path = Filename.remove_extension path ^ ".c" in
-       Printf.printf "[forge] wrote %s\n%!" out_path
-   | `Check ->
-       Printf.printf "[forge] type checking...\n%!";
-       Printf.printf "[forge] discharging proof obligations...\n%!";
-       Printf.printf "[forge] all obligations discharged — no errors\n%!")
+let parse_file path =
+  let ic = open_in path in
+  let lexbuf = Lexing.from_channel ic in
+  Lexing.set_filename lexbuf path;
+  (try
+    let prog = Parser.program Lexer.token lexbuf in
+    close_in ic;
+    { prog with Ast.prog_file = path }
+  with
+  | Lexer.LexError (msg, pos) ->
+      close_in ic;
+      Printf.eprintf "%s:%d:%d: lex error: %s\n"
+        path pos.pos_lnum (pos.pos_cnum - pos.pos_bol) msg;
+      exit 1
+  | Parser.Error ->
+      close_in ic;
+      let pos = Lexing.lexeme_start_p lexbuf in
+      Printf.eprintf "%s:%d:%d: parse error near '%s'\n"
+        path pos.pos_lnum (pos.pos_cnum - pos.pos_bol)
+        (Lexing.lexeme lexbuf);
+      exit 1)
 
-let audit_binary path =
-  Printf.printf "[forge audit] reading assumption log from %s\n%!" path;
-  Printf.printf "[forge audit] TODO: read .forge_assumptions ELF section\n%!"
+(* ------------------------------------------------------------------ *)
+(* Compile pipeline                                                     *)
+(* ------------------------------------------------------------------ *)
+
+let compile path emit_code =
+  Printf.printf "[forge] %s\n%!" path;
+
+  (* 1. Parse *)
+  Printf.printf "[forge] parsing...\n%!";
+  let prog = parse_file path in
+  Printf.printf "[forge] parsed %d top-level items\n%!"
+    (List.length prog.Ast.prog_items);
+
+  (* 2. Type check + generate proof obligations *)
+  Printf.printf "[forge] type checking...\n%!";
+  let (tc_errors, obligations) = typecheck_program prog in
+
+  if tc_errors <> [] then begin
+    Printf.eprintf "[forge] type errors:\n";
+    List.iter (fun e ->
+      match e with
+      | TypeError (loc, msg) ->
+          Printf.eprintf "  %s:%d:%d: %s\n" loc.file loc.line loc.col msg
+      | LinearityError (loc, msg) ->
+          Printf.eprintf "  %s:%d:%d: linearity: %s\n" loc.file loc.line loc.col msg
+      | UnboundVar (loc, name) ->
+          Printf.eprintf "  %s:%d:%d: unbound variable '%s'\n"
+            loc.file loc.line loc.col name
+      | UnboundFn (loc, name) ->
+          Printf.eprintf "  %s:%d:%d: unbound function '%s'\n"
+            loc.file loc.line loc.col name
+      | ArityMismatch (loc, fn, exp, got) ->
+          Printf.eprintf "  %s:%d:%d: '%s' expects %d args, got %d\n"
+            loc.file loc.line loc.col fn exp got
+      | ProofError pe ->
+          Printf.eprintf "  %s\n" (format_error pe)
+    ) tc_errors;
+    exit 1
+  end;
+
+  Printf.printf "[forge] %d proof obligations generated\n%!"
+    (List.length obligations);
+
+  (* 3. Discharge proof obligations *)
+  Printf.printf "[forge] discharging proof obligations...\n%!";
+  let env = empty_env in
+  let summary = discharge_all obligations env in
+
+  Printf.printf "[forge] proof summary: %d total, %d SMT, %d guided, %d manual, %d failed\n%!"
+    summary.ds_total summary.ds_tier1 summary.ds_tier2 summary.ds_tier3 summary.ds_failed;
+
+  if summary.ds_failed > 0 then begin
+    Printf.eprintf "[forge] %d proof obligation(s) could not be discharged\n"
+      summary.ds_failed;
+    Printf.eprintf "[forge] compilation stopped — fix proof failures before proceeding\n";
+    exit 1
+  end;
+
+  Printf.printf "[forge] all obligations discharged\n%!";
+
+  if not emit_code then begin
+    Printf.printf "[forge] check complete — no errors\n%!";
+    ()
+  end else begin
+    (* 4. Erase proofs and emit C *)
+    Printf.printf "[forge] erasing proofs...\n%!";
+    Printf.printf "[forge] emitting C...\n%!";
+    let c_code = emit_program prog in
+    let out_path = Filename.remove_extension path ^ ".c" in
+    let oc = open_out out_path in
+    output_string oc c_code;
+    close_out oc;
+    Printf.printf "[forge] wrote %s\n%!" out_path;
+
+    (* 5. Report assume audit *)
+    let assumes = dump_assume_log () in
+    if assumes = [] then
+      Printf.printf "[forge] assume audit: 0 assumptions (clean)\n%!"
+    else begin
+      Printf.printf "[forge] assume audit: %d assumption(s) — run 'forge audit %s' for details\n%!"
+        (List.length assumes) out_path
+    end
+  end
+
+(* ------------------------------------------------------------------ *)
+(* Audit subcommand                                                     *)
+(* ------------------------------------------------------------------ *)
+
+let audit path =
+  (* Read the .forge_assumptions section from the generated C file
+     (embedded as a comment block by the codegen) *)
+  Printf.printf "[forge audit] %s\n%!" path;
+  let ic = open_in path in
+  let found = ref false in
+  (try
+    while true do
+      let line = input_line ic in
+      if String.length line > 20 &&
+         String.sub line 0 22 = "/* ---- FORGE ASSUMPTI" then begin
+        found := true;
+        print_endline line;
+        (try
+          while true do
+            let l = input_line ic in
+            print_endline l;
+            if String.length l > 18 &&
+               String.sub l 0 19 = "   ---- END AUDIT L" then
+              raise Exit
+          done
+        with Exit | End_of_file -> ())
+      end
+    done
+  with End_of_file -> ());
+  close_in ic;
+  if not !found then
+    Printf.printf "[forge audit] no assumption log found in %s\n\
+                   (file may not be FORGE-generated or has 0 assumptions)\n%!" path
+
+(* ------------------------------------------------------------------ *)
+(* Entry point                                                          *)
+(* ------------------------------------------------------------------ *)
 
 let () =
   match Array.to_list Sys.argv |> List.tl with
-  | ["version"]        -> print_endline version
-  | ["build"; path]    -> compile_file path `Build
-  | ["check"; path]    -> compile_file path `Check
-  | ["audit"; path]    -> audit_binary path
-  | _                  -> print_string usage
+  | ["version"]      ->
+      Printf.printf "forge %s\n" version;
+      Printf.printf "  Calculus of Constructions proof kernel\n";
+      Printf.printf "  Z3 SMT backend (Tier 1 automatic)\n";
+      Printf.printf "  Target: C99\n"
+  | ["build"; path]  -> compile path true
+  | ["check"; path]  -> compile path false
+  | ["audit"; path]  -> audit path
+  | []               -> print_string usage
+  | args             ->
+      Printf.eprintf "unknown command: %s\n" (String.concat " " args);
+      print_string usage;
+      exit 1

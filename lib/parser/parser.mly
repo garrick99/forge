@@ -1,0 +1,823 @@
+%{
+(* FORGE Parser — Menhir LR(1) grammar
+   Full grammar: types, expressions, statements, proof blocks, contracts *)
+
+open Ast
+open Parse_util
+%}
+
+(* ------------------------------------------------------------------ *)
+(* Token declarations                                                   *)
+(* ------------------------------------------------------------------ *)
+
+%token <int>    INT
+%token <float>  FLOAT
+%token <string> STRING
+%token <string> IDENT
+
+(* Declaration keywords *)
+%token FN TYPE STRUCT ENUM IMPL USE EXTERN TASK CHAN
+
+(* Control flow *)
+%token LET MUT RETURN IF ELSE MATCH FOR WHILE LOOP IN BREAK CONTINUE
+%token OR_RETURN OR_FAIL
+
+(* Proof keywords *)
+%token REQUIRES ENSURES DECREASES INVARIANT
+%token PROOF ASSUME LEMMA WITNESS BY AUTO
+%token RAW FORALL EXISTS OLD RESULT
+
+(* Linearity *)
+%token LIN AFF
+
+(* Literals *)
+%token TRUE FALSE
+
+(* Ownership type keywords *)
+%token REF REFMUT OWN RAW_TY
+
+(* Primitive types *)
+%token U8 U16 U32 U64 U128 USIZE
+%token I8 I16 I32 I64 I128 ISIZE
+%token F32 F64
+%token BOOL_TY NEVER
+
+(* Grouping *)
+%token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET
+
+(* Punctuation *)
+%token COMMA SEMI COLON DCOLON DOT DOTDOT
+%token PIPE AT HASH UNDERSCORE
+%token ARROW FATARROW
+
+(* Comparison *)
+%token LT LE GT GE EQEQ NEQ
+
+(* Assignment *)
+%token EQ PLUSEQ MINUSEQ STAREQ SLASHEQ
+
+(* Arithmetic / bitwise *)
+%token PLUS MINUS STAR SLASH PERCENT
+%token AMP CARET TILDE SHL SHR
+
+(* Logical *)
+%token BANG LAND LOR IMPLIES IFF
+
+%token EOF
+
+(* ------------------------------------------------------------------ *)
+(* Operator precedence — lowest to highest                             *)
+(* ------------------------------------------------------------------ *)
+
+(* Predicate-level logical operators *)
+%right IFF
+%right IMPLIES
+%left  LOR
+%left  LAND
+
+(* Comparison *)
+%left  EQEQ NEQ
+%left  LT LE GT GE
+
+(* Bitwise *)
+%left  PIPE
+%left  CARET
+%left  AMP
+%left  SHL SHR
+
+(* Arithmetic *)
+%left  PLUS MINUS
+%left  STAR SLASH PERCENT
+
+(* Unary — highest *)
+%nonassoc UMINUS UBANG UTILDE UDEREF UREF
+
+(* Postfix — field access, indexing, call *)
+%left  DOT LBRACKET LPAREN
+
+(* ------------------------------------------------------------------ *)
+(* Start symbol                                                         *)
+(* ------------------------------------------------------------------ *)
+
+%start <Ast.program> program
+%type  <Ast.item>    item
+%type  <Ast.expr>    expr
+%type  <Ast.ty>      ty
+%type  <Ast.pred>    pred
+
+%%
+
+(* ------------------------------------------------------------------ *)
+(* Helpers                                                              *)
+(* ------------------------------------------------------------------ *)
+
+(* Zero or more, separated by sep, no trailing sep *)
+%inline separated_list0(sep, X):
+  | { [] }
+  | x = X { [x] }
+  | x = X sep xs = separated_list0(sep, X) { x :: xs }
+
+(* One or more, separated by sep *)
+%inline separated_list1(sep, X):
+  | x = X { [x] }
+  | x = X sep xs = separated_list1(sep, X) { x :: xs }
+
+(* Optional — returns option *)
+%inline opt(X):
+  | { None }
+  | x = X { Some x }
+
+(* ------------------------------------------------------------------ *)
+(* Program                                                              *)
+(* ------------------------------------------------------------------ *)
+
+program:
+  | items = list(item) EOF
+    { { prog_items = items; prog_file = $startpos.pos_fname } }
+
+(* ------------------------------------------------------------------ *)
+(* Top-level items                                                      *)
+(* ------------------------------------------------------------------ *)
+
+item:
+  | f = fn_def
+    { mk_item (IFn f) $startpos }
+  | t = type_def
+    { mk_item (IType t) $startpos }
+  | s = struct_def
+    { mk_item (IStruct s) $startpos }
+  | e = enum_def
+    { mk_item (IEnum e) $startpos }
+  | i = impl_def
+    { mk_item (IImpl i) $startpos }
+  | e = extern_def
+    { mk_item (IExtern e) $startpos }
+  | USE path = separated_list1(DCOLON, ident) SEMI
+    { mk_item (IUse path) $startpos }
+
+(* ------------------------------------------------------------------ *)
+(* Function definition                                                  *)
+(* ------------------------------------------------------------------ *)
+
+fn_def:
+  | TASK? FN name = ident
+    LPAREN params = separated_list0(COMMA, param) RPAREN
+    ret = opt(preceded(ARROW, ty))
+    reqs  = list(requires_clause)
+    enss  = list(ensures_clause)
+    dec   = opt(decreases_clause)
+    body  = fn_body
+    {
+      let ret_ty = match ret with Some t -> t | None -> TPrim TUnit in
+      {
+        fn_name     = name;
+        fn_params   = params;
+        fn_ret      = ret_ty;
+        fn_requires = reqs;
+        fn_ensures  = enss;
+        fn_decreases = dec;
+        fn_body     = body;
+        fn_attrs    = [];
+      }
+    }
+
+param:
+  | name = ident COLON t = ty
+    { (name, t) }
+
+requires_clause:
+  | REQUIRES p = pred { p }
+
+ensures_clause:
+  | ENSURES p = pred { p }
+
+decreases_clause:
+  | DECREASES p = pred { p }
+
+fn_body:
+  | SEMI         { None }
+  | e = block_expr { Some e }
+
+(* ------------------------------------------------------------------ *)
+(* Type definition                                                      *)
+(* ------------------------------------------------------------------ *)
+
+type_def:
+  | TYPE name = ident params = type_params EQ t = ty SEMI
+    {
+      {
+        td_name   = name;
+        td_params = params;
+        td_ty     = t;
+      }
+    }
+
+type_params:
+  | { [] }
+  | LT ps = separated_list1(COMMA, ident) GT { ps }
+
+(* ------------------------------------------------------------------ *)
+(* Struct definition                                                    *)
+(* ------------------------------------------------------------------ *)
+
+struct_def:
+  | STRUCT name = ident params = kind_params
+    LBRACE
+      fields = list(struct_field)
+      invars = list(invariant_clause)
+    RBRACE
+    {
+      {
+        sd_name   = name;
+        sd_params = params;
+        sd_fields = fields;
+        sd_invars = invars;
+      }
+    }
+
+struct_field:
+  | name = ident COLON t = ty COMMA
+    { (name, t) }
+  | name = ident COLON t = ty
+    { (name, t) }
+
+invariant_clause:
+  | INVARIANT p = pred SEMI { p }
+  | INVARIANT p = pred      { p }
+
+kind_params:
+  | { [] }
+  | LT ps = separated_list1(COMMA, kind_param) GT { ps }
+
+kind_param:
+  | name = ident                   { (name, KType) }
+  | name = ident COLON USIZE       { (name, KNat) }
+
+(* ------------------------------------------------------------------ *)
+(* Enum definition                                                      *)
+(* ------------------------------------------------------------------ *)
+
+enum_def:
+  | ENUM name = ident params = kind_params
+    LBRACE variants = list(enum_variant) RBRACE
+    {
+      {
+        ed_name     = name;
+        ed_params   = params;
+        ed_variants = variants;
+      }
+    }
+
+enum_variant:
+  | name = ident COMMA
+    { (name, []) }
+  | name = ident LPAREN fields = separated_list1(COMMA, ty) RPAREN COMMA
+    { (name, fields) }
+  | name = ident
+    { (name, []) }
+  | name = ident LPAREN fields = separated_list1(COMMA, ty) RPAREN
+    { (name, fields) }
+
+(* ------------------------------------------------------------------ *)
+(* Impl block                                                           *)
+(* ------------------------------------------------------------------ *)
+
+impl_def:
+  | IMPL t = ty LBRACE items = list(item) RBRACE
+    {
+      {
+        im_ty    = t;
+        im_items = items;
+      }
+    }
+
+(* ------------------------------------------------------------------ *)
+(* Extern declaration                                                   *)
+(* ------------------------------------------------------------------ *)
+
+extern_def:
+  | EXTERN FN name = ident
+    LPAREN params = separated_list0(COMMA, param) RPAREN
+    ret = opt(preceded(ARROW, ty))
+    link = opt(extern_link)
+    SEMI
+    {
+      let ret_ty = match ret with Some t -> t | None -> TPrim TUnit in
+      let link_name = match link with Some s -> s | None -> name.name in
+      let fn_ty = TFn (mk_fn_ty params ret_ty [] []) in
+      {
+        ex_name = name;
+        ex_ty   = fn_ty;
+        ex_link = link_name;
+      }
+    }
+
+extern_link:
+  | EQ s = STRING { s }
+
+(* ------------------------------------------------------------------ *)
+(* Types                                                                *)
+(* ------------------------------------------------------------------ *)
+
+ty:
+  (* Primitive with optional refinement *)
+  | b = prim_ty_kw
+    { TPrim b }
+  | b = prim_ty_kw LBRACE binder = ident PIPE p = pred RBRACE
+    { TRefined (b, binder, p) }
+
+  (* Ownership types *)
+  | REF LT t = ty GT
+    { TRef t }
+  | REFMUT LT t = ty GT
+    { TRefMut t }
+  | OWN LT t = ty GT
+    { TOwn t }
+  | RAW_TY LT t = ty GT
+    { TRaw t }
+
+  (* Array and slice *)
+  | LBRACKET t = ty RBRACKET
+    { TSlice t }
+  | LBRACKET t = ty SEMI n = expr RBRACKET
+    { TArray (t, Some n) }
+
+  (* Unit and never *)
+  | LPAREN RPAREN
+    { TPrim TUnit }
+  | NEVER
+    { TPrim TNever }
+
+  (* Named type with optional generic args *)
+  | name = ident args = type_args
+    {
+      match args with
+      | [] -> TNamed (name, [])
+      | _  -> TNamed (name, args)
+    }
+
+  (* Parenthesized type *)
+  | LPAREN t = ty RPAREN
+    { t }
+
+type_args:
+  | { [] }
+  | LT args = separated_list1(COMMA, ty) GT { args }
+
+prim_ty_kw:
+  | U8    { TUint U8  }  | U16   { TUint U16  }
+  | U32   { TUint U32 }  | U64   { TUint U64  }
+  | U128  { TUint U128 } | USIZE { TUint USize }
+  | I8    { TInt I8   }  | I16   { TInt I16   }
+  | I32   { TInt I32  }  | I64   { TInt I64   }
+  | I128  { TInt I128 }  | ISIZE { TInt ISize }
+  | F32   { TFloat F32 } | F64   { TFloat F64 }
+  | BOOL_TY { TBool }
+
+(* ------------------------------------------------------------------ *)
+(* Predicates (logical assertions)                                      *)
+(* Used in requires/ensures/invariant/refinements/assume                *)
+(* ------------------------------------------------------------------ *)
+
+pred:
+  (* Logical connectives — lowest precedence *)
+  | l = pred IFF r = pred
+    { PBinop (Iff, l, r) }
+  | l = pred IMPLIES r = pred
+    { PBinop (Implies, l, r) }
+  | l = pred LOR r = pred
+    { PBinop (Or, l, r) }
+  | l = pred LAND r = pred
+    { PBinop (And, l, r) }
+
+  (* Comparison *)
+  | l = pred EQEQ r = pred  { PBinop (Eq,  l, r) }
+  | l = pred NEQ  r = pred  { PBinop (Ne,  l, r) }
+  | l = pred LT   r = pred  { PBinop (Lt,  l, r) }
+  | l = pred LE   r = pred  { PBinop (Le,  l, r) }
+  | l = pred GT   r = pred  { PBinop (Gt,  l, r) }
+  | l = pred GE   r = pred  { PBinop (Ge,  l, r) }
+
+  (* Arithmetic *)
+  | l = pred PLUS    r = pred { PBinop (Add, l, r) }
+  | l = pred MINUS   r = pred { PBinop (Sub, l, r) }
+  | l = pred STAR    r = pred { PBinop (Mul, l, r) }
+  | l = pred SLASH   r = pred { PBinop (Div, l, r) }
+  | l = pred PERCENT r = pred { PBinop (Mod, l, r) }
+
+  (* Bitwise *)
+  | l = pred PIPE    r = pred { PBinop (BitOr,  l, r) }
+  | l = pred AMP     r = pred { PBinop (BitAnd, l, r) }
+  | l = pred CARET   r = pred { PBinop (BitXor, l, r) }
+  | l = pred SHL     r = pred { PBinop (Shl,    l, r) }
+  | l = pred SHR     r = pred { PBinop (Shr,    l, r) }
+
+  (* Unary *)
+  | BANG p = pred  { PUnop (Not, p) }
+  | MINUS p = pred { PUnop (Neg, p) }
+
+  (* Quantifiers *)
+  | FORALL name = ident COLON t = ty COMMA p = pred
+    { PForall (name, t, p) }
+  | EXISTS name = ident COLON t = ty COMMA p = pred
+    { PExists (name, t, p) }
+
+  (* Special pred atoms *)
+  | OLD LPAREN p = pred RPAREN
+    { POld p }
+  | RESULT
+    { PResult }
+
+  (* Atoms *)
+  | TRUE              { PBool true }
+  | FALSE             { PBool false }
+  | n = INT           { PInt n }
+  | name = ident LPAREN args = separated_list0(COMMA, pred) RPAREN
+    { PApp (name, args) }
+  | name = ident
+    { PVar name }
+  | LPAREN p = pred RPAREN
+    { p }
+
+(* ------------------------------------------------------------------ *)
+(* Expressions                                                          *)
+(* ------------------------------------------------------------------ *)
+
+expr:
+  (* Binary operators — in precedence order via %left/%right above *)
+  | l = expr IFF     r = expr  { mk_expr (EBinop (Iff,     l, r)) $startpos }
+  | l = expr IMPLIES r = expr  { mk_expr (EBinop (Implies, l, r)) $startpos }
+  | l = expr LOR     r = expr  { mk_expr (EBinop (Or,      l, r)) $startpos }
+  | l = expr LAND    r = expr  { mk_expr (EBinop (And,     l, r)) $startpos }
+  | l = expr EQEQ    r = expr  { mk_expr (EBinop (Eq,      l, r)) $startpos }
+  | l = expr NEQ     r = expr  { mk_expr (EBinop (Ne,      l, r)) $startpos }
+  | l = expr LT      r = expr  { mk_expr (EBinop (Lt,      l, r)) $startpos }
+  | l = expr LE      r = expr  { mk_expr (EBinop (Le,      l, r)) $startpos }
+  | l = expr GT      r = expr  { mk_expr (EBinop (Gt,      l, r)) $startpos }
+  | l = expr GE      r = expr  { mk_expr (EBinop (Ge,      l, r)) $startpos }
+  | l = expr PIPE    r = expr  { mk_expr (EBinop (BitOr,   l, r)) $startpos }
+  | l = expr CARET   r = expr  { mk_expr (EBinop (BitXor,  l, r)) $startpos }
+  | l = expr AMP     r = expr  { mk_expr (EBinop (BitAnd,  l, r)) $startpos }
+  | l = expr SHL     r = expr  { mk_expr (EBinop (Shl,     l, r)) $startpos }
+  | l = expr SHR     r = expr  { mk_expr (EBinop (Shr,     l, r)) $startpos }
+  | l = expr PLUS    r = expr  { mk_expr (EBinop (Add,     l, r)) $startpos }
+  | l = expr MINUS   r = expr  { mk_expr (EBinop (Sub,     l, r)) $startpos }
+  | l = expr STAR    r = expr  { mk_expr (EBinop (Mul,     l, r)) $startpos }
+  | l = expr SLASH   r = expr  { mk_expr (EBinop (Div,     l, r)) $startpos }
+  | l = expr PERCENT r = expr  { mk_expr (EBinop (Mod,     l, r)) $startpos }
+
+  (* Assignment *)
+  | l = expr EQ      r = expr  { mk_expr (EAssign (l, r))                            $startpos }
+  | l = expr PLUSEQ  r = expr  { desugar_aug_assign l Add r $startpos }
+  | l = expr MINUSEQ r = expr  { desugar_aug_assign l Sub r $startpos }
+  | l = expr STAREQ  r = expr  { desugar_aug_assign l Mul r $startpos }
+  | l = expr SLASHEQ r = expr  { desugar_aug_assign l Div r $startpos }
+
+  (* Unary *)
+  | MINUS e = expr %prec UMINUS  { mk_expr (EUnop (Neg,    e)) $startpos }
+  | BANG  e = expr %prec UBANG   { mk_expr (EUnop (Not,    e)) $startpos }
+  | TILDE e = expr %prec UTILDE  { mk_expr (EUnop (BitNot, e)) $startpos }
+  | STAR  e = expr %prec UDEREF  { mk_expr (EDeref e)          $startpos }
+  | AMP   e = expr %prec UREF    { mk_expr (ERef e)             $startpos }
+
+  (* Postfix: field, index, call *)
+  | e = expr DOT name = ident
+    { mk_expr (EField (e, name)) $startpos }
+  | e = expr LBRACKET idx = expr RBRACKET
+    { mk_expr (EIndex (e, idx)) $startpos }
+  | f = expr LPAREN args = separated_list0(COMMA, expr) RPAREN
+    { mk_expr (ECall (f, args)) $startpos }
+
+  (* or_return / or_fail *)
+  | e = expr OR_RETURN alt = expr
+    { mk_expr (ECall (
+        mk_expr (EVar (mk_ident "__or_return__" $startpos)) $startpos,
+        [e; alt])) $startpos }
+  | e = expr OR_FAIL alt = expr
+    { mk_expr (ECall (
+        mk_expr (EVar (mk_ident "__or_fail__" $startpos)) $startpos,
+        [e; alt])) $startpos }
+
+  (* Cast *)
+  | e = expr AS t = ty
+    { mk_expr (ECast (e, t)) $startpos }
+
+  (* Block, control flow, proof, raw *)
+  | e = block_expr    { e }
+  | e = if_expr       { e }
+  | e = match_expr    { e }
+  | e = loop_expr     { e }
+  | e = proof_expr    { e }
+  | e = raw_expr      { e }
+  | e = assume_expr   { e }
+  | e = return_expr   { e }
+
+  (* Atomic expressions *)
+  | e = atom_expr     { e }
+
+%inline AS: IDENT { (* handled as keyword in context *) }
+
+atom_expr:
+  | n = INT
+    { mk_expr (ELit (LInt (n, None))) $startpos }
+  | f = FLOAT
+    { mk_expr (ELit (LFloat (f, None))) $startpos }
+  | s = STRING
+    { mk_expr (ELit (LStr s)) $startpos }
+  | TRUE
+    { mk_expr (ELit (LBool true)) $startpos }
+  | FALSE
+    { mk_expr (ELit (LBool false)) $startpos }
+  | LPAREN RPAREN
+    { mk_expr (ELit LUnit) $startpos }
+  | name = ident
+    { mk_expr (EVar name) $startpos }
+  | LPAREN e = expr RPAREN
+    { e }
+
+(* ------------------------------------------------------------------ *)
+(* Block expression: { stmt* expr? }                                    *)
+(* ------------------------------------------------------------------ *)
+
+block_expr:
+  | LBRACE stmts = block_stmts RBRACE
+    {
+      let (ss, ret) = stmts in
+      mk_expr (EBlock (ss, ret)) $startpos
+    }
+
+(* A block's body is a list of stmts optionally ending in an expr *)
+block_stmts:
+  | (* empty *)
+    { ([], None) }
+  | e = expr_no_block
+    { ([], Some e) }
+  | s = stmt rest = block_stmts
+    { let (ss, ret) = rest in (s :: ss, ret) }
+  | e = block_or_control_expr rest = block_stmts_after_block
+    { let (ss, ret) = rest in
+      match ss, ret with
+      | [], None -> ([], Some e)
+      | _        -> ([mk_stmt (SExpr e) $startpos] @ ss, ret) }
+
+block_stmts_after_block:
+  | { ([], None) }
+  | e = expr_no_block
+    { ([], Some e) }
+  | s = stmt rest = block_stmts
+    { let (ss, ret) = rest in (s :: ss, ret) }
+
+(* Expressions that can appear in statement position without ambiguity *)
+block_or_control_expr:
+  | e = block_expr  { e }
+  | e = if_expr     { e }
+  | e = match_expr  { e }
+  | e = loop_expr   { e }
+  | e = proof_expr  { e }
+  | e = raw_expr    { e }
+
+(* Non-block expressions — used as final expr in blocks and as stmt values *)
+expr_no_block:
+  | l = expr_no_block IFF     r = expr_no_block  { mk_expr (EBinop (Iff,     l, r)) $startpos }
+  | l = expr_no_block IMPLIES r = expr_no_block  { mk_expr (EBinop (Implies, l, r)) $startpos }
+  | l = expr_no_block LOR     r = expr_no_block  { mk_expr (EBinop (Or,      l, r)) $startpos }
+  | l = expr_no_block LAND    r = expr_no_block  { mk_expr (EBinop (And,     l, r)) $startpos }
+  | l = expr_no_block EQEQ    r = expr_no_block  { mk_expr (EBinop (Eq,      l, r)) $startpos }
+  | l = expr_no_block NEQ     r = expr_no_block  { mk_expr (EBinop (Ne,      l, r)) $startpos }
+  | l = expr_no_block LT      r = expr_no_block  { mk_expr (EBinop (Lt,      l, r)) $startpos }
+  | l = expr_no_block LE      r = expr_no_block  { mk_expr (EBinop (Le,      l, r)) $startpos }
+  | l = expr_no_block GT      r = expr_no_block  { mk_expr (EBinop (Gt,      l, r)) $startpos }
+  | l = expr_no_block GE      r = expr_no_block  { mk_expr (EBinop (Ge,      l, r)) $startpos }
+  | l = expr_no_block PIPE    r = expr_no_block  { mk_expr (EBinop (BitOr,   l, r)) $startpos }
+  | l = expr_no_block CARET   r = expr_no_block  { mk_expr (EBinop (BitXor,  l, r)) $startpos }
+  | l = expr_no_block AMP     r = expr_no_block  { mk_expr (EBinop (BitAnd,  l, r)) $startpos }
+  | l = expr_no_block SHL     r = expr_no_block  { mk_expr (EBinop (Shl,     l, r)) $startpos }
+  | l = expr_no_block SHR     r = expr_no_block  { mk_expr (EBinop (Shr,     l, r)) $startpos }
+  | l = expr_no_block PLUS    r = expr_no_block  { mk_expr (EBinop (Add,     l, r)) $startpos }
+  | l = expr_no_block MINUS   r = expr_no_block  { mk_expr (EBinop (Sub,     l, r)) $startpos }
+  | l = expr_no_block STAR    r = expr_no_block  { mk_expr (EBinop (Mul,     l, r)) $startpos }
+  | l = expr_no_block SLASH   r = expr_no_block  { mk_expr (EBinop (Div,     l, r)) $startpos }
+  | l = expr_no_block PERCENT r = expr_no_block  { mk_expr (EBinop (Mod,     l, r)) $startpos }
+  | l = expr_no_block EQ      r = expr_no_block  { mk_expr (EAssign (l, r))          $startpos }
+  | l = expr_no_block PLUSEQ  r = expr_no_block  { desugar_aug_assign l Add r $startpos }
+  | l = expr_no_block MINUSEQ r = expr_no_block  { desugar_aug_assign l Sub r $startpos }
+  | l = expr_no_block STAREQ  r = expr_no_block  { desugar_aug_assign l Mul r $startpos }
+  | l = expr_no_block SLASHEQ r = expr_no_block  { desugar_aug_assign l Div r $startpos }
+  | MINUS e = expr_no_block %prec UMINUS  { mk_expr (EUnop (Neg,    e)) $startpos }
+  | BANG  e = expr_no_block %prec UBANG   { mk_expr (EUnop (Not,    e)) $startpos }
+  | TILDE e = expr_no_block %prec UTILDE  { mk_expr (EUnop (BitNot, e)) $startpos }
+  | STAR  e = expr_no_block %prec UDEREF  { mk_expr (EDeref e)          $startpos }
+  | AMP   e = expr_no_block %prec UREF    { mk_expr (ERef   e)          $startpos }
+  | e = expr_no_block DOT name = ident
+    { mk_expr (EField (e, name)) $startpos }
+  | e = expr_no_block LBRACKET idx = expr_no_block RBRACKET
+    { mk_expr (EIndex (e, idx)) $startpos }
+  | f = expr_no_block LPAREN args = separated_list0(COMMA, expr) RPAREN
+    { mk_expr (ECall (f, args)) $startpos }
+  | e = assume_expr   { e }
+  | e = return_expr   { e }
+  | e = atom_expr     { e }
+
+(* ------------------------------------------------------------------ *)
+(* Control flow expressions                                             *)
+(* ------------------------------------------------------------------ *)
+
+if_expr:
+  | IF cond = expr_no_block
+    then_ = block_expr
+    else_ = opt(preceded(ELSE, else_branch))
+    { mk_expr (EIf (cond, then_, else_)) $startpos }
+
+else_branch:
+  | e = block_expr { e }
+  | e = if_expr    { e }
+
+match_expr:
+  | MATCH scrut = expr_no_block LBRACE
+      arms = list(match_arm)
+    RBRACE
+    { mk_expr (EMatch (scrut, arms)) $startpos }
+
+match_arm:
+  | pat = pattern guard = opt(preceded(IF, pred)) FATARROW body = arm_body
+    { { pattern = pat; guard; body } }
+
+arm_body:
+  | e = block_expr COMMA? { e }
+  | e = expr_no_block COMMA { e }
+  | e = expr_no_block       { e }
+
+loop_expr:
+  | LOOP body = block_expr
+    { mk_expr (EBlock (
+        [mk_stmt (SWhile (
+            mk_expr (ELit (LBool true)) $startpos,
+            None, None,
+            [mk_stmt (SExpr body) $startpos]
+          )) $startpos],
+        None)) $startpos }
+  | WHILE cond = expr_no_block
+    inv = opt(preceded(INVARIANT, pred))
+    dec = opt(preceded(DECREASES, pred))
+    body = block_expr
+    {
+      let stmts = match body.expr_desc with
+        | EBlock (ss, _) -> ss
+        | _ -> [mk_stmt (SExpr body) $startpos]
+      in
+      mk_expr (EBlock (
+        [mk_stmt (SWhile (cond, inv, dec, stmts)) $startpos],
+        None)) $startpos
+    }
+  | FOR name = ident IN iter = expr_no_block
+    dec = opt(preceded(DECREASES, pred))
+    body = block_expr
+    {
+      let stmts = match body.expr_desc with
+        | EBlock (ss, _) -> ss
+        | _ -> [mk_stmt (SExpr body) $startpos]
+      in
+      mk_expr (EBlock (
+        [mk_stmt (SFor (name, iter, dec, stmts)) $startpos],
+        None)) $startpos
+    }
+
+return_expr:
+  | RETURN e = opt(expr_no_block)
+    { mk_expr (EBlock (
+        [mk_stmt (SReturn e) $startpos],
+        None)) $startpos }
+
+(* ------------------------------------------------------------------ *)
+(* Proof block: proof { lemma* assume* }                               *)
+(* ------------------------------------------------------------------ *)
+
+proof_expr:
+  | PROOF LBRACE pb = proof_contents RBRACE
+    { mk_expr (EProof pb) $startpos }
+
+proof_contents:
+  | lemmas = list(lemma_def) assumes = list(assume_in_proof)
+    {
+      {
+        pb_lemmas  = lemmas;
+        pb_assumes = assumes;
+        pb_loc     = mk_loc $startpos;
+      }
+    }
+
+lemma_def:
+  | LEMMA name = ident
+    LPAREN params = separated_list0(COMMA, param) RPAREN
+    COLON stmt = pred
+    LBRACE pt = proof_term RBRACE
+    {
+      {
+        lem_name   = name;
+        lem_params = params;
+        lem_stmt   = stmt;
+        lem_proof  = pt;
+        lem_loc    = mk_loc $startpos;
+      }
+    }
+
+assume_in_proof:
+  | ASSUME LPAREN p = pred RPAREN ctx = opt(STRING) SEMI
+    {
+      {
+        as_pred    = p;
+        as_context = ctx;
+        as_loc     = mk_loc $startpos;
+      }
+    }
+
+proof_term:
+  | AUTO
+    { PTAuto }
+  | IDENT (* "refl" *)
+    { PTRefl }
+  | WITNESS LPAREN e = expr RPAREN
+    { PTWitness e }
+  | BY name = ident LPAREN args = separated_list0(COMMA, proof_term) RPAREN
+    { PTBy (name, args) }
+  | LBRACE pts = list(proof_term) RBRACE
+    { PTCong pts }
+
+(* ------------------------------------------------------------------ *)
+(* Raw block: raw { stmts }                                            *)
+(* ------------------------------------------------------------------ *)
+
+raw_expr:
+  | RAW LBRACE stmts = list(stmt) RBRACE
+    {
+      mk_expr (ERaw {
+        rb_stmts = stmts;
+        rb_loc   = mk_loc $startpos;
+      }) $startpos
+    }
+
+(* ------------------------------------------------------------------ *)
+(* Assume expression: assume(pred) "context"                           *)
+(* ------------------------------------------------------------------ *)
+
+assume_expr:
+  | ASSUME LPAREN p = pred RPAREN ctx = opt(STRING)
+    { mk_expr (EAssume (p, ctx)) $startpos }
+
+(* ------------------------------------------------------------------ *)
+(* Statements                                                           *)
+(* ------------------------------------------------------------------ *)
+
+stmt:
+  | LET lin = linearity name = ident ann = opt(preceded(COLON, ty))
+    EQ e = expr SEMI
+    { mk_stmt (SLet (name, ann, e, lin)) $startpos }
+  | LET name = ident ann = opt(preceded(COLON, ty))
+    EQ e = expr SEMI
+    { mk_stmt (SLet (name, ann, e, Unr)) $startpos }
+  | e = expr SEMI
+    { mk_stmt (SExpr e) $startpos }
+  | BREAK SEMI
+    { mk_stmt SBreak $startpos }
+  | CONTINUE SEMI
+    { mk_stmt SContinue $startpos }
+
+linearity:
+  | LIN { Lin }
+  | AFF { Aff }
+
+(* ------------------------------------------------------------------ *)
+(* Patterns                                                             *)
+(* ------------------------------------------------------------------ *)
+
+pattern:
+  | UNDERSCORE
+    { PWild }
+  | name = ident
+    { PBind name }
+  | n = INT
+    { PLit (LInt (n, None)) }
+  | TRUE
+    { PLit (LBool true) }
+  | FALSE
+    { PLit (LBool false) }
+  | name = ident LPAREN pats = separated_list0(COMMA, pattern) RPAREN
+    { PCtor (name, pats) }
+  | pat = pattern IDENT (* "as" — handled as ident since 'as' is not reserved yet *)
+    name = ident
+    { PAs (pat, name) }
+  | LPAREN pats = separated_list0(COMMA, pattern) RPAREN
+    { PTuple pats }
+
+(* ------------------------------------------------------------------ *)
+(* Identifiers                                                          *)
+(* ------------------------------------------------------------------ *)
+
+ident:
+  | name = IDENT
+    { mk_ident name $startpos }
+  (* Allow some keywords as identifiers in certain positions *)
+  | RAW
+    { mk_ident "raw" $startpos }
+  | BY
+    { mk_ident "by" $startpos }

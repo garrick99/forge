@@ -1,0 +1,9 @@
+(library
+ (name parser)
+ (libraries ast lexer fmt)
+ (modules parse_util parser)
+ (preprocess (pps ppx_deriving.show)))
+
+(menhir
+ (modules parser)
+ (flags --explain --strict))
