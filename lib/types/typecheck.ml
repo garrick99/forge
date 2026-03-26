@@ -526,7 +526,8 @@ and check_field_access obj_ty field loc env =
   | TNamed (name, _) | TRef (TNamed (name, _)) | TRefMut (TNamed (name, _)) ->
       (match List.assoc_opt name.name env.structs with
        | Some sd ->
-           (match List.assoc_opt field.name sd.sd_fields with
+           (match List.assoc_opt field.name
+                    (List.map (fun (id, ty) -> (id.name, ty)) sd.sd_fields) with
             | Some ft -> ft
             | None ->
                 fail loc (Printf.sprintf "no field '%s' on struct '%s'"
