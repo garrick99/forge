@@ -126,6 +126,10 @@ All demos compile clean under `gcc -Wall -Wextra -Werror`.
 | 34 | `34_borrows.fg` | `ref<T>` and `refmut<T>` borrow types |
 | 35 | `35_secret_type.fg` | `secret<T>` constant-time taint: `ct_select`, `ct_eq`, `mulmod` |
 | 36 | `36_ct_modpow.fg` | Constant-time modular exponentiation (`base^exp mod q`, secret exponent) |
+| 37 | `37_fixed_arrays.fg` | `[T; N]` fixed-size arrays — bounds proven by Z3; `[val; N]` repeat syntax |
+| 38 | `38_ntt_crypto.fg` | `std::crypto` module: NTT butterfly, Horner poly eval, secret dot product |
+| 39 | `39_ptx_vecadd.fg` | PTX backend — SM_89 assembly emitted for `#[kernel]` functions |
+| 40 | `40_ind_cpa.fg` | `#[ind_cpa]` compile-time IND-CPA structural verification; `forge audit` log |
 
 ### Intentional failures (in `demos/bad/`)
 
@@ -140,6 +144,7 @@ These demonstrate what FORGE catches:
 | `05_field_ensures.fg` | Postcondition not provable from the body |
 | `06_mutual_no_decreases.fg` | Mutually recursive functions with no shared measure |
 | `07_syncthreads_divergent.fg` | `syncthreads()` inside a branch on a per-thread value |
+| `06_ind_cpa_violation.fg` | `#[ind_cpa]` function that `declassify(key)` — key leakage caught |
 
 ---
 
@@ -214,7 +219,7 @@ The pipeline: parse → type-check → generate obligations → discharge (Z3 / 
 
 ## Roadmap
 
-- `[T; N]` fixed-size arrays and const generics
-- `std::crypto` module (ML-KEM building blocks using `secret<T>`)
-- IND-CPA proof integration for cryptographic protocols
-- OpenPTXas PTX backend (FORGE → CUDA C → PTX, fully verified)
+- ML-KEM (Kyber) building blocks: `PolyVec`, NTT over `[secret<u64>; 256]`
+- Const generics: `fn foo<const N: u64>(a: [T; N])`
+- Ownership transfer: `own<T>` heap allocation with proven deallocation
+- Full IND-CPA game proof: adversary model, game-hopping, reduction to LWE
