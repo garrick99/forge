@@ -585,6 +585,11 @@ atom_expr:
     { mk_expr (EVar name) $startpos }
   | LPAREN e = expr RPAREN
     { e }
+  (* Fixed-size array literals: [a, b, c] and [val; N] *)
+  | LBRACKET elems = separated_list(COMMA, expr) RBRACKET
+    { mk_expr (EArrayLit elems) $startpos }
+  | LBRACKET v = expr SEMI n = expr RBRACKET
+    { mk_expr (EArrayRepeat (v, n)) $startpos }
 
 (* ------------------------------------------------------------------ *)
 (* Block expression: { stmt* expr? }                                    *)
@@ -746,8 +751,8 @@ proof_term:
   | AXIOM
     { PTAxiom }
   | id = IDENT
-    { if id = "refl" then PTRefl
-      else raise Error }
+    { (if id = "refl" then PTRefl
+       else raise Error : proof_term) }
   | SYMM LPAREN pt = proof_term RPAREN
     { PTSymm pt }
   | TRANS LPAREN mid = expr COMMA pt1 = proof_term COMMA pt2 = proof_term RPAREN

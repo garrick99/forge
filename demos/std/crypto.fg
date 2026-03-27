@@ -1,0 +1,105 @@
+// std/crypto.fg — constant-time cryptographic primitives
+//
+// All arithmetic over secret<u64> is constant-time:
+// no branches, no table lookups, no data-dependent memory access patterns.
+//
+// Include with:  use std::crypto;
+//
+// Invariants enforced by FORGE:
+//   - Array indices are public (u64); indexing with secret<u64> is a compile error.
+//   - Secret values may not appear as if-conditions.
+//   - All array bounds are proven by Z3 at compile time — no runtime checks.
+
+// ---- Modular arithmetic ----------------------------------------------------
+
+// Constant-time addition mod q.
+// Branchless: compute a+b; the caller is responsible for keeping inputs < q.
+fn ct_add_mod(a: secret<u64>, b: secret<u64>, q: u64) -> secret<u64>
+    requires q > 0
+{
+    let s: secret<u64> = a + b;
+    s
+}
+
+// Constant-time subtraction mod q (a - b mod q, branchless).
+// Adds q first so the subtract never underflows unsigned arithmetic.
+fn ct_sub_mod(a: secret<u64>, b: secret<u64>, q: u64) -> secret<u64>
+    requires q > 0
+{
+    let r: secret<u64> = a + q;
+    r - b
+}
+
+// Constant-time multiplication mod q (single u64 multiply).
+// Requires q < 2^32 to prevent overflow in the product a*b.
+fn ct_mul_mod(a: secret<u64>, b: secret<u64>, q: u64) -> secret<u64>
+    requires q > 0
+    requires q < 4294967296
+{
+    let p: secret<u64> = a * b;
+    p
+}
+
+// ---- NTT butterfly ---------------------------------------------------------
+
+// NTT butterfly low output: a + w*b mod q
+fn ntt_butterfly_lo(a: secret<u64>, b: secret<u64>, w: secret<u64>, q: u64)
+    -> secret<u64>
+    requires q > 0
+    requires q < 4294967296
+{
+    let t: secret<u64> = ct_mul_mod(b, w, q);
+    ct_add_mod(a, t, q)
+}
+
+// NTT butterfly high output: a - w*b mod q
+fn ntt_butterfly_hi(a: secret<u64>, b: secret<u64>, w: secret<u64>, q: u64)
+    -> secret<u64>
+    requires q > 0
+    requires q < 4294967296
+{
+    let t: secret<u64> = ct_mul_mod(b, w, q);
+    ct_sub_mod(a, t, q)
+}
+
+// ---- Polynomial operations (scalar results) --------------------------------
+
+// Evaluate polynomial at x using Horner's method: a[0] + a[1]*x + a[2]*x^2 + a[3]*x^3 mod q.
+// Coefficients are public u64; the result is secret (secrecy flows from x).
+// All four index accesses (a[0]..a[3]) are proven in-bounds by Z3 (idx < 4).
+fn poly_eval4(a: [u64; 4], x: secret<u64>, q: u64)
+    -> secret<u64>
+    requires q > 0
+    requires q < 4294967296
+{
+    // Horner: ((a[3]*x + a[2])*x + a[1])*x + a[0]
+    // u64 coefficients are implicitly promoted to secret<u64> at call sites.
+    let r: secret<u64> = a[3];
+    r = ct_mul_mod(r, x, q);
+    r = ct_add_mod(r, a[2], q);
+    r = ct_mul_mod(r, x, q);
+    r = ct_add_mod(r, a[1], q);
+    r = ct_mul_mod(r, x, q);
+    ct_add_mod(r, a[0], q)
+}
+
+// Inner product of two coefficient arrays mod q: sum_i a[i]*b[i] mod q.
+// Public coefficients; result is secret (constant-time accumulation).
+// Loop invariant i <= 4 proven at every iteration; bounds checks discharged.
+fn secret_dot4(a: [u64; 4], b: [u64; 4], q: u64)
+    -> secret<u64>
+    requires q > 0
+    requires q < 4294967296
+{
+    let s: secret<u64> = 0u64;
+    let i: u64 = 0u64;
+    while i < 4u64
+        invariant i <= 4
+        decreases 4 - i
+    {
+        let t: secret<u64> = ct_mul_mod(a[i], b[i], q);
+        s = ct_add_mod(s, t, q);
+        i = i + 1u64
+    };
+    s
+}

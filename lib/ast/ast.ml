@@ -136,6 +136,8 @@ and expr_desc =
   | EAssume of pred * string option         (* assume(pred) "context" *)
   | EStruct of ident * (ident * expr) list  (* StructName { field: val, ... } *)
   | ESync                                   (* __syncthreads() — GPU barrier *)
+  | EArrayLit    of expr list               (* [a, b, c] — fixed-size array literal *)
+  | EArrayRepeat of expr * expr             (* [val; N]  — repeat-value array init *)
 
 and lit =
   | LInt   of int64 * prim_ty option        (* 42u32, 5i64 — suffix sets type *)

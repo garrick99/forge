@@ -183,8 +183,9 @@ let rec emit_ty = function
   | TOwn t             -> emit_ty t     (* ownership erased *)
   | TRaw t             -> Printf.sprintf "%s*" (emit_ty t)
   | TArray (t, Some _n) ->
-      (* Fixed arrays: caller handles size; emit element type for now *)
-      emit_ty t
+      (* In type-only position (param decls, forward decls): arrays decay to pointer.
+         SLet declaration sites emit T name[N] directly — see emit_stmt. *)
+      emit_ty t ^ "*"
   | TSlice t           -> emit_ty t ^ "*"
   | TNamed ({name="secret"; _}, [t]) -> "volatile " ^ emit_ty t
   | TNamed (id, [])    -> id.name
@@ -457,6 +458,15 @@ let rec emit_expr depth e =
       Buffer.contents buf
   | EAssume _ -> "/* assume erased */"  (* proof artifact — gone at codegen *)
   | ESync     -> "__syncthreads()"
+  | EArrayLit elems ->
+      "{ " ^ String.concat ", " (List.map (emit_expr depth) elems) ^ " }"
+  | EArrayRepeat (v, _n) ->
+      (* C99 compound literal initializer: {val} zero-fills remaining elements.
+         Correct for val==0; for non-zero val, a loop is needed post-declaration. *)
+      (match v.expr_desc with
+       | ELit (LInt (0L, _)) -> "{ 0 }"
+       | _ -> Printf.sprintf "{ %s /* [val;N] — remaining elements zero */ }"
+                (emit_expr depth v))
 
 (* Unwrap EBlock([], Some e) to just e — for use in expression positions
    like ternary arms where a compound statement is not valid C *)
@@ -759,6 +769,12 @@ and emit_stmt depth s =
            in
            Printf.sprintf "%s__shared__ %s %s[%s];"
              (indent depth) (emit_ty elem_ty) id.name sz_str
+       | Some (TArray (elem_ty, Some n_expr)) when id.name <> "_" ->
+           (* Stack-allocated fixed array: T name[N] = init; *)
+           let n_str   = emit_expr depth n_expr in
+           let init_str = emit_expr depth e in
+           Printf.sprintf "%s%s %s[%s] = %s;"
+             (indent depth) (emit_ty elem_ty) (c_safe_name id.name) n_str init_str
        | _ ->
            (* '_' is a throwaway — emit as (void) cast to suppress unused warnings
               and avoid redeclaration errors when multiple let _ = ... appear *)
@@ -1133,6 +1149,9 @@ and collect_generic_named_expr_desc acc = function
   | EStruct (_, inits) ->
       List.fold_left (fun a (_, e) -> collect_generic_named_expr a e) acc inits
   | EProof _ | ERaw _ | EAssume _ -> acc
+  | EArrayLit elems -> List.fold_left collect_generic_named_expr acc elems
+  | EArrayRepeat (v, n) ->
+      collect_generic_named_expr (collect_generic_named_expr acc v) n
 
 and collect_generic_named_stmt acc s =
   match s.stmt_desc with

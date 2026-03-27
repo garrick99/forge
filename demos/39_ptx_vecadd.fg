@@ -1,0 +1,64 @@
+// demo 39: PTX backend — SM_89 kernel emission
+//
+// FORGE compiles #[kernel] functions to CUDA C (.cu) AND PTX assembly (.ptx).
+// The PTX backend (codegen_ptx.ml) targets SM_89 (RTX 40-series / H100 PCIe).
+//
+// This demo shows:
+//   - #[kernel] attribute triggers both CUDA C and PTX codegen
+//   - span<T> parameters expand to (ptr, len) pairs in the PTX .param block
+//   - Bounds checks on span indexing are proven by Z3 (no runtime asserts)
+//   - threadIdx_x / blockIdx_x / blockDim_x are GPU built-ins with type u64
+//   - #[coalesced] annotates stride-1 access patterns (verifier-enforced)
+//
+// PTX output:
+//   .version 8.5
+//   .target sm_89
+//   .address_size 64
+//   .visible .entry vecadd_f32(...)  { ... }
+//
+// Validate: ptxas --gpu-name sm_89 --compile-only 39_ptx_vecadd.ptx
+
+// Vector addition: C[i] = A[i] + B[i]
+#[kernel]
+#[coalesced]
+fn vecadd_f32(a: span<f32>, b: span<f32>, c: span<f32>)
+    requires a.len == b.len
+    requires b.len == c.len
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < a.len {
+        c[tid] = a[tid] + b[tid]
+    }
+}
+
+// Scalar multiply: B[i] = alpha * A[i]
+#[kernel]
+#[coalesced]
+fn scale_f32(a: span<f32>, b: span<f32>, alpha: f32)
+    requires a.len == b.len
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < a.len {
+        b[tid] = alpha * a[tid]
+    }
+}
+
+// Element-wise fused multiply-add: C[i] = A[i] * B[i] + C[i]
+// Demonstrates syncthreads() in PTX output (bar.sync 0).
+#[kernel]
+#[coalesced]
+fn fma_f32(a: span<f32>, b: span<f32>, c: span<f32>)
+    requires a.len == b.len
+    requires b.len == c.len
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    syncthreads();    // barrier before shared memory phase (demo)
+    if tid < a.len {
+        c[tid] = a[tid] * b[tid] + c[tid]
+    }
+}
+
+// Host-side entry point (non-kernel): returns a sentinel to verify codegen.
+fn run() -> u64 {
+    42u64
+}

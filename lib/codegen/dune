@@ -1,4 +1,5 @@
 (library
  (name codegen)
  (wrapped false)
- (libraries ast proof fmt))
+ (libraries ast proof fmt)
+ (modules codegen_c codegen_ptx))

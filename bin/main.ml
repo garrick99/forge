@@ -207,8 +207,19 @@ let compile path emit_code =
     output_string oc code;
     close_out oc;
     Printf.printf "[forge] wrote %s\n%!" out_path;
-    if is_cuda then
+    if is_cuda then begin
       Printf.printf "[forge] compile with: nvcc -arch=sm_89 %s\n%!" out_path;
+      (* Also emit PTX for #[kernel] functions *)
+      let ptx = Codegen_ptx.emit_ptx_program prog.prog_items 89 in
+      if ptx <> "" then begin
+        let ptx_path = Filename.remove_extension path ^ ".ptx" in
+        let ocp = open_out ptx_path in
+        output_string ocp ptx;
+        close_out ocp;
+        Printf.printf "[forge] wrote %s\n%!" ptx_path;
+        Printf.printf "[forge] validate: ptxas --gpu-name sm_89 --compile-only %s\n%!" ptx_path
+      end
+    end;
 
     (* 5. Report assume audit *)
     let assumes = dump_assume_log () in

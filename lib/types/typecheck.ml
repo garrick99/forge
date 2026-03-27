@@ -771,11 +771,30 @@ and infer_expr env expr : ty =
               | None -> ())
            end;
            elem
-       | TArray (elem, _) -> check_bounds arr idx expr.expr_loc env; elem
+       | TArray (elem, Some n_expr) ->
+           (* Static-size array: generate idx < N directly (Z3 Tier-1 dischargeable) *)
+           let idx_pred = expr_to_pred_simple idx in
+           let n_pred   = expr_to_pred_simple n_expr in
+           add_obligation (PBinop (Lt, idx_pred, n_pred))
+             (OBoundsCheck "array") expr.expr_loc env;
+           elem
+       | TArray (elem, None) -> check_bounds arr idx expr.expr_loc env; elem
        | TSlice elem -> check_bounds arr idx expr.expr_loc env; elem
-       | TRef (TArray (elem, _)) -> check_bounds arr idx expr.expr_loc env; elem
+       | TRef (TArray (elem, Some n_expr)) ->
+           let idx_pred = expr_to_pred_simple idx in
+           let n_pred   = expr_to_pred_simple n_expr in
+           add_obligation (PBinop (Lt, idx_pred, n_pred))
+             (OBoundsCheck "array") expr.expr_loc env;
+           elem
+       | TRef (TArray (elem, None)) -> check_bounds arr idx expr.expr_loc env; elem
        | TRef (TSlice elem) -> check_bounds arr idx expr.expr_loc env; elem
-       | TRefMut (TArray (elem, _)) -> check_bounds arr idx expr.expr_loc env; elem
+       | TRefMut (TArray (elem, Some n_expr)) ->
+           let idx_pred = expr_to_pred_simple idx in
+           let n_pred   = expr_to_pred_simple n_expr in
+           add_obligation (PBinop (Lt, idx_pred, n_pred))
+             (OBoundsCheck "array") expr.expr_loc env;
+           elem
+       | TRefMut (TArray (elem, None)) -> check_bounds arr idx expr.expr_loc env; elem
        | _ ->
            fail expr.expr_loc "indexing non-array type";
            TPrim (TUint U8))
@@ -933,8 +952,20 @@ and infer_expr env expr : ty =
                  | None -> partial_ret)
             | _ -> partial_ret)
        | _ ->
-           fail expr.expr_loc "calling non-function";
-           TPrim TUnit))
+           (* EVar lookup returns sig_.fs_ret directly for zero-param functions.
+              If sig_opt has the signature, use it to dispatch the call. *)
+           (match sig_opt with
+            | Some sig_ ->
+                if List.length sig_.fs_params <> List.length args then
+                  report_error (ArityMismatch (expr.expr_loc,
+                    "function", List.length sig_.fs_params, List.length args));
+                List.iter (fun a -> check_expr env a |> ignore) args;
+                check_preconditions "fn" sig_.fs_requires args sig_.fs_params
+                  expr.expr_loc env;
+                sig_.fs_ret
+            | None ->
+                fail expr.expr_loc "calling non-function";
+                TPrim TUnit)))
 
   (* Assignment — returns unit *)
   | EAssign (lhs, rhs) ->
@@ -1079,6 +1110,27 @@ and infer_expr env expr : ty =
         fail expr.expr_loc
           "__syncthreads() inside a divergent branch (varying condition) — undefined behavior";
       TPrim TUnit
+
+  | EArrayLit elems ->
+      let n = List.length elems in
+      if n = 0 then (fail expr.expr_loc "empty array literal []"; TArray (TPrim (TUint U64), None))
+      else
+        let elem_tys = List.map (check_expr env) elems in
+        let elem_ty = List.fold_left (fun acc t ->
+          if ty_compatible acc t then acc
+          else (fail expr.expr_loc
+            (Printf.sprintf "array literal: element types don't match: %s vs %s"
+              (format_ty acc) (format_ty t)); acc)
+        ) (List.hd elem_tys) (List.tl elem_tys) in
+        let n_expr = { expr_desc = ELit (LInt (Int64.of_int n, None));
+                       expr_loc = expr.expr_loc;
+                       expr_ty  = Some (TPrim (TUint U64)) } in
+        TArray (elem_ty, Some n_expr)
+
+  | EArrayRepeat (v, n) ->
+      let elem_ty = check_expr env v in
+      let _ = check_expr env n in
+      TArray (elem_ty, Some n)
 
 and check_stmts env stmts : env =
   let env' = List.fold_left check_stmt env stmts in
@@ -1675,7 +1727,9 @@ let collect_direct_calls (fn : fn_def) : string list =
     | EAssign (l, r) -> scan_expr l; scan_expr r
     | ERef e | ERefMut e | EDeref e -> scan_expr e
     | ECast (e, _)   -> scan_expr e
-    | EStruct (_, fs)-> List.iter (fun (_, e) -> scan_expr e) fs
+    | EStruct (_, fs)    -> List.iter (fun (_, e) -> scan_expr e) fs
+    | EArrayLit elems    -> List.iter scan_expr elems
+    | EArrayRepeat (v,n) -> scan_expr v; scan_expr n
     | _ -> ()
   and scan_stmt s =
     match s.stmt_desc with
