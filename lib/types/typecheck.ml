@@ -1466,11 +1466,124 @@ let collect_fn_sig (fn : fn_def) : fn_sig =
     fs_decreases   = fn.fn_decreases;
   }
 
+(* ------------------------------------------------------------------ *)
+(* IND-CPA structural verification                                    *)
+(* ------------------------------------------------------------------ *)
+
+(* Scan an expression for declassify(name) where name is in key_params.
+   Reports an error if the key is explicitly declassified — that would
+   leak secret key material into the ciphertext computation. *)
+let rec ind_cpa_scan_expr key_params expr =
+  (match expr.expr_desc with
+   | ECall ({ expr_desc = EVar id; _ }, args) when id.name = "declassify" ->
+       List.iter (fun arg ->
+         match arg.expr_desc with
+         | EVar v when List.mem v.name key_params ->
+             fail arg.expr_loc
+               (Printf.sprintf
+                  "ind_cpa: key parameter '%s' must not be declassified \
+                   (declassify strips secret — key material would be exposed)"
+                  v.name)
+         | _ -> ind_cpa_scan_expr key_params arg
+       ) args
+   | _ -> ());
+  match expr.expr_desc with
+  | ELit _ | EVar _ | ESync -> ()
+  | ECall (f, args)         -> ind_cpa_scan_expr key_params f;
+                               List.iter (ind_cpa_scan_expr key_params) args
+  | EBinop (_, l, r)        -> ind_cpa_scan_expr key_params l;
+                               ind_cpa_scan_expr key_params r
+  | EUnop (_, e) | ECast (e, _) | EField (e, _)
+  | ERef e | ERefMut e | EDeref e -> ind_cpa_scan_expr key_params e
+  | EAssign (l, r)          -> ind_cpa_scan_expr key_params l;
+                               ind_cpa_scan_expr key_params r
+  | EIndex (a, i)            -> ind_cpa_scan_expr key_params a;
+                               ind_cpa_scan_expr key_params i
+  | EIf (c, t, e)           -> ind_cpa_scan_expr key_params c;
+                               ind_cpa_scan_expr key_params t;
+                               (match e with Some e -> ind_cpa_scan_expr key_params e | None -> ())
+  | EMatch (s, arms)        -> ind_cpa_scan_expr key_params s;
+                               List.iter (fun arm -> ind_cpa_scan_expr key_params arm.body) arms
+  | EBlock (stmts, ret)     ->
+      List.iter (ind_cpa_scan_stmt key_params) stmts;
+      (match ret with Some e -> ind_cpa_scan_expr key_params e | None -> ())
+  | EStruct (_, fs)         -> List.iter (fun (_, e) -> ind_cpa_scan_expr key_params e) fs
+  | EArrayLit elems         -> List.iter (ind_cpa_scan_expr key_params) elems
+  | EArrayRepeat (v, n)     -> ind_cpa_scan_expr key_params v;
+                               ind_cpa_scan_expr key_params n
+  | EAssume _ | EProof _ | ERaw _ -> ()
+and ind_cpa_scan_stmt key_params stmt =
+  match stmt.stmt_desc with
+  | SLet (_, _, e, _)          -> ind_cpa_scan_expr key_params e
+  | SExpr e                    -> ind_cpa_scan_expr key_params e
+  | SReturn (Some e)           -> ind_cpa_scan_expr key_params e
+  | SWhile (c, _, _, body)     -> ind_cpa_scan_expr key_params c;
+                                  List.iter (ind_cpa_scan_stmt key_params) body
+  | SFor (_, e, _, body)       -> ind_cpa_scan_expr key_params e;
+                                  List.iter (ind_cpa_scan_stmt key_params) body
+  | _ -> ()
+
+(* Verify IND-CPA structural requirements on a function:
+   1. At least one secret<T> parameter (key/message material).
+   2. Return type is secret<T> (ciphertext must remain opaque).
+   3. No key parameter is passed to declassify() in the body.
+   4. Log an audit entry for the assume log (security claim is explicit).
+   Parameters named 'nonce' or 'nonce_*' are identified as nonces in the log. *)
+let check_ind_cpa fn =
+  let name = fn.fn_name.name in
+  (* Classify parameters:
+     - nonce: any param named 'nonce' or 'nonce_*' (public or secret)
+     - key:   secret<T> params that are not nonces
+     - input: non-secret, non-nonce params (plaintext, associated data, etc.) *)
+  let is_nonce_name n =
+    n = "nonce" || (String.length n >= 6 && String.sub n 0 6 = "nonce_")
+  in
+  let nonce_params = List.filter_map (fun (id, _ty) ->
+    if is_nonce_name id.name then Some id.name else None
+  ) fn.fn_params in
+  let key_params = List.filter_map (fun (id, ty) ->
+    if is_secret (normalize_ty ty) && not (is_nonce_name id.name)
+    then Some id.name else None
+  ) fn.fn_params in
+  let pure_key_params = key_params in
+  (* Check 1: at least one secret param *)
+  if key_params = [] then
+    fail fn.fn_name.loc
+      (Printf.sprintf "ind_cpa: '%s' has no secret<T> parameter — \
+                       key/plaintext must be marked secret" name);
+  (* Check 2: return type must be secret<T> *)
+  let ret = normalize_ty fn.fn_ret in
+  if not (is_secret ret) then
+    fail fn.fn_name.loc
+      (Printf.sprintf "ind_cpa: '%s' return type must be secret<T> — \
+                       ciphertext must remain opaque (got %s)"
+         name (format_ty ret));
+  (* Check 3: no declassify of key params in body *)
+  (match fn.fn_body with
+   | Some body -> ind_cpa_scan_expr pure_key_params body
+   | None -> ());
+  (* Check 4: log as an explicit security assumption (visible in forge audit) *)
+  let nonce_str = match nonce_params with
+    | [] -> "none (name params 'nonce'/'nonce_*' to identify; use lin bindings at call sites)"
+    | ns -> String.concat ", " ns ^ " (enforce single-use via lin bindings at call sites)"
+  in
+  let ctx = Printf.sprintf
+    "ind_cpa: '%s' — keys: [%s], nonces: %s, ciphertext: %s"
+    name
+    (String.concat ", " pure_key_params)
+    nonce_str
+    (format_ty ret)
+  in
+  log_assume (PApp ({ name = "ind_cpa_secure"; loc = fn.fn_name.loc },
+                    [PVar fn.fn_name]))
+             (Some ctx) fn.fn_name.loc
+
 let check_fn env fn =
   let sig_ = collect_fn_sig fn in
   (* Process function attributes *)
   let is_kernel    = List.exists (fun a -> a.attr_name = "kernel")    fn.fn_attrs in
   let is_coalesced = List.exists (fun a -> a.attr_name = "coalesced") fn.fn_attrs in
+  let is_ind_cpa   = List.exists (fun a -> a.attr_name = "ind_cpa")   fn.fn_attrs in
   let env = if is_kernel    then { env with is_gpu_fn    = true } else env in
   let env = if is_coalesced then { env with coalesced_fn = true } else env in
   (* Inject GPU built-in variables for kernel functions.
@@ -1548,7 +1661,9 @@ let check_fn env fn =
          let ob_pred = subst_pred subst ens in
          add_obligation ob_pred (OPostcondition fn.fn_name.name)
            fn.fn_name.loc body_env
-       ) fn.fn_ensures)
+       ) fn.fn_ensures);
+  (* IND-CPA structural verification — runs after body typecheck *)
+  if is_ind_cpa then check_ind_cpa fn
 
 let rec check_item env item =
   match item.item_desc with

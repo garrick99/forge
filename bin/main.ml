@@ -244,7 +244,7 @@ let audit path =
   (try
     while true do
       let line = input_line ic in
-      if String.length line > 20 &&
+      if String.length line >= 22 &&
          String.sub line 0 22 = "/* ---- FORGE ASSUMPTI" then begin
         found := true;
         print_endline line;
@@ -252,7 +252,7 @@ let audit path =
           while true do
             let l = input_line ic in
             print_endline l;
-            if String.length l > 18 &&
+            if String.length l >= 19 &&
                String.sub l 0 19 = "   ---- END AUDIT L" then
               raise Exit
           done
