@@ -1,0 +1,22 @@
+// FORGE Bad Demo 05 — Field Postcondition Violation (correctly rejected)
+//
+// This program SHOULD FAIL to compile.
+// The function claims result.lo == hi, but it actually stores lo in result.lo.
+//
+// Expected output:
+//   ✗  postcondition of bad_swap_range  (result.lo == hi not provable)
+//   compilation stopped
+
+struct Range {
+    lo: u64,
+    hi: u64,
+    invariant lo <= hi
+}
+
+// WRONG: claims result.lo == hi but constructs with lo: lo (not lo: hi).
+fn bad_swap_range(lo: u64, hi: u64) -> Range
+    requires lo <= hi
+    ensures result.lo == hi   // ERROR: result.lo is actually lo, not hi
+{
+    struct Range { lo: lo, hi: hi }
+}

@@ -1,0 +1,71 @@
+// Demo 28: Loop invariants with quantified predicates
+//
+// FORGE's loop invariant clause accepts full first-order predicates, including
+// 'forall'.  This lets you state and verify array-fill / prefix-property
+// contracts that require quantifier instantiation from Z3.
+//
+// The compiler generates two obligations per loop invariant:
+//   1. Entry: invariant holds before the first iteration
+//   2. Preservation: assuming the invariant and the loop condition, it holds
+//      after executing the body once (SSA renaming keeps the context consistent)
+//
+// After the loop: ¬cond ∧ invariant are in scope for the postcondition check.
+
+// ---- 1. Fill: set the first n elements to a constant value ----
+//
+// Invariant: every element with index < k already equals val.
+// At exit: k == n (because ¬(k < n) ∧ k ≤ n), so the invariant gives the
+//          full postcondition ∀ i < n. s[i] == val.
+
+fn fill(s: span<u64>, val: u64, n: u64)
+  requires n <= s.len
+  ensures  forall i : u64, i < n ==> s[i] == val
+{
+  let k: u64 = 0;
+  while k < n
+    invariant k <= n && forall j : u64, j < k ==> s[j] == val
+  {
+    s[k] = val;
+    k = k + 1
+  }
+}
+
+// ---- 2. Indexed fill: set s[i] = i + offset for each i < n ----
+//
+// The invariant tracks the position-dependent formula: s[j] == j + offset.
+// This demonstrates that Z3 can handle quantified postconditions where the
+// value at each index depends on the index itself, not just a constant.
+
+fn fill_offset(s: span<u64>, offset: u64, n: u64)
+  requires n <= s.len
+  ensures  forall i : u64, i < n ==> s[i] == i + offset
+{
+  let k: u64 = 0;
+  while k < n
+    invariant k <= n && forall j : u64, j < k ==> s[j] == j + offset
+  {
+    s[k] = k + offset;
+    k = k + 1
+  }
+}
+
+// ---- 3. Count: verify a counting loop carries a prefix invariant ----
+//
+// After processing k elements, the count of elements seen is at most k
+// (trivial upper bound, but demonstrates that non-quantified invariants
+// can be combined with loop-exit reasoning to prove postconditions).
+
+fn count_elements(s: span<u64>, n: u64) -> u64
+  requires n <= s.len
+  ensures  result <= n
+{
+  let k: u64 = 0;
+  let c: u64 = 0;
+  while k < n
+    invariant k <= n && c <= k
+  {
+    c = c + 1;
+    k = k + 1
+  };
+  c
+}

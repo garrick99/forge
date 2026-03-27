@@ -1,7 +1,8 @@
 (library
  (name lexer)
  (wrapped false)
- (libraries ast))
+ (modules lexer token)
+ (libraries ast parser))
 
 (ocamllex
  (modules lexer))

@@ -1,0 +1,16 @@
+// FORGE Bad Demo 03 — Recursive Function Without decreases (correctly rejected)
+//
+// This program SHOULD FAIL to compile.
+// A recursive call without a 'decreases' clause causes FORGE to
+// immediately error: "recursive call to 'oops' requires a
+// 'decreases:' clause".
+//
+// Fix: add  decreases n  and ensure the recursive argument n-1 < n.
+
+fn oops(n: u64) -> u64
+{
+    if n == 0
+    { 0 }
+    else
+    { oops(n - 1) }   // ERROR: no decreases clause on a self-call
+}

@@ -1,0 +1,65 @@
+// Demo 24: Parser Hardening
+//
+// Exercises all parser improvements:
+//   - as casts: expr as Type
+//   - OR patterns: A | B => body
+//   - Trailing commas in params/args
+//   - Typed integer literals: 42u32, 0xFFu64
+//   - Nested generics: span<span<T>> (>> splitting)
+
+// ---- as casts ----
+fn truncate(x: u64) -> u32
+  requires x <= 4294967295
+{
+  x as u32
+}
+
+fn widen(x: u32) -> u64 {
+  x as u64
+}
+
+// ---- typed integer literals ----
+fn typed_lits() -> u32 {
+    let a: u32 = 42u32;
+    let b: u64 = 255u64;
+    let c: u32 = 0u32;
+    let _ = b;
+    let _ = c;
+    a
+}
+
+// ---- trailing commas in params ----
+fn max3(
+    a: u64,
+    b: u64,
+    c: u64,
+) -> u64
+    ensures result >= a
+    ensures result >= b
+    ensures result >= c
+{
+    if a >= b && a >= c { a }
+    else if b >= c { b }
+    else { c }
+}
+
+// ---- OR patterns in match ----
+enum Direction { North, South, East, West, }
+
+fn is_horizontal(d: Direction) -> bool {
+    match d {
+        East | West   => true,
+        North | South => false,
+    }
+}
+
+fn is_cardinal(d: Direction) -> bool {
+    match d {
+        North | South | East | West => true,
+    }
+}
+
+// ---- nested generics (span<span<T>>) ----
+fn outer_len(s: span<span<u32>>) -> u64 {
+    s.len
+}

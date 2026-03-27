@@ -12,13 +12,15 @@ open Lexing
 (* --external-tokens Token tells Menhir to use Token.token, not gen.  *)
 (* ------------------------------------------------------------------ *)
 
-%token <int>    INT
+%token <int64>           INT
+%token <int64 * string>  INT_SUFF   (* 42u32, 100i64 *)
 %token <float>  FLOAT
 %token <string> STRING
 %token <string> IDENT
 
 (* Declaration keywords *)
 %token FN TYPE STRUCT ENUM IMPL USE EXTERN TASK CHAN
+%token SPAN SHARED UNIFORM VARYING KERNEL COALESCED SYNCTHREADS
 
 (* Control flow *)
 %token LET MUT RETURN IF ELSE MATCH FOR WHILE LOOP IN BREAK CONTINUE
@@ -26,10 +28,11 @@ open Lexing
 
 (* Proof keywords *)
 %token REQUIRES ENSURES DECREASES INVARIANT
-%token PROOF ASSUME LEMMA WITNESS BY AUTO
+%token PROOF ASSUME LEMMA WITNESS BY AUTO AXIOM SYMM TRANS INDUCTION
 %token RAW FORALL EXISTS OLD RESULT
 
 (* Linearity *)
+%token AS
 %token LIN AFF
 
 (* Literals *)
@@ -71,6 +74,10 @@ open Lexing
 (* Operator precedence — lowest to highest                             *)
 (* ------------------------------------------------------------------ *)
 
+(* Assignment and control-flow operators — LOWEST precedence *)
+%right EQ PLUSEQ MINUSEQ STAREQ SLASHEQ
+%right OR_RETURN OR_FAIL
+
 (* Predicate-level logical operators *)
 %right IFF
 %right IMPLIES
@@ -91,7 +98,10 @@ open Lexing
 %left  PLUS MINUS
 %left  STAR SLASH PERCENT
 
-(* Unary — highest *)
+(* Type cast — binds tighter than arithmetic, looser than unary *)
+%left  AS
+
+(* Unary — highest binary-ish *)
 %nonassoc UMINUS UBANG UTILDE UDEREF UREF
 
 (* Postfix — field access, indexing, call *)
@@ -108,6 +118,16 @@ open Lexing
 %type  <Ast.pred>    pred
 
 %%
+
+(* ------------------------------------------------------------------ *)
+(* Trailing-comma-tolerant list                                        *)
+(* tlist(x) matches:  ε | x | x,x | x,x, | x,x,x | x,x,x,  etc.   *)
+(* ------------------------------------------------------------------ *)
+
+tlist(x):
+  | { [] }
+  | x = x { [x] }
+  | x = x COMMA rest = tlist(x) { x :: rest }
 
 (* ------------------------------------------------------------------ *)
 (* Program                                                              *)
@@ -142,8 +162,8 @@ item:
 (* ------------------------------------------------------------------ *)
 
 fn_def:
-  | FN name = ident
-    LPAREN params = separated_list(COMMA, param) RPAREN
+  | attrs = list(attr_clause) FN name = ident
+    LPAREN params = tlist(param) RPAREN
     ret = option(preceded(ARROW, ty))
     reqs  = list(requires_clause)
     enss  = list(ensures_clause)
@@ -159,9 +179,15 @@ fn_def:
         fn_ensures  = enss;
         fn_decreases = dec;
         fn_body     = body;
-        fn_attrs    = [];
+        fn_attrs    = attrs;
       }
     }
+
+attr_clause:
+  | HASH LBRACKET name = ident RBRACKET
+    { { attr_name = name.name; attr_args = [] } }
+  | HASH LBRACKET name = ident LPAREN args = separated_list(COMMA, IDENT) RPAREN RBRACKET
+    { { attr_name = name.name; attr_args = args } }
 
 param:
   | name = ident COLON t = ty
@@ -253,11 +279,11 @@ enum_def:
 enum_variant:
   | name = ident COMMA
     { (name, []) }
-  | name = ident LPAREN fields = separated_nonempty_list(COMMA, ty) RPAREN COMMA
+  | name = ident LPAREN fields = tlist(ty) RPAREN COMMA
     { (name, fields) }
   | name = ident
     { (name, []) }
-  | name = ident LPAREN fields = separated_nonempty_list(COMMA, ty) RPAREN
+  | name = ident LPAREN fields = tlist(ty) RPAREN
     { (name, fields) }
 
 (* ------------------------------------------------------------------ *)
@@ -279,14 +305,16 @@ impl_def:
 
 extern_def:
   | EXTERN FN name = ident
-    LPAREN params = separated_list(COMMA, param) RPAREN
+    LPAREN params = tlist(param) RPAREN
     ret = option(preceded(ARROW, ty))
+    reqs = list(requires_clause)
+    enss = list(ensures_clause)
     link = option(extern_link)
     SEMI
     {
       let ret_ty = match ret with Some t -> t | None -> TPrim TUnit in
       let link_name = match link with Some s -> s | None -> name.name in
-      let fn_ty = TFn (mk_fn_ty params ret_ty [] []) in
+      let fn_ty = TFn (mk_fn_ty params ret_ty reqs enss) in
       {
         ex_name = name;
         ex_ty   = fn_ty;
@@ -315,7 +343,7 @@ ty:
     { TRefMut t }
   | OWN LT t = ty GT
     { TOwn t }
-  | RAW_TY LT t = ty GT
+  | RAW LT t = ty GT
     { TRaw t }
 
   (* Array and slice *)
@@ -329,6 +357,22 @@ ty:
     { TPrim TUnit }
   | NEVER
     { TPrim TNever }
+
+  (* span<T> — fat pointer with length *)
+  | SPAN LT t = ty GT
+    { TSpan t }
+
+  (* shared<T>[N] — GPU shared memory array *)
+  | SHARED LT t = ty GT LBRACKET n = expr RBRACKET
+    { TShared (t, Some n) }
+  | SHARED LT t = ty GT
+    { TShared (t, None) }
+
+  (* uniform/varying qualifiers *)
+  | UNIFORM t = ty
+    { TQual (Uniform, t) }
+  | VARYING t = ty
+    { TQual (Varying, t) }
 
   (* Named type with optional generic args *)
   | name = ident args = type_args
@@ -410,6 +454,18 @@ pred:
   | RESULT
     { PResult }
 
+  (* Lex tuple — for lexicographic termination: (a, b) *)
+  | LPAREN p1 = pred COMMA ps = separated_nonempty_list(COMMA, pred) RPAREN
+    { PLex (p1 :: ps) }
+
+  (* Field access — higher precedence than arithmetic (uses %left DOT) *)
+  | p = pred DOT name = ident
+    { PField (p, name.name) }
+
+  (* Array index in pred position: arr[i] *)
+  | p = pred LBRACKET idx = pred RBRACKET
+    { PIndex (p, idx) }
+
   (* Atoms *)
   | TRUE              { PBool true }
   | FALSE             { PBool false }
@@ -467,7 +523,7 @@ expr:
     { mk_expr (EField (e, name)) $startpos }
   | e = expr LBRACKET idx = expr RBRACKET
     { mk_expr (EIndex (e, idx)) $startpos }
-  | f = expr LPAREN args = separated_list(COMMA, expr) RPAREN
+  | f = expr LPAREN args = tlist(expr) RPAREN
     { mk_expr (ECall (f, args)) $startpos }
 
   (* or_return / or_fail *)
@@ -490,12 +546,31 @@ expr:
   | e = assume_expr   { e }
   | e = return_expr   { e }
 
+  (* __syncthreads() — GPU warp barrier *)
+  | SYNCTHREADS LPAREN RPAREN
+    { mk_expr ESync $startpos }
+
+  (* Type cast — expr as Type *)
+  | e = expr AS t = ty
+    { mk_expr (ECast (e, t)) $startpos }
+
+  (* Struct literal — struct TypeName { field: val, ... } *)
+  | STRUCT name = ident LBRACE
+      fields = tlist(struct_field_init)
+    RBRACE
+    { mk_expr (EStruct (name, fields)) $startpos }
+
   (* Atomic expressions *)
   | e = atom_expr     { e }
+
+struct_field_init:
+  | name = ident COLON e = expr { (name, e) }
 
 atom_expr:
   | n = INT
     { mk_expr (ELit (LInt (n, None))) $startpos }
+  | ns = INT_SUFF
+    { let (n, s) = ns in mk_expr (ELit (LInt (n, Some (prim_of_suffix s)))) $startpos }
   | f = FLOAT
     { mk_expr (ELit (LFloat (f, None))) $startpos }
   | s = STRING
@@ -565,12 +640,17 @@ match_expr:
     { mk_expr (EMatch (scrut, arms)) $startpos }
 
 match_arm:
-  | pat = pattern guard = option(preceded(IF, pred)) FATARROW body = arm_body
+  | pat = alt_pattern guard = option(preceded(IF, pred)) FATARROW body = arm_body
     { { pattern = pat; guard; body } }
+
+(* OR patterns: Red | Blue | Green => ...  *)
+(* Separate from pattern to avoid conflict with expr PIPE expr (BitOr) *)
+alt_pattern:
+  | p = pattern                              { p }
+  | p1 = alt_pattern PIPE p2 = pattern      { POr (p1, p2) }
 
 arm_body:
   | e = block_expr COMMA { e }
-  | e = block_expr       { e }
   | e = expr COMMA { e }
   | e = expr       { e }
 
@@ -589,7 +669,8 @@ loop_expr:
     body = block_expr
     {
       let stmts = match body.expr_desc with
-        | EBlock (ss, _) -> ss
+        | EBlock (ss, Some ret) -> ss @ [mk_stmt (SExpr ret) $startpos]
+        | EBlock (ss, None)     -> ss
         | _ -> [mk_stmt (SExpr body) $startpos]
       in
       mk_expr (EBlock (
@@ -601,7 +682,8 @@ loop_expr:
     body = block_expr
     {
       let stmts = match body.expr_desc with
-        | EBlock (ss, _) -> ss
+        | EBlock (ss, Some ret) -> ss @ [mk_stmt (SExpr ret) $startpos]
+        | EBlock (ss, None)     -> ss
         | _ -> [mk_stmt (SExpr body) $startpos]
       in
       mk_expr (EBlock (
@@ -635,7 +717,7 @@ proof_contents:
 
 lemma_def:
   | LEMMA name = ident
-    LPAREN params = separated_list(COMMA, param) RPAREN
+    LPAREN params = tlist(param) RPAREN
     COLON stmt = pred
     LBRACE pt = proof_term RBRACE
     {
@@ -661,8 +743,17 @@ assume_in_proof:
 proof_term:
   | AUTO
     { PTAuto }
-  | IDENT (* "refl" *)
-    { PTRefl }
+  | AXIOM
+    { PTAxiom }
+  | id = IDENT
+    { if id = "refl" then PTRefl
+      else raise Error }
+  | SYMM LPAREN pt = proof_term RPAREN
+    { PTSymm pt }
+  | TRANS LPAREN mid = expr COMMA pt1 = proof_term COMMA pt2 = proof_term RPAREN
+    { PTTrans (mid, pt1, pt2) }
+  | INDUCTION x = ident LBRACE base = proof_term COMMA step = proof_term RBRACE
+    { PTInduct (x, base, step) }
   | WITNESS LPAREN e = expr RPAREN
     { PTWitness e }
   | BY name = ident LPAREN args = separated_list(COMMA, proof_term) RPAREN
@@ -712,6 +803,7 @@ stmt:
 linearity:
   | LIN { Lin }
   | AFF { Aff }
+  | MUT { Unr }   (* let mut x = ... treated as unrestricted mutable binding *)
 
 (* ------------------------------------------------------------------ *)
 (* Patterns                                                             *)
@@ -730,8 +822,7 @@ pattern:
     { PLit (LBool false) }
   | name = ident LPAREN pats = separated_list(COMMA, pattern) RPAREN
     { PCtor (name, pats) }
-  | pat = pattern IDENT (* "as" — handled as ident since 'as' is not reserved yet *)
-    name = ident
+  | pat = pattern AS name = ident
     { PAs (pat, name) }
   | LPAREN pats = separated_list(COMMA, pattern) RPAREN
     { PTuple pats }
@@ -744,7 +835,12 @@ ident:
   | name = IDENT
     { mk_ident name $startpos }
   (* Allow some keywords as identifiers in certain positions *)
-  | RAW
-    { mk_ident "raw" $startpos }
-  | BY
-    { mk_ident "by" $startpos }
+  | RAW        { mk_ident "raw"        $startpos }
+  | BY         { mk_ident "by"         $startpos }
+  (* GPU attribute names must be usable as plain identifiers *)
+  | KERNEL     { mk_ident "kernel"     $startpos }
+  | COALESCED  { mk_ident "coalesced"  $startpos }
+  | SPAN       { mk_ident "span"       $startpos }
+  | SHARED     { mk_ident "shared"     $startpos }
+  | UNIFORM    { mk_ident "uniform"    $startpos }
+  | VARYING    { mk_ident "varying"    $startpos }

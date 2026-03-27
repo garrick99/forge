@@ -1,0 +1,220 @@
+# FORGE
+
+A formally-verified systems language that compiles to C99 and CUDA C.
+
+Every program FORGE emits is **correct by construction** — proof obligations are discharged by a Z3 SMT backend before any code is generated. If the proof fails, the compiler stops. There is no flag to suppress this.
+
+```forge
+fn divide(n: u64, d: u64) -> u64
+    requires d != 0
+    ensures  result * d <= n
+{
+    n / d
+}
+```
+
+```
+  ✓ [SMT]    01_divide.fg:4  precondition of '/'
+  ✓ [SMT]    01_divide.fg:3  postcondition of 'divide'
+  all obligations discharged → emitting C99
+```
+
+---
+
+## Features
+
+### Three-tier proof system
+- **Tier 1 — Z3 SMT (automatic):** preconditions, postconditions, loop invariants, termination, bounds checks, overflow guards
+- **Tier 2 — Guided hints:** `invariant`, `decreases`, `witness()`
+- **Tier 3 — Manual proof terms:** `refl`, `symm`, `trans`, `auto`, `by lemma()`, `induction x { base, step }`
+
+### Type system
+- **Refinement types:** `[x: u64 | x > 0]` — predicates encoded directly into the type
+- **Linear and affine types:** must-use and at-most-once enforcement checked at compile time
+- **`secret<T>` — constant-time taint:** marks cryptographic values; the type system enforces no branching on secrets, no secret-indexed memory access, and explicit `declassify()` at the output boundary. Emits `volatile T` in C.
+- **Generic types:** `enum Option<T>`, `enum Result<T,E>`, user-defined generics with monomorphization
+- **Span fat pointers:** `span<T>` with proven bounds; all indexing is verified against `.len`
+
+### GPU correctness (CUDA C backend)
+- `#[kernel]` functions compile to `__global__`
+- `shared<T>[N]` shared memory with ownership proofs
+- `syncthreads()` placement verified — divergence is a compile error
+- `#[coalesced]` attribute checked by static analysis
+
+### Loop and recursion verification
+- Loop invariants: `invariant p && forall i: u64, i < k ==> ...`
+- Termination: `decreases expr` for single measures, `decreases (a, b)` for lexicographic
+- Mutual recursion: Tarjan SCC detects cycles; each SCC gets a shared termination measure
+
+### Module system
+- `use std::prelude;` loads `./std/prelude.fg` (extern C/CUDA declarations)
+- `ex_link = "<header.h>"` convention: FORGE emits `#include` and skips redeclaration
+
+---
+
+## Building
+
+Requires OCaml 4.14+, Menhir, Z3, and Dune.
+
+```bash
+# Install dependencies (Ubuntu/WSL2)
+opam install dune menhir z3
+
+# Build
+dune build
+
+# Run a demo
+./_build/default/bin/main.exe build demos/01_divide.fg
+```
+
+The compiler binary is `./_build/default/bin/main.exe`.
+
+**Note:** `lib/parser/parser.ml` is pre-generated and committed. Do not add a `(menhir ...)` stanza to the dune file — there is a known Dune 3.22 + Menhir cycle bug. To regenerate after grammar changes, use the manual `--infer-write-query` / `--infer-read-reply` protocol.
+
+---
+
+## Commands
+
+```
+forge build <file.fg>    prove all obligations, emit C/CUDA C
+forge check <file.fg>    proof check only — no codegen
+forge audit <file.c>     dump the assume log from generated C
+forge version
+```
+
+---
+
+## Demos
+
+All demos compile clean under `gcc -Wall -Wextra -Werror`.
+
+| # | File | What it demonstrates |
+|---|------|----------------------|
+| 01 | `01_divide.fg` | Safe division — precondition + postcondition |
+| 02 | `02_bad_divide.fg` | **Intentional failure** — shows the compiler refusing to emit |
+| 03 | `03_overflow.fg` | Overflow-safe arithmetic |
+| 04 | `04_minmax.fg` | Min/max with proven postconditions |
+| 05 | `05_abs.fg` | Absolute difference |
+| 06 | `06_gcd.fg` | GCD: preconditions on recursive calls + termination |
+| 07 | `07_saturating.fg` | Saturating arithmetic |
+| 08 | `08_midpoint.fg` | Overflow-safe midpoint (the classic interview bug, proven safe) |
+| 09 | `09_packing.fg` | Bit-field packing |
+| 10 | `10_search.fg` | Binary search: provably correct index arithmetic |
+| 11 | `11_align.fg` | Memory alignment |
+| 12 | `12_fixedpoint.fg` | Fixed-point arithmetic |
+| 13 | `13_termination.fg` | Termination proofs |
+| 14 | `14_loop_inv.fg` | Loop invariants |
+| 15 | `15_structs.fg` | Struct invariants + field access in postconditions |
+| 16 | `16_lex_term.fg` | Lexicographic termination |
+| 17 | `17_span.fg` | `span<T>` fat pointer with proven bounds |
+| 18 | `18_mutual_rec.fg` | Mutual recursion with shared termination measure |
+| 19 | `19_gpu_kernel.fg` | GPU kernel: barrier correctness + coalescing analysis |
+| 20 | `20_enum.fg` | Enum types + exhaustive pattern matching |
+| 21 | `21_modules.fg` | Module system: `use std::prelude` |
+| 22 | `22_proof_terms.fg` | Tier 3 manual proof terms |
+| 23 | `23_bitvec.fg` | Bitvector SMT — Z3 uses `(_ BitVec N)` sorts for bitwise ops |
+| 24 | `24_parser_hardening.fg` | Casts, OR-patterns, typed integer literals, nested generics |
+| 25 | `25_generics.fg` | User-defined generic types (`Option<T>`, `Result<T,E>`) |
+| 26 | `26_quantified_ensures.fg` | Quantified postconditions: `forall i: u64, i < n ==> ...` |
+| 27 | `27_induction.fg` | Induction proof terms: `induction x { base, step }` |
+| 28 | `28_forall_loop_inv.fg` | Loop invariants with embedded universal quantifiers |
+| 29 | `29_as_patterns.fg` | `as` patterns in match expressions |
+| 30 | `30_gpu_reduction.fg` | GPU parallel tree reduction with `shared<u64>` and `syncthreads()` |
+| 31 | `31_lemma_postcond.fg` | Proved lemma injection — induction results used in postconditions |
+| 32 | `32_or_return.fg` | `or_return` / `or_fail` error propagation |
+| 33 | `33_impl_methods.fg` | `impl` blocks and struct methods |
+| 34 | `34_borrows.fg` | `ref<T>` and `refmut<T>` borrow types |
+| 35 | `35_secret_type.fg` | `secret<T>` constant-time taint: `ct_select`, `ct_eq`, `mulmod` |
+| 36 | `36_ct_modpow.fg` | Constant-time modular exponentiation (`base^exp mod q`, secret exponent) |
+
+### Intentional failures (in `demos/bad/`)
+
+These demonstrate what FORGE catches:
+
+| File | What it rejects |
+|------|-----------------|
+| `01_div_by_zero.fg` | Division without proof that divisor ≠ 0 |
+| `02_bad_invariant.fg` | Loop invariant that cannot be preserved |
+| `03_no_decreases.fg` | Unbounded recursion with no termination measure |
+| `04_struct_invariant.fg` | Struct construction violating a field invariant |
+| `05_field_ensures.fg` | Postcondition not provable from the body |
+| `06_mutual_no_decreases.fg` | Mutually recursive functions with no shared measure |
+| `07_syncthreads_divergent.fg` | `syncthreads()` inside a branch on a per-thread value |
+
+---
+
+## Language Quick Reference
+
+```forge
+// Function with preconditions, postconditions
+fn sqrt_floor(n: u64) -> u64
+    requires n >= 0
+    ensures  result * result <= n
+{ ... }
+
+// Refinement type
+fn positive(x: [n: u64 | n > 0]) -> u64 { x - 1 }
+
+// Loop invariant + termination
+fn sum(s: span<u64>) -> u64 {
+    let acc: u64 = 0u64;
+    let i: u64   = 0u64;
+    while i < s.len
+        invariant i <= s.len
+        decreases s.len - i
+    { acc = acc + s[i]; i = i + 1u64 };
+    acc
+}
+
+// secret<T> — constant-time cryptographic discipline
+fn ct_select(flag: secret<u64>, a: secret<u64>, b: secret<u64>) -> secret<u64> {
+    let mask: secret<u64> = 0u64 - flag;
+    (mask & a) | (~mask & b)
+}
+
+// GPU kernel
+#[kernel]
+fn vector_add(a: span<f32>, b: span<f32>, c: span<f32>)
+    requires a.len == b.len && b.len == c.len
+{
+    let i: u32 = threadIdx_x + blockIdx_x * blockDim_x;
+    if i < a.len { c[i] = a[i] + b[i] }
+}
+
+// Manual proof term
+lemma double_is_even(n: u64) -> bool
+    ensures result == true
+{
+    proof { auto }
+}
+```
+
+---
+
+## Architecture
+
+```
+lib/
+  ast/          AST node types
+  lexer/        Menhir lexer
+  parser/       Menhir parser (parser.ml pre-generated — see build note)
+  types/        Type checker + proof obligation generation (typecheck.ml)
+  proof/        Z3 bridge + three-tier discharge engine (proof_engine.ml)
+  codegen/      C99 and CUDA C emitter (codegen_c.ml)
+bin/
+  main.ml       CLI entry point
+demos/          36 passing demos + 7 intentional failures
+std/
+  prelude.fg    Standard C/CUDA extern declarations
+```
+
+The pipeline: parse → type-check → generate obligations → discharge (Z3 / guided / manual) → erase proofs → emit C.
+
+---
+
+## Roadmap
+
+- `[T; N]` fixed-size arrays and const generics
+- `std::crypto` module (ML-KEM building blocks using `secret<T>`)
+- IND-CPA proof integration for cryptographic protocols
+- OpenPTXas PTX backend (FORGE → CUDA C → PTX, fully verified)

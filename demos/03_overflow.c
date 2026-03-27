@@ -3,20 +3,27 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
-uint32_t safe_add(uint32_t a, uint32_t b) {
+/* Forward declarations */
+uint32_t safe_add(uint32_t a __attribute__((unused)), uint32_t b __attribute__((unused)));
+uint64_t safe_add64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
+uint64_t scale_to_u32(uint64_t a __attribute__((unused)));
+uint64_t forge_double(uint64_t x __attribute__((unused)));
+
+uint32_t safe_add(uint32_t a __attribute__((unused)), uint32_t b __attribute__((unused))) {
   return (a + b);
 }
 
-uint64_t safe_add64(uint64_t a, uint64_t b) {
+uint64_t safe_add64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
   return (a + b);
 }
 
-uint64_t scale_to_u32(uint64_t a) {
+uint64_t scale_to_u32(uint64_t a __attribute__((unused))) {
   return (a / 1);
 }
 
-uint64_t double(uint64_t x) {
+uint64_t forge_double(uint64_t x __attribute__((unused))) {
   return (x + x);
 }
 

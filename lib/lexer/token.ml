@@ -1,91 +1,128 @@
-(* FORGE Token types — updated: unified angle bracket tokens *)
+(* FORGE Token — re-exports Parser.token so callers can use Token.X constructors.
+   Constructor order must match Parser.MenhirBasics.token exactly. *)
 
-type token =
-  (* Literals *)
-  | INT    of int
-  | FLOAT  of float
+type token = Parser.token =
+  | WITNESS
+  | WHILE
+  | VARYING
+  | USIZE
+  | USE
+  | UNIFORM
+  | UNDERSCORE
+  | U8
+  | U64
+  | U32
+  | U16
+  | U128
+  | TYPE
+  | TRUE
+  | TRANS
+  | TILDE
+  | TASK
+  | SYNCTHREADS
+  | SYMM
+  | STRUCT
   | STRING of string
-
-  (* Identifiers *)
-  | IDENT  of string
-
-  (* Keywords — declarations *)
-  | FN | TYPE | STRUCT | ENUM | IMPL | USE | EXTERN | TASK | CHAN
-
-  (* Keywords — control flow *)
-  | LET | MUT | RETURN | IF | ELSE | MATCH | FOR | WHILE | LOOP
-  | IN | BREAK | CONTINUE | OR_RETURN | OR_FAIL
-
-  (* Keywords — proof *)
-  | REQUIRES | ENSURES | DECREASES | INVARIANT
-  | PROOF | ASSUME | LEMMA | WITNESS | BY | AUTO
-  | RAW | FORALL | EXISTS | OLD | RESULT
-
-  (* Keywords — linearity *)
-  | LIN | AFF
-
-  (* Keywords — literals *)
-  | TRUE | FALSE
-
-  (* Ownership type keywords *)
-  | REF | REFMUT | OWN | RAW_TY
-
-  (* Primitive type keywords *)
-  | U8 | U16 | U32 | U64 | U128 | USIZE
-  | I8 | I16 | I32 | I64 | I128 | ISIZE
-  | F32 | F64
-  | BOOL_TY | NEVER
-
-  (* Grouping *)
-  | LPAREN   (* ( *)
-  | RPAREN   (* ) *)
-  | LBRACE   (* { *)
-  | RBRACE   (* } *)
-  | LBRACKET (* [ *)
-  | RBRACKET (* ] *)
-
-  (* Punctuation *)
-  | COMMA    (* , *)
-  | SEMI     (* ; *)
-  | COLON    (* : *)
-  | DCOLON   (* :: *)
-  | DOT      (* . *)
-  | DOTDOT   (* .. *)
-  | PIPE     (* | *)
-  | AT       (* @ *)
-  | HASH     (* # *)
-  | UNDERSCORE (* _ *)
-
-  (* Arrows *)
-  | ARROW    (* -> *)
-  | FATARROW (* => *)
-
-  (* Comparison *)
-  | LT       (* < *)
-  | LE       (* <= *)
-  | GT       (* > *)
-  | GE       (* >= *)
-  | EQEQ     (* == *)
-  | NEQ      (* != *)
-
-  (* Assignment *)
-  | EQ       (* = *)
-  | PLUSEQ   (* += *)
-  | MINUSEQ  (* -= *)
-  | STAREQ   (* *= *)
-  | SLASHEQ  (* /= *)
-
-  (* Arithmetic *)
-  | PLUS | MINUS | STAR | SLASH | PERCENT
-
-  (* Bitwise *)
-  | AMP | CARET | TILDE | SHL | SHR
-
-  (* Logical *)
-  | BANG     (* ! *)
-  | LAND     (* && *)
-  | LOR      (* || *)
-  | IMPLIES  (* ==> logical implication in predicates *)
-  | IFF      (* <=> logical iff in predicates *)
-
+  | STAREQ
+  | STAR
+  | SPAN
+  | SLASHEQ
+  | SLASH
+  | SHR
+  | SHL
+  | SHARED
+  | SEMI
+  | RPAREN
+  | RETURN
+  | RESULT
+  | REQUIRES
+  | REFMUT
+  | REF
+  | RBRACKET
+  | RBRACE
+  | RAW_TY
+  | RAW
+  | PROOF
+  | PLUSEQ
+  | PLUS
+  | PIPE
+  | PERCENT
+  | OWN
+  | OR_RETURN
+  | OR_FAIL
+  | OLD
+  | NEVER
+  | NEQ
+  | MUT
+  | MINUSEQ
+  | MINUS
+  | MATCH
+  | LT
+  | LPAREN
+  | LOR
+  | LOOP
+  | LIN
+  | LET
+  | LEMMA
+  | LE
+  | LBRACKET
+  | LBRACE
+  | LAND
+  | KERNEL
+  | ISIZE
+  | INVARIANT
+  | INT_SUFF of (int64 * string)
+  | INT of int64
+  | INDUCTION
+  | IN
+  | IMPLIES
+  | IMPL
+  | IFF
+  | IF
+  | IDENT of string
+  | I8
+  | I64
+  | I32
+  | I16
+  | I128
+  | HASH
+  | GT
+  | GE
+  | FORALL
+  | FOR
+  | FN
+  | FLOAT of float
+  | FATARROW
+  | FALSE
+  | F64
+  | F32
+  | EXTERN
+  | EXISTS
+  | EQEQ
+  | EQ
   | EOF
+  | ENUM
+  | ENSURES
+  | ELSE
+  | DOTDOT
+  | DOT
+  | DECREASES
+  | DCOLON
+  | CONTINUE
+  | COMMA
+  | COLON
+  | COALESCED
+  | CHAN
+  | CARET
+  | BY
+  | BREAK
+  | BOOL_TY
+  | BANG
+  | AXIOM
+  | AUTO
+  | AT
+  | ASSUME
+  | AS
+  | ARROW
+  | AMP
+  | AFF

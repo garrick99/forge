@@ -1,0 +1,43 @@
+// Demo 18: Mutual recursion
+//
+// FORGE detects mutual recursion via Tarjan SCC on the call graph.
+// Every function in a cycle must have a 'decreases:' clause to prove termination.
+//
+// is_even / is_odd: the classic example.
+// They call each other; the shared measure is 'n'.
+
+fn is_even(n: u64) -> bool
+  decreases n
+{
+  if n == 0 {
+    true
+  } else {
+    is_odd(n - 1)
+  }
+}
+
+fn is_odd(n: u64) -> bool
+  decreases n
+{
+  if n == 0 {
+    false
+  } else {
+    is_even(n - 1)
+  }
+}
+
+// A more interesting mutual pair: Collatz-style alternating steps.
+// ack_a and ack_b take turns reducing n toward 0.
+fn ack_a(n: u64) -> u64
+  requires n <= 100
+  decreases n
+{
+  if n == 0 { 1 } else { ack_b(n - 1) + 1 }
+}
+
+fn ack_b(n: u64) -> u64
+  requires n <= 100
+  decreases n
+{
+  if n == 0 { 2 } else { ack_a(n - 1) + 1 }
+}

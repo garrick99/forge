@@ -3,8 +3,16 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
-uint64_t gcd(uint64_t a, uint64_t b) {
-  return ((b == 0) ? a : gcd(b, (a % b)));
+/* Forward declarations */
+uint64_t gcd(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
+
+uint64_t gcd(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
+  if ((b == 0)) {
+    return a;
+  } else {
+    return gcd(b, (a % b));
+  }
 }
 

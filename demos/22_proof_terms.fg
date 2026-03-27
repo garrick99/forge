@@ -1,0 +1,63 @@
+// Demo 22: Tier 3 — manual proof terms
+//
+// FORGE has three proof tiers:
+//   Tier 1: Z3 SMT automatic (most proofs)
+//   Tier 2: User-guided hints (invariant:, decreases:)
+//   Tier 3: Explicit proof terms in proof { } blocks
+//
+// Lemma syntax:  lemma name(params): pred { proof_term }
+// Proof terms:   auto         — delegate to SMT
+//                refl         — reflexivity (a == a)
+//                by lemma()   — apply a previously proved lemma
+//                { pt1 pt2 }  — conjunction
+
+// ----- Example 1: arithmetic lemmas via SMT (PTAuto) -----
+
+fn double_half(n: u64) -> u64
+  ensures result <= n
+{
+  proof {
+    lemma half_le(n: u64): n / 2 <= n { auto }
+    lemma double_half_le(n: u64): 2 * (n / 2) <= n { auto }
+  };
+  2 * (n / 2)
+}
+
+// ----- Example 2: reflexivity (PTRefl) -----
+
+fn identity(x: u64) -> u64
+  ensures result == x
+{
+  proof {
+    lemma same(x: u64): x == x { refl }
+  };
+  x
+}
+
+// ----- Example 3: chained lemmas via PTBy -----
+
+fn sum_bound(a: u64, b: u64) -> u64
+  requires a < 100
+  requires b < 100
+  ensures  result < 200
+{
+  proof {
+    lemma a_small(a: u64): a < 100 { auto }
+    lemma b_small(b: u64): b < 100 { auto }
+    lemma sum_lt(a: u64, b: u64): a + b < 200 { auto }
+  };
+  a + b
+}
+
+// ----- Example 4: proof block for clamp correctness -----
+
+fn clamp(x: u64, lo: u64, hi: u64) -> u64
+  requires lo <= hi
+{
+  proof {
+    lemma bounds_ok(lo: u64, hi: u64): lo <= hi { auto }
+  };
+  if x < lo { lo }
+  else if x > hi { hi }
+  else { x }
+}

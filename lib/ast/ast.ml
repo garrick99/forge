@@ -50,7 +50,7 @@ type pred =
   | PTrue
   | PFalse
   | PVar    of ident                        (* bound variable *)
-  | PInt    of int                          (* integer literal *)
+  | PInt    of int64                        (* integer literal *)
   | PBool   of bool
   | PBinop  of binop * pred * pred
   | PUnop   of unop * pred
@@ -60,6 +60,13 @@ type pred =
   | PIte    of pred * pred * pred           (* if cond then t else e — for SMT ite *)
   | PForall of ident * ty * pred           (* forall x: T, P *)
   | PExists of ident * ty * pred           (* exists x: T, P *)
+  | PLex    of pred list                   (* (a, b) — lexicographic termination measure *)
+  | PField  of pred * string               (* pred.field — field projection in pred *)
+  | PStruct of string * (string * pred) list (* struct literal in pred position *)
+  | PIndex  of pred * pred                 (* pred[pred] — array index in pred *)
+
+(* GPU uniformity qualifier — tracks whether a value is same across all threads *)
+and qual = Uniform | Varying
 
 and binop =
   | Add | Sub | Mul | Div | Mod
@@ -86,6 +93,10 @@ and ty =
   | TNamed   of ident * ty list             (* named type with params *)
   | TFn      of fn_ty                       (* function type *)
   | TDepArr  of ident * ty * ty            (* (x: T) -> U(x) dependent *)
+  | TSpan    of ty                          (* span<T> — fat pointer {raw<T>*, usize} *)
+  | TShared  of ty * expr option            (* shared<T>[N] — GPU __shared__ memory *)
+  | TQual    of qual * ty                   (* uniform/varying qualifier *)
+  | TSecret  of ty                          (* secret<T> — constant-time taint wrapper *)
 
 and fn_ty = {
   params:   (ident * ty) list;
@@ -123,9 +134,11 @@ and expr_desc =
   | EProof  of proof_block                  (* proof { ... } *)
   | ERaw    of raw_block                    (* raw { ... } *)
   | EAssume of pred * string option         (* assume(pred) "context" *)
+  | EStruct of ident * (ident * expr) list  (* StructName { field: val, ... } *)
+  | ESync                                   (* __syncthreads() — GPU barrier *)
 
 and lit =
-  | LInt   of int * uint_width option       (* 42u32 *)
+  | LInt   of int64 * prim_ty option        (* 42u32, 5i64 — suffix sets type *)
   | LFloat of float * float_width option
   | LBool  of bool
   | LUnit
@@ -144,6 +157,7 @@ and pattern =
   | PCtor   of ident * pattern list         (* Ctor(p1, p2) *)
   | PTuple  of pattern list
   | PAs     of pattern * ident              (* p as x *)
+  | POr     of pattern * pattern            (* p1 | p2 *)
 
 (* ------------------------------------------------------------------ *)
 (* Statements                                                           *)
@@ -195,11 +209,11 @@ and proof_term =
   | PTAxiom                         (* trust me *)
   | PTRefl                          (* reflexivity *)
   | PTSymm   of proof_term
-  | PTTrans  of proof_term * proof_term
+  | PTTrans  of expr * proof_term * proof_term  (* intermediate term, proof a=b, proof b=c *)
   | PTCong   of proof_term list
   | PTWitness of expr               (* exists witness *)
   | PTCase   of expr * proof_term list
-  | PTInduct of ident * proof_term
+  | PTInduct of ident * proof_term * proof_term  (* var, base, step *)
   | PTBy     of ident * proof_term list   (* by lemma_name(args) *)
   | PTAuto                          (* discharge to SMT *)
 

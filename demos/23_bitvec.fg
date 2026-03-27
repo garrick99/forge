@@ -1,0 +1,64 @@
+// Demo 23: Bitvector SMT — u32/u64 type-safe arithmetic
+//
+// FORGE's SMT backend uses Z3 bitvector sorts for integer types:
+//   u8/u16/u32/u64/u128/usize  →  (_ BitVec N)  unsigned
+//   i8/i16/i32/i64/i128/isize  →  (_ BitVec N)  signed (bvslt/bvsge etc.)
+//
+// This gives correct wrapping semantics and sound bounds proofs.
+// Properties that require bvurem are slow for Z3 4.8 — use masking instead.
+
+// ----- Example 1: byte extraction via masking -----
+// Masks are trivially provable with BV AND: (bvand x 0xFF) < 256
+
+fn lo_byte(x: u32) -> u32
+  ensures result < 256
+{
+  x & 255
+}
+
+fn hi_byte(x: u32) -> u32
+  ensures result < 256
+{
+  (x >> 8) & 255
+}
+
+fn byte2(x: u32) -> u32
+  ensures result < 256
+{
+  (x >> 16) & 255
+}
+
+fn byte3(x: u32) -> u32
+  ensures result < 256
+{
+  x >> 24
+}
+
+// ----- Example 2: u64 index guard for GPU thread indexing -----
+
+fn thread_index(block_id: u64, block_dim: u64, thread_id: u64) -> u64
+  requires block_dim > 0
+  requires thread_id < block_dim
+{
+  block_id * block_dim + thread_id
+}
+
+// ----- Example 3: wrapping overflow stays in u32 range -----
+// No postcondition needed — the BV sort itself enforces u32 range.
+
+fn wrapping_add(a: u32, b: u32) -> u32 {
+  a + b
+}
+
+fn wrapping_mul(a: u32, b: u32) -> u32 {
+  a * b
+}
+
+// ----- Example 4: bit field extraction — always bounded -----
+
+fn bitfield(x: u32, shift: u32, mask: u32) -> u32
+  requires shift < 32
+  ensures  result <= mask
+{
+  (x >> shift) & mask
+}

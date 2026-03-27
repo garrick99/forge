@@ -1,0 +1,61 @@
+// Demo 25: User-defined generic types
+//
+// FORGE supports generic enums and structs via monomorphization.
+// Type arguments are inferred from constructor arguments.
+// Each concrete instantiation (e.g. Option<u32>) becomes a distinct C struct.
+
+// ---- Generic Option ----
+enum Option<T> {
+    None,
+    Some(T),
+}
+
+// ---- Generic Result ----
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+
+// ---- Functions using Option<u32> ----
+
+fn wrap_u32(x: u32) -> Option<u32> {
+    Some(x)
+}
+
+fn unwrap_or(opt: Option<u32>, default: u32) -> u32 {
+    match opt {
+        None    => default,
+        Some(v) => v,
+    }
+}
+
+fn safe_div(a: u32, b: u32) -> Option<u32> {
+    if b == 0 { None }
+    else { Some(a / b) }
+}
+
+// ---- Functions using Option<u64> ----
+
+fn first_nonzero(s: span<u64>) -> Option<u64>
+    requires s.len > 0
+{
+    if s[0] != 0 { Some(s[0]) }
+    else { None }
+}
+
+// ---- Functions using Result<u32, u64> ----
+
+fn checked_add(a: u32, b: u32) -> Result<u32, u64>
+    requires a <= 4294967295
+    requires b <= 4294967295
+{
+    if a + b >= a { Ok(a + b) }
+    else { Err(1u64) }
+}
+
+fn result_unwrap_or(r: Result<u32, u64>, default: u32) -> u32 {
+    match r {
+        Ok(v)  => v,
+        Err(_) => default,
+    }
+}

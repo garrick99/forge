@@ -1,0 +1,28 @@
+// FORGE Bad Demo 02 — False Loop Invariant (correctly rejected)
+//
+// This program SHOULD FAIL to compile.
+// The claimed invariant 'v > 100' is false at loop entry:
+// v starts as x and x <= 10 (from requires).
+//
+// Expected output:
+//   ✗  invariant: while_entry   (v > 100 not provable when v <= 10)
+//   compilation stopped
+//
+// Note: while_preserved may vacuously pass here — because the entry
+// check fails, the invariant is assumed as hypothesis for the body,
+// making that assumption set inconsistent (v > 100 AND v <= 10).
+// An inconsistent hypothesis set makes all goals "provable". This is
+// mathematically sound: the loop never runs with a false invariant.
+// The entry failure is the real gate.
+
+fn bad_loop(x: u64) -> u64
+    requires x <= 10
+{
+    let v: u64 = x;
+    while v > 0
+        invariant v > 100   // false — x starts at most 10
+    {
+        v = v - 1
+    };
+    v
+}

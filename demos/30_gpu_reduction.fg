@@ -1,0 +1,99 @@
+// Demo 30: GPU parallel tree reduction
+//
+// A classic block-level parallel sum reduction using shared memory.
+// Each block of threads cooperatively sums elements from a global input
+// span<u64> into a single output slot per block.
+//
+// FORGE verifies:
+//   - shared memory is declared safely (shared<u64>[block_size])
+//   - syncthreads() is called before cross-thread shared-memory reads
+//   - the per-block write is bounds-safe: blockIdx_x < dst.len
+//   - a fill helper satisfies a quantified loop invariant (demo 28 style)
+//   - the sequential sum helper terminates and stays in-bounds
+
+// ---- CPU helper: sum the first n elements of src ----
+fn sum_n(src: span<u64>, n: u64) -> u64
+  requires n <= src.len
+{
+  let k: u64 = 0;
+  let s: u64 = 0;
+  while k < n
+    invariant k <= n
+    decreases n - k
+  {
+    s = s + src[k];
+    k = k + 1
+  };
+  s
+}
+
+// ---- Fill helper: set dst[0..n) to val ----
+fn fill_u64(dst: span<u64>, val: u64, n: u64)
+  requires n <= dst.len
+  ensures  forall i : u64, i < n ==> dst[i] == val
+{
+  let k: u64 = 0;
+  while k < n
+    invariant k <= n && forall j : u64, j < k ==> dst[j] == val
+  {
+    dst[k] = val;
+    k = k + 1
+  }
+}
+
+// ---- GPU parallel reduction kernel ----
+//
+// Each block reduces block_size elements of src into one element of dst.
+// Phase 1: load src[blockIdx_x * block_size + threadIdx_x] into smem[tid].
+// Phase 2: binary tree reduction with syncthreads() at each stride level.
+// Phase 3: thread 0 writes smem[0] to dst[blockIdx_x].
+//
+// Host preconditions:
+//   src.len == num_blocks * block_size
+//   dst.len >= num_blocks
+//   block_size > 0
+
+#[kernel]
+fn reduce_sum(src: span<u64>, dst: span<u64>, num_blocks: u64, block_size: u64)
+  requires src.len == num_blocks * block_size
+  requires dst.len >= num_blocks
+  requires num_blocks > 0
+  requires block_size == 256
+  requires block_size == blockDim_x
+{
+  // Shared memory tile — fixed 256 elements (one per thread per block)
+  let smem: shared<u64>[256] = 0;
+
+  let tid: u64 = threadIdx_x;
+  let bid: u64 = blockIdx_x;
+  let gid: u64 = bid * block_size + tid;
+
+  // Phase 1: each thread loads its element (bounds-safe: gid checked)
+  if gid < src.len {
+    smem[tid] = src[gid];
+  };
+  syncthreads();
+
+  // Phase 2: binary tree reduction
+  // stride starts at block_size/2 and halves each round.
+  // decreases: stride terminates because stride = stride/2 < stride
+  //            when stride > 0 (integer division).
+  let stride: u64 = block_size / 2;
+  while stride > 0
+    invariant stride >= 0
+    decreases stride
+  {
+    if tid < stride {
+      smem[tid] = smem[tid] + smem[tid + stride];
+    };
+    syncthreads();
+    stride = stride / 2
+  };
+
+  // Phase 3: thread 0 writes result — bid < num_blocks <= dst.len
+  if tid == 0 {
+    if bid < dst.len {
+      dst[bid] = smem[0];
+    }
+  }
+}

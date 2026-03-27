@@ -1,16 +1,17 @@
-// FORGE Demo 06 — GCD: Preconditions on Recursive Calls
+// FORGE Demo 06 — GCD: Preconditions on Recursive Calls + Termination
 //
 // Full GCD correctness requires inductive proofs (Tier 3 — manual).
 // But Tier 1 (Z3) proves what it can: every recursive call satisfies
-// its preconditions. If you mess up the base case or termination,
-// it won't compile — before you ever run a test.
+// its preconditions, and the termination measure strictly decreases.
 //
 // Z3 proves:
 //   - In the recursive case (b != 0), the first arg b > 0 holds
-//   - The recursion eventually terminates (a % b < b)
+//   - Termination measure b >= 0 at entry
+//   - At the recursive call: (a % b) < b  — so the new b is smaller
 
 fn gcd(a: u64[n | n > 0], b: u64) -> u64
     requires a > 0
+    decreases b
 {
     if b == 0
     { a }

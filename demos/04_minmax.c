@@ -3,17 +3,40 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
-uint64_t max(uint64_t a, uint64_t b) {
-  return ((a >= b) ? a : b);
+/* Forward declarations */
+uint64_t max(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
+uint64_t min(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
+uint64_t clamp(uint64_t x __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused)));
+
+uint64_t max(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
+  if ((a >= b)) {
+    return a;
+  } else {
+    return b;
+  }
 }
 
-uint64_t min(uint64_t a, uint64_t b) {
-  return ((a <= b) ? a : b);
+uint64_t min(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
+  if ((a <= b)) {
+    return a;
+  } else {
+    return b;
+  }
 }
 
-uint64_t clamp(uint64_t x, uint64_t lo, uint64_t hi) {
-  uint64_t y = ((x < lo) ? lo : x);
-  return ((y > hi) ? hi : y);
+uint64_t clamp(uint64_t x __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
+  uint64_t y;
+  if ((x < lo)) {
+    y = lo;
+  } else {
+    y = x;
+  }
+  if ((y > hi)) {
+    return hi;
+  } else {
+    return y;
+  }
 }
 

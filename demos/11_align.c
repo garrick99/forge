@@ -3,16 +3,26 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
-uint64_t align_down(uint64_t n, uint64_t align) {
+/* Forward declarations */
+uint64_t align_down(uint64_t n __attribute__((unused)), uint64_t align __attribute__((unused)));
+uint64_t align_up(uint64_t n __attribute__((unused)), uint64_t align __attribute__((unused)));
+uint64_t is_aligned(uint64_t n __attribute__((unused)), uint64_t align __attribute__((unused)));
+
+uint64_t align_down(uint64_t n __attribute__((unused)), uint64_t align __attribute__((unused))) {
   return ((n / align) * align);
 }
 
-uint64_t align_up(uint64_t n, uint64_t align) {
+uint64_t align_up(uint64_t n __attribute__((unused)), uint64_t align __attribute__((unused))) {
   return ((((n + align) - 1) / align) * align);
 }
 
-uint64_t is_aligned(uint64_t n, uint64_t align) {
-  return (((n - ((n / align) * align)) == 0) ? 1 : 0);
+uint64_t is_aligned(uint64_t n __attribute__((unused)), uint64_t align __attribute__((unused))) {
+  if (((n - ((n / align) * align)) == 0)) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 

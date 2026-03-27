@@ -1,0 +1,83 @@
+// Demo 27: Tier 3 — induction proof terms
+//
+// PTInduct: natural-number induction over a free variable x.
+// Syntax:   induction x { base_proof, step_proof }
+//
+// The proof engine checks:
+//   base case:  P[x := 0]          proved by base_proof
+//   step case:  P[x := x+1]        proved by step_proof, with IH P[x := x] in context
+//
+// Induction is most useful for non-linear and recursive properties that Z3
+// would time out on without structural guidance.  Here the interesting work
+// lives inside the proof blocks; the function bodies are kept trivially simple
+// so their postconditions are always dischargeable by SMT directly.
+
+// ---- 1. n >= 0 is vacuously true for u64 — shows basic induction shape ----
+//
+//   Base (n=0): 0 >= 0                           — auto
+//   Step:       given IH (n >= 0), n+1 >= 0      — auto (linear)
+
+fn prove_nonneg(n: u64) -> bool
+  ensures result == true
+{
+  proof {
+    lemma nonneg(n: u64): n >= 0 {
+      induction n { auto, auto }
+    }
+  };
+  true
+}
+
+// ---- 2. 2*n >= n for all n : u64 ----
+//
+//   Base (n=0): 2*0 >= 0                                — auto
+//   Step:       given IH (2*n >= n), 2*(n+1) >= n+1    — auto (linear: 2n+2 >= n+1)
+
+fn prove_double_lower_bound(n: u64) -> bool
+  ensures result == true
+{
+  proof {
+    lemma double_ge(n: u64): 2 * n >= n {
+      induction n { auto, auto }
+    }
+  };
+  true
+}
+
+// ---- 3. n*(n+1) is always even ----
+//
+//   Base (n=0): 0*1 % 2 == 0                            — auto
+//   Step:       given IH (n*(n+1) % 2 == 0),
+//               (n+1)*(n+2) = n*(n+1) + 2*(n+1),
+//               so (n+1)*(n+2) % 2 == 0                 — auto (IH + linear remainder)
+//
+// The IH is added as an assumption to the step context, so Z3 sees:
+//   assume (n*(n+1)) % 2 == 0
+//   prove  ((n+1)*(n+2)) % 2 == 0
+
+fn prove_consec_even(n: u64) -> bool
+  ensures result == true
+{
+  proof {
+    lemma consec_even(n: u64): (n * (n + 1)) % 2 == 0 {
+      induction n { auto, auto }
+    }
+  };
+  true
+}
+
+// ---- 4. Induction combined with a PTBy application ----
+//
+// First prove a building-block lemma, then use it in a second lemma via `by`.
+
+fn prove_chain(n: u64) -> bool
+  ensures result == true
+{
+  proof {
+    lemma step_pos(n: u64): n + 1 > 0 {
+      induction n { auto, auto }
+    }
+    lemma succ_ge_one(n: u64): n + 1 >= 1 { by step_pos() }
+  };
+  true
+}

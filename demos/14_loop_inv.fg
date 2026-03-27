@@ -1,0 +1,60 @@
+// FORGE Demo 14 — Loop Invariants
+//
+// FORGE's while loop accepts an 'invariant' clause.
+// For each loop, FORGE generates two proof obligations:
+//   1. Invariant holds at entry  (from pre-loop facts)
+//   2. Invariant is preserved    (body checked with cond ∧ inv as facts)
+//
+// After the loop: ¬cond ∧ inv are added as known facts,
+// enabling postcondition proofs that depend on loop results.
+//
+// SSA-lite assignment tracking (env_assign_var) renames the old
+// value of x to __x_pN when x is reassigned, so Z3 never sees a
+// contradiction from x = x - 1.
+
+// Decrement x to zero; prove the invariant x >= 0 is preserved
+// on every iteration.  Since u64 is non-negative, and the loop
+// only runs while x > 0, underflow is impossible.
+fn count_down(x: u64) -> u64
+    requires x <= 1000
+{
+    let v: u64 = x;
+    while v > 0
+        invariant v >= 0
+    {
+        v = v - 1
+    };
+    v
+}
+
+// Accumulate partial sum; invariant keeps the accumulator non-negative.
+fn triangular(n: u64) -> u64
+    requires n <= 1000
+    ensures  result >= 0
+{
+    let acc: u64 = 0;
+    let i: u64 = 0;
+    while i <= n
+        invariant acc >= 0
+    {
+        acc = acc + i;
+        i = i + 1
+    };
+    acc
+}
+
+// Count down to zero and prove result == 0.
+// After the loop: ¬(v > 0) ∧ (v >= 0)  →  v == 0.
+// The post-body env carries these facts, enabling the postcondition proof.
+fn count_down_to_zero(x: u64) -> u64
+    requires x <= 1000
+    ensures  result == 0
+{
+    let v: u64 = x;
+    while v > 0
+        invariant v >= 0
+    {
+        v = v - 1
+    };
+    v
+}

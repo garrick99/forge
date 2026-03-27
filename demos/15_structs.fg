@@ -1,0 +1,60 @@
+// FORGE Demo 15 — Struct Invariants + Field Access in Postconditions
+//
+// Structs carry invariants that must hold at every construction site.
+// FORGE generates a proof obligation for each invariant at each
+// 'struct TypeName { ... }' expression.
+//
+// NEW: field access in ensures clauses — result.lo, result.hi, etc.
+// Z3 proves:
+//   - make_range: lo <= hi at construction AND result.lo == lo, result.hi == hi
+//   - clamp:      result.hi == max, and result.lo <= max
+//   - in_range:   no struct construction — just field access (no obligations)
+//
+// The invariant is part of the type: any Range value FORGE accepts is
+// guaranteed to satisfy lo <= hi.  No runtime check needed.
+
+struct Range {
+    lo: u64,
+    hi: u64,
+    invariant lo <= hi
+}
+
+// Construct a range.  Requires the caller to prove lo <= hi.
+// FORGE proves: invariant holds AND result.lo == lo, result.hi == hi.
+fn make_range(lo: u64, hi: u64) -> Range
+    requires lo <= hi
+    ensures result.lo == lo
+    ensures result.hi == hi
+{
+    struct Range { lo: lo, hi: hi }
+}
+
+// Clamp a value to [0, max], returning a Range [v_clamped, max].
+// The hi field is always max; lo is at most max.
+fn clamp_range(v: u64, max: u64) -> Range
+    requires max > 0
+    ensures result.hi == max
+{
+    if v <= max
+    { struct Range { lo: v, hi: max } }
+    else
+    { struct Range { lo: 0, hi: max } }
+}
+
+// Check whether a value falls within a range.
+fn in_range(r: Range, x: u64) -> u64
+{
+    if r.lo <= x && x <= r.hi
+    { 1 }
+    else
+    { 0 }
+}
+
+// Width of a range: hi - lo.
+// Requires r.lo <= r.hi (guaranteed by the Range invariant).
+// Proves result == r.hi - r.lo via struct field access in ensures.
+fn range_width(r: Range) -> u64
+    ensures result == r.hi - r.lo
+{
+    r.hi - r.lo
+}

@@ -1,0 +1,42 @@
+// Demo 17: span<T> — fat pointer with proven bounds
+//
+// span<T> is a {data: raw<T>*, len: usize} pair.
+// Every index generates an obligation: i < span.len
+// which must be discharged by the proof engine.
+
+// Sum all elements of a span — bounds proven at each access.
+fn sum_span(s: span<u64>)
+  -> u64
+  requires s.len > 0
+{
+  let acc: u64 = 0;
+  let i: u64 = 0;
+  while i < s.len
+    invariant i <= s.len
+    decreases s.len - i
+  {
+    // i < s.len is the loop invariant — bounds check discharged by SMT
+    acc = acc + s[i];
+    i = i + 1;
+  };
+  acc
+}
+
+// Return the maximum element of a non-empty span.
+fn span_max(s: span<u64>)
+  -> u64
+  requires s.len > 0
+{
+  let m: u64 = s[0];
+  let i: u64 = 1;
+  while i < s.len
+    invariant i <= s.len
+    decreases s.len - i
+  {
+    if s[i] > m {
+      m = s[i];
+    };
+    i = i + 1;
+  };
+  m
+}

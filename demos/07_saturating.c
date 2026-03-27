@@ -3,12 +3,25 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
-uint32_t sat_add_u32(uint32_t a, uint32_t b) {
-  return ((a <= (4294967295 - b)) ? (a + b) : 4294967295);
+/* Forward declarations */
+uint32_t sat_add_u32(uint32_t a __attribute__((unused)), uint32_t b __attribute__((unused)));
+uint32_t sat_sub_u32(uint32_t a __attribute__((unused)), uint32_t b __attribute__((unused)));
+
+uint32_t sat_add_u32(uint32_t a __attribute__((unused)), uint32_t b __attribute__((unused))) {
+  if ((a <= (4294967295 - b))) {
+    return (a + b);
+  } else {
+    return 4294967295;
+  }
 }
 
-uint32_t sat_sub_u32(uint32_t a, uint32_t b) {
-  return ((a >= b) ? (a - b) : 0);
+uint32_t sat_sub_u32(uint32_t a __attribute__((unused)), uint32_t b __attribute__((unused))) {
+  if ((a >= b)) {
+    return (a - b);
+  } else {
+    return 0;
+  }
 }
 

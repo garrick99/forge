@@ -1,0 +1,24 @@
+// Demo 21: Module system — use declarations
+//
+// 'use' splices another .fg file's items directly into this compilation unit.
+// Path: std::prelude → ./std/prelude.fg
+// Duplicate use is safe — cycle guard prevents double-inclusion.
+
+use std::prelude;
+
+fn hypot(a: f64, b: f64) -> f64 {
+  sqrt(a * a + b * b)
+}
+
+fn abs_diff(a: f64, b: f64) -> f64 {
+  fabs(a - b)
+}
+
+fn circle_area(r: f64) -> f64 {
+  // pi ≈ pow(e, log(pi)) — just to use the prelude
+  r * r * 3.14159265358979
+}
+
+fn magnitude3(x: f64, y: f64, z: f64) -> f64 {
+  sqrt(x*x + y*y + z*z)
+}

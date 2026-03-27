@@ -1,0 +1,80 @@
+// Demo 31: Proved lemma injection — using induction results in postconditions
+//
+// FORGE's proved_lemmas registry accumulates across all items in a program.
+// Any lemma proved via `proof { lemma ... }` is injected as a universally-
+// quantified axiom into every subsequent Z3 query.  This lets you prove a
+// hard fact once by induction, then rely on it in function postconditions
+// without repeating the induction argument.
+//
+// Key property exercised here:
+//   (n * (n + 1)) % 2 == 0   for all n : u64
+//
+// Z3 cannot prove this unaided (non-linear integer arithmetic over an
+// unbounded variable).  After the induction lemma is registered, Z3 receives
+// it as:
+//   (assert (forall ((__lem_consec_even_n Int))
+//     (=> (>= __lem_consec_even_n 0)
+//         (= (mod (* __lem_consec_even_n (+ __lem_consec_even_n 1)) 2) 0))))
+// and can instantiate it for the specific 'n' in each obligation.
+
+// ---- Step 1: prove the lemma by induction ----
+//
+// We package it inside a function so it's registered at program-check time.
+// The function's own postcondition is trivial; the value is the side-effect
+// of registering the lemma.
+
+fn register_lemmas() -> bool
+  ensures result == true
+{
+  proof {
+    lemma consec_even(n: u64): (n * (n + 1)) % 2 == 0 {
+      induction n { auto, auto }
+    }
+    lemma double_ge(n: u64): 2 * n >= n {
+      induction n { auto, auto }
+    }
+  };
+  true
+}
+
+// ---- Step 2: function whose postcondition needs consec_even ----
+//
+// half_product computes floor(n*(n+1)/2) — the n-th triangular number.
+// The postcondition states the product is twice the result, i.e. the
+// division is exact.  This is only true because n*(n+1) is always even.
+//
+// Without lemma injection, Z3 sees:
+//   result = n*(n+1)/2  and must prove  result*2 == n*(n+1)
+// which requires knowing n*(n+1) % 2 == 0 — impossible for Z3 over Int.
+//
+// With the injected axiom, Z3 can instantiate consec_even(n) to get
+//   (n*(n+1)) % 2 == 0
+// and from there conclude the division is exact.
+
+fn half_product(n: u64) -> u64
+  ensures result * 2 == n * (n + 1)
+{
+  n * (n + 1) / 2
+}
+
+// ---- Step 3: function that uses double_ge ----
+//
+// proves result >= n without Z3 needing non-linear reasoning about 2*n >= n
+// (trivially true, but demonstrates the cross-function injection pattern)
+
+fn safe_double(n: u64) -> u64
+  ensures result >= n
+{
+  2 * n
+}
+
+// ---- Step 4: combining both lemmas ----
+//
+// A function that needs BOTH injected lemmas simultaneously.
+// result = 2*(n*(n+1)/2) = n*(n+1) >= n   (needs consec_even + double_ge)
+
+fn triangle_ge_n(n: u64) -> u64
+  ensures result >= n
+{
+  n * (n + 1) / 2
+}

@@ -1,0 +1,1385 @@
+
+** Conflict (shift/reduce) in state 26.
+** Tokens involved: VARYING UNIFORM SPAN SHARED RAW KERNEL IDENT COALESCED BY
+** The following explanations concentrate on token VARYING.
+** This state is reached from program after reading:
+
+STRUCT ident kind_params LBRACE ident COLON VARYING
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+struct_def 
+STRUCT ident kind_params LBRACE list(struct_field) list(invariant_clause) RBRACE 
+                                (?)
+
+** In state 26, looking ahead at VARYING, shifting is permitted
+** because of the following sub-derivation:
+
+struct_field list(struct_field) 
+ident COLON ty COMMA 
+            VARYING ty 
+                    ident type_args 
+                    . VARYING 
+
+** In state 26, looking ahead at VARYING, reducing production
+** ident -> VARYING
+** is permitted because of the following sub-derivation:
+
+struct_field list(struct_field) // lookahead token appears because list(struct_field) can begin with VARYING
+ident COLON ty // lookahead token is inherited
+            ident type_args // lookahead token is inherited because type_args can vanish
+            VARYING . 
+
+** Conflict (shift/reduce) in state 28.
+** Tokens involved: VARYING UNIFORM SPAN SHARED RAW KERNEL IDENT COALESCED BY
+** The following explanations concentrate on token VARYING.
+** This state is reached from program after reading:
+
+STRUCT ident kind_params LBRACE ident COLON UNIFORM
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+struct_def 
+STRUCT ident kind_params LBRACE list(struct_field) list(invariant_clause) RBRACE 
+                                (?)
+
+** In state 28, looking ahead at VARYING, reducing production
+** ident -> UNIFORM
+** is permitted because of the following sub-derivation:
+
+struct_field list(struct_field) // lookahead token appears because list(struct_field) can begin with VARYING
+ident COLON ty // lookahead token is inherited
+            ident type_args // lookahead token is inherited because type_args can vanish
+            UNIFORM . 
+
+** In state 28, looking ahead at VARYING, shifting is permitted
+** because of the following sub-derivation:
+
+struct_field list(struct_field) 
+ident COLON ty COMMA 
+            UNIFORM ty 
+                    ident type_args 
+                    . VARYING 
+
+** Conflict (shift/reduce) in state 34.
+** Token involved: LT
+** This state is reached from program after reading:
+
+IMPL SPAN
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     (?)
+
+** In state 34, looking ahead at LT, reducing production
+** ident -> SPAN
+** is permitted because of the following sub-derivation:
+
+ident type_args // lookahead token appears because type_args can begin with LT
+SPAN . 
+
+** In state 34, looking ahead at LT, shifting is permitted
+** because of the following sub-derivation:
+
+SPAN . LT ty GT 
+
+** Conflict (shift/reduce) in state 36.
+** Token involved: LT
+** This state is reached from program after reading:
+
+IMPL SHARED
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     (?)
+
+** In state 36, looking ahead at LT, reducing production
+** ident -> SHARED
+** is permitted because of the following sub-derivation:
+
+ident type_args // lookahead token appears because type_args can begin with LT
+SHARED . 
+
+** In state 36, looking ahead at LT, shifting is permitted
+** because of the following sub-derivation:
+
+SHARED . LT ty GT LBRACKET expr RBRACKET 
+
+** Conflict (shift/reduce) in state 77.
+** Tokens involved: VARYING UNIFORM TRUE STAR SPAN SHARED RAW MINUS LPAREN LBRACE KERNEL INT IDENT FALSE COALESCED BY AMP
+** The following explanations concentrate on token STAR.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI RETURN
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 77, looking ahead at STAR, shifting is permitted
+** because of the following sub-derivation:
+
+return_expr 
+RETURN option(expr) 
+       expr 
+       . STAR expr 
+
+** In state 77, looking ahead at STAR, reducing production
+** option(expr) ->
+** is permitted because of the following sub-derivation:
+
+expr STAR expr // lookahead token appears
+return_expr // lookahead token is inherited
+RETURN option(expr) // lookahead token is inherited
+       . 
+
+** Conflict (shift/reduce) in state 78.
+** Token involved: LBRACE
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI WHILE RAW
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      loop_expr 
+                      (?)
+
+** In state 78, looking ahead at LBRACE, reducing production
+** ident -> RAW
+** is permitted because of the following sub-derivation:
+
+WHILE expr option(preceded(INVARIANT,pred)) option(preceded(DECREASES,pred)) block_expr // lookahead token appears because option(preceded(INVARIANT,pred)) option(preceded(DECREASES,pred)) can vanish and block_expr can begin with LBRACE
+      atom_expr // lookahead token is inherited
+      ident // lookahead token is inherited
+      RAW . 
+
+** In state 78, looking ahead at LBRACE, shifting is permitted
+** because of the following sub-derivation:
+
+WHILE expr option(preceded(INVARIANT,pred)) option(preceded(DECREASES,pred)) block_expr 
+      raw_expr 
+      RAW . LBRACE list(stmt) RBRACE 
+
+** Conflict (shift/reduce) in state 115.
+** Tokens involved: STAR SLASH SHR SHL PLUS PIPE PERCENT NEQ MINUS LT LOR LE LBRACKET LAND IMPLIES IFF GT GE EQEQ DOT CARET AMP
+** The following explanations concentrate on token STAR.
+** This state is reached from program after reading:
+
+IMPL prim_ty_kw LBRACKET ident PIPE BANG pred
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     prim_ty_kw LBRACKET ident PIPE pred RBRACKET 
+                                    (?)
+
+** In state 115, looking ahead at STAR, shifting is permitted
+** because of the following sub-derivation:
+
+BANG pred 
+     pred . STAR pred 
+
+** In state 115, looking ahead at STAR, reducing production
+** pred -> BANG pred
+** is permitted because of the following sub-derivation:
+
+pred STAR pred // lookahead token appears
+BANG pred . 
+
+** Conflict (shift/reduce) in state 169.
+** Tokens involved: STAR SLASH SHR SHL PLUS PIPE PERCENT NEQ MINUS LT LOR LE LBRACKET LAND IMPLIES IFF GT GE EQEQ DOT CARET AMP
+** The following explanations concentrate on token STAR.
+** This state is reached from program after reading:
+
+IMPL prim_ty_kw LBRACKET ident PIPE EXISTS ident COLON ty COMMA pred
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     prim_ty_kw LBRACKET ident PIPE pred RBRACKET 
+                                    (?)
+
+** In state 169, looking ahead at STAR, shifting is permitted
+** because of the following sub-derivation:
+
+EXISTS ident COLON ty COMMA pred 
+                            pred . STAR pred 
+
+** In state 169, looking ahead at STAR, reducing production
+** pred -> EXISTS ident COLON ty COMMA pred
+** is permitted because of the following sub-derivation:
+
+pred STAR pred // lookahead token appears
+EXISTS ident COLON ty COMMA pred . 
+
+** Conflict (shift/reduce) in state 178.
+** Tokens involved: STAR SLASH SHR SHL PLUS PIPE PERCENT NEQ MINUS LT LOR LE LBRACKET LAND IMPLIES IFF GT GE EQEQ DOT CARET AMP
+** The following explanations concentrate on token STAR.
+** This state is reached from program after reading:
+
+IMPL prim_ty_kw LBRACKET ident PIPE FORALL ident COLON ty COMMA pred
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     prim_ty_kw LBRACKET ident PIPE pred RBRACKET 
+                                    (?)
+
+** In state 178, looking ahead at STAR, shifting is permitted
+** because of the following sub-derivation:
+
+FORALL ident COLON ty COMMA pred 
+                            pred . STAR pred 
+
+** In state 178, looking ahead at STAR, reducing production
+** pred -> FORALL ident COLON ty COMMA pred
+** is permitted because of the following sub-derivation:
+
+pred STAR pred // lookahead token appears
+FORALL ident COLON ty COMMA pred . 
+
+** Conflict (shift/reduce) in state 233.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI AMP expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 233, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+AMP expr 
+    expr . STAREQ expr 
+
+** In state 233, looking ahead at STAREQ, reducing production
+** expr -> AMP expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+AMP expr . 
+
+** Conflict (shift/reduce) in state 235.
+** Tokens involved: STAREQ STAR SLASHEQ SLASH SHR SHL PLUSEQ PLUS PIPE PERCENT OR_RETURN OR_FAIL NEQ MINUSEQ MINUS LT LPAREN LOR LE LBRACKET LAND IMPLIES IFF GT GE EQEQ EQ DOT CARET AMP
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr STAREQ expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 235, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr STAREQ expr 
+            expr . STAREQ expr 
+
+** In state 235, looking ahead at STAREQ, reducing production
+** expr -> expr STAREQ expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr STAREQ expr . 
+
+** Conflict (shift/reduce) in state 237.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr STAR expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 237, looking ahead at STAREQ, reducing production
+** expr -> expr STAR expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr STAR expr . 
+
+** In state 237, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr STAR expr 
+          expr . STAREQ expr 
+
+** Conflict (shift/reduce) in state 239.
+** Tokens involved: STAREQ STAR SLASHEQ SLASH SHR SHL PLUSEQ PLUS PIPE PERCENT OR_RETURN OR_FAIL NEQ MINUSEQ MINUS LT LPAREN LOR LE LBRACKET LAND IMPLIES IFF GT GE EQEQ EQ DOT CARET AMP
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr SLASHEQ expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 239, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr SLASHEQ expr 
+             expr . STAREQ expr 
+
+** In state 239, looking ahead at STAREQ, reducing production
+** expr -> expr SLASHEQ expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr SLASHEQ expr . 
+
+** Conflict (shift/reduce) in state 241.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr SLASH expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 241, looking ahead at STAREQ, reducing production
+** expr -> expr SLASH expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr SLASH expr . 
+
+** In state 241, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr SLASH expr 
+           expr . STAREQ expr 
+
+** Conflict (shift/reduce) in state 243.
+** Tokens involved: STAREQ STAR SLASHEQ SLASH SHR SHL PLUSEQ PLUS PIPE PERCENT OR_RETURN OR_FAIL NEQ MINUSEQ MINUS LT LPAREN LOR LE LBRACKET LAND IMPLIES IFF GT GE EQEQ EQ DOT CARET AMP
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr PLUSEQ expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 243, looking ahead at STAREQ, reducing production
+** expr -> expr PLUSEQ expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr PLUSEQ expr . 
+
+** In state 243, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr PLUSEQ expr 
+            expr . STAREQ expr 
+
+** Conflict (shift/reduce) in state 245.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr SHR expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 245, looking ahead at STAREQ, reducing production
+** expr -> expr SHR expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr SHR expr . 
+
+** In state 245, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr SHR expr 
+         expr . STAREQ expr 
+
+** Conflict (shift/reduce) in state 247.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr PLUS expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 247, looking ahead at STAREQ, reducing production
+** expr -> expr PLUS expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr PLUS expr . 
+
+** In state 247, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr PLUS expr 
+          expr . STAREQ expr 
+
+** Conflict (shift/reduce) in state 249.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr PERCENT expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 249, looking ahead at STAREQ, reducing production
+** expr -> expr PERCENT expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr PERCENT expr . 
+
+** In state 249, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr PERCENT expr 
+             expr . STAREQ expr 
+
+** Conflict (shift/reduce) in state 251.
+** Tokens involved: STAREQ STAR SLASHEQ SLASH SHR SHL PLUSEQ PLUS PIPE PERCENT OR_RETURN OR_FAIL NEQ MINUSEQ MINUS LT LPAREN LOR LE LBRACKET LAND IMPLIES IFF GT GE EQEQ EQ DOT CARET AMP
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr OR_RETURN expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 251, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr OR_RETURN expr 
+               expr . STAREQ expr 
+
+** In state 251, looking ahead at STAREQ, reducing production
+** expr -> expr OR_RETURN expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr OR_RETURN expr . 
+
+** Conflict (shift/reduce) in state 253.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr SHL expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 253, looking ahead at STAREQ, reducing production
+** expr -> expr SHL expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr SHL expr . 
+
+** In state 253, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr SHL expr 
+         expr . STAREQ expr 
+
+** Conflict (shift/reduce) in state 255.
+** Tokens involved: STAREQ STAR SLASHEQ SLASH SHR SHL PLUSEQ PLUS PIPE PERCENT OR_RETURN OR_FAIL NEQ MINUSEQ MINUS LT LPAREN LOR LE LBRACKET LAND IMPLIES IFF GT GE EQEQ EQ DOT CARET AMP
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr OR_FAIL expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 255, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr OR_FAIL expr 
+             expr . STAREQ expr 
+
+** In state 255, looking ahead at STAREQ, reducing production
+** expr -> expr OR_FAIL expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr OR_FAIL expr . 
+
+** Conflict (shift/reduce) in state 257.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr PIPE expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 257, looking ahead at STAREQ, reducing production
+** expr -> expr PIPE expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr PIPE expr . 
+
+** In state 257, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr PIPE expr 
+          expr . STAREQ expr 
+
+** Conflict (shift/reduce) in state 259.
+** Tokens involved: STAREQ STAR SLASHEQ SLASH SHR SHL PLUSEQ PLUS PIPE PERCENT OR_RETURN OR_FAIL NEQ MINUSEQ MINUS LT LPAREN LOR LE LBRACKET LAND IMPLIES IFF GT GE EQEQ EQ DOT CARET AMP
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr MINUSEQ expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 259, looking ahead at STAREQ, reducing production
+** expr -> expr MINUSEQ expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr MINUSEQ expr . 
+
+** In state 259, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr MINUSEQ expr 
+             expr . STAREQ expr 
+
+** Conflict (shift/reduce) in state 261.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr NEQ expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 261, looking ahead at STAREQ, reducing production
+** expr -> expr NEQ expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr NEQ expr . 
+
+** In state 261, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr NEQ expr 
+         expr . STAREQ expr 
+
+** Conflict (shift/reduce) in state 263.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr MINUS expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 263, looking ahead at STAREQ, reducing production
+** expr -> expr MINUS expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr MINUS expr . 
+
+** In state 263, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr MINUS expr 
+           expr . STAREQ expr 
+
+** Conflict (shift/reduce) in state 270.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr LT expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 270, looking ahead at STAREQ, reducing production
+** expr -> expr LT expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr LT expr . 
+
+** In state 270, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr LT expr 
+        expr . STAREQ expr 
+
+** Conflict (shift/reduce) in state 275.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr LOR expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 275, looking ahead at STAREQ, reducing production
+** expr -> expr LOR expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr LOR expr . 
+
+** In state 275, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr LOR expr 
+         expr . STAREQ expr 
+
+** Conflict (shift/reduce) in state 277.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr LE expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 277, looking ahead at STAREQ, reducing production
+** expr -> expr LE expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr LE expr . 
+
+** In state 277, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr LE expr 
+        expr . STAREQ expr 
+
+** Conflict (shift/reduce) in state 279.
+** Tokens involved: STAREQ STAR SLASHEQ SLASH SHR SHL PLUSEQ PLUS PIPE PERCENT OR_RETURN OR_FAIL NEQ MINUSEQ MINUS LT LPAREN LOR LE LBRACKET LAND IMPLIES IFF GT GE EQEQ EQ DOT CARET AMP
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr EQ expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 279, looking ahead at STAREQ, reducing production
+** expr -> expr EQ expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr EQ expr . 
+
+** In state 279, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr EQ expr 
+        expr . STAREQ expr 
+
+** Conflict (shift/reduce) in state 281.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr LAND expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 281, looking ahead at STAREQ, reducing production
+** expr -> expr LAND expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr LAND expr . 
+
+** In state 281, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr LAND expr 
+          expr . STAREQ expr 
+
+** Conflict (shift/reduce) in state 283.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr GT expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 283, looking ahead at STAREQ, reducing production
+** expr -> expr GT expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr GT expr . 
+
+** In state 283, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr GT expr 
+        expr . STAREQ expr 
+
+** Conflict (shift/reduce) in state 287.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr CARET expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 287, looking ahead at STAREQ, reducing production
+** expr -> expr CARET expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr CARET expr . 
+
+** In state 287, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr CARET expr 
+           expr . STAREQ expr 
+
+** Conflict (shift/reduce) in state 289.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr AMP expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 289, looking ahead at STAREQ, reducing production
+** expr -> expr AMP expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr AMP expr . 
+
+** In state 289, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr AMP expr 
+         expr . STAREQ expr 
+
+** Conflict (shift/reduce) in state 294.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr GE expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 294, looking ahead at STAREQ, reducing production
+** expr -> expr GE expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr GE expr . 
+
+** In state 294, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr GE expr 
+        expr . STAREQ expr 
+
+** Conflict (shift/reduce) in state 296.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr EQEQ expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 296, looking ahead at STAREQ, reducing production
+** expr -> expr EQEQ expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr EQEQ expr . 
+
+** In state 296, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr EQEQ expr 
+          expr . STAREQ expr 
+
+** Conflict (shift/reduce) in state 298.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr IMPLIES expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 298, looking ahead at STAREQ, reducing production
+** expr -> expr IMPLIES expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr IMPLIES expr . 
+
+** In state 298, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr IMPLIES expr 
+             expr . STAREQ expr 
+
+** Conflict (shift/reduce) in state 300.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr IFF expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 300, looking ahead at STAREQ, reducing production
+** expr -> expr IFF expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+expr IFF expr . 
+
+** In state 300, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+expr IFF expr 
+         expr . STAREQ expr 
+
+** Conflict (shift/reduce) in state 303.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI BANG expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 303, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+BANG expr 
+     expr . STAREQ expr 
+
+** In state 303, looking ahead at STAREQ, reducing production
+** expr -> BANG expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+BANG expr . 
+
+** Conflict (shift/reduce) in state 363.
+** Token involved: LPAREN
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI MATCH expr LBRACE pattern option(preceded(IF,pred)) FATARROW expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      match_expr 
+                      MATCH expr LBRACE list(match_arm) RBRACE 
+                                        (?)
+
+** In state 363, looking ahead at LPAREN, reducing production
+** arm_body -> expr
+** is permitted because of the following sub-derivation:
+
+match_arm list(match_arm) // lookahead token appears because list(match_arm) can begin with LPAREN
+pattern option(preceded(IF,pred)) FATARROW arm_body // lookahead token is inherited
+                                           expr . 
+
+** In state 363, looking ahead at LPAREN, shifting is permitted
+** because of the following sub-derivation:
+
+match_arm list(match_arm) 
+pattern option(preceded(IF,pred)) FATARROW arm_body 
+                                           expr COMMA 
+                                           expr . LPAREN loption(separated_nonempty_list(COMMA,expr)) RPAREN 
+
+** Conflict (reduce/reduce) in state 365.
+** Tokens involved: VARYING UNIFORM UNDERSCORE TRUE SPAN SHARED RBRACE RAW LPAREN KERNEL INT IDENT FALSE COMMA COALESCED BY
+** The following explanations concentrate on token VARYING.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI MATCH expr LBRACE pattern option(preceded(IF,pred)) FATARROW block_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      match_expr 
+                      MATCH expr LBRACE list(match_arm) RBRACE 
+                                        match_arm list(match_arm) // lookahead token appears because list(match_arm) can begin with VARYING
+                                        pattern option(preceded(IF,pred)) FATARROW arm_body // lookahead token is inherited
+                                                                                   (?)
+
+** In state 365, looking ahead at VARYING, reducing production
+** arm_body -> block_expr
+** is permitted because of the following sub-derivation:
+
+block_expr . 
+
+** In state 365, looking ahead at VARYING, reducing production
+** expr -> block_expr
+** is permitted because of the following sub-derivation:
+
+expr // lookahead token is inherited
+block_expr . 
+
+** Conflict (shift/reduce) in state 372.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI MINUS expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 372, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+MINUS expr 
+      expr . STAREQ expr 
+
+** In state 372, looking ahead at STAREQ, reducing production
+** expr -> MINUS expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+MINUS expr . 
+
+** Conflict (shift/reduce) in state 441.
+** Tokens involved: STAREQ STAR SLASHEQ SLASH SHR SHL PLUSEQ PLUS PIPE PERCENT OR_RETURN OR_FAIL NEQ MINUSEQ MINUS LT LPAREN LOR LE LBRACKET LAND IMPLIES IFF GT GE EQEQ EQ DOT CARET AMP
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI RETURN expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 441, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+return_expr 
+RETURN option(expr) 
+       expr 
+       expr . STAREQ expr 
+
+** In state 441, looking ahead at STAREQ, reducing production
+** option(expr) -> expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+return_expr // lookahead token is inherited
+RETURN option(expr) // lookahead token is inherited
+       expr . 
+
+** Conflict (shift/reduce) in state 442.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI STAR expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 442, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+STAR expr 
+     expr . STAREQ expr 
+
+** In state 442, looking ahead at STAREQ, reducing production
+** expr -> STAR expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+STAR expr . 
+
+** Conflict (shift/reduce) in state 447.
+** Tokens involved: STAREQ SLASHEQ PLUSEQ OR_RETURN OR_FAIL MINUSEQ EQ
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI TILDE expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 447, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+TILDE expr 
+      expr . STAREQ expr 
+
+** In state 447, looking ahead at STAREQ, reducing production
+** expr -> TILDE expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+TILDE expr . 

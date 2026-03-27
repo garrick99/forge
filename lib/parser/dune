@@ -1,9 +1,5 @@
 (library
  (name parser)
  (wrapped false)
- (libraries ast lexer fmt)
+ (libraries ast fmt)
  (modules parse_util parser))
-
-(menhir
- (modules parser)
- (flags --explain --external-tokens Token))

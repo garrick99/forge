@@ -1,0 +1,18 @@
+// FORGE Bad Demo 01 — Division by Zero (correctly rejected)
+//
+// This program SHOULD FAIL to compile.
+// FORGE requires proof that the divisor is != 0 before every
+// division.  Here, 'divisor' is an unconstrained u64, so Z3
+// cannot prove it is non-zero.
+//
+// Expected output:
+//   ✗  precondition of __div__  (divisor != 0)
+//   compilation stopped — fix proof failures before proceeding
+//
+// Fix: add  requires divisor != 0  (or  requires divisor > 0)
+
+fn bad_divide(n: u64, divisor: u64) -> u64
+    ensures result <= n
+{
+    n / divisor       // FORGE rejects this — divisor may be 0
+}

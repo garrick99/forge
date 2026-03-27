@@ -1,0 +1,136 @@
+
+(* The type of tokens. *)
+
+type token = 
+  | WITNESS
+  | WHILE
+  | VARYING
+  | USIZE
+  | USE
+  | UNIFORM
+  | UNDERSCORE
+  | U8
+  | U64
+  | U32
+  | U16
+  | U128
+  | TYPE
+  | TRUE
+  | TRANS
+  | TILDE
+  | TASK
+  | SYNCTHREADS
+  | SYMM
+  | STRUCT
+  | STRING of (string)
+  | STAREQ
+  | STAR
+  | SPAN
+  | SLASHEQ
+  | SLASH
+  | SHR
+  | SHL
+  | SHARED
+  | SEMI
+  | RPAREN
+  | RETURN
+  | RESULT
+  | REQUIRES
+  | REFMUT
+  | REF
+  | RBRACKET
+  | RBRACE
+  | RAW_TY
+  | RAW
+  | PROOF
+  | PLUSEQ
+  | PLUS
+  | PIPE
+  | PERCENT
+  | OWN
+  | OR_RETURN
+  | OR_FAIL
+  | OLD
+  | NEVER
+  | NEQ
+  | MUT
+  | MINUSEQ
+  | MINUS
+  | MATCH
+  | LT
+  | LPAREN
+  | LOR
+  | LOOP
+  | LIN
+  | LET
+  | LEMMA
+  | LE
+  | LBRACKET
+  | LBRACE
+  | LAND
+  | KERNEL
+  | ISIZE
+  | INVARIANT
+  | INT_SUFF of (int64 * string)
+  | INT of (int64)
+  | INDUCTION
+  | IN
+  | IMPLIES
+  | IMPL
+  | IFF
+  | IF
+  | IDENT of (string)
+  | I8
+  | I64
+  | I32
+  | I16
+  | I128
+  | HASH
+  | GT
+  | GE
+  | FORALL
+  | FOR
+  | FN
+  | FLOAT of (float)
+  | FATARROW
+  | FALSE
+  | F64
+  | F32
+  | EXTERN
+  | EXISTS
+  | EQEQ
+  | EQ
+  | EOF
+  | ENUM
+  | ENSURES
+  | ELSE
+  | DOTDOT
+  | DOT
+  | DECREASES
+  | DCOLON
+  | CONTINUE
+  | COMMA
+  | COLON
+  | COALESCED
+  | CHAN
+  | CARET
+  | BY
+  | BREAK
+  | BOOL_TY
+  | BANG
+  | AXIOM
+  | AUTO
+  | AT
+  | ASSUME
+  | AS
+  | ARROW
+  | AMP
+  | AFF
+
+(* This exception is raised by the monolithic API functions. *)
+
+exception Error
+
+(* The monolithic API. *)
+
+val program: (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (Ast.program)

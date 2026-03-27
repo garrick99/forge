@@ -3,12 +3,17 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
-uint64_t midpoint(uint64_t lo, uint64_t hi) {
+/* Forward declarations */
+uint64_t midpoint(uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused)));
+uint64_t avg_u64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
+
+uint64_t midpoint(uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
   return (lo + ((hi - lo) / 2));
 }
 
-uint64_t avg_u64(uint64_t a, uint64_t b) {
+uint64_t avg_u64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
   return (a + ((b - a) / 2));
 }
 
