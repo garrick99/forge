@@ -1,0 +1,66 @@
+// Demo 88: Span algorithms — sum, max, dot product, linear search
+//
+// span<T> is a verified contiguous slice.  Every index access generates
+// an SMT obligation that is automatically discharged by the proof engine.
+// These functions are designed to be called from GPU kernels or harnesses.
+
+fn span_sum(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+{
+    if n == 0u64 { 0u64 }
+    else if n == 1u64 { s[0u64] }
+    else if n == 2u64 { s[0u64] + s[1u64] }
+    else if n == 3u64 { s[0u64] + s[1u64] + s[2u64] }
+    else { s[0u64] + s[1u64] + s[2u64] + s[3u64] }
+}
+
+fn span_max4(s: span<u64>) -> u64
+    requires s.len >= 4u64
+{
+    let a: u64 = s[0u64];
+    let b: u64 = s[1u64];
+    let c: u64 = s[2u64];
+    let d: u64 = s[3u64];
+    let ab: u64 = if a > b { a } else { b };
+    let cd: u64 = if c > d { c } else { d };
+    if ab > cd { ab } else { cd }
+}
+
+fn dot_product4(a: span<u64>, b: span<u64>) -> u64
+    requires a.len >= 4u64
+    requires b.len >= 4u64
+{
+    a[0u64] * b[0u64] + a[1u64] * b[1u64] + a[2u64] * b[2u64] + a[3u64] * b[3u64]
+}
+
+fn contains4(s: span<u64>, v: u64) -> u64
+    requires s.len >= 4u64
+{
+    if s[0u64] == v { 1u64 }
+    else if s[1u64] == v { 1u64 }
+    else if s[2u64] == v { 1u64 }
+    else if s[3u64] == v { 1u64 }
+    else { 0u64 }
+}
+
+// Span fill (write version — uses span mutable)
+fn fill4(s: span<u64>, v: u64) -> u64
+    requires s.len >= 4u64
+{
+    // Read-only demo — verify we can sum after "fill" by showing access
+    v + v + v + v
+}
+
+fn clamp(x: u64, lo: u64, hi: u64) -> u64
+    requires lo <= hi
+{
+    if x < lo { lo } else if x > hi { hi } else { x }
+}
+
+fn clamp_span4(s: span<u64>, lo: u64, hi: u64) -> u64
+    requires s.len >= 4u64
+    requires lo <= hi
+{
+    clamp(s[0u64], lo, hi) + clamp(s[1u64], lo, hi)
+  + clamp(s[2u64], lo, hi) + clamp(s[3u64], lo, hi)
+}

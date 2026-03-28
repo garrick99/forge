@@ -1,0 +1,73 @@
+// Demo 99: Enum payloads — complex data in enum variants
+//
+// Enum variants can carry multiple types of data.
+// Pattern matching destructures the payload.
+
+enum Shape {
+    Circle(u64),          // radius
+    Rectangle(u64, u64),  // width, height
+    Triangle(u64, u64),   // base, height
+}
+
+fn area(s: Shape) -> u64 {
+    match s {
+        Circle(r)       => r * r * 3u64,        // pi*r^2 ≈ 3*r^2
+        Rectangle(w, h) => w * h,
+        Triangle(b, h)  => b * h / 2u64,
+    }
+}
+
+fn perimeter_approx(s: Shape) -> u64 {
+    match s {
+        Circle(r)       => r * 6u64,            // 2*pi*r ≈ 6*r
+        Rectangle(w, h) => 2u64 * w + 2u64 * h,
+        Triangle(b, h)  => b + h + b,           // approx isosceles
+    }
+}
+
+fn is_large(s: Shape) -> u64 {
+    match s {
+        Circle(r) if r > 10u64 => 1u64,
+        Rectangle(w, h) if w * h > 100u64 => 1u64,
+        _ => 0u64,
+    }
+}
+
+enum Expr {
+    Num(u64),
+    Add(u64, u64),
+    Mul(u64, u64),
+    Sub(u64, u64),
+}
+
+fn eval(e: Expr) -> u64 {
+    match e {
+        Num(n)    => n,
+        Add(a, b) => a + b,
+        Mul(a, b) => a * b,
+        Sub(a, b) => if a >= b { a - b } else { 0u64 },
+    }
+}
+
+fn main() -> u64 {
+    let c: Shape = Circle(5u64);
+    let r: Shape = Rectangle(4u64, 6u64);
+    let t: Shape = Triangle(8u64, 6u64);
+
+    let ac: u64 = area(c);     // 5*5*3 = 75
+    let ar: u64 = area(r);     // 4*6 = 24
+    let at: u64 = area(t);     // 8*6/2 = 24
+
+    let pc: u64 = perimeter_approx(Circle(10u64));   // 60
+    let pr: u64 = perimeter_approx(Rectangle(3u64, 4u64)); // 14
+
+    let lg1: u64 = is_large(Circle(15u64));      // 1
+    let lg2: u64 = is_large(Circle(5u64));       // 0
+
+    let e1: u64 = eval(Add(3u64, 4u64));    // 7
+    let e2: u64 = eval(Mul(6u64, 7u64));    // 42
+    let e3: u64 = eval(Sub(10u64, 3u64));   // 7
+
+    ac + ar + at + lg1 + lg2 + e1 + e2 + e3
+    // 75+24+24+1+0+7+42+7 = 180
+}

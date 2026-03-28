@@ -1,0 +1,56 @@
+// Demo 96: Refinement types — preconditions, postconditions, proven chains
+//
+// Each function's contract is proved independently by the SMT solver.
+// Postconditions become axioms at the call site for subsequent code.
+
+fn clamp_byte(x: u64) -> u64
+    ensures result <= 255u64
+{
+    if x > 255u64 { 255u64 } else { x }
+}
+
+fn is_in_range(x: u64, lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures result == 0u64 || result == 1u64
+{
+    if x >= lo && x <= hi { 1u64 } else { 0u64 }
+}
+
+fn saturating_add(a: u64, b: u64, max: u64) -> u64
+    requires max > 0u64
+    ensures result <= max
+{
+    if a > max - b { max } else { a + b }
+}
+
+fn normalize(x: u64, range: u64) -> u64
+    requires range > 0u64
+    ensures result < range
+{
+    x % range
+}
+
+fn weighted_avg(a: u64, wa: u64, b: u64, wb: u64) -> u64
+    requires wa + wb > 0u64
+{
+    (a * wa + b * wb) / (wa + wb)
+}
+
+fn main() -> u64 {
+    let c1: u64 = clamp_byte(300u64);   // 255
+    let c2: u64 = clamp_byte(100u64);   // 100
+
+    let r1: u64 = is_in_range(5u64, 1u64, 10u64);  // 1
+    let r2: u64 = is_in_range(15u64, 1u64, 10u64); // 0
+
+    let s1: u64 = saturating_add(200u64, 100u64, 255u64);  // 255 (would overflow)
+    let s2: u64 = saturating_add(50u64, 30u64, 255u64);    // 80
+
+    let n1: u64 = normalize(17u64, 5u64);  // 17 % 5 = 2
+    let n2: u64 = normalize(100u64, 7u64); // 100 % 7 = 2
+
+    let wa: u64 = weighted_avg(10u64, 3u64, 20u64, 7u64);  // (30+140)/10 = 17
+
+    c1 + c2 + r1 + r2 + s1 + s2 + n1 + n2 + wa
+    // 255+100+1+0+255+80+2+2+17 = 712 → 712%256 = 200
+}

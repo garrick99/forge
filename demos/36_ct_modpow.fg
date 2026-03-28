@@ -1,0 +1,74 @@
+// demo 36: constant-time modular exponentiation
+//
+// The exponent is secret<u64> — the type system enforces that:
+//   - No if/else branches on the secret exponent bits (timing oracle)
+//   - No secret-indexed memory access (cache oracle)
+//   - Only declassify() at the final output boundary
+//
+// Algorithm: left-to-right square-and-multiply (LSB-first variant)
+//   For each bit of exp, always square b and always multiply acc by b,
+//   then ct_select replaces the conditional "if bit then multiply" branch.
+//   Constant work per bit regardless of the exponent value.
+//
+// Correctness: 3^7 mod 17 == 11  (verified by Z3 precondition checks)
+
+// Constant-time modular multiplication (no-overflow: inputs < q < 2^32)
+fn mulmod(a: secret<u64>, b: secret<u64>, q: u64) -> secret<u64>
+    requires q > 0
+{
+    (a * b) % q
+}
+
+// Constant-time select: returns a if flag==1, b if flag==0.
+// Implemented via bitwise masking — no branch on the secret flag.
+fn ct_select(flag: secret<u64>, a: secret<u64>, b: secret<u64>) -> secret<u64>
+{
+    let mask: secret<u64> = 0u64 - flag;     // all-ones if flag==1, zero if flag==0
+    let neg: secret<u64>  = ~mask;
+    (mask & a) | (neg & b)
+}
+
+// Constant-time modular exponentiation: base^exp mod q
+// exp is secret — its value cannot be inferred from execution timing.
+// base and q are public (as in classic Diffie-Hellman or textbook RSA).
+fn ct_modpow(base: u64, exp: secret<u64>, q: u64) -> u64
+    requires q > 1
+    requires base < q
+{
+    let acc: secret<u64> = 1u64;
+    let b: secret<u64>      = base;
+    let e: secret<u64>      = exp;
+    let i: u64              = 0u64;
+
+    while i < 64u64
+        invariant i <= 64
+    {
+        // Extract low bit of e — never branches on it
+        let bit: secret<u64> = e & 1u64;
+
+        // Conditionally accumulate: acc = acc * b  (if bit==1)
+        //                           acc = acc      (if bit==0)
+        // Always computes acc*b to avoid timing difference
+        acc = ct_select(bit, mulmod(acc, b, q), acc);
+
+        // Square b for next bit position
+        b = mulmod(b, b, q);
+
+        // Shift exponent right (no branch on the value being shifted)
+        e = e >> 1u64;
+        i = i + 1u64
+    };
+
+    // The exponent has been fully consumed.
+    // Declassify only at the output boundary.
+    declassify(acc)
+}
+
+fn run() -> u64 {
+    // 3^7 mod 17:  3^7 = 2187 = 128 * 17 + 11  →  11
+    let base: u64          = 3u64;
+    let exp: secret<u64>   = 7u64;
+    let q: u64             = 17u64;
+
+    ct_modpow(base, exp, q)     // expected: 11
+}

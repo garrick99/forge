@@ -1,0 +1,70 @@
+// Demo 86: OR patterns in match — A | B => body
+//
+// Multiple patterns share one arm body.
+
+enum Day { Mon, Tue, Wed, Thu, Fri, Sat, Sun }
+
+fn is_weekend(d: Day) -> u64 {
+    match d {
+        Sat | Sun => 1u64,
+        _         => 0u64,
+    }
+}
+
+fn is_weekday(d: Day) -> u64 {
+    match d {
+        Mon | Tue | Wed | Thu | Fri => 1u64,
+        _                           => 0u64,
+    }
+}
+
+fn day_num(d: Day) -> u64 {
+    match d {
+        Mon => 1u64,
+        Tue => 2u64,
+        Wed => 3u64,
+        Thu => 4u64,
+        Fri => 5u64,
+        Sat => 6u64,
+        Sun => 7u64,
+    }
+}
+
+enum Token { Plus, Minus, Star, Slash, Eq, Ne, Lt, Gt }
+
+fn is_arith(t: Token) -> u64 {
+    match t {
+        Plus | Minus | Star | Slash => 1u64,
+        _                           => 0u64,
+    }
+}
+
+fn is_cmp(t: Token) -> u64 {
+    match t {
+        Eq | Ne | Lt | Gt => 1u64,
+        _                 => 0u64,
+    }
+}
+
+fn main() -> u64 {
+    let w1: u64 = is_weekend(Sat);  // 1
+    let w2: u64 = is_weekend(Sun);  // 1
+    let w3: u64 = is_weekend(Mon);  // 0
+
+    let d1: u64 = is_weekday(Fri);  // 1
+    let d2: u64 = is_weekday(Sat);  // 0
+
+    let n1: u64 = day_num(Wed);  // 3
+    let n2: u64 = day_num(Sun);  // 7
+
+    let a1: u64 = is_arith(Plus);   // 1
+    let a2: u64 = is_arith(Star);   // 1
+    let a3: u64 = is_arith(Eq);     // 0
+
+    let c1: u64 = is_cmp(Lt);   // 1
+    let c2: u64 = is_cmp(Gt);   // 1
+    let c3: u64 = is_cmp(Plus); // 0
+
+    w1 + w2 + w3 + d1 + d2 + n1 + n2 + a1 + a2 + a3 + c1 + c2 + c3
+    // 1+1+0+1+0+3+7+1+1+0+1+1+0 = 17
+}

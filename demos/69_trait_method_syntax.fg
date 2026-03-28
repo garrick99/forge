@@ -1,0 +1,53 @@
+// Demo 69: Trait methods via dot syntax — x.method() dispatches to TypeName__Trait__method
+//
+// Previously required explicit Point__Hashable__hash(&p).
+// Now works as p.hash() — the compiler resolves through the impl registry.
+
+trait Printable {
+    fn describe(self: ref<Self>) -> u64;
+}
+
+trait Scalable {
+    fn scale(self: ref<Self>, factor: u64) -> Self;
+    fn magnitude(self: ref<Self>) -> u64;
+}
+
+struct Vec3 { x: u64, y: u64, z: u64, }
+
+impl Printable for Vec3 {
+    fn describe(self: ref<Vec3>) -> u64 {
+        // Return a hash-like summary: sum of components
+        (*self).x + (*self).y + (*self).z
+    }
+}
+
+impl Scalable for Vec3 {
+    fn scale(self: ref<Vec3>, factor: u64) -> Vec3 {
+        struct Vec3 { x: (*self).x * factor, y: (*self).y * factor, z: (*self).z * factor }
+    }
+    fn magnitude(self: ref<Vec3>) -> u64 {
+        (*self).x * (*self).x + (*self).y * (*self).y + (*self).z * (*self).z
+    }
+}
+
+struct Rgb { r: u64, g: u64, b: u64, }
+
+impl Printable for Rgb {
+    fn describe(self: ref<Rgb>) -> u64 {
+        // Weighted luma: 2r + 4g + b (approximate perceived brightness)
+        (*self).r * 2u64 + (*self).g * 4u64 + (*self).b
+    }
+}
+
+fn main() -> u64 {
+    let v: Vec3 = struct Vec3 { x: 1u64, y: 2u64, z: 3u64 };
+    let c: Rgb  = struct Rgb  { r: 10u64, g: 5u64, b: 2u64 };
+
+    let d1: u64  = v.describe();     // 1+2+3 = 6  (Vec3::Printable::describe)
+    let d2: u64  = c.describe();     // 10*2+5*4+2 = 42  (Rgb::Printable::describe)
+
+    let v2: Vec3 = v.scale(3u64);    // {3,6,9}  (Vec3::Scalable::scale)
+    let mag: u64 = v2.magnitude();   // 9+36+81 = 126  (Vec3::Scalable::magnitude)
+
+    d1 + d2 + mag   // 6 + 42 + 126 = 174
+}

@@ -1,0 +1,48 @@
+// Demo 83: str type — length, indexing, and comparison
+//
+// str is a borrowed UTF-8 byte span with .len (usize) and s[i] (u8).
+// The SMT solver verifies that every index access is in-bounds.
+
+fn first_or_zero(s: str) -> u64 {
+    if s.len > 0u64 { (s[0u64]) as u64 } else { 0u64 }
+}
+
+fn second_or_zero(s: str) -> u64 {
+    if s.len > 1u64 { (s[1u64]) as u64 } else { 0u64 }
+}
+
+fn longer_len(a: str, b: str) -> u64 {
+    if a.len >= b.len { a.len as u64 } else { b.len as u64 }
+}
+
+// Sum of lengths of all strings
+fn total_len(s1: str, s2: str, s3: str) -> u64 {
+    (s1.len as u64) + (s2.len as u64) + (s3.len as u64)
+}
+
+fn main() -> u64 {
+    let s1: str = "ABCD";    // 65 66 67 68
+    let s2: str = "hello";   // 104 101 108 108 111
+    let s3: str = "";
+
+    let len_s1: u64 = s1.len as u64;  // 4
+    let len_s2: u64 = s2.len as u64;  // 5
+    let len_s3: u64 = s3.len as u64;  // 0
+
+    let fb1: u64 = first_or_zero(s1);   // 65 ('A')
+    let fb2: u64 = first_or_zero(s2);   // 104 ('h')
+    let fb3: u64 = first_or_zero(s3);   // 0 (empty)
+
+    let sb1: u64 = second_or_zero(s1);  // 66 ('B')
+    let sb2: u64 = second_or_zero(s3);  // 0 (empty)
+
+    let lng: u64 = longer_len(s1, s2);  // 5
+
+    let tot: u64 = total_len(s1, s2, s3);  // 4+5+0 = 9
+
+    let eq1: u64 = if s1 == s2 { 0u64 } else { 1u64 };  // 1 (different strings)
+    let eq2: u64 = if s2 == s3 { 1u64 } else { 0u64 };  // 0 (non-empty != empty)
+
+    len_s1 + len_s2 + len_s3 + fb1 + fb2 + fb3 + sb1 + sb2 + lng + eq1 + eq2
+    // 4 + 5 + 0 + 65 + 104 + 0 + 66 + 0 + 5 + 1 + 0 = 250
+}

@@ -1,0 +1,32 @@
+// Demo 70: const declarations — named compile-time constants
+//
+// const NAME: Type = value;  emits C  static const T NAME = VALUE;
+// Constants can be used in expressions, preconditions, and loop bounds.
+
+const MAX_SIZE: u64 = 1024u64;
+const MAGIC:    u64 = 0x1234u64;
+const PI_INT:   u64 = 3u64;       // integer approximation
+
+fn clamp_to_max(v: u64) -> u64
+    ensures result <= MAX_SIZE
+{
+    if v > MAX_SIZE { MAX_SIZE } else { v }
+}
+
+fn is_magic(v: u64) -> bool {
+    v == MAGIC
+}
+
+fn circle_area_approx(r: u64) -> u64 {
+    PI_INT * r * r
+}
+
+fn main() -> u64 {
+    let c1: u64  = clamp_to_max(2000u64);  // 1024
+    let c2: u64  = clamp_to_max(100u64);   // 100
+    let m: bool  = is_magic(0x1234u64);    // true → 1
+    let a: u64   = circle_area_approx(5u64); // 3*25 = 75
+
+    let m_val: u64 = if m { 1u64 } else { 0u64 };
+    c1 + c2 + m_val + a   // 1024 + 100 + 1 + 75 = 1200
+}

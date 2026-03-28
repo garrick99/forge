@@ -1,0 +1,50 @@
+// Demo 29: 'as' patterns (PAs) in match expressions
+//
+// Syntax:  <pattern> as <ident>
+// The inner pattern determines whether the arm fires; <ident> is bound
+// to the full matched value inside the arm body.
+//
+// Fixes applied:
+//   • parser: PAs rule now uses the reserved AS token (was IDENT, unreachable)
+//   • emit_pattern_cond: PAs delegates condition to inner pattern
+//   • switch emit: PAs injects "<ty> id = scrutinee;" into the default arm
+//   • if-else emit: PAs emits a block with the binding before the arm body
+
+// ---- 1. Enum path: Option<u64> ----
+//
+// The arm  Some(v) as _whole  fires when the option is Some.
+// Both the field v and the alias _whole are in scope.
+// We return v; _whole is declared in the emitted C to verify binding compiles.
+
+enum Option<T> { None, Some(T) }
+
+fn unwrap_or_zero(opt: Option<u64>) -> u64 {
+  match opt {
+    Some(v) as _whole => v,
+    None              => 0
+  }
+}
+
+// ---- 2. Non-enum path: literal with 'as' ----
+//
+// When x == 0 the arm fires and z is bound to 0.
+// Wildcard arm returns x otherwise.
+
+fn zero_or_self(x: u64) -> u64 {
+  match x {
+    0 as z => z,
+    _      => x
+  }
+}
+
+// ---- 3. Non-enum 'as' in a wildcard arm ----
+//
+// The wildcard arm  _ as n  captures any value as n.
+// Demonstrates that PAs on PWild also emits correct C.
+
+fn double_via_as(x: u64) -> u64 {
+  match x {
+    0 as _z => 0,
+    _ as n  => n + n
+  }
+}

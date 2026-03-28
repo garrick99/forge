@@ -1,0 +1,43 @@
+// Demo 62: for-in over Iterator trait types
+//
+// Demonstrates:
+//   trait Iterator { type Item; fn next(self: ref_mut<Self>) -> Option<Self::Item>; }
+//   impl Iterator for Counter { type Item = u64; ... }
+//   for x in counter { ... }   — calls Counter__Iterator__next in a loop
+
+use std::option;
+
+trait Iterator {
+    type Item;
+    fn next(self: refmut<Self>) -> Option<Self::Item>;
+}
+
+// Counter: yields 0, 1, 2, ..., limit-1
+struct Counter { cur: u64, limit: u64, }
+
+impl Iterator for Counter {
+    type Item = u64;
+    fn next(self: refmut<Counter>) -> Option<u64> {
+        if (*self).cur >= (*self).limit {
+            None
+        } else {
+            let v: u64 = (*self).cur;
+            (*self).cur = (*self).cur + 1u64;
+            Some(v)
+        }
+    }
+}
+
+fn sum_to(n: u64) -> u64 {
+    let c: Counter = struct Counter { cur: 0u64, limit: n };
+    let acc: u64 = 0u64;
+    for x in c {
+        acc = acc + x
+    };
+    acc
+}
+
+fn main() -> u64 {
+    // sum 0..5 = 0+1+2+3+4 = 10
+    sum_to(5u64)
+}

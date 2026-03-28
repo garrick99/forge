@@ -1,0 +1,57 @@
+// Demo 84: State machine — type-safe state transitions
+//
+// Each state is a distinct struct. Transitions are functions that
+// accept one state and return the next, preventing invalid transitions
+// at compile time.
+
+struct Idle     { id: u64 }
+struct Running  { id: u64, start_tick: u64 }
+struct Paused   { id: u64, start_tick: u64, pause_tick: u64 }
+struct Finished { id: u64, elapsed: u64 }
+
+// Transition: Idle → Running
+fn start(s: Idle, tick: u64) -> Running {
+    struct Running { id: s.id, start_tick: tick }
+}
+
+// Transition: Running → Paused
+fn pause(s: Running, tick: u64) -> Paused {
+    struct Paused { id: s.id, start_tick: s.start_tick, pause_tick: tick }
+}
+
+// Transition: Paused → Running (resume)
+fn resume(s: Paused, tick: u64) -> Running {
+    let elapsed_so_far: u64 = s.pause_tick - s.start_tick;
+    struct Running { id: s.id, start_tick: tick - elapsed_so_far }
+}
+
+// Transition: Running → Finished
+fn finish(s: Running, tick: u64) -> Finished {
+    let elapsed_ticks: u64 = if tick >= s.start_tick { tick - s.start_tick } else { 0u64 };
+    struct Finished { id: s.id, elapsed: elapsed_ticks }
+}
+
+// Read elapsed from finished state
+fn elapsed(s: Finished) -> u64 { s.elapsed }
+
+fn main() -> u64 {
+    // Sequence: Idle → start(10) → Running → pause(15) → Paused
+    //           → resume(20) → Running → finish(30) → Finished
+    let idle: Idle       = struct Idle { id: 1u64 };
+    let run1: Running    = start(idle, 10u64);
+    let psd:  Paused     = pause(run1, 15u64);
+    // Paused for 5 ticks (15-10=5). Resumes at 20, adjusted start = 20-5 = 15.
+    let run2: Running    = resume(psd, 20u64);
+    let done: Finished   = finish(run2, 30u64);
+
+    let e: u64 = elapsed(done);  // 30 - 15 = 15
+
+    // Another timer: no pause
+    let i2: Idle     = struct Idle { id: 2u64 };
+    let r2: Running  = start(i2, 0u64);
+    let f2: Finished = finish(r2, 100u64);
+    let e2: u64 = elapsed(f2);  // 100
+
+    e + e2
+    // 15 + 100 = 115
+}

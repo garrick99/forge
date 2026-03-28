@@ -1,0 +1,68 @@
+// Demo 47: own<T> — linear heap allocation
+//
+// own<T> is a linearly-typed heap pointer.  The FORGE type system guarantees:
+//
+//   1. Every own<T> binding must be consumed exactly once
+//      (either via own_into or own_free) — "must-use" checked at compile time.
+//
+//   2. No double-free: own<T> is linear (Lin), so using it twice is a compile error.
+//
+//   3. No use-after-free: after passing p to own_into / own_free, p is consumed
+//      and any subsequent reference is caught by the linearity checker.
+//
+// Generated C:
+//   own<u64>       → uint64_t*
+//   own_alloc(v)   → __forge_own_alloc_u64(v)   (malloc + init)
+//   own_into(p)    → __forge_own_into_u64(p)     (read *p then free)
+//   own_free(p)    → (free(p), (void)0)
+//
+// Intrinsics used:
+//   own_alloc(val: T) -> own<T>   — heap-allocate T, return linear pointer
+//   own_into(p: own<T>) -> T      — destructive read: copies value, frees heap
+//   own_free(p: own<T>) -> ()     — discard: free without reading
+
+// ----------------------------------------------------------------
+// Alloc + destructive read: value is preserved
+// ----------------------------------------------------------------
+fn round_trip(n: u64) -> u64 {
+    let lin p: own<u64> = own_alloc(n);
+    own_into(p)
+    // Linear check: p is consumed by own_into — cannot be used again.
+    // If p were unused, the compiler would report: "linear variable 'p' is never used"
+}
+
+// ----------------------------------------------------------------
+// Alloc + free: discard without reading
+// ----------------------------------------------------------------
+fn allocate_and_discard(n: u64) -> u64 {
+    let lin p: own<u64> = own_alloc(n);
+    own_free(p);
+    // p consumed; returning something unrelated
+    0u64
+}
+
+// ----------------------------------------------------------------
+// Chain: alloc one, read another
+// The linear tracker ensures both pointers are consumed.
+// ----------------------------------------------------------------
+fn alloc_two(a: u64, b: u64) -> u64 {
+    let lin pa: own<u64> = own_alloc(a);
+    let lin pb: own<u64> = own_alloc(b);
+    let va: u64 = own_into(pa);   // pa consumed
+    let vb: u64 = own_into(pb);   // pb consumed
+    va + vb
+}
+
+// ----------------------------------------------------------------
+// Postconditions proved by Z3:
+//   round_trip(n) == n  requires n == n (trivially true after expanding
+//   own_alloc/into as identity in the proof context — no SMT obligations here,
+//   but the linear discipline is enforced at compile time)
+// ----------------------------------------------------------------
+fn run() -> u64 {
+    let x: u64 = round_trip(42u64);
+    let y: u64 = allocate_and_discard(99u64);
+    let z: u64 = alloc_two(10u64, 32u64);
+    x + y + z
+    // 42 + 0 + 42 = 84
+}

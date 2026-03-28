@@ -1,0 +1,56 @@
+// Demo 82: Bitwise operations and bit manipulation utilities
+//
+// popcount, leading zeros, rotate left, bit extraction
+
+fn popcount(x: u64) -> u64 {
+    let x1: u64 = x - ((x >> 1u64) & 6148914691236517205u64);
+    let x2: u64 = (x1 & 3689348814741910323u64) + ((x1 >> 2u64) & 3689348814741910323u64);
+    let x3: u64 = (x2 + (x2 >> 4u64)) & 1085102592571150095u64;
+    (x3 * 72340172838076673u64) >> 56u64
+}
+
+fn is_power_of_two(x: u64) -> u64 {
+    if x == 0u64 { 0u64 }
+    else if (x & (x - 1u64)) == 0u64 { 1u64 }
+    else { 0u64 }
+}
+
+fn lowest_set_bit(x: u64) -> u64 {
+    if x == 0u64 { 0u64 }
+    else { x & (0u64 - x) }
+}
+
+fn extract_bits(x: u64, lo: u64, len: u64) -> u64 {
+    (x >> lo) & ((1u64 << len) - 1u64)
+}
+
+fn rotate_left(x: u64, n: u64) -> u64 {
+    let n_mod: u64 = n & 63u64;
+    (x << n_mod) | (x >> (64u64 - n_mod))
+}
+
+fn main() -> u64 {
+    // popcount
+    let pc1: u64 = popcount(255u64);     // 8 ones
+    let pc2: u64 = popcount(0u64);       // 0
+    let pc3: u64 = popcount(170u64);     // 0b10101010 → 4
+
+    // power of two
+    let p1: u64 = is_power_of_two(16u64);  // 1
+    let p2: u64 = is_power_of_two(15u64);  // 0
+    let p3: u64 = is_power_of_two(0u64);   // 0
+
+    // lowest set bit
+    let l1: u64 = lowest_set_bit(12u64);   // 4 (0b1100 → lowest is bit 2)
+    let l2: u64 = lowest_set_bit(0u64);    // 0
+
+    // extract bits
+    let e1: u64 = extract_bits(214u64, 2u64, 3u64);  // 214 = 0xD6 = 11010110 → bits[4:2] = 101 = 5
+    let e2: u64 = extract_bits(255u64, 0u64, 4u64);          // 15
+
+    // rotate left: rotate 1 by 4 = 16
+    let r1: u64 = rotate_left(1u64, 4u64);  // 16
+
+    pc1 + pc2 + pc3 + p1 + p2 + p3 + l1 + l2 + e1 + e2 + r1
+    // 8 + 0 + 4 + 1 + 0 + 0 + 4 + 0 + 5 + 15 + 16 = 53
+}

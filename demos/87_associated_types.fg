@@ -1,0 +1,62 @@
+// Demo 87: Associated types — trait with type Item
+//
+// A trait can declare an associated type.  Implementors specify the concrete
+// type.  The caller uses T::Item without knowing the concrete type.
+
+trait Container {
+    type Item;
+    fn get(self: ref<Self>) -> Self::Item;
+    fn size(self: ref<Self>) -> u64;
+}
+
+struct U64Box { value: u64 }
+struct U64Pair { first: u64, second: u64 }
+
+impl Container for U64Box {
+    type Item = u64;
+    fn get(self: ref<U64Box>) -> u64 { (*self).value }
+    fn size(self: ref<U64Box>) -> u64 { 1u64 }
+}
+
+impl Container for U64Pair {
+    type Item = u64;
+    fn get(self: ref<U64Pair>) -> u64 { (*self).first }
+    fn size(self: ref<U64Pair>) -> u64 { 2u64 }
+}
+
+trait Summable {
+    type Elem;
+    fn total(self: ref<Self>) -> Self::Elem;
+}
+
+struct Sum2 { a: u64, b: u64 }
+struct Sum3 { a: u64, b: u64, c: u64 }
+
+impl Summable for Sum2 {
+    type Elem = u64;
+    fn total(self: ref<Sum2>) -> u64 { (*self).a + (*self).b }
+}
+
+impl Summable for Sum3 {
+    type Elem = u64;
+    fn total(self: ref<Sum3>) -> u64 { (*self).a + (*self).b + (*self).c }
+}
+
+fn main() -> u64 {
+    let b: U64Box  = struct U64Box { value: 42u64 };
+    let p: U64Pair = struct U64Pair { first: 10u64, second: 20u64 };
+
+    let v1: u64 = U64Box__Container__get(&b);    // 42
+    let v2: u64 = U64Pair__Container__get(&p);   // 10
+    let s1: u64 = U64Box__Container__size(&b);   // 1
+    let s2: u64 = U64Pair__Container__size(&p);  // 2
+
+    let sum2: Sum2 = struct Sum2 { a: 3u64, b: 7u64 };
+    let sum3: Sum3 = struct Sum3 { a: 1u64, b: 2u64, c: 4u64 };
+
+    let t2: u64 = Sum2__Summable__total(&sum2);  // 10
+    let t3: u64 = Sum3__Summable__total(&sum3);  // 7
+
+    v1 + v2 + s1 + s2 + t2 + t3
+    // 42 + 10 + 1 + 2 + 10 + 7 = 72
+}

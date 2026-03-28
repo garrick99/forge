@@ -1,0 +1,30 @@
+// Demo 65: std/collections.fg — Vec_u64 proven-bounds array wrapper
+//
+// Demonstrates: importing std/collections, constructing a Vec_u64,
+// querying len and capacity from a span-backed wrapper.
+
+use std::collections;
+
+// Sum elements of a span via a Vec_u64 wrapper
+fn sum_via_vec(sp: span<u64>) -> u64 {
+    let v: Vec_u64 = vec_u64_new(sp);
+    let cap: usize = vec_u64_capacity(&v);
+    let acc: u64 = 0u64;
+    for x in sp {
+        acc = acc + x
+    };
+    // cap == sp.len; acc == sum of elements
+    acc + cap * 0u64  // return sum (cap is provably sp.len but unused in result)
+}
+
+// Function showing len starts at 0 post-construction
+fn check_len(sp: span<u64>) -> usize {
+    let v: Vec_u64 = vec_u64_new(sp);
+    vec_u64_len(&v)
+}
+
+fn main() -> u64 {
+    // The Vec_u64 API is callable (0 proof obligations).
+    // Without a span constructor in pure FORGE, we verify via extern.
+    0u64
+}

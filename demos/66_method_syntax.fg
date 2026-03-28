@@ -1,0 +1,52 @@
+// Demo 66: Method call syntax — obj.method(args)
+//
+// obj.method(args) desugars to TypeName__method(obj, args).
+// Inherent impl (no trait) and trait impl methods both work.
+
+struct Vec2 { x: u64, y: u64, }
+
+impl Vec2 {
+    fn dot(self: ref<Vec2>, other: ref<Vec2>) -> u64 {
+        (*self).x * (*other).x + (*self).y * (*other).y
+    }
+    fn scale(self: ref<Vec2>, s: u64) -> Vec2 {
+        struct Vec2 { x: (*self).x * s, y: (*self).y * s }
+    }
+    fn len_sq(self: ref<Vec2>) -> u64 {
+        (*self).x * (*self).x + (*self).y * (*self).y
+    }
+    fn sum(self: ref<Vec2>) -> u64 {
+        (*self).x + (*self).y
+    }
+}
+
+struct Counter { n: u64, }
+
+impl Counter {
+    fn new(start: u64) -> Counter {
+        struct Counter { n: start }
+    }
+    fn inc(self: ref<Counter>) -> Counter {
+        struct Counter { n: (*self).n + 1u64 }
+    }
+    fn get(self: ref<Counter>) -> u64 {
+        (*self).n
+    }
+}
+
+fn main() -> u64 {
+    let v: Vec2 = struct Vec2 { x: 3u64, y: 4u64 };
+    let w: Vec2 = struct Vec2 { x: 1u64, y: 2u64 };
+
+    let d: u64   = v.dot(&w);          // 3*1 + 4*2 = 11
+    let ls: u64  = v.len_sq();         // 9 + 16 = 25
+    let sc: Vec2 = v.scale(2u64);      // {6, 8}
+    let ss: u64  = sc.sum();           // 6+8 = 14
+
+    let c: Counter = Counter__new(10u64);
+    let c2: Counter = c.inc();
+    let c3: Counter = c2.inc();
+    let n: u64 = c3.get();             // 12
+
+    d + ls + ss + n    // 11 + 25 + 14 + 12 = 62
+}

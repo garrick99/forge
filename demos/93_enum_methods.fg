@@ -1,0 +1,77 @@
+// Demo 93: Enum methods and Display patterns
+//
+// impl blocks on enums provide methods dispatched via match.
+// Demonstrates enum self-operations and conversion methods.
+
+enum Color { Red, Green, Blue, Custom(u64) }
+
+impl Color {
+    fn to_rgb(self: ref<Color>) -> u64 {
+        match *self {
+            Red         => 0xFF0000u64,
+            Green       => 0x00FF00u64,
+            Blue        => 0x0000FFu64,
+            Custom(v)   => v,
+        }
+    }
+
+    fn brightness(self: ref<Color>) -> u64 {
+        let rgb: u64 = (*self).to_rgb();
+        let r: u64 = (rgb >> 16u64) & 0xFFu64;
+        let g: u64 = (rgb >> 8u64)  & 0xFFu64;
+        let b: u64 = rgb & 0xFFu64;
+        // Approximate luminance: 2r + 4g + b (no division to avoid proof complexity)
+        2u64 * r + 4u64 * g + b
+    }
+
+    fn is_primary(self: ref<Color>) -> u64 {
+        match *self {
+            Red | Green | Blue => 1u64,
+            Custom(_)          => 0u64,
+        }
+    }
+}
+
+enum Direction { North, South, East, West }
+
+impl Direction {
+    fn opposite(self: ref<Direction>) -> Direction {
+        match *self {
+            North => South,
+            South => North,
+            East  => West,
+            West  => East,
+        }
+    }
+
+    fn to_dx(self: ref<Direction>) -> u64 {
+        match *self {
+            East  => 1u64,
+            West  => 2u64,  // encoded as 2 (negative not supported in u64)
+            _     => 0u64,
+        }
+    }
+}
+
+fn main() -> u64 {
+    let c1: Color = Red;
+    let c2: Color = Green;
+    let c3: Color = Custom(0x808080u64);
+
+    let rgb1: u64 = c1.to_rgb();    // 0xFF0000 = 16711680
+    let rgb2: u64 = c2.to_rgb();    // 0x00FF00 = 65280
+    let br1:  u64 = c1.brightness(); // 2*255+0+0 = 510
+    let br2:  u64 = c2.brightness(); // 0+4*255+0 = 1020
+    let p1:   u64 = c1.is_primary(); // 1
+    let p3:   u64 = c3.is_primary(); // 0
+
+    let d: Direction = North;
+    let opp: Direction = d.opposite();  // South
+    let dx: u64 = match opp {
+        South => 3u64,
+        _     => 0u64,
+    };
+
+    br1 + br2 + p1 + p3 + dx
+    // 510 + 1020 + 1 + 0 + 3 = 1534 → 1534 % 256 = 254
+}

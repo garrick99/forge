@@ -1,0 +1,49 @@
+// Demo 59: Trait bound enforcement — impl registration + call-site checking
+//
+// Demonstrates:
+//  1. Multiple types implementing the same trait
+//  2. Direct trait method calls (monomorphized name scheme)
+//  3. The env.impls registry is populated: calling a KBounded generic with
+//     a non-implementing type fails at compile time (see bad/09_unbound_generic.fg)
+
+trait Hashable {
+    fn hash(self: ref<Self>) -> u64;
+}
+
+trait Eq {
+    fn eq(self: ref<Self>, other: ref<Self>) -> bool;
+}
+
+struct Point { x: u64, y: u64, }
+struct Color { r: u64, g: u64, b: u64, }
+
+impl Hashable for Point {
+    fn hash(self: ref<Point>) -> u64 {
+        (*self).x * 31u64 + (*self).y
+    }
+}
+
+impl Eq for Point {
+    fn eq(self: ref<Point>, other: ref<Point>) -> bool {
+        (*self).x == (*other).x && (*self).y == (*other).y
+    }
+}
+
+impl Hashable for Color {
+    fn hash(self: ref<Color>) -> u64 {
+        (*self).r * 1000003u64 + (*self).g * 1009u64 + (*self).b
+    }
+}
+
+fn main() -> u64 {
+    let p1: Point = struct Point { x: 3u64, y: 7u64 };
+    let p2: Point = struct Point { x: 3u64, y: 7u64 };
+    let c:  Color = struct Color { r: 255u64, g: 128u64, b: 0u64 };
+
+    let h1: u64  = Point__Hashable__hash(&p1);
+    let h2: u64  = Color__Hashable__hash(&c);
+    let eq: bool = Point__Eq__eq(&p1, &p2);
+
+    let eq_val: u64 = if eq { 1u64 } else { 0u64 };
+    h1 + h2 + eq_val
+}

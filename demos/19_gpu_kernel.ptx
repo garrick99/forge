@@ -1,0 +1,139 @@
+// FORGE-generated PTX — SM_89
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.5
+.target sm_89
+.address_size 64
+
+.visible .entry vec_add(
+    .param .u64 vec_add_param_src_a_data,
+    .param .u64 vec_add_param_src_a_len,
+    .param .u64 vec_add_param_src_b_data,
+    .param .u64 vec_add_param_src_b_len,
+    .param .u64 vec_add_param_dst_data,
+    .param .u64 vec_add_param_dst_len
+)
+{
+    .reg .pred %p11;
+    .reg .u64 %rd0, %rd1, %rd12, %rd14, %rd15, %rd16, %rd18, %rd19, %rd2, %rd20, %rd23, %rd24, %rd25, %rd3, %rd4, %rd5;
+    .reg .f32 %f17, %f21, %f22;
+    .reg .u32 %r10, %r26, %r27, %r6, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [vec_add_param_src_a_data];
+  ld.param.u64 %rd1, [vec_add_param_src_a_len];
+  ld.param.u64 %rd2, [vec_add_param_src_b_data];
+  ld.param.u64 %rd3, [vec_add_param_src_b_len];
+  ld.param.u64 %rd4, [vec_add_param_dst_data];
+  ld.param.u64 %rd5, [vec_add_param_dst_len];
+
+  mov.u32 %r6, %ctaid.x;
+  mov.u32 %r7, %ntid.x;
+  mul.lo.u32 %r8, %r6, %r7;
+  mov.u32 %r9, %tid.x;
+  add.u32 %r10, %r8, %r9;
+  cvt.u64.u32 %rd12, %r10;
+  setp.lt.u64 %p11, %rd12, %rd5;
+  @%p11 bra vec_add_then_13;
+  bra vec_add_else_13;
+  vec_add_then_13:
+  cvt.u64.u32 %rd14, %r10;
+  mul.lo.u64 %rd15, %rd14, 4;
+  add.u64 %rd16, %rd0, %rd15;
+  ld.global.f32 %f17, [%rd16];
+  cvt.u64.u32 %rd18, %r10;
+  mul.lo.u64 %rd19, %rd18, 4;
+  add.u64 %rd20, %rd2, %rd19;
+  ld.global.f32 %f21, [%rd20];
+  add.f32 %f22, %f17, %f21;
+  cvt.u64.u32 %rd23, %r10;
+  mul.lo.u64 %rd24, %rd23, 4;
+  add.u64 %rd25, %rd4, %rd24;
+  st.global.f32 [%rd25], %f22;
+  mov.u32 %r26, 0; // unit
+  mov.u32 %r27, %r26;
+  bra vec_add_end_13;
+  vec_add_else_13:
+  mov.u32 %r27, 0; // no else branch
+  vec_add_end_13:
+  ret;
+}
+
+.visible .entry prefix_sum_step(
+    .param .u64 prefix_sum_step_param_src_data,
+    .param .u64 prefix_sum_step_param_src_len,
+    .param .u64 prefix_sum_step_param_dst_data,
+    .param .u64 prefix_sum_step_param_dst_len,
+    .param .u64 prefix_sum_step_param_n
+)
+{
+    .reg .pred %p10;
+    .reg .s32 %r16;
+    .reg .u64 %rd0, %rd1, %rd11, %rd13, %rd14, %rd15, %rd17, %rd18, %rd19, %rd2, %rd3, %rd4;
+    .reg .u32 %r20, %r21, %r5, %r6, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [prefix_sum_step_param_src_data];
+  ld.param.u64 %rd1, [prefix_sum_step_param_src_len];
+  ld.param.u64 %rd2, [prefix_sum_step_param_dst_data];
+  ld.param.u64 %rd3, [prefix_sum_step_param_dst_len];
+  ld.param.u64 %rd4, [prefix_sum_step_param_n];
+
+  mov.u32 %r5, %ctaid.x;
+  mov.u32 %r6, %ntid.x;
+  mul.lo.u32 %r7, %r5, %r6;
+  mov.u32 %r8, %tid.x;
+  add.u32 %r9, %r7, %r8;
+  cvt.u64.u32 %rd11, %r9;
+  setp.lt.u64 %p10, %rd11, %rd4;
+  @%p10 bra prefix_sum_step_then_12;
+  bra prefix_sum_step_else_12;
+  prefix_sum_step_then_12:
+  cvt.u64.u32 %rd13, %r9;
+  mul.lo.u64 %rd14, %rd13, 4;
+  add.u64 %rd15, %rd0, %rd14;
+  ld.global.s32 %r16, [%rd15];
+  cvt.u64.u32 %rd17, %r9;
+  mul.lo.u64 %rd18, %rd17, 4;
+  add.u64 %rd19, %rd2, %rd18;
+  st.global.s32 [%rd19], %r16;
+  mov.u32 %r20, 0; // unit
+  mov.u32 %r21, %r20;
+  bra prefix_sum_step_end_12;
+  prefix_sum_step_else_12:
+  mov.u32 %r21, 0; // no else branch
+  prefix_sum_step_end_12:
+  ret;
+}
+
+.visible .entry block_offset_kernel(
+    .param .u64 block_offset_kernel_param_dst_data,
+    .param .u64 block_offset_kernel_param_dst_len
+)
+{
+    .reg .pred %p7;
+    .reg .u64 %rd0, %rd1, %rd10, %rd6, %rd9;
+    .reg .u32 %r11, %r12, %r2, %r3, %r4, %r5;
+
+  ld.param.u64 %rd0, [block_offset_kernel_param_dst_data];
+  ld.param.u64 %rd1, [block_offset_kernel_param_dst_len];
+
+  mov.u32 %r2, %ctaid.x;
+  mov.u32 %r3, %ntid.x;
+  mul.lo.u32 %r4, %r2, %r3;
+  mov.u32 %r5, %tid.x;
+  add.u64 %rd6, %r4, %r5;
+  setp.lt.u64 %p7, %rd6, %rd1;
+  @%p7 bra block_offset_kernel_then_8;
+  bra block_offset_kernel_else_8;
+  block_offset_kernel_then_8:
+  mul.lo.u64 %rd9, %rd6, 8;
+  add.u64 %rd10, %rd0, %rd9;
+  st.global.u64 [%rd10], %rd6;
+  mov.u32 %r11, 0; // unit
+  mov.u32 %r12, %r11;
+  bra block_offset_kernel_end_8;
+  block_offset_kernel_else_8:
+  mov.u32 %r12, 0; // no else branch
+  block_offset_kernel_end_8:
+  ret;
+}
+

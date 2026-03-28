@@ -1,0 +1,42 @@
+// Demo 56: Trait definitions and implementations
+//
+// trait Hashable { fn hash(self: ref<Point>) -> u64; }
+// impl Hashable for Point { fn hash(...) -> u64 { ... } }
+//
+// Trait methods mangle to TypeName__TraitName__MethodName at codegen.
+
+struct Point {
+    x: u64,
+    y: u64,
+}
+
+struct Pair {
+    a: u64,
+    b: u64,
+}
+
+trait Hashable {
+    fn hash(self: ref<Point>) -> u64;
+}
+
+impl Hashable for Point {
+    fn hash(self: ref<Point>) -> u64 {
+        (*self).x * 2654435761u64 ^ (*self).y * 2246822519u64
+    }
+}
+
+// Inherent impl — no trait
+impl Pair {
+    fn sum(self: ref<Pair>) -> u64 {
+        (*self).a + (*self).b
+    }
+}
+
+fn main() -> u64 {
+    let p: Point = struct Point { x: 3u64, y: 7u64 };
+    let h: u64 = Point__Hashable__hash(&p);
+    let q: Pair = struct Pair { a: 10u64, b: 32u64 };
+    let s: u64 = Pair__sum(&q);
+    // s == 42, h is a non-trivial hash
+    s
+}

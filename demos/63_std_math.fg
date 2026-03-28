@@ -1,0 +1,14 @@
+// Demo 63: std/math.fg — integer math utilities
+//
+// Imports abs_diff, min64, max64, clamp64, pow64 from stdlib.
+
+use std::math;
+
+fn main() -> u64 {
+    let d: u64  = abs_diff(10u64, 3u64);  // 7
+    let mn: u64 = min64(4u64, 9u64);      // 4
+    let mx: u64 = max64(4u64, 9u64);      // 9
+    let cl: u64 = clamp64(15u64, 0u64, 10u64); // 10
+    let pw: u64 = pow64(2u64, 5u64);      // 32
+    d + mn + mx + cl + pw                 // 62
+}

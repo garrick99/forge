@@ -1,0 +1,41 @@
+// Demo 55: loop { break val } + range patterns
+//
+// loop { ... break val; } evaluates to the break value.
+// Range patterns lo..=hi match integers in [lo, hi].
+
+// Collatz sequence: count steps to reach 1 from n.
+// Classic loop-with-accumulator — returns the step count.
+fn collatz_steps(n: u64) -> u64 {
+    let steps: u64 = loop {
+        let mut x: u64 = n;
+        let mut cnt: u64 = 0u64;
+        while x != 1u64 {
+            let next: u64 = match x % 2u64 {
+                0u64 => x / 2u64,
+                _    => 3u64 * x + 1u64,
+            };
+            x = next;
+            cnt = cnt + 1u64
+        };
+        break cnt;
+    };
+    steps
+}
+
+// Classify an integer by range — returns a category code.
+fn classify(x: u64) -> u64 {
+    match x {
+        0u64..=9u64   => 0u64,
+        10u64..=99u64 => 1u64,
+        _             => 2u64,
+    }
+}
+
+fn main() -> u64 {
+    // classify test: 5 → 0, 42 → 1, 100 → 2
+    let a: u64 = classify(5u64);
+    let b: u64 = classify(42u64);
+    let c: u64 = classify(100u64);
+    // a==0, b==1, c==2 → sum == 3
+    a + b + c
+}

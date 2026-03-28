@@ -1,0 +1,58 @@
+// Demo 91: Trait bounds with concrete dispatch
+//
+// Generic functions can call trait methods on their type parameters
+// when the call is dispatched to a concrete implementation.
+// FORGE resolves trait method calls via the impl registry.
+
+trait Metric {
+    fn distance(self: ref<Self>, other: ref<Self>) -> u64;
+    fn zero() -> u64;
+}
+
+struct Point2D { x: u64, y: u64 }
+struct Point1D { x: u64 }
+
+impl Metric for Point2D {
+    fn distance(self: ref<Point2D>, other: ref<Point2D>) -> u64 {
+        let dx: u64 = if (*self).x > (*other).x { (*self).x - (*other).x } else { (*other).x - (*self).x };
+        let dy: u64 = if (*self).y > (*other).y { (*self).y - (*other).y } else { (*other).y - (*self).y };
+        dx + dy  // Manhattan distance
+    }
+    fn zero() -> u64 { 0u64 }
+}
+
+impl Metric for Point1D {
+    fn distance(self: ref<Point1D>, other: ref<Point1D>) -> u64 {
+        if (*self).x > (*other).x { (*self).x - (*other).x } else { (*other).x - (*self).x }
+    }
+    fn zero() -> u64 { 0u64 }
+}
+
+trait Weighted {
+    fn weight(self: ref<Self>) -> u64;
+}
+
+impl Weighted for Point2D {
+    fn weight(self: ref<Point2D>) -> u64 { (*self).x + (*self).y }
+}
+
+impl Weighted for Point1D {
+    fn weight(self: ref<Point1D>) -> u64 { (*self).x }
+}
+
+fn main() -> u64 {
+    let p1: Point2D = struct Point2D { x: 3u64, y: 4u64 };
+    let p2: Point2D = struct Point2D { x: 7u64, y: 1u64 };
+
+    let d2: u64 = Point2D__Metric__distance(&p1, &p2);  // |3-7|+|4-1| = 4+3 = 7
+    let w1: u64 = Point2D__Weighted__weight(&p1);        // 3+4 = 7
+    let w2: u64 = Point2D__Weighted__weight(&p2);        // 7+1 = 8
+
+    let q1: Point1D = struct Point1D { x: 10u64 };
+    let q2: Point1D = struct Point1D { x: 3u64 };
+    let d1: u64 = Point1D__Metric__distance(&q1, &q2);   // |10-3| = 7
+    let wq1: u64 = Point1D__Weighted__weight(&q1);        // 10
+
+    d2 + w1 + w2 + d1 + wq1
+    // 7 + 7 + 8 + 7 + 10 = 39
+}

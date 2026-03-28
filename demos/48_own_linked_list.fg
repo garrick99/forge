@@ -1,0 +1,78 @@
+// Demo 48: Linked list with own<T>
+//
+// Demonstrates composing own<T> with structs to build heap data structures.
+// The linear type system enforces:
+//   - Every allocated node is freed exactly once
+//   - No dangling pointers — once freed, a pointer cannot be used
+//
+// Key intrinsics:
+//   own_alloc(val)   → own<T>            allocate on heap
+//   own_get(p)       → (T, own<T>)       peek: read value, return pointer back
+//   own_into(p)      → T                 destructive read + free
+//   own_free(p)      → ()               discard + free
+//
+// Note: own_get returns (value, pointer-back) as a tuple so the caller
+// can rebind the pointer and keep using it without consuming it.
+// Pattern:  let (val, p) = own_get(p);   // p still live, val copied out
+
+struct Node {
+    val:  u64,
+    next: u64,   // 0 = null sentinel (simplified — no Option<own<Node>> yet)
+}
+
+// ----------------------------------------------------------------
+// Allocate a node on the heap
+// ----------------------------------------------------------------
+fn node_new(v: u64) -> own<Node> {
+    let n: Node = struct Node { val: v, next: 0u64 };
+    own_alloc(n)
+}
+
+// ----------------------------------------------------------------
+// Read the value field without consuming the node
+// ----------------------------------------------------------------
+fn node_val(p: own<Node>) -> (u64, own<Node>) {
+    let (n, q) = own_get(p);   // q is the pointer returned back
+    (n.val, q)
+}
+
+// ----------------------------------------------------------------
+// Free the node and return its value
+// ----------------------------------------------------------------
+fn node_free(p: own<Node>) -> u64 {
+    let (n, q) = own_get(p);
+    let v: u64 = n.val;
+    own_free(q);
+    v
+}
+
+// ----------------------------------------------------------------
+// Accumulate: read val, free, return val
+// (The linear tracker ensures p is freed exactly once — via own_free in own_into path)
+// ----------------------------------------------------------------
+fn node_sum2(p1: own<Node>, p2: own<Node>) -> u64 {
+    let v1: u64 = node_free(p1);
+    let v2: u64 = node_free(p2);
+    v1 + v2
+}
+
+// ----------------------------------------------------------------
+// Demo driver
+// ----------------------------------------------------------------
+fn run() -> u64 {
+    let lin a: own<Node> = node_new(10u64);
+    let lin b: own<Node> = node_new(32u64);
+
+    // Peek at a's value without consuming
+    let (va, a2) = node_val(a);   // va = 10, a2 is the pointer returned back
+
+    // Peek at b's value without consuming
+    let (vb, b2) = node_val(b);   // vb = 32, b2 is the pointer returned back
+
+    // Free both nodes (consumed here)
+    own_free(a2);
+    own_free(b2);
+
+    va + vb
+    // 10 + 32 = 42
+}

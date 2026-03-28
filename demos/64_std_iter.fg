@@ -1,0 +1,21 @@
+// Demo 64: std/iter.fg — Iterator trait + Range implementation
+//
+// range(start, end_) returns a Range that yields start, start+1, ..., end_-1
+// Demonstrates for-in over a stdlib Iterator type.
+
+use std::iter;
+
+// Sum [lo, hi) using a Range iterator
+fn range_sum(lo: u64, hi: u64) -> u64 {
+    let r: Range = range(lo, hi);
+    let acc: u64 = 0u64;
+    for x in r {
+        acc = acc + x
+    };
+    acc
+}
+
+fn main() -> u64 {
+    // range_sum(1, 6) = 1+2+3+4+5 = 15; range_sum(0, 4) = 0+1+2+3 = 6
+    range_sum(1u64, 6u64) + range_sum(0u64, 4u64)  // = 21
+}

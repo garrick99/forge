@@ -1,0 +1,44 @@
+// Demo 67: Type aliases + chained method calls
+//
+// type Alias = ExistingType;  emits C typedef.
+// Chained method calls: x.method1().method2().method3()
+
+type Score  = u64;
+type Count  = u64;
+type Meters = u64;
+
+struct Acc { total: Score, count: Count, }
+
+impl Acc {
+    fn new() -> Acc {
+        struct Acc { total: 0u64, count: 0u64 }
+    }
+    fn add(self: ref<Acc>, v: Score) -> Acc {
+        struct Acc { total: (*self).total + v, count: (*self).count + 1u64 }
+    }
+    fn mean(self: ref<Acc>) -> Score {
+        if (*self).count == 0u64 { 0u64 } else { (*self).total / (*self).count }
+    }
+    fn total(self: ref<Acc>) -> Score {
+        (*self).total
+    }
+    fn count(self: ref<Acc>) -> Count {
+        (*self).count
+    }
+}
+
+fn main() -> u64 {
+    // Chained: build accumulator step by step
+    let a0: Acc = Acc__new();
+    let a1: Acc = a0.add(10u64);
+    let a2: Acc = a1.add(20u64);
+    let a3: Acc = a2.add(30u64);
+
+    let n: Count = a3.count();    // 3
+    let t: Score = a3.total();    // 60
+    let m: Score = a3.mean();     // 20
+
+    // Scale by Meters alias
+    let dist: Meters = 5u64;
+    n + t + m + dist   // 3 + 60 + 20 + 5 = 88
+}

@@ -1,0 +1,53 @@
+// Demo 71: Builder pattern + method chaining
+//
+// Uses: inherent impl, method call syntax, const, type alias, postconditions.
+
+use std::option;
+
+const DEFAULT_CAP: u64 = 8u64;
+
+type Weight = u64;
+type Score  = u64;
+
+struct Config {
+    max_iter: u64,
+    threshold: Weight,
+    verbose:  bool,
+}
+
+impl Config {
+    fn default() -> Config {
+        struct Config { max_iter: DEFAULT_CAP, threshold: 10u64, verbose: false }
+    }
+    fn with_max_iter(self: ref<Config>, n: u64) -> Config {
+        struct Config { max_iter: n, threshold: (*self).threshold, verbose: (*self).verbose }
+    }
+    fn with_threshold(self: ref<Config>, t: Weight) -> Config {
+        struct Config { max_iter: (*self).max_iter, threshold: t, verbose: (*self).verbose }
+    }
+    fn with_verbose(self: ref<Config>) -> Config {
+        struct Config { max_iter: (*self).max_iter, threshold: (*self).threshold, verbose: true }
+    }
+    fn max_iter(self: ref<Config>) -> u64  { (*self).max_iter }
+    fn threshold(self: ref<Config>) -> Weight { (*self).threshold }
+}
+
+fn run_with(max_iter: u64, threshold: Weight, data: u64) -> Score
+    requires max_iter > 0u64
+    ensures result <= data
+{
+    if data <= threshold { 0u64 } else { data / max_iter }
+}
+
+fn main() -> u64 {
+    let cfg: Config  = Config__default();
+    let cfg2: Config = cfg.with_max_iter(4u64).with_threshold(5u64);
+
+    let n1: u64 = cfg2.max_iter();     // 4
+    let n2: u64 = cfg2.threshold();    // 5
+
+    let s1: Score = run_with(4u64, n2, 100u64); // 100/4 = 25
+    let s2: Score = run_with(4u64, n2, 3u64);  // 0 (3 <= 5)
+
+    n1 + n2 + s1 + s2   // 4 + 5 + 25 + 0 = 34
+}

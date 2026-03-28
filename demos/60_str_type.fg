@@ -1,0 +1,31 @@
+// Demo 60: str type — UTF-8 byte span
+//
+// str is a fat pointer over u8 with a .len field (same ABI as span<u8>).
+// String literals emit as forge_span_u8_t fat pointers.
+// s.len, s[i] (bounds-checked), for-in iteration, byte arithmetic.
+
+fn str_len(s: str) -> u64 {
+    s.len as u64
+}
+
+fn str_at(s: str, i: u64) -> u8
+    requires i < s.len
+{
+    s[i]
+}
+
+// Sum all byte values in a str using for-in iteration
+fn byte_sum(s: str) -> u64 {
+    let acc: u64 = 0u64;
+    for b in s {
+        acc = acc + (b as u64)
+    };
+    acc
+}
+
+fn main() -> u64 {
+    let s: str = "AB";          // bytes: 65, 66
+    let l: u64  = str_len(s);   // 2
+    let sum: u64 = byte_sum(s); // 131
+    l + sum                     // 133
+}

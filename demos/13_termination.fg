@@ -1,0 +1,48 @@
+// FORGE Demo 13 — Termination Proofs
+//
+// Recursive functions must carry a 'decreases:' clause specifying a
+// termination measure. FORGE proves:
+//   1. The measure is non-negative at function entry (D >= 0)
+//   2. At every recursive call site: D[params := args] < D
+//
+// Both obligations are discharged by Z3 automatically.
+//
+// Demos:
+//   countdown   — classic n → n-1 recursion, decreases: n
+//   gcd         — Euclidean algorithm, decreases: b
+//   power_of_two — decreases: n / 2 (halving)
+
+// Count down from n to 0, returning 0.
+// Termination: at the recursive call, n-1 < n (and n > 0).
+fn countdown(n: u64) -> u64
+    decreases n
+{
+    if n == 0
+    { 0 }
+    else
+    { countdown(n - 1) }
+}
+
+// Greatest common divisor via Euclidean algorithm.
+// Terminates because b strictly decreases at each step:
+//   b_new = a % b < b   (when b > 0)
+fn gcd(a: u64, b: u64[k | k > 0]) -> u64
+    requires b > 0
+    decreases b
+{
+    if a - (a / b) * b == 0
+    { b }
+    else
+    { gcd(b, a - (a / b) * b) }
+}
+
+// Integer square root via repeated subtraction.
+// Terminates because n strictly decreases.
+fn isqrt_step(n: u64, acc: u64) -> u64
+    decreases n
+{
+    if n == 0
+    { acc }
+    else
+    { isqrt_step(n - 1, acc + 1) }
+}

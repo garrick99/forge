@@ -1,0 +1,39 @@
+// Demo 90: Const generics — functions parameterized by compile-time values
+//
+// FORGE supports const generic parameters with 'const N: u64'.
+// Const params are passed as the first argument(s), like KNat params.
+// The value is available in the body as an ordinary u64.
+
+fn replicate<const N: u64>(v: u64) -> u64 {
+    v * N
+}
+
+fn scale_up<const FACTOR: u64>(x: u64) -> u64 {
+    x * FACTOR
+}
+
+fn threshold_check<const LIMIT: u64>(x: u64) -> u64 {
+    if x <= LIMIT { 1u64 } else { 0u64 }
+}
+
+fn fixed_sum<const A: u64, const B: u64>() -> u64 {
+    A + B
+}
+
+fn main() -> u64 {
+    // Const param comes first, then regular params
+    let r1: u64 = replicate(3u64, 7u64);     // N=3, v=7 → 21
+    let r2: u64 = replicate(5u64, 4u64);     // N=5, v=4 → 20
+
+    let s1: u64 = scale_up(10u64, 8u64);     // FACTOR=10, x=8 → 80
+    let s2: u64 = scale_up(100u64, 2u64);    // FACTOR=100, x=2 → 200
+
+    let t1: u64 = threshold_check(50u64, 30u64);  // LIMIT=50, x=30 → 1
+    let t2: u64 = threshold_check(50u64, 60u64);  // LIMIT=50, x=60 → 0
+
+    let f1: u64 = fixed_sum(10u64, 20u64);   // A=10, B=20 → 30
+    let f2: u64 = fixed_sum(7u64, 8u64);     // A=7, B=8 → 15
+
+    r1 + r2 + s1 + s2 + t1 + t2 + f1 + f2
+    // 21 + 20 + 80 + 200 + 1 + 0 + 30 + 15 = 367
+}

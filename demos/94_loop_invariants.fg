@@ -1,0 +1,58 @@
+// Demo 94: Loop invariants — prove correctness of iterative algorithms
+//
+// 'invariant' in a while loop provides facts the SMT can use at each iteration.
+// 'decreases' provides the termination measure.
+
+fn sum_n(n: u64) -> u64 {
+    let acc: u64 = 0u64;
+    let i: u64 = 0u64;
+    while i <= n
+        invariant i <= n + 1u64
+        decreases n - i + 1u64
+    {
+        acc = acc + i;
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn factorial(n: u64) -> u64
+    requires n <= 12u64
+{
+    let acc: u64 = 1u64;
+    let i: u64 = 1u64;
+    while i <= n
+        invariant i >= 1u64
+        decreases n - i + 1u64
+    {
+        acc = acc * i;
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn count_down(start: u64) -> u64 {
+    let count: u64 = 0u64;
+    let i: u64 = start;
+    while i > 0u64
+        invariant count + i == start
+        decreases i
+    {
+        i = i - 1u64;
+        count = count + 1u64;
+    };
+    count
+}
+
+fn main() -> u64 {
+    let s5: u64  = sum_n(5u64);    // 0+1+2+3+4+5 = 15
+    let s10: u64 = sum_n(10u64);   // 55
+
+    let f5:  u64 = factorial(5u64);  // 120
+    let f6:  u64 = factorial(6u64);  // 720
+
+    let cd7: u64 = count_down(7u64);  // 7
+
+    s5 + s10 + f5 + cd7
+    // 15 + 55 + 120 + 7 = 197
+}

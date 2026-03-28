@@ -1,0 +1,97 @@
+// Demo 53: if let / assert
+//
+// Two new language features:
+//
+// 1. if let pattern = expr { body } [else { alt }]
+//    Desugars to: match expr { pattern => body, _ => alt }
+//    Ergonomic pattern matching for Option<T> and Result<T,E>.
+//
+// 2. assert(pred) "context"
+//    Proves pred via Z3 (generates an SMT obligation), then adds pred
+//    as a known fact for subsequent proof obligations in the same scope.
+//    Differs from assume(pred): assert is PROVED, not trusted.
+//
+// Together they enable concise + correct code with intermediate proof steps.
+
+enum Option<T> {
+    None,
+    Some(T),
+}
+
+// ----------------------------------------------------------------
+// Safe division returning Option<u64>.
+// ----------------------------------------------------------------
+fn safe_div(n: u64, d: u64) -> Option<u64> {
+    if d != 0u64 {
+        Some(n / d)
+    } else {
+        None
+    }
+}
+
+// ----------------------------------------------------------------
+// Use `if let Some(q) = safe_div(...)` to avoid explicit match.
+// ----------------------------------------------------------------
+fn div_or_zero(n: u64, d: u64) -> u64 {
+    if let Some(q) = safe_div(n, d) {
+        q
+    } else {
+        0u64
+    }
+}
+
+// ----------------------------------------------------------------
+// Compute (a / b) + (c / d), returning 0 for any zero divisor.
+// ----------------------------------------------------------------
+fn safe_add_divs(a: u64, b: u64, c: u64, d: u64) -> u64 {
+    if let Some(ab) = safe_div(a, b) {
+        if let Some(cd) = safe_div(c, d) {
+            ab + cd
+        } else {
+            ab
+        }
+    } else {
+        div_or_zero(c, d)
+    }
+}
+
+// ----------------------------------------------------------------
+// assert as a proof stepping stone.
+//
+// Compute floor(n / 4) via right shift + add residue back.
+// assert introduces intermediate facts that Z3 uses to
+// discharge the final postcondition.
+// ----------------------------------------------------------------
+fn div4(n: u64) -> u64
+    requires n > 0u64
+    ensures  result <= n
+{
+    let q: u64 = n >> 2u64;
+    // assert q <= n/4, and n/4 <= n (for n>0, shift by 2 ≤ original).
+    // We add the intermediate fact q <= n to the proof context so the
+    // postcondition result <= n is trivially provable.
+    assert(q <= n) "shift right by 2 never exceeds the original";
+    q
+}
+
+// ----------------------------------------------------------------
+// Clamp a value to [lo, hi] with an assert confirming the result.
+// ----------------------------------------------------------------
+fn clamp(x: u64, lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures  result >= lo && result <= hi
+{
+    let r: u64 =
+        if x < lo { lo }
+        else if x > hi { hi }
+        else { x };
+    assert(r >= lo && r <= hi) "clamp result is in [lo, hi]";
+    r
+}
+
+// ----------------------------------------------------------------
+// Demo driver.
+// ----------------------------------------------------------------
+fn run() -> u64 {
+    0u64
+}

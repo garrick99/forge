@@ -1,0 +1,63 @@
+// Demo 78: Nested pattern matching — matching inside constructors
+//
+// match Result { Ok(Some(v)) => ..., Ok(None) => ..., Err(_) => ... }
+// Demonstrates matching two levels deep using nested matches.
+
+use std::option;
+
+enum ParseResult { Good(u64), Bad }
+
+fn parse_even(n: u64) -> ParseResult {
+    if n % 2u64 == 0u64 { Good(n) }
+    else { Bad }
+}
+
+fn double_if_good(r: ParseResult) -> u64 {
+    match r {
+        Good(v) => v * 2u64,
+        Bad     => 0u64,
+    }
+}
+
+// Nested: Option<ParseResult>
+fn handle_opt(o: Option<u64>) -> u64 {
+    let inner: u64 = match o {
+        Some(v) => v,
+        None    => 0u64,
+    };
+    let parsed: ParseResult = parse_even(inner);
+    double_if_good(parsed)
+}
+
+// Two-level match via chaining
+fn classify_pair(a: u64, b: u64) -> u64 {
+    let pa: ParseResult = parse_even(a);
+    let pb: ParseResult = parse_even(b);
+    match pa {
+        Good(x) => match pb {
+            Good(y) => x + y,    // both even
+            Bad     => x,        // only a even
+        },
+        Bad => match pb {
+            Good(y) => y,        // only b even
+            Bad     => 0u64,     // neither even
+        },
+    }
+}
+
+fn main() -> u64 {
+    let r1: u64 = double_if_good(parse_even(4u64));   // Good(4) → 8
+    let r2: u64 = double_if_good(parse_even(7u64));   // Bad → 0
+    let r3: u64 = handle_opt(Some(10u64));             // Some(10) → Good(10) → 20
+    let r4: u64 = handle_opt(Some(3u64));              // Some(3) → Bad → 0
+    let none_val: Option<u64> = None;
+    let r5: u64 = handle_opt(none_val);                // None → 0
+
+    let c1: u64 = classify_pair(4u64, 6u64);           // both even → 4+6 = 10
+    let c2: u64 = classify_pair(4u64, 7u64);           // only a → 4
+    let c3: u64 = classify_pair(3u64, 6u64);           // only b → 6
+    let c4: u64 = classify_pair(3u64, 7u64);           // neither → 0
+
+    r1 + r2 + r3 + r4 + r5 + c1 + c2 + c3 + c4
+    // 8 + 0 + 20 + 0 + 0 + 10 + 4 + 6 + 0 = 48
+}

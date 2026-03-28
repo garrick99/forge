@@ -1,0 +1,53 @@
+// Demo 80: Accumulator pattern — mutable state via structs + methods
+//
+// A Stats struct accumulates a running sum, count, min, and max.
+// Demonstrates methods that return updated copies (functional update).
+
+struct Stats {
+    count: u64,
+    total: u64,
+    min:   u64,
+    max:   u64,
+}
+
+impl Stats {
+    fn new() -> Stats {
+        struct Stats { count: 0u64, total: 0u64, min: 9999999999u64, max: 0u64 }
+    }
+
+    fn add(self: ref<Stats>, v: u64) -> Stats {
+        let new_count: u64 = (*self).count + 1u64;
+        let new_total: u64 = (*self).total + v;
+        let new_min: u64 = if v < (*self).min { v } else { (*self).min };
+        let new_max: u64 = if v > (*self).max { v } else { (*self).max };
+        struct Stats { count: new_count, total: new_total, min: new_min, max: new_max }
+    }
+
+    fn mean(self: ref<Stats>) -> u64 {
+        if (*self).count == 0u64 { 0u64 }
+        else { (*self).total / (*self).count }
+    }
+
+    fn count(self: ref<Stats>) -> u64 { (*self).count }
+    fn total(self: ref<Stats>) -> u64 { (*self).total }
+    fn min(self: ref<Stats>)   -> u64 { (*self).min   }
+    fn max(self: ref<Stats>)   -> u64 { (*self).max   }
+}
+
+fn main() -> u64 {
+    let s0: Stats = Stats__new();
+    let s1: Stats = s0.add(10u64);
+    let s2: Stats = s1.add(30u64);
+    let s3: Stats = s2.add(20u64);
+    let s4: Stats = s3.add(40u64);
+    // count=4, total=100, min=10, max=40
+
+    let cnt:  u64 = s4.count();  // 4
+    let tot:  u64 = s4.total();  // 100
+    let mn:   u64 = s4.min();    // 10
+    let mx:   u64 = s4.max();    // 40
+    let avg:  u64 = s4.mean();   // 25
+
+    cnt + tot + mn + mx + avg
+    // 4 + 100 + 10 + 40 + 25 = 179
+}

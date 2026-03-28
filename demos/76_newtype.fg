@@ -1,0 +1,48 @@
+// Demo 76: Newtype pattern — single-field wrapper structs
+//
+// Wrapping a primitive in a struct creates a distinct type that prevents
+// accidentally mixing meters and seconds.  Methods give domain APIs.
+
+struct Meters  { val: u64 }
+struct Seconds { val: u64 }
+struct Speed   { val: u64 }  // metres per second (integer arithmetic)
+
+impl Meters {
+    fn new(v: u64) -> Meters { struct Meters { val: v } }
+    fn value(self: ref<Meters>) -> u64 { (*self).val }
+    fn add(self: ref<Meters>, other: ref<Meters>) -> Meters {
+        struct Meters { val: (*self).val + (*other).val }
+    }
+    fn scale(self: ref<Meters>, factor: u64) -> Meters {
+        struct Meters { val: (*self).val * factor }
+    }
+}
+
+impl Seconds {
+    fn new(v: u64) -> Seconds { struct Seconds { val: v } }
+    fn value(self: ref<Seconds>) -> u64 { (*self).val }
+}
+
+// Takes plain u64 values so the precondition is straightforward
+fn compute_speed(dist: u64, time: u64) -> Speed
+    requires time > 0u64
+{
+    struct Speed { val: dist / time }
+}
+
+impl Speed {
+    fn value(self: ref<Speed>) -> u64 { (*self).val }
+}
+
+fn main() -> u64 {
+    let d1: Meters  = Meters__new(60u64);
+    let d2: Meters  = Meters__new(40u64);
+    let t:  Seconds = Seconds__new(5u64);
+
+    let total: Meters = d1.add(&d2);        // 100 m
+    let spd:   Speed  = compute_speed(total.value(), 5u64);  // 100/5 = 20 m/s
+
+    let doubled: Meters = total.scale(2u64);  // 200 m
+
+    total.value() + spd.value() + doubled.value()  // 100 + 20 + 200 = 320
+}

@@ -1,0 +1,76 @@
+// Demo 73: where clauses — alternative syntax for trait bounds
+//
+// fn foo<T>(x: T) where T: Trait  is equivalent to  fn foo<T: Trait>(x: T)
+// Both enforce the bound at the call site; the parser merges where-bounds
+// into the generic parameter list.
+
+trait Hashable {
+    fn hash(self: ref<Self>) -> u64;
+}
+
+trait Printable {
+    fn label(self: ref<Self>) -> u64;
+}
+
+struct Color { r: u64, g: u64, b: u64 }
+struct Tag   { id: u64 }
+
+impl Hashable for Color {
+    fn hash(self: ref<Color>) -> u64 {
+        (*self).r * 1009u64 + (*self).g * 97u64 + (*self).b
+    }
+}
+
+impl Printable for Color {
+    fn label(self: ref<Color>) -> u64 { 3u64 }
+}
+
+impl Hashable for Tag {
+    fn hash(self: ref<Tag>) -> u64 { (*self).id * 31u64 }
+}
+
+impl Printable for Tag {
+    fn label(self: ref<Tag>) -> u64 { 7u64 }
+}
+
+// Inline-bound form: identical bound enforcement
+fn hash_inline<T: Hashable>(x: ref<T>) -> u64
+{
+    // Body operates on the ref — no generic dispatch needed;
+    // caller passes concrete types and uses mangled calls directly.
+    0u64
+}
+
+// where-clause form: equivalent to above at the call site
+fn hash_where<T>(x: ref<T>) -> u64
+    where T: Hashable
+{
+    0u64
+}
+
+// Multi-bound via where clause: T must implement both traits
+fn multi_bound<T>(x: ref<T>) -> u64
+    where T: Hashable + Printable
+{
+    0u64
+}
+
+fn main() -> u64 {
+    let c: Color = struct Color { r: 10u64, g: 20u64, b: 30u64 };
+    let t: Tag   = struct Tag   { id: 5u64 };
+
+    // Both syntactic forms enforce the bound — these calls compile only
+    // because Color and Tag implement Hashable.
+    let _a: u64 = hash_inline(&c);  // Color: Hashable ✓
+    let _b: u64 = hash_where(&t);   // Tag:   Hashable ✓
+    let _c: u64 = multi_bound(&c);  // Color: Hashable + Printable ✓
+    let _d: u64 = multi_bound(&t);  // Tag:   Hashable + Printable ✓
+
+    // Concrete dispatch via explicit mangled names
+    let hc: u64 = Color__Hashable__hash(&c);  // 10*1009 + 20*97 + 30 = 12020
+    let ht: u64 = Tag__Hashable__hash(&t);    // 5*31 = 155
+    let lc: u64 = Color__Printable__label(&c); // 3
+    let lt: u64 = Tag__Printable__label(&t);   // 7
+
+    hc + ht + lc + lt   // 12060 + 155 + 3 + 7 = 12225
+}

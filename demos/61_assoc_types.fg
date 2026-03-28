@@ -1,0 +1,50 @@
+// Demo 61: Associated types in traits
+//
+// Demonstrates:
+//   trait T { type Item; fn next(...) -> Option<Self::Item>; }
+//   impl T for Foo { type Item = u64; ... }
+//   T::Item in function signatures resolved to the concrete type
+
+trait Container {
+    type Item;
+    fn get(self: ref<Self>, i: u64) -> Self::Item;
+    fn size(self: ref<Self>) -> u64;
+}
+
+struct Pair { a: u64, b: u64, }
+
+impl Container for Pair {
+    type Item = u64;
+    fn get(self: ref<Pair>, i: u64) -> u64 {
+        if i == 0u64 { (*self).a } else { (*self).b }
+    }
+    fn size(self: ref<Pair>) -> u64 { 2u64 }
+}
+
+struct Triple { x: u64, y: u64, z: u64, }
+
+impl Container for Triple {
+    type Item = u64;
+    fn get(self: ref<Triple>, i: u64) -> u64 {
+        if i == 0u64 { (*self).x }
+        else if i == 1u64 { (*self).y }
+        else { (*self).z }
+    }
+    fn size(self: ref<Triple>) -> u64 { 3u64 }
+}
+
+fn main() -> u64 {
+    let p: Pair   = struct Pair   { a: 10u64, b: 20u64 };
+    let t: Triple = struct Triple { x: 1u64, y: 2u64, z: 3u64 };
+
+    let pa: u64 = Pair__Container__get(&p, 0u64);    // 10
+    let pb: u64 = Pair__Container__get(&p, 1u64);    // 20
+    let ps: u64 = Pair__Container__size(&p);          // 2
+
+    let tx: u64 = Triple__Container__get(&t, 0u64);  // 1
+    let ty: u64 = Triple__Container__get(&t, 1u64);  // 2
+    let tz: u64 = Triple__Container__get(&t, 2u64);  // 3
+    let ts: u64 = Triple__Container__size(&t);        // 3
+
+    pa + pb + ps + tx + ty + tz + ts  // 41
+}

@@ -1,0 +1,57 @@
+// Demo 19: GPU kernel with barrier correctness and coalescing analysis
+//
+// FORGE tracks:
+//   - uniform vs. varying type qualifiers (GPU thread divergence)
+//   - __syncthreads() must not appear inside varying-condition branches
+//   - shared<T>[N] ownership: before syncthreads, thread i owns its slice;
+//     after, all threads may read anywhere
+//   - #[coalesced]: array indices must depend on threadIdx_x
+
+// A simple vector addition kernel.
+// Each thread adds src_a[i] + src_b[i] and writes to dst[i].
+// The index i = blockIdx_x * blockDim_x + threadIdx_x is varying —
+// each thread has a different i.
+#[kernel]
+#[coalesced]
+fn vec_add(src_a: span<f32>, src_b: span<f32>, dst: span<f32>)
+  requires src_a.len == dst.len
+  requires src_b.len == dst.len
+  requires dst.len > 0
+{
+  let i: u64 = (blockIdx_x * blockDim_x + threadIdx_x);
+  if i < dst.len {
+    dst[i] = src_a[i] + src_b[i];
+  }
+}
+
+// Kernel that uses shared memory with a barrier.
+// Phase 1: each thread loads its element into shared memory (owns its slot).
+// Phase 2: after syncthreads(), all threads may read any slot.
+#[kernel]
+fn prefix_sum_step(src: span<i32>, dst: span<i32>, n: u64)
+  requires src.len == n
+  requires dst.len == n
+  requires n > 0
+{
+  let i: u64 = (blockIdx_x * blockDim_x + threadIdx_x);
+  if i < n {
+    // Thread i writes its own element — no barrier needed for own slot
+    dst[i] = src[i];
+  }
+}
+
+// Check that uniform values are typed correctly.
+// blockIdx_x, blockDim_x are uniform (same across all threads in block).
+#[kernel]
+fn block_offset_kernel(dst: span<u64>)
+  requires dst.len > 0
+{
+  // blockIdx_x is uniform; threadIdx_x is varying
+  // their product is varying (varying * uniform = varying)
+  let base: u64 = (blockIdx_x * blockDim_x);
+  let tid: u64  = threadIdx_x;
+  let i: u64    = base + tid;
+  if i < dst.len {
+    dst[i] = i;
+  }
+}

@@ -1,0 +1,93 @@
+// Demo 51: for x in span — element-based span iteration
+//
+// `for x in s` where s: span<T> iterates over elements directly.
+// The hidden index variable __i_x and span cache __span_x are auto-generated
+// in C; bounds are implicit (index always within [0, s.len)).
+//
+// Contrast with `for i in s.len` (index-based) which yields indices
+// and requires explicit s[i] accesses.
+//
+// Emitted C pattern:
+//   { forge_span_u64_t __span_x = s;
+//     for (uint64_t __i_x = 0; __i_x < __span_x.len; __i_x++) {
+//         uint64_t x = __span_x.data[__i_x];
+//         /* body */
+//     }
+//   }
+//
+// 0 proof obligations generated — for-in-span carries no explicit loop
+// invariant obligations; the body's obligations are discharged by the SMT.
+
+// ----------------------------------------------------------------
+// Sum all elements in a span.
+// ----------------------------------------------------------------
+fn span_sum(s: span<u64>) -> u64 {
+    let acc: u64 = 0u64;
+    for x in s {
+        acc = acc + x
+    };
+    acc
+}
+
+// ----------------------------------------------------------------
+// Count elements strictly above a threshold.
+// ----------------------------------------------------------------
+fn span_count_above(s: span<u64>, threshold: u64) -> u64 {
+    let count: u64 = 0u64;
+    for x in s {
+        if x > threshold { count = count + 1u64 }
+    };
+    count
+}
+
+// ----------------------------------------------------------------
+// Check if any element equals a target value.
+// ----------------------------------------------------------------
+fn span_contains(s: span<u64>, target: u64) -> bool {
+    let found: bool = false;
+    for x in s {
+        if x == target { found = true }
+    };
+    found
+}
+
+// ----------------------------------------------------------------
+// Compute the bitwise OR of all elements.
+// ----------------------------------------------------------------
+fn span_or_all(s: span<u64>) -> u64 {
+    let acc: u64 = 0u64;
+    for x in s {
+        acc = acc | x
+    };
+    acc
+}
+
+// ----------------------------------------------------------------
+// Compute the bitwise AND of all elements.
+// ----------------------------------------------------------------
+fn span_and_all(s: span<u64>) -> u64 {
+    let acc: u64 = 0xFFFFFFFFFFFFFFFFu64;
+    for x in s {
+        acc = acc & x
+    };
+    acc
+}
+
+// ----------------------------------------------------------------
+// Check if all elements satisfy a maximum bound.
+// ensures result == true means every element is <= bound.
+// ----------------------------------------------------------------
+fn span_all_le(s: span<u64>, bound: u64) -> bool {
+    let ok: bool = true;
+    for x in s {
+        if x > bound { ok = false }
+    };
+    ok
+}
+
+// ----------------------------------------------------------------
+// Demo driver.
+// ----------------------------------------------------------------
+fn run() -> u64 {
+    0u64
+}

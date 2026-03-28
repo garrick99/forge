@@ -1,0 +1,67 @@
+// Demo 89: Postconditions (ensures) — verifying function contracts
+//
+// 'ensures result ...' states what holds about the return value.
+// The proof engine verifies the body satisfies the contract.
+
+fn max(a: u64, b: u64) -> u64
+    ensures result >= a
+    ensures result >= b
+    ensures result == a || result == b
+{
+    if a >= b { a } else { b }
+}
+
+fn min(a: u64, b: u64) -> u64
+    ensures result <= a
+    ensures result <= b
+    ensures result == a || result == b
+{
+    if a <= b { a } else { b }
+}
+
+fn clamp(x: u64, lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures result >= lo
+    ensures result <= hi
+{
+    if x < lo { lo } else if x > hi { hi } else { x }
+}
+
+fn abs_diff(a: u64, b: u64) -> u64
+    ensures result == a - b || result == b - a
+{
+    if a >= b { a - b } else { b - a }
+}
+
+fn ceil_div(a: u64, b: u64) -> u64
+    requires b > 0u64
+    ensures result * b >= a
+{
+    (a + b - 1u64) / b
+}
+
+fn round_up_to_pow2(x: u64) -> u64
+    requires x > 0u64
+    requires x <= 16u64
+    ensures result >= x
+{
+    if x <= 1u64 { 1u64 }
+    else if x <= 2u64 { 2u64 }
+    else if x <= 4u64 { 4u64 }
+    else if x <= 8u64 { 8u64 }
+    else { 16u64 }
+}
+
+fn main() -> u64 {
+    let a: u64 = max(7u64, 3u64);   // 7
+    let b: u64 = min(7u64, 3u64);   // 3
+    let c: u64 = clamp(15u64, 0u64, 10u64);   // 10
+    let d: u64 = clamp(5u64, 0u64, 10u64);    // 5
+    let e: u64 = abs_diff(10u64, 4u64);        // 6
+    let f: u64 = ceil_div(10u64, 3u64);        // 4
+    let g: u64 = round_up_to_pow2(5u64);       // 8
+    let h: u64 = round_up_to_pow2(8u64);       // 8
+
+    a + b + c + d + e + f + g + h
+    // 7 + 3 + 10 + 5 + 6 + 4 + 8 + 8 = 51
+}

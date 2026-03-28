@@ -1,0 +1,116 @@
+// Demo 33: impl blocks and struct methods
+//
+// FORGE supports impl blocks that attach methods to struct types.
+// Methods are name-mangled as TypeName__method_name in the emitted C.
+// The receiver 'self' is just the first parameter with the struct type.
+//
+// Method call syntax:  obj.method(args)
+// Emitted C:           TypeName__method_name(obj, args)
+//
+// FORGE verifies all proof obligations in method bodies:
+//   - preconditions on method calls
+//   - bounds checks
+//   - postconditions (ensures)
+
+// ---- Vec2: 2D vector arithmetic ----
+
+struct Vec2 {
+  x: f64,
+  y: f64,
+}
+
+impl Vec2 {
+  fn dot(self: Vec2, other: Vec2) -> f64 {
+    self.x * other.x + self.y * other.y
+  }
+
+  fn scale(self: Vec2, s: f64) -> Vec2 {
+    struct Vec2 { x: self.x * s, y: self.y * s }
+  }
+
+  fn add(self: Vec2, other: Vec2) -> Vec2 {
+    struct Vec2 { x: self.x + other.x, y: self.y + other.y }
+  }
+
+  fn zero() -> Vec2 {
+    struct Vec2 { x: 0.0, y: 0.0 }
+  }
+}
+
+// ---- Rect: axis-aligned bounding box ----
+
+struct Rect {
+  lo_x: u64,
+  lo_y: u64,
+  hi_x: u64,
+  hi_y: u64,
+}
+
+impl Rect {
+  fn width(self: Rect) -> u64
+    requires self.hi_x >= self.lo_x
+    ensures  result == self.hi_x - self.lo_x
+  {
+    self.hi_x - self.lo_x
+  }
+
+  fn height(self: Rect) -> u64
+    requires self.hi_y >= self.lo_y
+    ensures  result == self.hi_y - self.lo_y
+  {
+    self.hi_y - self.lo_y
+  }
+
+  fn area(self: Rect) -> u64
+    requires self.hi_x >= self.lo_x
+    requires self.hi_y >= self.lo_y
+  {
+    let w: u64 = self.width();
+    let h: u64 = self.height();
+    w * h
+  }
+
+  fn contains(self: Rect, px: u64, py: u64) -> bool {
+    px >= self.lo_x && px < self.hi_x &&
+    py >= self.lo_y && py < self.hi_y
+  }
+}
+
+// ---- Counter: simple integer counter with bounded increment ----
+
+struct Counter {
+  val: u64,
+  max: u64,
+}
+
+impl Counter {
+  fn new(max: u64) -> Counter {
+    struct Counter { val: 0, max: max }
+  }
+
+  fn increment(self: Counter) -> Counter
+    requires self.val < self.max
+    ensures  result.val == self.val + 1
+    ensures  result.max == self.max
+  {
+    struct Counter { val: self.val + 1, max: self.max }
+  }
+
+  fn is_full(self: Counter) -> bool
+    ensures result == (self.val >= self.max)
+  {
+    self.val >= self.max
+  }
+}
+
+// ---- Top-level function that uses all methods ----
+
+fn demo(r: Rect, c: Counter) -> u64
+  requires r.hi_x >= r.lo_x
+  requires r.hi_y >= r.lo_y
+  requires c.val < c.max
+{
+  let area: u64 = r.area();
+  let c2: Counter = c.increment();
+  area + c2.val
+}

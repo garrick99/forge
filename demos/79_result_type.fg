@@ -1,0 +1,67 @@
+// Demo 79: Result<T, E> type — error propagation pattern
+//
+// Result is an enum with Ok(T) and Err(E) variants.
+// Demonstrates error-handling without exceptions.
+
+enum MathError { DivByZero, Overflow, NegInput }
+
+enum Result_u64 { Ok(u64), Err(MathError) }
+
+fn safe_div(a: u64, b: u64) -> Result_u64 {
+    if b == 0u64 { Err(DivByZero) }
+    else { Ok(a / b) }
+}
+
+fn safe_sqrt_approx(n: u64) -> Result_u64 {
+    // integer Newton's method sqrt
+    if n == 0u64 { Ok(0u64) }
+    else {
+        let x: u64 = n;
+        let x1: u64 = (x + n / x) / 2u64;
+        let x2: u64 = (x1 + n / x1) / 2u64;
+        let x3: u64 = (x2 + n / x2) / 2u64;
+        Ok(x3)
+    }
+}
+
+fn unwrap_or(r: Result_u64, default: u64) -> u64 {
+    match r {
+        Ok(v)  => v,
+        Err(_) => default,
+    }
+}
+
+fn is_ok(r: Result_u64) -> u64 {
+    match r {
+        Ok(_)  => 1u64,
+        Err(_) => 0u64,
+    }
+}
+
+fn error_code(r: Result_u64) -> u64 {
+    match r {
+        Ok(_)           => 0u64,
+        Err(DivByZero)  => 1u64,
+        Err(Overflow)   => 2u64,
+        Err(NegInput)   => 3u64,
+    }
+}
+
+fn main() -> u64 {
+    let r1: Result_u64 = safe_div(100u64, 4u64);    // Ok(25)
+    let r2: Result_u64 = safe_div(7u64, 0u64);      // Err(DivByZero)
+    let r3: Result_u64 = safe_div(81u64, 9u64);     // Ok(9)
+
+    let v1: u64 = unwrap_or(r1, 0u64);  // 25
+    let v2: u64 = unwrap_or(r2, 99u64); // 99 (fallback)
+    let v3: u64 = unwrap_or(r3, 0u64);  // 9
+
+    let ok1: u64 = is_ok(safe_div(10u64, 2u64));    // 1
+    let ok2: u64 = is_ok(safe_div(10u64, 0u64));    // 0
+
+    let ec1: u64 = error_code(safe_div(5u64, 0u64));   // 1 (DivByZero)
+    let ec2: u64 = error_code(safe_div(5u64, 1u64));   // 0 (Ok)
+
+    v1 + v2 + v3 + ok1 + ok2 + ec1 + ec2
+    // 25 + 99 + 9 + 1 + 0 + 1 + 0 = 135
+}

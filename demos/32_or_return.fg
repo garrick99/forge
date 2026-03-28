@@ -1,0 +1,90 @@
+// Demo 32: or_return and or_fail error propagation
+//
+// 'e or_return default' — if e is an Err variant, return default immediately;
+//                         otherwise evaluate to the Ok payload.
+// 'e or_fail msg'       — if e is an Err variant, call abort(); otherwise
+//                         evaluate to the Ok payload.
+//
+// Both operators work with any two-variant enum where:
+//   variant 0 = success (e.g. Ok, Some)
+//   variant 1 = failure (e.g. Err, None)
+//
+// FORGE verifies:
+//   - The input enum type and payload type are consistent
+//   - The default/fallback expression has a compatible type
+//   - All proof obligations (preconditions, bounds checks) still hold
+
+enum Result<T, E> {
+  Ok(T),
+  Err(E),
+}
+
+enum Option<T> {
+  Some(T),
+  None,
+}
+
+// ---- safe_div: returns Result<u64, u64> ----
+fn safe_div(a: u64, b: u64) -> Result<u64, u64>
+  requires a < 1000000
+{
+  if b == 0 {
+    Err(0u64)
+  } else {
+    Ok(a / b)
+  }
+}
+
+// ---- or_return: early-return on error ----
+//
+// If safe_div returns Err, immediately return 0 from the caller.
+// Otherwise continue with the Ok value.
+fn divide_or_zero(a: u64, b: u64) -> u64
+  requires a < 1000000
+{
+  let q: u64 = safe_div(a, b) or_return 0;
+  q * 2
+}
+
+// ---- or_fail: abort on error ----
+//
+// If safe_div returns Err, call abort().
+// The caller guarantees b != 0 so this never fires.
+fn divide_assert(a: u64, b: u64) -> u64
+  requires a < 1000000
+  requires b > 0
+{
+  let q: u64 = safe_div(a, b) or_fail 0;
+  q
+}
+
+// ---- chained or_return ----
+//
+// Multiple operations can be chained — the first Err short-circuits.
+fn double_divide(a: u64, b: u64, c: u64) -> u64
+  requires a < 1000000
+{
+  let q1: u64 = safe_div(a, b) or_return 0;
+  // q1 = a / b <= a < 1000000, but Z3 needs the division bound explicitly
+  let q2: u64 = if q1 < 1000000 { safe_div(q1, c) or_return 0 } else { 0 };
+  q1 + q2
+}
+
+// ---- or_return with Option<T> ----
+fn find_first(s: span<u64>, n: u64) -> u64
+  requires n <= s.len
+{
+  let i: u64 = 0;
+  let found: Option<u64> = None;
+  while i < n
+    invariant i <= n
+    decreases n - i
+  {
+    if s[i] > 0 {
+      found = Some(s[i]);
+      i = n  // break
+    };
+    i = i + 1
+  };
+  found or_return 0
+}

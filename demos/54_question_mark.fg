@@ -1,0 +1,37 @@
+// Demo 54: ? operator — propagate Err on failure
+//
+// The ? operator desugars at parse time to:
+//   match e { Ok(v) => v, Err(e) => return Err(e) }
+//
+// This demo chains two fallible operations without explicit match arms.
+
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+
+// Safe division — returns Err if divisor is zero
+fn safe_div(a: u64, b: u64) -> Result<u64, u64> {
+    if b == 0u64 {
+        Err(0u64)
+    } else {
+        Ok(a / b)
+    }
+}
+
+// Chain: divide twice using ?
+// If either division returns Err, the whole function returns Err.
+fn div_twice(a: u64, b: u64, c: u64) -> Result<u64, u64> {
+    let x: u64 = safe_div(a, b)?;
+    let y: u64 = safe_div(x, c)?;
+    Ok(y)
+}
+
+fn main() -> u64 {
+    // 100 / 5 / 4 = 5
+    let r: Result<u64, u64> = div_twice(100u64, 5u64, 4u64);
+    match r {
+        Ok(v)  => v,
+        Err(_) => 999u64,
+    }
+}

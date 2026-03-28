@@ -1,0 +1,86 @@
+// Demo 50: own_borrow / own_borrow_mut — affine borrows for own<T>
+//
+// own_borrow(p)     -> (ref<T>,    own<T>)   immutable borrow: read without consuming
+// own_borrow_mut(p) -> (refmut<T>, own<T>)   mutable borrow:  write whole value in one step
+//
+// Linearity rules:
+//   ref<T>    bindings are Unr — can be read many times
+//   refmut<T> bindings are Aff — used at most once (prevents aliased writes)
+//   own<T>    bindings are Lin — must be freed or passed somewhere exactly once
+//
+// In C:
+//   __forge_own_borrow_T(p)     → { ._0 = p, ._1 = p }  (same pointer in both fields)
+//   __forge_own_borrow_mut_T(p) → { ._0 = p, ._1 = p }
+//
+// 0 proof obligations (no arithmetic, no preconditions/postconditions needed).
+
+struct Point {
+    x: u64,
+    y: u64,
+}
+
+// ----------------------------------------------------------------
+// Read both fields through an immutable borrow.
+// own<Point> is returned so the caller keeps ownership.
+// ----------------------------------------------------------------
+fn point_x(p: own<Point>) -> (u64, own<Point>) {
+    let (r, p2) = own_borrow(p);
+    let xval: u64 = (*r).x;
+    (xval, p2)
+}
+
+fn point_y(p: own<Point>) -> (u64, own<Point>) {
+    let (r, p2) = own_borrow(p);
+    let yval: u64 = (*r).y;
+    (yval, p2)
+}
+
+// ----------------------------------------------------------------
+// Translate: read old value, compute new value, write back via
+// own_borrow_mut.  r is Aff — used exactly once by *r = new_pt.
+// ----------------------------------------------------------------
+fn point_translate(p: own<Point>, dx: u64, dy: u64) -> own<Point> {
+    let (pt, p2) = own_get(p);
+    let new_pt: Point = struct Point { x: pt.x + dx, y: pt.y + dy };
+    let (r, p3) = own_borrow_mut(p2);
+    *r = new_pt;
+    p3
+}
+
+// ----------------------------------------------------------------
+// Scale both coordinates by a factor via borrow_mut.
+// ----------------------------------------------------------------
+fn point_scale(p: own<Point>, factor: u64) -> own<Point> {
+    let (pt, p2) = own_get(p);
+    let scaled: Point = struct Point { x: pt.x * factor, y: pt.y * factor };
+    let (r, p3) = own_borrow_mut(p2);
+    *r = scaled;
+    p3
+}
+
+// ----------------------------------------------------------------
+// Demo driver: allocate, borrow, mutate, free.
+// ----------------------------------------------------------------
+fn run() -> u64 {
+    let p: own<Point> = own_alloc(struct Point { x: 3u64, y: 7u64 });
+
+    // Immutable borrows to read fields (own comes back each time)
+    let (x0, p1) = point_x(p);
+    let (y0, p2) = point_y(p1);
+
+    // Mutable borrow to translate (+10, +20)
+    let p3 = point_translate(p2, 10u64, 20u64);
+
+    // Mutable borrow to scale (*2)
+    let p4 = point_scale(p3, 2u64);
+
+    // Read final coordinates
+    let (xf, p5) = point_x(p4);
+    let (yf, p6) = point_y(p5);
+
+    // Free the allocation — linear discipline satisfied
+    own_free(p6);
+
+    // Return sum of initial + final coordinates as a smoke-test value
+    x0 + y0 + xf + yf
+}

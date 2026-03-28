@@ -1,0 +1,58 @@
+// Demo 74: Default trait methods
+//
+// A trait can provide a default method body.  Types that implement the
+// trait may override the default or inherit it.  Synthesized defaults are
+// checked and emitted as concrete functions per implementing type.
+
+trait Config {
+    // Abstract — every impl must provide
+    fn name_hash(self: ref<Self>) -> u64;
+
+    // Default — returns a fixed constant; impls may override
+    fn version() -> u64 {
+        1u64
+    }
+
+    // Default with a slightly different value
+    fn flags() -> u64 {
+        0u64
+    }
+}
+
+struct Debug   { seed: u64 }
+struct Release { optimized: u64 }
+
+impl Config for Debug {
+    fn name_hash(self: ref<Debug>) -> u64 {
+        (*self).seed * 37u64
+    }
+    // Override version for Debug builds
+    fn version() -> u64 { 999u64 }
+    // Inherits default flags() = 0
+}
+
+impl Config for Release {
+    fn name_hash(self: ref<Release>) -> u64 {
+        (*self).optimized * 7u64
+    }
+    // Override flags for Release builds
+    fn flags() -> u64 { 128u64 }
+    // Inherits default version() = 1
+}
+
+fn main() -> u64 {
+    let d: Debug   = struct Debug   { seed: 5u64 };
+    let r: Release = struct Release { optimized: 10u64 };
+
+    // Debug: hash = 5*37 = 185, version = 999 (override), flags = 0 (default)
+    let dh: u64 = Debug__Config__name_hash(&d);  // 185
+    let dv: u64 = Debug__Config__version();       // 999
+    let df: u64 = Debug__Config__flags();         // 0
+
+    // Release: hash = 10*7 = 70, version = 1 (default), flags = 128 (override)
+    let rh: u64 = Release__Config__name_hash(&r); // 70
+    let rv: u64 = Release__Config__version();      // 1
+    let rf: u64 = Release__Config__flags();        // 128
+
+    dh + dv + df + rh + rv + rf  // 185 + 999 + 0 + 70 + 1 + 128 = 1383
+}

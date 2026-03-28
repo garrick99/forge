@@ -1,0 +1,103 @@
+// Demo 45: Kyber butterfly with tuple return
+//
+// The Cooley-Tukey NTT butterfly computes two values simultaneously:
+//   (a + zeta*b mod q,  a - zeta*b mod q)
+//
+// Previously this required mutable span out-params.  With tuple returns,
+// the butterfly is a pure function returning (u64, u64), and postconditions
+// on both outputs are proved by Z3.
+//
+// Key technique: callee postcondition injection.
+// When `let x: u64 = f(args)` binds a function result, the type checker
+// automatically adds `f`'s postconditions (with result→x) to the proof context.
+// So `let lo = ntt_add(a, t, q)` injects `lo < q` as a free fact.
+
+fn ntt_add(a: u64, b: u64, q: u64) -> u64
+    requires q > 0u64
+    ensures  result < q
+{
+    (a % q + b % q) % q
+}
+
+fn ntt_sub(a: u64, b: u64, q: u64) -> u64
+    requires q > 0u64
+    ensures  result < q
+{
+    let ar: u64 = a % q;
+    let br: u64 = b % q;
+    if ar >= br { ar - br } else { ar + q - br }
+}
+
+fn ntt_mul(a: u64, b: u64, q: u64) -> u64
+    requires q > 0u64
+    ensures  result < q
+{
+    (a % q) * (b % q) % q
+}
+
+// ----------------------------------------------------------------
+// Pure Cooley-Tukey butterfly: (a, b) → (a + ζb, a - ζb) mod q
+// Postconditions proved by callee postcondition injection:
+//   let t   = ntt_mul(ζ, b, q)  →  t < q            [from ntt_mul]
+//   let lo  = ntt_add(a, t, q)  →  lo < q            [from ntt_add]
+//   let hi  = ntt_sub(a, t, q)  →  hi < q            [from ntt_sub]
+//   return (lo, hi)             →  result.0=lo, result.1=hi
+//   ensures result.0 < q        →  lo < q  ✓
+// ----------------------------------------------------------------
+fn butterfly(a: u64, b: u64, zeta: u64, q: u64) -> (u64, u64)
+    requires q > 0u64
+    ensures  result.0 < q
+    ensures  result.1 < q
+{
+    let t:  u64 = ntt_mul(zeta, b, q);
+    let lo: u64 = ntt_add(a, t, q);
+    let hi: u64 = ntt_sub(a, t, q);
+    (lo, hi)
+}
+
+// ----------------------------------------------------------------
+// Inverse (Gentleman-Sande): (a, b) → (a+b, ζ(a-b)) mod q
+// ----------------------------------------------------------------
+fn inv_butterfly(a: u64, b: u64, zeta: u64, q: u64) -> (u64, u64)
+    requires q > 0u64
+    ensures  result.0 < q
+    ensures  result.1 < q
+{
+    let s: u64 = ntt_add(a, b, q);
+    let d: u64 = ntt_sub(a, b, q);
+    let m: u64 = ntt_mul(zeta, d, q);
+    (s, m)
+}
+
+// ----------------------------------------------------------------
+// In-place butterfly layer: applies butterfly to consecutive pairs.
+// Returns count of pairs (= half), proved to equal half.
+// ----------------------------------------------------------------
+fn butterfly_layer(poly: span<u64>, half: u64, zeta: u64, q: u64) -> u64
+    requires poly.len == 256u64
+    requires half >= 1u64
+    requires half <= 128u64
+    requires q > 0u64
+    ensures  result == half
+{
+    let i: u64 = 0u64;
+    while i < half
+        invariant i <= half
+        decreases half - i
+    {
+        let bf: (u64, u64) = butterfly(poly[i], poly[i + half], zeta, q);
+        poly[i]        = bf.0;
+        poly[i + half] = bf.1;
+        i = i + 1u64
+    };
+    half
+}
+
+fn run() -> u64 {
+    let q:    u64 = 3329u64;
+    let zeta: u64 = 17u64;
+    let a:    u64 = 100u64;
+    let b:    u64 = 200u64;
+    let bf: (u64, u64) = butterfly(a, b, zeta, q);
+    bf.0 + bf.1
+}

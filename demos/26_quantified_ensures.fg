@@ -1,0 +1,55 @@
+// Demo 26: Quantified predicates over spans
+//
+// FORGE supports forall and exists in requires/ensures clauses.
+// The Z3 backend encodes these as (forall ...) / (exists ...) with
+// array theory for span indexing: s[i] → (select s i).
+//
+// Three escalating examples:
+//   1. Array indexing in a postcondition (no quantifier)
+//   2. forall in requires — caller guarantees a property of all elements
+//   3. forall in both requires and ensures — full quantified specification
+
+// ---- 1. Array-index postcondition ----
+//
+// Simple: return the sum of the first two elements and prove exactly what it equals.
+
+fn get_pair_sum(s: span<u64>) -> u64
+    requires s.len >= 2
+    ensures result == s[0] + s[1]
+{
+    s[0] + s[1]
+}
+
+// ---- 2. forall in requires ----
+//
+// Caller guarantees all elements in a range equal a constant.
+// FORGE proves the postcondition by having Z3 instantiate the
+// forall at indices 0 and 1 to derive s[0] == val and s[1] == val.
+
+fn sum_of_uniform(s: span<u64>, val: u64) -> u64
+    requires s.len >= 2
+    requires forall i : u64, i < 2 ==> s[i] == val
+    ensures result == val * 2
+{
+    s[0] + s[1]
+}
+
+// ---- 3. forall in both requires and ensures ----
+//
+// Given: s[0] is the maximum of the first n elements (forall in requires).
+// Prove: the returned value is >= every one of those elements (forall in ensures).
+//
+// Z3 proves the ensures by:
+//   - Negating: assume exists i* < n such that result < s[i*]
+//   - From requires: s[i*] <= s[0]
+//   - But result == s[0], so result >= s[i*] — contradiction.
+
+fn prefix_max_is_first(s: span<u64>, n: u64) -> u64
+    requires n > 0
+    requires n <= s.len
+    requires forall i : u64, i < n ==> s[i] <= s[0]
+    ensures result == s[0]
+    ensures forall i : u64, i < n ==> result >= s[i]
+{
+    s[0]
+}

@@ -1,0 +1,79 @@
+// Demo 46: Let-binding tuple destructuring
+//
+// `let (a, b) = f(...)` desugars at parse time to:
+//   let __tup_L_C = f(...);   // callee postcondition injection fires here
+//   let a = __tup_L_C.0;     // a == __tup_L_C.0 added to context
+//   let b = __tup_L_C.1;     // b == __tup_L_C.1 added to context
+//
+// Because callee postcondition injection happens on the temp binding,
+// Z3 has full postcondition facts in scope when checking downstream
+// postconditions that reference the destructured names.
+
+fn divmod(a: u64, b: u64) -> (u64, u64)
+    requires b > 0u64
+    ensures  result.0 * b + result.1 == a
+    ensures  result.1 < b
+{
+    (a / b, a % b)
+}
+
+fn minmax(x: u64, y: u64) -> (u64, u64)
+    ensures result.0 <= result.1
+{
+    if x <= y { (x, y) } else { (y, x) }
+}
+
+fn swap(x: u64, y: u64) -> (u64, u64)
+    ensures result.0 == y
+    ensures result.1 == x
+{
+    (y, x)
+}
+
+// ----------------------------------------------------------------
+// Postconditions on caller that reference destructured names:
+// q * d + r == n  (injected from divmod postcondition)
+// Therefore q <= n  (since d >= 1 and q*d <= q*d+r == n)
+// ----------------------------------------------------------------
+fn quotient_le(n: u64, d: u64) -> u64
+    requires d > 0u64
+    ensures  result <= n
+{
+    let (q, r) = divmod(n, d);
+    // injected: q * d + r == n,  r < d
+    // q * d <= n → q <= n (since d >= 1)
+    q
+}
+
+// ----------------------------------------------------------------
+// Chaining destructuring: sort then check
+// ----------------------------------------------------------------
+fn sorted_sum(x: u64, y: u64) -> u64 {
+    let (lo, hi) = minmax(x, y);
+    // injected: lo <= hi
+    lo + hi
+}
+
+// ----------------------------------------------------------------
+// Demo driver — checks various destructuring patterns
+// ----------------------------------------------------------------
+fn run() -> u64 {
+    // Basic Euclidean division
+    let (q, r) = divmod(17u64, 5u64);
+    // q == 3, r == 2   (injected: q*5 + r == 17, r < 5)
+
+    // Sort a pair
+    let (lo, hi) = minmax(9u64, 4u64);
+    // lo == 4, hi == 9  (injected: lo <= hi)
+
+    // Swap
+    let (a, b) = swap(10u64, 20u64);
+    // a == 20, b == 10
+
+    // Nested: sort then divmod
+    let (s, t) = minmax(q, r);
+    // s == 2, t == 3  (injected: s <= t)
+
+    q + r + lo + hi + a + b + s + t
+    // 3 + 2 + 4 + 9 + 20 + 10 + 2 + 3 = 53
+}

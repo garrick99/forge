@@ -1,0 +1,72 @@
+// Demo 75: Multi-bound generics — T: Trait1 + Trait2
+//
+// A type parameter can require multiple traits simultaneously.
+// Both inline form  <T: A + B>  and  where T: A + B  are supported.
+
+trait Hashable {
+    fn hash(self: ref<Self>) -> u64;
+}
+
+trait Comparable {
+    fn compare(self: ref<Self>, other: ref<Self>) -> u64;
+    // 0 = equal, 1 = greater, 2 = less (unsigned convention)
+}
+
+trait Displayable {
+    fn display_val(self: ref<Self>) -> u64;
+}
+
+struct Record { key: u64, value: u64 }
+
+impl Hashable for Record {
+    fn hash(self: ref<Record>) -> u64 {
+        (*self).key * 2654435761u64
+    }
+}
+
+impl Comparable for Record {
+    fn compare(self: ref<Record>, other: ref<Record>) -> u64 {
+        if (*self).key == (*other).key { 0u64 }
+        else if (*self).key > (*other).key { 1u64 }
+        else { 2u64 }
+    }
+}
+
+impl Displayable for Record {
+    fn display_val(self: ref<Record>) -> u64 {
+        (*self).key * 1000u64 + (*self).value
+    }
+}
+
+// Inline multi-bound form
+fn process_pair<T: Hashable + Comparable + Displayable>(
+    a: ref<T>, b: ref<T>
+) -> u64 {
+    0u64  // bound enforced at call site; body doesn't need polymorphic dispatch
+}
+
+// where-clause multi-bound form — equivalent
+fn describe_pair<T>(a: ref<T>, b: ref<T>) -> u64
+    where T: Hashable + Comparable + Displayable
+{
+    0u64
+}
+
+fn main() -> u64 {
+    let r1: Record = struct Record { key: 10u64, value: 5u64 };
+    let r2: Record = struct Record { key: 7u64,  value: 3u64 };
+
+    // Bounds enforced: Record implements all three traits ✓
+    let _p: u64 = process_pair(&r1, &r2);
+    let _d: u64 = describe_pair(&r1, &r2);
+
+    // Direct calls using the concrete implementations
+    let h1: u64 = Record__Hashable__hash(&r1);         // 10 * 2654435761
+    let h2: u64 = Record__Hashable__hash(&r2);         // 7  * 2654435761
+    let cmp: u64 = Record__Comparable__compare(&r1, &r2); // 1 (r1.key > r2.key)
+    let dv1: u64 = Record__Displayable__display_val(&r1); // 10005
+    let dv2: u64 = Record__Displayable__display_val(&r2); // 7003
+
+    // Sum of just the display values and compare (hash is too big for u8 exit)
+    cmp + dv1 + dv2   // 1 + 10005 + 7003 = 17009
+}

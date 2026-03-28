@@ -1,0 +1,88 @@
+// Demo 52: s[lo..hi] — sub-span slicing with proven bounds
+//
+// s[lo..hi] returns a span<T> pointing into s starting at lo, length hi-lo.
+// Three proof obligations are generated and discharged by Z3:
+//   1. lo >= 0
+//   2. lo <= hi
+//   3. hi <= s.len
+//
+// In C:
+//   (forge_span_u64_t){ .data = s.data + lo, .len = (uintptr_t)(hi - lo) }
+//
+// Sub-spans compose naturally with `for x in sub` element iteration (demo 51)
+// and with `for i in n` index-based loops.
+
+// ----------------------------------------------------------------
+// Sum s[lo..hi] using element-based span iteration.
+// ----------------------------------------------------------------
+fn slice_sum(s: span<u64>, lo: u64, hi: u64) -> u64
+    requires lo <= hi && hi <= s.len
+{
+    let sub: span<u64> = s[lo..hi];
+    let acc: u64 = 0u64;
+    for x in sub {
+        acc = acc + x
+    };
+    acc
+}
+
+// ----------------------------------------------------------------
+// Copy src[lo..hi] into dst[0..hi-lo].
+// Uses for i in n (index loop) so bounds are auto-proved.
+// ----------------------------------------------------------------
+fn span_copy_slice(dst: span<u64>, src: span<u64>, lo: u64, hi: u64)
+    requires lo <= hi && hi <= src.len && hi - lo <= dst.len
+{
+    let sub: span<u64> = src[lo..hi];
+    let n: u64 = sub.len;
+    for i in n {
+        dst[i] = sub[i]
+    }
+}
+
+// ----------------------------------------------------------------
+// Split at midpoint: returns (left_half, right_half).
+// Both sub-spans share the original backing memory.
+// ----------------------------------------------------------------
+fn span_split(s: span<u64>, mid: u64) -> (span<u64>, span<u64>)
+    requires mid <= s.len
+{
+    (s[0u64..mid], s[mid..s.len])
+}
+
+// ----------------------------------------------------------------
+// Check whether s[lo..hi] is all-zero.
+// ----------------------------------------------------------------
+fn slice_all_zero(s: span<u64>, lo: u64, hi: u64) -> bool
+    requires lo <= hi && hi <= s.len
+{
+    let sub: span<u64> = s[lo..hi];
+    let ok: bool = true;
+    for x in sub {
+        if x != 0u64 { ok = false }
+    };
+    ok
+}
+
+// ----------------------------------------------------------------
+// Find the maximum in s[lo..hi].
+// Requires the slice is non-empty.
+// ----------------------------------------------------------------
+fn slice_max(s: span<u64>, lo: u64, hi: u64) -> u64
+    requires lo < hi && hi <= s.len
+{
+    let sub: span<u64> = s[lo..hi];
+    // sub.len == hi - lo >= 1 since lo < hi — Z3 proves sub[0] is in bounds.
+    let m: u64 = sub[0u64];
+    for x in sub {
+        if x > m { m = x }
+    };
+    m
+}
+
+// ----------------------------------------------------------------
+// Demo driver.
+// ----------------------------------------------------------------
+fn run() -> u64 {
+    0u64
+}

@@ -1,0 +1,46 @@
+// demo 38: std::crypto — constant-time NTT/polynomial operations
+//
+// Exercises the std/crypto module:
+//   - ct_add_mod, ct_sub_mod, ct_mul_mod   — branchless modular arithmetic
+//   - ntt_butterfly_lo / ntt_butterfly_hi  — one NTT butterfly step
+//   - poly_eval4                           — Horner evaluation of a degree-3 poly
+//   - secret_dot4                          — secret inner product via loop
+//
+// All array bounds are proven at compile time by Z3.
+// No secret value ever reaches an if-condition, array index, or loop bound.
+//
+// Correctness check (run()):
+//   q = 17  (prime, < 2^32)
+//   a = [1,2,3,4], b = [1,1,1,1]  (public coefficients, cast to secret)
+//   poly_eval4(a, 2, 17) = 1 + 2*2 + 3*4 + 4*8 = 1+4+12+32 = 49 mod 17 = 15
+//   secret_dot4(a, b, 17) = 1+2+3+4 = 10 mod 17 = 10
+//   NTT butterfly on (3, 5, w=2, q=17):
+//     lo = 3 + 2*5 mod 17 = 13
+//     hi = 3 - 2*5 mod 17 = 3 - 10 + 17 = 10  (branchless: 3 + 17 - 10 = 10)
+//   Total: 15 + 10 + 13 + 10 = 48
+
+use std::crypto;
+
+fn run() -> u64 {
+    let q: u64 = 17u64;
+
+    // Polynomial evaluation: a(x) = 1 + 2x + 3x^2 + 4x^3, evaluate at x=2 mod 17
+    let a: [u64; 4] = [1u64, 2u64, 3u64, 4u64];
+    let x: secret<u64> = 2u64;
+    let ev: secret<u64> = poly_eval4(a, x, q);    // expected: 15
+
+    // Inner product: <a, [1,1,1,1]> mod 17 = 10
+    let b: [u64; 4] = [1u64, 1u64, 1u64, 1u64];
+    let dp: secret<u64> = secret_dot4(a, b, q);   // expected: 10
+
+    // NTT butterfly: (u=3, v=5, twiddle=2, q=17)
+    let u: secret<u64> = 3u64;
+    let v: secret<u64> = 5u64;
+    let w: secret<u64> = 2u64;
+    let lo: secret<u64> = ntt_butterfly_lo(u, v, w, q);   // expected: 13
+    let hi: secret<u64> = ntt_butterfly_hi(u, v, w, q);   // expected: 10
+
+    // Declassify final sum for return (all values are now public after the demo)
+    let r: u64 = declassify(ev) + declassify(dp) + declassify(lo) + declassify(hi);
+    r   // expected: 15 + 10 + 13 + 10 = 48
+}

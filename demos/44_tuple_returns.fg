@@ -1,0 +1,77 @@
+// Demo 44: Tuple return types — (T1, T2, ...)
+//
+// Functions can return multiple values as anonymous tuples.
+// In generated C: typedef struct { T1 _0; T2 _1; } __forge_tuple_T1_T2_t;
+//
+// Features:
+//   fn f(...) -> (u64, u64)            — tuple return type
+//   (expr1, expr2)                     — tuple construction
+//   t.0, t.1                           — numeric field projection
+//   ensures result.0 * b + result.1    — postconditions on tuple fields
+//   result.0 and result.1 reduce in Z3 via PStruct field projection
+
+// ----------------------------------------------------------------
+// Euclidean division: returns (quotient, remainder)
+// Z3 proves result.0 * b + result.1 == a  and  result.1 < b
+// ----------------------------------------------------------------
+fn divmod(a: u64, b: u64) -> (u64, u64)
+    requires b > 0u64
+    ensures  result.0 * b + result.1 == a
+    ensures  result.1 < b
+{
+    (a / b, a % b)
+}
+
+// ----------------------------------------------------------------
+// Sorted pair: ensures lo ≤ hi
+// ----------------------------------------------------------------
+fn minmax(x: u64, y: u64) -> (u64, u64)
+    ensures result.0 <= result.1
+{
+    if x <= y { (x, y) } else { (y, x) }
+}
+
+// ----------------------------------------------------------------
+// Swap — ensures positions are exchanged
+// ----------------------------------------------------------------
+fn swap(x: u64, y: u64) -> (u64, u64)
+    ensures result.0 == y
+    ensures result.1 == x
+{
+    (y, x)
+}
+
+// ----------------------------------------------------------------
+// Split length: ensures halves sum to total
+// ----------------------------------------------------------------
+fn split_at(total: u64, at: u64) -> (u64, u64)
+    requires at <= total
+    ensures  result.0 + result.1 == total
+    ensures  result.0 == at
+{
+    (at, total - at)
+}
+
+// ----------------------------------------------------------------
+// Demo driver
+// ----------------------------------------------------------------
+fn run() -> u64 {
+    let dm: (u64, u64) = divmod(10u64, 3u64);
+    let q: u64 = dm.0;   // 3
+    let r: u64 = dm.1;   // 1
+
+    let mm: (u64, u64) = minmax(7u64, 2u64);
+    let lo: u64 = mm.0;  // 2
+    let hi: u64 = mm.1;  // 7
+
+    let sw: (u64, u64) = swap(5u64, 9u64);
+    let a: u64 = sw.0;   // 9
+    let b: u64 = sw.1;   // 5
+
+    let sp: (u64, u64) = split_at(20u64, 8u64);
+    let left: u64  = sp.0;  // 8
+    let right: u64 = sp.1;  // 12
+
+    q + r + lo + hi + a + b + left + right
+    // 3+1+2+7+9+5+8+12 = 47
+}

@@ -1,0 +1,74 @@
+// Demo 58: Module system — use std::option; use std::result;
+//
+// Demonstrates multi-file module composition.
+// Option<T> and Result<T,E> are imported from the std/ library
+// rather than redefined inline.
+//
+// Uses:  use std::option;  →  loads ./std/option.fg
+//        use std::result;  →  loads ./std/result.fg
+
+use std::option;
+use std::result;
+
+// ── Option helpers ────────────────────────────────────────────────────────────
+
+fn option_unwrap_or(opt: Option<u64>, default: u64) -> u64 {
+    match opt {
+        Some(v) => v,
+        None    => default,
+    }
+}
+
+fn safe_sqrt(n: u64) -> Option<u64>
+{
+    if n == 0u64 {
+        Some(0u64)
+    } else {
+        let r: u64 = n / 2u64 + 1u64;
+        // Newton step: if r*r <= n, return Some(r), else None
+        if r * r <= n {
+            Some(r)
+        } else {
+            None
+        }
+    }
+}
+
+// ── Result helpers ────────────────────────────────────────────────────────────
+
+fn safe_div(a: u64, b: u64) -> Result<u64, u64>
+    requires b > 0u64
+{
+    Ok(a / b)
+}
+
+fn div_chain(a: u64, b: u64, c: u64) -> Result<u64, u64>
+    requires b > 0u64
+    requires c > 0u64
+{
+    let x: u64 = safe_div(a, b)?;
+    let y: u64 = safe_div(x, c)?;
+    Ok(y)
+}
+
+// ── main ──────────────────────────────────────────────────────────────────────
+
+fn main() -> u64 {
+    // Option: safe_sqrt of 16 → Some(v), unwrap with default 0
+    let sq: Option<u64> = safe_sqrt(16u64);
+    let sv: u64 = option_unwrap_or(sq, 0u64);
+
+    // Option: safe_sqrt of 3 → None (3/2+1=2, 4>3), unwrap with default 99
+    let sq2: Option<u64> = safe_sqrt(3u64);
+    let sv2: u64 = option_unwrap_or(sq2, 99u64);
+
+    // Result: 200 / 10 / 4 = 5
+    let r: Result<u64, u64> = div_chain(200u64, 10u64, 4u64);
+    let rv: u64 = match r {
+        Ok(v)  => v,
+        Err(_) => 0u64,
+    };
+
+    sv + sv2 + rv
+    // expected: 104
+}

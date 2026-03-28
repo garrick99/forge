@@ -1,0 +1,36 @@
+// Demo 72: Signed integers — i64 arithmetic, negation, absolute value
+//
+// i64 maps to int64_t in C99.  Negative literals use the unary minus.
+// Postconditions over signed results work with Z3.
+
+fn abs64(x: i64) -> i64
+    ensures result >= 0i64
+{
+    if x < 0i64 { 0i64 - x } else { x }
+}
+
+fn sign(x: i64) -> i64
+    ensures result == 1i64 || result == 0i64 || result == (0i64 - 1i64)
+{
+    if x > 0i64 { 1i64 }
+    else if x < 0i64 { 0i64 - 1i64 }
+    else { 0i64 }
+}
+
+fn clamp_i64(x: i64, lo: i64, hi: i64) -> i64
+    requires lo <= hi
+    ensures result >= lo && result <= hi
+{
+    if x < lo { lo } else if x > hi { hi } else { x }
+}
+
+fn main() -> u64 {
+    let a: i64 = abs64(0i64 - 42i64);   // 42
+    let b: i64 = abs64(17i64);           // 17
+    let s: i64 = sign(0i64 - 99i64);    // -1
+    let c: i64 = clamp_i64(200i64, 0i64 - 10i64, 50i64);  // 50
+
+    // a=42, b=17, s=-1, c=50 → (42+17+50) - 1 = 108
+    let sum: i64 = a + b + s + c;
+    sum as u64   // 108
+}

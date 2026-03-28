@@ -1,0 +1,72 @@
+// demo 37: [T; N] fixed-size arrays
+//
+// Stack-allocated arrays with proven bounds.
+// Every index access generates a Z3 obligation: idx < N.
+// secret<T> arrays are declared volatile in C (timing-safe access).
+//
+// Correctness: bounds on all accesses verified by SMT (no runtime checks).
+
+// Sum the first N elements of a fixed array — all bounds proven at compile time.
+fn array_sum(a: [u64; 8]) -> u64
+{
+    let s: u64 = 0u64;
+    let i: u64 = 0u64;
+    while i < 8u64
+        invariant i <= 8
+        decreases 8 - i
+    {
+        s = s + a[i];
+        i = i + 1u64
+    };
+    s
+}
+
+// Dot product of two fixed-size vectors.
+fn dot8(a: [u64; 8], b: [u64; 8]) -> u64
+{
+    let s: u64 = 0u64;
+    let i: u64 = 0u64;
+    while i < 8u64
+        invariant i <= 8
+        decreases 8 - i
+    {
+        s = s + a[i] * b[i];
+        i = i + 1u64
+    };
+    s
+}
+
+// Constant-time selection over a small lookup table.
+// No branch on the secret index — but this is a demo of array bounds only.
+// (Secret indexing is a cache timing channel and would be a compile error.)
+fn ct_table_lookup(tbl: [u64; 4], idx: u64) -> u64
+    requires idx < 4
+{
+    tbl[idx]
+}
+
+// Zero-initialize an array using [val; N] repeat syntax.
+fn zeros() -> u64 {
+    let z: [u64; 16] = [0u64; 16u64];
+    z[0] + z[15]
+}
+
+fn run() -> u64 {
+    let a: [u64; 8] = [1u64, 2u64, 3u64, 4u64, 5u64, 6u64, 7u64, 8u64];
+    let b: [u64; 8] = [2u64, 2u64, 2u64, 2u64, 2u64, 2u64, 2u64, 2u64];
+
+    // sum(1..8) = 36
+    let s: u64 = array_sum(a);
+
+    // dot([1..8], [2..2]) = 2*(1+2+...+8) = 72
+    let d: u64 = dot8(a, b);
+
+    // lookup table
+    let tbl: [u64; 4] = [10u64, 20u64, 30u64, 40u64];
+    let v: u64 = ct_table_lookup(tbl, 2u64);  // expected: 30
+
+    // zero array
+    let z: u64 = zeros();  // expected: 0
+
+    s + d + v + z   // expected: 36 + 72 + 30 + 0 = 138
+}

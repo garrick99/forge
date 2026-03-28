@@ -1,0 +1,88 @@
+// Demo 34: ref<T> and refmut<T> borrow types
+//
+// FORGE borrows lower to C pointers:
+//   ref<T>    → const T*   (immutable borrow)
+//   refmut<T> → T*         (mutable borrow)
+//
+// Safety properties enforced:
+//   1. ref<T>    params → read-only: writing through them is a type error
+//   2. refmut<T> params → mutable: dereference and assign works
+//   3. refmut<T> bindings are automatically Aff (affine):
+//      the binding may be used at most once, preventing trivial duplication
+//   4. All proof obligations (postconditions, bounds) are verified normally
+//
+// Lowering:
+//   fn foo(x: ref<u64>)    → void foo(const uint64_t* x)
+//   fn bar(x: refmut<u64>) → void bar(uint64_t* x)
+//   *x                     → (*x)
+
+// ---- 1. Immutable borrow: read-only access ----
+
+struct Point {
+  x: f64,
+  y: f64,
+}
+
+// p: ref<Point> → const Point* in C
+fn length_sq(p: ref<Point>) -> f64 {
+  (*p).x * (*p).x + (*p).y * (*p).y
+}
+
+// Two immutable borrows may coexist — both read-only
+fn dot_product(a: ref<Point>, b: ref<Point>) -> f64 {
+  (*a).x * (*b).x + (*a).y * (*b).y
+}
+
+// ---- 2. Mutable borrow: in-place mutation ----
+
+// x: refmut<u64> → uint64_t* in C
+fn increment(x: refmut<u64>) {
+  *x = *x + 1
+}
+
+fn double_val(x: refmut<u64>) {
+  *x = *x * 2
+}
+
+// Mutable borrow — write a specific value through the pointer
+fn set_to(x: refmut<u64>, val: u64) {
+  *x = val
+}
+
+// ---- 3. Struct mutation through refmut ----
+
+fn translate(p: refmut<Point>, dx: f64, dy: f64) {
+  (*p).x = (*p).x + dx;
+  (*p).y = (*p).y + dy
+}
+
+fn scale(p: refmut<Point>, factor: f64) {
+  (*p).x = (*p).x * factor;
+  (*p).y = (*p).y * factor
+}
+
+// ---- 4. Affine enforcement ----
+//
+// refmut<T> parameters are automatically Aff: they may be passed to at most
+// one callee.  This prevents the following:
+//   let r1 = x;   // ok: first use
+//   let r2 = x;   // error at runtime: would alias r1 and r2
+//
+// Because refmut<T> is Aff, FORGE's linearity tracker flags double-use.
+// The demo below uses each refmut exactly once (correct use):
+
+fn swap(a: refmut<u64>, b: refmut<u64>) -> u64 {
+  let tmp: u64 = *a;
+  *a = *b;
+  *b = tmp;
+  tmp
+}
+
+// ---- 5. Composing ref and refmut ----
+//
+// A function may take both a ref and a refmut, provided they point to
+// different values (caller's responsibility, enforced by value identity).
+
+fn copy_val(src: ref<u64>, dst: refmut<u64>) {
+  *dst = *src
+}

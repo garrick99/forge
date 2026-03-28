@@ -1,0 +1,164 @@
+// FORGE-generated PTX — SM_89
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.5
+.target sm_89
+.address_size 64
+
+.visible .entry vecadd_f32(
+    .param .u64 vecadd_f32_param_a_data,
+    .param .u64 vecadd_f32_param_a_len,
+    .param .u64 vecadd_f32_param_b_data,
+    .param .u64 vecadd_f32_param_b_len,
+    .param .u64 vecadd_f32_param_c_data,
+    .param .u64 vecadd_f32_param_c_len
+)
+{
+    .reg .pred %p11;
+    .reg .f32 %f17, %f21, %f22, %f26;
+    .reg .u64 %rd0, %rd1, %rd12, %rd14, %rd15, %rd16, %rd18, %rd19, %rd2, %rd20, %rd23, %rd24, %rd25, %rd3, %rd4, %rd5;
+    .reg .u32 %r10, %r6, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [vecadd_f32_param_a_data];
+  ld.param.u64 %rd1, [vecadd_f32_param_a_len];
+  ld.param.u64 %rd2, [vecadd_f32_param_b_data];
+  ld.param.u64 %rd3, [vecadd_f32_param_b_len];
+  ld.param.u64 %rd4, [vecadd_f32_param_c_data];
+  ld.param.u64 %rd5, [vecadd_f32_param_c_len];
+
+  mov.u32 %r6, %ctaid.x;
+  mov.u32 %r7, %ntid.x;
+  mul.lo.u32 %r8, %r6, %r7;
+  mov.u32 %r9, %tid.x;
+  add.u32 %r10, %r8, %r9;
+  cvt.u64.u32 %rd12, %r10;
+  setp.lt.u64 %p11, %rd12, %rd1;
+  @%p11 bra vecadd_f32_then_13;
+  bra vecadd_f32_else_13;
+  vecadd_f32_then_13:
+  cvt.u64.u32 %rd14, %r10;
+  mul.lo.u64 %rd15, %rd14, 4;
+  add.u64 %rd16, %rd0, %rd15;
+  ld.global.f32 %f17, [%rd16];
+  cvt.u64.u32 %rd18, %r10;
+  mul.lo.u64 %rd19, %rd18, 4;
+  add.u64 %rd20, %rd2, %rd19;
+  ld.global.f32 %f21, [%rd20];
+  add.f32 %f22, %f17, %f21;
+  cvt.u64.u32 %rd23, %r10;
+  mul.lo.u64 %rd24, %rd23, 4;
+  add.u64 %rd25, %rd4, %rd24;
+  st.global.f32 [%rd25], %f22;
+  mov.f32 %f26, %f22;
+  bra vecadd_f32_end_13;
+  vecadd_f32_else_13:
+  mov.f32 %f26, 0; // no else branch
+  vecadd_f32_end_13:
+  ret;
+}
+
+.visible .entry scale_f32(
+    .param .u64 scale_f32_param_a_data,
+    .param .u64 scale_f32_param_a_len,
+    .param .u64 scale_f32_param_b_data,
+    .param .u64 scale_f32_param_b_len,
+    .param .u32 scale_f32_param_alpha
+)
+{
+    .reg .pred %p10;
+    .reg .f32 %f16, %f17, %f21, %f4;
+    .reg .u64 %rd0, %rd1, %rd11, %rd13, %rd14, %rd15, %rd18, %rd19, %rd2, %rd20, %rd3;
+    .reg .u32 %r5, %r6, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [scale_f32_param_a_data];
+  ld.param.u64 %rd1, [scale_f32_param_a_len];
+  ld.param.u64 %rd2, [scale_f32_param_b_data];
+  ld.param.u64 %rd3, [scale_f32_param_b_len];
+  ld.param.u32 %f4, [scale_f32_param_alpha];
+
+  mov.u32 %r5, %ctaid.x;
+  mov.u32 %r6, %ntid.x;
+  mul.lo.u32 %r7, %r5, %r6;
+  mov.u32 %r8, %tid.x;
+  add.u32 %r9, %r7, %r8;
+  cvt.u64.u32 %rd11, %r9;
+  setp.lt.u64 %p10, %rd11, %rd1;
+  @%p10 bra scale_f32_then_12;
+  bra scale_f32_else_12;
+  scale_f32_then_12:
+  cvt.u64.u32 %rd13, %r9;
+  mul.lo.u64 %rd14, %rd13, 4;
+  add.u64 %rd15, %rd0, %rd14;
+  ld.global.f32 %f16, [%rd15];
+  mul.lo.f32 %f17, %f4, %f16;
+  cvt.u64.u32 %rd18, %r9;
+  mul.lo.u64 %rd19, %rd18, 4;
+  add.u64 %rd20, %rd2, %rd19;
+  st.global.f32 [%rd20], %f17;
+  mov.f32 %f21, %f17;
+  bra scale_f32_end_12;
+  scale_f32_else_12:
+  mov.f32 %f21, 0; // no else branch
+  scale_f32_end_12:
+  ret;
+}
+
+.visible .entry fma_f32(
+    .param .u64 fma_f32_param_a_data,
+    .param .u64 fma_f32_param_a_len,
+    .param .u64 fma_f32_param_b_data,
+    .param .u64 fma_f32_param_b_len,
+    .param .u64 fma_f32_param_c_data,
+    .param .u64 fma_f32_param_c_len
+)
+{
+    .reg .pred %p12;
+    .reg .f32 %f18, %f22, %f23, %f27, %f28, %f32;
+    .reg .u64 %rd0, %rd1, %rd13, %rd15, %rd16, %rd17, %rd19, %rd2, %rd20, %rd21, %rd24, %rd25, %rd26, %rd29, %rd3, %rd30, %rd31, %rd4, %rd5;
+    .reg .u32 %r10, %r11, %r6, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [fma_f32_param_a_data];
+  ld.param.u64 %rd1, [fma_f32_param_a_len];
+  ld.param.u64 %rd2, [fma_f32_param_b_data];
+  ld.param.u64 %rd3, [fma_f32_param_b_len];
+  ld.param.u64 %rd4, [fma_f32_param_c_data];
+  ld.param.u64 %rd5, [fma_f32_param_c_len];
+
+  mov.u32 %r6, %ctaid.x;
+  mov.u32 %r7, %ntid.x;
+  mul.lo.u32 %r8, %r6, %r7;
+  mov.u32 %r9, %tid.x;
+  add.u32 %r10, %r8, %r9;
+  bar.sync 0;
+  mov.u32 %r11, 0; // unit
+  cvt.u64.u32 %rd13, %r10;
+  setp.lt.u64 %p12, %rd13, %rd1;
+  @%p12 bra fma_f32_then_14;
+  bra fma_f32_else_14;
+  fma_f32_then_14:
+  cvt.u64.u32 %rd15, %r10;
+  mul.lo.u64 %rd16, %rd15, 4;
+  add.u64 %rd17, %rd0, %rd16;
+  ld.global.f32 %f18, [%rd17];
+  cvt.u64.u32 %rd19, %r10;
+  mul.lo.u64 %rd20, %rd19, 4;
+  add.u64 %rd21, %rd2, %rd20;
+  ld.global.f32 %f22, [%rd21];
+  mul.lo.f32 %f23, %f18, %f22;
+  cvt.u64.u32 %rd24, %r10;
+  mul.lo.u64 %rd25, %rd24, 4;
+  add.u64 %rd26, %rd4, %rd25;
+  ld.global.f32 %f27, [%rd26];
+  add.f32 %f28, %f23, %f27;
+  cvt.u64.u32 %rd29, %r10;
+  mul.lo.u64 %rd30, %rd29, 4;
+  add.u64 %rd31, %rd4, %rd30;
+  st.global.f32 [%rd31], %f28;
+  mov.f32 %f32, %f28;
+  bra fma_f32_end_14;
+  fma_f32_else_14:
+  mov.f32 %f32, 0; // no else branch
+  fma_f32_end_14:
+  ret;
+}
+

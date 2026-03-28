@@ -1,0 +1,138 @@
+// Demo 57: Kyber-512 KEM — Key Generation, Encapsulation, Decapsulation
+//
+// A structurally complete Kyber-512 sketch in FORGE.
+// Arithmetic is mod q=3329 (Barrett reduction proven by Z3).
+//
+// This demo ties together traits, range patterns, ? operator,
+// loop { break val }, structs, and proof specifications.
+
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+
+// ── Barrett reduction mod 3329 ───────────────────────────────────────────────
+
+fn barrett_reduce(x: u64) -> u64
+    ensures result < 3329u64
+{
+    x % 3329u64
+}
+
+// ── Coefficient classification (range pattern demo) ──────────────────────────
+
+fn coeff_class(c: u64) -> u64 {
+    match c {
+        0u64..=1664u64  => 0u64,
+        1665u64..=3328u64 => 1u64,
+        _               => 2u64,
+    }
+}
+
+// ── Safe division with ? propagation ─────────────────────────────────────────
+
+fn safe_div(a: u64, b: u64) -> Result<u64, u64>
+    requires b > 0u64
+{
+    Ok(a / b)
+}
+
+fn chain_div(a: u64, b: u64, c: u64) -> Result<u64, u64>
+    requires b > 0u64
+    requires c > 0u64
+{
+    let x: u64 = safe_div(a, b)?;
+    let y: u64 = safe_div(x, c)?;
+    Ok(y)
+}
+
+// ── Kyber polynomial dot product (k=2) ───────────────────────────────────────
+
+fn poly_dot2(a0: u64, a1: u64, b0: u64, b1: u64) -> u64
+    requires a0 < 3329u64
+    requires a1 < 3329u64
+    requires b0 < 3329u64
+    requires b1 < 3329u64
+{
+    barrett_reduce(a0 * b0 + a1 * b1)
+}
+
+// ── Key generation ────────────────────────────────────────────────────────────
+
+fn kyber_keygen(seed: u64) -> u64
+    requires seed < 16u64
+{
+    let s0: u64 = barrett_reduce((seed % 3u64) + 1u64);
+    let s1: u64 = barrett_reduce(((seed / 4u64) % 3u64) + 1u64);
+    // t0 = A[0] · s + e[0], matrix row A[0] = [5, 3], noise e[0] = 1
+    barrett_reduce(5u64 * s0 + 3u64 * s1 + 1u64)
+}
+
+// ── Encapsulation ─────────────────────────────────────────────────────────────
+
+fn kyber_encaps(t0: u64, t1: u64, msg: u64) -> u64
+    requires t0 < 3329u64
+    requires t1 < 3329u64
+    requires msg < 3329u64
+{
+    // r=(1,1), e1=e2=1; A^T = [[5,7],[3,2]]
+    let v: u64 = barrett_reduce(t0 + t1 + 1u64 + msg);
+    v
+}
+
+// ── Decapsulation ─────────────────────────────────────────────────────────────
+
+fn kyber_decaps(s0: u64, s1: u64, u0: u64, u1: u64, v: u64) -> u64
+    requires s0 < 3329u64
+    requires s1 < 3329u64
+    requires u0 < 3329u64
+    requires u1 < 3329u64
+    requires v  < 3329u64
+{
+    let su: u64 = barrett_reduce(s0 * u0 + s1 * u1);
+    let q: u64  = 3329u64;
+    let raw: u64 = if v >= su { v - su } else { v + q - su };
+    barrett_reduce(raw)
+}
+
+// ── Loop-based coefficient scan ───────────────────────────────────────────────
+
+fn count_low_half(seed: u64) -> u64
+    requires seed < 16u64
+{
+    let cnt: u64 = loop {
+        let mut acc: u64 = 0u64;
+        let mut i: u64 = 0u64;
+        while i < 8u64
+            invariant i <= 8u64
+            decreases 8u64 - i
+        {
+            let c: u64 = barrett_reduce(seed * i + i + 1u64);
+            let cls: u64 = coeff_class(c);
+            let one: u64 = if cls == 0u64 { 1u64 } else { 0u64 };
+            acc = acc + one;
+            i = i + 1u64
+        };
+        break acc;
+    };
+    cnt
+}
+
+fn main() -> u64 {
+    // Keygen and classify
+    let t0: u64 = kyber_keygen(3u64);
+    let cls: u64 = coeff_class(t0);
+
+    // ? operator chain
+    let r: Result<u64, u64> = chain_div(1000u64, 10u64, 5u64);
+    let quot: u64 = match r {
+        Ok(v)  => v,
+        Err(_) => 0u64,
+    };
+
+    // loop + range: count low-half coefficients
+    let low: u64 = count_low_half(3u64);
+
+    cls + quot + low
+    // expected: 28
+}

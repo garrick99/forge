@@ -1,0 +1,67 @@
+// Demo 92: Struct invariants — properties always hold for valid values
+//
+// 'invariant' inside a struct body states a predicate that must hold
+// at every construction site.  The proof engine verifies it.
+
+struct BoundedU8 {
+    val: u64,
+    invariant val <= 255u64;
+}
+
+struct Fraction {
+    num: u64,
+    den: u64,
+    invariant den > 0u64;
+}
+
+struct SortedPair {
+    lo: u64,
+    hi: u64,
+    invariant lo <= hi;
+}
+
+fn make_bounded(v: u64) -> BoundedU8
+    requires v <= 255u64
+{
+    struct BoundedU8 { val: v }
+}
+
+fn make_fraction(n: u64, d: u64) -> Fraction
+    requires d > 0u64
+{
+    struct Fraction { num: n, den: d }
+}
+
+fn make_sorted(a: u64, b: u64) -> SortedPair {
+    if a <= b {
+        struct SortedPair { lo: a, hi: b }
+    } else {
+        struct SortedPair { lo: b, hi: a }
+    }
+}
+
+fn frac_value_times_10(f: Fraction) -> u64 {
+    // f.den > 0 is guaranteed by the struct invariant
+    if f.den == 0u64 { 0u64 } else { f.num * 10u64 / f.den }
+}
+
+fn span_size(p: SortedPair) -> u64 {
+    p.hi - p.lo
+}
+
+fn main() -> u64 {
+    let b1: BoundedU8 = make_bounded(100u64);   // val=100
+    let b2: BoundedU8 = make_bounded(200u64);   // val=200
+
+    let f1: Fraction = make_fraction(1u64, 4u64);   // 1/4
+    let f2: Fraction = make_fraction(3u64, 2u64);   // 3/2
+
+    let fv1: u64 = frac_value_times_10(f1);  // 10/4 = 2 (integer)
+    let fv2: u64 = frac_value_times_10(f2);  // 30/2 = 15
+
+    let sp: SortedPair = make_sorted(7u64, 3u64);  // lo=3, hi=7 (swapped)
+    let sz: u64 = span_size(sp);  // 7-3 = 4
+
+    b1.val + b2.val + fv1 + fv2 + sz
+    // 100 + 200 + 2 + 15 + 4 = 321
+}

@@ -1,0 +1,63 @@
+// Demo 95: Type aliases — names for complex types
+//
+// 'type Alias = ...' creates a synonym for an existing type.
+// Useful for readability and reducing repetition.
+
+type Meters  = u64;
+type Seconds = u64;
+type MPS     = u64;    // meters per second
+type Grams   = u64;
+type Newtons = u64;    // force = mass * acceleration
+
+fn speed(dist: Meters, time: Seconds) -> MPS
+    requires time > 0u64
+{
+    dist / time
+}
+
+fn force(mass: Grams, accel: u64) -> Newtons {
+    mass * accel / 1000u64  // mass in grams → kg conversion
+}
+
+// Struct alias for a 2D point
+struct PointXY { x: u64, y: u64 }
+
+type Point = PointXY;
+
+fn make_point(x: u64, y: u64) -> Point {
+    struct PointXY { x: x, y: y }
+}
+
+fn manhattan(p: Point, q: Point) -> u64 {
+    let dx: u64 = if p.x > q.x { p.x - q.x } else { q.x - p.x };
+    let dy: u64 = if p.y > q.y { p.y - q.y } else { q.y - p.y };
+    dx + dy
+}
+
+// Type aliases for domain-specific integer types
+type RGB = u64;  // packed 0xRRGGBB
+
+fn rgb(r: u64, g: u64, b: u64) -> RGB {
+    (r & 0xFFu64) << 16u64 | (g & 0xFFu64) << 8u64 | (b & 0xFFu64)
+}
+
+fn red_channel(c: RGB) -> u64 { (c >> 16u64) & 0xFFu64 }
+fn green_channel(c: RGB) -> u64 { (c >> 8u64) & 0xFFu64 }
+fn blue_channel(c: RGB) -> u64 { c & 0xFFu64 }
+
+fn main() -> u64 {
+    let v1: MPS = speed(100u64, 5u64);    // 100/5 = 20 m/s
+    let v2: MPS = speed(60u64, 3u64);     // 20 m/s
+
+    let p1: Point = make_point(1u64, 2u64);
+    let p2: Point = make_point(4u64, 6u64);
+    let dist: u64 = manhattan(p1, p2);    // |4-1|+|6-2| = 3+4 = 7
+
+    let color: RGB = rgb(255u64, 128u64, 0u64);
+    let r: u64 = red_channel(color);    // 255
+    let g: u64 = green_channel(color);  // 128
+    let b: u64 = blue_channel(color);   // 0
+
+    v1 + v2 + dist + r + g + b
+    // 20 + 20 + 7 + 255 + 128 + 0 = 430 → 430 % 256 = 174
+}
