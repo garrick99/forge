@@ -410,6 +410,18 @@ module Z3Bridge = struct
         List.filter ((<>) x.name) (pred_vars acc p)
     | PLex ps -> List.fold_left pred_vars acc ps
     | PField (p, f) ->
+        (* Helper: flatten nested PField into a single mangled name.
+           PField(PField(PVar "r", "br"), "x") -> "r__br__x"
+           Returns None for non-flattenable expressions. *)
+        let rec flatten_field_base = function
+          | PVar id        -> Some id.name
+          | PResult        -> Some "result__"
+          | PField (q, fi) ->
+              (match flatten_field_base q with
+               | Some b -> Some (b ^ "__" ^ fi)
+               | None   -> None)
+          | _ -> None
+        in
         let rec do_field acc inner =
           match inner with
           | PStruct (_, fields) ->
@@ -420,6 +432,10 @@ module Z3Bridge = struct
               do_field (do_field (pred_vars acc cond) t) e
           | PVar id  -> (id.name ^ "__" ^ f) :: acc
           | PResult  -> ("result____" ^ f) :: acc
+          | PField _ ->
+              (match flatten_field_base inner with
+               | Some base -> (base ^ "__" ^ f) :: acc
+               | None      -> pred_vars acc inner)
           | _        -> pred_vars acc inner
         in
         do_field acc p

@@ -1,0 +1,80 @@
+// Demo 319: Nested struct field access in postconditions
+//
+// Demonstrates that the proof engine can now reason about
+// multi-level field access like r.tl.x, r.br.y, etc.
+// These were previously unprovable due to a free-variable
+// naming bug in the SMT encoder's pred_vars function.
+
+struct Point {
+    x: u64,
+    y: u64,
+}
+
+struct Rect {
+    tl: Point,   // top-left
+    br: Point,   // bottom-right
+}
+
+// Width = br.x - tl.x
+fn rect_width(r: Rect) -> u64
+    requires r.br.x >= r.tl.x
+    ensures  result == r.br.x - r.tl.x
+{
+    r.br.x - r.tl.x
+}
+
+// Height = br.y - tl.y
+fn rect_height(r: Rect) -> u64
+    requires r.br.y >= r.tl.y
+    ensures  result == r.br.y - r.tl.y
+{
+    r.br.y - r.tl.y
+}
+
+// Area = width * height (no overflow assumed: area < 2^32)
+fn rect_area(r: Rect) -> u64
+    requires r.br.x >= r.tl.x
+    requires r.br.y >= r.tl.y
+    requires (r.br.x - r.tl.x) < 65536u64
+    requires (r.br.y - r.tl.y) < 65536u64
+    ensures  result == (r.br.x - r.tl.x) * (r.br.y - r.tl.y)
+{
+    let w: u64 = r.br.x - r.tl.x;
+    let h: u64 = r.br.y - r.tl.y;
+    w * h
+}
+
+// A point in [tl, br] range
+fn point_in_rect(p: Point, r: Rect) -> u64
+    requires r.tl.x <= r.br.x
+    requires r.tl.y <= r.br.y
+    requires p.x >= r.tl.x
+    requires p.x <= r.br.x
+    requires p.y >= r.tl.y
+    requires p.y <= r.br.y
+    ensures  result == 1u64
+{
+    1u64
+}
+
+// Translate a point: add dx to x, dy to y
+struct Segment {
+    start: Point,
+    end_:  Point,
+}
+
+fn seg_length_x(s: Segment) -> u64
+    requires s.end_.x >= s.start.x
+    ensures  result == s.end_.x - s.start.x
+{
+    s.end_.x - s.start.x
+}
+
+fn seg_length_y(s: Segment) -> u64
+    requires s.end_.y >= s.start.y
+    ensures  result == s.end_.y - s.start.y
+{
+    s.end_.y - s.start.y
+}
+
+fn main() -> u64 { 0u64 }
