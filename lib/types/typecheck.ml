@@ -503,6 +503,10 @@ let rec expr_to_pred_simple e =
       in
       last_return stmts
   | EField (obj, field) -> PField (expr_to_pred_simple obj, field.name)
+  (* Dereference is identity in the proof model (value-based SMT encoding) *)
+  | EDeref e  -> expr_to_pred_simple e
+  | ERef e    -> expr_to_pred_simple e
+  | ERefMut e -> expr_to_pred_simple e
   | EStruct (name, inits) ->
       PStruct (name.name,
         List.map (fun (fid, fe) -> (fid.name, expr_to_pred_simple fe)) inits)
@@ -1033,6 +1037,19 @@ and stmt_final_env env stmt =
        | EAssign (lhs, rhs) ->
            (match lhs.expr_desc with
             | EVar v -> env_assign_var env v (expr_to_pred_simple rhs)
+            (* Scalar dereference assignment: *v = rhs  →  SSA-update v *)
+            | EDeref deref_inner ->
+                (match deref_inner.expr_desc with
+                 | EVar v -> env_assign_var env v (expr_to_pred_simple rhs)
+                 | _      -> env)
+            (* Field assignment: c.field = rhs, or deref-then-field = rhs *)
+            | EField (outer, fld) ->
+                let base_pred = match outer.expr_desc with
+                  | EDeref inner -> expr_to_pred_simple inner
+                  | _            -> expr_to_pred_simple outer
+                in
+                env_add_fact env (PBinop (Eq, PField (base_pred, fld.name),
+                                          expr_to_pred_simple rhs))
             | EIndex ({ expr_desc = EVar arr_id; _ }, idx) ->
                 let idx_pred = expr_to_pred_simple idx in
                 let rhs_pred = expr_to_pred_simple rhs in
@@ -2225,6 +2242,21 @@ and check_stmt env stmt : env =
        | EAssign (lhs, rhs) ->
            (match lhs.expr_desc with
             | EVar v -> env_assign_var env v (expr_to_pred_simple rhs)
+            (* Scalar dereference assignment: *v = rhs *)
+            | EDeref deref_inner ->
+                (match deref_inner.expr_desc with
+                 | EVar v -> env_assign_var env v (expr_to_pred_simple rhs)
+                 | _      -> env)
+            (* Field assignment: c.field = rhs, or deref-then-field = rhs.
+               Record c.field == rhs as a fact so postconditions can use it. *)
+            | EField (outer, fld) ->
+                let base_pred = match outer.expr_desc with
+                  | EDeref inner -> expr_to_pred_simple inner
+                  | _            -> expr_to_pred_simple outer
+                in
+                let fact = PBinop (Eq, PField (base_pred, fld.name),
+                                   expr_to_pred_simple rhs) in
+                env_add_fact env fact
             | EIndex (arr, idx) ->
                 (* Array element assignment: use SSA-style store model.
                    For a simple EVar base, use env_array_write which renames

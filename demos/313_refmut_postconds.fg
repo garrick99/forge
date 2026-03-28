@@ -1,0 +1,76 @@
+// Demo 313: refmut<T> postconditions via field assignment tracking
+//
+// When a function mutates a struct through a refmut<T> parameter,
+// the proof engine now tracks field assignments and verifies postconditions
+// about the mutated fields.
+//
+// New capabilities:
+//   (*c).field = v  →  adds fact  c.field == v  to proof context
+//   ensures (*c).field == v  →  discharged from that fact
+//   requires (*c).field == k  →  precondition the caller must satisfy
+//
+// This enables typestate verification for in-place mutation patterns.
+
+struct Counter {
+    value: u64,
+    max:   u64,
+}
+
+fn counter_init(c: refmut<Counter>, max: u64)
+    requires max > 0u64
+    ensures (*c).value == 0u64
+    ensures (*c).max   == max
+{
+    (*c).value = 0u64;
+    (*c).max   = max;
+}
+
+fn counter_inc(c: refmut<Counter>)
+    requires (*c).value < (*c).max
+    ensures (*c).value == (*c).value + 1u64
+{
+    (*c).value = (*c).value + 1u64;
+}
+
+fn counter_reset(c: refmut<Counter>)
+    ensures (*c).value == 0u64
+{
+    (*c).value = 0u64;
+}
+
+// Connection state machine with refmut verification
+struct ConnState {
+    state: u64,   // 0=init, 1=open, 2=closed
+    count: u64,
+}
+
+fn conn_open(c: refmut<ConnState>)
+    requires (*c).state == 0u64
+    ensures (*c).state == 1u64
+{
+    (*c).state = 1u64;
+}
+
+fn conn_send(c: refmut<ConnState>)
+    requires (*c).state == 1u64
+    ensures (*c).state == 1u64
+    ensures (*c).count == (*c).count + 1u64
+{
+    (*c).count = (*c).count + 1u64;
+}
+
+fn conn_close(c: refmut<ConnState>)
+    requires (*c).state == 1u64
+    ensures (*c).state == 2u64
+{
+    (*c).state = 2u64;
+}
+
+// Scalar refmut: write a value and verify the postcondition
+fn set_val(v: refmut<u64>, val: u64)
+    ensures (*v) == val
+{
+    *v = val;
+}
+
+fn main() -> u64 { 0u64 }

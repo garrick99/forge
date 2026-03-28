@@ -594,6 +594,10 @@ pred:
     { PApp (name, args) }
   | name = ident
     { PVar name }
+  (* Dereference in pred context: LPAREN STAR pred RPAREN
+     The proof model is value-based so deref is identity in specifications. *)
+  | LPAREN STAR p = pred RPAREN
+    { p }
   | LPAREN p = pred RPAREN
     { p }
 
