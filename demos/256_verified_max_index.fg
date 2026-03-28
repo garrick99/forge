@@ -1,0 +1,31 @@
+// Demo 256: Verified argmax — returns index of maximum element
+//
+// argmax(s, n) returns i such that s[i] >= s[j] for all j < n.
+// Postcondition: result < n (valid index).
+//
+fn argmax(s: span<u64>, n: u64) -> u64
+    requires s.len == n
+    requires n > 0u64
+    ensures result < n
+    ensures forall j: u64, j < n ==> s[result] >= s[j]
+{
+    let mut best_idx: u64 = 0u64;
+    let mut best_val: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant best_idx < n
+        invariant best_val == s[best_idx]
+        invariant forall j: u64, j < i ==> best_val >= s[j]
+        decreases n - i
+    {
+        if s[i] > best_val {
+            best_idx = i;
+            best_val = s[i];
+        };
+        i = i + 1u64;
+    };
+    best_idx
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,32 @@
+// Demo 202: Verified ring buffer index arithmetic
+//
+// Ring buffer with head/tail pointers.
+// Invariant: head and tail are always in [0, capacity).
+// Push advances tail, wrapping around.
+//
+struct RingBuf {
+    head: u64,
+    tail: u64,
+    cap: u64,
+    invariant head < cap
+    invariant tail < cap
+}
+
+fn ring_push(buf: RingBuf) -> RingBuf
+    requires buf.cap >= 2u64
+    ensures result.tail < result.cap
+    ensures result.head == buf.head
+{
+    let new_tail: u64 = (buf.tail + 1u64) % buf.cap;
+    struct RingBuf { head: buf.head, tail: new_tail, cap: buf.cap }
+}
+
+fn ring_make(capacity: u64) -> RingBuf
+    requires capacity >= 2u64
+    ensures result.head == 0u64
+    ensures result.tail == 0u64
+{
+    struct RingBuf { head: 0u64, tail: 0u64, cap: capacity }
+}
+
+fn main() -> u64 { 0u64 }

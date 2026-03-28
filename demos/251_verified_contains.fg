@@ -1,0 +1,25 @@
+// Demo 251: Verified linear search returning bool
+//
+// contains(s, n, target) returns true iff some s[i] == target.
+// Postcondition: result == true => ∃ i < n, s[i] == target.
+//
+fn contains(s: span<u64>, n: u64, target: u64) -> bool
+    requires s.len == n
+    ensures result == true ==> (exists i: u64, i < n && s[i] == target)
+{
+    let mut k: u64 = 0u64;
+    let mut found: bool = false;
+    while k < n
+        invariant k <= n
+        invariant found == true ==> (exists i: u64, i < k && s[i] == target)
+        decreases n - k
+    {
+        if s[k] == target {
+            found = true;
+        };
+        k = k + 1u64;
+    };
+    found
+}
+
+fn main() -> u64 { 0u64 }

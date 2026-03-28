@@ -1,0 +1,20 @@
+// Demo 218: Copy a slice using lo..hi range
+//
+// copy_slice copies src[lo..hi) into dst[lo..hi).
+// Two-span operation with a bounded range; postcondition covers the exact window.
+//
+fn copy_slice(dst: span<u64>, src: span<u64>, lo: u64, hi: u64)
+    requires hi <= dst.len
+    requires hi <= src.len
+    requires lo <= hi
+    ensures forall k: u64, lo <= k && k < hi ==> dst[k] == src[k]
+{
+    for i in lo..hi
+        invariant i <= hi
+        invariant forall k: u64, lo <= k && k < i ==> dst[k] == src[k]
+    {
+        dst[i] = src[i];
+    }
+}
+
+fn main() -> u64 { 0u64 }

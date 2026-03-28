@@ -1,0 +1,24 @@
+// Demo 220: Bounds check injection for lo..hi range
+//
+// Demonstrates that for i in lo..hi automatically injects lo <= i < hi,
+// making span accesses at s[i] auto-provable without explicit invariant.
+// count_in_range counts elements above threshold in [lo, hi).
+//
+fn count_in_range(s: span<u64>, lo: u64, hi: u64, threshold: u64) -> u64
+    requires hi <= s.len
+    requires lo <= hi
+    ensures result <= hi - lo
+{
+    let mut count: u64 = 0u64;
+    for i in lo..hi
+        invariant i <= hi
+        invariant count <= i - lo
+    {
+        if s[i] > threshold {
+            count = count + 1u64;
+        };
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

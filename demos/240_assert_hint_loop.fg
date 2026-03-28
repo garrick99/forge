@@ -1,0 +1,23 @@
+// Demo 240: assert() as proof hint inside a loop
+//
+// Demonstrates using assert() to introduce intermediate facts
+// that bridge proof gaps in complex loop bodies.
+// Here we prove a sum stays bounded by using assert as a pivot.
+//
+fn bounded_sum(s: span<u64>, n: u64, cap: u64) -> u64
+    requires s.len == n
+    requires forall k: u64, k < n ==> s[k] <= cap
+    ensures result <= n * cap
+{
+    let mut acc: u64 = 0u64;
+    for i in n
+        invariant i <= n
+        invariant acc <= i * cap
+    {
+        assert(s[i] <= cap) "element bounded by cap";
+        acc = acc + s[i];
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

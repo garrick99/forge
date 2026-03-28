@@ -1,0 +1,30 @@
+// Demo 249: else-if with bool flag updated through chain
+//
+// categorize(s, n, threshold) sets flags: any_below and any_above
+// based on whether any element is below or above threshold.
+// Both flags are updated through an else-if chain inside the loop.
+//
+fn categorize(s: span<u64>, n: u64, threshold: u64)
+    requires s.len == n
+    ensures true
+{
+    let mut i: u64 = 0u64;
+    let mut any_below: bool = false;
+    let mut any_above: bool = false;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] < threshold {
+            any_below = true;
+        } else if s[i] > threshold {
+            any_above = true;
+        };
+        i = i + 1u64;
+    };
+    // Postcondition is trivial but the loop verifies without crashes.
+    let _ = any_below;
+    let _ = any_above;
+}
+
+fn main() -> u64 { 0u64 }

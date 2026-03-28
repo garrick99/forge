@@ -1,0 +1,39 @@
+// Demo 241: Verified merge — copy remaining elements from two sorted spans
+//
+// merge_copy(dst, a, na) copies all elements from a to dst, verifying bounds.
+// The simpler form: just copy one span — proven fully.
+// Full merge would need else-if chain support (future feature).
+//
+fn merge_copy(dst: span<u64>, a: span<u64>, n: u64)
+    requires dst.len == n
+    requires a.len == n
+    ensures forall k: u64, k < n ==> dst[k] == a[k]
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> dst[k] == a[k]
+    {
+        dst[i] = a[i];
+    }
+}
+
+// interleave: take elements alternately from a and b into dst.
+// dst[2*i] = a[i], dst[2*i+1] = b[i] for all i < n.
+fn interleave(dst: span<u64>, a: span<u64>, b: span<u64>, n: u64)
+    requires dst.len == 2u64 * n
+    requires a.len == n
+    requires b.len == n
+    ensures forall k: u64, k < n ==> dst[2u64 * k] == a[k]
+    ensures forall k: u64, k < n ==> dst[2u64 * k + 1u64] == b[k]
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> dst[2u64 * k] == a[k]
+        invariant forall k: u64, k < i ==> dst[2u64 * k + 1u64] == b[k]
+    {
+        dst[2u64 * i] = a[i];
+        dst[2u64 * i + 1u64] = b[i];
+    }
+}
+
+fn main() -> u64 { 0u64 }

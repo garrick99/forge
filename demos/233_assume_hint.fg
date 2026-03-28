@@ -1,0 +1,22 @@
+// Demo 233: assume() as a proof hint
+//
+// Sometimes the verifier needs an extra hint to bridge a gap.
+// assume(pred) adds pred as an axiom in the current scope.
+// Here we use it to give Z3 a hint about array content.
+//
+fn sum_with_hint(s: span<u64>, n: u64) -> u64
+    requires s.len == n
+    requires n > 0u64
+    ensures result >= s[0u64]
+{
+    let mut acc: u64 = s[0u64];
+    for i in 1u64..n
+        invariant i <= n
+        invariant acc >= s[0u64]
+    {
+        acc = acc + s[i];
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

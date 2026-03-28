@@ -1,0 +1,47 @@
+// Demo 288: Verified two-pass max — find max, then find second max below it
+//
+// max_of(s, n): returns m with forall k < n, m >= s[k].
+// second_below(s, n, bound): returns max of elements strictly < bound.
+// Both have clean quantifier postconditions.
+//
+fn max_of(s: span<u64>, n: u64) -> u64
+    requires s.len == n
+    requires n > 0u64
+    ensures forall k: u64, k < n ==> result >= s[k]
+{
+    let mut m: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i >= 1u64
+        invariant i <= n
+        invariant forall k: u64, k < i ==> m >= s[k]
+        decreases n - i
+    {
+        if s[i] > m {
+            m = s[i];
+        };
+        i = i + 1u64;
+    };
+    m
+}
+
+fn second_below(s: span<u64>, n: u64, bound: u64) -> u64
+    requires s.len == n
+    ensures result < bound || result == 0u64
+{
+    let mut m: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant m < bound || m == 0u64
+        decreases n - i
+    {
+        if s[i] > m && s[i] < bound {
+            m = s[i];
+        };
+        i = i + 1u64;
+    };
+    m
+}
+
+fn main() -> u64 { 0u64 }

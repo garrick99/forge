@@ -1,0 +1,37 @@
+// Demo 237: Verified two-pointer sum check
+//
+// two_sum_sorted(s, n, target) returns true if any pair s[lo] + s[hi] == target
+// using the two-pointer technique on a sorted array.
+// Postcondition: lo <= hi throughout (valid window invariant).
+//
+fn two_sum_sorted(s: span<u64>, n: u64, target: u64) -> u64
+    requires s.len == n
+    requires n >= 2u64
+    ensures result <= 1u64
+{
+    let mut lo: u64 = 0u64;
+    let mut hi: u64 = n - 1u64;
+    let mut found: u64 = 0u64;
+    while lo < hi
+        invariant lo <= hi
+        invariant hi < n
+        invariant found <= 1u64
+    {
+        let sum: u64 = s[lo] + s[hi];
+        if sum == target {
+            found = 1u64;
+            lo = hi; // terminate
+        } else if s[lo] < s[hi] {
+            lo = lo + 1u64;
+        } else {
+            if hi > 0u64 {
+                hi = hi - 1u64;
+            } else {
+                lo = hi; // terminate
+            };
+        };
+    };
+    found
+}
+
+fn main() -> u64 { 0u64 }

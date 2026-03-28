@@ -1,0 +1,22 @@
+// Demo 243: Verified matrix row access (row-major flat array)
+//
+// matrix_fill_row(s, rows, cols, r, val) fills row r of a rows×cols matrix.
+// The matrix is stored row-major: element (r, c) = s[r * cols + c].
+// Postcondition: all elements in row r equal val.
+//
+fn matrix_fill_row(s: span<u64>, rows: u64, cols: u64, r: u64, val: u64)
+    requires s.len == rows * cols
+    requires r < rows
+    requires cols > 0u64
+    requires r * cols + cols <= s.len
+    ensures forall c: u64, c < cols ==> s[r * cols + c] == val
+{
+    for c in cols
+        invariant c <= cols
+        invariant forall j: u64, j < c ==> s[r * cols + j] == val
+    {
+        s[r * cols + c] = val;
+    }
+}
+
+fn main() -> u64 { 0u64 }

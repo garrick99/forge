@@ -1,0 +1,21 @@
+// Demo 213: Verified memmove (forward copy, non-overlapping assumed)
+//
+// Copies n elements from src to dst, left-to-right.
+// Full functional postcondition: forall k < n, dst[k] == src[k].
+// Requires non-overlap: dst and src are separate spans with their own lengths.
+// This is the most fundamental memory primitive after memset.
+//
+fn memmove_fwd(dst: span<u64>, src: span<u64>, n: u64)
+    requires dst.len == n
+    requires src.len == n
+    ensures forall k: u64, k < n ==> dst[k] == src[k]
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> dst[k] == src[k]
+    {
+        dst[i] = src[i];
+    }
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,22 @@
+// Demo 203: Hamming weight (popcount) with invariant
+//
+// Counts the number of set bits in a u64 value.
+// Loop invariant: count <= 64 (at most 64 bits can be set).
+// Postcondition: result <= 64.
+//
+fn popcount(x: u64) -> u64
+    ensures result <= 64u64
+{
+    let mut v: u64 = x;
+    let mut count: u64 = 0u64;
+    while v > 0u64
+        invariant count <= 64u64
+        decreases v
+    {
+        count = count + (v & 1u64);
+        v = v >> 1u64;
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

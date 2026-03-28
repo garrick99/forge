@@ -1,0 +1,16 @@
+// Demo 200: Assert statements generate proof obligations
+//
+// assert(pred) in FORGE is not a runtime check — it's a compile-time
+// proof obligation. The fact is then added to the proof context as
+// an established truth for downstream reasoning.
+//
+fn bounded_add(a: u64, b: u64) -> u64
+    requires a <= 100u64
+    requires b <= 100u64
+    ensures result <= 200u64
+{
+    assert(a + b <= 200u64) "sum of bounded values is bounded";
+    a + b
+}
+
+fn main() -> u64 { 0u64 }

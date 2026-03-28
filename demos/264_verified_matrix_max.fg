@@ -1,0 +1,31 @@
+// Demo 264: Verified matrix row maximum
+//
+// row_max(s, rows, cols, r) returns the maximum value in row r.
+// Row r starts at s[r * cols] and has cols elements.
+// Precondition: explicit bound r * cols + cols <= s.len (avoids nonlinear NIA).
+//
+fn row_max(s: span<u64>, rows: u64, cols: u64, r: u64) -> u64
+    requires s.len == rows * cols
+    requires r < rows
+    requires cols > 0u64
+    requires r * cols + cols <= s.len
+    ensures result >= 0u64
+    ensures forall c: u64, c < cols ==> result >= s[r * cols + c]
+{
+    let mut best: u64 = s[r * cols];
+    let mut c: u64 = 1u64;
+    while c < cols
+        invariant c <= cols
+        invariant best >= 0u64
+        invariant forall j: u64, j < c ==> best >= s[r * cols + j]
+        decreases cols - c
+    {
+        if s[r * cols + c] > best {
+            best = s[r * cols + c];
+        };
+        c = c + 1u64;
+    };
+    best
+}
+
+fn main() -> u64 { 0u64 }

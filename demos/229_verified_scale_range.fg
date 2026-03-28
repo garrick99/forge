@@ -1,0 +1,18 @@
+// Demo 229: Verified scale with old() postcondition
+//
+// scale(s, n, factor) multiplies every element by factor.
+// old(s[k]) is the pre-call value; postcondition relates output to input.
+//
+fn scale(s: span<u64>, n: u64, factor: u64)
+    requires s.len == n
+    ensures forall k: u64, k < n ==> s[k] == old(s[k]) * factor
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> s[k] == old(s[k]) * factor
+    {
+        s[i] = s[i] * factor;
+    }
+}
+
+fn main() -> u64 { 0u64 }

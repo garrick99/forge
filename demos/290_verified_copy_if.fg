@@ -1,0 +1,27 @@
+// Demo 290: Verified copy-if — copy elements above threshold into output
+//
+// copy_if_gt(src, dst, n, thresh) copies src[i] to dst[out_count] when src[i] > thresh.
+// Postcondition: out_count <= n.
+//
+fn copy_if_gt(src: span<u64>, dst: span<u64>, n: u64, thresh: u64) -> u64
+    requires src.len == n
+    requires dst.len == n
+    ensures result <= n
+{
+    let mut out: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant out <= i
+        decreases n - i
+    {
+        if src[i] > thresh {
+            dst[out] = src[i];
+            out = out + 1u64;
+        };
+        i = i + 1u64;
+    };
+    out
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,25 @@
+// Demo 293: Verified saturating-add arrays — dst[i] = min(a[i] + b[i], MAX)
+//
+// sat_add(a, b, dst, n, max_val) adds element-wise, clamping to max_val.
+// Postcondition: forall k < n, dst[k] <= max_val.
+//
+fn sat_add(a: span<u64>, b: span<u64>, dst: span<u64>, n: u64, max_val: u64)
+    requires a.len == n
+    requires b.len == n
+    requires dst.len == n
+    ensures forall k: u64, k < n ==> dst[k] <= max_val
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> dst[k] <= max_val
+    {
+        let sum: u64 = a[i] + b[i];
+        if sum > max_val {
+            dst[i] = max_val;
+        } else {
+            dst[i] = sum;
+        }
+    }
+}
+
+fn main() -> u64 { 0u64 }

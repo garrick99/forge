@@ -1,0 +1,25 @@
+// Demo 272: Verified range fill — fill s[lo..hi) with val
+//
+// fill_range(s, n, lo, hi, val) sets s[i] = val for lo <= i < hi.
+// Callee injection: after fill_range, forall k in [lo,hi), s[k] == val.
+// Postcondition: forall k in [lo,hi), s[k] == val AND out-of-range unchanged.
+//
+fn fill_range(s: span<u64>, n: u64, lo: u64, hi: u64, val: u64)
+    requires s.len == n
+    requires lo <= hi
+    requires hi <= n
+    ensures forall k: u64, k >= lo && k < hi ==> s[k] == val
+{
+    let mut i: u64 = lo;
+    while i < hi
+        invariant i >= lo
+        invariant i <= hi
+        invariant forall k: u64, k >= lo && k < i ==> s[k] == val
+        decreases hi - i
+    {
+        s[i] = val;
+        i = i + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

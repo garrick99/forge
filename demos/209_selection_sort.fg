@@ -1,0 +1,35 @@
+// Demo 209: Verified selection sort — index bounds proof
+//
+// Selection sort scans for the minimum and swaps it into place.
+// Outer: i from 0..n. Inner: j from i+1..n (find min).
+// All array accesses are proven safe by the nested loop invariants.
+//
+fn selection_sort(s: span<u64>, n: u64)
+    requires s.len == n
+    requires n >= 1u64
+{
+    for i in n
+        invariant i <= n
+    {
+        let mut min_idx: u64 = i;
+        let mut j: u64 = i + 1u64;
+        while j < n
+            invariant j <= n
+            invariant min_idx < n
+            invariant min_idx >= i
+            decreases n - j
+        {
+            if s[j] < s[min_idx] {
+                min_idx = j;
+            };
+            j = j + 1u64;
+        };
+        if min_idx != i {
+            let tmp: u64 = s[i];
+            s[i] = s[min_idx];
+            s[min_idx] = tmp;
+        };
+    }
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,44 @@
+// Demo 253: Verified count — count_below(s, n, threshold)
+//
+// Returns the number of elements strictly less than threshold.
+// Uses an accumulator with postcondition count <= n.
+//
+fn count_below(s: span<u64>, n: u64, threshold: u64) -> u64
+    requires s.len == n
+    ensures result <= n
+{
+    let mut cnt: u64 = 0u64;
+    for i in n
+        invariant i <= n
+        invariant cnt <= i
+    {
+        if s[i] < threshold {
+            cnt = cnt + 1u64;
+        };
+    };
+    cnt
+}
+
+// count_in_range: count elements in [lo_val, hi_val]
+fn count_in_range(s: span<u64>, n: u64, lo_val: u64, hi_val: u64) -> u64
+    requires s.len == n
+    requires lo_val <= hi_val
+    ensures result <= n
+{
+    let mut cnt: u64 = 0u64;
+    for i in n
+        invariant i <= n
+        invariant cnt <= i
+    {
+        if s[i] < lo_val {
+            // below range — skip
+        } else if s[i] > hi_val {
+            // above range — skip
+        } else {
+            cnt = cnt + 1u64;
+        };
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }

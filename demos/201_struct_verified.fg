@@ -1,0 +1,28 @@
+// Demo 201: Verified struct with invariant
+//
+// BoundedCounter struct invariant: count <= max.
+// Increment only if count < max.
+// The struct invariant is proved at every field update.
+//
+struct BoundedCounter {
+    count: u64,
+    max: u64,
+    invariant count <= max
+}
+
+fn make_counter(limit: u64) -> BoundedCounter
+    ensures result.count == 0u64
+    ensures result.max == limit
+{
+    struct BoundedCounter { count: 0u64, max: limit }
+}
+
+fn increment(c: BoundedCounter) -> BoundedCounter
+    requires c.count < c.max
+    ensures result.count == c.count + 1u64
+    ensures result.max == c.max
+{
+    struct BoundedCounter { count: c.count + 1u64, max: c.max }
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,31 @@
+// Demo 263: Verified Boyer-Moore majority vote
+//
+// majority_candidate(s, n) returns the majority candidate.
+// If a majority element exists, this returns it (completeness not proved here).
+// Uses a 3-way else-if chain: no count → new candidate, match → increment,
+// mismatch → decrement. Invariant: count <= i (count bounded by iteration).
+//
+fn majority_candidate(s: span<u64>, n: u64) -> u64
+    requires s.len == n
+    requires n > 0u64
+    ensures result >= 0u64
+{
+    let mut candidate: u64 = s[0u64];
+    let mut count: u64 = 0u64;
+    for i in n
+        invariant i <= n
+        invariant count <= i
+    {
+        if count == 0u64 {
+            candidate = s[i];
+            count = 1u64;
+        } else if s[i] == candidate {
+            count = count + 1u64;
+        } else {
+            count = count - 1u64;
+        };
+    };
+    candidate
+}
+
+fn main() -> u64 { 0u64 }

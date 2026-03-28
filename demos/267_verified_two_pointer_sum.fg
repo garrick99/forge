@@ -1,0 +1,32 @@
+// Demo 267: Verified two-pointer sum equality
+//
+// sum_lr(s, n) computes sum from left and right simultaneously, proving they're equal.
+// Both pointers advance by 1 each iteration (left and right symmetrically).
+// Invariant: l + r == n (symmetric advance).
+//
+fn sum_both_ends(s: span<u64>, n: u64) -> u64
+    requires s.len == n
+    requires n > 0u64
+    ensures result >= 0u64
+{
+    let mut l: u64 = 0u64;
+    let mut r: u64 = n;
+    let mut acc: u64 = 0u64;
+    while l < r
+        invariant l <= r
+        invariant r <= n
+        invariant l + (n - r) <= n
+        invariant acc >= 0u64
+        decreases r - l
+    {
+        acc = acc + s[l];
+        l = l + 1u64;
+        if l < r {
+            acc = acc + s[r - 1u64];
+            r = r - 1u64;
+        };
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

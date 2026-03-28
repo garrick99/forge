@@ -1,0 +1,30 @@
+// Demo 260: Verified running maximum — track max so far using elif update
+//
+// running_max(s, n) computes the running maximum and returns the global max.
+// Uses an else-if update: if s[i] > cur_max then update, else keep.
+// Postcondition: result >= 0 (non-negative since u64).
+// Invariant: cur_max >= s[j] for all j < i seen so far.
+//
+fn running_max(s: span<u64>, n: u64) -> u64
+    requires s.len == n
+    requires n > 0u64
+    ensures result >= 0u64
+    ensures forall j: u64, j < n ==> result >= s[j]
+{
+    let mut cur_max: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant cur_max >= 0u64
+        invariant forall j: u64, j < i ==> cur_max >= s[j]
+        decreases n - i
+    {
+        if s[i] > cur_max {
+            cur_max = s[i];
+        };
+        i = i + 1u64;
+    };
+    cur_max
+}
+
+fn main() -> u64 { 0u64 }

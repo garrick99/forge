@@ -1,0 +1,23 @@
+// Demo 269: Verified threshold fill — set elements above threshold to threshold
+//
+// threshold_fill(s, n, cap) sets s[i] = min(s[i], cap) for all i.
+// Uses a 2-branch elif: if s[i] > cap then s[i] = cap else no-op.
+// Postcondition: forall k, s[k] <= cap AND s[k] == old(s[k]) OR s[k] == cap.
+//
+fn threshold_fill(s: span<u64>, n: u64, cap: u64)
+    requires s.len == n
+    ensures forall k: u64, k < n ==> s[k] <= cap
+    ensures forall k: u64, k < n ==> s[k] == old(s[k]) || s[k] == cap
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> s[k] <= cap
+        invariant forall k: u64, k < i ==> s[k] == old(s[k]) || s[k] == cap
+    {
+        if s[i] > cap {
+            s[i] = cap;
+        }
+    }
+}
+
+fn main() -> u64 { 0u64 }

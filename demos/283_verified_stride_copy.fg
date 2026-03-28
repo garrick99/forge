@@ -1,0 +1,20 @@
+// Demo 283: Verified stride copy — copy every other element
+//
+// stride_copy(src, dst, n) copies src[2*i] to dst[i] for i < n.
+// Requires src.len >= 2*n, dst.len >= n.
+// Postcondition: dst[k] == src[2*k] for all k < n.
+//
+fn stride_copy(src: span<u64>, dst: span<u64>, n: u64)
+    requires src.len >= 2u64 * n
+    requires dst.len >= n
+    ensures forall k: u64, k < n ==> dst[k] == old(src[2u64 * k])
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> dst[k] == old(src[2u64 * k])
+    {
+        dst[i] = src[2u64 * i];
+    }
+}
+
+fn main() -> u64 { 0u64 }

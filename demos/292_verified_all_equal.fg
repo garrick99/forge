@@ -1,0 +1,28 @@
+// Demo 292: Verified all-equal check
+//
+// all_equal(s, n) returns true iff all elements equal s[0].
+// Postcondition: result == true ==> forall k < n, s[k] == s[0].
+//
+fn all_equal(s: span<u64>, n: u64) -> bool
+    requires s.len == n
+    requires n > 0u64
+    ensures result == true ==> forall k: u64, k < n ==> s[k] == s[0u64]
+{
+    let first: u64 = s[0u64];
+    let mut ok: bool = true;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i >= 1u64
+        invariant i <= n
+        invariant ok == true ==> forall k: u64, k < i ==> s[k] == first
+        decreases n - i
+    {
+        if s[i] != first {
+            ok = false;
+        };
+        i = i + 1u64;
+    };
+    ok
+}
+
+fn main() -> u64 { 0u64 }

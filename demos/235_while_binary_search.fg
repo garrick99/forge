@@ -1,0 +1,27 @@
+// Demo 235: Binary search via while loop with multiple invariants
+//
+// lower_bound(s, n, target) returns the first index where s[k] >= target.
+// Uses while loop with multiple invariants — lo <= hi and hi <= n.
+// Postcondition: result <= n (valid index or sentinel).
+//
+fn lower_bound(s: span<u64>, n: u64, target: u64) -> u64
+    requires s.len == n
+    ensures result <= n
+{
+    let mut lo: u64 = 0u64;
+    let mut hi: u64 = n;
+    while lo < hi
+        invariant lo <= hi
+        invariant hi <= n
+    {
+        let mid: u64 = lo + (hi - lo) / 2u64;
+        if s[mid] < target {
+            lo = mid + 1u64;
+        } else {
+            hi = mid;
+        };
+    };
+    lo
+}
+
+fn main() -> u64 { 0u64 }

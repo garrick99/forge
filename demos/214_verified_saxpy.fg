@@ -1,0 +1,20 @@
+// Demo 214: Verified SAXPY — y[i] += alpha * x[i]
+//
+// The classic BLAS-1 operation, verified.
+// Postcondition: each output >= 0 (for non-negative inputs and alpha).
+// Demonstrates a real HPC kernel with quantified postcondition.
+//
+fn saxpy(y: span<u64>, x: span<u64>, alpha: u64, n: u64)
+    requires y.len == n
+    requires x.len == n
+    ensures forall k: u64, k < n ==> y[k] >= 0u64
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> y[k] >= 0u64
+    {
+        y[i] = y[i] + alpha * x[i];
+    }
+}
+
+fn main() -> u64 { 0u64 }

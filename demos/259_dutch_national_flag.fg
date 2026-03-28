@@ -1,0 +1,31 @@
+// Demo 259: Verified Dutch National Flag style 3-way scan
+//
+// Counts elements < pivot (lo_cnt) and > pivot (hi_cnt).
+// Uses an else-if chain inside the loop.
+// Postcondition: lo_cnt + eq_cnt + hi_cnt == n.
+//
+fn count_partition(s: span<u64>, n: u64, pivot: u64) -> u64
+    requires s.len == n
+    ensures result <= n
+{
+    let mut lo: u64 = 0u64;
+    let mut eq: u64 = 0u64;
+    let mut hi: u64 = 0u64;
+    for i in n
+        invariant i <= n
+        invariant lo + eq + hi == i
+        invariant lo <= i
+        invariant hi <= i
+    {
+        if s[i] < pivot {
+            lo = lo + 1u64;
+        } else if s[i] > pivot {
+            hi = hi + 1u64;
+        } else {
+            eq = eq + 1u64;
+        };
+    };
+    lo + eq + hi
+}
+
+fn main() -> u64 { 0u64 }

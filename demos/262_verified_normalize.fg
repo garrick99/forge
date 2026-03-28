@@ -1,0 +1,27 @@
+// Demo 262: Verified normalize — shift each element down by min_val, cap at 255
+//
+// normalize_inplace(s, n, min_val) computes s[i] = min(s[i] - min_val, 255u64).
+// Requires: s[i] >= min_val for all i (no underflow on shift).
+// Postcondition: all s[k] <= 255.
+// Two-branch if/else: if shifted > 255 then cap, else keep shifted value.
+//
+fn normalize_inplace(s: span<u64>, n: u64, min_val: u64)
+    requires s.len == n
+    requires forall k: u64, k < n ==> s[k] >= min_val
+    ensures forall k: u64, k < n ==> s[k] <= 255u64
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> s[k] <= 255u64
+        invariant forall k: u64, k >= i && k < n ==> s[k] >= min_val
+    {
+        let shifted: u64 = s[i] - min_val;
+        if shifted > 255u64 {
+            s[i] = 255u64;
+        } else {
+            s[i] = shifted;
+        }
+    }
+}
+
+fn main() -> u64 { 0u64 }

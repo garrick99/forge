@@ -1,0 +1,30 @@
+// Demo 280: Verified bounded sum — sum with overflow guard
+//
+// sum_bounded(s, n, cap) sums s[i] while acc <= cap; stops if adding would exceed cap.
+// Postcondition: result <= cap.
+// Uses bool flag to stop accumulation.
+//
+fn sum_bounded(s: span<u64>, n: u64, cap: u64) -> u64
+    requires s.len == n
+    ensures result <= cap
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    let mut stopped: bool = false;
+    while i < n
+        invariant i <= n
+        invariant acc <= cap
+        invariant stopped == true ==> acc <= cap
+        decreases n - i
+    {
+        if stopped == false && s[i] <= cap - acc {
+            acc = acc + s[i];
+        } else {
+            stopped = true;
+        };
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

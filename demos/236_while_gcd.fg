@@ -1,0 +1,26 @@
+// Demo 236: Verified GCD via Euclidean algorithm
+//
+// gcd(a, b) returns the GCD via the while loop.
+// Invariant: result >= 1 if inputs are > 0.
+// Postcondition: result >= 1 (non-zero GCD for non-zero inputs).
+//
+fn gcd(a: u64, b: u64) -> u64
+    requires a > 0u64
+    requires b > 0u64
+    ensures result >= 1u64
+{
+    let mut x: u64 = a;
+    let mut y: u64 = b;
+    while y > 0u64
+        invariant x >= 1u64
+        invariant y >= 0u64
+        decreases y
+    {
+        let t: u64 = y;
+        y = x % y;
+        x = t;
+    };
+    x
+}
+
+fn main() -> u64 { 0u64 }

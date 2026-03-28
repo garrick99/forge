@@ -1,0 +1,20 @@
+// Demo 226: Matrix fill via nested for loops with lo..hi range
+//
+// fill_row(s, row_start, row_end, val) fills s[row_start..row_end) with val.
+// Outer loop is per-row; inner loop fills within a row range.
+// Demonstrates nested for loops where inner uses lo..hi range.
+//
+fn fill_row(s: span<u64>, row_start: u64, row_end: u64, val: u64)
+    requires row_end <= s.len
+    requires row_start <= row_end
+    ensures forall k: u64, row_start <= k && k < row_end ==> s[k] == val
+{
+    for i in row_start..row_end
+        invariant i <= row_end
+        invariant forall k: u64, row_start <= k && k < i ==> s[k] == val
+    {
+        s[i] = val;
+    }
+}
+
+fn main() -> u64 { 0u64 }

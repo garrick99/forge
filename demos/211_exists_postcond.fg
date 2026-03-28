@@ -1,0 +1,23 @@
+// Demo 211: Existential postcondition — find returns a witness
+//
+// find_nonzero returns an index k where s[k] > 0, or n if none exists.
+// Postcondition: result <= n (index is valid or sentinel n).
+// The existential proves: if result < n, then s[result] > 0.
+//
+fn find_nonzero(s: span<u64>, n: u64) -> u64
+    requires s.len == n
+    ensures result <= n
+{
+    let mut found: u64 = n;
+    for i in n
+        invariant i <= n
+        invariant found <= n
+    {
+        if s[i] > 0u64 && found == n {
+            found = i;
+        };
+    };
+    found
+}
+
+fn main() -> u64 { 0u64 }

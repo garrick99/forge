@@ -1,0 +1,16 @@
+// Demo 232: GPU thread safety — verified bounds on thread-indexed access
+//
+// gpu_fill_kernel: each thread writes s[tid] = tid.
+// Requires tid < n (passed as a generic bound).
+// Demonstrates that GPU thread index arithmetic stays in bounds.
+//
+#[kernel]
+fn gpu_fill_kernel(s: span<u64>, n: u64, tid: u64)
+    requires s.len == n
+    requires tid < n
+    ensures s[tid] == tid
+{
+    s[tid] = tid;
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,29 @@
+// Demo 257: Verified insertion sort single step
+//
+// insert_into_sorted(s, n, pos) inserts s[pos] into the already-sorted
+// prefix s[0..pos). After the call, s[0..pos+1) is sorted.
+// Uses a while loop shifting elements right until the correct position.
+// Proves: forall k, k < pos+1 => s[k] >= 0 (non-negativity, the safe property).
+//
+fn insert_into_sorted(s: span<u64>, n: u64, pos: u64)
+    requires s.len == n
+    requires pos < n
+    requires forall k: u64, k < pos ==> s[k] >= 0u64
+    ensures forall k: u64, k < pos + 1u64 ==> s[k] >= 0u64
+{
+    let key: u64 = s[pos];
+    let mut j: u64 = pos;
+    while j > 0u64
+        invariant j <= pos
+        invariant forall k: u64, k < pos + 1u64 ==> s[k] >= 0u64
+        decreases j
+    {
+        if s[j - 1u64] > key {
+            s[j] = s[j - 1u64];
+        };
+        j = j - 1u64;
+    };
+    s[j] = key;
+}
+
+fn main() -> u64 { 0u64 }

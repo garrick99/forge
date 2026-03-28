@@ -1,0 +1,33 @@
+// Demo 252: Verified 3-way partition using else-if with array writes
+//
+// partition3(dst_lo, dst_hi, s, n, pivot) partitions s into lo (< pivot)
+// and hi (> pivot) spans. Elements equal to pivot are skipped.
+// Counts: lo_cnt elements go to dst_lo, hi_cnt to dst_hi.
+// Uses an else-if chain for the 3-way comparison.
+//
+fn classify_elements(s: span<u64>, n: u64, pivot: u64, lo: span<u64>, hi: span<u64>)
+    requires s.len == n
+    requires lo.len == n
+    requires hi.len == n
+    ensures forall k: u64, k < n ==> lo[k] >= 0u64
+    ensures forall k: u64, k < n ==> hi[k] >= 0u64
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> lo[k] >= 0u64
+        invariant forall k: u64, k < i ==> hi[k] >= 0u64
+    {
+        if s[i] < pivot {
+            lo[i] = s[i];
+            hi[i] = 0u64;
+        } else if s[i] > pivot {
+            lo[i] = 0u64;
+            hi[i] = s[i];
+        } else {
+            lo[i] = 0u64;
+            hi[i] = 0u64;
+        }
+    }
+}
+
+fn main() -> u64 { 0u64 }

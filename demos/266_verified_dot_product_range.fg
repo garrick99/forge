@@ -1,0 +1,23 @@
+// Demo 266: Verified dot product over range with forall postcondition
+//
+// dot_partial(a, b, n, lo, hi) computes sum of a[k]*b[k] for k in [lo, hi).
+// Uses range loop lo..hi. Postcondition: result >= 0 (u64).
+//
+fn dot_partial(a: span<u64>, b: span<u64>, n: u64, lo: u64, hi: u64) -> u64
+    requires a.len == n
+    requires b.len == n
+    requires lo <= hi
+    requires hi <= n
+    ensures result >= 0u64
+{
+    let mut acc: u64 = 0u64;
+    for i in lo..hi
+        invariant i <= hi
+        invariant acc >= 0u64
+    {
+        acc = acc + a[i] * b[i];
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

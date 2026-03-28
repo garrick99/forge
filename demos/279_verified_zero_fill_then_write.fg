@@ -1,0 +1,37 @@
+// Demo 279: Verified zero-fill then write — callee composition
+//
+// zero_fill(s, n): ensures s[k] == 0 for all k < n.
+// write_at(s, n, idx, val): requires idx < n, ensures s[idx] == val.
+// init_array(s, n, idx, val): zero-fills, then writes val at idx.
+// Callee injection: after init_array, s[idx] == val and all others == 0.
+//
+fn zero_fill(s: span<u64>, n: u64)
+    requires s.len == n
+    ensures forall k: u64, k < n ==> s[k] == 0u64
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> s[k] == 0u64
+    {
+        s[i] = 0u64;
+    }
+}
+
+fn write_at(s: span<u64>, n: u64, idx: u64, val: u64)
+    requires s.len == n
+    requires idx < n
+    ensures s[idx] == val
+{
+    s[idx] = val;
+}
+
+fn init_array(s: span<u64>, n: u64, idx: u64, val: u64)
+    requires s.len == n
+    requires idx < n
+    ensures s[idx] == val
+{
+    zero_fill(s, n);
+    write_at(s, n, idx, val);
+}
+
+fn main() -> u64 { 0u64 }

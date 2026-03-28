@@ -1,0 +1,40 @@
+// Demo 247: Verified merge step — k == i + j invariant with else-if chain
+//
+// merge_step uses a 3-branch else-if: i exhausted → take b[j],
+// j exhausted → take a[i], otherwise → take a[i].
+// (Stable comparison omitted: array-valued conditions escape Z3's ITE case-split.)
+// Verifies: k == i + j via nested PIte(c1, i, PIte(c2, i+1, i)) + ...
+//
+fn merge_step(dst: span<u64>, a: span<u64>, b: span<u64>, na: u64, nb: u64)
+    requires dst.len == na + nb
+    requires a.len == na
+    requires b.len == nb
+    requires na + nb > 0u64
+    ensures forall k: u64, k < na + nb ==> dst[k] >= 0u64
+{
+    let mut i: u64 = 0u64;
+    let mut j: u64 = 0u64;
+    let mut k: u64 = 0u64;
+    for _step in na + nb
+        invariant _step <= na + nb
+        invariant k == i + j
+        invariant i <= na
+        invariant j <= nb
+        invariant k <= na + nb
+        invariant forall idx: u64, idx < k ==> dst[idx] >= 0u64
+    {
+        if i >= na {
+            dst[k] = b[j];
+            j = j + 1u64;
+        } else if j >= nb {
+            dst[k] = a[i];
+            i = i + 1u64;
+        } else {
+            dst[k] = a[i];
+            i = i + 1u64;
+        };
+        k = k + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

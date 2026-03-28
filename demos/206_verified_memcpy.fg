@@ -1,0 +1,20 @@
+// Demo 206: Verified memcpy — full functional correctness
+//
+// Copies n bytes from src to dst.
+// Postcondition: forall k < n, dst[k] == src[k] (complete correctness proof).
+// This is the gold standard: memory copy that's provably correct.
+//
+fn memcpy(dst: span<u64>, src: span<u64>, n: u64)
+    requires dst.len == n
+    requires src.len == n
+    ensures forall k: u64, k < n ==> dst[k] == src[k]
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> dst[k] == src[k]
+    {
+        dst[i] = src[i];
+    }
+}
+
+fn main() -> u64 { 0u64 }

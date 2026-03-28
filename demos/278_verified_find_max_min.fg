@@ -1,0 +1,49 @@
+// Demo 278: Verified find max and min simultaneously
+//
+// max_val(s, n) returns x with x >= s[k] for all k < n.
+// min_val(s, n) returns x with x <= s[k] for all k < n.
+// Both use single-pass accumulation.
+//
+fn max_val(s: span<u64>, n: u64) -> u64
+    requires s.len == n
+    requires n > 0u64
+    ensures forall k: u64, k < n ==> result >= s[k]
+{
+    let mut m: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i >= 1u64
+        invariant i <= n
+        invariant forall k: u64, k < i ==> m >= s[k]
+        decreases n - i
+    {
+        if s[i] > m {
+            m = s[i];
+        };
+        i = i + 1u64;
+    };
+    m
+}
+
+fn min_val(s: span<u64>, n: u64) -> u64
+    requires s.len == n
+    requires n > 0u64
+    ensures forall k: u64, k < n ==> result <= s[k]
+{
+    let mut m: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i >= 1u64
+        invariant i <= n
+        invariant forall k: u64, k < i ==> m <= s[k]
+        decreases n - i
+    {
+        if s[i] < m {
+            m = s[i];
+        };
+        i = i + 1u64;
+    };
+    m
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,21 @@
+// Demo 294: Verified bounded copy — copy min(src.len, dst.len, limit) elements
+//
+// copy_bounded(src, dst, n, limit) copies min(n, limit) elements.
+// Requires limit <= n.
+// Postcondition: forall k < limit, dst[k] == src[k].
+//
+fn copy_bounded(src: span<u64>, dst: span<u64>, n: u64, limit: u64)
+    requires src.len == n
+    requires dst.len == n
+    requires limit <= n
+    ensures forall k: u64, k < limit ==> dst[k] == src[k]
+{
+    for i in limit
+        invariant i <= limit
+        invariant forall k: u64, k < i ==> dst[k] == src[k]
+    {
+        dst[i] = src[i];
+    }
+}
+
+fn main() -> u64 { 0u64 }

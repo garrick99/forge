@@ -1,0 +1,23 @@
+// Demo 238: Verified counting with range syntax
+//
+// count_in_bounds(s, n, lo_val, hi_val) counts elements in [lo_val, hi_val].
+// Postcondition: count <= n (cannot count more than n elements).
+//
+fn count_in_bounds(s: span<u64>, n: u64, lo_val: u64, hi_val: u64) -> u64
+    requires s.len == n
+    requires lo_val <= hi_val
+    ensures result <= n
+{
+    let mut count: u64 = 0u64;
+    for i in n
+        invariant i <= n
+        invariant count <= i
+    {
+        if s[i] >= lo_val && s[i] <= hi_val {
+            count = count + 1u64;
+        };
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

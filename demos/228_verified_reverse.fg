@@ -1,0 +1,20 @@
+// Demo 228: Verified reverse — postcondition with old()
+//
+// reverse_copy(dst, src, n) writes dst[i] = src[n-1-i] for all i.
+// old(src[k]) refers to source elements before the copy.
+// Postcondition: dst is the mirror of src.
+//
+fn reverse_copy(dst: span<u64>, src: span<u64>, n: u64)
+    requires dst.len == n
+    requires src.len == n
+    ensures forall k: u64, k < n ==> dst[k] == old(src[n - 1u64 - k])
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> dst[k] == old(src[n - 1u64 - k])
+    {
+        dst[i] = src[n - 1u64 - i];
+    }
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,19 @@
+// Demo 207: Verified memset — sets all bytes to a value
+//
+// Sets all n elements of dst to val.
+// Full correctness: forall k < n, dst[k] == val.
+// Combined with memcpy (206), this completes the verified memory primitive set.
+//
+fn memset(dst: span<u64>, n: u64, val: u64)
+    requires dst.len == n
+    ensures forall k: u64, k < n ==> dst[k] == val
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> dst[k] == val
+    {
+        dst[i] = val;
+    }
+}
+
+fn main() -> u64 { 0u64 }

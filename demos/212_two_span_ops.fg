@@ -1,0 +1,21 @@
+// Demo 212: Two-span operation — add corresponding elements
+//
+// out[i] = a[i] + b[i] for i in n.
+// Demonstrates multiple span parameters with separate length constraints.
+// Quantified postcondition: forall k < n, out[k] == a[k] + b[k].
+//
+fn add_spans(out: span<u64>, a: span<u64>, b: span<u64>, n: u64)
+    requires out.len == n
+    requires a.len == n
+    requires b.len == n
+    ensures forall k: u64, k < n ==> out[k] == a[k] + b[k]
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> out[k] == a[k] + b[k]
+    {
+        out[i] = a[i] + b[i];
+    }
+}
+
+fn main() -> u64 { 0u64 }

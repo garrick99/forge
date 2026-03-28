@@ -1,0 +1,27 @@
+// Demo 261: Verified absolute-value copy using elif and old()
+//
+// saturating_copy(dst, src, n, cap) copies src to dst, capping at cap.
+// If src[i] > cap: dst[i] = cap. Else: dst[i] = src[i].
+// Postcondition: dst[k] == min(old(src[k]), cap) for all k < n.
+// Uses old() to reference pre-call src values in the ensures.
+//
+fn saturating_copy(dst: span<u64>, src: span<u64>, n: u64, cap: u64)
+    requires dst.len == n
+    requires src.len == n
+    ensures forall k: u64, k < n ==> dst[k] <= cap
+    ensures forall k: u64, k < n ==> dst[k] == old(src[k]) || dst[k] == cap
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> dst[k] <= cap
+        invariant forall k: u64, k < i ==> dst[k] == old(src[k]) || dst[k] == cap
+    {
+        if src[i] > cap {
+            dst[i] = cap;
+        } else {
+            dst[i] = src[i];
+        };
+    }
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,26 @@
+// Demo 295: Verified elementwise max — dst[i] = max(a[i], b[i])
+//
+// elementwise_max(a, b, dst, n) sets dst[i] = max(a[i], b[i]).
+// Postcondition: dst[k] >= a[k] AND dst[k] >= b[k] for all k < n.
+//
+fn elementwise_max(a: span<u64>, b: span<u64>, dst: span<u64>, n: u64)
+    requires a.len == n
+    requires b.len == n
+    requires dst.len == n
+    ensures forall k: u64, k < n ==> dst[k] >= a[k]
+    ensures forall k: u64, k < n ==> dst[k] >= b[k]
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> dst[k] >= a[k]
+        invariant forall k: u64, k < i ==> dst[k] >= b[k]
+    {
+        if a[i] >= b[i] {
+            dst[i] = a[i];
+        } else {
+            dst[i] = b[i];
+        }
+    }
+}
+
+fn main() -> u64 { 0u64 }

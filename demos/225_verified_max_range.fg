@@ -1,0 +1,24 @@
+// Demo 225: Verified maximum over a range
+//
+// max_range(s, lo, hi) returns the maximum of s[lo..hi).
+// Requires the range is non-empty (lo < hi).
+// Postcondition: result >= s[lo] (the initial value is a lower bound).
+//
+fn max_range(s: span<u64>, lo: u64, hi: u64) -> u64
+    requires s.len == hi
+    requires lo < hi
+    ensures result >= s[lo]
+{
+    let mut m: u64 = s[lo];
+    for i in lo..hi
+        invariant i <= hi
+        invariant m >= s[lo]
+    {
+        if s[i] > m {
+            m = s[i];
+        };
+    };
+    m
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,21 @@
+// Demo 282: Verified apply mask — zero out elements where mask[i] == 0
+//
+// apply_mask(s, mask, n) sets s[i] = 0 where mask[i] == 0, else keeps s[i].
+// Postcondition: forall k, mask[k] == 0 ==> s[k] == 0.
+//
+fn apply_mask(s: span<u64>, mask: span<u64>, n: u64)
+    requires s.len == n
+    requires mask.len == n
+    ensures forall k: u64, k < n ==> mask[k] == 0u64 ==> s[k] == 0u64
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> mask[k] == 0u64 ==> s[k] == 0u64
+    {
+        if mask[i] == 0u64 {
+            s[i] = 0u64;
+        }
+    }
+}
+
+fn main() -> u64 { 0u64 }

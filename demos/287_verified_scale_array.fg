@@ -1,0 +1,19 @@
+// Demo 287: Verified scale array — multiply each element by factor
+//
+// scale(s, n, factor) sets s[i] *= factor.
+// Postcondition: s[k] == old(s[k]) * factor for all k < n.
+//
+fn scale(s: span<u64>, n: u64, factor: u64)
+    requires s.len == n
+    ensures forall k: u64, k < n ==> s[k] == old(s[k]) * factor
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> s[k] == old(s[k]) * factor
+        invariant forall k: u64, k >= i && k < n ==> s[k] == old(s[k])
+    {
+        s[i] = s[i] * factor;
+    }
+}
+
+fn main() -> u64 { 0u64 }

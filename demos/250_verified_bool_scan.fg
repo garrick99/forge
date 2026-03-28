@@ -1,0 +1,25 @@
+// Demo 250: Verified boolean scan — all_positive(s, n) returns true iff all s[i] > 0
+//
+// Uses bool flag with while loop. The is_sorted-style proof now works
+// because bool variables are declared as Bool sort in SMT (proof_engine fix).
+//
+fn all_positive(s: span<u64>, n: u64) -> bool
+    requires s.len == n
+    ensures result == true ==> (forall i: u64, i < n ==> s[i] > 0u64)
+{
+    let mut k: u64 = 0u64;
+    let mut ok: bool = true;
+    while k < n
+        invariant k <= n
+        invariant ok == true ==> (forall i: u64, i < k ==> s[i] > 0u64)
+        decreases n - k
+    {
+        if s[k] == 0u64 {
+            ok = false;
+        };
+        k = k + 1u64;
+    };
+    ok
+}
+
+fn main() -> u64 { 0u64 }

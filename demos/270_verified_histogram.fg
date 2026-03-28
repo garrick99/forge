@@ -1,0 +1,22 @@
+// Demo 270: Verified histogram — count elements per bucket
+//
+// histogram(s, n, hist, buckets) increments hist[s[i] % buckets] for each s[i].
+// Precondition: buckets > 0, hist.len == buckets.
+// Postcondition: all hist[k] >= 0 (trivially true for u64, but verified).
+//
+fn histogram(s: span<u64>, n: u64, hist: span<u64>, buckets: u64)
+    requires s.len == n
+    requires hist.len == buckets
+    requires buckets > 0u64
+    ensures forall k: u64, k < buckets ==> hist[k] >= 0u64
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < buckets ==> hist[k] >= 0u64
+    {
+        let bucket: u64 = s[i] % buckets;
+        hist[bucket] = hist[bucket] + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,31 @@
+// Demo 265: Verified sliding window sum
+//
+// window_sum(s, n, out, w) computes out[i] = s[i] + s[i+1] + ... + s[i+w-1]
+// for i in 0..n-w+1. Window of width w.
+// Preconditions: w <= n, out.len == n - w + 1.
+// Postcondition: out[k] >= 0 for all k (u64, non-negative).
+// Uses range loop and inner range loop.
+//
+fn window_sum(s: span<u64>, n: u64, out: span<u64>, w: u64)
+    requires s.len == n
+    requires w > 0u64
+    requires w <= n
+    requires out.len == n - w + 1u64
+    ensures forall k: u64, k < n - w + 1u64 ==> out[k] >= 0u64
+{
+    for i in n - w + 1u64
+        invariant i <= n - w + 1u64
+        invariant forall k: u64, k < i ==> out[k] >= 0u64
+    {
+        let mut acc: u64 = 0u64;
+        for j in i..(i + w)
+            invariant j <= i + w
+            invariant acc >= 0u64
+        {
+            acc = acc + s[j];
+        };
+        out[i] = acc;
+    }
+}
+
+fn main() -> u64 { 0u64 }

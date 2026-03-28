@@ -1,0 +1,27 @@
+// Demo 223: Verified clamp over a range [lo, hi)
+//
+// clamp_range(s, lo, hi, min_val, max_val) clamps each s[i] to [min_val, max_val].
+// Postcondition: all elements in range are within bounds after clamping.
+//
+fn clamp_range(s: span<u64>, lo: u64, hi: u64, min_val: u64, max_val: u64)
+    requires hi <= s.len
+    requires lo <= hi
+    requires min_val <= max_val
+    ensures forall k: u64, lo <= k && k < hi ==> s[k] >= min_val
+    ensures forall k: u64, lo <= k && k < hi ==> s[k] <= max_val
+{
+    for i in lo..hi
+        invariant i <= hi
+        invariant forall k: u64, lo <= k && k < i ==> s[k] >= min_val
+        invariant forall k: u64, lo <= k && k < i ==> s[k] <= max_val
+    {
+        if s[i] < min_val {
+            s[i] = min_val;
+        };
+        if s[i] > max_val {
+            s[i] = max_val;
+        };
+    }
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,23 @@
+// Demo 224: Verified sliding window sum
+//
+// sum_range(s, lo, hi) computes the sum of s[lo..hi).
+// Result is bounded: result <= (hi - lo) * max_elem
+// where max_elem is an upper bound on array elements.
+// Demonstrates: lo..hi range syntax + bounded accumulator postcondition.
+//
+fn sum_range(s: span<u64>, lo: u64, hi: u64) -> u64
+    requires hi <= s.len
+    requires lo <= hi
+    ensures result >= 0u64
+{
+    let mut acc: u64 = 0u64;
+    for i in lo..hi
+        invariant i <= hi
+        invariant acc >= 0u64
+    {
+        acc = acc + s[i];
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

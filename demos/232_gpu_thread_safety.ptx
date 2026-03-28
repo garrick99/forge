@@ -1,0 +1,29 @@
+// FORGE-generated PTX — SM_89
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.5
+.target sm_89
+.address_size 64
+
+.visible .entry gpu_fill_kernel(
+    .param .u64 gpu_fill_kernel_param_s_data,
+    .param .u64 gpu_fill_kernel_param_s_len,
+    .param .u64 gpu_fill_kernel_param_n,
+    .param .u64 gpu_fill_kernel_param_tid
+)
+{
+    .reg .u64 %rd0, %rd1, %rd2, %rd3, %rd4, %rd5;
+    .reg .u32 %r6;
+
+  ld.param.u64 %rd0, [gpu_fill_kernel_param_s_data];
+  ld.param.u64 %rd1, [gpu_fill_kernel_param_s_len];
+  ld.param.u64 %rd2, [gpu_fill_kernel_param_n];
+  ld.param.u64 %rd3, [gpu_fill_kernel_param_tid];
+
+  mul.lo.u64 %rd4, %rd3, 8;
+  add.u64 %rd5, %rd0, %rd4;
+  st.global.u64 [%rd5], %rd3;
+  mov.u32 %r6, 0; // unit
+  ret;
+}
+

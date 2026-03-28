@@ -1,0 +1,26 @@
+// Demo 286: Verified clamp array — clamp each element to [lo, hi]
+//
+// clamp_array(s, n, lo, hi) sets s[i] = max(lo, min(s[i], hi)).
+// Requires lo <= hi.
+// Postcondition: forall k < n, s[k] >= lo AND s[k] <= hi.
+//
+fn clamp_array(s: span<u64>, n: u64, lo: u64, hi: u64)
+    requires s.len == n
+    requires lo <= hi
+    ensures forall k: u64, k < n ==> s[k] >= lo
+    ensures forall k: u64, k < n ==> s[k] <= hi
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> s[k] >= lo
+        invariant forall k: u64, k < i ==> s[k] <= hi
+    {
+        if s[i] < lo {
+            s[i] = lo;
+        } else if s[i] > hi {
+            s[i] = hi;
+        }
+    }
+}
+
+fn main() -> u64 { 0u64 }

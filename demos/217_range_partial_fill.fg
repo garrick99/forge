@@ -1,0 +1,20 @@
+// Demo 217: Partial fill using lo..hi range
+//
+// zero_range sets s[i] = 0 for i in [lo, hi).
+// Demonstrates that lo..hi range injects lo <= i < hi,
+// and the quantified postcondition covers the exact range written.
+//
+fn zero_range(s: span<u64>, lo: u64, hi: u64)
+    requires hi <= s.len
+    requires lo <= hi
+    ensures forall k: u64, lo <= k && k < hi ==> s[k] == 0u64
+{
+    for i in lo..hi
+        invariant i <= hi
+        invariant forall k: u64, lo <= k && k < i ==> s[k] == 0u64
+    {
+        s[i] = 0u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,29 @@
+// Demo 254: Verified find_first — returns index of first element >= threshold
+//
+// find_first_ge(s, n, threshold) scans s and returns the index of the first
+// element >= threshold, or n if none exists.
+// Uses bool flag + early-ish termination modeled as "stop updating idx after found".
+//
+fn find_first_ge(s: span<u64>, n: u64, threshold: u64) -> u64
+    requires s.len == n
+    ensures result <= n
+{
+    let mut idx: u64 = n;
+    let mut found: bool = false;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant idx <= n
+        invariant found == false ==> idx == n
+        decreases n - i
+    {
+        if found == false && s[i] >= threshold {
+            idx = i;
+            found = true;
+        };
+        i = i + 1u64;
+    };
+    idx
+}
+
+fn main() -> u64 { 0u64 }

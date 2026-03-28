@@ -1,0 +1,30 @@
+// Demo 268: Verified mismatch — first index where a[i] != b[i]
+//
+// mismatch(a, b, n) returns the first index i where a[i] != b[i],
+// or n if the arrays are equal. Uses bool flag to stop recording.
+// Postcondition: result <= n.
+//
+fn mismatch(a: span<u64>, b: span<u64>, n: u64) -> u64
+    requires a.len == n
+    requires b.len == n
+    ensures result <= n
+{
+    let mut idx: u64 = n;
+    let mut found: bool = false;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant idx <= n
+        invariant found == false ==> idx == n
+        decreases n - i
+    {
+        if found == false && a[i] != b[i] {
+            idx = i;
+            found = true;
+        };
+        i = i + 1u64;
+    };
+    idx
+}
+
+fn main() -> u64 { 0u64 }

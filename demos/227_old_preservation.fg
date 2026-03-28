@@ -1,0 +1,16 @@
+// Demo 227: old() in postconditions — verified preservation
+//
+// fill_last(s, n, val) writes val into s[n-1], leaving the rest unchanged.
+// old(s[k]) refers to s[k] before the call.
+// Postcondition: every element except the last is unchanged.
+//
+fn fill_last(s: span<u64>, n: u64, val: u64)
+    requires s.len == n
+    requires n > 0u64
+    ensures s[n - 1u64] == val
+    ensures forall k: u64, k < n - 1u64 ==> s[k] == old(s[k])
+{
+    s[n - 1u64] = val;
+}
+
+fn main() -> u64 { 0u64 }

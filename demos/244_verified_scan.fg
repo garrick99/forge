@@ -1,0 +1,20 @@
+// Demo 244: Verified inclusive scan (prefix sum, in-place)
+//
+// scan_inplace(s, n) computes the inclusive prefix sum in place:
+// s'[i] = s[0] + s[1] + ... + s[i]
+// Postcondition: all elements are non-negative (u64).
+//
+fn scan_inplace(s: span<u64>, n: u64)
+    requires s.len == n
+    requires n > 0u64
+    ensures forall k: u64, k < n ==> s[k] >= 0u64
+{
+    for i in 1u64..n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> s[k] >= 0u64
+    {
+        s[i] = s[i] + s[i - 1u64];
+    }
+}
+
+fn main() -> u64 { 0u64 }

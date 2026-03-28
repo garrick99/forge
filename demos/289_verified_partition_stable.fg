@@ -1,0 +1,44 @@
+// Demo 289: Verified partition count — count elements satisfying predicate
+//
+// count_lt(s, n, pivot) returns count of elements strictly less than pivot.
+// Postcondition: result <= n.
+//
+fn count_lt(s: span<u64>, n: u64, pivot: u64) -> u64
+    requires s.len == n
+    ensures result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if s[i] < pivot {
+            cnt = cnt + 1u64;
+        };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn count_ge(s: span<u64>, n: u64, pivot: u64) -> u64
+    requires s.len == n
+    ensures result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if s[i] >= pivot {
+            cnt = cnt + 1u64;
+        };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,26 @@
+// Demo 276: Verified prefix sum — out[i] >= in[i] for all i
+//
+// prefix_sum(src, dst, n) sets dst[i] = src[0] + ... + src[i].
+// Postcondition: dst[k] >= src[k] for all k < n (each prefix includes src[k]).
+//
+fn prefix_sum(src: span<u64>, dst: span<u64>, n: u64)
+    requires src.len == n
+    requires dst.len == n
+    requires n > 0u64
+    ensures forall k: u64, k < n ==> dst[k] >= src[k]
+{
+    dst[0u64] = src[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i >= 1u64
+        invariant i <= n
+        invariant dst[0u64] >= src[0u64]
+        invariant forall k: u64, k >= 1u64 && k < i ==> dst[k] >= src[k]
+        decreases n - i
+    {
+        dst[i] = dst[i - 1u64] + src[i];
+        i = i + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

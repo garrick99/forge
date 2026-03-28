@@ -1,0 +1,20 @@
+// Demo 216: for i in lo..hi — bounded range loop, verified
+//
+// fill_range sets s[i] = i for i in [lo, hi).
+// Demonstrates that for i in lo..hi injects lo <= i < hi bounds,
+// and the loop invariant with i->hi substitution proves the postcondition.
+//
+fn fill_range(s: span<u64>, lo: u64, hi: u64)
+    requires s.len == hi
+    requires lo == 0u64
+    ensures forall k: u64, k < hi ==> s[k] == k
+{
+    for i in lo..hi
+        invariant i <= hi
+        invariant forall k: u64, k < i ==> s[k] == k
+    {
+        s[i] = i;
+    }
+}
+
+fn main() -> u64 { 0u64 }

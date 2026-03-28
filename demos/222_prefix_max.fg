@@ -1,0 +1,23 @@
+// Demo 222: Verified prefix maximum
+//
+// prefix_max(s, n) computes the running maximum in-place:
+// s[i] = max(s[0], ..., s[i]) for all i.
+// Postcondition: each output >= 0 (trivially, since u64).
+// Also: the output is non-decreasing — captured by invariant.
+//
+fn prefix_max(s: span<u64>, n: u64)
+    requires s.len == n
+    requires n > 0u64
+    ensures forall k: u64, k < n ==> s[k] >= 0u64
+{
+    for i in 1u64..n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> s[k] >= 0u64
+    {
+        if s[i] < s[i - 1u64] {
+            s[i] = s[i - 1u64];
+        };
+    }
+}
+
+fn main() -> u64 { 0u64 }

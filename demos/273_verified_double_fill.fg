@@ -1,0 +1,35 @@
+// Demo 273: Verified double fill — fill two non-overlapping ranges
+//
+// fill_range fills s[lo..hi) with val.
+// double_fill calls it twice for [0,mid) and [mid,n).
+// Callee postcondition injection proves both regions filled.
+//
+fn fill_range(s: span<u64>, n: u64, lo: u64, hi: u64, val: u64)
+    requires s.len == n
+    requires lo <= hi
+    requires hi <= n
+    ensures forall k: u64, k >= lo && k < hi ==> s[k] == val
+{
+    let mut i: u64 = lo;
+    while i < hi
+        invariant i >= lo
+        invariant i <= hi
+        invariant forall k: u64, k >= lo && k < i ==> s[k] == val
+        decreases hi - i
+    {
+        s[i] = val;
+        i = i + 1u64;
+    }
+}
+
+fn double_fill(s: span<u64>, n: u64, mid: u64, v1: u64, v2: u64)
+    requires s.len == n
+    requires mid <= n
+    ensures forall k: u64, k < mid ==> s[k] == v1
+    ensures forall k: u64, k >= mid && k < n ==> s[k] == v2
+{
+    fill_range(s, n, 0u64, mid, v1);
+    fill_range(s, n, mid, n, v2);
+}
+
+fn main() -> u64 { 0u64 }

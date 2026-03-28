@@ -1,0 +1,25 @@
+// Demo 284: Verified all-nonzero check
+//
+// all_nonzero(s, n) returns true iff all s[i] > 0.
+// Postcondition: result == true ==> forall k < n, s[k] > 0.
+//
+fn all_nonzero(s: span<u64>, n: u64) -> bool
+    requires s.len == n
+    ensures result == true ==> forall k: u64, k < n ==> s[k] > 0u64
+{
+    let mut ok: bool = true;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant ok == true ==> forall k: u64, k < i ==> s[k] > 0u64
+        decreases n - i
+    {
+        if s[i] == 0u64 {
+            ok = false;
+        };
+        i = i + 1u64;
+    };
+    ok
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,30 @@
+// Demo 297: Verified min index in subrange — find index of minimum in s[lo..hi)
+//
+// min_index_range(s, n, lo, hi) returns idx in [lo,hi) such that s[idx] <= s[k] for k in [lo,hi).
+// Postcondition: result >= lo AND result < hi.
+//
+fn min_index_range(s: span<u64>, n: u64, lo: u64, hi: u64) -> u64
+    requires s.len == n
+    requires lo < hi
+    requires hi <= n
+    ensures result >= lo
+    ensures result < hi
+{
+    let mut idx: u64 = lo;
+    let mut i: u64 = lo + 1u64;
+    while i < hi
+        invariant i >= lo + 1u64
+        invariant i <= hi
+        invariant idx >= lo
+        invariant idx < hi
+        decreases hi - i
+    {
+        if s[i] < s[idx] {
+            idx = i;
+        };
+        i = i + 1u64;
+    };
+    idx
+}
+
+fn main() -> u64 { 0u64 }

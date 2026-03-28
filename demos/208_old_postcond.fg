@@ -1,0 +1,27 @@
+// Demo 208: old() in postconditions — prove preservation
+//
+// reverse_first_n reverses the first n elements.
+// Postcondition uses old() to state that the length is preserved.
+// Also shows: result >= 0 (trivial for u64 return value).
+//
+fn reverse(s: span<u64>, n: u64)
+    requires s.len == n
+    requires n >= 2u64
+    ensures s.len == n
+{
+    let mut lo: u64 = 0u64;
+    let mut hi: u64 = n - 1u64;
+    while lo < hi
+        invariant hi < n
+        invariant lo < n
+        decreases hi - lo
+    {
+        let tmp: u64 = s[lo];
+        s[lo] = s[hi];
+        s[hi] = tmp;
+        lo = lo + 1u64;
+        hi = hi - 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

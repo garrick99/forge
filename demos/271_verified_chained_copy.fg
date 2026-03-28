@@ -1,0 +1,31 @@
+// Demo 271: Verified chained copy — copy a to b, then b to c
+//
+// copy(dst, src, n): proven dst[k] == src[k] for all k < n.
+// chained_copy(a, b, c, n): calls copy twice; postcondition c[k] == old(a[k]).
+// Demonstrates callee postcondition injection.
+//
+fn copy(dst: span<u64>, src: span<u64>, n: u64)
+    requires dst.len == n
+    requires src.len == n
+    ensures forall k: u64, k < n ==> dst[k] == src[k]
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> dst[k] == src[k]
+    {
+        dst[i] = src[i];
+    }
+}
+
+fn chained_copy(a: span<u64>, b: span<u64>, c: span<u64>, n: u64)
+    requires a.len == n
+    requires b.len == n
+    requires c.len == n
+    ensures forall k: u64, k < n ==> b[k] == a[k]
+    ensures forall k: u64, k < n ==> c[k] == b[k]
+{
+    copy(b, a, n);
+    copy(c, b, n);
+}
+
+fn main() -> u64 { 0u64 }

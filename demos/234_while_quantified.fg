@@ -1,0 +1,21 @@
+// Demo 234: While loop with quantified postcondition
+//
+// fill_while(s, n, val) fills s[0..n) using a while loop.
+// Demonstrates that while loops with invariants can prove quantified postconditions
+// the same way as for loops.
+//
+fn fill_while(s: span<u64>, n: u64, val: u64)
+    requires s.len == n
+    ensures forall k: u64, k < n ==> s[k] == val
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> s[k] == val
+    {
+        s[i] = val;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }
