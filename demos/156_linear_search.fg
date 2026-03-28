@@ -1,0 +1,41 @@
+// Demo 156: Verified linear search
+//
+// Returns the index of the first occurrence of `target` in `s`, or s.len
+// if not found.  Full-scan variant: iterates all elements but only records
+// the first match (found_idx == n guards against overwriting).
+//
+// Invariants:
+//   k <= n
+//   found_idx <= n
+//   found_idx < n ==> s[found_idx] == target     (recorded index holds target)
+//   found_idx == n ==> forall i < k, s[i] != target   (nothing found yet)
+//
+// Postconditions:
+//   result <= s.len
+//   result < s.len ==> s[result] == target
+//   result == s.len ==> forall i: u64, i < s.len ==> s[i] != target
+//
+fn linear_search(s: span<u64>, target: u64) -> u64
+    ensures result <= s.len
+    ensures result < s.len ==> s[result] == target
+    ensures result == s.len ==> (forall i: u64, i < s.len ==> s[i] != target)
+{
+    let n: u64 = s.len;
+    let mut k: u64 = 0u64;
+    let mut found_idx: u64 = n;
+    while k < n
+        invariant k <= n
+        invariant found_idx <= n
+        invariant found_idx < n ==> s[found_idx] == target
+        invariant found_idx == n ==> (forall i: u64, i < k ==> s[i] != target)
+        decreases n - k
+    {
+        if s[k] == target && found_idx == n {
+            found_idx = k;
+        };
+        k = k + 1u64;
+    };
+    found_idx
+}
+
+fn main() -> u64 { 0u64 }

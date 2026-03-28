@@ -1,0 +1,48 @@
+// Demo 151: Mutable ghost variable — verified running maximum
+//
+// Finds the maximum element in a non-empty span.
+// Uses a mutable ghost variable to track the "true" maximum of elements
+// seen so far, providing a clean invariant for the proof.
+//
+// Pattern:
+//   ghost let mut gmax = s[0u64];
+//   while k < n {
+//     if s[k] > cur_max {
+//       cur_max = s[k];
+//       ghost gmax = s[k];     // ghost update mirrors runtime
+//     } else {
+//       ghost gmax = gmax;     // identity update keeps SSA chain live
+//     }
+//   }
+//   invariant cur_max == gmax
+//   invariant forall i < k, s[i] <= gmax
+//
+// Postcondition:
+//   forall i < s.len, s[i] <= result
+//
+fn find_max(s: span<u64>) -> u64
+    requires s.len > 0u64
+    ensures forall i: u64, i < s.len ==> s[i] <= result
+{
+    let n: u64 = s.len;
+    let mut cur_max: u64 = s[0u64];
+    ghost let mut gmax: u64 = s[0u64];
+    let mut k: u64 = 1u64;
+    while k < n
+        invariant k <= n
+        invariant cur_max == gmax
+        invariant forall i: u64, i < k ==> s[i] <= gmax
+        decreases n - k
+    {
+        if s[k] > cur_max {
+            cur_max = s[k];
+            ghost gmax = s[k];
+        } else {
+            ghost gmax = gmax;
+        };
+        k = k + 1u64;
+    };
+    cur_max
+}
+
+fn main() -> u64 { 0u64 }

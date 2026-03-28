@@ -1,0 +1,38 @@
+// Demo 174: Verified function composition
+//
+// `clamp_val` clamps a single u64 to [lo, hi].
+// `normalize` uses clamp_val on each element to clamp the array.
+//
+// Exercises: calling a verified helper inside a loop,
+// postcondition of callee flows into loop invariant of caller.
+//
+fn clamp_val(x: u64, lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures result >= lo
+    ensures result <= hi
+{
+    if x < lo { lo } else if x > hi { hi } else { x }
+}
+
+fn normalize(s: span<u64>, lo: u64, hi: u64)
+    requires lo <= hi
+    requires s.len > 0u64
+    ensures forall i: u64, i < s.len ==> s[i] >= lo
+    ensures forall i: u64, i < s.len ==> s[i] <= hi
+{
+    let n: u64 = s.len;
+    let mut k: u64 = 0u64;
+    while k < n
+        invariant k <= n
+        invariant forall i: u64, i < k ==> s[i] >= lo
+        invariant forall i: u64, i < k ==> s[i] <= hi
+        decreases n - k
+    {
+        // Direct array write with callee postcondition injection:
+        //   s[k] = clamp_val(...) triggers callee ensures → s[k] >= lo && s[k] <= hi
+        s[k] = clamp_val(s[k], lo, hi);
+        k = k + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

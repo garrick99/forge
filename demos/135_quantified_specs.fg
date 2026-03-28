@@ -1,0 +1,132 @@
+// Demo 135: Quantified postconditions over collections
+//
+// Uses forall/exists in preconditions, postconditions, and loop invariants.
+// Key pattern: conditional assignments (ok = if cond { v } else { ok })
+// put PIte facts in the proof context so Z3 can reason about both branches.
+//
+// Syntax: forall x: T, P ==> Q   (==> is implication in pred position)
+//         exists x: T, P && Q
+
+// ── All-below: result == 1 iff every element is < bound ─────────────────────
+fn all_below(s: span<u64>, bound: u64) -> u64
+    requires s.len <= 1000u64
+    ensures result == 0u64 || result == 1u64
+    ensures result == 1u64 ==> forall i: u64, i < s.len ==> s[i] < bound
+{
+    let mut ok: u64 = 1u64;
+    let mut idx: u64 = 0u64;
+    while idx < s.len
+        invariant ok == 0u64 || ok == 1u64
+        invariant idx <= s.len
+        invariant ok == 1u64 ==> forall j: u64, j < idx ==> s[j] < bound
+    {
+        ok = if s[idx] >= bound { 0u64 } else { ok };
+        idx = idx + 1u64;
+    };
+    ok
+}
+
+// ── All-above: result == 1 iff every element is > lo ────────────────────────
+fn all_above(s: span<u64>, lo: u64) -> u64
+    requires s.len <= 1000u64
+    ensures result == 0u64 || result == 1u64
+    ensures result == 1u64 ==> forall i: u64, i < s.len ==> s[i] > lo
+{
+    let mut ok: u64 = 1u64;
+    let mut idx: u64 = 0u64;
+    while idx < s.len
+        invariant ok == 0u64 || ok == 1u64
+        invariant idx <= s.len
+        invariant ok == 1u64 ==> forall j: u64, j < idx ==> s[j] > lo
+    {
+        ok = if s[idx] <= lo { 0u64 } else { ok };
+        idx = idx + 1u64;
+    };
+    ok
+}
+
+// ── Count: result == number of elements equal to target ─────────────────────
+fn count_eq(s: span<u64>, target: u64) -> u64
+    requires s.len <= 1000u64
+    ensures result <= s.len
+{
+    let mut cnt: u64 = 0u64;
+    let mut idx: u64 = 0u64;
+    while idx < s.len
+        invariant cnt <= idx
+        invariant idx <= s.len
+    {
+        cnt = if s[idx] == target { cnt + 1u64 } else { cnt };
+        idx = idx + 1u64;
+    };
+    cnt
+}
+
+// ── Find-first: returns first index where s[i] == target, or s.len ──────────
+fn find_first(s: span<u64>, target: u64) -> u64
+    requires s.len <= 1000u64
+    ensures result <= s.len
+    ensures result < s.len ==> s[result] == target
+    ensures result == s.len ==> forall i: u64, i < s.len ==> s[i] != target
+{
+    let mut found_idx: u64 = s.len;
+    let mut found: u64 = 0u64;
+    let mut idx: u64 = 0u64;
+    while idx < s.len
+        invariant idx <= s.len
+        invariant found_idx <= s.len
+        invariant found == 0u64 || found == 1u64
+        invariant found == 1u64 ==> found_idx < s.len
+        invariant found == 1u64 ==> s[found_idx] == target
+        invariant found == 0u64 ==> forall j: u64, j < idx ==> s[j] != target
+        invariant found == 0u64 ==> found_idx == s.len
+    {
+        let matched: u64 = if s[idx] == target && found == 0u64 { 1u64 } else { 0u64 };
+        found_idx = if matched == 1u64 { idx } else { found_idx };
+        found = if matched == 1u64 { 1u64 } else { found };
+        idx = idx + 1u64;
+    };
+    found_idx
+}
+
+// ── Max: returns the maximum element (requires non-empty span) ───────────────
+fn span_max(s: span<u64>) -> u64
+    requires s.len > 0u64
+    requires s.len <= 1000u64
+    ensures forall i: u64, i < s.len ==> result >= s[i]
+{
+    let mut m: u64 = s[0u64];
+    let mut idx: u64 = 1u64;
+    while idx < s.len
+        invariant idx <= s.len
+        invariant forall j: u64, j < idx ==> m >= s[j]
+    {
+        m = if s[idx] > m { s[idx] } else { m };
+        idx = idx + 1u64;
+    };
+    m
+}
+
+// ── Using a forall precondition to prove a postcondition ─────────────────────
+fn sum_positive(s: span<u64>) -> u64
+    requires s.len <= 100u64
+    requires forall i: u64, i < s.len ==> s[i] > 0u64
+    ensures result >= s.len
+{
+    let mut acc: u64 = 0u64;
+    let mut idx: u64 = 0u64;
+    while idx < s.len
+        invariant idx <= s.len
+        invariant acc >= idx
+    {
+        acc = acc + s[idx];
+        idx = idx + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 {
+    // Span functions are proved correct above; their postconditions hold
+    // for any valid span at runtime. Main returns a sentinel.
+    42u64
+}

@@ -1,0 +1,45 @@
+// Demo 169: Verified two-sum existence check
+//
+// Returns true iff there exist distinct indices i != j such that s[i] + s[j] == target.
+// Full scan variant: O(n^2), no early exit — stays within provable invariants.
+//
+// Invariants (outer loop):
+//   0 <= i <= n
+//   found ==> (exists some already-checked (i',j') with s[i']+s[j'] == target)
+//
+// Postcondition: result == true only if such a pair exists.
+//   (completeness — no false negatives — is not proved here)
+//
+fn two_sum_exists(s: span<u64>, target: u64) -> bool
+    ensures result == true ==>
+        (exists i: u64, exists j: u64, i < s.len && j < s.len && i != j && s[i] + s[j] == target)
+{
+    let n: u64 = s.len;
+    let mut i: u64 = 0u64;
+    let mut found: bool = false;
+    while i < n
+        invariant i <= n
+        invariant found == true ==>
+            (exists p: u64, exists q: u64,
+             p < n && q < n && p != q && s[p] + s[q] == target)
+        decreases n - i
+    {
+        let mut j: u64 = i + 1u64;
+        while j < n
+            invariant j <= n
+            invariant found == true ==>
+                (exists p: u64, exists q: u64,
+                 p < n && q < n && p != q && s[p] + s[q] == target)
+            decreases n - j
+        {
+            if s[i] + s[j] == target {
+                found = true;
+            };
+            j = j + 1u64;
+        };
+        i = i + 1u64;
+    };
+    found
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,154 @@
+// Demo 129: Verified decimal digit operations
+//
+// Extract decimal digits, compute digit sums, reverse 2-digit numbers,
+// classify ASCII digit characters, and check palindromes.
+// All digit functions guarantee result < 10.
+
+// Extract ones digit.
+fn digit0(n: u64) -> u64
+    ensures result < 10u64
+    ensures result == n % 10u64
+{
+    n % 10u64
+}
+
+// Extract tens digit.
+fn digit1(n: u64) -> u64
+    ensures result < 10u64
+    ensures result == (n / 10u64) % 10u64
+{
+    (n / 10u64) % 10u64
+}
+
+// Extract hundreds digit.
+fn digit2(n: u64) -> u64
+    ensures result < 10u64
+{
+    (n / 100u64) % 10u64
+}
+
+// Extract thousands digit.
+fn digit3(n: u64) -> u64
+    ensures result < 10u64
+{
+    (n / 1000u64) % 10u64
+}
+
+// Sum of four decimal digits of n (n < 10000).
+fn digit_sum4(n: u64) -> u64
+    requires n < 10000u64
+    ensures result < 40u64
+{
+    let d0: u64 = digit0(n);
+    let d1: u64 = digit1(n);
+    let d2: u64 = digit2(n);
+    let d3: u64 = digit3(n);
+    d0 + d1 + d2 + d3
+}
+
+// Is ASCII character c a decimal digit ('0'..'9')?
+fn is_ascii_digit(c: u64) -> u64
+    requires c < 128u64
+    ensures result == 0u64 || result == 1u64
+{
+    if c >= 48u64 && c <= 57u64 { 1u64 } else { 0u64 }
+}
+
+// Convert ASCII digit character to its numeric value.
+fn ascii_digit_val(c: u64) -> u64
+    requires c >= 48u64
+    requires c <= 57u64
+    ensures result < 10u64
+    ensures result == c - 48u64
+{
+    c - 48u64
+}
+
+// Reverse a 2-digit number: tens↔ones.
+fn reverse2(n: u64) -> u64
+    requires n < 100u64
+    ensures result < 100u64
+    ensures result == (n % 10u64) * 10u64 + (n / 10u64)
+{
+    let tens: u64 = n / 10u64;
+    let ones: u64 = n % 10u64;
+    ones * 10u64 + tens
+}
+
+// Is a 2-digit number a decimal palindrome? (11, 22, ..., 99)
+fn is_palindrome2(n: u64) -> u64
+    requires n < 100u64
+    ensures result == 0u64 || result == 1u64
+{
+    let tens: u64 = n / 10u64;
+    let ones: u64 = n % 10u64;
+    if tens == ones { 1u64 } else { 0u64 }
+}
+
+// Verify: reverse of a palindrome equals itself.
+fn palindrome_self_rev(n: u64) -> u64
+    requires n < 100u64
+    requires n / 10u64 == n % 10u64    // n is a palindrome
+    ensures result == n
+{
+    let v: u64 = reverse2(n);
+    v
+}
+
+// Verify: reversing twice gives back the original (for 2-digit n >= 10).
+fn double_reverse2(n: u64) -> u64
+    requires n >= 10u64
+    requires n < 100u64
+    ensures result == n
+{
+    let r1: u64 = reverse2(n);
+    let v: u64 = reverse2(r1);
+    v
+}
+
+// Digit product for 2-digit number (tens * ones).
+fn digit_product2(n: u64) -> u64
+    requires n < 100u64
+    ensures result < 82u64     // max: 9*9 = 81
+{
+    let tens: u64 = n / 10u64;
+    let ones: u64 = n % 10u64;
+    tens * ones
+}
+
+fn main() -> u64 {
+    // digit extraction
+    let d0: u64 = digit0(1234u64);  // 4
+    let d1: u64 = digit1(1234u64);  // 3
+    let d2: u64 = digit2(1234u64);  // 2
+    let d3: u64 = digit3(1234u64);  // 1
+
+    // digit sum
+    let ds: u64 = digit_sum4(1234u64);  // 10
+
+    // ASCII digit
+    let ad1: u64 = is_ascii_digit(48u64);  // '0' → 1
+    let ad2: u64 = is_ascii_digit(57u64);  // '9' → 1
+    let ad3: u64 = is_ascii_digit(65u64);  // 'A' → 0
+
+    // ascii digit value
+    let av: u64 = ascii_digit_val(53u64);  // '5' → 5
+
+    // reverse
+    let rv1: u64 = reverse2(42u64);  // 24
+    let rv2: u64 = reverse2(10u64);  // 1
+
+    // palindrome
+    let p1: u64 = is_palindrome2(33u64);  // 1
+    let p2: u64 = is_palindrome2(34u64);  // 0
+
+    // double_reverse
+    let dr: u64 = double_reverse2(73u64);   // 73
+
+    // digit_product
+    let dp: u64 = digit_product2(39u64);   // 27
+
+    d0 + d1 + d2 + d3 + ds + ad1 + ad2 + ad3 + av + rv1 + rv2 + p1 + p2 + dr + dp
+    // 4+3+2+1+10+1+1+0+5+24+1+1+0+73+27 = 153
+    // = 153
+}

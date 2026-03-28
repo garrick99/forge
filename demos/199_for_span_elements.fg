@@ -1,0 +1,19 @@
+// Demo 199: For-loop over span elements with invariant
+//
+// Iterate over elements directly (for x in s).
+// Compute sum of elements; invariant: running sum >= 0.
+// Postcondition: result >= 0.
+//
+fn sum_elements(s: span<u64>) -> u64
+    ensures result >= 0u64
+{
+    let mut total: u64 = 0u64;
+    for x in s
+        invariant total >= 0u64
+    {
+        total = total + x;
+    };
+    total
+}
+
+fn main() -> u64 { 0u64 }

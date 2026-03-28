@@ -1,0 +1,156 @@
+// Demo 127: Verified modular arithmetic
+//
+// mod_add, mod_sub, mod_mul: results stay in [0, m).
+// mod_neg: additive inverse. mod_add_neg verifies a + (-a) = 0.
+// gcd8: 8-step Euclidean unroll for a,b < 256 (no hard postcondition).
+// coprime: gcd == 1 check.
+
+fn mod_add(a: u64, b: u64, m: u64) -> u64
+    requires m > 1u64
+    requires a < m
+    requires b < m
+    ensures result < m
+    ensures result == (a + b) % m
+{
+    (a + b) % m
+}
+
+fn mod_sub(a: u64, b: u64, m: u64) -> u64
+    requires m > 1u64
+    requires a < m
+    requires b < m
+    ensures result < m
+    ensures a < b || result == a - b
+    ensures a >= b || result == m + a - b
+{
+    if a >= b { a - b } else { m + a - b }
+}
+
+// Multiply; m < 65536 prevents overflow in a*b.
+fn mod_mul(a: u64, b: u64, m: u64) -> u64
+    requires m > 1u64
+    requires m < 65536u64
+    requires a < m
+    requires b < m
+    ensures result < m
+{
+    (a * b) % m
+}
+
+// Additive inverse: -a mod m.
+fn mod_neg(a: u64, m: u64) -> u64
+    requires m > 1u64
+    requires a < m
+    ensures result < m
+    ensures a == 0u64 || result == m - a
+    ensures a != 0u64 || result == 0u64
+{
+    if a == 0u64 { 0u64 } else { m - a }
+}
+
+// Verify: a + (-a) ≡ 0 (mod m).
+fn mod_add_neg(a: u64, m: u64) -> u64
+    requires m > 1u64
+    requires a < m
+    ensures result == 0u64
+{
+    let na: u64 = mod_neg(a, m);
+    let v: u64 = mod_add(a, na, m);
+    v
+}
+
+// Verify: mod_sub(a, b) + b == a when a >= b (no wraparound needed).
+fn mod_sub_inv(a: u64, b: u64, m: u64) -> u64
+    requires m > 1u64
+    requires a < m
+    requires b <= a
+    ensures result == a
+{
+    let s: u64 = mod_sub(a, b, m);
+    s + b
+}
+
+// Verify: mod_add is commutative.
+fn mod_add_comm(a: u64, b: u64, m: u64) -> u64
+    requires m > 1u64
+    requires a < m
+    requires b < m
+    ensures result == 1u64
+{
+    let ab: u64 = mod_add(a, b, m);
+    let ba: u64 = mod_add(b, a, m);
+    if ab == ba { 1u64 } else { 0u64 }
+}
+
+// GCD via 8-step Euclidean unroll.
+fn gcd8(a: u64, b: u64) -> u64
+    requires a > 0u64
+    requires b > 0u64
+    requires a < 256u64
+    requires b < 256u64
+{
+    let r0: u64 = a % b;
+    if r0 == 0u64 { b } else {
+    let r1: u64 = b % r0;
+    if r1 == 0u64 { r0 } else {
+    let r2: u64 = r0 % r1;
+    if r2 == 0u64 { r1 } else {
+    let r3: u64 = r1 % r2;
+    if r3 == 0u64 { r2 } else {
+    let r4: u64 = r2 % r3;
+    if r4 == 0u64 { r3 } else {
+    let r5: u64 = r3 % r4;
+    if r5 == 0u64 { r4 } else {
+    let r6: u64 = r4 % r5;
+    if r6 == 0u64 { r5 } else {
+    let r7: u64 = r5 % r6;
+    if r7 == 0u64 { r6 } else { r6 }
+    }}}}}}}
+}
+
+// Are a and b coprime? (gcd == 1)
+fn coprime(a: u64, b: u64) -> u64
+    requires a > 0u64
+    requires b > 0u64
+    requires a < 256u64
+    requires b < 256u64
+    ensures result == 0u64 || result == 1u64
+{
+    let g: u64 = gcd8(a, b);
+    if g == 1u64 { 1u64 } else { 0u64 }
+}
+
+fn main() -> u64 {
+    // mod_add
+    let ma1: u64 = mod_add(3u64, 4u64, 7u64);  // 0
+    let ma2: u64 = mod_add(5u64, 5u64, 7u64);  // 3
+
+    // mod_sub
+    let ms1: u64 = mod_sub(5u64, 3u64, 7u64);  // 2
+    let ms2: u64 = mod_sub(1u64, 3u64, 7u64);  // 5
+
+    // mod_mul
+    let mm1: u64 = mod_mul(3u64, 4u64, 7u64);  // 5
+    let mm2: u64 = mod_mul(6u64, 6u64, 7u64);  // 1
+
+    // mod_neg
+    let mn1: u64 = mod_neg(3u64, 7u64);   // 4
+    let mn0: u64 = mod_neg(0u64, 7u64);   // 0
+
+    // mod_add_neg identity
+    let ck1: u64 = mod_add_neg(3u64, 7u64);  // 0
+    let ck2: u64 = mod_add_neg(0u64, 7u64);  // 0
+
+    // gcd8
+    let g1: u64 = gcd8(12u64, 8u64);   // 4
+    let g2: u64 = gcd8(7u64, 13u64);   // 1
+    let g3: u64 = gcd8(48u64, 18u64);  // 6
+
+    // coprime
+    let cp1: u64 = coprime(7u64, 13u64);  // 1
+    let cp2: u64 = coprime(4u64, 6u64);   // 0
+
+    ma1 + ma2 + ms1 + ms2 + mm1 + mm2 + mn1 + mn0 + ck1 + ck2 + g1 + g2 + g3 + cp1 + cp2
+    // 0+3+2+5+5+1+4+0+0+0+4+1+6+1+0 = 32
+    // = 32
+}

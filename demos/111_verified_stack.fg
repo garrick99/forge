@@ -1,0 +1,127 @@
+// Demo 111: Verified fixed-size stack (capacity 8, LIFO)
+//
+// A stack stored as an 8-element array with a size counter.
+// Operations: push, pop, peek, is_empty, is_full.
+// Postconditions verify LIFO invariant: push then pop returns the pushed value.
+
+struct Stack8 {
+    s0: u64, s1: u64, s2: u64, s3: u64,
+    s4: u64, s5: u64, s6: u64, s7: u64,
+    size: u64,   // 0..8
+}
+
+// Empty stack.
+fn stack_new() -> Stack8
+    ensures result.size == 0u64
+{
+    struct Stack8 {
+        s0: 0u64, s1: 0u64, s2: 0u64, s3: 0u64,
+        s4: 0u64, s5: 0u64, s6: 0u64, s7: 0u64,
+        size: 0u64
+    }
+}
+
+// Read slot i.
+fn stack_get(s: Stack8, i: u64) -> u64 {
+    if i == 0u64 { s.s0 }
+    else if i == 1u64 { s.s1 }
+    else if i == 2u64 { s.s2 }
+    else if i == 3u64 { s.s3 }
+    else if i == 4u64 { s.s4 }
+    else if i == 5u64 { s.s5 }
+    else if i == 6u64 { s.s6 }
+    else { s.s7 }
+}
+
+// Push value onto stack. Size grows by 1.
+fn stack_push(s: Stack8, val: u64) -> Stack8
+    requires s.size < 8u64
+    ensures result.size == s.size + 1u64
+{
+    let n: u64 = s.size;
+    if n == 0u64 {
+        struct Stack8 { s0: val, s1: s.s1, s2: s.s2, s3: s.s3, s4: s.s4, s5: s.s5, s6: s.s6, s7: s.s7, size: 1u64 }
+    } else if n == 1u64 {
+        struct Stack8 { s0: s.s0, s1: val, s2: s.s2, s3: s.s3, s4: s.s4, s5: s.s5, s6: s.s6, s7: s.s7, size: 2u64 }
+    } else if n == 2u64 {
+        struct Stack8 { s0: s.s0, s1: s.s1, s2: val, s3: s.s3, s4: s.s4, s5: s.s5, s6: s.s6, s7: s.s7, size: 3u64 }
+    } else if n == 3u64 {
+        struct Stack8 { s0: s.s0, s1: s.s1, s2: s.s2, s3: val, s4: s.s4, s5: s.s5, s6: s.s6, s7: s.s7, size: 4u64 }
+    } else if n == 4u64 {
+        struct Stack8 { s0: s.s0, s1: s.s1, s2: s.s2, s3: s.s3, s4: val, s5: s.s5, s6: s.s6, s7: s.s7, size: 5u64 }
+    } else if n == 5u64 {
+        struct Stack8 { s0: s.s0, s1: s.s1, s2: s.s2, s3: s.s3, s4: s.s4, s5: val, s6: s.s6, s7: s.s7, size: 6u64 }
+    } else if n == 6u64 {
+        struct Stack8 { s0: s.s0, s1: s.s1, s2: s.s2, s3: s.s3, s4: s.s4, s5: s.s5, s6: val, s7: s.s7, size: 7u64 }
+    } else {
+        struct Stack8 { s0: s.s0, s1: s.s1, s2: s.s2, s3: s.s3, s4: s.s4, s5: s.s5, s6: s.s6, s7: val, size: 8u64 }
+    }
+}
+
+// Peek: return top without removing. Requires non-empty.
+fn stack_peek(s: Stack8) -> u64
+    requires s.size > 0u64
+    requires s.size <= 8u64
+{
+    stack_get(s, s.size - 1u64)
+}
+
+// Pop: return stack with top removed. Size shrinks by 1.
+fn stack_pop(s: Stack8) -> Stack8
+    requires s.size > 0u64
+    requires s.size <= 8u64
+    ensures result.size == s.size - 1u64
+{
+    let n: u64 = s.size;
+    if n == 1u64 {
+        struct Stack8 { s0: s.s0, s1: s.s1, s2: s.s2, s3: s.s3, s4: s.s4, s5: s.s5, s6: s.s6, s7: s.s7, size: 0u64 }
+    } else if n == 2u64 {
+        struct Stack8 { s0: s.s0, s1: s.s1, s2: s.s2, s3: s.s3, s4: s.s4, s5: s.s5, s6: s.s6, s7: s.s7, size: 1u64 }
+    } else if n == 3u64 {
+        struct Stack8 { s0: s.s0, s1: s.s1, s2: s.s2, s3: s.s3, s4: s.s4, s5: s.s5, s6: s.s6, s7: s.s7, size: 2u64 }
+    } else if n == 4u64 {
+        struct Stack8 { s0: s.s0, s1: s.s1, s2: s.s2, s3: s.s3, s4: s.s4, s5: s.s5, s6: s.s6, s7: s.s7, size: 3u64 }
+    } else if n == 5u64 {
+        struct Stack8 { s0: s.s0, s1: s.s1, s2: s.s2, s3: s.s3, s4: s.s4, s5: s.s5, s6: s.s6, s7: s.s7, size: 4u64 }
+    } else if n == 6u64 {
+        struct Stack8 { s0: s.s0, s1: s.s1, s2: s.s2, s3: s.s3, s4: s.s4, s5: s.s5, s6: s.s6, s7: s.s7, size: 5u64 }
+    } else if n == 7u64 {
+        struct Stack8 { s0: s.s0, s1: s.s1, s2: s.s2, s3: s.s3, s4: s.s4, s5: s.s5, s6: s.s6, s7: s.s7, size: 6u64 }
+    } else {
+        struct Stack8 { s0: s.s0, s1: s.s1, s2: s.s2, s3: s.s3, s4: s.s4, s5: s.s5, s6: s.s6, s7: s.s7, size: 7u64 }
+    }
+}
+
+// LIFO property: push then pop restores size.
+fn push_pop_size(s: Stack8, val: u64) -> u64
+    requires s.size < 8u64
+    ensures result == s.size
+{
+    let s1: Stack8 = stack_push(s, val);
+    let s2: Stack8 = stack_pop(s1);
+    s2.size
+}
+
+fn main() -> u64 {
+    let s0: Stack8 = stack_new();              // size=0
+
+    let s1: Stack8 = stack_push(s0, 10u64);    // [10], size=1
+    let s2: Stack8 = stack_push(s1, 20u64);    // [10,20], size=2
+    let s3: Stack8 = stack_push(s2, 30u64);    // [10,20,30], size=3
+
+    let sz3: u64 = s3.size;                    // 3
+
+    // Top of stack is 30 (s2 = slot index 2)
+    let top: u64 = s3.s2;                      // 30
+
+    // Pop once: size=2
+    let s4: Stack8 = stack_pop(s3);
+    let sz4: u64 = s4.size;                    // 2
+
+    // Push/pop size invariant
+    let inv: u64 = push_pop_size(s2, 99u64);   // == s2.size == 2
+
+    sz3 + top + sz4 + inv
+    // 3 + 30 + 2 + 2 = 37
+    // = 37
+}

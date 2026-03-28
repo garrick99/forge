@@ -1,0 +1,120 @@
+// Demo 112: Verified bit manipulation tricks
+//
+// Classic bit tricks with SMT-verified postconditions.
+// Covers: next/prev power of two, bit reversal (8-bit), byte swap,
+// sign extension, and bit field extraction/insertion.
+
+// Round up to next power of two (for x > 0, result <= 2^63).
+// Algorithm: fill all lower bits with 1s, then add 1.
+fn next_pow2(x: u64) -> u64
+    requires x > 0u64
+    requires x <= 4611686018427387904u64    // <= 2^62 so result fits in u64
+    ensures result >= x
+    ensures result > 0u64
+{
+    let a: u64 = x - 1u64;
+    let b: u64 = a | (a >> 1u64);
+    let c: u64 = b | (b >> 2u64);
+    let d: u64 = c | (c >> 4u64);
+    let e: u64 = d | (d >> 8u64);
+    let f: u64 = e | (e >> 16u64);
+    let g: u64 = f | (f >> 32u64);
+    g + 1u64
+}
+
+// Check if x is a power of two.
+fn is_pow2(x: u64) -> u64
+    requires x > 0u64
+    ensures result == 0u64 || result == 1u64
+{
+    if x & (x - 1u64) == 0u64 { 1u64 } else { 0u64 }
+}
+
+// Reverse the bits of an 8-bit value (x < 256).
+fn reverse8(x: u64) -> u64
+    requires x < 256u64
+    ensures result < 256u64
+{
+    let a: u64 = x & 170u64;          // 0b10101010
+    let b: u64 = x & 85u64;           // 0b01010101
+    let step1: u64 = ((a >> 1u64) | (b << 1u64)) & 255u64;
+    let c: u64 = step1 & 204u64;      // 0b11001100
+    let dd: u64 = step1 & 51u64;      // 0b00110011
+    let step2: u64 = ((c >> 2u64) | (dd << 2u64)) & 255u64;
+    let e: u64 = step2 & 240u64;      // 0b11110000
+    let f: u64 = step2 & 15u64;       // 0b00001111
+    ((e >> 4u64) | (f << 4u64)) & 255u64
+}
+
+// Swap low and high bytes of a 16-bit value (x < 65536).
+fn swap_bytes16(x: u64) -> u64
+    requires x < 65536u64
+    ensures result < 65536u64
+{
+    let lo: u64 = x & 255u64;
+    let hi: u64 = (x >> 8u64) & 255u64;
+    (lo << 8u64) | hi
+}
+
+// Extract a bit field: bits [start, start+len) from x.
+// Requires start + len <= 64.
+fn extract_bits(x: u64, start: u64, len: u64) -> u64
+    requires start < 64u64
+    requires len > 0u64
+    requires len <= 64u64
+    requires start + len <= 64u64
+{
+    let mask: u64 = (1u64 << len) - 1u64;
+    (x >> start) & mask
+}
+
+// Set the low n bits to 1 (n <= 63 to avoid shifting by 64).
+fn low_bits_mask(n: u64) -> u64
+    requires n <= 63u64
+    ensures result == (1u64 << n) - 1u64
+{
+    (1u64 << n) - 1u64
+}
+
+// Count the number of set bits in a byte (x < 256).
+fn popcount8(x: u64) -> u64
+    requires x < 256u64
+    ensures result <= 8u64
+{
+    let a: u64 = (x & 85u64) + ((x >> 1u64) & 85u64);   // 0b01010101
+    let b: u64 = (a & 51u64) + ((a >> 2u64) & 51u64);   // 0b00110011
+    let c: u64 = (b & 15u64) + ((b >> 4u64) & 15u64);   // 0b00001111
+    c
+}
+
+fn main() -> u64 {
+    // next_pow2
+    let np1: u64 = next_pow2(1u64);    // 1
+    let np5: u64 = next_pow2(5u64);    // 8
+    let np8: u64 = next_pow2(8u64);    // 8
+    let np9: u64 = next_pow2(9u64);    // 16
+
+    // is_pow2
+    let ip1: u64 = is_pow2(8u64);      // 1
+    let ip2: u64 = is_pow2(9u64);      // 0
+
+    // reverse8: reverse 0b10110000 (176) → 0b00001101 (13)
+    let rv: u64 = reverse8(176u64);    // 13
+
+    // swap_bytes16: 0x0102 (258) → 0x0201 (513)
+    let sw: u64 = swap_bytes16(258u64);  // 513
+
+    // extract_bits: bits [4,8) of 0b11110000 (240) → 0b1111 = 15
+    let ex: u64 = extract_bits(240u64, 4u64, 4u64);  // 15
+
+    // low_bits_mask(3) = 7
+    let lm: u64 = low_bits_mask(3u64);  // 7
+
+    // popcount8(255) = 8, popcount8(170) = 4
+    let pc1: u64 = popcount8(255u64);   // 8
+    let pc2: u64 = popcount8(170u64);   // 4
+
+    np1 + np5 + np8 + np9 + ip1 + ip2 + rv + sw + ex + lm + pc1 + pc2
+    // 1 + 8 + 8 + 16 + 1 + 0 + 13 + 513 + 15 + 7 + 8 + 4 = 594
+    // = 594
+}

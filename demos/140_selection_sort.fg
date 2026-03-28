@@ -1,0 +1,69 @@
+// Demo 140: Verified in-place selection sort
+//
+// Proves full sortedness: forall a < b < s.len, s[a] <= s[b]
+//
+// Key infrastructure used:
+//   1. ITE modeling for `if cond { x = v }` in check_stmt:
+//      min_idx = ite(s[idx] < m, idx, min_idx_old)
+//      m       = ite(s[idx] < m_old, s[idx], m_old)
+//      Enables inner loop while_preserved proof.
+//
+//   2. Loop exit env propagation: parser wraps while in EBlock,
+//      so check_stmt|SExpr|EBlock falls through to expr_final_env,
+//      which strips stale let-binding facts and injects NOT(cond)+inv.
+//      Without this, the inner loop's minimum-found facts were invisible
+//      to the outer loop's continuation, making while_preserved unprovable.
+//
+//   3. Stale-fact stripping in check_stmt|SWhile exit:
+//      collect_assigned_vars now scans EIf bodies, so min_idx/m/idx
+//      are correctly stripped when the inner loop exits.
+//
+// Two-invariant outer loop:
+//   inv1: forall a < b < k, s[a] <= s[b]         — prefix is sorted
+//   inv2: forall a < k, b >= k, b < n, s[a] <= s[b] — prefix ≤ suffix
+//
+// After finding min at min_idx in [k, n):
+//   s[k] = m = min(s[k..n))
+//   Z3 chains: outer inv (a < k, min_idx >= k) → s[a] <= s[min_idx] = m = s[k]
+//              inner inv forall j in [k,n): m <= s[j]  →  s[k] <= s[j]
+
+fn selection_sort(s: span<u64>)
+    ensures forall a: u64, forall b: u64, a < b && b < s.len ==> s[a] <= s[b]
+{
+    let n: u64 = s.len;
+    let mut k: u64 = 0u64;
+    while k < n
+        invariant k <= n
+        invariant forall a: u64, forall b: u64,
+                    a < b && b < k ==> s[a] <= s[b]
+        invariant forall a: u64, forall b: u64,
+                    a < k && b >= k && b < n ==> s[a] <= s[b]
+        decreases n - k
+    {
+        // Find minimum element in s[k..n)
+        let mut min_idx: u64 = k;
+        let mut m: u64 = s[k];
+        let mut idx: u64 = k + 1u64;
+        while idx < n
+            invariant idx <= n
+            invariant min_idx >= k
+            invariant min_idx < n
+            invariant m == s[min_idx]
+            invariant forall j: u64, j >= k && j < idx ==> m <= s[j]
+            decreases n - idx
+        {
+            if s[idx] < m {
+                min_idx = idx;
+                m = s[idx];
+            };
+            idx = idx + 1u64;
+        };
+        // Swap s[k] ↔ s[min_idx]
+        let old_k: u64 = s[k];
+        s[k] = s[min_idx];
+        s[min_idx] = old_k;
+        k = k + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

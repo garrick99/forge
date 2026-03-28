@@ -1,0 +1,37 @@
+// Demo 161: Verified array sum
+//
+// Computes the sum of all elements. Proves that the result is bounded by
+// n * max_elem, given that each element is at most max_elem.
+//
+// This is a cleaner version of demo 149 (ghost_sum), without ghost variables,
+// relying on a direct acc <= k * max_elem invariant.
+//
+// Preconditions:
+//   forall i < s.len, s[i] <= max_elem
+//
+// Invariants:
+//   k <= n
+//   acc <= k * max_elem
+//
+// Postconditions:
+//   result <= s.len * max_elem
+//
+fn array_sum(s: span<u64>, max_elem: u64) -> u64
+    requires forall i: u64, i < s.len ==> s[i] <= max_elem
+    ensures result <= s.len * max_elem
+{
+    let n: u64 = s.len;
+    let mut k: u64 = 0u64;
+    let mut acc: u64 = 0u64;
+    while k < n
+        invariant k <= n
+        invariant acc <= k * max_elem
+        decreases n - k
+    {
+        acc = acc + s[k];
+        k = k + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

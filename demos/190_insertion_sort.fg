@@ -1,0 +1,35 @@
+// Demo 190: Verified insertion sort with nested loop invariants
+//
+// Classic insertion sort. The outer for-loop invariant states
+// that after i iterations, elements 0..i are sorted relative
+// to each other (non-decreasing order).
+//
+// We track a simple proxy invariant: i stays in bounds.
+// Full sortedness invariant requires quantified predicates (future work).
+//
+fn insertion_sort(s: span<u64>, n: u64)
+    requires s.len == n
+    requires n >= 1u64
+{
+    for i in n
+        invariant i <= n
+    {
+        let key: u64 = s[i];
+        let mut j: u64 = i;
+        while j > 0u64
+            invariant j <= i
+            invariant j <= n
+            decreases j
+        {
+            if s[j - 1u64] > key {
+                s[j] = s[j - 1u64];
+                j = j - 1u64;
+            } else {
+                j = 0u64;
+            };
+        };
+        s[j] = key;
+    }
+}
+
+fn main() -> u64 { 0u64 }

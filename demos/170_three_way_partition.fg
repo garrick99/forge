@@ -1,0 +1,53 @@
+// Demo 170: Verified 3-way partition (Dutch National Flag)
+//
+// Partitions s into three regions around pivot:
+//   s[0..lo)    — all elements < pivot
+//   s[lo..hi)   — all elements == pivot
+//   s[hi..n)    — all elements > pivot
+//
+// Classic Dijkstra 3-way algorithm.
+//
+// Returns (lo, hi) as a tuple.
+//
+// We use ghost variables to track the three-region invariant, and
+// only prove the lightweight structural invariants here:
+//   lo <= mid  (lo doesn't overtake mid)
+//   mid <= n   (mid stays in range)
+//   lo <= hi   (lo <= hi at all times — hi is "end of pivot region")
+//
+// Full element-level proof would require ghost array snapshots.
+//
+fn three_way_partition(s: span<u64>, pivot: u64) -> (u64, u64)
+    requires s.len > 0u64
+    ensures result.0 <= result.1
+    ensures result.1 <= s.len
+{
+    let n: u64 = s.len;
+    let mut lo: u64 = 0u64;
+    let mut mid: u64 = 0u64;
+    let mut hi: u64 = n;
+    while mid < hi
+        invariant lo <= mid
+        invariant mid <= hi
+        invariant hi <= n
+        decreases hi - mid
+    {
+        if s[mid] < pivot {
+            let tmp: u64 = s[lo];
+            s[lo] = s[mid];
+            s[mid] = tmp;
+            lo = lo + 1u64;
+            mid = mid + 1u64;
+        } else if s[mid] > pivot {
+            hi = hi - 1u64;
+            let tmp: u64 = s[mid];
+            s[mid] = s[hi];
+            s[hi] = tmp;
+        } else {
+            mid = mid + 1u64;
+        }
+    };
+    (lo, hi)
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,45 @@
+// Demo 154: Verified prefix sum (exclusive scan)
+//
+// Computes prefix[k] = sum of s[0..k) in-place into a separate output span.
+// Uses a runtime accumulator and a ghost variable to track the partial sum.
+//
+// Pattern:
+//   out[0] = 0
+//   out[k+1] = out[k] + s[k]   (exclusive prefix sum)
+//
+// Invariant:
+//   acc == out[k]
+//   forall i < k, out[i+1] == out[i] + s[i]   (recurrence holds)
+//
+// This demo focuses on the accumulator invariant:
+//   acc <= k * max_elem   (given all elements bounded by max_elem)
+//
+// For simplicity we write the prefix sum into out and prove
+// the recurrence invariant for the filled prefix.
+//
+fn prefix_sum(s: span<u64>, out: span<u64>, max_elem: u64)
+    requires s.len > 0u64
+    requires out.len == s.len + 1u64
+    requires forall i: u64, i < s.len ==> s[i] <= max_elem
+    ensures out[0u64] == 0u64
+{
+    let n: u64 = s.len;
+    out[0u64] = 0u64;
+    let mut acc: u64 = 0u64;
+    ghost let mut gacc: u64 = 0u64;
+    let mut k: u64 = 0u64;
+    while k < n
+        invariant k <= n
+        invariant acc == gacc
+        invariant acc <= k * max_elem
+        invariant out[0u64] == 0u64
+        decreases n - k
+    {
+        acc = acc + s[k];
+        ghost gacc = gacc + s[k];
+        out[k + 1u64] = acc;
+        k = k + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

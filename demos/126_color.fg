@@ -1,0 +1,155 @@
+// Demo 126: Verified RGB color operations
+//
+// Colors stored as (r, g, b) triples, each in [0, 255].
+// Operations: clamp, blend, luminance approximation, invert, grayscale.
+// Postconditions verify all outputs remain in valid byte range.
+
+struct RGB { r: u64, g: u64, b: u64 }
+
+fn rgb_new(r: u64, g: u64, b: u64) -> RGB
+    requires r < 256u64
+    requires g < 256u64
+    requires b < 256u64
+    ensures result.r == r
+    ensures result.g == g
+    ensures result.b == b
+{
+    struct RGB { r: r, g: g, b: b }
+}
+
+// Clamp a channel to [0, 255].
+fn clamp8(x: u64) -> u64
+    ensures result < 256u64
+{
+    if x > 255u64 { 255u64 } else { x }
+}
+
+// Add two channels with saturation.
+fn ch_add(a: u64, b: u64) -> u64
+    requires a < 256u64
+    requires b < 256u64
+    ensures result < 256u64
+{
+    let s: u64 = a + b;
+    if s > 255u64 { 255u64 } else { s }
+}
+
+// Invert a channel: 255 - x.
+fn ch_invert(x: u64) -> u64
+    requires x < 256u64
+    ensures result < 256u64
+    ensures result + x == 255u64
+{
+    255u64 - x
+}
+
+// Scale channel by factor/256 (integer approximation of multiply by fraction).
+fn ch_scale(x: u64, factor: u64) -> u64
+    requires x < 256u64
+    requires factor < 256u64
+    ensures result < 256u64
+{
+    (x * factor) / 256u64
+}
+
+// Invert all channels.
+fn rgb_invert(c: RGB) -> RGB
+    requires c.r < 256u64
+    requires c.g < 256u64
+    requires c.b < 256u64
+    ensures result.r < 256u64
+    ensures result.g < 256u64
+    ensures result.b < 256u64
+    ensures result.r + c.r == 255u64
+    ensures result.g + c.g == 255u64
+    ensures result.b + c.b == 255u64
+{
+    struct RGB {
+        r: 255u64 - c.r,
+        g: 255u64 - c.g,
+        b: 255u64 - c.b
+    }
+}
+
+// Blend: (a*t + b*(256-t)) / 256 per channel, t in [0,256].
+fn ch_blend(a: u64, b: u64, t: u64) -> u64
+    requires a < 256u64
+    requires b < 256u64
+    requires t <= 256u64
+    ensures result < 256u64
+{
+    let wa: u64 = (a * t) / 256u64;
+    let wb: u64 = (b * (256u64 - t)) / 256u64;
+    let s: u64 = wa + wb;
+    if s > 255u64 { 255u64 } else { s }
+}
+
+// Approximate luminance: (r*77 + g*150 + b*29) / 256 ≈ 0.299R + 0.587G + 0.114B
+fn rgb_luma(c: RGB) -> u64
+    requires c.r < 256u64
+    requires c.g < 256u64
+    requires c.b < 256u64
+    ensures result < 256u64
+{
+    (c.r * 77u64 + c.g * 150u64 + c.b * 29u64) / 256u64
+}
+
+// Grayscale: all channels set to luma.
+fn rgb_grayscale(c: RGB) -> RGB
+    requires c.r < 256u64
+    requires c.g < 256u64
+    requires c.b < 256u64
+    ensures result.r < 256u64
+    ensures result.g < 256u64
+    ensures result.b < 256u64
+    ensures result.r == result.g
+    ensures result.g == result.b
+{
+    let luma: u64 = rgb_luma(c);
+    struct RGB { r: luma, g: luma, b: luma }
+}
+
+// Verify: double-invert returns original.
+fn invert_involution(c: RGB) -> u64
+    requires c.r < 256u64
+    requires c.g < 256u64
+    requires c.b < 256u64
+    ensures result == 1u64
+{
+    let ci: RGB = rgb_invert(c);
+    let cii: RGB = rgb_invert(ci);
+    if cii.r == c.r && cii.g == c.g && cii.b == c.b { 1u64 } else { 0u64 }
+}
+
+fn main() -> u64 {
+    let red: RGB   = rgb_new(255u64, 0u64, 0u64);
+    let green: RGB = rgb_new(0u64, 255u64, 0u64);
+    let blue: RGB  = rgb_new(0u64, 0u64, 255u64);
+    let gray: RGB  = rgb_new(128u64, 128u64, 128u64);
+
+    // Invert red → (0, 255, 255)
+    let ir: RGB = rgb_invert(red);
+    let irr: u64 = ir.r;   // 0
+    let irg: u64 = ir.g;   // 255
+
+    // ch_add with saturation
+    let ca: u64 = ch_add(200u64, 100u64);  // 255 (saturated)
+    let cb: u64 = ch_add(100u64, 50u64);   // 150
+
+    // Luma of gray (128,128,128) = (128*256)/256 = 128
+    let luma: u64 = rgb_luma(gray);   // 128*(77+150+29)/256 = 128*256/256 = 128
+
+    // Grayscale: r==g==b
+    let gs: RGB = rgb_grayscale(gray);
+    let gs_eq: u64 = if gs.r == gs.g { 1u64 } else { 0u64 };  // 1
+
+    // Double-invert
+    let inv_inv: u64 = invert_involution(red);   // 1
+
+    // ch_blend: 50% between 0 and 200 = 100
+    let bl: u64 = ch_blend(0u64, 200u64, 128u64);  // ≈ 100
+
+    irr + irg + ca + cb + luma + gs_eq + inv_inv + bl
+    // 0 + 255 + 255 + 150 + 128 + 1 + 1 + 100 = 890
+    // = 890 (approximately — blend is floor arithmetic)
+}

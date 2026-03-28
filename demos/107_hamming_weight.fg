@@ -1,0 +1,82 @@
+// Demo 107: Verified Hamming weight (popcount) with bitwise proofs
+//
+// Parallel prefix algorithm for counting set bits.
+// Postcondition result <= 64u64 is SMT-verified in BV mode.
+// Also demonstrates ctz (count trailing zeros) built from popcount.
+
+// Popcount via parallel bit-counting.
+// Constant names: m1 = 0x5555..., m2 = 0x3333..., m4 = 0x0f0f...
+fn popcount(x: u64) -> u64
+    ensures result <= 64u64
+{
+    // Split into 2-bit groups: count bits in pairs
+    let m1: u64 = 6148914691236517205u64;
+    let s1: u64 = (x & m1) + ((x >> 1u64) & m1);
+
+    // Accumulate into 4-bit groups
+    let m2: u64 = 3689348814741910323u64;
+    let s2: u64 = (s1 & m2) + ((s1 >> 2u64) & m2);
+
+    // Accumulate into 8-bit groups
+    let m4: u64 = 1085102592571150095u64;
+    let s3: u64 = (s2 + (s2 >> 4u64)) & m4;
+
+    // Sum all 8-bit counts into a 64-bit total (fits in 7 bits)
+    let final_: u64 = (s3 * 72340172838076673u64) >> 56u64;
+    final_
+}
+
+// Count trailing zeros: number of low zero bits.
+// Isolates the lowest set bit then counts bits below it.
+fn ctz(x: u64) -> u64
+    requires x > 0u64
+    ensures result <= 64u64
+{
+    let lowest: u64 = x & (0u64 - x);   // isolate lowest set bit
+    let below:  u64 = lowest - 1u64;    // all bits below it are set
+    let r: u64 = popcount(below);
+    r
+}
+
+// Is x a power of two? (1 iff exactly one bit set)
+fn is_pow2(x: u64) -> u64
+    requires x > 0u64
+    ensures result == 0u64 || result == 1u64
+{
+    if x & (x - 1u64) == 0u64 { 1u64 } else { 0u64 }
+}
+
+// Bit parity: XOR of all bits (0 = even, 1 = odd number of set bits)
+fn parity(x: u64) -> u64
+    ensures result == 0u64 || result == 1u64
+{
+    let a: u64 = x ^ (x >> 32u64);
+    let b: u64 = a ^ (a >> 16u64);
+    let c: u64 = b ^ (b >> 8u64);
+    let d: u64 = c ^ (c >> 4u64);
+    let e: u64 = d ^ (d >> 2u64);
+    let f: u64 = e ^ (e >> 1u64);
+    f & 1u64
+}
+
+fn main() -> u64 {
+    let pc0: u64 = popcount(0u64);            // 0
+    let pc8: u64 = popcount(255u64);          // 8  (0xff)
+    let pc3: u64 = popcount(7u64);            // 3  (0b111)
+    let pc1: u64 = popcount(256u64);          // 1  (single bit)
+
+    let tz3: u64 = ctz(8u64);                // 3  (bit 3 is lowest)
+    let tz0: u64 = ctz(1u64);               // 0  (bit 0 is lowest)
+    let tz2: u64 = ctz(12u64);              // 2  (bit 2 is lowest)
+
+    let p16: u64 = is_pow2(16u64);           // 1
+    let p12: u64 = is_pow2(12u64);           // 0
+
+    let par0: u64 = parity(0u64);            // 0
+    let par1: u64 = parity(7u64);            // 1  (3 bits → odd)
+    let par2: u64 = parity(6u64);            // 0  (2 bits → even)
+
+    pc0 + pc8 + pc3 + pc1 + tz3 + tz0 + tz2 + p16 + p12 + par0 + par1 + par2
+    // 0 + 8 + 3 + 1 + 3 + 0 + 2 + 1 + 0 + 0 + 1 + 0 = 19
+    // = 19
+}

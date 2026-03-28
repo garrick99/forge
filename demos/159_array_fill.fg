@@ -1,0 +1,27 @@
+// Demo 159: Verified array fill (memset)
+//
+// Sets every element of s to `val`.
+//
+// Invariants:
+//   k <= n
+//   forall i < k, s[i] == val
+//
+// Postconditions:
+//   forall i < s.len, s[i] == val
+//
+fn array_fill(s: span<u64>, val: u64)
+    ensures forall i: u64, i < s.len ==> s[i] == val
+{
+    let n: u64 = s.len;
+    let mut k: u64 = 0u64;
+    while k < n
+        invariant k <= n
+        invariant forall i: u64, i < k ==> s[i] == val
+        decreases n - k
+    {
+        s[k] = val;
+        k = k + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

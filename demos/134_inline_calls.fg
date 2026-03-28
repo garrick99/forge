@@ -1,0 +1,87 @@
+// Demo 134: Function calls as return expressions
+//
+// Before this fix, `f(args)` as a trailing expression was opaque in the proof
+// system — postconditions of f could not be used to discharge the caller's ensures.
+// Now the compiler injects callee postconditions for trailing calls, enabling:
+//   fn g() -> u64 ensures result < 10u64 { f(x) }
+// to be verified using f's own postconditions.
+
+// Base: always returns a value < 10.
+fn base_val(x: u64) -> u64
+    requires x < 10u64
+    ensures result == x
+    ensures result < 10u64
+{
+    x
+}
+
+// Compose: caller's postcondition relies entirely on the callee.
+fn double_bound(x: u64) -> u64
+    requires x < 5u64
+    ensures result < 10u64
+{
+    base_val(x)
+}
+
+// Chain: two levels of delegation.
+fn triple_bound(x: u64) -> u64
+    requires x < 5u64
+    ensures result < 10u64
+{
+    double_bound(x)
+}
+
+// Returns 0 (via a helper that returns 0).
+fn always_zero(dummy: u64) -> u64
+    ensures result == 0u64
+{
+    let z: u64 = 0u64;
+    z
+}
+
+fn wrapper_zero(x: u64) -> u64
+    ensures result == 0u64
+{
+    always_zero(x)
+}
+
+// clamp_to_99: returns a value <= 99.
+fn clamp_to_99(n: u64) -> u64
+    ensures result <= 99u64
+{
+    if n >= 100u64 { 99u64 } else { n }
+}
+
+fn bounded_clamp(n: u64) -> u64
+    ensures result <= 99u64
+{
+    clamp_to_99(n)
+}
+
+// A simple identity function with tight postcondition.
+fn identity(x: u64) -> u64
+    requires x < 1000u64
+    ensures result == x
+    ensures result < 1000u64
+{
+    x
+}
+
+// Caller uses identity's postcondition to prove its own.
+fn relay(x: u64) -> u64
+    requires x < 500u64
+    ensures result < 1000u64
+{
+    identity(x)
+}
+
+fn main() -> u64 {
+    let a: u64 = double_bound(3u64);    // < 10
+    let b: u64 = triple_bound(4u64);    // < 10
+    let c: u64 = wrapper_zero(42u64);   // == 0
+    let d: u64 = bounded_clamp(200u64); // == 99
+    let e: u64 = relay(7u64);           // == 7, < 1000
+    a + b + c + d + e
+    // 3 + 4 + 0 + 99 + 7 = 113
+    // = 113
+}

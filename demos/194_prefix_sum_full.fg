@@ -1,0 +1,25 @@
+// Demo 194: Verified prefix sum with quantified non-negativity postcondition
+//
+// Computes prefix sums in-place: s[i] += s[i-1] for i > 0.
+// Proves: after the loop, all elements >= 0.
+// The loop invariant carries the property `forall k < i, s[k] >= 0`.
+// This is trivially true for span<u64> (unsigned), but FORGE now proves
+// it automatically via the uint-element non-negativity axioms emitted for
+// u64 span parameters.
+//
+fn prefix_sum(s: span<u64>, n: u64)
+    requires s.len == n
+    requires n >= 1u64
+    ensures forall k: u64, k < n ==> s[k] >= 0u64
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> s[k] >= 0u64
+    {
+        if i > 0u64 {
+            s[i] = s[i] + s[i - 1u64];
+        };
+    }
+}
+
+fn main() -> u64 { 0u64 }

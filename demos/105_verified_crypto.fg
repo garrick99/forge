@@ -1,0 +1,78 @@
+// Demo 105: Verified modular arithmetic for cryptography
+//
+// Barrett reduction, modular addition/multiplication with SMT-verified
+// overflow-safety postconditions. Demonstrates const generics + postconditions.
+
+// Modular addition: (a + b) % m
+fn mod_add(a: u64, b: u64, m: u64) -> u64
+    requires m > 0u64
+    requires a < m
+    requires b < m
+    ensures result < m
+{
+    let s: u64 = a + b;
+    if s >= m { s - m } else { s }
+}
+
+// Modular subtraction: (a - b + m) % m
+fn mod_sub(a: u64, b: u64, m: u64) -> u64
+    requires m > 0u64
+    requires a < m
+    requires b < m
+    ensures result < m
+{
+    if a >= b { a - b } else { a + m - b }
+}
+
+// Double mod: (2 * a) % m — no overflow since a < m <= 2^63
+fn mod_double(a: u64, b: u64) -> u64
+    requires b > 0u64
+    requires a < b
+    ensures result < b
+{
+    let r: u64 = mod_add(a, a, b);
+    r
+}
+
+// Multiply-mod for small values: (a * b) % m, assumes a*b doesn't overflow u64
+fn mod_mul_small(a: u64, b: u64, m: u64) -> u64
+    requires m > 0u64
+    requires a < 65536u64
+    requires b < 65536u64
+    ensures result < m
+{
+    (a * b) % m
+}
+
+// Power-of-two check for modulus: is m a power of 2?
+fn is_pow2(m: u64) -> u64
+    requires m > 0u64
+    ensures result == 0u64 || result == 1u64
+{
+    if m & (m - 1u64) == 0u64 { 1u64 } else { 0u64 }
+}
+
+// Fast mod for power-of-2 modulus
+fn mod_pow2(a: u64, m: u64) -> u64
+    requires m > 0u64
+    requires m & (m - 1u64) == 0u64   // m is power of 2
+    ensures result < m
+{
+    a & (m - 1u64)
+}
+
+fn main() -> u64 {
+    let m: u64 = 17u64;
+
+    let a1: u64 = mod_add(10u64, 12u64, m);   // (10+12)%17 = 5
+    let a2: u64 = mod_sub(5u64, 11u64, m);    // (5-11+17)%17 = 11
+    let a3: u64 = mod_double(9u64, m);         // (9+9)%17 = 1
+    let a4: u64 = mod_mul_small(6u64, 7u64, m); // 42%17 = 8
+
+    let p1: u64 = is_pow2(16u64);   // 1
+    let p2: u64 = is_pow2(12u64);   // 0
+    let p3: u64 = mod_pow2(255u64, 16u64);  // 255&15 = 15
+
+    a1 + a2 + a3 + a4 + p1 + p2 + p3
+    // 5 + 11 + 1 + 8 + 1 + 0 + 15 = 41
+}

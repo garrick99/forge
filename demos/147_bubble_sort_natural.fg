@@ -1,0 +1,58 @@
+// Demo 147: Verified bubble sort — natural conditional swap form
+//
+// Unlike demo 144 (which used min/max rewrite to avoid conditional array
+// writes), this version uses the natural swap form directly:
+//
+//   if s[j] > s[j+1] {
+//       let tmp: u64 = s[j];
+//       s[j] = s[j+1];
+//       s[j+1] = tmp;
+//   }
+//
+// This requires conditional array write ITE modeling (added session 16).
+// The then-block has two array writes and a let-binding:
+//   let tmp = s[j];        → let_subst: tmp → s_old[j]
+//   s[j] = s[j+1];        → s_new[j]   = PIte(cond, s_old[j+1], s_old[j])
+//   s[j+1] = tmp;         → s_new[j+1] = PIte(cond, s_old[j],   s_old[j+1])
+//   (after apply_subst inlines tmp → s_old[j] into the write rhs)
+//
+// Same invariants as demo 144:
+//   outer inv1: last k elements are sorted: forall n-k <= a < b < n, s[a] <= s[b]
+//   outer inv2: prefix <= sorted suffix: forall a < n-k, b >= n-k && b < n, s[a] <= s[b]
+//   inner inv3: running max at j: forall i <= j, s[i] <= s[j]
+//   inner inv4: cross-boundary: forall i < n-k, b >= n-k && b < n, s[i] <= s[b]
+//
+fn bubble_sort_natural(s: span<u64>)
+    ensures forall a: u64, forall b: u64, a < b && b < s.len ==> s[a] <= s[b]
+{
+    let n: u64 = s.len;
+    let mut k: u64 = 0u64;
+    while k < n
+        invariant k <= n
+        invariant forall a: u64, forall b: u64,
+                    n - k <= a && a < b && b < n ==> s[a] <= s[b]
+        invariant forall a: u64, forall b: u64,
+                    a < n - k && b >= n - k && b < n ==> s[a] <= s[b]
+        decreases n - k
+    {
+        let bound: u64 = n - k - 1u64;
+        let mut j: u64 = 0u64;
+        while j < bound
+            invariant j <= bound
+            invariant forall i: u64, i <= j ==> s[i] <= s[j]
+            invariant forall i: u64, forall b: u64,
+                        i < n - k && b >= n - k && b < n ==> s[i] <= s[b]
+            decreases bound - j
+        {
+            if s[j] > s[j + 1u64] {
+                let tmp: u64 = s[j];
+                s[j] = s[j + 1u64];
+                s[j + 1u64] = tmp;
+            };
+            j = j + 1u64;
+        };
+        k = k + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

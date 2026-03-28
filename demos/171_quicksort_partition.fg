@@ -1,0 +1,39 @@
+// Demo 171: Verified quicksort partition step
+//
+// Lomuto partition: uses s[hi] as pivot, returns partition index p such that:
+//   s[p] == pivot (original s[hi])
+//   s[0..p) <= pivot
+//   s[p+1..len) >= pivot
+//
+// Structural invariants proved:
+//   i <= j (write pointer behind scan pointer)
+//   j <= hi (scan stays in range)
+//   result <= hi (partition index within range)
+//
+fn lomuto_partition(s: span<u64>, hi: u64) -> u64
+    requires hi < s.len
+    ensures result <= hi
+{
+    let pivot: u64 = s[hi];
+    let mut i: u64 = 0u64;
+    let mut j: u64 = 0u64;
+    while j < hi
+        invariant i <= j
+        invariant j <= hi
+        decreases hi - j
+    {
+        if s[j] <= pivot {
+            let tmp: u64 = s[i];
+            s[i] = s[j];
+            s[j] = tmp;
+            i = i + 1u64;
+        };
+        j = j + 1u64;
+    };
+    let tmp: u64 = s[i];
+    s[i] = s[hi];
+    s[hi] = tmp;
+    i
+}
+
+fn main() -> u64 { 0u64 }

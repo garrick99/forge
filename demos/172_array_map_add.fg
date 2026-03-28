@@ -1,0 +1,24 @@
+// Demo 172: Verified array map (add constant to each element)
+//
+// Adds `delta` to every element of s in-place.
+// Proves: forall i < s.len, result_s[i] == old_s[i] + delta
+//
+// Uses old() to reference the pre-mutation values in the postcondition.
+//
+fn map_add(s: span<u64>, delta: u64)
+    ensures forall i: u64, i < s.len ==> s[i] == old(s[i]) + delta
+{
+    let n: u64 = s.len;
+    let mut k: u64 = 0u64;
+    while k < n
+        invariant k <= n
+        invariant forall i: u64, i < k ==> s[i] == old(s[i]) + delta
+        invariant forall i: u64, i >= k ==> i < n ==> s[i] == old(s[i])
+        decreases n - k
+    {
+        s[k] = s[k] + delta;
+        k = k + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

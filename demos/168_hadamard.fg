@@ -1,0 +1,27 @@
+// Demo 168: Verified Hadamard product (elementwise multiply)
+//
+// Computes out[i] = a[i] * b[i] for equal-length spans.
+// Proves out[i] <= max_prod for all i, given a[i]*b[i] <= max_prod.
+//
+// Uses a while loop with invariant to carry the elementwise bound forward.
+//
+fn hadamard(a: span<u64>, b: span<u64>, out: span<u64>, max_prod: u64)
+    requires a.len == b.len
+    requires a.len == out.len
+    requires a.len > 0u64
+    requires forall i: u64, i < a.len ==> a[i] * b[i] <= max_prod
+    ensures forall i: u64, i < out.len ==> out[i] <= max_prod
+{
+    let n: u64 = a.len;
+    let mut k: u64 = 0u64;
+    while k < n
+        invariant k <= n
+        invariant forall i: u64, i < k ==> out[i] <= max_prod
+        decreases n - k
+    {
+        out[k] = a[k] * b[k];
+        k = k + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

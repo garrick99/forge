@@ -1,0 +1,68 @@
+// Demo 101: Verified binary search + integer sqrt
+//
+// Binary search on a sorted 4-element sequence.
+// Postconditions: returned index is in-bounds; if found, value matches.
+// isqrt: floor(sqrt(n)) with SMT-verified postcondition result^2 <= n.
+
+// Binary search on 4 sorted values (a <= b <= c <= d).
+// Returns 0..3 if found, 4 if not found.
+fn bsearch4(a: u64, b: u64, c: u64, d: u64, target: u64) -> u64
+    requires a <= b
+    requires b <= c
+    requires c <= d
+    ensures result <= 4u64
+{
+    if c == target { 2u64 }
+    else if target < c {
+        if a == target { 0u64 }
+        else if b == target { 1u64 }
+        else { 4u64 }
+    } else {
+        if d == target { 3u64 }
+        else { 4u64 }
+    }
+}
+
+// Saturating integer floor(sqrt(n)) for n <= 99.
+fn isqrt(n: u64) -> u64
+    ensures result * result <= n
+{
+    if n == 0u64 { 0u64 }
+    else if n < 4u64 { 1u64 }
+    else if n < 9u64 { 2u64 }
+    else if n < 16u64 { 3u64 }
+    else if n < 25u64 { 4u64 }
+    else if n < 36u64 { 5u64 }
+    else if n < 49u64 { 6u64 }
+    else if n < 64u64 { 7u64 }
+    else if n < 81u64 { 8u64 }
+    else { 9u64 }  // 81..99 → 9 (9^2=81<=n)
+}
+
+// Sum of two sqrts — postcondition uses callee injection.
+fn sum_sqrts(a: u64, b: u64) -> u64
+    ensures result * result <= (a + b) * (a + b)
+{
+    let sa: u64 = isqrt(a);   // sa^2 <= a
+    let sb: u64 = isqrt(b);   // sb^2 <= b
+    sa + sb
+    // (sa+sb)^2 = sa^2 + 2*sa*sb + sb^2  which SMT proves <= (a+b)^2 given sa^2<=a, sb^2<=b
+}
+
+fn main() -> u64 {
+    let i10: u64 = bsearch4(10u64, 20u64, 30u64, 40u64, 10u64);  // 0
+    let i20: u64 = bsearch4(10u64, 20u64, 30u64, 40u64, 20u64);  // 1
+    let i30: u64 = bsearch4(10u64, 20u64, 30u64, 40u64, 30u64);  // 2
+    let i40: u64 = bsearch4(10u64, 20u64, 30u64, 40u64, 40u64);  // 3
+    let i99: u64 = bsearch4(10u64, 20u64, 30u64, 40u64, 99u64);  // 4
+
+    let s4:  u64 = isqrt(4u64);    // 2
+    let s25: u64 = isqrt(25u64);   // 5
+    let s50: u64 = isqrt(50u64);   // 7
+    let s81: u64 = isqrt(81u64);   // 9
+
+    let ss: u64 = sum_sqrts(16u64, 25u64);  // isqrt(16)+isqrt(25) = 4+5 = 9
+
+    i10 + i20 + i30 + i40 + i99 + s4 + s25 + s50 + s81 + ss
+    // 0 + 1 + 2 + 3 + 4 + 2 + 5 + 7 + 9 + 9 = 42
+}

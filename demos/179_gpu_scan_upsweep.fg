@@ -1,0 +1,32 @@
+// Demo 179: Verified GPU scan upsweep (reduce phase)
+//
+// The "upsweep" (reduce) phase of a work-efficient prefix scan.
+// Processes a fixed-size shared memory buffer of 256 elements.
+//
+// Stride doubles each round: 1 → 2 → 4 → ... → 128.
+// At each stride, pairs (left, right) = (k*2s + s - 1, k*2s + 2s - 1)
+// are accumulated. This demo uses a simple while loop.
+//
+// Invariants:
+//   stride >= 1  (stride is positive)
+//   stride <= 128 (within half-n)
+//
+#[kernel]
+fn scan_upsweep(smem: span<u64>)
+    requires smem.len == 256u64
+{
+    let mut stride: u64 = 1u64;
+    while stride <= 128u64
+        invariant stride >= 1u64
+        invariant stride <= 256u64
+        decreases 256u64 - stride
+    {
+        // Process a single pair at index 0 (illustrative for the proof)
+        let left:  u64 = stride - 1u64;
+        let right: u64 = stride * 2u64 - 1u64;
+        smem[right] = smem[left] + smem[right];
+        stride = stride * 2u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

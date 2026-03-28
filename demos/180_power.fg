@@ -1,0 +1,33 @@
+// Demo 180: Verified fast exponentiation (square-and-multiply)
+//
+// Computes base^exp via repeated squaring.
+// Termination proved: exponent is halved each iteration via div 2.
+//
+// Postcondition: result >= 1 (for base >= 1, result is at least 1)
+//
+// The full algebraic correctness (result == base^exp) requires
+// inductive proof terms — deferred to demo 27-style proofs.
+//
+fn pow(base: u64, exp: u64) -> u64
+    requires base >= 1u64
+    ensures result >= 1u64
+{
+    let mut b: u64 = base;
+    let mut e: u64 = exp;
+    let mut acc: u64 = 1u64;
+    while e > 0u64
+        invariant e <= exp
+        invariant acc >= 1u64
+        invariant b >= 1u64
+        decreases e
+    {
+        if e % 2u64 == 1u64 {
+            acc = acc * b;
+        };
+        b = b * b;
+        e = e / 2u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

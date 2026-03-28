@@ -1,0 +1,24 @@
+// Demo 187: Check all-positive with for-loop invariant + early semantics
+//
+// Scans a span; returns 1 if all elements > 0, else 0.
+// Uses a flag that starts at 1 and is set to 0 on first failure.
+// Invariant: flag is 0 or 1 (binary), and i stays in bounds.
+// Postcondition: result <= 1u64.
+//
+fn all_positive(s: span<u64>, n: u64) -> u64
+    requires s.len == n
+    ensures result <= 1u64
+{
+    let mut flag: u64 = 1u64;
+    for i in n
+        invariant flag <= 1u64
+        invariant i <= n
+    {
+        if s[i] == 0u64 {
+            flag = 0u64;
+        };
+    };
+    flag
+}
+
+fn main() -> u64 { 0u64 }

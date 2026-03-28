@@ -1,0 +1,49 @@
+// Demo 143: Verified binary search — lower_bound
+//
+// Finds the first index where s[i] >= target in a sorted span.
+// Returns s.len if target is greater than all elements.
+//
+// Read-only operation: no span writes, no old() needed.
+//
+// Loop invariants maintain a three-way partition:
+//   inv_lo: forall i < lo,          s[i] < target   — left region excluded
+//   inv_hi: forall i >= hi, i < n,  s[i] >= target  — right region included
+//   lo <= hi <= n
+//
+// Convergence: hi - lo strictly decreases each iteration.
+//   mid = lo + (hi - lo) / 2  satisfies  lo <= mid < hi  when lo < hi.
+//   Branch s[mid] < target → lo_new = mid+1 → hi - lo_new < hi - lo
+//   Branch s[mid] >= target → hi_new = mid  → hi_new - lo < hi - lo
+//
+// Postconditions follow from invariants at loop exit (lo == hi):
+//   result <= s.len         : lo <= hi <= n
+//   result < n => s[r] >= t : inv_hi at i = lo = hi = result
+//   result > 0 => s[r-1] < t: inv_lo at i = lo - 1 = result - 1
+//
+fn lower_bound(s: span<u64>, target: u64) -> u64
+    requires forall a: u64, forall b: u64, a < b && b < s.len ==> s[a] <= s[b]
+    ensures result <= s.len
+    ensures result < s.len ==> s[result] >= target
+    ensures result == 0u64 || s[result - 1u64] < target
+{
+    let n: u64 = s.len;
+    let mut lo: u64 = 0u64;
+    let mut hi: u64 = n;
+    while lo < hi
+        invariant lo <= hi
+        invariant hi <= n
+        invariant forall i: u64, i < lo ==> s[i] < target
+        invariant forall i: u64, i >= hi && i < n ==> s[i] >= target
+        decreases hi - lo
+    {
+        let mid: u64 = lo + (hi - lo) / 2u64;
+        if s[mid] < target {
+            lo = mid + 1u64;
+        } else {
+            hi = mid;
+        };
+    };
+    lo
+}
+
+fn main() -> u64 { 0u64 }

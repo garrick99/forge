@@ -1,0 +1,37 @@
+// Demo 158: Verified dot product
+//
+// Computes the dot product of two equal-length spans.
+// Uses a caller-supplied per-element product bound max_prod to avoid
+// nonlinear arithmetic in the proof.
+//
+// Preconditions:
+//   a.len == b.len
+//   forall i < a.len, a[i] * b[i] <= max_prod    (caller bounds each pair)
+//
+// Invariants:
+//   k <= n
+//   acc <= k * max_prod
+//
+// Postconditions:
+//   result <= a.len * max_prod
+//
+fn dot_product(a: span<u64>, b: span<u64>, max_prod: u64) -> u64
+    requires a.len == b.len
+    requires forall i: u64, i < a.len ==> a[i] * b[i] <= max_prod
+    ensures result <= a.len * max_prod
+{
+    let n: u64 = a.len;
+    let mut k: u64 = 0u64;
+    let mut acc: u64 = 0u64;
+    while k < n
+        invariant k <= n
+        invariant acc <= k * max_prod
+        decreases n - k
+    {
+        acc = acc + a[k] * b[k];
+        k = k + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

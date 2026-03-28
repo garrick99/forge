@@ -1,0 +1,28 @@
+// Demo 197: Verified normalize — clamp to [0, 255] and prove result in range
+//
+// normalize(s, n) clamps each element to [0, 255] (for image processing).
+// Two quantified postconditions: each element >= 0 AND <= 255.
+// Uses callee postcondition injection + for-loop quantified invariants.
+//
+fn clamp255(x: u64) -> u64
+    ensures result <= 255u64
+    ensures result >= 0u64
+{
+    if x > 255u64 { 255u64 } else { x }
+}
+
+fn normalize(s: span<u64>, n: u64)
+    requires s.len == n
+    ensures forall k: u64, k < n ==> s[k] <= 255u64
+    ensures forall k: u64, k < n ==> s[k] >= 0u64
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> s[k] <= 255u64
+        invariant forall k: u64, k < i ==> s[k] >= 0u64
+    {
+        s[i] = clamp255(s[i]);
+    }
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,139 @@
+// Demo 119: Verified 2×2 matrix arithmetic
+//
+// 2×2 matrices stored as four u64 scalars (small values to avoid overflow).
+// Operations: add, scalar multiply, transpose, trace, identity check.
+// Postconditions verify algebraic properties.
+
+struct Mat2 { a00: u64, a01: u64, a10: u64, a11: u64 }
+
+// Construct a matrix.
+fn mat_new(a00: u64, a01: u64, a10: u64, a11: u64) -> Mat2
+    ensures result.a00 == a00
+    ensures result.a01 == a01
+    ensures result.a10 == a10
+    ensures result.a11 == a11
+{
+    struct Mat2 { a00: a00, a01: a01, a10: a10, a11: a11 }
+}
+
+// Identity matrix.
+fn mat_identity() -> Mat2
+    ensures result.a00 == 1u64
+    ensures result.a11 == 1u64
+    ensures result.a01 == 0u64
+    ensures result.a10 == 0u64
+{
+    struct Mat2 { a00: 1u64, a01: 0u64, a10: 0u64, a11: 1u64 }
+}
+
+// Matrix addition.
+fn mat_add(a: Mat2, b: Mat2) -> Mat2
+    ensures result.a00 == a.a00 + b.a00
+    ensures result.a01 == a.a01 + b.a01
+    ensures result.a10 == a.a10 + b.a10
+    ensures result.a11 == a.a11 + b.a11
+{
+    struct Mat2 {
+        a00: a.a00 + b.a00,
+        a01: a.a01 + b.a01,
+        a10: a.a10 + b.a10,
+        a11: a.a11 + b.a11
+    }
+}
+
+// Scalar multiply.
+fn mat_scale(a: Mat2, s: u64) -> Mat2
+    ensures result.a00 == a.a00 * s
+    ensures result.a01 == a.a01 * s
+    ensures result.a10 == a.a10 * s
+    ensures result.a11 == a.a11 * s
+{
+    struct Mat2 {
+        a00: a.a00 * s,
+        a01: a.a01 * s,
+        a10: a.a10 * s,
+        a11: a.a11 * s
+    }
+}
+
+// Transpose: swap off-diagonal elements.
+fn mat_transpose(a: Mat2) -> Mat2
+    ensures result.a00 == a.a00
+    ensures result.a11 == a.a11
+    ensures result.a01 == a.a10
+    ensures result.a10 == a.a01
+{
+    struct Mat2 { a00: a.a00, a01: a.a10, a10: a.a01, a11: a.a11 }
+}
+
+// Trace: sum of diagonal elements.
+fn mat_trace(a: Mat2) -> u64
+    ensures result == a.a00 + a.a11
+{
+    a.a00 + a.a11
+}
+
+// Matrix multiply (small values only — no overflow precondition).
+fn mat_mul(a: Mat2, b: Mat2) -> Mat2
+    ensures result.a00 == a.a00 * b.a00 + a.a01 * b.a10
+    ensures result.a01 == a.a00 * b.a01 + a.a01 * b.a11
+    ensures result.a10 == a.a10 * b.a00 + a.a11 * b.a10
+    ensures result.a11 == a.a10 * b.a01 + a.a11 * b.a11
+{
+    struct Mat2 {
+        a00: a.a00 * b.a00 + a.a01 * b.a10,
+        a01: a.a00 * b.a01 + a.a01 * b.a11,
+        a10: a.a10 * b.a00 + a.a11 * b.a10,
+        a11: a.a10 * b.a01 + a.a11 * b.a11
+    }
+}
+
+// Verify: M * I = M (identity is right-identity).
+fn mul_identity(m: Mat2) -> u64
+    ensures result == 1u64
+{
+    let eye: Mat2 = mat_identity();
+    let p: Mat2 = mat_mul(m, eye);
+    if p.a00 == m.a00 && p.a01 == m.a01 && p.a10 == m.a10 && p.a11 == m.a11 { 1u64 } else { 0u64 }
+}
+
+// Verify: trace(A + B) = trace(A) + trace(B).
+fn trace_additive(a: Mat2, b: Mat2) -> u64
+    ensures result == 1u64
+{
+    let c: Mat2 = mat_add(a, b);
+    let tc: u64 = mat_trace(c);
+    let ta: u64 = mat_trace(a);
+    let tb: u64 = mat_trace(b);
+    if tc == ta + tb { 1u64 } else { 0u64 }
+}
+
+fn main() -> u64 {
+    let a: Mat2 = mat_new(1u64, 2u64, 3u64, 4u64);
+    let b: Mat2 = mat_new(5u64, 6u64, 7u64, 8u64);
+
+    // mat_add
+    let c: Mat2 = mat_add(a, b);
+    let tr_c: u64 = mat_trace(c);          // (1+5) + (4+8) = 18
+
+    // mat_scale
+    let d: Mat2 = mat_scale(a, 3u64);
+    let tr_d: u64 = mat_trace(d);          // 3*1 + 3*4 = 15
+
+    // mat_transpose: a01 and a10 swap
+    let at: Mat2 = mat_transpose(a);
+    let same_diag: u64 = if at.a00 == a.a00 && at.a11 == a.a11 { 1u64 } else { 0u64 };  // 1
+
+    // mat_mul: a * b
+    let p: Mat2 = mat_mul(a, b);
+    let p00: u64 = p.a00;   // 1*5 + 2*7 = 19
+    let p11: u64 = p.a11;   // 3*6 + 4*8 = 50
+
+    // identity properties
+    let id_prop: u64 = mul_identity(a);   // 1
+    let tr_prop: u64 = trace_additive(a, b);  // 1
+
+    tr_c + tr_d + same_diag + p00 + p11 + id_prop + tr_prop
+    // 18 + 15 + 1 + 19 + 50 + 1 + 1 = 105
+    // = 105
+}

@@ -1,0 +1,30 @@
+// Demo 188: For-loop with ghost min+max tracking
+//
+// Tracks both minimum and maximum over a scan using ghost variables.
+// Ghost vars gmin, gmax track the running min/max.
+// Invariant: gmin <= gmax throughout.
+// Demonstrates ghost + for-loop invariant interaction.
+//
+fn minmax_range(s: span<u64>, n: u64) -> u64
+    requires s.len == n
+    requires n >= 1u64
+    ensures result >= 0u64
+{
+    ghost let mut gmin: u64 = s[0u64];
+    ghost let mut gmax: u64 = s[0u64];
+    for i in n
+        invariant gmin <= gmax
+        invariant i <= n
+    {
+        let cur: u64 = s[i];
+        if cur < gmin {
+            ghost gmin = cur;
+        };
+        if cur > gmax {
+            ghost gmax = cur;
+        };
+    };
+    gmax - gmin
+}
+
+fn main() -> u64 { 0u64 }

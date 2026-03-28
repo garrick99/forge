@@ -1,0 +1,22 @@
+// Demo 183: Dot product with for-loop invariant
+//
+// Computes dot(a, b) = sum of a[i]*b[i] for i in n.
+// Invariant: accumulator stays non-negative (assuming non-negative inputs).
+// The for-loop carries two invariants simultaneously.
+//
+fn dot(a: span<u64>, b: span<u64>, n: u64) -> u64
+    requires a.len == n
+    requires b.len == n
+    ensures result >= 0u64
+{
+    let mut acc: u64 = 0u64;
+    for i in n
+        invariant acc >= 0u64
+        invariant i <= n
+    {
+        acc = acc + a[i] * b[i];
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

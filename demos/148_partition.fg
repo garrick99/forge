@@ -1,0 +1,38 @@
+// Demo 148: Verified array partition (fill below/above pivot)
+//
+// Demonstrates conditional array writes in a practical algorithm context.
+// Given a span and a pivot value, replaces every element:
+//   if s[i] > pivot { s[i] = pivot + 1u64 }  — cap above-pivot to pivot+1
+//   if s[i] < pivot { s[i] = 0u64 }          — zero out below-pivot
+//
+// This is a stylized operation to exercise multiple conditional writes per
+// element with non-trivial postconditions.
+//
+// Postconditions:
+//   forall i < n, s[i] == 0u64 || s[i] == pivot || s[i] == pivot + 1u64
+//   forall i < n, s[i] <= pivot + 1u64
+//
+fn normalize_to_pivot(s: span<u64>, pivot: u64)
+    requires pivot <= 18446744073709551614u64  // pivot+1 won't overflow u64
+    ensures forall i: u64, i < s.len ==>
+        s[i] == 0u64 || s[i] == pivot || s[i] == pivot + 1u64
+{
+    let n: u64 = s.len;
+    let mut k: u64 = 0u64;
+    while k < n
+        invariant k <= n
+        invariant forall i: u64, i < k ==>
+            s[i] == 0u64 || s[i] == pivot || s[i] == pivot + 1u64
+        decreases n - k
+    {
+        if s[k] < pivot {
+            s[k] = 0u64;
+        };
+        if s[k] > pivot {
+            s[k] = pivot + 1u64;
+        };
+        k = k + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

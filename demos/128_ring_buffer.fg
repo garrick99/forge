@@ -1,0 +1,162 @@
+// Demo 128: Verified ring buffer (circular FIFO queue)
+//
+// Fixed 8-slot ring buffer. head/tail in [0,8), size in [0,8].
+// push appends to tail; pop removes from head.
+// Postconditions: size invariant maintained.
+
+struct Ring8 {
+    head: u64, tail: u64, size: u64,
+    d0: u64, d1: u64, d2: u64, d3: u64,
+    d4: u64, d5: u64, d6: u64, d7: u64
+}
+
+fn ring_empty() -> Ring8
+    ensures result.size == 0u64
+    ensures result.head == 0u64
+    ensures result.tail == 0u64
+{
+    struct Ring8 {
+        head: 0u64, tail: 0u64, size: 0u64,
+        d0: 0u64, d1: 0u64, d2: 0u64, d3: 0u64,
+        d4: 0u64, d5: 0u64, d6: 0u64, d7: 0u64
+    }
+}
+
+fn ring_is_empty(r: Ring8) -> u64
+    ensures result == 0u64 || result == 1u64
+{
+    if r.size == 0u64 { 1u64 } else { 0u64 }
+}
+
+fn ring_is_full(r: Ring8) -> u64
+    ensures result == 0u64 || result == 1u64
+{
+    if r.size == 8u64 { 1u64 } else { 0u64 }
+}
+
+// Push v onto tail. Requires space available.
+fn ring_push(r: Ring8, v: u64) -> Ring8
+    requires r.size < 8u64
+    requires r.tail < 8u64
+    ensures result.size == r.size + 1u64
+    ensures result.tail == (r.tail + 1u64) % 8u64
+    ensures result.head == r.head
+{
+    let slot: u64 = r.tail % 8u64;
+    let nt: u64 = (r.tail + 1u64) % 8u64;
+    let nd0: u64 = if slot == 0u64 { v } else { r.d0 };
+    let nd1: u64 = if slot == 1u64 { v } else { r.d1 };
+    let nd2: u64 = if slot == 2u64 { v } else { r.d2 };
+    let nd3: u64 = if slot == 3u64 { v } else { r.d3 };
+    let nd4: u64 = if slot == 4u64 { v } else { r.d4 };
+    let nd5: u64 = if slot == 5u64 { v } else { r.d5 };
+    let nd6: u64 = if slot == 6u64 { v } else { r.d6 };
+    let nd7: u64 = if slot == 7u64 { v } else { r.d7 };
+    struct Ring8 {
+        head: r.head, tail: nt, size: r.size + 1u64,
+        d0: nd0, d1: nd1, d2: nd2, d3: nd3,
+        d4: nd4, d5: nd5, d6: nd6, d7: nd7
+    }
+}
+
+// Pop from head. Returns ring with head element removed.
+fn ring_pop(r: Ring8) -> Ring8
+    requires r.size > 0u64
+    requires r.head < 8u64
+    ensures result.size == r.size - 1u64
+    ensures result.head == (r.head + 1u64) % 8u64
+{
+    let nh: u64 = (r.head + 1u64) % 8u64;
+    struct Ring8 {
+        head: nh, tail: r.tail, size: r.size - 1u64,
+        d0: r.d0, d1: r.d1, d2: r.d2, d3: r.d3,
+        d4: r.d4, d5: r.d5, d6: r.d6, d7: r.d7
+    }
+}
+
+// Peek at head element without removing.
+fn ring_peek(r: Ring8) -> u64
+    requires r.size > 0u64
+    requires r.head < 8u64
+{
+    let slot: u64 = r.head % 8u64;
+    if slot == 0u64 { r.d0 }
+    else if slot == 1u64 { r.d1 }
+    else if slot == 2u64 { r.d2 }
+    else if slot == 3u64 { r.d3 }
+    else if slot == 4u64 { r.d4 }
+    else if slot == 5u64 { r.d5 }
+    else if slot == 6u64 { r.d6 }
+    else { r.d7 }
+}
+
+// Verify: push then pop restores size.
+fn push_pop_size(r: Ring8, v: u64) -> u64
+    requires r.size < 8u64
+    requires r.size > 0u64
+    requires r.head < 8u64
+    requires r.tail < 8u64
+    ensures result == r.size
+{
+    let r2: Ring8 = ring_push(r, v);
+    let r3: Ring8 = ring_pop(r2);
+    r3.size
+}
+
+// Verify: empty ring has size 0.
+fn empty_size() -> u64
+    ensures result == 0u64
+{
+    let r: Ring8 = ring_empty();
+    r.size
+}
+
+// Verify: push increases size by 1.
+fn push_size(r: Ring8, v: u64) -> u64
+    requires r.size < 8u64
+    requires r.tail < 8u64
+    ensures result == r.size + 1u64
+{
+    let r2: Ring8 = ring_push(r, v);
+    r2.size
+}
+
+fn main() -> u64 {
+    let empty: Ring8 = ring_empty();
+    let ie: u64 = ring_is_empty(empty);  // 1
+
+    // Push 3 values
+    let r1: Ring8 = ring_push(empty, 10u64);
+    let r2: Ring8 = ring_push(r1,    20u64);
+    let r3: Ring8 = ring_push(r2,    30u64);
+    let sz3: u64 = r3.size;   // 3
+
+    // is_full check on 3-element ring
+    let full3: u64 = ring_is_full(r3);  // 0
+
+    // Pop one
+    let r4: Ring8 = ring_pop(r3);
+    let sz4: u64 = r4.size;   // 2
+
+    // push_pop_size identity
+    let pps: u64 = push_pop_size(r3, 99u64);  // 3
+
+    // push_size
+    let ps: u64 = push_size(r2, 40u64);  // 3
+
+    // tail wraps correctly: push 8 elements to a fresh ring, check tail == 0
+    let ra: Ring8 = ring_push(empty,  1u64);
+    let rb: Ring8 = ring_push(ra,     2u64);
+    let rc: Ring8 = ring_push(rb,     3u64);
+    let rd: Ring8 = ring_push(rc,     4u64);
+    let re: Ring8 = ring_push(rd,     5u64);
+    let rf: Ring8 = ring_push(re,     6u64);
+    let rg: Ring8 = ring_push(rf,     7u64);
+    let rh: Ring8 = ring_push(rg,     8u64);
+    let tailw: u64 = rh.tail;   // 0 (wrapped)
+    let fullf: u64 = ring_is_full(rh);  // 1
+
+    ie + sz3 + full3 + sz4 + pps + ps + tailw + fullf
+    // 1+3+0+2+3+3+0+1 = 13
+    // = 13
+}

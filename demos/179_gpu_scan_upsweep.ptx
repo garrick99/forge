@@ -1,0 +1,48 @@
+// FORGE-generated PTX — SM_89
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.5
+.target sm_89
+.address_size 64
+
+.visible .entry scan_upsweep(
+    .param .u64 scan_upsweep_param_smem_data,
+    .param .u64 scan_upsweep_param_smem_len
+)
+{
+    .reg .pred %p5;
+    .reg .u64 %rd0, %rd1, %rd10, %rd11, %rd12, %rd13, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd4, %rd6, %rd7, %rd8, %rd9;
+    .reg .u32 %r23;
+
+  ld.param.u64 %rd0, [scan_upsweep_param_smem_data];
+  ld.param.u64 %rd1, [scan_upsweep_param_smem_len];
+
+  mov.u64 %rd2, 1;
+  scan_upsweep_loop_3:
+  mov.u64 %rd4, 128;
+  setp.le.u64 %p5, %rd2, %rd4;
+  @!%p5 bra scan_upsweep_loop_end_3;
+  mov.u64 %rd6, 1;
+  sub.u64 %rd7, %rd2, %rd6;
+  mov.u64 %rd8, 2;
+  mul.lo.u64 %rd9, %rd2, %rd8;
+  mov.u64 %rd10, 1;
+  sub.u64 %rd11, %rd9, %rd10;
+  mul.lo.u64 %rd12, %rd7, 8;
+  add.u64 %rd13, %rd0, %rd12;
+  ld.global.u64 %rd14, [%rd13];
+  mul.lo.u64 %rd15, %rd11, 8;
+  add.u64 %rd16, %rd0, %rd15;
+  ld.global.u64 %rd17, [%rd16];
+  add.u64 %rd18, %rd14, %rd17;
+  mul.lo.u64 %rd19, %rd11, 8;
+  add.u64 %rd20, %rd0, %rd19;
+  st.global.u64 [%rd20], %rd18;
+  mov.u64 %rd21, 2;
+  mul.lo.u64 %rd22, %rd2, %rd21;
+  bra scan_upsweep_loop_3;
+  scan_upsweep_loop_end_3:
+  mov.u32 %r23, 0; // unit
+  ret;
+}
+

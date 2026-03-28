@@ -1,0 +1,32 @@
+// Demo 164: Verified matrix-vector multiply (row-major flat layout)
+//
+// Computes out[i] = sum_j A[i*cols + j] * x[j]
+// for a rows x cols matrix stored flat in A.
+//
+// Preconditions:
+//   A.len == rows * cols
+//   x.len == cols
+//   out.len == rows
+//   forall k < A.len, A[k] * x[k % cols] <= max_prod  (element-wise bound)
+//
+// Simplified: no overflow proof on the inner sum — just bounds checking.
+// The inner for loop injects 0 <= j < cols, ensuring A[i*cols+j] and x[j]
+// are in-bounds given A.len == rows*cols and x.len == cols.
+//
+fn matvec(A: span<u64>, x: span<u64>, out: span<u64>, rows: u64, cols: u64)
+    requires A.len == rows * cols
+    requires x.len == cols
+    requires out.len == rows
+    requires rows > 0u64
+    requires cols > 0u64
+{
+    for i in rows {
+        let mut acc: u64 = 0u64;
+        for j in cols {
+            acc = acc + A[i * cols + j] * x[j];
+        };
+        out[i] = acc;
+    }
+}
+
+fn main() -> u64 { 0u64 }

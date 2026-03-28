@@ -1,0 +1,21 @@
+// Demo 166: Verified stride copy
+//
+// Copies every `stride`-th element from src into dst.
+// dst[k] = src[k * stride]  for k < count
+//
+// Preconditions:
+//   stride > 0
+//   count * stride <= src.len    (no out-of-bounds on src)
+//   count <= dst.len
+//
+fn stride_copy(src: span<u64>, dst: span<u64>, stride: u64, count: u64)
+    requires stride > 0u64
+    requires count * stride <= src.len
+    requires count <= dst.len
+{
+    for k in count {
+        dst[k] = src[k * stride];
+    }
+}
+
+fn main() -> u64 { 0u64 }

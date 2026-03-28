@@ -1,0 +1,19 @@
+// Demo 193: Verified copy — prove every element was copied correctly
+//
+// copy(dst, src, n) copies src[0..n] into dst[0..n].
+// Quantified postcondition: forall k < n, dst[k] == src[k].
+//
+fn copy_span(dst: span<u64>, src: span<u64>, n: u64)
+    requires dst.len == n
+    requires src.len == n
+    ensures forall k: u64, k < n ==> dst[k] == src[k]
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> dst[k] == src[k]
+    {
+        dst[i] = src[i];
+    }
+}
+
+fn main() -> u64 { 0u64 }

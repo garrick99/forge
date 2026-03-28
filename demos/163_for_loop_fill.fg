@@ -1,0 +1,14 @@
+// Demo 163: Verified for-loop array fill
+//
+// Fills every slot of a span with `val` using a for loop.
+// The for loop injects 0 <= i < n, so each s[i] write is auto-proved in-bounds.
+//
+fn for_fill(s: span<u64>, val: u64)
+{
+    let n: u64 = s.len;
+    for i in n {
+        s[i] = val;
+    }
+}
+
+fn main() -> u64 { 0u64 }

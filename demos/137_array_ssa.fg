@@ -1,0 +1,83 @@
+// Demo 137: Array write SSA — verified multi-write reasoning
+//
+// Each span write s[i] = v creates a new SSA "generation" of the array:
+//   - s_old is renamed to __s_pN
+//   - Write fact: s[i] == v (referring to the new generation)
+//   - Frame axiom: forall k != i, s[k] == __s_pN[k]  (unchanged elements)
+//   - Length fact: s.len == __s_pN.len
+//
+// This gives Z3 enough to reason across multiple writes, including swap.
+
+// ── Swap: exchange two elements, return the old value of s[j] ────────────────
+// Proves: after swap, s[i] holds the original s[j].
+// Proof chain: s[i] == __s_p1[i]  (frame, i≠j)
+//              == __s_p0[j]        (renamed write fact from s[i]=s[j])
+//              == old_j            (let binding, before any write)
+fn swap_check(s: span<u64>, i: u64, j: u64) -> u64
+    requires i < s.len
+    requires j < s.len
+    requires i != j
+    requires s.len <= 10000u64
+    ensures s[i] == result
+{
+    let old_j: u64 = s[j];
+    let tmp: u64 = s[i];
+    s[i] = s[j];
+    s[j] = tmp;
+    old_j
+}
+
+// ── Write two: set two different indices, prove their sum ────────────────────
+// After s[i]=v and s[j]=w (i≠j), Z3 chains frame axioms to see s[i]==v && s[j]==w.
+fn write_two(s: span<u64>, i: u64, j: u64, v: u64, w: u64) -> u64
+    requires i < s.len
+    requires j < s.len
+    requires i != j
+    requires s.len <= 10000u64
+    requires v <= 1000000u64
+    requires w <= 1000000u64
+    ensures result == v + w
+{
+    s[i] = v;
+    s[j] = w;
+    s[i] + s[j]
+}
+
+// ── Overwrite: write the same index twice, final value wins ──────────────────
+// After s[i]=v then s[i]=w, result is w (second write is visible).
+fn overwrite(s: span<u64>, i: u64, v: u64, w: u64) -> u64
+    requires i < s.len
+    requires s.len <= 10000u64
+    ensures result == w
+{
+    s[i] = v;
+    s[i] = w;
+    s[i]
+}
+
+// ── Write-then-read: value written is immediately visible ────────────────────
+fn write_read(s: span<u64>, i: u64, v: u64) -> u64
+    requires i < s.len
+    requires s.len <= 10000u64
+    ensures result == v
+{
+    s[i] = v;
+    s[i]
+}
+
+// ── Frame: write to j does not disturb i (i ≠ j) ────────────────────────────
+// Captures the fundamental frame axiom: unwritten elements are unchanged.
+fn frame_check(s: span<u64>, i: u64, j: u64, v: u64) -> u64
+    requires i < s.len
+    requires j < s.len
+    requires i != j
+    requires s.len <= 10000u64
+    requires s[i] < 1000000u64
+    ensures result == s[i]
+{
+    let before: u64 = s[i];
+    s[j] = v;
+    before  // s[j] write didn't touch s[i]
+}
+
+fn main() -> u64 { 0u64 }

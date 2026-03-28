@@ -1,0 +1,125 @@
+// Demo 113: Verified DFA-based character classifier
+//
+// A minimal deterministic finite automaton that classifies ASCII bytes.
+// States: 0=Start, 1=InDigit, 2=InAlpha, 3=InWhitespace, 4=Other.
+// Postconditions verify that state output is always bounded and that
+// classification functions return only 0 or 1.
+
+// ASCII character class predicates.
+fn is_digit(c: u64) -> u64
+    requires c < 128u64
+    ensures result == 0u64 || result == 1u64
+{
+    if c >= 48u64 && c <= 57u64 { 1u64 } else { 0u64 }
+}
+
+fn is_upper(c: u64) -> u64
+    requires c < 128u64
+    ensures result == 0u64 || result == 1u64
+{
+    if c >= 65u64 && c <= 90u64 { 1u64 } else { 0u64 }
+}
+
+fn is_lower(c: u64) -> u64
+    requires c < 128u64
+    ensures result == 0u64 || result == 1u64
+{
+    if c >= 97u64 && c <= 122u64 { 1u64 } else { 0u64 }
+}
+
+fn is_alpha(c: u64) -> u64
+    requires c < 128u64
+    ensures result == 0u64 || result == 1u64
+{
+    if (c >= 65u64 && c <= 90u64) || (c >= 97u64 && c <= 122u64) { 1u64 } else { 0u64 }
+}
+
+fn is_alnum(c: u64) -> u64
+    requires c < 128u64
+    ensures result == 0u64 || result == 1u64
+{
+    if (c >= 48u64 && c <= 57u64) ||
+       (c >= 65u64 && c <= 90u64) ||
+       (c >= 97u64 && c <= 122u64) { 1u64 } else { 0u64 }
+}
+
+fn is_whitespace(c: u64) -> u64
+    requires c < 128u64
+    ensures result == 0u64 || result == 1u64
+{
+    if c == 32u64 || c == 9u64 || c == 10u64 || c == 13u64 { 1u64 } else { 0u64 }
+}
+
+// DFA transition: given current state and input char, return next state.
+// States: 0=Start, 1=Digit, 2=Alpha, 3=Space, 4=Other
+fn dfa_step(state: u64, c: u64) -> u64
+    requires state <= 4u64
+    requires c < 128u64
+    ensures result <= 4u64
+{
+    if c >= 48u64 && c <= 57u64 { 1u64 }      // digit
+    else if (c >= 65u64 && c <= 90u64) ||
+            (c >= 97u64 && c <= 122u64) { 2u64 }  // alpha
+    else if c == 32u64 || c == 9u64 ||
+            c == 10u64 || c == 13u64 { 3u64 }  // whitespace
+    else { 4u64 }                               // other
+}
+
+// Run the DFA for 4 characters (unrolled).
+fn dfa_run4(c0: u64, c1: u64, c2: u64, c3: u64) -> u64
+    requires c0 < 128u64
+    requires c1 < 128u64
+    requires c2 < 128u64
+    requires c3 < 128u64
+    ensures result <= 4u64
+{
+    let s0: u64 = 0u64;
+    let s1: u64 = dfa_step(s0, c0);
+    let s2: u64 = dfa_step(s1, c1);
+    let s3: u64 = dfa_step(s2, c2);
+    let s4: u64 = dfa_step(s3, c3);
+    s4
+}
+
+// Count digits in a 4-char sequence.
+fn count_digits4(c0: u64, c1: u64, c2: u64, c3: u64) -> u64
+    requires c0 < 128u64
+    requires c1 < 128u64
+    requires c2 < 128u64
+    requires c3 < 128u64
+    ensures result <= 4u64
+{
+    let d0: u64 = is_digit(c0);
+    let d1: u64 = is_digit(c1);
+    let d2: u64 = is_digit(c2);
+    let d3: u64 = is_digit(c3);
+    d0 + d1 + d2 + d3
+}
+
+fn main() -> u64 {
+    // ASCII: '0'=48, 'A'=65, ' '=32, '!'=33
+    let d0: u64 = is_digit(48u64);         // 1 ('0')
+    let d1: u64 = is_digit(65u64);         // 0 ('A')
+    let a0: u64 = is_alpha(65u64);         // 1 ('A')
+    let a1: u64 = is_alpha(97u64);         // 1 ('a')
+    let a2: u64 = is_alpha(48u64);         // 0 ('0')
+    let w0: u64 = is_whitespace(32u64);    // 1 (' ')
+    let w1: u64 = is_whitespace(65u64);    // 0 ('A')
+    let n0: u64 = is_alnum(48u64);         // 1
+    let n1: u64 = is_alnum(65u64);         // 1
+    let n2: u64 = is_alnum(33u64);         // 0 ('!')
+
+    // DFA: run "1 A b !" → 48, 65, 98, 33
+    // step 48 → state 1 (digit)
+    // step 65 → state 2 (alpha)
+    // step 98 → state 2 (alpha)
+    // step 33 → state 4 (other)
+    let final_state: u64 = dfa_run4(48u64, 65u64, 98u64, 33u64);  // 4
+
+    // Count digits in "1 2 A !": 48, 50, 65, 33
+    let cnt: u64 = count_digits4(48u64, 50u64, 65u64, 33u64);     // 2
+
+    d0 + d1 + a0 + a1 + a2 + w0 + w1 + n0 + n1 + n2 + final_state + cnt
+    // 1 + 0 + 1 + 1 + 0 + 1 + 0 + 1 + 1 + 0 + 4 + 2 = 12
+    // = 12
+}

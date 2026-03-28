@@ -1,0 +1,37 @@
+// Demo 146: Verified two-sided saturating clamp
+//
+// Clamps each element of a span to [lo_val, hi_val].
+// Uses two sequential conditional array writes per element:
+//   if s[k] < lo_val { s[k] = lo_val }
+//   if s[k] > hi_val { s[k] = hi_val }
+//
+// Each conditional write models as ITE on the current array version:
+//   after step 1: s[k] = ite(s_old[k] < lo_val, lo_val, s_old[k])
+//   after step 2: s[k] = ite(s_mid[k] > hi_val, hi_val, s_mid[k])
+//
+// Precondition: lo_val <= hi_val (so the range is valid)
+// Postcondition:
+//   forall i, lo_val <= s[i] <= hi_val
+//
+fn saturate_array(s: span<u64>, lo_val: u64, hi_val: u64)
+    requires lo_val <= hi_val
+    ensures forall i: u64, i < s.len ==> s[i] >= lo_val && s[i] <= hi_val
+{
+    let n: u64 = s.len;
+    let mut k: u64 = 0u64;
+    while k < n
+        invariant k <= n
+        invariant forall i: u64, i < k ==> s[i] >= lo_val && s[i] <= hi_val
+        decreases n - k
+    {
+        if s[k] < lo_val {
+            s[k] = lo_val;
+        };
+        if s[k] > hi_val {
+            s[k] = hi_val;
+        };
+        k = k + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

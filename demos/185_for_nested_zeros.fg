@@ -1,0 +1,24 @@
+// Demo 185: Nested for-loops with invariants — zero a 2D matrix
+//
+// Sets all elements of a rows×cols matrix (stored row-major) to zero.
+// Outer loop: row index invariant row <= rows.
+// Inner loop: col index invariant col <= cols.
+// Both use for-loop invariants to prove index bounds stay safe.
+//
+fn zero_matrix(s: span<u64>, rows: u64, cols: u64)
+    requires s.len == rows * cols
+    requires rows >= 1u64
+    requires cols >= 1u64
+{
+    for row in rows
+        invariant row <= rows
+    {
+        for col in cols
+            invariant col <= cols
+        {
+            s[row * cols + col] = 0u64;
+        }
+    }
+}
+
+fn main() -> u64 { 0u64 }

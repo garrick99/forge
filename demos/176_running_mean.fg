@@ -1,0 +1,32 @@
+// Demo 176: Verified running mean (truncating integer division)
+//
+// Computes the mean of a non-empty bounded span.
+// Uses a mutable ghost variable to track the running total separately,
+// proving the mean is bounded by the maximum element.
+//
+// Postconditions:
+//   result <= max_elem    (mean cannot exceed the maximum element)
+//
+fn running_mean(s: span<u64>, max_elem: u64) -> u64
+    requires s.len > 0u64
+    requires forall i: u64, i < s.len ==> s[i] <= max_elem
+    ensures result <= max_elem
+{
+    let n: u64 = s.len;
+    ghost let mut gsum: u64 = 0u64;
+    let mut k: u64 = 0u64;
+    let mut acc: u64 = 0u64;
+    while k < n
+        invariant k <= n
+        invariant acc == gsum
+        invariant acc <= k * max_elem
+        decreases n - k
+    {
+        acc = acc + s[k];
+        ghost gsum = gsum + s[k];
+        k = k + 1u64;
+    };
+    acc / n
+}
+
+fn main() -> u64 { 0u64 }

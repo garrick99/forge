@@ -1,0 +1,107 @@
+// Demo 117: Verified sliding window statistics (window size 4)
+//
+// A fixed 4-element circular buffer. Supports sum, min, max, and range.
+// Postconditions verify bounds: min <= max, range = max - min,
+// and sum equals the sum of the four slots.
+
+struct Win4 { a: u64, b: u64, c: u64, d: u64 }
+
+// Construct a window with four values.
+fn win_new(a: u64, b: u64, c: u64, d: u64) -> Win4
+    ensures result.a == a
+    ensures result.b == b
+    ensures result.c == c
+    ensures result.d == d
+{
+    struct Win4 { a: a, b: b, c: c, d: d }
+}
+
+// Sum of window.
+fn win_sum(w: Win4) -> u64
+    ensures result == w.a + w.b + w.c + w.d
+{
+    w.a + w.b + w.c + w.d
+}
+
+// Minimum of two values.
+fn min2(x: u64, y: u64) -> u64
+    ensures result <= x
+    ensures result <= y
+{
+    if x <= y { x } else { y }
+}
+
+// Maximum of two values.
+fn max2(x: u64, y: u64) -> u64
+    ensures result >= x
+    ensures result >= y
+{
+    if x >= y { x } else { y }
+}
+
+// Minimum of window.
+fn win_min(w: Win4) -> u64
+    ensures result <= w.a
+    ensures result <= w.b
+    ensures result <= w.c
+    ensures result <= w.d
+{
+    let m1: u64 = min2(w.a, w.b);
+    let m2: u64 = min2(w.c, w.d);
+    min2(m1, m2)
+}
+
+// Maximum of window.
+fn win_max(w: Win4) -> u64
+    ensures result >= w.a
+    ensures result >= w.b
+    ensures result >= w.c
+    ensures result >= w.d
+{
+    let m1: u64 = max2(w.a, w.b);
+    let m2: u64 = max2(w.c, w.d);
+    max2(m1, m2)
+}
+
+// Range = max - min.
+fn win_range(w: Win4) -> u64 {
+    let mn: u64 = win_min(w);
+    let mx: u64 = win_max(w);
+    mx - mn
+}
+
+// Average (floor): sum / 4. Verified: result * 4 <= sum (floor division).
+fn win_avg(w: Win4) -> u64
+    ensures result * 4u64 <= w.a + w.b + w.c + w.d
+{
+    let s: u64 = win_sum(w);
+    s / 4u64
+}
+
+// Slide: drop oldest (a), append new value at d.
+fn win_slide(w: Win4, new_val: u64) -> Win4
+    ensures result.a == w.b
+    ensures result.b == w.c
+    ensures result.c == w.d
+    ensures result.d == new_val
+{
+    struct Win4 { a: w.b, b: w.c, c: w.d, d: new_val }
+}
+
+fn main() -> u64 {
+    let w: Win4 = win_new(4u64, 8u64, 2u64, 6u64);
+
+    let s: u64 = win_sum(w);     // 4+8+2+6 = 20
+    let mn: u64 = win_min(w);    // 2
+    let mx: u64 = win_max(w);    // 8
+    let rng: u64 = win_range(w); // 8-2 = 6
+    let avg: u64 = win_avg(w);   // 20/4 = 5
+
+    // Slide in 10, drop 4 → [8, 2, 6, 10]
+    let w2: Win4 = win_slide(w, 10u64);
+    let s2: u64 = win_sum(w2);   // 8+2+6+10 = 26
+
+    s + mn + mx + rng + avg + s2
+    // 20 + 2 + 8 + 6 + 5 + 26 = 67
+    // = 67
+}

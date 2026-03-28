@@ -1,0 +1,128 @@
+// Demo 114: Verified checksum algorithms
+//
+// Internet checksum (ones-complement sum), simple CRC-8, Fletcher-16 checksum,
+// and Adler-32 components. Postconditions bound all outputs.
+
+// --- Ones-complement utilities ---
+
+// Add two 16-bit values with end-around carry (ones-complement addition).
+// Result fits in 16 bits.
+fn oc_add(a: u64, b: u64) -> u64
+    requires a < 65536u64
+    requires b < 65536u64
+    ensures result < 65536u64
+{
+    let s: u64 = a + b;
+    let lo: u64 = s & 65535u64;
+    let carry: u64 = s >> 16u64;
+    let r: u64 = lo + carry;
+    if r >= 65536u64 { r - 65536u64 } else { r }
+}
+
+// Internet checksum (ones-complement) of 4 bytes packed as 2 words.
+// w0 = bytes [0,1], w1 = bytes [2,3]. Each < 65536.
+fn inet_checksum4(w0: u64, w1: u64) -> u64
+    requires w0 < 65536u64
+    requires w1 < 65536u64
+    ensures result < 65536u64
+{
+    let s: u64 = oc_add(w0, w1);
+    let inv: u64 = s ^ 65535u64;    // bitwise NOT of low 16 bits
+    inv & 65535u64
+}
+
+// --- CRC-8 (polynomial 0x07) single-byte update ---
+// This is one step of the standard CRC-8 algorithm.
+fn crc8_byte(crc: u64, data: u64) -> u64
+    requires crc < 256u64
+    requires data < 256u64
+    ensures result < 256u64
+{
+    let x: u64 = crc ^ data;
+    // 8 rounds of shift+XOR (unrolled)
+    let x0: u64 = if (x & 128u64) > 0u64 { ((x << 1u64) & 255u64) ^ 7u64 } else { (x << 1u64) & 255u64 };
+    let x1: u64 = if (x0 & 128u64) > 0u64 { ((x0 << 1u64) & 255u64) ^ 7u64 } else { (x0 << 1u64) & 255u64 };
+    let x2: u64 = if (x1 & 128u64) > 0u64 { ((x1 << 1u64) & 255u64) ^ 7u64 } else { (x1 << 1u64) & 255u64 };
+    let x3: u64 = if (x2 & 128u64) > 0u64 { ((x2 << 1u64) & 255u64) ^ 7u64 } else { (x2 << 1u64) & 255u64 };
+    let x4: u64 = if (x3 & 128u64) > 0u64 { ((x3 << 1u64) & 255u64) ^ 7u64 } else { (x3 << 1u64) & 255u64 };
+    let x5: u64 = if (x4 & 128u64) > 0u64 { ((x4 << 1u64) & 255u64) ^ 7u64 } else { (x4 << 1u64) & 255u64 };
+    let x6: u64 = if (x5 & 128u64) > 0u64 { ((x5 << 1u64) & 255u64) ^ 7u64 } else { (x5 << 1u64) & 255u64 };
+    let x7: u64 = if (x6 & 128u64) > 0u64 { ((x6 << 1u64) & 255u64) ^ 7u64 } else { (x6 << 1u64) & 255u64 };
+    x7
+}
+
+// CRC-8 over 4 bytes starting from crc=0.
+fn crc8_4(b0: u64, b1: u64, b2: u64, b3: u64) -> u64
+    requires b0 < 256u64
+    requires b1 < 256u64
+    requires b2 < 256u64
+    requires b3 < 256u64
+    ensures result < 256u64
+{
+    let c0: u64 = crc8_byte(0u64, b0);
+    let c1: u64 = crc8_byte(c0, b1);
+    let c2: u64 = crc8_byte(c1, b2);
+    let c3: u64 = crc8_byte(c2, b3);
+    c3
+}
+
+// --- Fletcher-16 components ---
+// Returns sum1: simple byte sum mod 255.
+fn fletcher_sum1(b0: u64, b1: u64, b2: u64, b3: u64) -> u64
+    requires b0 < 256u64
+    requires b1 < 256u64
+    requires b2 < 256u64
+    requires b3 < 256u64
+    ensures result < 255u64
+{
+    let s: u64 = (b0 + b1 + b2 + b3) % 255u64;
+    s
+}
+
+// Returns sum2: cumulative sum mod 255.
+fn fletcher_sum2(b0: u64, b1: u64, b2: u64, b3: u64) -> u64
+    requires b0 < 256u64
+    requires b1 < 256u64
+    requires b2 < 256u64
+    requires b3 < 256u64
+    ensures result < 255u64
+{
+    let a1: u64 = b0 % 255u64;
+    let a2: u64 = (a1 + b1) % 255u64;
+    let a3: u64 = (a2 + b2) % 255u64;
+    let a4: u64 = (a3 + b3) % 255u64;
+
+    let c1: u64 = b0 % 255u64;
+    let c2: u64 = (c1 + (a1 + b1) % 255u64) % 255u64;
+    let c3: u64 = (c2 + (a2 + b2) % 255u64) % 255u64;
+    let c4: u64 = (c3 + (a3 + b3) % 255u64) % 255u64;
+    c4
+}
+
+fn main() -> u64 {
+    // oc_add tests
+    let oc1: u64 = oc_add(0u64, 0u64);          // 0
+    let oc2: u64 = oc_add(65535u64, 1u64);      // 65535 + 1 = 65536; carry → 1
+    let oc3: u64 = oc_add(60000u64, 10000u64);  // 70000 → carry: 70000 & 0xffff = 4464, carry=1 → 4465
+
+    // inet_checksum4 of all-zeros
+    let ic0: u64 = inet_checksum4(0u64, 0u64);  // ~0 & 0xffff = 65535
+
+    // CRC-8 of bytes [0, 0, 0, 0]
+    let crc0: u64 = crc8_4(0u64, 0u64, 0u64, 0u64);  // 0
+
+    // CRC-8 of bytes [1, 2, 3, 4]
+    let crc1: u64 = crc8_4(1u64, 2u64, 3u64, 4u64);  // some value < 256
+
+    // Fletcher sum1 of [1, 2, 3, 4]: (1+2+3+4)%255 = 10
+    let fs1: u64 = fletcher_sum1(1u64, 2u64, 3u64, 4u64);  // 10
+
+    // Fletcher sum2 of [1, 2, 3, 4]
+    let fs2: u64 = fletcher_sum2(1u64, 2u64, 3u64, 4u64);  // < 255
+
+    oc1 + oc2 + oc3 + ic0 + crc0 + crc1 + fs1 + fs2
+    // 0 + 1 + 4465 + 65535 + 0 + crc1 + 10 + fs2
+    // crc1 = crc8(1,2,3,4) = computed value
+    // fs2 = some value < 255
+    // exact sum varies but all bounds verified
+}

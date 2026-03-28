@@ -1,0 +1,80 @@
+// Demo 138: Quantified writes — index-dependent span initialization
+//
+// Each write s[idx] = f(idx) adds a write fact and frame axiom.
+// With the loop invariant forall j < idx, s[j] == f(j), Z3 chains:
+//   write fact:  s[idx] == f(idx)          (new element correct)
+//   frame axiom: forall k != idx, s[k] == __s_pN[k]  (others unchanged)
+//   renamed inv: forall j < idx, __s_pN[j] == f(j)   (history preserved)
+// → preservation: forall j < idx+1, s[j] == f(j).
+//
+// After the loop: idx == s.len, so forall j < s.len, s[j] == f(j). ✓
+
+// ── fill_increasing: s[i] = start + i ────────────────────────────────────────
+fn fill_increasing(s: span<u64>, start: u64)
+    requires s.len <= 10000u64
+    requires start + s.len <= 4000000000u64
+    ensures forall i: u64, i < s.len ==> s[i] == start + i
+{
+    let mut idx: u64 = 0u64;
+    while idx < s.len
+        invariant idx <= s.len
+        invariant forall j: u64, j < idx ==> s[j] == start + j
+    {
+        s[idx] = start + idx;
+        idx = idx + 1u64;
+    };
+}
+
+// ── copy_add: dst[i] = src[i] + delta ────────────────────────────────────────
+fn copy_add(dst: span<u64>, src: span<u64>, delta: u64)
+    requires dst.len == src.len
+    requires dst.len <= 10000u64
+    requires forall i: u64, i < src.len ==> src[i] + delta < 4000000000u64
+    ensures forall i: u64, i < dst.len ==> dst[i] == src[i] + delta
+{
+    let mut idx: u64 = 0u64;
+    while idx < dst.len
+        invariant idx <= dst.len
+        invariant forall j: u64, j < idx ==> dst[j] == src[j] + delta
+    {
+        dst[idx] = src[idx] + delta;
+        idx = idx + 1u64;
+    };
+}
+
+// ── zip_add: out[i] = a[i] + b[i] ────────────────────────────────────────────
+fn zip_add(a: span<u64>, b: span<u64>, out: span<u64>)
+    requires a.len == b.len
+    requires a.len == out.len
+    requires a.len <= 10000u64
+    requires forall i: u64, i < a.len ==> a[i] + b[i] < 4000000000u64
+    ensures forall i: u64, i < out.len ==> out[i] == a[i] + b[i]
+{
+    let mut idx: u64 = 0u64;
+    while idx < out.len
+        invariant idx <= out.len
+        invariant forall j: u64, j < idx ==> out[j] == a[j] + b[j]
+    {
+        out[idx] = a[idx] + b[idx];
+        idx = idx + 1u64;
+    };
+}
+
+// ── fill_increasing also proves sorted postcondition ─────────────────────────
+// Z3 derives s[i] <= s[i+1] from s[i]==start+i and s[i+1]==start+(i+1).
+fn fill_inc_sorted(s: span<u64>, start: u64)
+    requires s.len <= 10000u64
+    requires start + s.len <= 4000000000u64
+    ensures forall i: u64, i + 1u64 < s.len ==> s[i] <= s[i + 1u64]
+{
+    let mut idx: u64 = 0u64;
+    while idx < s.len
+        invariant idx <= s.len
+        invariant forall j: u64, j < idx ==> s[j] == start + j
+    {
+        s[idx] = start + idx;
+        idx = idx + 1u64;
+    };
+}
+
+fn main() -> u64 { 42u64 }

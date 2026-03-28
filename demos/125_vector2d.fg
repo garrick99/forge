@@ -1,0 +1,130 @@
+// Demo 125: Verified 2D vector arithmetic
+//
+// Integer 2D vectors with verified dot product, component-wise ops,
+// Manhattan/Chebyshev distance, and algebraic identities.
+
+struct Vec2 { x: u64, y: u64 }
+
+fn vec_new(x: u64, y: u64) -> Vec2
+    ensures result.x == x
+    ensures result.y == y
+{
+    struct Vec2 { x: x, y: y }
+}
+
+fn vec_add(a: Vec2, b: Vec2) -> Vec2
+    ensures result.x == a.x + b.x
+    ensures result.y == a.y + b.y
+{
+    struct Vec2 { x: a.x + b.x, y: a.y + b.y }
+}
+
+fn vec_scale(v: Vec2, s: u64) -> Vec2
+    ensures result.x == v.x * s
+    ensures result.y == v.y * s
+{
+    struct Vec2 { x: v.x * s, y: v.y * s }
+}
+
+// Dot product.
+fn vec_dot(a: Vec2, b: Vec2) -> u64
+    ensures result == a.x * b.x + a.y * b.y
+{
+    a.x * b.x + a.y * b.y
+}
+
+// Manhattan (L1) distance.
+fn vec_manhattan(a: Vec2, b: Vec2) -> u64 {
+    let dx: u64 = if a.x >= b.x { a.x - b.x } else { b.x - a.x };
+    let dy: u64 = if a.y >= b.y { a.y - b.y } else { b.y - a.y };
+    dx + dy
+}
+
+// Chebyshev (L-inf) distance.
+fn vec_chebyshev(a: Vec2, b: Vec2) -> u64 {
+    let dx: u64 = if a.x >= b.x { a.x - b.x } else { b.x - a.x };
+    let dy: u64 = if a.y >= b.y { a.y - b.y } else { b.y - a.y };
+    if dx >= dy { dx } else { dy }
+}
+
+// Is axis-aligned (x=0 or y=0)?
+fn vec_is_axis(v: Vec2) -> u64
+    ensures result == 0u64 || result == 1u64
+{
+    if v.x == 0u64 || v.y == 0u64 { 1u64 } else { 0u64 }
+}
+
+// Component-wise min.
+fn vec_min(a: Vec2, b: Vec2) -> Vec2
+    ensures result.x <= a.x
+    ensures result.x <= b.x
+    ensures result.y <= a.y
+    ensures result.y <= b.y
+{
+    let mx: u64 = if a.x <= b.x { a.x } else { b.x };
+    let my: u64 = if a.y <= b.y { a.y } else { b.y };
+    struct Vec2 { x: mx, y: my }
+}
+
+// Component-wise max.
+fn vec_max(a: Vec2, b: Vec2) -> Vec2
+    ensures result.x >= a.x
+    ensures result.x >= b.x
+    ensures result.y >= a.y
+    ensures result.y >= b.y
+{
+    let mx: u64 = if a.x >= b.x { a.x } else { b.x };
+    let my: u64 = if a.y >= b.y { a.y } else { b.y };
+    struct Vec2 { x: mx, y: my }
+}
+
+// Verify: add is commutative.
+fn add_commutative(a: Vec2, b: Vec2) -> u64
+    ensures result == 1u64
+{
+    let ab: Vec2 = vec_add(a, b);
+    let ba: Vec2 = vec_add(b, a);
+    if ab.x == ba.x && ab.y == ba.y { 1u64 } else { 0u64 }
+}
+
+// Verify: scale(add(a,b), s).x == scale(a,s).x + scale(b,s).x
+fn scale_distrib(a: Vec2, b: Vec2, s: u64) -> u64
+    ensures result == 1u64
+{
+    let ab: Vec2 = vec_add(a, b);
+    let sab: Vec2 = vec_scale(ab, s);
+    let sa: Vec2 = vec_scale(a, s);
+    let sb: Vec2 = vec_scale(b, s);
+    let lhs: u64 = sab.x;
+    let rhs: u64 = sa.x + sb.x;
+    if lhs == rhs { 1u64 } else { 0u64 }
+}
+
+fn main() -> u64 {
+    let a: Vec2 = vec_new(3u64, 4u64);
+    let b: Vec2 = vec_new(1u64, 2u64);
+
+    let c: Vec2 = vec_add(a, b);
+    let cx: u64 = c.x;   // 4
+    let cy: u64 = c.y;   // 6
+
+    let sc: Vec2 = vec_scale(a, 2u64);
+    let scx: u64 = sc.x;   // 6
+
+    let dot: u64 = vec_dot(a, b);        // 3*1 + 4*2 = 11
+    let man: u64 = vec_manhattan(a, b);  // 2 + 2 = 4
+    let cheb: u64 = vec_chebyshev(a, b); // max(2,2) = 2
+
+    let mn: Vec2 = vec_min(a, b);
+    let mx: Vec2 = vec_max(a, b);
+    let mnx: u64 = mn.x;  // 1
+    let mxy: u64 = mx.y;  // 4
+
+    let ax: u64 = vec_is_axis(vec_new(0u64, 7u64));  // 1
+    let comm: u64 = add_commutative(a, b);             // 1
+    let dist: u64 = scale_distrib(a, b, 3u64);         // 1
+
+    cx + cy + scx + dot + man + cheb + mnx + mxy + ax + comm + dist
+    // 4 + 6 + 6 + 11 + 4 + 2 + 1 + 4 + 1 + 1 + 1 = 41
+    // = 41
+}

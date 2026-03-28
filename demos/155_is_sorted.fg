@@ -1,0 +1,31 @@
+// Demo 155: Verified sorted-order check
+//
+// Returns true iff the span is non-decreasing (sorted ascending).
+//
+// Invariant:
+//   result == true => forall i < k-1, s[i] <= s[i+1]
+//
+// Postcondition:
+//   result == true => forall i: u64, i + 1u64 < s.len ==> s[i] <= s[i+1]
+//
+fn is_sorted(s: span<u64>) -> bool
+    requires s.len > 0u64
+    ensures result == true ==> (forall i: u64, i + 1u64 < s.len ==> s[i] <= s[i + 1u64])
+{
+    let n: u64 = s.len;
+    let mut k: u64 = 1u64;
+    let mut sorted: bool = true;
+    while k < n
+        invariant k <= n
+        invariant sorted == true ==> (forall i: u64, i + 1u64 < k ==> s[i] <= s[i + 1u64])
+        decreases n - k
+    {
+        if s[k - 1u64] > s[k] {
+            sorted = false;
+        };
+        k = k + 1u64;
+    };
+    sorted
+}
+
+fn main() -> u64 { 0u64 }

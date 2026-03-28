@@ -1,0 +1,97 @@
+// Demo 108: Verified interval arithmetic
+//
+// Intervals [lo, hi] with lo <= hi invariant.
+// Operations: add, sub, intersect, contains, width.
+// Postconditions enforce that results are valid intervals.
+
+struct Interval {
+    lo: u64,
+    hi: u64,
+}
+
+// Construct a valid interval. Requires lo <= hi.
+fn interval_new(lo: u64, hi: u64) -> Interval
+    requires lo <= hi
+    ensures result.lo == lo
+    ensures result.hi == hi
+{
+    struct Interval { lo: lo, hi: hi }
+}
+
+// Width of interval (hi - lo).
+fn interval_width(iv: Interval) -> u64
+    requires iv.lo <= iv.hi
+{
+    iv.hi - iv.lo
+}
+
+// Add a constant offset to an interval.
+// Result shifts both endpoints — hi grows, but lo <= hi is preserved.
+fn interval_shift(iv: Interval, delta: u64) -> Interval
+    requires iv.lo <= iv.hi
+    requires iv.hi + delta >= iv.hi    // no overflow on hi
+    ensures result.lo <= result.hi
+{
+    struct Interval { lo: iv.lo + delta, hi: iv.hi + delta }
+}
+
+// Intersection: max of los, min of his.
+// Returns a zero-width interval if they don't overlap.
+fn interval_intersect(a: Interval, b: Interval) -> Interval
+    requires a.lo <= a.hi
+    requires b.lo <= b.hi
+    ensures result.lo <= result.hi
+{
+    let lo: u64 = if a.lo >= b.lo { a.lo } else { b.lo };
+    let hi: u64 = if a.hi <= b.hi { a.hi } else { b.hi };
+    if lo <= hi {
+        struct Interval { lo: lo, hi: hi }
+    } else {
+        struct Interval { lo: hi, hi: hi }   // empty → lo == hi
+    }
+}
+
+// Does interval contain a value?
+fn interval_contains(iv: Interval, x: u64) -> u64
+    requires iv.lo <= iv.hi
+    ensures result == 0u64 || result == 1u64
+{
+    if x >= iv.lo && x <= iv.hi { 1u64 } else { 0u64 }
+}
+
+// Is interval a (with its bounds) a subset of interval b?
+fn interval_subset(a: Interval, b: Interval) -> u64
+    requires a.lo <= a.hi
+    requires b.lo <= b.hi
+    ensures result == 0u64 || result == 1u64
+{
+    if a.lo >= b.lo && a.hi <= b.hi { 1u64 } else { 0u64 }
+}
+
+fn main() -> u64 {
+    let iv1: Interval = interval_new(10u64, 20u64);
+    let iv2: Interval = interval_new(15u64, 30u64);
+    let iv3: Interval = interval_new(5u64, 12u64);
+
+    let w1: u64 = interval_width(iv1);    // 10
+    let w2: u64 = interval_width(iv2);    // 15
+
+    let iv4: Interval = interval_shift(iv1, 5u64);  // [15, 25]
+    let w4: u64 = interval_width(iv4);    // 10
+
+    let ix12: Interval = interval_intersect(iv1, iv2);  // [15, 20]
+    let w12: u64 = interval_width(ix12);  // 5
+
+    let ix13: Interval = interval_intersect(iv1, iv3);  // [10, 12]
+    let w13: u64 = interval_width(ix13);  // 2
+
+    let c1: u64 = interval_contains(iv1, 15u64);  // 1 (in range)
+    let c2: u64 = interval_contains(iv1, 25u64);  // 0 (out of range)
+
+    let sub1: u64 = interval_subset(ix12, iv1);   // 1 (intersect is subset of iv1)
+    let sub2: u64 = interval_subset(iv2, iv1);    // 0 (iv2 is not a subset of iv1)
+
+    w1 + w2 + w4 + w12 + w13 + c1 + c2 + sub1 + sub2
+    // 10 + 15 + 10 + 5 + 2 + 1 + 0 + 1 + 0 = 44
+    // = 44
+}

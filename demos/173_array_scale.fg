@@ -1,0 +1,29 @@
+// Demo 173: Verified array scale (multiply each element by a constant)
+//
+// Scales every element of s by `factor` in-place.
+// Proves: forall i < s.len, s[i] == old(s[i]) * factor
+//
+// Also proves the upper bound: given old(s[i]) <= max_elem,
+// the result satisfies s[i] <= max_elem * factor.
+//
+fn scale(s: span<u64>, factor: u64, max_elem: u64)
+    requires forall i: u64, i < s.len ==> s[i] <= max_elem
+    ensures forall i: u64, i < s.len ==> s[i] == old(s[i]) * factor
+    ensures forall i: u64, i < s.len ==> s[i] <= max_elem * factor
+{
+    let n: u64 = s.len;
+    let mut k: u64 = 0u64;
+    while k < n
+        invariant k <= n
+        invariant forall i: u64, i < k ==> s[i] == old(s[i]) * factor
+        invariant forall i: u64, i < k ==> s[i] <= max_elem * factor
+        invariant forall i: u64, i >= k ==> i < n ==> s[i] == old(s[i])
+        invariant forall i: u64, i >= k ==> i < n ==> s[i] <= max_elem
+        decreases n - k
+    {
+        s[k] = s[k] * factor;
+        k = k + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

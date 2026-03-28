@@ -1,0 +1,32 @@
+// Demo 178: Verified NTT round (one butterfly pass)
+//
+// Performs one level of the NTT butterfly pass with stride `half`.
+// For each group of 2*half elements, applies the butterfly to pairs.
+//
+// Simplified: proves all array accesses are in bounds.
+// The indices are i (even) and i + half (odd partner).
+//
+// Preconditions:
+//   a.len == n
+//   half > 0
+//   n == 2 * half     (exactly one butterfly level — n is a power of 2)
+//   w < q
+//   q > 0
+//   all a[i] < q
+//
+fn ntt_round(a: span<u64>, half: u64, w: u64, q: u64)
+    requires a.len == 2u64 * half
+    requires half > 0u64
+    requires w < q
+    requires q > 0u64
+    requires forall i: u64, i < a.len ==> a[i] < q
+{
+    for i in half {
+        let u: u64 = a[i];
+        let v: u64 = a[i + half] * w % q;
+        a[i]        = (u + v) % q;
+        a[i + half] = (u + q - v) % q;
+    }
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,135 @@
+// Demo 115: Verified run-length encoding helpers
+//
+// RLE encodes runs of repeated bytes as (count, value) pairs.
+// Flat representation: parallel arrays for counts and values, plus nruns.
+// Postconditions guarantee counts are positive, sizes are bounded.
+
+// A 4-run RLE buffer: count_i and val_i hold run i.
+struct Rle4 {
+    c0: u64, v0: u64,
+    c1: u64, v1: u64,
+    c2: u64, v2: u64,
+    c3: u64, v3: u64,
+    nruns: u64,
+}
+
+// Empty RLE buffer.
+fn rle_new() -> Rle4
+    ensures result.nruns == 0u64
+{
+    struct Rle4 {
+        c0: 0u64, v0: 0u64,
+        c1: 0u64, v1: 0u64,
+        c2: 0u64, v2: 0u64,
+        c3: 0u64, v3: 0u64,
+        nruns: 0u64
+    }
+}
+
+// Append a (count, value) run. Requires room.
+fn rle_push(r: Rle4, count: u64, value: u64) -> Rle4
+    requires r.nruns < 4u64
+    requires count > 0u64
+    requires value < 256u64
+    ensures result.nruns == r.nruns + 1u64
+{
+    let n: u64 = r.nruns;
+    if n == 0u64 {
+        struct Rle4 { c0: count, v0: value, c1: r.c1, v1: r.v1, c2: r.c2, v2: r.v2, c3: r.c3, v3: r.v3, nruns: 1u64 }
+    } else if n == 1u64 {
+        struct Rle4 { c0: r.c0, v0: r.v0, c1: count, v1: value, c2: r.c2, v2: r.v2, c3: r.c3, v3: r.v3, nruns: 2u64 }
+    } else if n == 2u64 {
+        struct Rle4 { c0: r.c0, v0: r.v0, c1: r.c1, v1: r.v1, c2: count, v2: value, c3: r.c3, v3: r.v3, nruns: 3u64 }
+    } else {
+        struct Rle4 { c0: r.c0, v0: r.v0, c1: r.c1, v1: r.v1, c2: r.c2, v2: r.v2, c3: count, v3: value, nruns: 4u64 }
+    }
+}
+
+// Total number of elements (sum of run counts).
+fn rle_total(r: Rle4) -> u64
+    requires r.nruns <= 4u64
+{
+    if r.nruns == 0u64 { 0u64 }
+    else if r.nruns == 1u64 { r.c0 }
+    else if r.nruns == 2u64 { r.c0 + r.c1 }
+    else if r.nruns == 3u64 { r.c0 + r.c1 + r.c2 }
+    else { r.c0 + r.c1 + r.c2 + r.c3 }
+}
+
+// Count of run i (0..3). Returns 0 if out of range.
+fn rle_count(r: Rle4, i: u64) -> u64
+    requires i < 4u64
+{
+    if i == 0u64 { r.c0 }
+    else if i == 1u64 { r.c1 }
+    else if i == 2u64 { r.c2 }
+    else { r.c3 }
+}
+
+// Value of run i (0..3).
+fn rle_value(r: Rle4, i: u64) -> u64
+    requires i < 4u64
+{
+    if i == 0u64 { r.v0 }
+    else if i == 1u64 { r.v1 }
+    else if i == 2u64 { r.v2 }
+    else { r.v3 }
+}
+
+// Encode 4 bytes as individual 1-element runs (no merging — simple version).
+fn rle_encode4(b0: u64, b1: u64, b2: u64, b3: u64) -> Rle4
+    requires b0 < 256u64
+    requires b1 < 256u64
+    requires b2 < 256u64
+    requires b3 < 256u64
+    ensures result.nruns == 4u64
+    ensures result.c0 == 1u64
+    ensures result.c1 == 1u64
+    ensures result.c2 == 1u64
+    ensures result.c3 == 1u64
+    ensures result.v0 == b0
+    ensures result.v3 == b3
+{
+    struct Rle4 {
+        c0: 1u64, v0: b0,
+        c1: 1u64, v1: b1,
+        c2: 1u64, v2: b2,
+        c3: 1u64, v3: b3,
+        nruns: 4u64
+    }
+}
+
+// Verify: encoding 4 bytes gives total 4 (uses injected count postconditions).
+fn encode_total(b0: u64, b1: u64, b2: u64, b3: u64) -> u64
+    requires b0 < 256u64
+    requires b1 < 256u64
+    requires b2 < 256u64
+    requires b3 < 256u64
+    ensures result == 4u64
+{
+    let enc: Rle4 = rle_encode4(b0, b1, b2, b3);
+    enc.c0 + enc.c1 + enc.c2 + enc.c3
+}
+
+fn main() -> u64 {
+    let r0: Rle4 = rle_new();                          // nruns=0
+    let r1: Rle4 = rle_push(r0, 5u64, 65u64);         // 5x'A', nruns=1
+    let r2: Rle4 = rle_push(r1, 3u64, 66u64);         // 3x'B', nruns=2
+    let r3: Rle4 = rle_push(r2, 2u64, 67u64);         // 2x'C', nruns=3
+
+    let sz3: u64 = r3.nruns;                           // 3
+    let tot3: u64 = rle_total(r3);                     // 5+3+2 = 10
+
+    // Encode 4 bytes individually
+    let enc: Rle4 = rle_encode4(7u64, 8u64, 9u64, 10u64);
+    let enc_runs: u64 = enc.nruns;                     // 4
+    let enc_tot: u64 = encode_total(7u64, 8u64, 9u64, 10u64);  // 4
+
+    // Check values
+    let v0: u64 = rle_value(enc, 0u64);   // 7
+    let v3: u64 = rle_value(enc, 3u64);   // 10
+
+    sz3 + tot3 + enc_runs + enc_tot + v0 + v3
+    // 3 + 10 + 4 + 4 + 7 + 10 = 38
+    // = 38
+}

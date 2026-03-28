@@ -1,0 +1,43 @@
+// Demo 152: Mutable ghost variable — verified minimum index
+//
+// Finds the index of the minimum element in a non-empty span.
+// Uses a mutable ghost variable to track the "true" minimum value of
+// elements seen so far, mirroring the runtime min_idx update.
+//
+// Key invariants:
+//   s[min_idx] == gmin           — ghost tracks element at current min index
+//   forall i < k, gmin <= s[i]  — gmin is minimum of elements seen so far
+//   min_idx < k                  — index is within visited range
+//
+// Postconditions:
+//   result < s.len
+//   forall i < s.len, s[result] <= s[i]
+//
+fn find_min_idx(s: span<u64>) -> u64
+    requires s.len > 0u64
+    ensures result < s.len
+    ensures forall i: u64, i < s.len ==> s[result] <= s[i]
+{
+    let n: u64 = s.len;
+    let mut min_idx: u64 = 0u64;
+    ghost let mut gmin: u64 = s[0u64];
+    let mut k: u64 = 1u64;
+    while k < n
+        invariant k <= n
+        invariant min_idx < k
+        invariant s[min_idx] == gmin
+        invariant forall i: u64, i < k ==> gmin <= s[i]
+        decreases n - k
+    {
+        if s[k] < gmin {
+            min_idx = k;
+            ghost gmin = s[k];
+        } else {
+            ghost gmin = gmin;
+        };
+        k = k + 1u64;
+    };
+    min_idx
+}
+
+fn main() -> u64 { 0u64 }

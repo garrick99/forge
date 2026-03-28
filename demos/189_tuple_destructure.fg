@@ -1,0 +1,23 @@
+// Demo 189: Tuple let-destructuring
+//
+// Demonstrates let (a, b) = f() syntax.
+// A function returns a 2-tuple; the caller destructures it.
+//
+fn minmax(a: u64, b: u64) -> (u64, u64)
+    ensures result.0 <= result.1
+{
+    if a <= b {
+        (a, b)
+    } else {
+        (b, a)
+    }
+}
+
+fn use_minmax(x: u64, y: u64) -> u64
+    ensures result >= 0u64
+{
+    let (lo, hi) = minmax(x, y);
+    hi - lo
+}
+
+fn main() -> u64 { 0u64 }

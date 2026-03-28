@@ -1,0 +1,82 @@
+// Demo 139: old() in postconditions — capture pre-call span state
+//
+// For each span<T> parameter s, the compiler adds a snapshot __s_init with:
+//   forall k, __s_init[k] == s[k]   (element equality at function entry)
+//   __s_init.len == s.len            (length equality at function entry)
+// env_array_write renames s→__s_pN in these facts, preserving the chain.
+// old(s[j]) in postconditions encodes as (select __s_init j) in Z3.
+//
+// This enables full verification of mutations: not just "new value is X"
+// but "new value equals what old slot Y held."
+
+// ── Swap: both slots correctly exchanged ─────────────────────────────────────
+// Proves two postconditions simultaneously:
+//   s[i] == old(s[j])  — slot i now holds what j had
+//   s[j] == old(s[i])  — slot j now holds what i had
+fn swap(s: span<u64>, i: u64, j: u64)
+    requires i < s.len
+    requires j < s.len
+    requires i != j
+    requires s.len <= 10000u64
+    ensures s[i] == old(s[j])
+    ensures s[j] == old(s[i])
+{
+    let tmp: u64 = s[i];
+    s[i] = s[j];
+    s[j] = tmp;
+}
+
+// ── Single write: postcondition in terms of original value ───────────────────
+// old(s[j]) preserved at every k != i.
+fn write_preserves(s: span<u64>, i: u64, j: u64, v: u64)
+    requires i < s.len
+    requires j < s.len
+    requires i != j
+    requires s.len <= 10000u64
+    ensures s[j] == old(s[j])
+{
+    s[i] = v;
+}
+
+// ── Overwrite: slot retains initial value until explicitly changed ────────────
+fn init_then_overwrite(s: span<u64>, i: u64, first: u64, second: u64)
+    requires i < s.len
+    requires s.len <= 10000u64
+    ensures s[i] == second
+{
+    s[i] = first;
+    s[i] = second;
+}
+
+// ── Rotate three: s[a]←s[b], s[b]←s[c], s[c]←s[a] ──────────────────────────
+fn rotate3(s: span<u64>, a: u64, b: u64, c: u64)
+    requires a < s.len
+    requires b < s.len
+    requires c < s.len
+    requires a != b
+    requires b != c
+    requires a != c
+    requires s.len <= 10000u64
+    ensures s[a] == old(s[b])
+    ensures s[b] == old(s[c])
+    ensures s[c] == old(s[a])
+{
+    let va: u64 = s[a];
+    let vb: u64 = s[b];
+    let vc: u64 = s[c];
+    s[a] = vb;
+    s[b] = vc;
+    s[c] = va;
+}
+
+// ── Copy slot: s[dst] gets value from s[src] ─────────────────────────────────
+fn copy_slot(s: span<u64>, src: u64, dst: u64)
+    requires src < s.len
+    requires dst < s.len
+    requires s.len <= 10000u64
+    ensures s[dst] == old(s[src])
+{
+    s[dst] = s[src];
+}
+
+fn main() -> u64 { 0u64 }

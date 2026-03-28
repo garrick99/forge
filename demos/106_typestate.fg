@@ -1,0 +1,74 @@
+// Demo 106: Typestate pattern — connection lifecycle
+//
+// Models a TCP-like connection with states: Closed → Listening → Connected → Closed.
+// Each transition is a struct transform; invalid transitions are type errors.
+// Postconditions ensure state fields are consistent.
+
+enum ConnState { Closed, Listening, Connected }
+
+struct Connection {
+    state:      u64,   // 0=Closed, 1=Listening, 2=Connected
+    local_port: u64,
+    remote_port: u64,
+    bytes_sent:  u64,
+}
+
+fn conn_new() -> Connection
+    ensures result.state == 0u64
+    ensures result.bytes_sent == 0u64
+{
+    struct Connection { state: 0u64, local_port: 0u64, remote_port: 0u64, bytes_sent: 0u64 }
+}
+
+fn conn_listen(c: Connection, port: u64) -> Connection
+    requires c.state == 0u64
+    requires port > 0u64
+    ensures result.state == 1u64
+    ensures result.local_port == port
+{
+    struct Connection { state: 1u64, local_port: port, remote_port: 0u64, bytes_sent: 0u64 }
+}
+
+fn conn_accept(c: Connection, remote: u64) -> Connection
+    requires c.state == 1u64
+    requires remote > 0u64
+    ensures result.state == 2u64
+    ensures result.local_port == c.local_port
+    ensures result.remote_port == remote
+{
+    struct Connection { state: 2u64, local_port: c.local_port,
+                        remote_port: remote, bytes_sent: 0u64 }
+}
+
+fn conn_send(c: Connection, nbytes: u64) -> Connection
+    requires c.state == 2u64
+    ensures result.state == 2u64
+    ensures result.bytes_sent == c.bytes_sent + nbytes
+{
+    struct Connection { state: 2u64, local_port: c.local_port,
+                        remote_port: c.remote_port, bytes_sent: c.bytes_sent + nbytes }
+}
+
+fn conn_close(c: Connection) -> Connection
+    ensures result.state == 0u64
+{
+    struct Connection { state: 0u64, local_port: 0u64, remote_port: 0u64,
+                        bytes_sent: c.bytes_sent }
+}
+
+fn main() -> u64 {
+    let c0: Connection = conn_new();        // Closed
+    let c1: Connection = conn_listen(c0, 8080u64);  // Listening on 8080
+    let c2: Connection = conn_accept(c1, 4444u64);  // Connected to 4444
+    let c3: Connection = conn_send(c2, 100u64);     // Sent 100 bytes
+    let c4: Connection = conn_send(c3, 50u64);      // Sent 50 more
+    let c5: Connection = conn_close(c4);            // Closed
+
+    let port: u64 = c2.local_port;     // 8080 % 256 = 8080 (> 256, so mod)
+    let sent: u64 = c4.bytes_sent;     // 150
+    let closed: u64 = c5.state;        // 0
+
+    // port % 256 = 8080 % 256 = 144, but let's use raw values
+    c2.local_port % 256u64 + sent + closed
+    // 8080%256 + 150 + 0 = 144 + 150 + 0 = 294 % 256 = 38
+}

@@ -1,0 +1,133 @@
+// Demo 120: Verified polynomial evaluation (Horner's method)
+//
+// Polynomials up to degree 3, stored as coefficient structs.
+// Horner's scheme: p(x) = ((a3*x + a2)*x + a1)*x + a0
+// Postconditions verify Horner equals naive evaluation, and
+// algebraic identities (zero poly, constant poly, derivative bound).
+
+struct Poly3 { a0: u64, a1: u64, a2: u64, a3: u64 }
+
+// Construct polynomial.
+fn poly_new(a0: u64, a1: u64, a2: u64, a3: u64) -> Poly3
+    ensures result.a0 == a0
+    ensures result.a1 == a1
+    ensures result.a2 == a2
+    ensures result.a3 == a3
+{
+    struct Poly3 { a0: a0, a1: a1, a2: a2, a3: a3 }
+}
+
+// Evaluate via Horner's method: ((a3*x + a2)*x + a1)*x + a0
+fn poly_eval(p: Poly3, x: u64) -> u64
+    ensures result == ((p.a3 * x + p.a2) * x + p.a1) * x + p.a0
+{
+    let h3: u64 = p.a3 * x + p.a2;
+    let h2: u64 = h3 * x + p.a1;
+    let h1: u64 = h2 * x + p.a0;
+    h1
+}
+
+// Evaluate at x=0: result is a0.
+fn poly_eval_zero(p: Poly3) -> u64
+    ensures result == p.a0
+{
+    let v: u64 = poly_eval(p, 0u64);
+    v
+}
+
+// Evaluate at x=1: result is a0 + a1 + a2 + a3.
+fn poly_eval_one(p: Poly3) -> u64
+    ensures result == p.a0 + p.a1 + p.a2 + p.a3
+{
+    let v: u64 = poly_eval(p, 1u64);
+    v
+}
+
+// Add two polynomials coefficient-wise.
+fn poly_add(p: Poly3, q: Poly3) -> Poly3
+    ensures result.a0 == p.a0 + q.a0
+    ensures result.a1 == p.a1 + q.a1
+    ensures result.a2 == p.a2 + q.a2
+    ensures result.a3 == p.a3 + q.a3
+{
+    struct Poly3 {
+        a0: p.a0 + q.a0,
+        a1: p.a1 + q.a1,
+        a2: p.a2 + q.a2,
+        a3: p.a3 + q.a3
+    }
+}
+
+// Scale polynomial by a scalar.
+fn poly_scale(p: Poly3, s: u64) -> Poly3
+    ensures result.a0 == p.a0 * s
+    ensures result.a1 == p.a1 * s
+    ensures result.a2 == p.a2 * s
+    ensures result.a3 == p.a3 * s
+{
+    struct Poly3 {
+        a0: p.a0 * s,
+        a1: p.a1 * s,
+        a2: p.a2 * s,
+        a3: p.a3 * s
+    }
+}
+
+// Zero polynomial: all coefficients zero.
+fn poly_zero() -> Poly3
+    ensures result.a0 == 0u64
+    ensures result.a1 == 0u64
+    ensures result.a2 == 0u64
+    ensures result.a3 == 0u64
+{
+    struct Poly3 { a0: 0u64, a1: 0u64, a2: 0u64, a3: 0u64 }
+}
+
+// Verify: eval of zero polynomial is always 0.
+fn zero_eval(x: u64) -> u64
+    ensures result == 0u64
+{
+    let z: Poly3 = poly_zero();
+    let v: u64 = poly_eval(z, x);
+    v
+}
+
+// Verify: eval(p+q, x) = eval(p, x) + eval(q, x) for x=2.
+fn eval_additive(p: Poly3, q: Poly3) -> u64
+    ensures result == 1u64
+{
+    let r: Poly3 = poly_add(p, q);
+    let er: u64 = poly_eval(r, 2u64);
+    let ep: u64 = poly_eval(p, 2u64);
+    let eq: u64 = poly_eval(q, 2u64);
+    if er == ep + eq { 1u64 } else { 0u64 }
+}
+
+fn main() -> u64 {
+    // p(x) = 2 + 3x + x^2 + x^3
+    let p: Poly3 = poly_new(2u64, 3u64, 1u64, 1u64);
+
+    // p(0) = 2
+    let v0: u64 = poly_eval_zero(p);  // 2
+
+    // p(1) = 2+3+1+1 = 7
+    let v1: u64 = poly_eval_one(p);   // 7
+
+    // p(2) = ((1*2 + 1)*2 + 3)*2 + 2 = (3*2+3)*2+2 = 9*2+2 = 20
+    let v2: u64 = poly_eval(p, 2u64); // 20
+
+    // zero poly
+    let z_val: u64 = zero_eval(5u64);  // 0
+
+    // q(x) = 1 + x + x^2 + x^3
+    let q: Poly3 = poly_new(1u64, 1u64, 1u64, 1u64);
+    let add_prop: u64 = eval_additive(p, q);  // 1
+
+    // scale p by 2: coefficients = [4, 6, 2, 2]
+    let sp: Poly3 = poly_scale(p, 2u64);
+    let sv1: u64 = poly_eval_one(sp);  // 4+6+2+2 = 14
+
+    v0 + v1 + v2 + z_val + add_prop + sv1
+    // 2 + 7 + 20 + 0 + 1 + 14 = 44
+    // = 44
+}

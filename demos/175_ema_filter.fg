@@ -1,0 +1,39 @@
+// Demo 175: Verified EMA (exponential moving average) filter
+//
+// Fixed-point EMA: ema[k+1] = (alpha * s[k] + (256 - alpha) * ema[k]) / 256
+// where alpha is an 8-bit weight in [1, 255].
+//
+// Uses integer division (shift by 8 = divide by 256).
+// Proves: for all k, ema[k] <= max_elem (filter stays bounded).
+//
+// Preconditions:
+//   alpha in [1, 255]
+//   all s[i] <= max_elem
+//   s.len > 0
+//
+// Invariants:
+//   k <= n
+//   acc <= max_elem   (current EMA value bounded)
+//
+fn ema_filter(s: span<u64>, alpha: u64, max_elem: u64) -> u64
+    requires s.len > 0u64
+    requires alpha >= 1u64
+    requires alpha <= 255u64
+    requires forall i: u64, i < s.len ==> s[i] <= max_elem
+    ensures result <= max_elem
+{
+    let n: u64 = s.len;
+    let mut acc: u64 = s[0u64];
+    let mut k: u64 = 1u64;
+    while k < n
+        invariant k <= n
+        invariant acc <= max_elem
+        decreases n - k
+    {
+        acc = (alpha * s[k] + (256u64 - alpha) * acc) / 256u64;
+        k = k + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

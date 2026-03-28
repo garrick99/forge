@@ -1,0 +1,29 @@
+// Demo 165: Verified matrix transpose (out-of-place)
+//
+// Computes out[j*rows + i] = A[i*cols + j] for a rows×cols matrix.
+// Flat row-major layout.
+//
+// Preconditions:
+//   A.len == rows * cols
+//   out.len == rows * cols
+//
+// The nested for loop automatically injects:
+//   0 <= i < rows  (outer)
+//   0 <= j < cols  (inner)
+// The flat indices i*cols+j and j*rows+i are proved in-bounds by the NIA
+// fallback (the same mechanism as demo 164).
+//
+fn transpose(A: span<u64>, out: span<u64>, rows: u64, cols: u64)
+    requires A.len == rows * cols
+    requires out.len == rows * cols
+    requires rows > 0u64
+    requires cols > 0u64
+{
+    for i in rows {
+        for j in cols {
+            out[j * rows + i] = A[i * cols + j];
+        }
+    }
+}
+
+fn main() -> u64 { 0u64 }

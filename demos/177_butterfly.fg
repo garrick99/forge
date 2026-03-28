@@ -1,0 +1,35 @@
+// Demo 177: Verified NTT butterfly operation
+//
+// Cooley-Tukey butterfly:
+//   u = a[i]
+//   v = a[j] * w mod q
+//   a[i] = (u + v) mod q
+//   a[j] = (u - v + q) mod q
+//
+// Proves: after butterfly, both a[i] and a[j] are < q.
+//
+// Preconditions:
+//   i < j
+//   j < a.len
+//   a[i] < q
+//   a[j] < q
+//   w < q
+//   q > 0
+//
+fn butterfly(a: span<u64>, i: u64, j: u64, w: u64, q: u64)
+    requires i < j
+    requires j < a.len
+    requires a[i] < q
+    requires a[j] < q
+    requires w < q
+    requires q > 0u64
+    ensures a[i] < q
+    ensures a[j] < q
+{
+    let u: u64 = a[i];
+    let v: u64 = a[j] * w % q;
+    a[i] = (u + v) % q;
+    a[j] = (u + q - v) % q;
+}
+
+fn main() -> u64 { 0u64 }

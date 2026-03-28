@@ -1,0 +1,92 @@
+// Demo 132: Verified recursive functions with termination measures
+//
+// decreases: tells the prover which measure strictly decreases each call.
+// The prover checks: measure > 0 (or is well-founded) at each recursive call,
+// and the measure strictly decreases (or a lexicographic pair decreases).
+
+// Factorial: n! with termination measure n.
+fn factorial(n: u64) -> u64
+    requires n <= 12u64
+    decreases n
+{
+    if n == 0u64 { 1u64 }
+    else { n * factorial(n - 1u64) }
+}
+
+// Fibonacci: exponential but proved terminating.
+fn fib(n: u64) -> u64
+    requires n <= 20u64
+    decreases n
+{
+    if n <= 1u64 { n }
+    else { fib(n - 1u64) + fib(n - 2u64) }
+}
+
+// Integer power: base^exp. Use let binding so postcondition injection works.
+fn ipow(base: u64, exp: u64) -> u64
+    requires base > 0u64
+    requires exp <= 10u64
+    decreases exp
+{
+    if exp == 0u64 { 1u64 }
+    else {
+        let sub: u64 = ipow(base, exp - 1u64);
+        base * sub
+    }
+}
+
+// Sum 0 + 1 + ... + n recursively.
+fn rsum(n: u64) -> u64
+    requires n <= 100u64
+    decreases n
+{
+    if n == 0u64 { 0u64 }
+    else { n + rsum(n - 1u64) }
+}
+
+// GCD via Euclidean algorithm. decreases b (since a%b < b when b > 0).
+fn gcd(a: u64, b: u64) -> u64
+    requires a > 0u64
+    requires b > 0u64
+    requires a < 10000u64
+    requires b < 10000u64
+    decreases b
+{
+    if a % b == 0u64 { b }
+    else { gcd(b, a % b) }
+}
+
+// Count digits in n (base 10).
+fn count_digits(n: u64) -> u64
+    requires n > 0u64
+    requires n < 1000000000u64
+    ensures result > 0u64
+    decreases n
+{
+    if n < 10u64 { 1u64 }
+    else { 1u64 + count_digits(n / 10u64) }
+}
+
+// Integer log2: floor(log2(n)) for n >= 1.
+fn ilog2_rec(n: u64) -> u64
+    requires n >= 1u64
+    requires n < 4294967296u64
+    decreases n
+{
+    if n <= 1u64 { 0u64 }
+    else { 1u64 + ilog2_rec(n / 2u64) }
+}
+
+fn main() -> u64 {
+    let f5: u64 = factorial(5u64);         // 120
+    let fb7: u64 = fib(7u64);              // 13
+    let p3: u64 = ipow(2u64, 10u64);       // 1024
+    let rs: u64 = rsum(10u64);             // 55
+    let g: u64 = gcd(48u64, 18u64);        // 6
+    let cd: u64 = count_digits(12345u64);  // 5
+    let lg: u64 = ilog2_rec(256u64);       // 8
+
+    f5 + fb7 + p3 + rs + g + cd + lg
+    // 120 + 13 + 1024 + 55 + 6 + 5 + 8 = 1231
+    // = 1231
+}

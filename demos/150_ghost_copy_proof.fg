@@ -1,0 +1,36 @@
+// Demo 150: Ghost variable — verified array copy with ghost snapshot
+//
+// Copies src[0..n) into dst[0..n).
+// Uses a ghost variable to capture the initial value of dst for comparison,
+// though since we write every element the postcondition is simply:
+//   forall i < n, dst[i] == src[i]
+//
+// The ghost let documents INTENT: 'ghost let original_src = src' records that
+// we're capturing the source at function entry, useful when src and dst alias
+// or src is mutated (not the case here, but the pattern is instructive).
+//
+// This demo shows ghost variables as proof bookmarks:
+//   ghost let snapshot: u64 = s.len  — ghost capture of span length
+//
+// Postconditions:
+//   forall i < n, dst[i] == src[i]
+//
+fn copy_span(src: span<u64>, dst: span<u64>, n: u64)
+    requires n <= src.len
+    requires n <= dst.len
+    ensures forall i: u64, i < n ==> dst[i] == src[i]
+{
+    ghost let src_len_snap: u64 = src.len;
+    ghost let dst_len_snap: u64 = dst.len;
+    let mut k: u64 = 0u64;
+    while k < n
+        invariant k <= n
+        invariant forall i: u64, i < k ==> dst[i] == src[i]
+        decreases n - k
+    {
+        dst[k] = src[k];
+        k = k + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

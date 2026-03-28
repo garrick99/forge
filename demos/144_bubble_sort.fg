@@ -1,0 +1,72 @@
+// Demo 144: Verified in-place bubble sort
+//
+// Proves full sortedness: forall a < b < s.len, s[a] <= s[b]
+//
+// Key implementation choice: the inner conditional swap
+//   if s[j] > s[j+1] { swap }
+// is rewritten as unconditional min/max writes:
+//   let a = s[j]; let b = s[j+1];
+//   let lo_val = if a <= b { a } else { b };   // ITE on scalar
+//   let hi_val = if a <= b { b } else { a };   // ITE on scalar
+//   s[j] = lo_val; s[j+1] = hi_val;           // unconditional array writes
+//
+// This avoids conditional array element writes (not yet supported for
+// ITE modeling) and makes all array mutations visible to the proof engine.
+//
+// Outer loop invariants (k = number of passes completed):
+//   inv1: last k elements are in final sorted position:
+//         forall n-k <= a < b < n, s[a] <= s[b]
+//   inv2: every unsorted element is <= every sorted suffix element:
+//         forall a < n-k, b >= n-k && b < n, s[a] <= s[b]
+//
+// Inner loop invariants (j = current index being processed):
+//   inv3: s[j] is the running maximum of s[0..j+1]:
+//         forall i <= j, s[i] <= s[j]
+//   inv4: cross-boundary ordering preserved:
+//         forall i < n-k, b >= n-k && b < n, s[i] <= s[b]
+//         (same as outer inv2, maintained because min/max never
+//          moves a value above the sorted suffix elements)
+//
+// Key Z3 chains for inner loop while_preserved (after writing lo_val/hi_val):
+//   lo_val = ite(a<=b, a, b):
+//     if a<=b: lo_val = a = s_old[j], bounded by inv3, inv4 ✓
+//     else:    lo_val = b = s_old[j+1], bounded by prev inv4 ✓
+//   hi_val = ite(a<=b, b, a) >= lo_val (by ITE symmetry) ✓
+//   For i < j: s[i] unchanged (frame), s_old[i] <= s_old[j] (inv3),
+//     hi_val = max(a,b) >= a = s_old[j] >= s_old[i] → s[i] <= s[j+1] ✓
+//
+fn bubble_sort(s: span<u64>)
+    ensures forall a: u64, forall b: u64, a < b && b < s.len ==> s[a] <= s[b]
+{
+    let n: u64 = s.len;
+    let mut k: u64 = 0u64;
+    while k < n
+        invariant k <= n
+        invariant forall a: u64, forall b: u64,
+                    n - k <= a && a < b && b < n ==> s[a] <= s[b]
+        invariant forall a: u64, forall b: u64,
+                    a < n - k && b >= n - k && b < n ==> s[a] <= s[b]
+        decreases n - k
+    {
+        let bound: u64 = n - k - 1u64;
+        let mut j: u64 = 0u64;
+        while j < bound
+            invariant j <= bound
+            invariant forall i: u64, i <= j ==> s[i] <= s[j]
+            invariant forall i: u64, forall b: u64,
+                        i < n - k && b >= n - k && b < n ==> s[i] <= s[b]
+            decreases bound - j
+        {
+            let a: u64 = s[j];
+            let b: u64 = s[j + 1u64];
+            let lo_val: u64 = if a <= b { a } else { b };
+            let hi_val: u64 = if a <= b { b } else { a };
+            s[j] = lo_val;
+            s[j + 1u64] = hi_val;
+            j = j + 1u64;
+        };
+        k = k + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

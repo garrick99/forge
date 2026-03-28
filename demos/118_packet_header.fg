@@ -1,0 +1,126 @@
+// Demo 118: Verified packet header parsing
+//
+// A minimal network packet header (simplified IPv4-like):
+//   bits [63:56] = version (4 bits) + ihl (4 bits)
+//   bits [55:48] = dscp/ecn
+//   bits [47:32] = total length
+//   bits [31:16] = identification
+//   bits [15:13] = flags, [12:0] = fragment offset
+//   (packed into a single u64 for simplicity)
+//
+// Extraction functions with postconditions bounding each field.
+
+// Extract version (top 4 bits of byte 0).
+fn pkt_version(hdr: u64) -> u64
+    ensures result < 16u64
+{
+    (hdr >> 60u64) & 15u64
+}
+
+// Extract IHL (bottom 4 bits of byte 0).
+fn pkt_ihl(hdr: u64) -> u64
+    ensures result < 16u64
+{
+    (hdr >> 56u64) & 15u64
+}
+
+// Extract DSCP (top 6 bits of byte 1).
+fn pkt_dscp(hdr: u64) -> u64
+    ensures result < 64u64
+{
+    (hdr >> 50u64) & 63u64
+}
+
+// Extract ECN (bottom 2 bits of byte 1).
+fn pkt_ecn(hdr: u64) -> u64
+    ensures result < 4u64
+{
+    (hdr >> 48u64) & 3u64
+}
+
+// Extract total length (bytes 2-3, 16-bit field).
+fn pkt_total_len(hdr: u64) -> u64
+    ensures result < 65536u64
+{
+    (hdr >> 32u64) & 65535u64
+}
+
+// Extract identification (bytes 4-5, 16-bit field).
+fn pkt_ident(hdr: u64) -> u64
+    ensures result < 65536u64
+{
+    (hdr >> 16u64) & 65535u64
+}
+
+// Extract flags (3 bits: DF, MF, reserved).
+fn pkt_flags(hdr: u64) -> u64
+    ensures result < 8u64
+{
+    (hdr >> 13u64) & 7u64
+}
+
+// Extract fragment offset (13 bits).
+fn pkt_frag_offset(hdr: u64) -> u64
+    ensures result < 8192u64
+{
+    hdr & 8191u64
+}
+
+// Pack a header from components (no postcondition needed — construction helper).
+fn pkt_pack(version: u64, ihl: u64, dscp: u64, ecn: u64,
+            total_len: u64, ident: u64, flags: u64, frag: u64) -> u64
+    requires version < 16u64
+    requires ihl < 16u64
+    requires dscp < 64u64
+    requires ecn < 4u64
+    requires total_len < 65536u64
+    requires ident < 65536u64
+    requires flags < 8u64
+    requires frag < 8192u64
+{
+    (version << 60u64) |
+    (ihl    << 56u64) |
+    (dscp   << 50u64) |
+    (ecn    << 48u64) |
+    (total_len << 32u64) |
+    (ident     << 16u64) |
+    (flags     << 13u64) |
+    frag
+}
+
+// Validate: IPv4 requires version == 4 and IHL >= 5.
+fn pkt_is_ipv4(hdr: u64) -> u64
+    ensures result == 0u64 || result == 1u64
+{
+    let v: u64 = pkt_version(hdr);
+    let ihl: u64 = pkt_ihl(hdr);
+    if v == 4u64 && ihl >= 5u64 { 1u64 } else { 0u64 }
+}
+
+// Is the "Don't Fragment" bit set? (flag bit 1, 0-indexed from LSB of flags field)
+fn pkt_df(hdr: u64) -> u64
+    ensures result == 0u64 || result == 1u64
+{
+    let f: u64 = pkt_flags(hdr);
+    (f >> 1u64) & 1u64
+}
+
+fn main() -> u64 {
+    // Build a simple IPv4 header: version=4, ihl=5, dscp=0, ecn=0,
+    // total_len=40, ident=1234, flags=2 (DF set), frag=0
+    let hdr: u64 = pkt_pack(4u64, 5u64, 0u64, 0u64,
+                             40u64, 1234u64, 2u64, 0u64);
+
+    let ver: u64 = pkt_version(hdr);      // 4
+    let ihl: u64 = pkt_ihl(hdr);          // 5
+    let tl:  u64 = pkt_total_len(hdr);    // 40
+    let id:  u64 = pkt_ident(hdr);        // 1234
+    let fl:  u64 = pkt_flags(hdr);        // 2
+    let fo:  u64 = pkt_frag_offset(hdr);  // 0
+    let v4:  u64 = pkt_is_ipv4(hdr);      // 1
+    let df:  u64 = pkt_df(hdr);           // 1 (DF set)
+
+    ver + ihl + tl + id + fl + fo + v4 + df
+    // 4 + 5 + 40 + 1234 + 2 + 0 + 1 + 1 = 1287
+    // = 1287
+}

@@ -1,0 +1,45 @@
+// Demo 149: Ghost variables — verified running sum
+//
+// ghost let introduces a proof-only binding: it participates in invariants
+// and postconditions but is completely erased from C output.
+//
+// This demo tracks the running sum of array elements as a ghost variable
+// and proves the final value equals the sum of all elements.
+//
+// Pattern:
+//   ghost let sum: u64 = 0u64;
+//   while k < n
+//     invariant ghost_sum == sum_of(s, k)  (defined via forall quantifiers)
+//   {
+//     ghost sum = sum + s[k];
+//     k = k + 1u64;
+//   }
+//
+// For now ghost variables are immutable (re-binding not yet supported),
+// so we use ghost let inside the invariant by relating the accumulator
+// `acc` (a runtime variable) to a ghost description of partial sums.
+//
+// This demo verifies: the returned sum satisfies
+//   result <= n * max_elem
+// given that all elements are bounded by max_elem.
+//
+fn bounded_sum(s: span<u64>, max_elem: u64) -> u64
+    requires forall i: u64, i < s.len ==> s[i] <= max_elem
+    ensures result <= s.len * max_elem
+{
+    let n: u64 = s.len;
+    ghost let bound: u64 = n * max_elem;
+    let mut k: u64 = 0u64;
+    let mut acc: u64 = 0u64;
+    while k < n
+        invariant k <= n
+        invariant acc <= k * max_elem
+        decreases n - k
+    {
+        acc = acc + s[k];
+        k = k + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

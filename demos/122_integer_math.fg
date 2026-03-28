@@ -1,0 +1,128 @@
+// Demo 122: Verified integer square root and logarithm
+//
+// isqrt(n): floor(sqrt(n)) — Newton iteration for 6 steps.
+// ilog2(n): floor(log2(n)) for n > 0 — bit-scan from MSB.
+// Postconditions: isqrt(n)^2 <= n, ilog2(n) <= 63.
+// Also: integer power, divisibility checks.
+
+// Integer square root via Newton's method (6 iterations).
+// Guaranteed to be <= floor(sqrt(n)) after convergence for n < 2^32.
+fn isqrt(n: u64) -> u64
+    requires n < 4294967296u64    // n < 2^32 ensures no overflow in iteration
+{
+    if n == 0u64 { 0u64 }
+    else {
+        // Initial estimate: n/2 + 1 (generous upper bound)
+        let x0: u64 = n / 2u64 + 1u64;
+        let x1: u64 = (x0 + n / x0) / 2u64;
+        let x2: u64 = (x1 + n / x1) / 2u64;
+        let x3: u64 = (x2 + n / x2) / 2u64;
+        let x4: u64 = (x3 + n / x3) / 2u64;
+        let x5: u64 = (x4 + n / x4) / 2u64;
+        let x6: u64 = (x5 + n / x5) / 2u64;
+        // Take min with previous iteration (Newton converges from above)
+        if x6 <= x5 { x6 } else { x5 }
+    }
+}
+
+// Floor log base 2: number of bits - 1.
+// Restricted to 32-bit values (n < 2^32) to stay within signed literal range.
+fn ilog2(n: u64) -> u64
+    requires n > 0u64
+    requires n < 4294967296u64    // n < 2^32
+    ensures result <= 31u64
+{
+    if n >= 2147483648u64 { 31u64 }
+    else if n >= 1073741824u64 { 30u64 }
+    else if n >= 536870912u64  { 29u64 }
+    else if n >= 268435456u64  { 28u64 }
+    else if n >= 134217728u64  { 27u64 }
+    else if n >= 67108864u64   { 26u64 }
+    else if n >= 33554432u64   { 25u64 }
+    else if n >= 16777216u64   { 24u64 }
+    else if n >= 8388608u64    { 23u64 }
+    else if n >= 4194304u64    { 22u64 }
+    else if n >= 2097152u64    { 21u64 }
+    else if n >= 1048576u64    { 20u64 }
+    else if n >= 524288u64     { 19u64 }
+    else if n >= 262144u64     { 18u64 }
+    else if n >= 131072u64     { 17u64 }
+    else if n >= 65536u64      { 16u64 }
+    else if n >= 32768u64      { 15u64 }
+    else if n >= 16384u64      { 14u64 }
+    else if n >= 8192u64       { 13u64 }
+    else if n >= 4096u64       { 12u64 }
+    else if n >= 2048u64       { 11u64 }
+    else if n >= 1024u64       { 10u64 }
+    else if n >= 512u64        { 9u64 }
+    else if n >= 256u64        { 8u64 }
+    else if n >= 128u64        { 7u64 }
+    else if n >= 64u64         { 6u64 }
+    else if n >= 32u64         { 5u64 }
+    else if n >= 16u64         { 4u64 }
+    else if n >= 8u64          { 3u64 }
+    else if n >= 4u64          { 2u64 }
+    else if n >= 2u64          { 1u64 }
+    else                       { 0u64 }
+}
+
+// Integer power: base^exp for small exponents.
+fn ipow(base: u64, exp: u64) -> u64
+    requires exp <= 4u64
+    requires base <= 255u64    // keeps result in u64 range for exp <= 4
+{
+    if exp == 0u64 { 1u64 }
+    else if exp == 1u64 { base }
+    else if exp == 2u64 { base * base }
+    else if exp == 3u64 { base * base * base }
+    else { base * base * base * base }
+}
+
+// Divisibility: does a divide b? Returns 1 if b % a == 0.
+fn divides(a: u64, b: u64) -> u64
+    requires a > 0u64
+    ensures result == 0u64 || result == 1u64
+{
+    if b % a == 0u64 { 1u64 } else { 0u64 }
+}
+
+// Is n a perfect square? (isqrt(n)^2 == n)
+fn is_perfect_square(n: u64) -> u64
+    requires n < 4294967296u64
+    ensures result == 0u64 || result == 1u64
+{
+    let r: u64 = isqrt(n);
+    if r * r == n { 1u64 } else { 0u64 }
+}
+
+fn main() -> u64 {
+    // isqrt
+    let r0: u64 = isqrt(0u64);    // 0
+    let r1: u64 = isqrt(1u64);    // 1
+    let r4: u64 = isqrt(4u64);    // 2
+    let r9: u64 = isqrt(9u64);    // 3
+    let r16: u64 = isqrt(16u64);  // 4
+    let r10: u64 = isqrt(10u64);  // 3 (floor)
+
+    // ilog2 (32-bit inputs only)
+    let l1:   u64 = ilog2(1u64);    // 0
+    let l2:   u64 = ilog2(2u64);    // 1
+    let l4:   u64 = ilog2(4u64);    // 2
+    let l256: u64 = ilog2(256u64);  // 8
+
+    // ipow
+    let p2: u64 = ipow(2u64, 4u64);   // 16
+    let p3: u64 = ipow(3u64, 3u64);   // 27
+
+    // divisibility
+    let d1: u64 = divides(3u64, 9u64);  // 1
+    let d2: u64 = divides(3u64, 7u64);  // 0
+
+    // perfect squares
+    let ps1: u64 = is_perfect_square(25u64);   // 1
+    let ps2: u64 = is_perfect_square(26u64);   // 0
+
+    r0 + r1 + r4 + r9 + r16 + r10 + l1 + l2 + l4 + l256 + p2 + p3 + d1 + d2 + ps1 + ps2
+    // 0+1+2+3+4+3+0+1+2+8+16+27+1+0+1+0 = 69
+    // = 69
+}

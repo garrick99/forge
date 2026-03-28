@@ -1,0 +1,129 @@
+// Demo 123: Verified simple tokenizer (number/identifier/operator scanner)
+//
+// Scan a 4-character window and classify it as:
+//   0 = empty, 1 = integer literal, 2 = identifier, 3 = operator, 4 = unknown
+// Each character is classified first; token type is derived from character classes.
+
+// Character class constants.
+fn CC_DIGIT()  -> u64 ensures result == 1u64 { 1u64 }
+fn CC_ALPHA()  -> u64 ensures result == 2u64 { 2u64 }
+fn CC_UNDER()  -> u64 ensures result == 3u64 { 3u64 }
+fn CC_SPACE()  -> u64 ensures result == 4u64 { 4u64 }
+fn CC_OPER()   -> u64 ensures result == 5u64 { 5u64 }
+fn CC_OTHER()  -> u64 ensures result == 6u64 { 6u64 }
+
+// Classify a single ASCII byte into a character class.
+fn char_class(c: u64) -> u64
+    requires c < 128u64
+    ensures result >= 1u64
+    ensures result <= 6u64
+{
+    if c >= 48u64 && c <= 57u64 { 1u64 }                          // digit
+    else if (c >= 65u64 && c <= 90u64) ||
+            (c >= 97u64 && c <= 122u64) { 2u64 }                  // alpha
+    else if c == 95u64 { 3u64 }                                    // underscore
+    else if c == 32u64 || c == 9u64 ||
+            c == 10u64 || c == 13u64 { 4u64 }                     // whitespace
+    else if c == 43u64 || c == 45u64 || c == 42u64 ||
+            c == 47u64 || c == 61u64 || c == 60u64 ||
+            c == 62u64 { 5u64 }                                    // operator: + - * / = < >
+    else { 6u64 }
+}
+
+// Is a character class the start of an integer? (digit)
+fn is_int_start(cc: u64) -> u64
+    requires cc >= 1u64 && cc <= 6u64
+    ensures result == 0u64 || result == 1u64
+{
+    if cc == 1u64 { 1u64 } else { 0u64 }
+}
+
+// Is a character class the start of an identifier? (alpha or underscore)
+fn is_ident_start(cc: u64) -> u64
+    requires cc >= 1u64 && cc <= 6u64
+    ensures result == 0u64 || result == 1u64
+{
+    if cc == 2u64 || cc == 3u64 { 1u64 } else { 0u64 }
+}
+
+// Is a character class a continuation of an identifier? (alpha, digit, or underscore)
+fn is_ident_cont(cc: u64) -> u64
+    requires cc >= 1u64 && cc <= 6u64
+    ensures result == 0u64 || result == 1u64
+{
+    if cc == 1u64 || cc == 2u64 || cc == 3u64 { 1u64 } else { 0u64 }
+}
+
+// Token type constants: 0=empty 1=int 2=ident 3=oper 4=unknown
+// Classify a 1-character token.
+fn token_type1(c0: u64) -> u64
+    requires c0 < 128u64
+    ensures result <= 4u64
+{
+    let cc: u64 = char_class(c0);
+    if cc == 1u64 { 1u64 }          // digit → integer literal
+    else if cc == 2u64 || cc == 3u64 { 2u64 }  // alpha/_ → identifier
+    else if cc == 5u64 { 3u64 }     // operator
+    else if cc == 4u64 { 0u64 }     // whitespace → empty
+    else { 4u64 }                   // unknown
+}
+
+// Classify a 2-character token (both chars same class for simplicity).
+fn token_type2(c0: u64, c1: u64) -> u64
+    requires c0 < 128u64
+    requires c1 < 128u64
+    ensures result <= 4u64
+{
+    let cc0: u64 = char_class(c0);
+    let cc1: u64 = char_class(c1);
+    if cc0 == 1u64 && cc1 == 1u64 { 1u64 }           // digit digit → int
+    else if (cc0 == 2u64 || cc0 == 3u64) &&
+            (cc1 == 1u64 || cc1 == 2u64 || cc1 == 3u64) { 2u64 }  // ident
+    else if cc0 == 5u64 && cc1 == 5u64 { 3u64 }      // op op → compound op
+    else { 4u64 }
+}
+
+// Scan 4 chars: return number of leading digits (integer literal length).
+fn scan_int_len(c0: u64, c1: u64, c2: u64, c3: u64) -> u64
+    requires c0 < 128u64
+    requires c1 < 128u64
+    requires c2 < 128u64
+    requires c3 < 128u64
+    ensures result <= 4u64
+{
+    let d0: u64 = if char_class(c0) == 1u64 { 1u64 } else { 0u64 };
+    let d1: u64 = if char_class(c1) == 1u64 { 1u64 } else { 0u64 };
+    let d2: u64 = if char_class(c2) == 1u64 { 1u64 } else { 0u64 };
+    let d3: u64 = if char_class(c3) == 1u64 { 1u64 } else { 0u64 };
+    if d0 == 0u64 { 0u64 }
+    else if d1 == 0u64 { 1u64 }
+    else if d2 == 0u64 { 2u64 }
+    else if d3 == 0u64 { 3u64 }
+    else { 4u64 }
+}
+
+fn main() -> u64 {
+    // char_class tests
+    let cc1: u64 = char_class(48u64);   // '0' → 1 (digit)
+    let cc2: u64 = char_class(65u64);   // 'A' → 2 (alpha)
+    let cc3: u64 = char_class(95u64);   // '_' → 3 (underscore)
+    let cc4: u64 = char_class(32u64);   // ' ' → 4 (space)
+    let cc5: u64 = char_class(43u64);   // '+' → 5 (operator)
+    let cc6: u64 = char_class(36u64);   // '$' → 6 (other)
+
+    // is_ident_start
+    let ia: u64 = is_ident_start(2u64);   // 1
+    let id: u64 = is_ident_start(1u64);   // 0
+
+    // token_type1
+    let t1: u64 = token_type1(49u64);    // '1' → 1 (int)
+    let t2: u64 = token_type1(97u64);    // 'a' → 2 (ident)
+    let t3: u64 = token_type1(43u64);    // '+' → 3 (op)
+
+    // scan_int_len("123x") = 3
+    let sl: u64 = scan_int_len(49u64, 50u64, 51u64, 120u64);  // '1','2','3','x' → 3
+
+    cc1 + cc2 + cc3 + cc4 + cc5 + cc6 + ia + id + t1 + t2 + t3 + sl
+    // 1 + 2 + 3 + 4 + 5 + 6 + 1 + 0 + 1 + 2 + 3 + 3 = 31
+    // = 31
+}

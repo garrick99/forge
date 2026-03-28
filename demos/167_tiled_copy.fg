@@ -1,0 +1,37 @@
+// Demo 167: Verified tiled (block) copy from 2D matrix
+//
+// Copies a tile starting at (row_off, col_off) of size (tile_rows × tile_cols)
+// from src (rows × cols) into dst (tile_rows × tile_cols).
+//
+// dst[i * tile_cols + j] = src[(row_off + i) * cols + (col_off + j)]
+//
+// Preconditions:
+//   src.len == rows * cols
+//   dst.len == tile_rows * tile_cols
+//   row_off + tile_rows <= rows
+//   col_off + tile_cols <= cols
+//   rows > 0, cols > 0, tile_rows > 0, tile_cols > 0
+//
+fn tiled_copy(
+    src: span<u64>, dst: span<u64>,
+    rows: u64, cols: u64,
+    row_off: u64, col_off: u64,
+    tile_rows: u64, tile_cols: u64
+)
+    requires src.len == rows * cols
+    requires dst.len == tile_rows * tile_cols
+    requires row_off + tile_rows <= rows
+    requires col_off + tile_cols <= cols
+    requires rows > 0u64
+    requires cols > 0u64
+    requires tile_rows > 0u64
+    requires tile_cols > 0u64
+{
+    for i in tile_rows {
+        for j in tile_cols {
+            dst[i * tile_cols + j] = src[(row_off + i) * cols + (col_off + j)];
+        }
+    }
+}
+
+fn main() -> u64 { 0u64 }

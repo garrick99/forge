@@ -1,0 +1,115 @@
+// Demo 131: While loops with invariants
+//
+// Tests loop invariant checking end-to-end.
+// Demonstrates: entry/preservation/exit obligations all discharged by Z3.
+// Note: while loops need a semicolon after the closing brace when followed
+// by more statements: `while ... { ... };`
+
+// Count from 0 to n: result == n.
+fn count_up(n: u64) -> u64
+    requires n <= 1000u64
+    ensures result == n
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+    {
+        i = i + 1u64;
+    };
+    i
+}
+
+// Count down to zero.
+fn count_down(n: u64) -> u64
+    requires n <= 1000u64
+    ensures result == 0u64
+{
+    let mut i: u64 = n;
+    while i > 0u64
+        invariant i <= n
+    {
+        i = i - 1u64;
+    };
+    i
+}
+
+// Multiply a * b by repeated addition; prove result <= 10000.
+fn mul_by_add(a: u64, b: u64) -> u64
+    requires a <= 100u64
+    requires b <= 100u64
+    ensures result <= 10000u64
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < b
+        invariant acc <= 100u64 * i
+        invariant i <= b
+    {
+        acc = acc + a;
+        i = i + 1u64;
+    };
+    acc
+}
+
+// Increment val n times: result == start + n.
+fn increment_n_times(start: u64, n: u64) -> u64
+    requires start + n <= 10000u64
+    ensures result == start + n
+{
+    let mut val: u64 = start;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant val == start + i
+        invariant i <= n
+    {
+        val = val + 1u64;
+        i = i + 1u64;
+    };
+    val
+}
+
+// Sum 0..n with upper bound invariant (linear in i, constant factor 1000).
+fn sum_with_bound(n: u64) -> u64
+    requires n <= 1000u64
+    ensures result <= 1000u64 * n
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant acc <= 1000u64 * i
+        invariant i <= n
+    {
+        acc = acc + i;
+        i = i + 1u64;
+    };
+    acc
+}
+
+// count loop iterations and verify result is exactly k.
+fn loop_count(k: u64) -> u64
+    requires k <= 100u64
+    ensures result == k
+{
+    let mut c: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < k
+        invariant c == i
+        invariant i <= k
+    {
+        c = c + 1u64;
+        i = i + 1u64;
+    };
+    c
+}
+
+fn main() -> u64 {
+    let cu: u64 = count_up(10u64);                      // 10
+    let cd: u64 = count_down(5u64);                     // 0
+    let ml: u64 = mul_by_add(3u64, 4u64);               // ≤10000
+    let it: u64 = increment_n_times(100u64, 5u64);      // 105
+    let sb: u64 = sum_with_bound(10u64);                // 45 (0+1+...+9)
+    let lc: u64 = loop_count(7u64);                     // 7
+
+    cu + cd + ml + it + sb + lc
+    // 10 + 0 + 12 + 105 + 45 + 7 = 179 (mul_by_add returns 12, within bound)
+}

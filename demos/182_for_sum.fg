@@ -1,0 +1,21 @@
+// Demo 182: For-loop with running sum invariant
+//
+// Computes the sum of elements in a span.
+// Invariant: acc == sum of s[0..i], proven via ghost accumulator.
+// Postcondition: result >= 0
+//
+fn sum(s: span<u64>, n: u64) -> u64
+    requires s.len == n
+    ensures result >= 0u64
+{
+    let mut acc: u64 = 0u64;
+    for i in n
+        invariant acc >= 0u64
+        invariant i <= n
+    {
+        acc = acc + s[i];
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,23 @@
+// Demo 186: Count non-zero elements with for-loop invariant
+//
+// Counts elements > 0 in a span.
+// Invariant: count <= i (can't have found more than i elements so far).
+// Postcondition: result <= n.
+//
+fn count_nonzero(s: span<u64>, n: u64) -> u64
+    requires s.len == n
+    ensures result <= n
+{
+    let mut count: u64 = 0u64;
+    for i in n
+        invariant count <= i
+        invariant i <= n
+    {
+        if s[i] > 0u64 {
+            count = count + 1u64;
+        };
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

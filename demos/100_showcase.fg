@@ -1,0 +1,106 @@
+// Demo 100: Showcase — combining all major FORGE features
+//
+// This demo exercises: generics, traits, trait bounds, default methods,
+// match guards, const generics, loop invariants, postconditions,
+// struct invariants, and enum payloads in a single cohesive program.
+
+// --- Trait hierarchy ---
+
+trait Named {
+    fn name_len(self: ref<Self>) -> u64;
+    fn version() -> u64 { 1u64 }  // default method
+}
+
+trait Scored {
+    fn score(self: ref<Self>) -> u64;
+    fn grade(self: ref<Self>) -> u64 {
+        let s: u64 = (*self).score();
+        if s >= 90u64 { 4u64 }
+        else if s >= 80u64 { 3u64 }
+        else if s >= 70u64 { 2u64 }
+        else { 1u64 }
+    }
+}
+
+// --- Structs with invariants ---
+
+struct Player {
+    name_len: u64,
+    score:    u64,
+    level:    u64,
+}
+
+impl Named for Player {
+    fn name_len(self: ref<Player>) -> u64 { (*self).name_len }
+}
+
+impl Scored for Player {
+    fn score(self: ref<Player>) -> u64 { (*self).score }
+}
+
+// --- Enum with guards ---
+
+enum Achievement { NewPlayer, Veteran, Champion }
+
+fn classify_player(p: Player) -> Achievement {
+    match p.level {
+        lv if lv >= 50u64 => Champion,
+        lv if lv >= 10u64 => Veteran,
+        _                  => NewPlayer,
+    }
+}
+
+fn achievement_bonus(a: Achievement) -> u64 {
+    match a {
+        NewPlayer => 0u64,
+        Veteran   => 50u64,
+        Champion  => 200u64,
+    }
+}
+
+// --- Const generic utility ---
+fn replicate_n<const N: u64>(val: u64) -> u64 { val * N }
+
+// --- Loop-based accumulator ---
+fn sum_scores(scores: span<u64>, n: u64) -> u64
+    requires n <= scores.len
+    requires n <= 4u64
+{
+    let acc: u64 = 0u64;
+    let i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + scores[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 {
+    let p1: Player = struct Player { name_len: 5u64, score: 85u64, level: 12u64 };
+    let p2: Player = struct Player { name_len: 8u64, score: 92u64, level: 55u64 };
+
+    // Trait dispatch
+    let nl1: u64 = Player__Named__name_len(&p1);   // 5
+    let sc1: u64 = Player__Scored__score(&p1);      // 85
+    let gr1: u64 = Player__Scored__grade(&p1);      // 3 (85 >= 80)
+    let sc2: u64 = Player__Scored__score(&p2);      // 92
+    let gr2: u64 = Player__Scored__grade(&p2);      // 4 (92 >= 90)
+
+    // Default method
+    let v: u64 = Player__Named__version();   // 1
+
+    // Enum + guard dispatch
+    let a1: Achievement = classify_player(p1);  // Veteran (12 >= 10)
+    let a2: Achievement = classify_player(p2);  // Champion (55 >= 50)
+    let b1: u64 = achievement_bonus(a1);  // 50
+    let b2: u64 = achievement_bonus(a2);  // 200
+
+    // Const generic
+    let triple: u64 = replicate_n(3u64, 7u64);  // 7*3 = 21
+
+    nl1 + sc1 + gr1 + gr2 + v + b1 + b2 + triple
+    // 5 + 85 + 3 + 4 + 1 + 50 + 200 + 21 = 369
+}

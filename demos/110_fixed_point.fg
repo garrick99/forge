@@ -1,0 +1,139 @@
+// Demo 110: Verified fixed-point arithmetic (Q16.16 format)
+//
+// 32-bit fixed-point numbers: upper 16 bits = integer part,
+// lower 16 bits = fractional part. Scale factor = 65536.
+// Postconditions verify no-overflow bounds and identity properties.
+
+// Scale factor for Q16.16
+fn fp_scale() -> u64
+    ensures result == 65536u64
+{
+    65536u64
+}
+
+// Construct a fixed-point number from an integer (no fractional part).
+fn fp_from_int(n: u64) -> u64
+    requires n <= 65535u64      // fits in upper 16 bits
+    ensures result == n * 65536u64
+{
+    n * 65536u64
+}
+
+// Extract the integer part (floor).
+fn fp_floor(x: u64) -> u64
+    ensures result == x / 65536u64
+{
+    x / 65536u64
+}
+
+// Extract the fractional part (scaled 0..65535).
+fn fp_frac(x: u64) -> u64
+    ensures result < 65536u64
+{
+    x % 65536u64
+}
+
+// Add two fixed-point numbers.
+// Requires sum won't overflow u64 (caller ensures x + y <= max u64).
+fn fp_add(x: u64, y: u64) -> u64
+    requires x <= 4294967295u64   // fits in 32 bits
+    requires y <= 4294967295u64
+    ensures result == x + y
+{
+    x + y
+}
+
+// Subtract: x - y (requires x >= y).
+fn fp_sub(x: u64, y: u64) -> u64
+    requires x >= y
+    ensures result == x - y
+    ensures result <= x
+{
+    x - y
+}
+
+// Multiply two Q16.16 numbers: (x * y) / scale.
+// Requires x, y <= 65535 * scale = 4294901760 to avoid overflow.
+fn fp_mul(x: u64, y: u64) -> u64
+    requires x <= 65535u64 * 65536u64
+    requires y <= 65535u64 * 65536u64
+    ensures result == (x * y) / 65536u64
+{
+    (x * y) / 65536u64
+}
+
+// Scale a fixed-point number by an integer factor.
+fn fp_scale_by(x: u64, n: u64) -> u64
+    requires n <= 65535u64
+    requires x <= 65535u64 * 65536u64
+    ensures result == x * n
+{
+    x * n
+}
+
+// Clamp a value to [lo, hi].
+fn fp_clamp(x: u64, lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures result >= lo
+    ensures result <= hi
+{
+    if x < lo { lo }
+    else if x > hi { hi }
+    else { x }
+}
+
+// Linear interpolation: lo + t*(hi - lo)/scale, t in [0, scale].
+// Returns a value in [lo, hi].
+fn fp_lerp(lo: u64, hi: u64, t: u64) -> u64
+    requires lo <= hi
+    requires t <= 65536u64
+    ensures result >= lo
+    ensures result <= hi
+{
+    let span: u64 = hi - lo;
+    let frac: u64 = (span * t) / 65536u64;
+    lo + frac
+}
+
+fn main() -> u64 {
+    // fp_from_int: 3 → 3*65536 = 196608
+    let a: u64 = fp_from_int(3u64);          // 196608
+
+    // fp_floor / fp_frac
+    let fl: u64 = fp_floor(a);               // 3
+    let fr: u64 = fp_frac(a);                // 0
+
+    // Represent 1.5: 1*65536 + 32768 = 98304
+    let half: u64 = fp_from_int(1u64) + 32768u64;  // 98304
+
+    let fl2: u64 = fp_floor(half);           // 1
+    let fr2: u64 = fp_frac(half);            // 32768
+
+    // Add 3.0 + 1.5 = 4.5 → 294912
+    let sum: u64 = fp_add(a, half);          // 294912
+    let fl3: u64 = fp_floor(sum);            // 4
+
+    // Subtract 3.0 - 1.5 = 1.5 → 98304
+    let diff: u64 = fp_sub(a, half);         // 98304
+    let fl4: u64 = fp_floor(diff);           // 1
+
+    // Multiply 1.5 * 1.5 = 2.25 → 147456
+    let prod: u64 = fp_mul(half, half);      // 147456
+    let fl5: u64 = fp_floor(prod);           // 2
+
+    // Clamp 5.0 to [1.0, 4.0] → 4.0
+    let fp1: u64 = fp_from_int(1u64);        // 65536
+    let fp4: u64 = fp_from_int(4u64);        // 262144
+    let fp5: u64 = fp_from_int(5u64);        // 327680
+    let cl: u64 = fp_clamp(fp5, fp1, fp4);   // 262144
+    let fl6: u64 = fp_floor(cl);             // 4
+
+    // Lerp from 0 to 4.0 at t=0.25 (16384/65536) → 1.0
+    let fp0: u64 = fp_from_int(0u64);        // 0
+    let lr: u64 = fp_lerp(fp0, fp4, 16384u64); // 65536 = 1.0
+    let fl7: u64 = fp_floor(lr);             // 1
+
+    fl + fr + fl2 + fr2 + fl3 + fl4 + fl5 + fl6 + fl7
+    // 3 + 0 + 1 + 32768 + 4 + 1 + 2 + 4 + 1 = 32784
+    // = 32784
+}

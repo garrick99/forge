@@ -1,0 +1,60 @@
+// Demo 153: Mutable ghost variables — verified single-pass min/max
+//
+// Computes both minimum and maximum of a non-empty span in one pass.
+// Returns (min, max) as a tuple.
+//
+// Two mutable ghost variables mirror the runtime accumulators:
+//   ghost let mut gmin = s[0]
+//   ghost let mut gmax = s[0]
+//
+// Invariants:
+//   cur_min == gmin
+//   cur_max == gmax
+//   forall i < k, gmin <= s[i]
+//   forall i < k, s[i] <= gmax
+//   gmin <= gmax
+//
+// Postconditions:
+//   result.0 <= result.1
+//   forall i < s.len, result.0 <= s[i]
+//   forall i < s.len, s[i] <= result.1
+//
+fn minmax(s: span<u64>) -> (u64, u64)
+    requires s.len > 0u64
+    ensures result.0 <= result.1
+    ensures forall i: u64, i < s.len ==> result.0 <= s[i]
+    ensures forall i: u64, i < s.len ==> s[i] <= result.1
+{
+    let n: u64 = s.len;
+    let mut cur_min: u64 = s[0u64];
+    let mut cur_max: u64 = s[0u64];
+    ghost let mut gmin: u64 = s[0u64];
+    ghost let mut gmax: u64 = s[0u64];
+    let mut k: u64 = 1u64;
+    while k < n
+        invariant k <= n
+        invariant cur_min == gmin
+        invariant cur_max == gmax
+        invariant gmin <= gmax
+        invariant forall i: u64, i < k ==> gmin <= s[i]
+        invariant forall i: u64, i < k ==> s[i] <= gmax
+        decreases n - k
+    {
+        if s[k] < cur_min {
+            cur_min = s[k];
+            ghost gmin = s[k];
+        } else {
+            ghost gmin = gmin;
+        };
+        if s[k] > cur_max {
+            cur_max = s[k];
+            ghost gmax = s[k];
+        } else {
+            ghost gmax = gmax;
+        };
+        k = k + 1u64;
+    };
+    (cur_min, cur_max)
+}
+
+fn main() -> u64 { 0u64 }

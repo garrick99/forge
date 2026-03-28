@@ -1,0 +1,31 @@
+// Demo 196: Verified clamp-all — prove all elements are bounded after clamp
+//
+// clamp_all(s, n, lo, hi) clamps every element to [lo, hi].
+// Quantified postcondition: forall k < n, lo <= s[k] && s[k] <= hi.
+//
+fn clamp_val(x: u64, lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures result >= lo
+    ensures result <= hi
+{
+    if x < lo { lo }
+    else if x > hi { hi }
+    else { x }
+}
+
+fn clamp_all(s: span<u64>, n: u64, lo: u64, hi: u64)
+    requires s.len == n
+    requires lo <= hi
+    ensures forall k: u64, k < n ==> s[k] >= lo
+    ensures forall k: u64, k < n ==> s[k] <= hi
+{
+    for i in n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> s[k] >= lo
+        invariant forall k: u64, k < i ==> s[k] <= hi
+    {
+        s[i] = clamp_val(s[i], lo, hi);
+    }
+}
+
+fn main() -> u64 { 0u64 }

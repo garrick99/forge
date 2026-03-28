@@ -1,0 +1,38 @@
+// Demo 141: In-place array reversal verified with old() in loop invariants
+//
+// ensures forall i < s.len, s[i] == old(s[s.len - 1 - i])
+//
+// Loop invariants track three regions at each step (lo = # swaps done):
+//   inv1: forall i < lo,          s[i] == old(s[n-1-i])  — left reversed
+//   inv2: forall i < lo,     s[n-1-i] == old(s[i])       — right reversed
+//   inv3: forall i in [lo, n-lo), s[i] == old(s[i])      — middle unchanged
+//
+// Key Z3 chain for inv1 at i=lo (newly swapped position):
+//   write: s_new[lo] = s[hi=n-1-lo]
+//   inv3 at i=hi: s[hi] = old(s[hi]) = __s_init[n-1-lo]
+//   → s_new[lo] = old(s[n-1-lo]) ✓
+//
+// old() in loop invariants and postconditions both resolve to
+// (select __s_init expr) via the POld path introduced in demo 139.
+fn reverse(s: span<u64>)
+    requires s.len >= 1u64
+    ensures forall i: u64, i < s.len ==> s[i] == old(s[s.len - 1u64 - i])
+{
+    let n: u64 = s.len;
+    let mut lo: u64 = 0u64;
+    while lo + lo < n
+        invariant lo <= n
+        invariant forall i: u64, i < lo ==> s[i] == old(s[n - 1u64 - i])
+        invariant forall i: u64, i < lo ==> s[n - 1u64 - i] == old(s[i])
+        invariant forall i: u64, i >= lo && i + lo < n ==> s[i] == old(s[i])
+        decreases n - lo
+    {
+        let hi: u64 = n - 1u64 - lo;
+        let tmp: u64 = s[lo];
+        s[lo] = s[hi];
+        s[hi] = tmp;
+        lo = lo + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

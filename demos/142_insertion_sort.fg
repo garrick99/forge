@@ -1,0 +1,59 @@
+// Demo 142: Verified in-place insertion sort
+//
+// Proves full sortedness: forall a < b < s.len, s[a] <= s[b]
+//
+// Key insight: the inner loop maintains the outer sorted invariant
+//   forall a < b < k, s[a] <= s[b]
+// even though it only writes to the range [j, k].  Reason: the writes
+// s[j] = s[j-1] are duplicate-value copies — they preserve ≤ order
+// because the prefix [0, k) was already sorted before the inner loop.
+//
+// Two inner-loop invariants beyond the carried outer inv:
+//
+//   inv3: forall a < b <= k && a > j, s[a] <= s[b]
+//     — the shifted region [j+1, k] is sorted (values shifted right
+//       are still in non-decreasing order, just with a gap at j)
+//
+//   inv4: forall a > j && a <= k, s[a] > key
+//     — every shifted element is strictly greater than the key,
+//       which lets Z3 prove s[j] = key restores full sortedness.
+//
+// Z3 chain for the postcondition after s[j] = key:
+//   • a < b < j   : outer inv (carried) → s[a] <= s[b]
+//   • a < j, b = j: outer inv said s[a] <= s[j_old]; after shifts
+//                   s[j_old] ≤ key was not violated (inner loop
+//                   stopped because s[j-1] <= key), so s[a] <= key = s[j]
+//   • a = j, j < b <= k: inv4 gives s[b] > key = s[j] → s[j] < s[b] ✓
+//   • j < a < b <= k: inv3 covers the shifted region ✓
+//   • b > k, a < k: outer sorted prefix covers the (k+1) position
+//                   via extension: s[k] = key <= s[k+1..] (loop exit)
+//
+fn insertion_sort(s: span<u64>)
+    ensures forall a: u64, forall b: u64, a < b && b < s.len ==> s[a] <= s[b]
+{
+    let n: u64 = s.len;
+    let mut k: u64 = 0u64;
+    while k < n
+        invariant k <= n
+        invariant forall a: u64, forall b: u64, a < b && b < k ==> s[a] <= s[b]
+        decreases n - k
+    {
+        let key: u64 = s[k];
+        let mut j: u64 = k;
+        while j > 0u64 && s[j - 1u64] > key
+            invariant j <= k
+            invariant forall a: u64, forall b: u64, a < b && b < k ==> s[a] <= s[b]
+            invariant forall a: u64, forall b: u64,
+                        a < b && b <= k && a > j ==> s[a] <= s[b]
+            invariant forall a: u64, a > j && a <= k ==> s[a] > key
+            decreases j
+        {
+            s[j] = s[j - 1u64];
+            j = j - 1u64;
+        };
+        s[j] = key;
+        k = k + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

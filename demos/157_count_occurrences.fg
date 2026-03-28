@@ -1,0 +1,31 @@
+// Demo 157: Verified occurrence count
+//
+// Counts how many elements in s equal target.
+//
+// Invariants:
+//   k <= n
+//   count <= k
+//
+// Postconditions:
+//   result <= s.len
+//
+fn count_occurrences(s: span<u64>, target: u64) -> u64
+    ensures result <= s.len
+{
+    let n: u64 = s.len;
+    let mut k: u64 = 0u64;
+    let mut count: u64 = 0u64;
+    while k < n
+        invariant k <= n
+        invariant count <= k
+        decreases n - k
+    {
+        if s[k] == target {
+            count = count + 1u64;
+        };
+        k = k + 1u64;
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

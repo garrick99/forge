@@ -1,0 +1,178 @@
+// Demo 130: Verified interval arithmetic
+//
+// Closed integer intervals [lo, hi] with lo <= hi invariant.
+// Operations: width, contains, add (Minkowski sum), clamp, scale, shift, intersect.
+// Postconditions: lo <= hi preserved, width, containment properties.
+
+struct Ivl { lo: u64, hi: u64 }
+
+fn ivl_new(lo: u64, hi: u64) -> Ivl
+    requires lo <= hi
+    ensures result.lo == lo
+    ensures result.hi == hi
+    ensures result.lo <= result.hi
+{
+    struct Ivl { lo: lo, hi: hi }
+}
+
+// Width of interval.
+fn ivl_width(i: Ivl) -> u64
+    requires i.lo <= i.hi
+    ensures result == i.hi - i.lo
+{
+    i.hi - i.lo
+}
+
+// Is x contained in [lo, hi]?
+fn ivl_contains(i: Ivl, x: u64) -> u64
+    requires i.lo <= i.hi
+    ensures result == 0u64 || result == 1u64
+    ensures (x < i.lo || x > i.hi) || result == 1u64
+    ensures (x >= i.lo && x <= i.hi) || result == 0u64
+{
+    if x >= i.lo && x <= i.hi { 1u64 } else { 0u64 }
+}
+
+// lo is always contained.
+fn ivl_contains_lo(i: Ivl) -> u64
+    requires i.lo <= i.hi
+    ensures result == 1u64
+{
+    let v: u64 = ivl_contains(i, i.lo);
+    v
+}
+
+// hi is always contained.
+fn ivl_contains_hi(i: Ivl) -> u64
+    requires i.lo <= i.hi
+    ensures result == 1u64
+{
+    let v: u64 = ivl_contains(i, i.hi);
+    v
+}
+
+// Minkowski sum: [a.lo+b.lo, a.hi+b.hi].
+fn ivl_add(a: Ivl, b: Ivl) -> Ivl
+    requires a.lo <= a.hi
+    requires b.lo <= b.hi
+    requires a.hi + b.hi < 4611686018427387903u64
+    ensures result.lo == a.lo + b.lo
+    ensures result.hi == a.hi + b.hi
+    ensures result.lo <= result.hi
+{
+    struct Ivl { lo: a.lo + b.lo, hi: a.hi + b.hi }
+}
+
+// Width of sum equals sum of widths: (a.hi-a.lo) + (b.hi-b.lo).
+fn add_width(a: Ivl, b: Ivl) -> u64
+    requires a.lo <= a.hi
+    requires b.lo <= b.hi
+    requires a.hi + b.hi < 4611686018427387903u64
+    ensures result == (a.hi - a.lo) + (b.hi - b.lo)
+{
+    let s: Ivl = ivl_add(a, b);
+    let v: u64 = ivl_width(s);
+    v
+}
+
+// Clamp x to [lo, hi].
+fn ivl_clamp(i: Ivl, x: u64) -> u64
+    requires i.lo <= i.hi
+    ensures result >= i.lo
+    ensures result <= i.hi
+{
+    if x < i.lo { i.lo }
+    else if x > i.hi { i.hi }
+    else { x }
+}
+
+// Clamped value is always contained.
+fn clamp_contained(i: Ivl, x: u64) -> u64
+    requires i.lo <= i.hi
+    ensures result == 1u64
+{
+    let cx: u64 = ivl_clamp(i, x);
+    let v: u64 = ivl_contains(i, cx);
+    v
+}
+
+// Scale interval by factor s: [lo*s, hi*s].
+fn ivl_scale(i: Ivl, s: u64) -> Ivl
+    requires i.lo <= i.hi
+    requires i.hi < 65536u64
+    requires s < 65536u64
+    ensures result.lo == i.lo * s
+    ensures result.hi == i.hi * s
+{
+    struct Ivl { lo: i.lo * s, hi: i.hi * s }
+}
+
+// Shift interval right by d: [lo+d, hi+d].
+fn ivl_shift(i: Ivl, d: u64) -> Ivl
+    requires i.lo <= i.hi
+    requires i.hi + d < 4611686018427387903u64
+    ensures result.lo == i.lo + d
+    ensures result.hi == i.hi + d
+    ensures result.lo <= result.hi
+    ensures result.hi - result.lo == i.hi - i.lo
+{
+    struct Ivl { lo: i.lo + d, hi: i.hi + d }
+}
+
+// Intersection: max(lo), min(hi). Returns degenerate [lo,lo] if disjoint.
+fn ivl_intersect(a: Ivl, b: Ivl) -> Ivl
+    requires a.lo <= a.hi
+    requires b.lo <= b.hi
+    ensures result.lo <= result.hi
+{
+    let lo: u64 = if a.lo >= b.lo { a.lo } else { b.lo };
+    let hi_raw: u64 = if a.hi <= b.hi { a.hi } else { b.hi };
+    let hi: u64 = if hi_raw >= lo { hi_raw } else { lo };
+    struct Ivl { lo: lo, hi: hi }
+}
+
+fn main() -> u64 {
+    let i1: Ivl = ivl_new(2u64, 8u64);
+    let i2: Ivl = ivl_new(5u64, 12u64);
+    let i3: Ivl = ivl_new(0u64, 10u64);
+
+    // widths
+    let w1: u64 = ivl_width(i1);   // 6
+    let w2: u64 = ivl_width(i2);   // 7
+    let w3: u64 = ivl_width(i3);   // 10
+
+    // contains
+    let c1: u64 = ivl_contains(i1, 5u64);   // 1
+    let c2: u64 = ivl_contains(i1, 9u64);   // 0
+
+    // lo/hi contained
+    let clo: u64 = ivl_contains_lo(i1);  // 1
+    let chi: u64 = ivl_contains_hi(i1);  // 1
+
+    // clamp
+    let cl1: u64 = ivl_clamp(i1, 0u64);   // 2
+    let cl2: u64 = ivl_clamp(i1, 5u64);   // 5
+    let cl3: u64 = ivl_clamp(i1, 99u64);  // 8
+
+    // add
+    let iadd: Ivl = ivl_add(i1, i2);
+    let alo: u64 = iadd.lo;   // 7
+    let ahi: u64 = iadd.hi;   // 20
+
+    // add_width
+    let aw: u64 = add_width(i1, i2);   // 13
+
+    // scale
+    let isc: Ivl = ivl_scale(i1, 3u64);
+    let slo: u64 = isc.lo;   // 6
+    let shi: u64 = isc.hi;   // 24
+
+    // shift
+    let ish: Ivl = ivl_shift(i1, 10u64);
+    let shlo: u64 = ish.lo;  // 12
+    let shhi: u64 = ish.hi;  // 18
+
+    w1 + w2 + w3 + c1 + c2 + clo + chi + cl1 + cl2 + cl3 + alo + ahi + aw + slo + shi + shlo + shhi
+    // 6+7+10+1+0+1+1+2+5+8+7+20+13+6+24+12+18 = 141
+    // = 141
+}

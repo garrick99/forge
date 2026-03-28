@@ -1,0 +1,36 @@
+// Demo 145: Verified conditional array write — clamp_array
+//
+// Clamps each element of a span to [0, max_val].
+// Uses conditional array writes: if s[k] > max_val { s[k] = max_val }
+//
+// This demo exercises the ITE modeling for conditional array element writes,
+// added in session 16. The write `if s[k] > max_val { s[k] = max_val }` is
+// modeled as:
+//   s_new[k] = PIte(s_old[k] > max_val, max_val, s_old[k])
+//
+// Postcondition: every element is <= max_val
+// Loop invariant:
+//   inv1: forall i < k, s[i] <= max_val          (clamped prefix)
+//   inv2: forall i >= k && i < n, s[i] == old(s)[i]  (suffix unchanged)
+//
+// The second invariant lets the postcondition reference original values
+// and confirms we only touch elements in the prefix.
+//
+fn clamp_array(s: span<u64>, max_val: u64)
+    ensures forall i: u64, i < s.len ==> s[i] <= max_val
+{
+    let n: u64 = s.len;
+    let mut k: u64 = 0u64;
+    while k < n
+        invariant k <= n
+        invariant forall i: u64, i < k ==> s[i] <= max_val
+        decreases n - k
+    {
+        if s[k] > max_val {
+            s[k] = max_val;
+        };
+        k = k + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

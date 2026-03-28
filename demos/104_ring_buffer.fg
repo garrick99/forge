@@ -1,0 +1,98 @@
+// Demo 104: Ring buffer with capacity invariants
+//
+// A fixed-capacity-4 ring buffer with push/pop operations.
+// Invariant: len <= cap.  Method postconditions chain through calls.
+
+struct RingBuf4 {
+    d0: u64, d1: u64, d2: u64, d3: u64,
+    head: u64,  // read index (0..3)
+    len:  u64,  // number of elements (0..4)
+}
+
+impl RingBuf4 {
+    fn new() -> RingBuf4 {
+        struct RingBuf4 { d0: 0u64, d1: 0u64, d2: 0u64, d3: 0u64, head: 0u64, len: 0u64 }
+    }
+
+    fn size(self: ref<RingBuf4>) -> u64
+        ensures result <= 4u64
+    {
+        let n: u64 = (*self).len;
+        if n <= 4u64 { n } else { 4u64 }
+    }
+
+    fn is_full(self: ref<RingBuf4>) -> u64
+        ensures result == 0u64 || result == 1u64
+    {
+        if (*self).len >= 4u64 { 1u64 } else { 0u64 }
+    }
+
+    fn is_empty(self: ref<RingBuf4>) -> u64
+        ensures result == 0u64 || result == 1u64
+    {
+        if (*self).len == 0u64 { 1u64 } else { 0u64 }
+    }
+
+    // Push a value (returns unchanged buf if full as safeguard).
+    fn push(self: ref<RingBuf4>, val: u64) -> RingBuf4 {
+        let s: RingBuf4 = *self;
+        if s.len >= 4u64 {
+            s  // no-op when full
+        } else {
+            let tail: u64 = (s.head + s.len) % 4u64;
+            if tail == 0u64 {
+                struct RingBuf4 { d0: val, d1: s.d1, d2: s.d2, d3: s.d3, head: s.head, len: s.len + 1u64 }
+            } else if tail == 1u64 {
+                struct RingBuf4 { d0: s.d0, d1: val, d2: s.d2, d3: s.d3, head: s.head, len: s.len + 1u64 }
+            } else if tail == 2u64 {
+                struct RingBuf4 { d0: s.d0, d1: s.d1, d2: val, d3: s.d3, head: s.head, len: s.len + 1u64 }
+            } else {
+                struct RingBuf4 { d0: s.d0, d1: s.d1, d2: s.d2, d3: val, head: s.head, len: s.len + 1u64 }
+            }
+        }
+    }
+
+    // Return front value (0 if empty).
+    fn peek(self: ref<RingBuf4>) -> u64 {
+        let h: u64 = (*self).head;
+        if (*self).len == 0u64 { 0u64 }
+        else if h == 0u64 { (*self).d0 }
+        else if h == 1u64 { (*self).d1 }
+        else if h == 2u64 { (*self).d2 }
+        else { (*self).d3 }
+    }
+
+    // Pop (shrink by one, move head).
+    fn pop(self: ref<RingBuf4>) -> RingBuf4 {
+        let s: RingBuf4 = *self;
+        if s.len == 0u64 {
+            s  // no-op when empty
+        } else {
+            struct RingBuf4 { d0: s.d0, d1: s.d1, d2: s.d2, d3: s.d3,
+                              head: (s.head + 1u64) % 4u64, len: s.len - 1u64 }
+        }
+    }
+}
+
+fn main() -> u64 {
+    let b0: RingBuf4 = RingBuf4__new();
+    let sz0: u64 = b0.size();           // 0
+    let emp: u64 = b0.is_empty();       // 1
+
+    let b1: RingBuf4 = b0.push(10u64);
+    let b2: RingBuf4 = b1.push(20u64);
+    let b3: RingBuf4 = b2.push(30u64);
+    let sz3: u64 = b3.size();           // 3
+    let full3: u64 = b3.is_full();      // 0
+
+    let b4: RingBuf4 = b3.push(40u64);
+    let full4: u64 = b4.is_full();      // 1
+
+    let v0: u64 = b4.peek();            // 10
+    let b5: RingBuf4 = b4.pop();
+    let v1: u64 = b5.peek();            // 20
+    let sz5: u64 = b5.size();           // 3
+
+    sz0 + emp + sz3 + full3 + full4 + v0 + v1 + sz5
+    // 0 + 1 + 3 + 0 + 1 + 10 + 20 + 3 = 38
+}
