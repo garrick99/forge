@@ -600,6 +600,11 @@ pred:
     { p }
   | LPAREN p = pred RPAREN
     { p }
+  (* Conditional value in pred context: if pred { pred } else { pred }
+     Encodes as PIte — useful for conditional postconditions like
+       ensures result == if a >= b { a } else { b } *)
+  | IF c = pred LBRACE t = pred RBRACE ELSE LBRACE e = pred RBRACE
+    { PIte (c, t, e) }
 
 (* ------------------------------------------------------------------ *)
 (* Expressions                                                          *)

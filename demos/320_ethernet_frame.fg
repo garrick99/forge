@@ -1,0 +1,89 @@
+// Demo 320: Verified Ethernet frame parser with nested struct fields
+//
+// An Ethernet frame header with nested Address and EtherType structs.
+// The proof engine verifies:
+//   - Field extraction gives values within valid ranges
+//   - Nested struct field access works in postconditions
+//   - Frame type classification is exhaustive
+
+struct MacAddr {
+    hi: u64,   // upper 24 bits (OUI)
+    lo: u64,   // lower 24 bits (NIC-specific)
+}
+
+struct EtherType {
+    raw: u64,  // 0x0800=IPv4, 0x0806=ARP, 0x86DD=IPv6, 0x8100=VLAN
+}
+
+struct EtherFrame {
+    dst: MacAddr,
+    src: MacAddr,
+    etype: EtherType,
+}
+
+// Extract destination OUI (upper 24 bits = hi field), masked to 24 bits
+fn dst_oui(f: EtherFrame) -> u64
+    ensures result < 16777216u64      // 2^24 = always fits in 24 bits
+{
+    f.dst.hi % 16777216u64
+}
+
+// Extract source OUI, masked to 24 bits
+fn src_oui(f: EtherFrame) -> u64
+    ensures result < 16777216u64
+{
+    f.src.hi % 16777216u64
+}
+
+// Check if ethertype indicates IPv4 (0x0800 = 2048)
+fn is_ipv4(f: EtherFrame) -> u64
+    ensures result == 1u64 || result == 0u64
+{
+    if f.etype.raw == 2048u64 { 1u64 } else { 0u64 }
+}
+
+// Check if ethertype indicates ARP (0x0806 = 2054)
+fn is_arp(f: EtherFrame) -> u64
+    ensures result == 1u64 || result == 0u64
+{
+    if f.etype.raw == 2054u64 { 1u64 } else { 0u64 }
+}
+
+// Verify same source and destination OUI (same manufacturer)
+fn same_vendor(f: EtherFrame) -> u64
+    requires f.dst.hi < 16777216u64
+    requires f.src.hi < 16777216u64
+    ensures result == 1u64 || result == 0u64
+{
+    if f.dst.hi == f.src.hi { 1u64 } else { 0u64 }
+}
+
+// Extract the raw EtherType value
+fn etype_value(f: EtherFrame) -> u64
+    ensures result == f.etype.raw
+{
+    f.etype.raw
+}
+
+// Verify the EtherType is a known unicast type
+fn is_known_etype(f: EtherFrame) -> u64
+    ensures result == 1u64 || result == 0u64
+{
+    let t: u64 = f.etype.raw;
+    if t == 2048u64 { 1u64 }          // IPv4
+    else if t == 2054u64 { 1u64 }     // ARP
+    else if t == 34525u64 { 1u64 }    // IPv6
+    else if t == 33024u64 { 1u64 }    // VLAN
+    else { 0u64 }
+}
+
+// Check if two frames share the same destination OUI
+fn same_dst_oui(a: EtherFrame, b: EtherFrame) -> u64
+    requires a.dst.hi < 16777216u64
+    requires b.dst.hi < 16777216u64
+    ensures result == 1u64 || result == 0u64
+{
+    if a.dst.hi == b.dst.hi { 1u64 } else { 0u64 }
+}
+
+fn main() -> u64 { 0u64 }

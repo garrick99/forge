@@ -1,0 +1,66 @@
+// Demo 321: Conditional postconditions with if/else in ensures clauses
+//
+// The proof engine now supports PIte in spec position:
+//   ensures result == if cond { a } else { b }
+//
+// This enables precise characterization of conditional computations —
+// the postcondition exactly specifies which branch was taken based on
+// the input values. Z3 verifies both branches simultaneously.
+
+// Classic min/max with exact conditional postconditions
+fn max2(a: u64, b: u64) -> u64
+    ensures result == if a >= b { a } else { b }
+{
+    if a >= b { a } else { b }
+}
+
+fn min2(a: u64, b: u64) -> u64
+    ensures result == if a <= b { a } else { b }
+{
+    if a <= b { a } else { b }
+}
+
+// Clamp with precise conditional spec
+fn clamp(x: u64, lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures result == if x < lo { lo } else { if x > hi { hi } else { x } }
+{
+    if x < lo { lo } else if x > hi { hi } else { x }
+}
+
+// Absolute difference: |a - b|
+fn abs_diff(a: u64, b: u64) -> u64
+    ensures result == if a >= b { a - b } else { b - a }
+{
+    if a >= b { a - b } else { b - a }
+}
+
+// Select: if flag != 0 pick a, else pick b
+fn select(flag: u64, a: u64, b: u64) -> u64
+    ensures result == if flag != 0u64 { a } else { b }
+{
+    if flag != 0u64 { a } else { b }
+}
+
+// Conditional increment: if x < limit, return x+1, else return x
+fn bounded_inc(x: u64, limit: u64) -> u64
+    ensures result == if x < limit { x + 1u64 } else { x }
+{
+    if x < limit { x + 1u64 } else { x }
+}
+
+// Sign extension stub: if high bit set, return ff..ff prefix, else 0
+fn sign_bit(x: u64) -> u64
+    ensures result == if x >= 128u64 { 1u64 } else { 0u64 }
+{
+    if x >= 128u64 { 1u64 } else { 0u64 }
+}
+
+// Saturating sub: a - b but floor at 0
+fn sat_sub(a: u64, b: u64) -> u64
+    ensures result == if a >= b { a - b } else { 0u64 }
+{
+    if a >= b { a - b } else { 0u64 }
+}
+
+fn main() -> u64 { 0u64 }
