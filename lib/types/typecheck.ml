@@ -2950,6 +2950,26 @@ let check_fn env fn =
         env_add_fact e len_fact
     | _ -> e
   ) env' fn.fn_params in
+  (* Init-snapshot for refmut<Struct> params: enables old() in postconditions.
+     For each refmut<S> param c, add __c_init__field constants equal to c__field
+     at function entry. The SMT encoder handles old(x.f) as __x_init__f.
+     Field mutations (env_add_fact with PField) add new facts but the init
+     constants remain unchanged, so old() continues to refer to entry values. *)
+  let env' = List.fold_left (fun e (id, ty) ->
+    match normalize_ty ty with
+    | TRefMut (TNamed (s_id, [])) ->
+        (match List.assoc_opt s_id.name e.structs with
+         | Some sd ->
+             List.fold_left (fun e2 (fid, fty) ->
+               let init_name = "__" ^ id.name ^ "_init__" ^ fid.name in
+               let field_pred = PField (PVar id, fid.name) in
+               let init_var   = PVar { name = init_name; loc = id.loc } in
+               let e3 = env_add_var e2 init_name (normalize_ty fty) Unr id.loc in
+               env_add_fact e3 (PBinop (Eq, init_var, field_pred))
+             ) e sd.sd_fields
+         | None -> e)
+    | _ -> e
+  ) env' fn.fn_params in
   (* Termination measure(s) must be non-negative at function entry *)
   (match fn.fn_decreases with
    | Some (PLex ms) ->

@@ -1,0 +1,82 @@
+// Demo 325: old() predicate for refmut<T> parameters
+//
+// When a function mutates a struct through refmut<T>,
+// the proof engine now supports old((*param).field) in postconditions
+// to refer to the entry value before mutation.
+//
+// This enables semantically correct relative postconditions like:
+//   ensures (*c).value == old((*c).value) + 1u64
+//
+// The compiler injects __c_init__field constants at function entry
+// equal to the initial field values. old((*c).field) maps to
+// __c_init__field in the SMT query.
+
+struct Counter {
+    value: u64,
+    max:   u64,
+}
+
+fn counter_inc(c: refmut<Counter>)
+    requires (*c).value < (*c).max
+    ensures  (*c).value == old((*c).value) + 1u64
+{
+    (*c).value = (*c).value + 1u64;
+}
+
+fn counter_dec(c: refmut<Counter>)
+    requires (*c).value > 0u64
+    ensures  (*c).value == old((*c).value) - 1u64
+{
+    (*c).value = (*c).value - 1u64;
+}
+
+fn counter_reset(c: refmut<Counter>)
+    ensures  (*c).value == 0u64
+    ensures  (*c).max   == old((*c).max)    // max is preserved
+{
+    (*c).value = 0u64;
+}
+
+fn counter_set_max(c: refmut<Counter>, m: u64)
+    requires m >= (*c).value
+    ensures  (*c).max   == m
+    ensures  (*c).value == old((*c).value)  // value is preserved
+{
+    (*c).max = m;
+}
+
+// State machine: verify that set_port only changes port, not state
+struct Conn {
+    state: u64,
+    port:  u64,
+}
+
+fn conn_set_port(c: refmut<Conn>, port: u64)
+    ensures (*c).port  == port
+    ensures (*c).state == old((*c).state)   // state is unchanged
+{
+    (*c).port = port;
+}
+
+fn conn_set_state(c: refmut<Conn>, state: u64)
+    ensures (*c).state == state
+    ensures (*c).port  == old((*c).port)    // port is unchanged
+{
+    (*c).state = state;
+}
+
+// Accumulator: add delta, verify new value is old + delta
+struct Accum {
+    total: u64,
+    count: u64,
+}
+
+fn accum_add(a: refmut<Accum>, delta: u64)
+    ensures (*a).total == old((*a).total) + delta
+    ensures (*a).count == old((*a).count) + 1u64
+{
+    (*a).total = (*a).total + delta;
+    (*a).count = (*a).count + 1u64;
+}
+
+fn main() -> u64 { 0u64 }
