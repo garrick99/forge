@@ -1,0 +1,40 @@
+// Demo 309: Bounded addition stays within range
+//
+// If a <= A and b <= B and A + B <= MAX, then a + b <= A + B <= MAX.
+// The proof engine can verify these chains with cast/mod range facts.
+
+// Sum of two bytes fits in u16 range (0..510)
+fn sum_bytes(a: u8, b: u8) -> u64
+    ensures result <= 510u64
+{
+    let x: u64 = a as u64;   // x <= 255
+    let y: u64 = b as u64;   // y <= 255
+    x + y
+}
+
+// Byte times 4 fits in u10 range (0..1020)
+fn byte_scale4(b: u8) -> u64
+    ensures result <= 1020u64
+{
+    let v: u64 = b as u64;   // v <= 255
+    v * 4u64
+}
+
+// Nibble shift: upper nibble * 16 fits in 0..240
+fn nibble_shift(x: u64) -> u64
+    ensures result <= 240u64
+{
+    let n: u64 = x % 16u64;  // n < 16
+    n * 16u64
+}
+
+// Big-endian encode: reconstruct big-endian byte value is always <= 255
+fn be_encode(nibble_hi: u64, nibble_lo: u64) -> u64
+    requires nibble_hi <= 15u64
+    requires nibble_lo <= 15u64
+    ensures result <= 255u64
+{
+    nibble_hi * 16u64 + nibble_lo
+}
+
+fn main() -> u64 { 0u64 }
