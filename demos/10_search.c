@@ -3,16 +3,25 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#ifndef __GNUC__
+#  define __attribute__(x)
+#endif
 
-uint64_t search_step_lo(uint64_t lo, uint64_t hi, uint64_t mid) {
+/* Forward declarations */
+uint64_t search_step_lo(uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused)), uint64_t mid __attribute__((unused)));
+uint64_t search_step_hi(uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused)), uint64_t mid __attribute__((unused)));
+uint64_t search_mid(uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused)));
+
+uint64_t search_step_lo(uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused)), uint64_t mid __attribute__((unused))) {
   return (mid + 1);
 }
 
-uint64_t search_step_hi(uint64_t lo, uint64_t hi, uint64_t mid) {
+uint64_t search_step_hi(uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused)), uint64_t mid __attribute__((unused))) {
   return (mid - 1);
 }
 
-uint64_t search_mid(uint64_t lo, uint64_t hi) {
+uint64_t search_mid(uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
   return (lo + ((hi - lo) / 2));
 }
 

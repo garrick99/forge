@@ -3,8 +3,15 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#ifndef __GNUC__
+#  define __attribute__(x)
+#endif
 
-uint64_t divide(uint64_t a, uint64_t b) {
+/* Forward declarations */
+uint64_t divide(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
+
+uint64_t divide(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
   return (a / b);
 }
 

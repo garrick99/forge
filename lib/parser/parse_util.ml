@@ -55,6 +55,18 @@ let rec expr_to_pred (e : expr) : pred =
          type checker will handle this *)
       PVar { name = "__expr__"; loc = e.expr_loc }
 
+(* Convert typed integer literal suffix to prim_ty.
+   "u32" -> TUint U32, "i64" -> TInt I64, etc. *)
+let prim_of_suffix s : prim_ty =
+  match s with
+  | "u8"    -> TUint U8    | "u16"   -> TUint U16
+  | "u32"   -> TUint U32   | "u64"   -> TUint U64
+  | "u128"  -> TUint U128  | "usize" -> TUint USize
+  | "i8"    -> TInt  I8    | "i16"   -> TInt  I16
+  | "i32"   -> TInt  I32   | "i64"   -> TInt  I64
+  | "i128"  -> TInt  I128  | "isize" -> TInt  ISize
+  | _       -> TUint U64
+
 (* Build a function type from components *)
 let mk_fn_ty params ret requires ensures : fn_ty =
   { params; ret; requires; ensures }

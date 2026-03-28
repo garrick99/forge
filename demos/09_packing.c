@@ -3,16 +3,25 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#ifndef __GNUC__
+#  define __attribute__(x)
+#endif
 
-uint32_t pack_u32(uint32_t hi, uint32_t lo) {
+/* Forward declarations */
+uint32_t pack_u32(uint32_t hi __attribute__((unused)), uint32_t lo __attribute__((unused)));
+uint32_t unpack_lo(uint32_t word __attribute__((unused)));
+uint32_t unpack_hi(uint32_t word __attribute__((unused)));
+
+uint32_t pack_u32(uint32_t hi __attribute__((unused)), uint32_t lo __attribute__((unused))) {
   return ((hi * 65536) + lo);
 }
 
-uint32_t unpack_lo(uint32_t word) {
+uint32_t unpack_lo(uint32_t word __attribute__((unused))) {
   return (word - ((word / 65536) * 65536));
 }
 
-uint32_t unpack_hi(uint32_t word) {
+uint32_t unpack_hi(uint32_t word __attribute__((unused))) {
   return (word / 65536);
 }
 

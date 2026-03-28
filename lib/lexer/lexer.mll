@@ -16,7 +16,9 @@ let kw_table = Hashtbl.of_seq @@ List.to_seq [
   "extern",     EXTERN;
   "task",       TASK;
   "chan",        CHAN;
+  "const",      CONST;
   "let",        LET;
+  "ghost",      GHOST;
   "mut",        MUT;
   "return",     RETURN;
   "if",         IF;
@@ -35,16 +37,30 @@ let kw_table = Hashtbl.of_seq @@ List.to_seq [
   "decreases",  DECREASES;
   "invariant",  INVARIANT;
   "proof",      PROOF;
+  "trait",      TRAIT;
   "assume",     ASSUME;
+  "assert",     ASSERT;
   "lemma",      LEMMA;
   "witness",    WITNESS;
   "by",         BY;
   "auto",       AUTO;
-  "raw",        RAW;
-  "forall",     FORALL;
+  "axiom",      AXIOM;
+  "symm",       SYMM;
+  "trans",      TRANS;
+  "induction",  INDUCTION;
+  "raw",          RAW;
+  "span",         SPAN;
+  "shared",       SHARED;
+  "uniform",      UNIFORM;
+  "varying",      VARYING;
+  "kernel",       KERNEL;
+  "coalesced",    COALESCED;
+  "syncthreads",  SYNCTHREADS;
+  "forall",       FORALL;
   "exists",     EXISTS;
   "old",        OLD;
   "result",     RESULT;
+  "as",         AS;
   "lin",        LIN;
   "aff",        AFF;
   "true",       TRUE;
@@ -59,6 +75,8 @@ let kw_table = Hashtbl.of_seq @@ List.to_seq [
   "f32",        F32;  "f64", F64;
   "bool",       BOOL_TY;
   "Never",      NEVER;
+  "str",        STR_TY;
+  "where",      WHERE;
 ]
 
 let ident_or_kw s =
@@ -73,6 +91,36 @@ let advance_line lexbuf =
     pos_lnum = pos.pos_lnum + 1;
     pos_bol  = pos.pos_cnum;
   }
+
+(* Integer literal parsing supporting the full u64 range [0, 2^64-1].
+   OCaml Int64 is signed, so values >= 2^63 are stored as their two's-complement
+   bit pattern (negative Int64).  The BV-mode SMT emitter uses "%Lu" (unsigned
+   format) to recover the correct decimal representation for those literals. *)
+let parse_int s lexbuf =
+  (* Fast path: value fits in signed Int64 range (covers the vast majority of literals). *)
+  match Int64.of_string_opt s with
+  | Some n -> n
+  | None ->
+    (* Slow path: decimal literal in [2^63, 2^64-1].
+       Parse digit-by-digit with wrapping Int64 arithmetic so we store the
+       two's-complement bit pattern.  Reject anything > 2^64-1. *)
+    let max_u64 = "18446744073709551615" in
+    let valid =
+      String.length s < String.length max_u64 ||
+      (String.length s = String.length max_u64 && s <= max_u64)
+    in
+    if not valid then
+      raise (LexError (
+        Printf.sprintf "integer literal '%s' is out of range (max u64 = 18446744073709551615)" s,
+        lexbuf.lex_curr_p))
+    else begin
+      let acc = ref 0L in
+      String.iter (fun c ->
+        let d = Int64.of_int (Char.code c - Char.code '0') in
+        acc := Int64.add (Int64.mul !acc 10L) d   (* wraps at 2^64 *)
+      ) s;
+      !acc
+    end
 }
 
 let digit     = ['0'-'9']
@@ -85,6 +133,8 @@ let newline   = '\n' | "\r\n"
 let int_lit   = digit+ | "0x" hex+
 let float_lit = digit+ '.' digit* (['e' 'E'] ['+' '-']? digit+)?
               | digit+ ['e' 'E'] ['+' '-']? digit+
+(* integer type suffixes: u8/u16/u32/u64/u128/usize/i8/i16/i32/i64/i128/isize *)
+let int_type_suf = ('u'|'i') ("8" | "16" | "32" | "64" | "128" | "size")
 
 rule token = parse
   | ws+     { token lexbuf }
@@ -92,8 +142,12 @@ rule token = parse
   | "//" [^'\n']* { token lexbuf }
   | "/*"    { block_comment 1 lexbuf }
 
-  (* Literals *)
-  | int_lit as n   { INT (int_of_string n) }
+  (* Typed integer literals — must precede plain int_lit (longest match wins) *)
+  | (digit+ as n) (int_type_suf as s)       { INT_SUFF (parse_int n lexbuf, s) }
+  | ("0x" hex+ as n) (int_type_suf as s)    { INT_SUFF (parse_int n lexbuf, s) }
+
+  (* Plain literals *)
+  | int_lit as n   { INT (parse_int n lexbuf) }
   | float_lit as f { FLOAT (float_of_string f) }
   | '"'            { string_tok (Buffer.create 64) lexbuf }
 
@@ -103,6 +157,9 @@ rule token = parse
   (* Three-character tokens *)
   | "==>" { IMPLIES }
   | "<=>" { IFF }
+
+  (* Three-char must precede two-char for correct longest-match *)
+  | "..=" { DOTDOTEQ }
 
   (* Two-character tokens *)
   | "::" { DCOLON }
@@ -134,6 +191,7 @@ rule token = parse
   | '+' { PLUS }     | '-' { MINUS }
   | '/' { SLASH }    | '%' { PERCENT }
   | '^' { CARET }    | '~' { TILDE }
+  | '?' { QUESTION }
   | '=' { EQ }       | '@' { AT }
   | '#' { HASH }     | '_' { UNDERSCORE }
 

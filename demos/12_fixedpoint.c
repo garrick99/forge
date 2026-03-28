@@ -3,16 +3,25 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#ifndef __GNUC__
+#  define __attribute__(x)
+#endif
 
-uint64_t fp_add(uint64_t a, uint64_t b) {
+/* Forward declarations */
+uint64_t fp_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
+uint64_t fp_floor(uint64_t n __attribute__((unused)));
+uint64_t fp_scale(uint64_t n __attribute__((unused)), uint64_t num __attribute__((unused)), uint64_t den __attribute__((unused)));
+
+uint64_t fp_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
   return (a + b);
 }
 
-uint64_t fp_floor(uint64_t n) {
+uint64_t fp_floor(uint64_t n __attribute__((unused))) {
   return ((n / 65536) * 65536);
 }
 
-uint64_t fp_scale(uint64_t n, uint64_t num, uint64_t den) {
+uint64_t fp_scale(uint64_t n __attribute__((unused)), uint64_t num __attribute__((unused)), uint64_t den __attribute__((unused))) {
   return ((n * num) / den);
 }
 

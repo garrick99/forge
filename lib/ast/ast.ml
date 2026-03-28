@@ -50,7 +50,7 @@ type pred =
   | PTrue
   | PFalse
   | PVar    of ident                        (* bound variable *)
-  | PInt    of int                          (* integer literal *)
+  | PInt    of int64                        (* integer literal *)
   | PBool   of bool
   | PBinop  of binop * pred * pred
   | PUnop   of unop * pred
@@ -60,6 +60,13 @@ type pred =
   | PIte    of pred * pred * pred           (* if cond then t else e — for SMT ite *)
   | PForall of ident * ty * pred           (* forall x: T, P *)
   | PExists of ident * ty * pred           (* exists x: T, P *)
+  | PLex    of pred list                   (* (a, b) — lexicographic termination measure *)
+  | PField  of pred * string               (* pred.field — field projection in pred *)
+  | PStruct of string * (string * pred) list (* struct literal in pred position *)
+  | PIndex  of pred * pred                 (* pred[pred] — array index in pred *)
+
+(* GPU uniformity qualifier — tracks whether a value is same across all threads *)
+and qual = Uniform | Varying
 
 and binop =
   | Add | Sub | Mul | Div | Mod
@@ -86,6 +93,13 @@ and ty =
   | TNamed   of ident * ty list             (* named type with params *)
   | TFn      of fn_ty                       (* function type *)
   | TDepArr  of ident * ty * ty            (* (x: T) -> U(x) dependent *)
+  | TTuple   of ty list                    (* (T1, T2, ...) — anonymous product type *)
+  | TSpan    of ty                          (* span<T> — fat pointer {raw<T>*, usize} *)
+  | TShared  of ty * expr option            (* shared<T>[N] — GPU __shared__ memory *)
+  | TQual    of qual * ty                   (* uniform/varying qualifier *)
+  | TSecret  of ty                          (* secret<T> — constant-time taint wrapper *)
+  | TStr                                    (* str — UTF-8 byte span (sugar for span<u8>) *)
+  | TAssoc   of ty * string                 (* T::Item — associated type projection *)
 
 and fn_ty = {
   params:   (ident * ty) list;
@@ -122,10 +136,20 @@ and expr_desc =
   | ECast   of expr * ty
   | EProof  of proof_block                  (* proof { ... } *)
   | ERaw    of raw_block                    (* raw { ... } *)
-  | EAssume of pred * string option         (* assume(pred) "context" *)
+  | EAssume of pred * string option         (* assume(pred) "context" — trusted, logged *)
+  | EAssert of pred * string option         (* assert(pred) "context" — proved, then added as fact *)
+  | ELoop   of stmt list                    (* loop { stmts } — break val; returns loop result *)
+  | EStruct of ident * (ident * expr) list  (* StructName { field: val, ... } *)
+  | ESync                                   (* __syncthreads() — GPU barrier *)
+  | EArrayLit    of expr list               (* [a, b, c] — fixed-size array literal *)
+  | EArrayRepeat of expr * expr             (* [val; N]  — repeat-value array init *)
+  | ETuple       of expr list               (* (e1, e2, ...) — tuple construction *)
+  | EField_n     of expr * int              (* t.0, t.1 — tuple field projection *)
+  | ESubspan     of expr * expr * expr      (* s[lo..hi] — sub-span with proven bounds *)
+  | ERange       of expr * expr             (* lo..hi — integer range for for-loops *)
 
 and lit =
-  | LInt   of int * uint_width option       (* 42u32 *)
+  | LInt   of int64 * prim_ty option        (* 42u32, 5i64 — suffix sets type *)
   | LFloat of float * float_width option
   | LBool  of bool
   | LUnit
@@ -141,9 +165,11 @@ and pattern =
   | PWild
   | PBind   of ident
   | PLit    of lit
+  | PLitRange of lit * lit                  (* lo..=hi — integer range pattern *)
   | PCtor   of ident * pattern list         (* Ctor(p1, p2) *)
   | PTuple  of pattern list
   | PAs     of pattern * ident              (* p as x *)
+  | POr     of pattern * pattern            (* p1 | p2 *)
 
 (* ------------------------------------------------------------------ *)
 (* Statements                                                           *)
@@ -156,13 +182,15 @@ and stmt = {
 
 and stmt_desc =
   | SLet      of ident * ty option * expr * linearity (* let x: T = e *)
+  | SGhost    of ident * ty option * expr             (* ghost let x: T = e — proof only, erased in codegen *)
+  | SGhostAssign of ident * expr                      (* ghost x = e — mutable ghost update, erased in codegen *)
   | SExpr     of expr
   | SReturn   of expr option
-  | SWhile    of expr * pred option * pred option * stmt list
-                 (* while cond invariant: P decreases: Q { body } *)
-  | SFor      of ident * expr * pred option * stmt list
-                 (* for x in iter decreases: Q { body } *)
-  | SBreak
+  | SWhile    of expr * pred list * pred option * stmt list
+                 (* while cond invariant: P* decreases: Q { body } *)
+  | SFor      of ident * expr * pred list * pred option * stmt list
+                 (* for x in iter invariant: P* decreases: Q { body } *)
+  | SBreak    of expr option                          (* break [val] — value is loop result *)
   | SContinue
 
 and linearity = Lin | Aff | Unr   (* linear, affine, unrestricted *)
@@ -195,11 +223,11 @@ and proof_term =
   | PTAxiom                         (* trust me *)
   | PTRefl                          (* reflexivity *)
   | PTSymm   of proof_term
-  | PTTrans  of proof_term * proof_term
+  | PTTrans  of expr * proof_term * proof_term  (* intermediate term, proof a=b, proof b=c *)
   | PTCong   of proof_term list
   | PTWitness of expr               (* exists witness *)
   | PTCase   of expr * proof_term list
-  | PTInduct of ident * proof_term
+  | PTInduct of ident * proof_term * proof_term  (* var, base, step *)
   | PTBy     of ident * proof_term list   (* by lemma_name(args) *)
   | PTAuto                          (* discharge to SMT *)
 
@@ -224,14 +252,17 @@ type item = {
 and item_desc =
   | IFn     of fn_def
   | IType   of type_def
+  | IConst  of ident * ty * expr    (* const NAME: ty = expr; *)
   | IStruct of struct_def
   | IEnum   of enum_def
+  | ITrait  of trait_def            (* trait definition *)
   | IImpl   of impl_def
   | IExtern of extern_def           (* FFI *)
   | IUse    of ident list           (* use path *)
 
 and fn_def = {
   fn_name:     ident;
+  fn_generics: (ident * kind) list;  (* <T, N: usize> — KType/KNat generic params *)
   fn_params:   (ident * ty) list;
   fn_ret:      ty;
   fn_requires: pred list;
@@ -261,8 +292,10 @@ and enum_def = {
 }
 
 and impl_def = {
-  im_ty:    ty;
-  im_items: item list;
+  im_trait:     ident option;           (* None = inherent impl; Some name = trait impl *)
+  im_ty:        ty;
+  im_assoc_tys: impl_assoc_ty list;     (* type Item = u64; — associated type definitions *)
+  im_items:     item list;
 }
 
 and extern_def = {
@@ -276,9 +309,23 @@ and attr = {
   attr_args: string list;
 }
 
+and trait_def = {
+  tr_name:       ident;
+  tr_params:     (ident * kind) list;
+  tr_assoc_tys:  ident list;                (* type Item; — associated type declarations *)
+  tr_methods:    (ident * fn_ty * expr option) list; (* method name → signature, optional default body *)
+}
+
+and impl_assoc_ty = {
+  iat_name: ident;
+  iat_ty:   ty;
+}
+
 and kind =
   | KType                           (* type parameter *)
   | KNat                            (* natural number (dimension) *)
+  | KBounded of ident list          (* T: Trait — bounded type parameter *)
+  | KConst of ty                    (* const N: u64 — compile-time value parameter *)
 
 (* ------------------------------------------------------------------ *)
 (* Compilation unit                                                     *)
