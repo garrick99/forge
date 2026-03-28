@@ -54,7 +54,7 @@ fn divide(n: u64, d: u64) -> u64
 
 ## Building
 
-Requires OCaml 4.14+, Menhir, Z3, and Dune.
+Requires OCaml 5.0+, Menhir 20231231+, Z3 4.12+, and Dune 3.0+.
 
 ```bash
 # Install dependencies (Ubuntu/WSL2)
@@ -149,6 +149,47 @@ All demos compile clean under `gcc -Wall -Wextra -Werror`.
 | 57 | `57_kyber_kem.fg` | Kyber-512 KEM sketch — Barrett reduction, encaps, decaps, round-trip; ties together traits, range patterns, `?` operator, `loop { break }`, structs, proof specs; 12 obligations ✓ |
 | 58 | `58_modules.fg` | Module system — `use std::option;` + `use std::result;` imports `Option<T>` and `Result<T,E>` from `std/`; `safe_sqrt` + `?`-chained `div_chain`; 6 obligations ✓ |
 
+Demos 59–99 cover: bounded generics, `str` type, associated types, `for-in` iterators,
+`std::math`/`std::iter`/`std::collections` usage, method syntax, type aliases, enum methods,
+trait method dispatch, `const` items, builder pattern, signed integers, `where` clauses,
+default trait methods, multi-bounds, newtypes, match guards, nested match, `Result<T,E>`,
+accumulators, Fibonacci, bit ops, string ops, state machines, strategy pattern,
+or-patterns, span algorithms, postcondition libraries, const generics, generic bounds
+dispatch, invariant structs, loop invariants, type aliases, refinement types,
+generic data structures, multi-return, and enum payloads.
+
+Demos 100–130 cover: language showcase, verified binary search / GCD / sort /
+ring buffer / crypto / typestate, Hamming weight, interval arithmetic, priority queue,
+fixed-point, verified stack, bit tricks, DFA classifier, checksums, run-length encoding,
+sorting networks, window statistics, packet header, matrix2x2, polynomial evaluation,
+bitset, integer math, tokenizer, gray code, 2D vector, color math, modular arithmetic,
+ring buffer, digit ops, and interval manipulation.
+
+Demos 131–199 cover: while loops with quantified invariants, recursion, spans,
+inline call postcondition injection, mutable span writes, array SSA patterns,
+old() postconditions, selection/insertion/binary-search/bubble sort,
+clamp/saturate array passes, partition, ghost variables (sum, copy proof, running max,
+min index, minmax pass), prefix sum, is_sorted, linear/count search, dot product,
+array fill/reverse/sum, for-loop patterns (sum, fill, matvec, transpose, stride copy,
+tiled copy, Hadamard, two-sum, three-way partition, quicksort partition, array map/scale,
+function composition, EMA filter, running mean, NTT butterfly/round, GPU scan upsweep,
+power, and full quantified postcondition suites.
+
+Demos 200–297 cover deep verified algorithms: assert facts, GPU reduce, verified
+memcpy/memset/memmove/saxpy/iota, for-range patterns (partial fill, slice copy,
+SAXPY, bounds check), verified partition/prefix-max/clamp/sliding-sum/max-range/
+matrix-fill, old() scalar and preservation, GPU thread safety, assume hints, while with
+quantified invariants (binary search, GCD, two-pointer), verified merge/stride/matrix-row/
+scan, elif chains (clamp, three-way select, bool flag, partition flag), verified
+merge-sort step, bool scan, contains, count-lt/gt, find-first, strong is-sorted,
+max-index, insertion/selection sort steps, Dutch national flag, running max, abs-copy,
+normalize, Boyer-Moore majority, matrix max, window sum, dot-product range,
+two-pointer sum, mismatch, threshold fill, histogram, chained copy, reverse,
+count-equal, prefix sum, find-max-min, zero-fill-then-write, sum bounded, rotate-left,
+apply-mask, stride copy, all-nonzero, upper bound, clamp/scale array, find-second-max,
+stable partition, copy-if, interleave sum, all-equal, saturating-add array,
+copy-bounded, elementwise max, zero count, and min-index range.
+
 ### Intentional failures (in `demos/bad/`)
 
 These demonstrate what FORGE catches:
@@ -164,6 +205,7 @@ These demonstrate what FORGE catches:
 | `07_syncthreads_divergent.fg` | `syncthreads()` inside a branch on a per-thread value |
 | `06_ind_cpa_violation.fg` | `#[ind_cpa]` function that `declassify(key)` — key leakage caught |
 | `08_own_not_freed.fg` | `own<T>` allocated but never freed — linear must-use violation |
+| `09_unbound_generic.fg` | Generic type variable used outside its scope |
 
 ---
 
@@ -219,23 +261,39 @@ lemma double_is_even(n: u64) -> bool
 
 ```
 lib/
-  ast/          AST node types
-  lexer/        Menhir lexer
-  parser/       Menhir parser (parser.ml pre-generated — see build note)
-  types/        Type checker + proof obligation generation (typecheck.ml)
-  proof/        Z3 bridge + three-tier discharge engine (proof_engine.ml)
-  codegen/      C99 and CUDA C emitter (codegen_c.ml)
+  ast/          AST node types (~220 lines)
+  lexer/        Ocamllex lexer (lexer.mll ~290 lines)
+  parser/       Menhir LR(1) grammar (parser.mly ~1085 lines; parser.ml pre-generated)
+  tokens/       Standalone token type module
+  types/        Type checker + proof obligation generation (typecheck.ml ~3200 lines)
+  proof/        Z3 bridge + three-tier discharge engine (proof_engine.ml ~1200 lines)
+  codegen/      C99 emitter (codegen_c.ml ~2100 lines) + PTX backend (codegen_ptx.ml)
 bin/
-  main.ml       CLI entry point
-demos/          58 passing demos + 8 intentional failures
-std/
-  prelude.fg    Standard C/CUDA extern declarations
+  main.ml       CLI driver + compiler pipeline (~290 lines)
+demos/          296 passing demos (01–297, excluding intentional 02_bad_divide)
+  bad/          9 intentional failures
+  std/          Standard library modules (prelude, option, result, math, iter,
+                collections, crypto)
 ```
 
-The pipeline: parse → type-check → generate obligations → discharge (Z3 / guided / manual) → erase proofs → emit C.
+The pipeline: parse → type-check → generate obligations → discharge (Z3 / guided / manual) → erase proofs → emit C99 or CUDA C.
+
+**Proof obligation types generated:**
+- `OPrecondition` — `requires` clause satisfied at each call site
+- `OPostcondition` — `ensures` clause follows from function body
+- `OBoundsCheck` — every span/array index proven within `.len`
+- `ONoOverflow` — arithmetic stays within the type's value range
+- `OTermination` — recursive calls and loops have a decreasing measure
+- `OLinear` — `own<T>` values consumed exactly once
+- `OInvariant` — struct field predicates and loop invariants preserved
 
 ---
 
 ## Roadmap
 
-- Full IND-CPA game proof: adversary model, game-hopping, reduction to LWE
+- **First-class function values** — proper `fn(T) -> U` types, closures, verified higher-order functions (`map`, `filter`, `fold` with postconditions)
+- **Full IND-CPA game proof** — adversary model, game-hopping, reduction to LWE
+- **Recursive data structures** — verified linked lists, trees, and heaps with `own<T>` linearity
+- **Warp-level GPU primitives** — `__shfl_sync`, warp-level reduction, tensor core intrinsics
+- **Compiler error spans** — structured diagnostics with source location ranges
+- **Verified unsafe C interop** — `extern` blocks with explicit proof obligations at the FFI boundary
