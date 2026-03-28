@@ -378,6 +378,10 @@ let rec ty_eq t1 t2 =
   | TStr, TStr -> true
   | TStr, TSpan (TPrim (TUint U8)) | TSpan (TPrim (TUint U8)), TStr -> true
   | TAssoc (b1, n1), TAssoc (b2, n2) -> n1 = n2 && ty_eq b1 b2
+  | TFn fty1, TFn fty2 ->
+      ty_eq fty1.ret fty2.ret &&
+      List.length fty1.params = List.length fty2.params &&
+      List.for_all2 (fun (_, t1) (_, t2) -> ty_eq t1 t2) fty1.params fty2.params
   | _ -> false
 
 (* Numeric coercion: integer literals default to u64, but when used alongside a

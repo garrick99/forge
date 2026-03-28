@@ -41,6 +41,9 @@ let rec mangle_ty_id = function
   | TQual (_, t)       -> mangle_ty_id t
   | TSecret t          -> mangle_ty_id t
   | TTuple tys         -> "tuple_" ^ String.concat "_" (List.map mangle_ty_id tys)
+  | TFn fty            ->
+      "fn_" ^ String.concat "_" (List.map (fun (_, t) -> mangle_ty_id t) fty.params)
+      ^ "_ret_" ^ mangle_ty_id fty.ret
   | TStr               -> "str"
   | TAssoc _           -> "assoc"
   | _                  -> "opaque"
@@ -216,6 +219,34 @@ let collect_own_types items =
   ) [] items
 
 (* ------------------------------------------------------------------ *)
+(* Collect all unique fn(...)->T function pointer types                *)
+(* Used to emit C typedefs: typedef ret_t (forge_fn_..._t)(params);   *)
+(* ------------------------------------------------------------------ *)
+
+let rec collect_fn_ptr_tys acc = function
+  | TFn fty as t ->
+      let key = mangle_ty_id t in
+      let acc = if List.mem_assoc key acc then acc else (key, fty) :: acc in
+      let acc = List.fold_left (fun a (_, pt) -> collect_fn_ptr_tys a pt) acc fty.params in
+      collect_fn_ptr_tys acc fty.ret
+  | TRef t | TRefMut t | TOwn t | TRaw t | TSlice t -> collect_fn_ptr_tys acc t
+  | TSpan t | TArray (t, _) | TShared (t, _) -> collect_fn_ptr_tys acc t
+  | TQual (_, t) | TSecret t -> collect_fn_ptr_tys acc t
+  | TTuple tys -> List.fold_left collect_fn_ptr_tys acc tys
+  | _ -> acc
+
+let collect_fn_ptr_types items =
+  List.fold_left (fun acc item ->
+    match item.item_desc with
+    | IFn fn ->
+        let acc = List.fold_left (fun a (_, t) -> collect_fn_ptr_tys a t) acc fn.fn_params in
+        collect_fn_ptr_tys acc fn.fn_ret
+    | IExtern ex -> collect_fn_ptr_tys acc ex.ex_ty
+    | IStruct sd -> List.fold_left (fun a (_, t) -> collect_fn_ptr_tys a t) acc sd.sd_fields
+    | _ -> acc
+  ) [] items
+
+(* ------------------------------------------------------------------ *)
 (* Enum constructor registry                                           *)
 (*                                                                     *)
 (* Maps ctor_name -> (enum_name, tag_index, field_types).             *)
@@ -345,7 +376,7 @@ let rec emit_ty = function
       id.name ^ "_" ^ String.concat "_" (List.map mangle_ty_id args)
   | TArray (t, None)   -> emit_ty t ^ "*"
   | TDepArr (_, _, r)  -> emit_ty r
-  | TFn _              -> "void*"   (* function pointers — TODO *)
+  | TFn fty            -> Printf.sprintf "forge_%s_t" (mangle_ty_id (TFn fty))
   (* GPU / span types *)
   | TSpan t   ->
       (* Use a typedef name: forge_span_<mangled_elem>_t.
@@ -1979,6 +2010,21 @@ let emit_program prog =
         (Printf.sprintf "typedef struct { %s } %s;\n"
            (String.concat " " fields) (emit_ty tup_ty))
     ) (List.rev tuple_types);
+    Buffer.add_char buf '\n'
+  end;
+  (* Emit function pointer typedefs for each unique fn(...)->T type used *)
+  let fn_ptr_types = collect_fn_ptr_types prog.prog_items in
+  if fn_ptr_types <> [] then begin
+    Buffer.add_string buf "/* Function pointer typedefs */\n";
+    List.iter (fun (key, fty) ->
+      let ret_str = emit_ty fty.ret in
+      let params_str =
+        if fty.params = [] then "void"
+        else String.concat ", " (List.map (fun (_, t) -> emit_ty t) fty.params)
+      in
+      Buffer.add_string buf
+        (Printf.sprintf "typedef %s (*forge_%s_t)(%s);\n" ret_str key params_str)
+    ) (List.rev fn_ptr_types);
     Buffer.add_char buf '\n'
   end;
   (* Emit own<T> heap helpers for each unique element type.

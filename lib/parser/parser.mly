@@ -471,6 +471,13 @@ ty:
   | STR_TY
     { TStr }
 
+  (* fn(T1, T2) -> U — first-class function pointer type *)
+  | FN LPAREN params = separated_list(COMMA, ty) RPAREN ARROW ret = ty
+    { TFn (mk_fn_ty
+        (List.mapi (fun i t ->
+          (mk_ident ("_" ^ string_of_int i) $startpos, t)) params)
+        ret [] []) }
+
   (* T::Item — associated type projection (must come before plain ident rule) *)
   | base = ident DCOLON assoc = ident
     { TAssoc (TNamed (base, []), assoc.name) }
