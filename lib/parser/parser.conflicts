@@ -1,5 +1,5 @@
 
-** Conflict (shift/reduce) in state 689.
+** Conflict (shift/reduce) in state 694.
 ** Token involved: EQ
 ** This state is reached from program after reading:
 
@@ -16,12 +16,12 @@ IMPL ty LBRACE list(impl_item) RBRACE
                impl_item list(impl_item) 
                (?)
 
-** In state 689, looking ahead at EQ, shifting is permitted
+** In state 694, looking ahead at EQ, shifting is permitted
 ** because of the following sub-derivation:
 
 TYPE ident . EQ ty SEMI 
 
-** In state 689, looking ahead at EQ, reducing production
+** In state 694, looking ahead at EQ, reducing production
 ** type_params ->
 ** is permitted because of the following sub-derivation:
 
@@ -30,7 +30,7 @@ type_def
 TYPE ident type_params EQ ty SEMI // lookahead token appears
            . 
 
-** Conflict (shift/reduce) in state 586.
+** Conflict (shift/reduce) in state 591.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -47,20 +47,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 586, looking ahead at DCOLON, reducing production
+** In state 591, looking ahead at DCOLON, reducing production
 ** expr -> TILDE expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 TILDE expr . 
 
-** In state 586, looking ahead at DCOLON, shifting is permitted
+** In state 591, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 TILDE expr 
       expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 584.
+** Conflict (shift/reduce) in state 589.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -77,20 +77,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 584, looking ahead at DCOLON, reducing production
+** In state 589, looking ahead at DCOLON, reducing production
 ** expr -> STAR expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 STAR expr . 
 
-** In state 584, looking ahead at DCOLON, shifting is permitted
+** In state 589, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 STAR expr 
      expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 583.
+** Conflict (shift/reduce) in state 588.
 ** Tokens involved: STAREQ STAR SLASHEQ SLASH SHR SHL QUESTION PLUSEQ PLUS PIPE PERCENT OR_RETURN OR_FAIL NEQ MINUSEQ MINUS LT LPAREN LOR LE LBRACKET LAND IMPLIES IFF GT GE EQEQ EQ DOT DCOLON CARET AS AMP
 ** The following explanations concentrate on token STAREQ.
 ** This state is reached from program after reading:
@@ -108,7 +108,7 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 583, looking ahead at STAREQ, shifting is permitted
+** In state 588, looking ahead at STAREQ, shifting is permitted
 ** because of the following sub-derivation:
 
 return_expr 
@@ -116,7 +116,7 @@ RETURN option(expr)
        expr 
        expr . STAREQ expr 
 
-** In state 583, looking ahead at STAREQ, reducing production
+** In state 588, looking ahead at STAREQ, reducing production
 ** option(expr) -> expr
 ** is permitted because of the following sub-derivation:
 
@@ -125,7 +125,7 @@ return_expr // lookahead token is inherited
 RETURN option(expr) // lookahead token is inherited
        expr . 
 
-** Conflict (shift/reduce) in state 485.
+** Conflict (shift/reduce) in state 490.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -142,20 +142,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 485, looking ahead at DCOLON, reducing production
+** In state 490, looking ahead at DCOLON, reducing production
 ** expr -> MINUS expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 MINUS expr . 
 
-** In state 485, looking ahead at DCOLON, shifting is permitted
+** In state 490, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 MINUS expr 
       expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 480.
+** Conflict (shift/reduce) in state 485.
 ** Token involved: COMMA
 ** This state is reached from program after reading:
 
@@ -176,19 +176,19 @@ IMPL ty LBRACE list(impl_item) RBRACE
                                         alt_pattern option(preceded(IF,pred)) FATARROW arm_body 
                                                                                        (?)
 
-** In state 480, looking ahead at COMMA, shifting is permitted
+** In state 485, looking ahead at COMMA, shifting is permitted
 ** because of the following sub-derivation:
 
 block_expr . COMMA 
 
-** In state 480, looking ahead at COMMA, reducing production
+** In state 485, looking ahead at COMMA, reducing production
 ** expr -> block_expr
 ** is permitted because of the following sub-derivation:
 
 expr COMMA // lookahead token appears
 block_expr . 
 
-** Conflict (shift/reduce) in state 478.
+** Conflict (shift/reduce) in state 483.
 ** Token involved: LPAREN
 ** This state is reached from program after reading:
 
@@ -207,7 +207,7 @@ IMPL ty LBRACE list(impl_item) RBRACE
                       MATCH expr LBRACE list(match_arm) RBRACE 
                                         (?)
 
-** In state 478, looking ahead at LPAREN, reducing production
+** In state 483, looking ahead at LPAREN, reducing production
 ** arm_body -> expr
 ** is permitted because of the following sub-derivation:
 
@@ -215,7 +215,7 @@ match_arm list(match_arm) // lookahead token appears because list(match_arm) can
 alt_pattern option(preceded(IF,pred)) FATARROW arm_body // lookahead token is inherited
                                                expr . 
 
-** In state 478, looking ahead at LPAREN, shifting is permitted
+** In state 483, looking ahead at LPAREN, shifting is permitted
 ** because of the following sub-derivation:
 
 match_arm list(match_arm) 
@@ -223,7 +223,7 @@ alt_pattern option(preceded(IF,pred)) FATARROW arm_body
                                                expr COMMA 
                                                expr . LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 377.
+** Conflict (shift/reduce) in state 382.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -240,20 +240,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 377, looking ahead at DCOLON, reducing production
+** In state 382, looking ahead at DCOLON, reducing production
 ** expr -> BANG expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 BANG expr . 
 
-** In state 377, looking ahead at DCOLON, shifting is permitted
+** In state 382, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 BANG expr 
      expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 370.
+** Conflict (shift/reduce) in state 375.
 ** Tokens involved: STAREQ STAR SLASHEQ SLASH SHR SHL QUESTION PLUSEQ PLUS PIPE PERCENT OR_RETURN OR_FAIL NEQ MINUSEQ MINUS LT LPAREN LOR LE LBRACKET LAND IMPLIES IFF GT GE EQEQ EQ DOT DCOLON CARET AS AMP
 ** The following explanations concentrate on token STAREQ.
 ** This state is reached from program after reading:
@@ -271,20 +271,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 370, looking ahead at STAREQ, shifting is permitted
+** In state 375, looking ahead at STAREQ, shifting is permitted
 ** because of the following sub-derivation:
 
 BACKSLASH LPAREN tlist(lambda_param) RPAREN ARROW expr 
                                                   expr . STAREQ expr 
 
-** In state 370, looking ahead at STAREQ, reducing production
+** In state 375, looking ahead at STAREQ, reducing production
 ** expr -> BACKSLASH LPAREN tlist(lambda_param) RPAREN ARROW expr
 ** is permitted because of the following sub-derivation:
 
 expr STAREQ expr // lookahead token appears
 BACKSLASH LPAREN tlist(lambda_param) RPAREN ARROW expr . 
 
-** Conflict (shift/reduce) in state 361.
+** Conflict (shift/reduce) in state 366.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -301,20 +301,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 361, looking ahead at DCOLON, reducing production
+** In state 366, looking ahead at DCOLON, reducing production
 ** expr -> expr EQ expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr EQ expr . 
 
-** In state 361, looking ahead at DCOLON, shifting is permitted
+** In state 366, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr EQ expr 
         expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 359.
+** Conflict (shift/reduce) in state 364.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -331,20 +331,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 359, looking ahead at DCOLON, reducing production
+** In state 364, looking ahead at DCOLON, reducing production
 ** expr -> expr MINUSEQ expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr MINUSEQ expr . 
 
-** In state 359, looking ahead at DCOLON, shifting is permitted
+** In state 364, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr MINUSEQ expr 
              expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 357.
+** Conflict (shift/reduce) in state 362.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -361,20 +361,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 357, looking ahead at DCOLON, reducing production
+** In state 362, looking ahead at DCOLON, reducing production
 ** expr -> expr IFF expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr IFF expr . 
 
-** In state 357, looking ahead at DCOLON, shifting is permitted
+** In state 362, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr IFF expr 
          expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 355.
+** Conflict (shift/reduce) in state 360.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -391,20 +391,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 355, looking ahead at DCOLON, reducing production
+** In state 360, looking ahead at DCOLON, reducing production
 ** expr -> expr IMPLIES expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr IMPLIES expr . 
 
-** In state 355, looking ahead at DCOLON, shifting is permitted
+** In state 360, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr IMPLIES expr 
              expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 353.
+** Conflict (shift/reduce) in state 358.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -421,20 +421,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 353, looking ahead at DCOLON, reducing production
+** In state 358, looking ahead at DCOLON, reducing production
 ** expr -> expr EQEQ expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr EQEQ expr . 
 
-** In state 353, looking ahead at DCOLON, shifting is permitted
+** In state 358, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr EQEQ expr 
           expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 351.
+** Conflict (shift/reduce) in state 356.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -451,20 +451,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 351, looking ahead at DCOLON, reducing production
+** In state 356, looking ahead at DCOLON, reducing production
 ** expr -> expr LAND expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr LAND expr . 
 
-** In state 351, looking ahead at DCOLON, shifting is permitted
+** In state 356, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr LAND expr 
           expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 349.
+** Conflict (shift/reduce) in state 354.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -481,20 +481,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 349, looking ahead at DCOLON, reducing production
+** In state 354, looking ahead at DCOLON, reducing production
 ** expr -> expr LOR expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr LOR expr . 
 
-** In state 349, looking ahead at DCOLON, shifting is permitted
+** In state 354, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr LOR expr 
          expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 347.
+** Conflict (shift/reduce) in state 352.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -511,20 +511,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 347, looking ahead at DCOLON, reducing production
+** In state 352, looking ahead at DCOLON, reducing production
 ** expr -> expr GE expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr GE expr . 
 
-** In state 347, looking ahead at DCOLON, shifting is permitted
+** In state 352, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr GE expr 
         expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 345.
+** Conflict (shift/reduce) in state 350.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -541,20 +541,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 345, looking ahead at DCOLON, reducing production
+** In state 350, looking ahead at DCOLON, reducing production
 ** expr -> expr GT expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr GT expr . 
 
-** In state 345, looking ahead at DCOLON, shifting is permitted
+** In state 350, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr GT expr 
         expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 343.
+** Conflict (shift/reduce) in state 348.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -571,20 +571,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 343, looking ahead at DCOLON, reducing production
+** In state 348, looking ahead at DCOLON, reducing production
 ** expr -> expr LE expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr LE expr . 
 
-** In state 343, looking ahead at DCOLON, shifting is permitted
+** In state 348, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr LE expr 
         expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 341.
+** Conflict (shift/reduce) in state 346.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -601,20 +601,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 341, looking ahead at DCOLON, reducing production
+** In state 346, looking ahead at DCOLON, reducing production
 ** expr -> expr LT expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr LT expr . 
 
-** In state 341, looking ahead at DCOLON, shifting is permitted
+** In state 346, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr LT expr 
         expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 339.
+** Conflict (shift/reduce) in state 344.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -631,20 +631,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 339, looking ahead at DCOLON, reducing production
+** In state 344, looking ahead at DCOLON, reducing production
 ** expr -> expr NEQ expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr NEQ expr . 
 
-** In state 339, looking ahead at DCOLON, shifting is permitted
+** In state 344, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr NEQ expr 
          expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 337.
+** Conflict (shift/reduce) in state 342.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -661,20 +661,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 337, looking ahead at DCOLON, shifting is permitted
+** In state 342, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr OR_FAIL expr 
              expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** In state 337, looking ahead at DCOLON, reducing production
+** In state 342, looking ahead at DCOLON, reducing production
 ** expr -> expr OR_FAIL expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr OR_FAIL expr . 
 
-** Conflict (shift/reduce) in state 335.
+** Conflict (shift/reduce) in state 340.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -691,20 +691,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 335, looking ahead at DCOLON, shifting is permitted
+** In state 340, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr OR_RETURN expr 
                expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** In state 335, looking ahead at DCOLON, reducing production
+** In state 340, looking ahead at DCOLON, reducing production
 ** expr -> expr OR_RETURN expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr OR_RETURN expr . 
 
-** Conflict (shift/reduce) in state 333.
+** Conflict (shift/reduce) in state 338.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -721,20 +721,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 333, looking ahead at DCOLON, reducing production
+** In state 338, looking ahead at DCOLON, reducing production
 ** expr -> expr AMP expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr AMP expr . 
 
-** In state 333, looking ahead at DCOLON, shifting is permitted
+** In state 338, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr AMP expr 
          expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 331.
+** Conflict (shift/reduce) in state 336.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -751,20 +751,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 331, looking ahead at DCOLON, reducing production
+** In state 336, looking ahead at DCOLON, reducing production
 ** expr -> expr CARET expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr CARET expr . 
 
-** In state 331, looking ahead at DCOLON, shifting is permitted
+** In state 336, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr CARET expr 
            expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 329.
+** Conflict (shift/reduce) in state 334.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -781,20 +781,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 329, looking ahead at DCOLON, reducing production
+** In state 334, looking ahead at DCOLON, reducing production
 ** expr -> expr PIPE expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr PIPE expr . 
 
-** In state 329, looking ahead at DCOLON, shifting is permitted
+** In state 334, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr PIPE expr 
           expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 327.
+** Conflict (shift/reduce) in state 332.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -811,20 +811,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 327, looking ahead at DCOLON, reducing production
+** In state 332, looking ahead at DCOLON, reducing production
 ** expr -> expr PLUSEQ expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr PLUSEQ expr . 
 
-** In state 327, looking ahead at DCOLON, shifting is permitted
+** In state 332, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr PLUSEQ expr 
             expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 325.
+** Conflict (shift/reduce) in state 330.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -841,20 +841,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 325, looking ahead at DCOLON, reducing production
+** In state 330, looking ahead at DCOLON, reducing production
 ** expr -> expr SHL expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr SHL expr . 
 
-** In state 325, looking ahead at DCOLON, shifting is permitted
+** In state 330, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr SHL expr 
          expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 323.
+** Conflict (shift/reduce) in state 328.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -871,20 +871,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 323, looking ahead at DCOLON, reducing production
+** In state 328, looking ahead at DCOLON, reducing production
 ** expr -> expr MINUS expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr MINUS expr . 
 
-** In state 323, looking ahead at DCOLON, shifting is permitted
+** In state 328, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr MINUS expr 
            expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 319.
+** Conflict (shift/reduce) in state 324.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -901,20 +901,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 319, looking ahead at DCOLON, reducing production
+** In state 324, looking ahead at DCOLON, reducing production
 ** expr -> expr PERCENT expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr PERCENT expr . 
 
-** In state 319, looking ahead at DCOLON, shifting is permitted
+** In state 324, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr PERCENT expr 
              expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 317.
+** Conflict (shift/reduce) in state 322.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -931,20 +931,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 317, looking ahead at DCOLON, reducing production
+** In state 322, looking ahead at DCOLON, reducing production
 ** expr -> expr PLUS expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr PLUS expr . 
 
-** In state 317, looking ahead at DCOLON, shifting is permitted
+** In state 322, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr PLUS expr 
           expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 315.
+** Conflict (shift/reduce) in state 320.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -961,20 +961,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 315, looking ahead at DCOLON, reducing production
+** In state 320, looking ahead at DCOLON, reducing production
 ** expr -> expr SHR expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr SHR expr . 
 
-** In state 315, looking ahead at DCOLON, shifting is permitted
+** In state 320, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr SHR expr 
          expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 313.
+** Conflict (shift/reduce) in state 318.
 ** Token involved: GT
 ** This state is reached from program after reading:
 
@@ -991,21 +991,21 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 313, looking ahead at GT, shifting is permitted
+** In state 318, looking ahead at GT, shifting is permitted
 ** because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
                expr 
                expr . GT expr 
 
-** In state 313, looking ahead at GT, reducing production
+** In state 318, looking ahead at GT, reducing production
 ** separated_nonempty_list(COMMA,expr) -> expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
                expr . 
 
-** Conflict (shift/reduce) in state 298.
+** Conflict (shift/reduce) in state 303.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -1022,20 +1022,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 298, looking ahead at DCOLON, reducing production
+** In state 303, looking ahead at DCOLON, reducing production
 ** expr -> expr SLASH expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr SLASH expr . 
 
-** In state 298, looking ahead at DCOLON, shifting is permitted
+** In state 303, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr SLASH expr 
            expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 296.
+** Conflict (shift/reduce) in state 301.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -1052,20 +1052,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 296, looking ahead at DCOLON, reducing production
+** In state 301, looking ahead at DCOLON, reducing production
 ** expr -> expr SLASHEQ expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr SLASHEQ expr . 
 
-** In state 296, looking ahead at DCOLON, shifting is permitted
+** In state 301, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr SLASHEQ expr 
              expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 292.
+** Conflict (shift/reduce) in state 297.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -1082,20 +1082,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 292, looking ahead at DCOLON, reducing production
+** In state 297, looking ahead at DCOLON, reducing production
 ** expr -> expr STAR expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr STAR expr . 
 
-** In state 292, looking ahead at DCOLON, shifting is permitted
+** In state 297, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr STAR expr 
           expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 290.
+** Conflict (shift/reduce) in state 295.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -1112,20 +1112,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 290, looking ahead at DCOLON, reducing production
+** In state 295, looking ahead at DCOLON, reducing production
 ** expr -> expr STAREQ expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 expr STAREQ expr . 
 
-** In state 290, looking ahead at DCOLON, shifting is permitted
+** In state 295, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 expr STAREQ expr 
             expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 283.
+** Conflict (shift/reduce) in state 288.
 ** Token involved: DCOLON
 ** This state is reached from program after reading:
 
@@ -1142,20 +1142,20 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 283, looking ahead at DCOLON, reducing production
+** In state 288, looking ahead at DCOLON, reducing production
 ** expr -> AMP expr
 ** is permitted because of the following sub-derivation:
 
 expr DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN // lookahead token appears
 AMP expr . 
 
-** In state 283, looking ahead at DCOLON, shifting is permitted
+** In state 288, looking ahead at DCOLON, shifting is permitted
 ** because of the following sub-derivation:
 
 AMP expr 
     expr . DCOLON LT separated_nonempty_list(COMMA,expr) GT LPAREN tlist(expr) RPAREN 
 
-** Conflict (shift/reduce) in state 198.
+** Conflict (shift/reduce) in state 203.
 ** Token involved: LBRACE
 ** This state is reached from program after reading:
 
@@ -1173,7 +1173,7 @@ IMPL ty LBRACE list(impl_item) RBRACE
                       loop_expr 
                       (?)
 
-** In state 198, looking ahead at LBRACE, reducing production
+** In state 203, looking ahead at LBRACE, reducing production
 ** ident -> RAW
 ** is permitted because of the following sub-derivation:
 
@@ -1182,14 +1182,14 @@ WHILE expr list(preceded(INVARIANT,pred)) option(preceded(DECREASES,pred)) block
       ident // lookahead token is inherited
       RAW . 
 
-** In state 198, looking ahead at LBRACE, shifting is permitted
+** In state 203, looking ahead at LBRACE, shifting is permitted
 ** because of the following sub-derivation:
 
 WHILE expr list(preceded(INVARIANT,pred)) option(preceded(DECREASES,pred)) block_expr 
       raw_expr 
       RAW . LBRACE list(stmt) RBRACE 
 
-** Conflict (shift/reduce) in state 197.
+** Conflict (shift/reduce) in state 202.
 ** Tokens involved: VARYING UNIFORM TRUE TRAIT STAR SPAN SHARED RAW MINUS LPAREN LBRACKET LBRACE KERNEL INT_SUFF INT IDENT FALSE COALESCED BY AMP
 ** The following explanations concentrate on token STAR.
 ** This state is reached from program after reading:
@@ -1207,7 +1207,7 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 197, looking ahead at STAR, shifting is permitted
+** In state 202, looking ahead at STAR, shifting is permitted
 ** because of the following sub-derivation:
 
 return_expr 
@@ -1215,7 +1215,7 @@ RETURN option(expr)
        expr 
        . STAR expr 
 
-** In state 197, looking ahead at STAR, reducing production
+** In state 202, looking ahead at STAR, reducing production
 ** option(expr) ->
 ** is permitted because of the following sub-derivation:
 
@@ -1224,11 +1224,11 @@ return_expr // lookahead token is inherited
 RETURN option(expr) // lookahead token is inherited
        . 
 
-** Conflict (shift/reduce) in state 175.
-** Token involved: ENSURES
+** Conflict (shift/reduce) in state 180.
+** Token involved: REQUIRES
 ** This state is reached from program after reading:
 
-IMPL FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty fn_ty_ensures_clause
+IMPL FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty fn_ty_requires_clause
 
 ** The derivations that appear below have the following common factor:
 ** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
@@ -1240,30 +1240,131 @@ impl_def
 IMPL ty LBRACE list(impl_item) RBRACE 
      (?)
 
-** In state 175, looking ahead at ENSURES, shifting is permitted
+** In state 180, looking ahead at REQUIRES, shifting is permitted
 ** because of the following sub-derivation:
 
-FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_ensures_clause) 
-                                                                  FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_ensures_clause) 
-                                                                                                                                       fn_ty_ensures_clause list(fn_ty_ensures_clause) 
-                                                                                                                                                            fn_ty_ensures_clause list(fn_ty_ensures_clause) 
-                                                                                                                                                            . ENSURES pred 
+FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) list(fn_ty_ensures_clause) 
+                                                                  FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) list(fn_ty_ensures_clause) 
+                                                                                                                                       fn_ty_requires_clause list(fn_ty_requires_clause) 
+                                                                                                                                                             fn_ty_requires_clause list(fn_ty_requires_clause) 
+                                                                                                                                                             . REQUIRES pred 
 
-** In state 175, looking ahead at ENSURES, reducing production
+** In state 180, looking ahead at REQUIRES, reducing production
+** list(fn_ty_requires_clause) ->
+** is permitted because of the following sub-derivation:
+
+FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) list(fn_ty_ensures_clause) // lookahead token appears because list(fn_ty_requires_clause) can begin with REQUIRES
+                                                                  FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) list(fn_ty_ensures_clause) // lookahead token is inherited because list(fn_ty_ensures_clause) can vanish
+                                                                                                                                       fn_ty_requires_clause list(fn_ty_requires_clause) // lookahead token is inherited
+                                                                                                                                                             . 
+
+** Conflict (shift/reduce) in state 178.
+** Token involved: ENSURES
+** This state is reached from program after reading:
+
+IMPL FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) fn_ty_ensures_clause
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(impl_item) RBRACE 
+     (?)
+
+** In state 178, looking ahead at ENSURES, shifting is permitted
+** because of the following sub-derivation:
+
+FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) list(fn_ty_ensures_clause) 
+                                                                  FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) list(fn_ty_ensures_clause) 
+                                                                                                                                                                   fn_ty_ensures_clause list(fn_ty_ensures_clause) 
+                                                                                                                                                                                        fn_ty_ensures_clause list(fn_ty_ensures_clause) 
+                                                                                                                                                                                        . ENSURES pred 
+
+** In state 178, looking ahead at ENSURES, reducing production
 ** list(fn_ty_ensures_clause) ->
 ** is permitted because of the following sub-derivation:
 
-FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_ensures_clause) // lookahead token appears because list(fn_ty_ensures_clause) can begin with ENSURES
-                                                                  FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_ensures_clause) // lookahead token is inherited
-                                                                                                                                       fn_ty_ensures_clause list(fn_ty_ensures_clause) // lookahead token is inherited
-                                                                                                                                                            . 
+FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) list(fn_ty_ensures_clause) // lookahead token appears because list(fn_ty_requires_clause) can vanish and list(fn_ty_ensures_clause) can begin with ENSURES
+                                                                  FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) list(fn_ty_ensures_clause) // lookahead token is inherited
+                                                                                                                                                                   fn_ty_ensures_clause list(fn_ty_ensures_clause) // lookahead token is inherited
+                                                                                                                                                                                        . 
+
+** Conflict (shift/reduce) in state 176.
+** Tokens involved: STAR SLASH SHR SHL PLUS PIPE PERCENT NEQ MINUS LT LOR LE LBRACKET LAND IMPLIES IFF GT GE EQEQ DOT CARET AMP
+** The following explanations concentrate on token GT.
+** This state is reached from program after reading:
+
+IMPL SPAN LT FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) ENSURES pred
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(impl_item) RBRACE 
+     (?)
+
+** In state 176, looking ahead at GT, reducing production
+** fn_ty_ensures_clause -> ENSURES pred
+** is permitted because of the following sub-derivation:
+
+SPAN LT ty GT // lookahead token appears
+        FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) list(fn_ty_ensures_clause) // lookahead token is inherited
+                                                                                                         fn_ty_ensures_clause list(fn_ty_ensures_clause) // lookahead token is inherited because list(fn_ty_ensures_clause) can vanish
+                                                                                                         ENSURES pred . 
+
+** In state 176, looking ahead at GT, shifting is permitted
+** because of the following sub-derivation:
+
+SPAN LT ty GT 
+        FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) list(fn_ty_ensures_clause) 
+                                                                                                         fn_ty_ensures_clause list(fn_ty_ensures_clause) 
+                                                                                                         ENSURES pred 
+                                                                                                                 pred . GT pred 
+
+** Conflict (shift/reduce) in state 174.
+** Token involved: ENSURES
+** This state is reached from program after reading:
+
+IMPL FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause)
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(impl_item) RBRACE 
+     (?)
+
+** In state 174, looking ahead at ENSURES, shifting is permitted
+** because of the following sub-derivation:
+
+FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) list(fn_ty_ensures_clause) 
+                                                                  FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) list(fn_ty_ensures_clause) 
+                                                                                                                                                                   fn_ty_ensures_clause list(fn_ty_ensures_clause) 
+                                                                                                                                                                   . ENSURES pred 
+
+** In state 174, looking ahead at ENSURES, reducing production
+** list(fn_ty_ensures_clause) ->
+** is permitted because of the following sub-derivation:
+
+FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) list(fn_ty_ensures_clause) // lookahead token appears because list(fn_ty_requires_clause) can vanish and list(fn_ty_ensures_clause) can begin with ENSURES
+                                                                  FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) list(fn_ty_ensures_clause) // lookahead token is inherited
+                                                                                                                                                                   . 
 
 ** Conflict (shift/reduce) in state 173.
 ** Tokens involved: STAR SLASH SHR SHL PLUS PIPE PERCENT NEQ MINUS LT LOR LE LBRACKET LAND IMPLIES IFF GT GE EQEQ DOT CARET AMP
 ** The following explanations concentrate on token GT.
 ** This state is reached from program after reading:
 
-IMPL SPAN LT FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty ENSURES pred
+IMPL SPAN LT FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty REQUIRES pred
 
 ** The derivations that appear below have the following common factor:
 ** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
@@ -1276,25 +1377,25 @@ IMPL ty LBRACE list(impl_item) RBRACE
      (?)
 
 ** In state 173, looking ahead at GT, reducing production
-** fn_ty_ensures_clause -> ENSURES pred
+** fn_ty_requires_clause -> REQUIRES pred
 ** is permitted because of the following sub-derivation:
 
 SPAN LT ty GT // lookahead token appears
-        FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_ensures_clause) // lookahead token is inherited
-                                                                             fn_ty_ensures_clause list(fn_ty_ensures_clause) // lookahead token is inherited because list(fn_ty_ensures_clause) can vanish
-                                                                             ENSURES pred . 
+        FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) list(fn_ty_ensures_clause) // lookahead token is inherited because list(fn_ty_ensures_clause) can vanish
+                                                                             fn_ty_requires_clause list(fn_ty_requires_clause) // lookahead token is inherited because list(fn_ty_requires_clause) can vanish
+                                                                             REQUIRES pred . 
 
 ** In state 173, looking ahead at GT, shifting is permitted
 ** because of the following sub-derivation:
 
 SPAN LT ty GT 
-        FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_ensures_clause) 
-                                                                             fn_ty_ensures_clause list(fn_ty_ensures_clause) 
-                                                                             ENSURES pred 
-                                                                                     pred . GT pred 
+        FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) list(fn_ty_ensures_clause) 
+                                                                             fn_ty_requires_clause list(fn_ty_requires_clause) 
+                                                                             REQUIRES pred 
+                                                                                      pred . GT pred 
 
 ** Conflict (shift/reduce) in state 171.
-** Token involved: ENSURES
+** Token involved: REQUIRES
 ** This state is reached from program after reading:
 
 IMPL FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty
@@ -1309,20 +1410,20 @@ impl_def
 IMPL ty LBRACE list(impl_item) RBRACE 
      (?)
 
-** In state 171, looking ahead at ENSURES, shifting is permitted
+** In state 171, looking ahead at REQUIRES, shifting is permitted
 ** because of the following sub-derivation:
 
-FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_ensures_clause) 
-                                                                  FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_ensures_clause) 
-                                                                                                                                       fn_ty_ensures_clause list(fn_ty_ensures_clause) 
-                                                                                                                                       . ENSURES pred 
+FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) list(fn_ty_ensures_clause) 
+                                                                  FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) list(fn_ty_ensures_clause) 
+                                                                                                                                       fn_ty_requires_clause list(fn_ty_requires_clause) 
+                                                                                                                                       . REQUIRES pred 
 
-** In state 171, looking ahead at ENSURES, reducing production
-** list(fn_ty_ensures_clause) ->
+** In state 171, looking ahead at REQUIRES, reducing production
+** list(fn_ty_requires_clause) ->
 ** is permitted because of the following sub-derivation:
 
-FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_ensures_clause) // lookahead token appears because list(fn_ty_ensures_clause) can begin with ENSURES
-                                                                  FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_ensures_clause) // lookahead token is inherited
+FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) list(fn_ty_ensures_clause) // lookahead token appears because list(fn_ty_requires_clause) can begin with REQUIRES
+                                                                  FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) list(fn_ty_ensures_clause) // lookahead token is inherited because list(fn_ty_ensures_clause) can vanish
                                                                                                                                        . 
 
 ** Conflict (shift/reduce) in state 156.
@@ -1425,7 +1526,7 @@ EXISTS ident COLON ty COMMA pred .
 ** Token involved: LPAREN
 ** This state is reached from program after reading:
 
-IMPL LBRACKET ty SEMI expr AS FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty ENSURES ident
+IMPL LBRACKET ty SEMI expr AS FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty REQUIRES ident
 
 ** The derivations that appear below have the following common factor:
 ** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
@@ -1442,10 +1543,10 @@ IMPL ty LBRACE list(impl_item) RBRACE
 ** because of the following sub-derivation:
 
 expr AS ty 
-        FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_ensures_clause) 
-                                                                             fn_ty_ensures_clause list(fn_ty_ensures_clause) 
-                                                                             ENSURES pred 
-                                                                                     ident . LPAREN loption(separated_nonempty_list(COMMA,pred)) RPAREN 
+        FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) list(fn_ty_ensures_clause) 
+                                                                             fn_ty_requires_clause list(fn_ty_requires_clause) 
+                                                                             REQUIRES pred 
+                                                                                      ident . LPAREN loption(separated_nonempty_list(COMMA,pred)) RPAREN 
 
 ** In state 103, looking ahead at LPAREN, reducing production
 ** pred -> ident
@@ -1453,10 +1554,10 @@ expr AS ty
 
 expr LPAREN tlist(expr) RPAREN // lookahead token appears
 expr AS ty // lookahead token is inherited
-        FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_ensures_clause) // lookahead token is inherited
-                                                                             fn_ty_ensures_clause list(fn_ty_ensures_clause) // lookahead token is inherited because list(fn_ty_ensures_clause) can vanish
-                                                                             ENSURES pred // lookahead token is inherited
-                                                                                     ident . 
+        FN LPAREN loption(separated_nonempty_list(COMMA,ty)) RPAREN ARROW ty list(fn_ty_requires_clause) list(fn_ty_ensures_clause) // lookahead token is inherited because list(fn_ty_ensures_clause) can vanish
+                                                                             fn_ty_requires_clause list(fn_ty_requires_clause) // lookahead token is inherited because list(fn_ty_requires_clause) can vanish
+                                                                             REQUIRES pred // lookahead token is inherited
+                                                                                      ident . 
 
 ** Conflict (shift/reduce) in state 93.
 ** Tokens involved: STAR SLASH SHR SHL PLUS PIPE PERCENT NEQ MINUS LT LOR LE LBRACKET LAND IMPLIES IFF GT GE EQEQ DOT CARET AMP

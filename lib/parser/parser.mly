@@ -473,15 +473,16 @@ ty:
   | STR_TY
     { TStr }
 
-  (* fn(T1, T2) -> U [ensures pred]* — first-class function pointer type
-     Optional ensures clauses allow the caller to inject postconditions
-     through fn-pointer calls: fn(u64) -> u64 ensures result <= 255u64 *)
+  (* fn(T1, T2) -> U [requires pred]* [ensures pred]* — first-class function pointer type
+     requires: precondition on arguments; ensures: postcondition on the result.
+     fn(u64) -> u64 requires _0 < 100u64 ensures result <= 255u64 *)
   | FN LPAREN params = separated_list(COMMA, ty) RPAREN ARROW ret = ty
+    reqs = list(fn_ty_requires_clause)
     enss = list(fn_ty_ensures_clause)
     { TFn (mk_fn_ty
         (List.mapi (fun i t ->
           (mk_ident ("_" ^ string_of_int i) $startpos, t)) params)
-        ret [] enss) }
+        ret reqs enss) }
 
   (* T::Item — associated type projection (must come before plain ident rule) *)
   | base = ident DCOLON assoc = ident
@@ -1103,6 +1104,10 @@ use_path_seg:
 (* Lambda parameter: name: type *)
 lambda_param:
   | id = ident COLON t = ty { (id, t) }
+
+(* Precondition clause on a fn-pointer type: requires <pred> *)
+fn_ty_requires_clause:
+  | REQUIRES p = pred { p }
 
 (* Postcondition clause on a fn-pointer type: ensures <pred> *)
 fn_ty_ensures_clause:
