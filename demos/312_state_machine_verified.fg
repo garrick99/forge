@@ -1,0 +1,94 @@
+// Demo 312: Verified state machine with struct typestate
+//
+// A connection state machine with verified transitions.
+// Functions return new connection states, allowing postconditions on result.state.
+//
+// State codes: 0=Closed, 1=Listening, 2=Connected, 3=Error
+//
+// The proof engine verifies:
+//   - Transitions produce the correct state code
+//   - State invariants hold in composed sequences
+//   - The full cycle ends in the correct terminal state
+
+struct Connection {
+    state: u64,
+    port:  u64,
+}
+
+fn conn_new() -> Connection
+    ensures result.state == 0u64
+    ensures result.port  == 0u64
+{
+    struct Connection { state: 0u64, port: 0u64 }
+}
+
+fn conn_listen(state: u64, port: u64) -> Connection
+    requires state == 0u64
+    requires port > 0u64
+    requires port < 65536u64
+    ensures result.state == 1u64
+    ensures result.port == port
+{
+    struct Connection { state: 1u64, port: port }
+}
+
+fn conn_accept(state: u64, port: u64) -> Connection
+    requires state == 1u64
+    ensures result.state == 2u64
+    ensures result.port == port
+{
+    struct Connection { state: 2u64, port: port }
+}
+
+fn conn_close(state: u64) -> Connection
+    ensures result.state == 0u64
+    ensures result.port  == 0u64
+{
+    let _ = state;
+    struct Connection { state: 0u64, port: 0u64 }
+}
+
+fn conn_error(state: u64, port: u64) -> Connection
+    ensures result.state == 3u64
+{
+    let _ = state;
+    struct Connection { state: 3u64, port: port }
+}
+
+// Full cycle: new -> listen -> accept -> close  =>  state == 0
+fn conn_full_cycle(port: u64) -> u64
+    requires port > 0u64
+    requires port < 65536u64
+    ensures result == 0u64
+{
+    let c0: Connection = conn_new();                    // c0.state == 0
+    let c1: Connection = conn_listen(c0.state, port);   // c1.state == 1
+    let c2: Connection = conn_accept(c1.state, c1.port); // c2.state == 2
+    let c3: Connection = conn_close(c2.state);           // c3.state == 0
+    c3.state
+}
+
+// Error cycle: new -> listen -> error  =>  state == 3
+fn conn_error_cycle(port: u64) -> u64
+    requires port > 0u64
+    requires port < 65536u64
+    ensures result == 3u64
+{
+    let c0: Connection = conn_new();
+    let c1: Connection = conn_listen(c0.state, port);
+    let c2: Connection = conn_error(c1.state, c1.port);
+    c2.state
+}
+
+// Listen requires Closed: state==0 -> state==1
+fn transition_listen_ok(port: u64) -> u64
+    requires port > 0u64
+    requires port < 65536u64
+    ensures result == 1u64
+{
+    let c: Connection = conn_new();       // c.state == 0
+    let c2: Connection = conn_listen(c.state, port);
+    c2.state
+}
+
+fn main() -> u64 { 0u64 }
