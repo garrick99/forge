@@ -1,0 +1,483 @@
+
+** Conflict (shift/reduce) in state 481.
+** Tokens involved: STAREQ STAR SLASHEQ SLASH SHR SHL PLUSEQ PLUS PIPE PERCENT OR_RETURN OR_FAIL NEQ MINUSEQ MINUS LT LPAREN LOR LE LBRACKET LAND IMPLIES IFF GT GE EQEQ EQ DOT CARET AS AMP
+** The following explanations concentrate on token STAREQ.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI RETURN expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 481, looking ahead at STAREQ, shifting is permitted
+** because of the following sub-derivation:
+
+return_expr 
+RETURN option(expr) 
+       expr 
+       expr . STAREQ expr 
+
+** In state 481, looking ahead at STAREQ, reducing production
+** option(expr) -> expr
+** is permitted because of the following sub-derivation:
+
+expr STAREQ expr // lookahead token appears
+return_expr // lookahead token is inherited
+RETURN option(expr) // lookahead token is inherited
+       expr . 
+
+** Conflict (shift/reduce) in state 392.
+** Token involved: COMMA
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI MATCH expr LBRACE alt_pattern option(preceded(IF,pred)) FATARROW block_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      match_expr 
+                      MATCH expr LBRACE list(match_arm) RBRACE 
+                                        match_arm list(match_arm) 
+                                        alt_pattern option(preceded(IF,pred)) FATARROW arm_body 
+                                                                                       (?)
+
+** In state 392, looking ahead at COMMA, shifting is permitted
+** because of the following sub-derivation:
+
+block_expr . COMMA 
+
+** In state 392, looking ahead at COMMA, reducing production
+** expr -> block_expr
+** is permitted because of the following sub-derivation:
+
+expr COMMA // lookahead token appears
+block_expr . 
+
+** Conflict (shift/reduce) in state 390.
+** Token involved: LPAREN
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI MATCH expr LBRACE alt_pattern option(preceded(IF,pred)) FATARROW expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      match_expr 
+                      MATCH expr LBRACE list(match_arm) RBRACE 
+                                        (?)
+
+** In state 390, looking ahead at LPAREN, reducing production
+** arm_body -> expr
+** is permitted because of the following sub-derivation:
+
+match_arm list(match_arm) // lookahead token appears because list(match_arm) can begin with LPAREN
+alt_pattern option(preceded(IF,pred)) FATARROW arm_body // lookahead token is inherited
+                                               expr . 
+
+** In state 390, looking ahead at LPAREN, shifting is permitted
+** because of the following sub-derivation:
+
+match_arm list(match_arm) 
+alt_pattern option(preceded(IF,pred)) FATARROW arm_body 
+                                               expr COMMA 
+                                               expr . LPAREN tlist(expr) RPAREN 
+
+** Conflict (shift/reduce) in state 180.
+** Tokens involved: STAR SLASH SHR SHL PLUS PIPE PERCENT NEQ MINUS LT LOR LE LBRACKET LAND IMPLIES IFF GT GE EQEQ DOT CARET AMP
+** The following explanations concentrate on token STAR.
+** This state is reached from program after reading:
+
+IMPL prim_ty_kw LBRACKET ident PIPE FORALL ident COLON ty COMMA pred
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     prim_ty_kw LBRACKET ident PIPE pred RBRACKET 
+                                    (?)
+
+** In state 180, looking ahead at STAR, shifting is permitted
+** because of the following sub-derivation:
+
+FORALL ident COLON ty COMMA pred 
+                            pred . STAR pred 
+
+** In state 180, looking ahead at STAR, reducing production
+** pred -> FORALL ident COLON ty COMMA pred
+** is permitted because of the following sub-derivation:
+
+pred STAR pred // lookahead token appears
+FORALL ident COLON ty COMMA pred . 
+
+** Conflict (shift/reduce) in state 172.
+** Token involved: LT
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr AS ident
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 172, looking ahead at LT, reducing production
+** type_args ->
+** is permitted because of the following sub-derivation:
+
+expr LT expr // lookahead token appears
+expr AS ty // lookahead token is inherited
+        ident type_args // lookahead token is inherited
+              . 
+
+** In state 172, looking ahead at LT, shifting is permitted
+** because of the following sub-derivation:
+
+expr AS ty 
+        ident type_args 
+              . LT separated_nonempty_list(COMMA,ty) GT 
+
+** Conflict (shift/reduce) in state 166.
+** Token involved: LBRACKET
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI expr AS prim_ty_kw
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 166, looking ahead at LBRACKET, reducing production
+** ty -> prim_ty_kw
+** is permitted because of the following sub-derivation:
+
+expr LBRACKET expr RBRACKET // lookahead token appears
+expr AS ty // lookahead token is inherited
+        prim_ty_kw . 
+
+** In state 166, looking ahead at LBRACKET, shifting is permitted
+** because of the following sub-derivation:
+
+expr AS ty 
+        prim_ty_kw . LBRACKET ident PIPE pred RBRACKET 
+
+** Conflict (shift/reduce) in state 165.
+** Tokens involved: STAR SLASH SHR SHL PLUS PIPE PERCENT NEQ MINUS LT LOR LE LBRACKET LAND IMPLIES IFF GT GE EQEQ DOT CARET AMP
+** The following explanations concentrate on token STAR.
+** This state is reached from program after reading:
+
+IMPL prim_ty_kw LBRACKET ident PIPE EXISTS ident COLON ty COMMA pred
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     prim_ty_kw LBRACKET ident PIPE pred RBRACKET 
+                                    (?)
+
+** In state 165, looking ahead at STAR, shifting is permitted
+** because of the following sub-derivation:
+
+EXISTS ident COLON ty COMMA pred 
+                            pred . STAR pred 
+
+** In state 165, looking ahead at STAR, reducing production
+** pred -> EXISTS ident COLON ty COMMA pred
+** is permitted because of the following sub-derivation:
+
+pred STAR pred // lookahead token appears
+EXISTS ident COLON ty COMMA pred . 
+
+** Conflict (shift/reduce) in state 110.
+** Tokens involved: STAR SLASH SHR SHL PLUS PIPE PERCENT NEQ MINUS LT LOR LE LBRACKET LAND IMPLIES IFF GT GE EQEQ DOT CARET AMP
+** The following explanations concentrate on token STAR.
+** This state is reached from program after reading:
+
+IMPL prim_ty_kw LBRACKET ident PIPE BANG pred
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     prim_ty_kw LBRACKET ident PIPE pred RBRACKET 
+                                    (?)
+
+** In state 110, looking ahead at STAR, shifting is permitted
+** because of the following sub-derivation:
+
+BANG pred 
+     pred . STAR pred 
+
+** In state 110, looking ahead at STAR, reducing production
+** pred -> BANG pred
+** is permitted because of the following sub-derivation:
+
+pred STAR pred // lookahead token appears
+BANG pred . 
+
+** Conflict (shift/reduce) in state 80.
+** Token involved: LBRACE
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI WHILE RAW
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      loop_expr 
+                      (?)
+
+** In state 80, looking ahead at LBRACE, reducing production
+** ident -> RAW
+** is permitted because of the following sub-derivation:
+
+WHILE expr option(preceded(INVARIANT,pred)) option(preceded(DECREASES,pred)) block_expr // lookahead token appears because option(preceded(INVARIANT,pred)) option(preceded(DECREASES,pred)) can vanish and block_expr can begin with LBRACE
+      atom_expr // lookahead token is inherited
+      ident // lookahead token is inherited
+      RAW . 
+
+** In state 80, looking ahead at LBRACE, shifting is permitted
+** because of the following sub-derivation:
+
+WHILE expr option(preceded(INVARIANT,pred)) option(preceded(DECREASES,pred)) block_expr 
+      raw_expr 
+      RAW . LBRACE list(stmt) RBRACE 
+
+** Conflict (shift/reduce) in state 79.
+** Tokens involved: VARYING UNIFORM TRUE STAR SPAN SHARED RAW MINUS LPAREN LBRACKET LBRACE KERNEL INT IDENT FALSE COALESCED BY AMP
+** The following explanations concentrate on token STAR.
+** This state is reached from program after reading:
+
+IMPL LBRACKET ty SEMI RETURN
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     LBRACKET ty SEMI expr RBRACKET 
+                      (?)
+
+** In state 79, looking ahead at STAR, shifting is permitted
+** because of the following sub-derivation:
+
+return_expr 
+RETURN option(expr) 
+       expr 
+       . STAR expr 
+
+** In state 79, looking ahead at STAR, reducing production
+** option(expr) ->
+** is permitted because of the following sub-derivation:
+
+expr STAR expr // lookahead token appears
+return_expr // lookahead token is inherited
+RETURN option(expr) // lookahead token is inherited
+       . 
+
+** Conflict (shift/reduce) in state 42.
+** Token involved: LT
+** This state is reached from program after reading:
+
+IMPL RAW
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     (?)
+
+** In state 42, looking ahead at LT, reducing production
+** ident -> RAW
+** is permitted because of the following sub-derivation:
+
+ident type_args // lookahead token appears because type_args can begin with LT
+RAW . 
+
+** In state 42, looking ahead at LT, shifting is permitted
+** because of the following sub-derivation:
+
+RAW . LT ty GT 
+
+** Conflict (shift/reduce) in state 36.
+** Token involved: LT
+** This state is reached from program after reading:
+
+IMPL SHARED
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     (?)
+
+** In state 36, looking ahead at LT, reducing production
+** ident -> SHARED
+** is permitted because of the following sub-derivation:
+
+ident type_args // lookahead token appears because type_args can begin with LT
+SHARED . 
+
+** In state 36, looking ahead at LT, shifting is permitted
+** because of the following sub-derivation:
+
+SHARED . LT ty GT LBRACKET expr RBRACKET 
+
+** Conflict (shift/reduce) in state 34.
+** Token involved: LT
+** This state is reached from program after reading:
+
+IMPL SPAN
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+impl_def 
+IMPL ty LBRACE list(item) RBRACE 
+     (?)
+
+** In state 34, looking ahead at LT, reducing production
+** ident -> SPAN
+** is permitted because of the following sub-derivation:
+
+ident type_args // lookahead token appears because type_args can begin with LT
+SPAN . 
+
+** In state 34, looking ahead at LT, shifting is permitted
+** because of the following sub-derivation:
+
+SPAN . LT ty GT 
+
+** Conflict (shift/reduce) in state 28.
+** Tokens involved: VARYING UNIFORM SPAN SHARED RAW LPAREN LBRACKET KERNEL IDENT COALESCED BY
+** The following explanations concentrate on token VARYING.
+** This state is reached from program after reading:
+
+STRUCT ident kind_params LBRACE ident COLON UNIFORM
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+struct_def 
+STRUCT ident kind_params LBRACE list(struct_field) list(invariant_clause) RBRACE 
+                                (?)
+
+** In state 28, looking ahead at VARYING, reducing production
+** ident -> UNIFORM
+** is permitted because of the following sub-derivation:
+
+struct_field list(struct_field) // lookahead token appears because list(struct_field) can begin with VARYING
+ident COLON ty // lookahead token is inherited
+            ident type_args // lookahead token is inherited because type_args can vanish
+            UNIFORM . 
+
+** In state 28, looking ahead at VARYING, shifting is permitted
+** because of the following sub-derivation:
+
+struct_field list(struct_field) 
+ident COLON ty COMMA 
+            UNIFORM ty 
+                    ident type_args 
+                    . VARYING 
+
+** Conflict (shift/reduce) in state 26.
+** Tokens involved: VARYING UNIFORM SPAN SHARED RAW LPAREN LBRACKET KERNEL IDENT COALESCED BY
+** The following explanations concentrate on token VARYING.
+** This state is reached from program after reading:
+
+STRUCT ident kind_params LBRACE ident COLON VARYING
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+list(item) EOF 
+item list(item) 
+struct_def 
+STRUCT ident kind_params LBRACE list(struct_field) list(invariant_clause) RBRACE 
+                                (?)
+
+** In state 26, looking ahead at VARYING, shifting is permitted
+** because of the following sub-derivation:
+
+struct_field list(struct_field) 
+ident COLON ty COMMA 
+            VARYING ty 
+                    ident type_args 
+                    . VARYING 
+
+** In state 26, looking ahead at VARYING, reducing production
+** ident -> VARYING
+** is permitted because of the following sub-derivation:
+
+struct_field list(struct_field) // lookahead token appears because list(struct_field) can begin with VARYING
+ident COLON ty // lookahead token is inherited
+            ident type_args // lookahead token is inherited because type_args can vanish
+            VARYING . 
