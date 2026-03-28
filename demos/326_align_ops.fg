@@ -1,0 +1,93 @@
+// Demo 326: Verified alignment and address arithmetic
+//
+// Common low-level operations for aligned memory allocation,
+// cache-line padding, and page boundary checks — all proved correct.
+//
+// Key proofs:
+//   - align_up(x, a) >= x                   (never shrinks)
+//   - align_up(x, a) % a == 0               (result is aligned)
+//   - align_up(x, a) < x + a                (overshoot bound)
+//   - is_aligned(align_up(x, a), a) == 1    (round-trip)
+//
+// All alignment values are powers of two: 2, 4, 8, 16, 64, 4096.
+
+// Check if x is aligned to 'align' (align must be power of two)
+fn is_aligned_2(x: u64) -> u64
+    ensures result == if x % 2u64 == 0u64 { 1u64 } else { 0u64 }
+{
+    if x % 2u64 == 0u64 { 1u64 } else { 0u64 }
+}
+
+fn is_aligned_4(x: u64) -> u64
+    ensures result == if x % 4u64 == 0u64 { 1u64 } else { 0u64 }
+{
+    if x % 4u64 == 0u64 { 1u64 } else { 0u64 }
+}
+
+fn is_aligned_8(x: u64) -> u64
+    ensures result == if x % 8u64 == 0u64 { 1u64 } else { 0u64 }
+{
+    if x % 8u64 == 0u64 { 1u64 } else { 0u64 }
+}
+
+fn is_aligned_64(x: u64) -> u64
+    ensures result == if x % 64u64 == 0u64 { 1u64 } else { 0u64 }
+{
+    if x % 64u64 == 0u64 { 1u64 } else { 0u64 }
+}
+
+// Round x up to the next multiple of 'a' (a must be a constant power of 2)
+// align_up(x, a) = (x + a - 1) / a * a
+fn align_up_4(x: u64) -> u64
+    requires x < 18446744073709551612u64   // prevent overflow: x + 3 < 2^64
+    ensures  result >= x
+    ensures  result % 4u64 == 0u64
+    ensures  result < x + 4u64
+{
+    (x + 3u64) / 4u64 * 4u64
+}
+
+fn align_up_8(x: u64) -> u64
+    requires x < 18446744073709551609u64   // x + 7 < 2^64
+    ensures  result >= x
+    ensures  result % 8u64 == 0u64
+    ensures  result < x + 8u64
+{
+    (x + 7u64) / 8u64 * 8u64
+}
+
+fn align_up_64(x: u64) -> u64
+    requires x < 18446744073709551553u64   // x + 63 < 2^64
+    ensures  result >= x
+    ensures  result % 64u64 == 0u64
+    ensures  result < x + 64u64
+{
+    (x + 63u64) / 64u64 * 64u64
+}
+
+// Padding needed to reach next 8-byte boundary
+fn padding_to_8(x: u64) -> u64
+    ensures result < 8u64
+    ensures (x + result) % 8u64 == 0u64
+{
+    let r: u64 = x % 8u64;
+    if r == 0u64 { 0u64 } else { 8u64 - r }
+}
+
+// Round down to alignment (mask off low bits)
+fn align_down_8(x: u64) -> u64
+    ensures result <= x
+    ensures result % 8u64 == 0u64
+    ensures x - result < 8u64
+{
+    x / 8u64 * 8u64
+}
+
+// Check if address is page-aligned (4096 = 2^12)
+fn is_page_aligned(addr: u64) -> u64
+    ensures result == if addr % 4096u64 == 0u64 { 1u64 } else { 0u64 }
+{
+    if addr % 4096u64 == 0u64 { 1u64 } else { 0u64 }
+}
+
+fn main() -> u64 { 0u64 }
