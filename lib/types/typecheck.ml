@@ -2457,12 +2457,23 @@ and check_field_access obj_ty field loc env =
        | _ ->
            fail loc (Printf.sprintf "shared<T> has no field '%s'" field.name);
            TPrim TUnit)
-  | TNamed (name, _) | TRef (TNamed (name, _)) | TRefMut (TNamed (name, _)) ->
+  | TNamed (name, ty_args) | TRef (TNamed (name, ty_args))
+  | TRefMut (TNamed (name, ty_args)) | TOwn (TNamed (name, ty_args)) ->
       (match List.assoc_opt name.name env.structs with
        | Some sd ->
+           (* Build type-param substitution if the struct is generic *)
+           let param_subst =
+             if ty_args = [] then []
+             else
+               let param_names = List.map (fun (p, _) -> p.name) sd.sd_params in
+               if List.length param_names = List.length ty_args then
+                 List.combine param_names ty_args
+               else []
+           in
            (match List.assoc_opt field.name
                     (List.map (fun (id, ty) -> (id.name, ty)) sd.sd_fields) with
-            | Some ft -> ft
+            | Some ft ->
+                if param_subst = [] then ft else subst_ty param_subst ft
             | None ->
                 fail loc (Printf.sprintf "no field '%s' on struct '%s'"
                   field.name name.name);
@@ -2971,13 +2982,36 @@ let rec check_item env item =
       ) env im.im_assoc_tys in
       (* Set self_ty for method body checking *)
       let env_with_self = { env with self_ty = Some im.im_ty } in
+      (* Build type-param substitution for generic impl types, e.g. impl Pair<u64>:
+         look up the struct/enum definition to find generic param names, then build
+         a mapping from param names to the concrete types in im_ty. *)
+      let ty_param_subst =
+        match im.im_ty with
+        | TNamed (base_id, concrete_args) when concrete_args <> [] ->
+            let param_names =
+              (match List.assoc_opt base_id.name env.structs with
+               | Some sd -> List.map (fun (p, _) -> p.name) sd.sd_params
+               | None ->
+                   match List.assoc_opt base_id.name env.enums with
+                   | Some ed -> List.map (fun (p, _) -> p.name) ed.ed_params
+                   | None -> [])
+            in
+            if List.length param_names = List.length concrete_args then
+              List.combine param_names concrete_args
+            else []
+        | _ -> []
+      in
+      let apply_ty_subst t = if ty_param_subst = [] then t else subst_ty ty_param_subst t in
       let env2 = List.fold_left (fun e item ->
         match item.item_desc with
         | IFn fn ->
             let mangled_name = prefix ^ fn.fn_name.name in
-            (* Resolve Self in param/return types *)
-            let resolved_params = List.map (fun (id, t) -> (id, resolve_self env_with_self t)) fn.fn_params in
-            let resolved_ret    = resolve_self env_with_self fn.fn_ret in
+            (* Resolve Self and apply generic type-param substitution *)
+            let resolved_params = List.map (fun (id, t) ->
+              (id, apply_ty_subst (resolve_self env_with_self t))) fn.fn_params in
+            let resolved_ret = apply_ty_subst (resolve_self env_with_self fn.fn_ret) in
+            (* requires/ensures are pred expressions — type-param substitution not needed *)
+            let _ = fn.fn_requires in
             let mangled_fn = { fn with fn_name = { fn.fn_name with name = mangled_name };
                                        fn_params = resolved_params;
                                        fn_ret    = resolved_ret } in
