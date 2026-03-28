@@ -1,0 +1,114 @@
+// Demo 303: Closure simulation — captured environment via struct + fn pointer
+//
+// Forge does not have built-in closures with capture, but the pattern can be
+// expressed explicitly as a struct holding the captured state alongside a
+// function pointer (the "fat pointer" or "vtable" pattern).
+//
+// Struct { captured_args..., f: fn(args) -> ret } simulates a closure.
+// This is exactly how Rust implements Fn/FnMut under the hood.
+//
+// Three examples:
+//  1. AdderClosure — captured addend, calls f(x) = x + addend
+//  2. ScaledMapper  — scale factor + fn pointer, maps s[i] = f(s[i]) * scale
+//  3. ThresholdFilter — threshold + predicate fn, counts s[i] where pred(s[i], thresh)
+
+// ── 1. Adder closure ─────────────────────────────────────────────────────────
+
+struct AdderClosure {
+    addend: u64,
+}
+
+fn adder_call(c: ref<AdderClosure>, x: u64) -> u64 {
+    (*c).addend + x
+}
+
+fn apply_adder(s: span<u64>, n: u64, c: ref<AdderClosure>)
+    requires s.len == n
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = adder_call(c, s[i]);
+        i = i + 1u64;
+    }
+}
+
+// ── 2. Scaled mapper — fn ptr + captured scale ───────────────────────────────
+
+struct ScaledMapper {
+    scale: u64,
+    f:     fn(u64) -> u64 ensures result <= 255u64,
+}
+
+fn scaled_map_call(c: ref<ScaledMapper>, x: u64) -> u64 {
+    let v: u64 = (*c).f(x);
+    v * (*c).scale
+}
+
+fn apply_scaled_mapper(s: span<u64>, n: u64, c: ref<ScaledMapper>)
+    requires s.len == n
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = scaled_map_call(c, s[i]);
+        i = i + 1u64;
+    }
+}
+
+// ── 3. Threshold counter — captured threshold + predicate ────────────────────
+
+struct ThresholdCounter {
+    threshold: u64,
+    pred:      fn(u64, u64) -> bool,
+}
+
+fn count_matching(s: span<u64>, n: u64, c: ref<ThresholdCounter>) -> u64
+    requires s.len == n
+    ensures result >= 0u64
+{
+    let mut count: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant count >= 0u64
+        decreases n - i
+    {
+        if (*c).pred(s[i], (*c).threshold) {
+            count = count + 1u64;
+        };
+        i = i + 1u64;
+    };
+    count
+}
+
+// ── Demo entrypoint ───────────────────────────────────────────────────────────
+
+fn clamp255(x: u64) -> u64 ensures result <= 255u64 {
+    if x > 255u64 { 255u64 } else { x }
+}
+
+fn gt_threshold(x: u64, thresh: u64) -> bool { x > thresh }
+
+fn demo(s: span<u64>, n: u64) -> u64
+    requires s.len == n
+    requires n > 0u64
+{
+    let adder: AdderClosure = struct AdderClosure { addend: 10u64 };
+    apply_adder(s, n, &adder);
+
+    let mapper: ScaledMapper = struct ScaledMapper { scale: 2u64, f: clamp255 };
+    apply_scaled_mapper(s, n, &mapper);
+
+    let counter: ThresholdCounter = struct ThresholdCounter {
+        threshold: 100u64,
+        pred: gt_threshold,
+    };
+    count_matching(s, n, &counter)
+}
+
+fn main() -> u64 { 0u64 }

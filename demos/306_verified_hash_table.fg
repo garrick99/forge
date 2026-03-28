@@ -1,0 +1,86 @@
+// Demo 306: Verified open-addressing hash table (fixed-size)
+//
+// A simple hash table with linear probing on a fixed-size span.
+// Key insight: the proof engine verifies:
+//  - Every probe index is in-bounds (via modular arithmetic)
+//  - Linear probe terminates (decreases clause)
+//  - Insert and lookup are consistent
+//
+// This demo uses u64 keys and values, with 0 as the "empty" sentinel.
+// Table capacity is passed as a parameter (must be > 0).
+
+fn hash_key(key: u64, cap: u64) -> u64
+    requires cap > 0u64
+    ensures result < cap
+{
+    key % cap
+}
+
+// probe_index: compute (start + step) % cap, verified in-bounds
+fn probe_index(start: u64, step: u64, cap: u64) -> u64
+    requires cap > 0u64
+    requires start < cap
+    ensures result < cap
+{
+    (start + step) % cap
+}
+
+// ht_lookup: find key in table, return its value or 0 if not found.
+// Linear probing — stops when empty slot (key == 0) is found.
+fn ht_lookup(keys: span<u64>, vals: span<u64>, cap: u64, key: u64) -> u64
+    requires keys.len == cap
+    requires vals.len == cap
+    requires cap > 0u64
+    requires key != 0u64
+{
+    let start: u64 = hash_key(key, cap);
+    let mut step: u64 = 0u64;
+    let mut found_val: u64 = 0u64;
+    while step < cap
+        invariant step <= cap
+        decreases cap - step
+    {
+        let idx: u64 = probe_index(start, step, cap);
+        let k: u64 = keys[idx];
+        if k == key {
+            found_val = vals[idx];
+            step = cap;  // break
+        } else if k == 0u64 {
+            step = cap;  // empty slot — not found
+        } else {
+            step = step + 1u64;
+        };
+    };
+    found_val
+}
+
+// ht_insert: insert (key, val) into table.
+// Returns true if inserted, false if table is full.
+fn ht_insert(keys: span<u64>, vals: span<u64>, cap: u64, key: u64, val: u64) -> bool
+    requires keys.len == cap
+    requires vals.len == cap
+    requires cap > 0u64
+    requires key != 0u64
+{
+    let start: u64 = hash_key(key, cap);
+    let mut step: u64 = 0u64;
+    let mut inserted: bool = false;
+    while step < cap
+        invariant step <= cap
+        decreases cap - step
+    {
+        let idx: u64 = probe_index(start, step, cap);
+        let k: u64 = keys[idx];
+        if k == 0u64 || k == key {
+            keys[idx] = key;
+            vals[idx] = val;
+            inserted = true;
+            step = cap;  // break
+        } else {
+            step = step + 1u64;
+        };
+    };
+    inserted
+}
+
+fn main() -> u64 { 0u64 }

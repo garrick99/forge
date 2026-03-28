@@ -1,0 +1,82 @@
+// Demo 304: Verified packet header parser
+//
+// Parse a binary network packet with guaranteed bounds safety.
+// The proof engine verifies every field extraction is within bounds.
+//
+// Packet layout (big-endian):
+//   offset 0: u8   version (4 bits) + header_len (4 bits)
+//   offset 1: u8   type_of_service
+//   offset 2: u16  total_length  (bytes 2-3)
+//   offset 4: u16  identification (bytes 4-5)
+//   offset 6: u16  flags+fragment_offset (bytes 6-7)
+//   offset 8: u8   ttl
+//   offset 9: u8   protocol
+//   offset 10: u16 checksum (bytes 10-11)
+//
+// We model the packet as a span<u8> and extract fields with verified indexing.
+
+struct PacketHeader {
+    version:     u64,
+    header_len:  u64,
+    tos:         u64,
+    total_len:   u64,
+    id:          u64,
+    ttl:         u64,
+    protocol:    u64,
+}
+
+fn parse_header(pkt: span<u8>, n: u64) -> PacketHeader
+    requires pkt.len == n
+    requires n >= 12u64
+{
+    let byte0: u64 = pkt[0u64] as u64;
+    let ver: u64   = byte0 / 16u64;         // upper nibble
+    let hlen: u64  = byte0 % 16u64;         // lower nibble
+    let tos: u64   = pkt[1u64] as u64;
+    let tlen_hi: u64 = pkt[2u64] as u64;
+    let tlen_lo: u64 = pkt[3u64] as u64;
+    let total_len: u64 = tlen_hi * 256u64 + tlen_lo;
+    let id_hi: u64 = pkt[4u64] as u64;
+    let id_lo: u64 = pkt[5u64] as u64;
+    let id: u64 = id_hi * 256u64 + id_lo;
+    let ttl: u64      = pkt[8u64] as u64;
+    let protocol: u64 = pkt[9u64] as u64;
+
+    struct PacketHeader {
+        version:    ver,
+        header_len: hlen,
+        tos:        tos,
+        total_len:  total_len,
+        id:         id,
+        ttl:        ttl,
+        protocol:   protocol,
+    }
+}
+
+fn is_ipv4(h: ref<PacketHeader>) -> bool {
+    (*h).version == 4u64
+}
+
+fn is_tcp(h: ref<PacketHeader>) -> bool {
+    (*h).protocol == 6u64
+}
+
+fn is_udp(h: ref<PacketHeader>) -> bool {
+    (*h).protocol == 17u64
+}
+
+fn classify_packet(pkt: span<u8>, n: u64) -> u64
+    requires pkt.len == n
+    requires n >= 12u64
+{
+    let h: PacketHeader = parse_header(pkt, n);
+    if is_ipv4(&h) {
+        if is_tcp(&h) { 1u64 }
+        else if is_udp(&h) { 2u64 }
+        else { 0u64 }
+    } else {
+        0u64
+    }
+}
+
+fn main() -> u64 { 0u64 }
