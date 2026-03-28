@@ -1,0 +1,157 @@
+// Demo 300: Higher-order combinators — map, fold, any, compose
+//
+// Demonstrates first-class function pointers and lambda expressions
+// working together as verified higher-order combinators.
+//
+// map_span      — apply f to every element in-place
+// fold_span     — reduce to a single value with initial accumulator
+// any_span      — check if predicate holds for at least one element
+// compose_apply — apply g(f(x)) for a single value
+// pipeline      — compose two transforms over a span in-place
+//
+// Postconditions verified on concrete instantiations where the
+// proof engine can track through named-function postconditions.
+
+fn clamp255(x: u64) -> u64
+    ensures result <= 255u64
+{ if x > 255u64 { 255u64 } else { x } }
+
+fn double(x: u64) -> u64 { x + x }
+fn is_nonzero(x: u64) -> bool { x != 0u64 }
+fn add(a: u64, b: u64) -> u64 { a + b }
+
+// ── map ─────────────────────────────────────────────────────────────────────
+
+fn map_span(s: span<u64>, n: u64, f: fn(u64) -> u64)
+    requires s.len == n
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = f(s[i]);
+        i = i + 1u64;
+    }
+}
+
+// Verified specialisation: map clamp255 preserves s[k] <= 255
+fn map_clamp(s: span<u64>, n: u64)
+    requires s.len == n
+    ensures forall k: u64, k < n ==> s[k] <= 255u64
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> s[k] <= 255u64
+        decreases n - i
+    {
+        s[i] = clamp255(s[i]);
+        i = i + 1u64;
+    }
+}
+
+// ── fold ─────────────────────────────────────────────────────────────────────
+
+fn fold_span(s: span<u64>, n: u64, init: u64, f: fn(u64, u64) -> u64) -> u64
+    requires s.len == n
+{
+    let mut acc: u64 = init;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = f(acc, s[i]);
+        i = i + 1u64;
+    };
+    acc
+}
+
+// Verified specialisation: sum is >= n * 0 = 0 (trivially u64 >= 0)
+fn sum_span(s: span<u64>, n: u64) -> u64
+    requires s.len == n
+    ensures result >= 0u64
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant acc >= 0u64
+        decreases n - i
+    {
+        acc = acc + s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+// ── any ──────────────────────────────────────────────────────────────────────
+
+fn any_span(s: span<u64>, n: u64, pred: fn(u64) -> bool) -> bool
+    requires s.len == n
+{
+    let mut i: u64 = 0u64;
+    let mut found: bool = false;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if pred(s[i]) { found = true; };
+        i = i + 1u64;
+    };
+    found
+}
+
+// ── compose_apply ─────────────────────────────────────────────────────────────
+
+fn compose_apply(f: fn(u64) -> u64, g: fn(u64) -> u64, x: u64) -> u64 {
+    g(f(x))
+}
+
+// ── pipeline ─────────────────────────────────────────────────────────────────
+
+fn pipeline(s: span<u64>, n: u64, f: fn(u64) -> u64, g: fn(u64) -> u64)
+    requires s.len == n
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = g(f(s[i]));
+        i = i + 1u64;
+    }
+}
+
+// ── demo entrypoint ──────────────────────────────────────────────────────────
+
+fn demo_higher_order(s: span<u64>, n: u64) -> u64
+    requires s.len == n
+    requires n > 0u64
+{
+    // Map with a named function
+    map_span(s, n, double);
+
+    // Map with an inline lambda
+    map_span(s, n, \(x: u64) -> x + 1u64);
+
+    // Fold (sum) with a named function
+    let total: u64 = fold_span(s, n, 0u64, add);
+
+    // Any (check for non-zero) with a named function
+    let _has_nonzero: bool = any_span(s, n, is_nonzero);
+
+    // Any with an inline lambda
+    let _has_large: bool = any_span(s, n, \(x: u64) -> x > 100u64);
+
+    // Compose: double then clamp (single value)
+    let _v: u64 = compose_apply(double, clamp255, 200u64);
+
+    // Pipeline over span: double then clamp
+    pipeline(s, n, double, clamp255);
+
+    total
+}
+
+fn main() -> u64 { 0u64 }

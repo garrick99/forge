@@ -926,11 +926,30 @@ and stmt_final_env env stmt =
           ) env_in sig_.fs_ensures
         end
       in
+      (* Helper: inject postconditions from a fn-pointer variable's fn_ty.ensures *)
+      let inject_postconds_fty env_in fty all_args =
+        if fty.ensures = [] then env_in
+        else if List.length fty.params <> List.length all_args then env_in
+        else begin
+          let arg_subst = List.map2 (fun (pid, _) arg ->
+            (pid.name, expr_to_pred_simple arg)
+          ) fty.params all_args in
+          let result_subst = ("result", PVar name) :: arg_subst in
+          List.fold_left (fun e ens ->
+            env_add_fact e (subst_pred result_subst ens)
+          ) env_in fty.ensures
+        end
+      in
       (match rhs.expr_desc with
        | ECall ({ expr_desc = EVar fn_id; _ }, call_args) ->
            (match env_lookup_fn env fn_id.name with
             | Some sig_ -> inject_postconds env''' sig_ call_args
-            | _ -> env''')
+            | None ->
+                (* fn_id may be a variable of fn-pointer type with ensures clauses *)
+                (match env_lookup_var env fn_id.name with
+                 | Some { vi_ty = TFn fty; _ } ->
+                     inject_postconds_fty env''' fty call_args
+                 | _ -> env'''))
        | ECall ({ expr_desc = EField (obj, method_name); _ }, call_args) ->
            (* Method call: a.method(args) → TypeName__method(a, args) *)
            (* obj.expr_ty is set by the main typecheck pass *)
@@ -1592,6 +1611,38 @@ and infer_expr env expr : ty =
                   | _ -> ()
                 ) sig_.fs_generics
             | _ -> ());
+           (* Check fn-pointer contract compliance:
+              When a named function is passed as an argument to a param of type
+              fn(T)->U ensures pred, verify the named function's postconditions
+              imply the required pred.  E.g. passing clamp255 where
+              fn(u64)->u64 ensures result<=255u64 is expected generates an
+              obligation: given clamp255's ensures, prove result<=255.
+              PResult is substituted to PVar "__fnret" to make it a real SMT variable. *)
+           List.iter2 (fun (_, param_ty) arg ->
+             let concrete_param = if type_subst = [] then param_ty
+                                  else subst_ty type_subst param_ty in
+             (match concrete_param, arg.expr_desc with
+              | TFn fty_param, EVar fn_id when fty_param.ensures <> [] ->
+                  (match env_lookup_fn env fn_id.name with
+                   | Some sig_ ->
+                       let ret_nm = "__fnret" in
+                       let ret_pred = PVar { name = ret_nm; loc = arg.expr_loc } in
+                       let result_subst = [("result", ret_pred)] in
+                       let check_env =
+                         let e = env_add_var env ret_nm sig_.fs_ret Unr arg.expr_loc in
+                         List.fold_left (fun e ens ->
+                           env_add_fact e (subst_pred result_subst ens)
+                         ) e sig_.fs_ensures
+                       in
+                       List.iter (fun req_ens ->
+                         let req_ens' = subst_pred result_subst req_ens in
+                         add_obligation req_ens'
+                           (OPrecondition ("fn contract for " ^ fn_id.name))
+                           arg.expr_loc check_env
+                       ) fty_param.ensures
+                   | None -> ())
+              | _ -> ())
+           ) fty.params args;
            (* Generate precondition obligations *)
            check_preconditions "fn" fty.requires args fty.params
              expr.expr_loc env;
@@ -2036,11 +2087,29 @@ and check_stmt env stmt : env =
           ) env_in sig_.fs_ensures
         end
       in
+      (* Helper: inject postconditions from a fn-pointer variable's fn_ty.ensures *)
+      let inject_postconds_fty env_in fty all_args =
+        if fty.ensures = [] then env_in
+        else if List.length fty.params <> List.length all_args then env_in
+        else begin
+          let arg_subst = List.map2 (fun (pid, _) arg ->
+            (pid.name, expr_to_pred_simple arg)
+          ) fty.params all_args in
+          let result_subst = ("result", PVar name) :: arg_subst in
+          List.fold_left (fun e ens ->
+            env_add_fact e (subst_pred result_subst ens)
+          ) env_in fty.ensures
+        end
+      in
       (match expr_.expr_desc with
        | ECall ({ expr_desc = EVar fn_id; _ }, call_args) ->
            (match env_lookup_fn env fn_id.name with
             | Some sig_ -> inject_postconds env_base sig_ call_args
-            | _ -> env_base)
+            | None ->
+                (match env_lookup_var env fn_id.name with
+                 | Some { vi_ty = TFn fty; _ } ->
+                     inject_postconds_fty env_base fty call_args
+                 | _ -> env_base))
        | ECall ({ expr_desc = EField (obj, method_name); _ }, call_args) ->
            let obj_ty = match obj.expr_ty with Some t -> t | None -> TPrim TUnit in
            let type_name = mangle_ty_name (normalize_ty obj_ty) in
@@ -2792,19 +2861,29 @@ let check_fn env fn =
           caller's postcondition check can see them (mirrors the SLet injection). *)
        let inject_trailing_call base_env fn_name_str call_args call_loc =
          let call_pred = PVar { name = "__ret_call"; loc = call_loc } in
+         let enrich_with ensures params all_args env_in =
+           if ensures = [] then env_in
+           else if List.length params <> List.length all_args then env_in
+           else begin
+             let arg_subst = List.map2 (fun (pid, _) arg ->
+               (pid.name, expr_to_pred_simple arg)
+             ) params all_args in
+             let result_subst = ("result", call_pred) :: arg_subst in
+             List.fold_left (fun e ens ->
+               env_add_fact e (subst_pred result_subst ens)
+             ) env_in ensures
+           end
+         in
          let enriched =
            match env_lookup_fn base_env fn_name_str with
-           | Some sig_
-             when sig_.fs_ensures <> []
-               && List.length sig_.fs_params = List.length call_args ->
-               let arg_subst = List.map2 (fun (pid, _) arg ->
-                 (pid.name, expr_to_pred_simple arg)
-               ) sig_.fs_params call_args in
-               let result_subst = ("result", call_pred) :: arg_subst in
-               List.fold_left (fun e ens ->
-                 env_add_fact e (subst_pred result_subst ens)
-               ) base_env sig_.fs_ensures
-           | _ -> base_env
+           | Some sig_ ->
+               enrich_with sig_.fs_ensures sig_.fs_params call_args base_env
+           | None ->
+               (* fn_name_str may be a variable of fn-pointer type with ensures *)
+               (match env_lookup_var base_env fn_name_str with
+                | Some { vi_ty = TFn fty; _ } ->
+                    enrich_with fty.ensures fty.params call_args base_env
+                | _ -> base_env)
          in
          (call_pred, enriched)
        in
