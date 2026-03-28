@@ -1,0 +1,14 @@
+// BAD demo 08: own<T> not freed — linear must-use violation
+//
+// FORGE catches this at compile time: a linear variable that is
+// allocated but never consumed (own_into or own_free not called).
+//
+// Expected error:
+//   linearity: linear variable 'p' is never used
+//              (linear values must be consumed exactly once)
+
+fn leak(n: u64) -> u64 {
+    let lin p: own<u64> = own_alloc(n);
+    // p is never freed or moved — FORGE must reject this
+    n + 1u64
+}

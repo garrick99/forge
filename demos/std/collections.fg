@@ -1,0 +1,21 @@
+// std/collections.fg — concrete Vec_u64 proven-bounds array wrapper
+//
+// A fixed-capacity slice view with a tracked logical length.
+// Indexing is bounds-checked at compile time via preconditions.
+
+struct Vec_u64 {
+    data: span<u64>,
+    len:  usize,
+}
+
+fn vec_u64_new(data: span<u64>) -> Vec_u64 {
+    struct Vec_u64 { data: data, len: 0u64 }
+}
+
+fn vec_u64_len(v: ref<Vec_u64>) -> usize {
+    (*v).len
+}
+
+fn vec_u64_capacity(v: ref<Vec_u64>) -> usize {
+    (*v).data.len
+}

@@ -1,0 +1,10 @@
+// FORGE standard library — Option<T>
+//
+// Include with:  use std::option;
+//
+// Option<T> represents an optional value: either Some(val) or None.
+
+enum Option<T> {
+    Some(T),
+    None,
+}

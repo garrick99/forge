@@ -1,0 +1,17 @@
+// bad/06: #[ind_cpa] violation — key is declassified inside the cipher
+//
+// This should NOT compile:
+//   ind_cpa: key parameter 'key' must not be declassified
+//
+// Declassifying the key strips the secret qualifier and leaks key material
+// into the computation — a fundamental IND-CPA violation.
+
+#[ind_cpa]
+fn leaky_encrypt(key: secret<u64>, nonce: u64, plaintext: u64) -> secret<u64>
+{
+    // BUG: declassify strips secret — key is now observable
+    let exposed: u64 = declassify(key);
+    // Mix exposed key with plaintext — key leaks into non-secret path
+    let ks: secret<u64> = exposed ^ plaintext;
+    ks ^ nonce
+}

@@ -1,0 +1,21 @@
+// FORGE Bad Demo 04 — Struct Invariant Violation (correctly rejected)
+//
+// This program SHOULD FAIL to compile.
+// The Range struct requires lo <= hi.  The function below constructs
+// a Range with hi < lo without any precondition guaranteeing safety.
+//
+// Expected output:
+//   ✗  invariant: struct:Range  (lo <= hi not provable)
+//   compilation stopped
+
+struct Range {
+    lo: u64,
+    hi: u64,
+    invariant lo <= hi
+}
+
+// WRONG: passes lo and hi in the wrong order — invariant violated.
+fn bad_range(lo: u64, hi: u64) -> Range
+{
+    struct Range { lo: hi, hi: lo }   // ERROR: hi < lo when hi < lo
+}

@@ -1,0 +1,43 @@
+// std/math.fg — integer math utilities
+//
+// Pure functions with postconditions:
+//   abs_diff, min64, max64, clamp64, pow64
+
+fn abs_diff(a: u64, b: u64) -> u64
+    ensures result <= a || result <= b
+{
+    if a >= b { a - b } else { b - a }
+}
+
+fn min64(a: u64, b: u64) -> u64
+    ensures result <= a
+    ensures result <= b
+{
+    if a <= b { a } else { b }
+}
+
+fn max64(a: u64, b: u64) -> u64
+    ensures result >= a
+    ensures result >= b
+{
+    if a >= b { a } else { b }
+}
+
+fn clamp64(v: u64, lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures result >= lo
+    ensures result <= hi
+{
+    if v < lo { lo } else if v > hi { hi } else { v }
+}
+
+// Integer power: base^exp
+fn pow64(base: u64, exp: u64) -> u64
+    decreases exp
+{
+    if exp == 0u64 {
+        1u64
+    } else {
+        base * pow64(base, exp - 1u64)
+    }
+}

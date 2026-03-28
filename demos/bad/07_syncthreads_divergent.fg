@@ -1,0 +1,17 @@
+// BAD Demo 07: __syncthreads() inside a divergent branch
+//
+// If the warp-condition is varying (per-thread), then some threads
+// may not reach the syncthreads() call while others do.
+// This is undefined behavior in CUDA.  FORGE rejects it.
+
+#[kernel]
+fn bad_kernel(src: span<f32>, n: u64)
+  requires n > 0
+{
+  let i: u64 = threadIdx_x;
+  // threadIdx_x is varying — this branch is divergent
+  if i < n {
+    // syncthreads inside a varying branch: FORGE error
+    syncthreads();
+  }
+}

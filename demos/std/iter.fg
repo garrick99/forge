@@ -1,0 +1,31 @@
+// std/iter.fg — Iterator trait and Range implementation
+//
+// trait Iterator { type Item; fn next(self: refmut<Self>) -> Option<Self::Item>; }
+// struct Range { cur: u64, end_: u64 }  — yields cur, cur+1, ..., end_-1
+
+use option;
+
+trait Iterator {
+    type Item;
+    fn next(self: refmut<Self>) -> Option<Self::Item>;
+}
+
+// Range: half-open [start, end_)
+struct Range { cur: u64, end_: u64, }
+
+impl Iterator for Range {
+    type Item = u64;
+    fn next(self: refmut<Range>) -> Option<u64> {
+        if (*self).cur >= (*self).end_ {
+            None
+        } else {
+            let v: u64 = (*self).cur;
+            (*self).cur = (*self).cur + 1u64;
+            Some(v)
+        }
+    }
+}
+
+fn range(start: u64, end_: u64) -> Range {
+    struct Range { cur: start, end_: end_ }
+}

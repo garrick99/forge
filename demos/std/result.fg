@@ -1,0 +1,11 @@
+// FORGE standard library — Result<T, E>
+//
+// Include with:  use std::result;
+//
+// Result<T, E> represents either success Ok(val) or failure Err(err).
+// The ? operator desugars to: match e { Ok(v) => v, Err(e) => return Err(e) }
+
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
