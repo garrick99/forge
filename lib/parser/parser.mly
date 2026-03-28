@@ -639,8 +639,9 @@ expr:
   | MINUS e = expr %prec UMINUS  { mk_expr (EUnop (Neg,    e)) $startpos }
   | BANG  e = expr %prec UBANG   { mk_expr (EUnop (Not,    e)) $startpos }
   | TILDE e = expr %prec UTILDE  { mk_expr (EUnop (BitNot, e)) $startpos }
-  | STAR  e = expr %prec UDEREF  { mk_expr (EDeref e)          $startpos }
+  | STAR  e = expr %prec UDEREF  { mk_expr (EDeref e)           $startpos }
   | AMP   e = expr %prec UREF    { mk_expr (ERef e)             $startpos }
+  | AMP MUT e = expr %prec UREF  { mk_expr (ERefMut e)          $startpos }
 
   (* Postfix: field, index, call *)
   | e = expr DOT name = ident

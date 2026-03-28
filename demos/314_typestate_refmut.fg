@@ -1,0 +1,75 @@
+// Demo 314: Typestate verification with refmut<T> + requires/ensures
+//
+// Full connection lifecycle verification with in-place mutation.
+// The proof engine verifies:
+//   - Only valid transitions are possible (requires on source state)
+//   - Transitions produce the correct target state (ensures)
+//   - Chained calls satisfy preconditions via postcondition injection
+//
+// State codes: 0=Closed, 1=Listening, 2=Connected
+
+struct Conn {
+    state: u64,
+    port:  u64,
+}
+
+fn conn_new() -> Conn
+    ensures result.state == 0u64
+    ensures result.port  == 0u64
+{
+    struct Conn { state: 0u64, port: 0u64 }
+}
+
+fn conn_listen(c: refmut<Conn>, port: u64)
+    requires (*c).state == 0u64
+    requires port > 0u64
+    requires port < 65536u64
+    ensures (*c).state == 1u64
+    ensures (*c).port  == port
+{
+    (*c).state = 1u64;
+    (*c).port  = port;
+}
+
+fn conn_accept(c: refmut<Conn>)
+    requires (*c).state == 1u64
+    ensures (*c).state == 2u64
+{
+    (*c).state = 2u64;
+}
+
+fn conn_close(c: refmut<Conn>)
+    ensures (*c).state == 0u64
+{
+    (*c).state = 0u64;
+    (*c).port  = 0u64;
+}
+
+// Verify full lifecycle: Closed -> Listening -> Connected -> Closed
+fn full_cycle(port: u64) -> u64
+    requires port > 0u64
+    requires port < 65536u64
+    ensures result == 0u64
+{
+    let c: Conn = conn_new();         // c.state == 0
+    conn_listen(&mut c, port);            // c.state == 1
+    conn_accept(&mut c);                  // c.state == 2
+    conn_close(&mut c);                   // c.state == 0
+    c.state
+}
+
+// Retry: after close, can listen again
+fn reopen_cycle(port1: u64, port2: u64) -> u64
+    requires port1 > 0u64 && port1 < 65536u64
+    requires port2 > 0u64 && port2 < 65536u64
+    ensures result == 1u64
+{
+    let c: Conn = conn_new();
+    conn_listen(&mut c, port1);           // c.state == 1
+    conn_accept(&mut c);                  // c.state == 2
+    conn_close(&mut c);                   // c.state == 0
+    conn_listen(&mut c, port2);           // c.state == 1 again
+    c.state
+}
+
+fn main() -> u64 { 0u64 }

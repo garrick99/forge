@@ -2332,6 +2332,20 @@ and check_stmt env stmt : env =
              end
            in
            env2
+       (* Void function call as statement: inject callee postconditions.
+          Handles cases like  conn_listen(&mut c, port)  where ensures clauses
+          describe mutations to refmut params that the caller needs downstream. *)
+       | ECall ({ expr_desc = EVar fn_id; _ }, call_args) ->
+           (match env_lookup_fn env fn_id.name with
+            | Some sig_ when sig_.fs_ensures <> [] &&
+                List.length sig_.fs_params = List.length call_args ->
+                let arg_subst = List.map2 (fun (pid, _) arg ->
+                  (pid.name, expr_to_pred_simple arg)
+                ) sig_.fs_params call_args in
+                List.fold_left (fun e ens ->
+                  env_add_fact e (subst_pred arg_subst ens)
+                ) env sig_.fs_ensures
+            | _ -> env)
        | _ ->
            (* For EBlock (which wraps while/for loops from the parser),
               use expr_final_env to propagate loop exit facts (NOT cond,
