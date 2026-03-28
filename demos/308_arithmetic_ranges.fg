@@ -1,0 +1,70 @@
+// Demo 308: Arithmetic range injection
+//
+// The proof engine automatically injects range facts for:
+//   let r = x % n  →  r < n        (when n is a positive literal)
+//   let q = x / n  →  q <= x       (when n >= 1 literal, unsigned)
+//   let v = b as u64 (b: u8)  →  v <= 255
+//
+// These enable rich postconditions without manual invariants.
+
+// Nibble extraction — lower/upper nibble directly from x % 16, x / 16
+fn nibbles(x: u64) -> u64
+    ensures result <= 15u64
+{
+    x % 16u64
+}
+
+fn upper4(x: u64) -> u64
+    ensures result <= x
+{
+    x / 16u64
+}
+
+// Hash table slot: key % cap is always < cap
+fn hash_slot(key: u64, cap: u64) -> u64
+    requires cap > 0u64
+    ensures result < cap
+{
+    key % cap
+}
+
+// Byte field extraction: tos field is a full byte, so <= 255 after modulo-256
+fn extract_byte_field(word: u64) -> u64
+    ensures result <= 255u64
+{
+    word % 256u64
+}
+
+// Byte-pair to u16: hi * 256 + lo <= 65535 (proved via div/mod ranges)
+fn make_u16(hi: u8, lo: u8) -> u64
+    ensures result <= 65535u64
+{
+    let h: u64 = hi as u64;    // h <= 255
+    let l: u64 = lo as u64;    // l <= 255
+    h * 256u64 + l             // <= 255*256+255 = 65535
+}
+
+// Protocol field: low 8 bits of a u64 word
+fn low_byte(word: u64) -> u64
+    ensures result <= 255u64
+{
+    word % 256u64
+}
+
+// Division-bounded index: divide index by stride, result <= index
+fn strided_base(idx: u64, stride: u64) -> u64
+    requires stride >= 1u64
+    ensures result <= idx
+{
+    idx / stride
+}
+
+// Remainder of index is always < stride
+fn strided_offset(idx: u64, stride: u64) -> u64
+    requires stride >= 1u64
+    ensures result < stride
+{
+    idx % stride
+}
+
+fn main() -> u64 { 0u64 }

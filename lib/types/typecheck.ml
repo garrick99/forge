@@ -921,6 +921,19 @@ and stmt_final_env env stmt =
             | TPrim (TUint U32) ->
                 env_add_fact env'' (PBinop (Le, PVar name, PInt 4294967295L))
             | _ -> env'')
+       | EBinop (Mod, _, divisor) ->
+           (* x % n  →  result < n  (when n is a positive literal) *)
+           (match expr_to_pred_simple divisor with
+            | PInt n when n > 0L ->
+                env_add_fact env'' (PBinop (Lt, PVar name, PInt n))
+            | _ -> env'')
+       | EBinop (Div, dividend, divisor) ->
+           (* x / n  →  result <= x  (when n >= 1, unsigned division is non-increasing) *)
+           (match expr_to_pred_simple divisor with
+            | PInt n when n >= 1L ->
+                let _ = n in
+                env_add_fact env'' (PBinop (Le, PVar name, expr_to_pred_simple dividend))
+            | _ -> env'')
        | _ -> env'' in
       (* For function calls: inject callee postconditions as facts about name.
          E.g. `let x = f(a, b)` where f ensures result < q  →  adds fact x < q.
@@ -2085,6 +2098,17 @@ and check_stmt env stmt : env =
              | TPrim (TUint U8)  -> env_add_fact env'' (PBinop (Le, PVar name, PInt 255L))
              | TPrim (TUint U16) -> env_add_fact env'' (PBinop (Le, PVar name, PInt 65535L))
              | TPrim (TUint U32) -> env_add_fact env'' (PBinop (Le, PVar name, PInt 4294967295L))
+             | _ -> env'')
+        | EBinop (Mod, _, divisor) ->
+            (match expr_to_pred_simple divisor with
+             | PInt n when n > 0L ->
+                 env_add_fact env'' (PBinop (Lt, PVar name, PInt n))
+             | _ -> env'')
+        | EBinop (Div, dividend, divisor) ->
+            (match expr_to_pred_simple divisor with
+             | PInt n when n >= 1L ->
+                 let _ = n in
+                 env_add_fact env'' (PBinop (Le, PVar name, expr_to_pred_simple dividend))
              | _ -> env'')
         | _ -> env''
       in
