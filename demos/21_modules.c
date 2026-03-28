@@ -11,6 +11,18 @@
 #include <stdio.h>
 #include <math.h>
 
+/* Function pointer typedefs */
+typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
+typedef void (*forge_fn_u64_ret_unit_t)(uint64_t);
+typedef uint64_t (*forge_fn_u64_u64_u64_ret_u64_t)(uint64_t, uint64_t, uint64_t);
+typedef uint64_t (*forge_fn_u64_i32_u64_ret_u64_t)(uint64_t, int32_t, uint64_t);
+typedef int32_t (*forge_fn_u64_ret_i32_t)(uint64_t);
+typedef void (*forge_fn__ret_unit_t)(void);
+typedef double (*forge_fn_f64_ret_f64_t)(double);
+typedef double (*forge_fn_f64_f64_ret_f64_t)(double, double);
+typedef float (*forge_fn_f32_ret_f32_t)(float);
+typedef float (*forge_fn_f32_f32_ret_f32_t)(float, float);
+
 /* Forward declarations */
 double hypot(double a __attribute__((unused)), double b __attribute__((unused)));
 double abs_diff(double a __attribute__((unused)), double b __attribute__((unused)));
