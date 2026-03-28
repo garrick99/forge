@@ -1,0 +1,86 @@
+// Demo 311: Verified IPv4 header parser with field-level postconditions
+//
+// Full IPv4 header parse with proven field bounds:
+//   version <= 15    (4-bit field)
+//   ihl <= 15        (4-bit field)
+//   tos <= 255       (8-bit field)
+//   total_len <= 65535 (16-bit field)
+//   ttl <= 255       (8-bit field)
+//   protocol <= 255  (8-bit field)
+//
+// All proofs are fully automatic from:
+//  - cast range injection (u8 as u64 <= 255)
+//  - mod range injection  (x % 16 < 16)
+//  - div range injection  (x / 16 <= x)
+
+struct Ipv4Header {
+    version:   u64,
+    ihl:       u64,
+    tos:       u64,
+    total_len: u64,
+    id:        u64,
+    ttl:       u64,
+    protocol:  u64,
+    src_ip:    u64,
+    dst_ip:    u64,
+}
+
+fn parse_ipv4(pkt: span<u8>, n: u64) -> Ipv4Header
+    requires pkt.len == n
+    requires n >= 20u64
+    ensures result.version  <= 15u64
+    ensures result.ihl      <= 15u64
+    ensures result.tos      <= 255u64
+    ensures result.total_len <= 65535u64
+    ensures result.ttl      <= 255u64
+    ensures result.protocol <= 255u64
+{
+    let b0: u64 = pkt[0u64] as u64;          // b0 <= 255
+    let ver: u64  = b0 / 16u64;              // ver <= b0 <= 255, and <= 15 (div)
+    let ihl: u64  = b0 % 16u64;              // ihl < 16
+    let tos: u64  = pkt[1u64] as u64;        // tos <= 255
+    let tl_hi: u64 = pkt[2u64] as u64;       // tl_hi <= 255
+    let tl_lo: u64 = pkt[3u64] as u64;       // tl_lo <= 255
+    let total_len: u64 = tl_hi * 256u64 + tl_lo;  // <= 65535
+    let id_hi: u64 = pkt[4u64] as u64;
+    let id_lo: u64 = pkt[5u64] as u64;
+    let id: u64  = id_hi * 256u64 + id_lo;
+    let ttl: u64  = pkt[8u64] as u64;        // ttl <= 255
+    let proto: u64 = pkt[9u64] as u64;       // proto <= 255
+    let src3: u64 = pkt[12u64] as u64;
+    let src2: u64 = pkt[13u64] as u64;
+    let src1: u64 = pkt[14u64] as u64;
+    let src0: u64 = pkt[15u64] as u64;
+    let src_ip: u64 = src3 * 16777216u64 + src2 * 65536u64
+                    + src1 * 256u64 + src0;
+    let dst3: u64 = pkt[16u64] as u64;
+    let dst2: u64 = pkt[17u64] as u64;
+    let dst1: u64 = pkt[18u64] as u64;
+    let dst0: u64 = pkt[19u64] as u64;
+    let dst_ip: u64 = dst3 * 16777216u64 + dst2 * 65536u64
+                    + dst1 * 256u64 + dst0;
+
+    struct Ipv4Header {
+        version:   ver,
+        ihl:       ihl,
+        tos:       tos,
+        total_len: total_len,
+        id:        id,
+        ttl:       ttl,
+        protocol:  proto,
+        src_ip:    src_ip,
+        dst_ip:    dst_ip,
+    }
+}
+
+// Validate that the IHL is at least 5 (minimum header length = 20 bytes)
+fn ihl_valid(h: ref<Ipv4Header>) -> bool {
+    (*h).ihl >= 5u64
+}
+
+// Total length must be >= IHL*4 for a well-formed packet
+fn pkt_valid(h: ref<Ipv4Header>) -> bool {
+    (*h).total_len >= (*h).ihl * 4u64
+}
+
+fn main() -> u64 { 0u64 }
