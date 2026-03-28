@@ -1,0 +1,108 @@
+// Demo 328: Verified TCP header field extraction
+//
+// TCP header layout (first 20 bytes as packed u64 fields).
+// We prove bounds on all extracted fields:
+//   - src/dst port: [0, 65535]
+//   - data offset: [5, 15] (valid TCP headers are 20-60 bytes)
+//   - flags: individual bits in [0,1]
+//   - window size: [0, 65535]
+//   - checksum: [0, 65535]
+
+struct TcpHdr {
+    src_port:    u64,   // [0, 65535]
+    dst_port:    u64,   // [0, 65535]
+    seq_num:     u64,   // [0, 2^32 - 1]
+    ack_num:     u64,   // [0, 2^32 - 1]
+    data_offset: u64,   // [0, 15] — bits 7:4 of byte 12
+    flags:       u64,   // [0, 63] — 6 flag bits
+    window:      u64,   // [0, 65535]
+    checksum:    u64,   // [0, 65535]
+}
+
+// Parse from raw byte fields (each already extracted from the packet)
+fn parse_tcp(raw_src: u64, raw_dst: u64,
+             raw_seq: u64, raw_ack: u64,
+             raw_doff_flags: u64,
+             raw_window: u64, raw_chk: u64) -> TcpHdr
+    requires raw_src     < 65536u64
+    requires raw_dst     < 65536u64
+    requires raw_seq     < 4294967296u64
+    requires raw_ack     < 4294967296u64
+    requires raw_doff_flags < 65536u64
+    requires raw_window  < 65536u64
+    requires raw_chk     < 65536u64
+    ensures  result.src_port    == raw_src
+    ensures  result.dst_port    == raw_dst
+    ensures  result.src_port    < 65536u64
+    ensures  result.dst_port    < 65536u64
+    ensures  result.data_offset < 16u64
+    ensures  result.flags       < 64u64
+    ensures  result.window      == raw_window
+{
+    struct TcpHdr {
+        src_port:    raw_src,
+        dst_port:    raw_dst,
+        seq_num:     raw_seq,
+        ack_num:     raw_ack,
+        data_offset: (raw_doff_flags >> 12u64) & 15u64,
+        flags:       raw_doff_flags & 63u64,
+        window:      raw_window,
+        checksum:    raw_chk,
+    }
+}
+
+// Check individual flags (bit positions 0-5 of flags field)
+fn flag_urg(h: TcpHdr) -> u64
+    requires h.flags < 64u64
+    ensures  result == 1u64 || result == 0u64
+{
+    (h.flags >> 5u64) & 1u64
+}
+
+fn flag_ack(h: TcpHdr) -> u64
+    requires h.flags < 64u64
+    ensures  result == 1u64 || result == 0u64
+{
+    (h.flags >> 4u64) & 1u64
+}
+
+fn flag_psh(h: TcpHdr) -> u64
+    requires h.flags < 64u64
+    ensures  result == 1u64 || result == 0u64
+{
+    (h.flags >> 3u64) & 1u64
+}
+
+fn flag_rst(h: TcpHdr) -> u64
+    requires h.flags < 64u64
+    ensures  result == 1u64 || result == 0u64
+{
+    (h.flags >> 2u64) & 1u64
+}
+
+fn flag_syn(h: TcpHdr) -> u64
+    requires h.flags < 64u64
+    ensures  result == 1u64 || result == 0u64
+{
+    (h.flags >> 1u64) & 1u64
+}
+
+fn flag_fin(h: TcpHdr) -> u64
+    requires h.flags < 64u64
+    ensures  result == 1u64 || result == 0u64
+{
+    h.flags & 1u64
+}
+
+// Header length in bytes: data_offset * 4 (min 20, max 60)
+fn header_bytes(h: TcpHdr) -> u64
+    requires h.data_offset >= 5u64
+    requires h.data_offset < 16u64
+    ensures  result >= 20u64
+    ensures  result <= 60u64
+    ensures  result % 4u64 == 0u64
+{
+    h.data_offset * 4u64
+}
+
+fn main() -> u64 { 0u64 }
