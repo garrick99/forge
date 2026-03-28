@@ -125,5 +125,6 @@ type token = Parser.token =
   | ASSUME
   | AS
   | ARROW
+  | BACKSLASH
   | AMP
   | AFF

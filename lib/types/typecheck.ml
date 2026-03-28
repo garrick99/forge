@@ -1899,6 +1899,35 @@ and infer_expr env expr : ty =
       let _ = check_expr env hi in
       TPrim (TUint U64)
 
+  | ELambda (params, body, name_ref) ->
+      (* Lift \(x: T, ...) -> body to a synthesized top-level function __forge_lambda_N.
+         Typecheck the body in an env extended with the lambda params.
+         Return TFn type; the lifted name is recorded in name_ref for codegen. *)
+      let n = List.length !synthesized_items in
+      let lam_name = Printf.sprintf "__forge_lambda_%d" n in
+      name_ref := Some lam_name;
+      (* Build inner env with params bound *)
+      let inner_env = List.fold_left
+        (fun e (id, t) -> env_add_var e id.name t Unr id.loc)
+        env params
+      in
+      let ret_ty = check_expr inner_env body in
+      (* Synthesize the top-level IFn *)
+      let lam_fn : fn_def = {
+        fn_name     = { name = lam_name; loc = expr.expr_loc };
+        fn_generics = [];
+        fn_params   = params;
+        fn_ret      = ret_ty;
+        fn_requires = [];
+        fn_ensures  = [];
+        fn_decreases = None;
+        fn_body     = Some body;
+        fn_attrs    = [];
+      } in
+      let synth_item = { item_desc = IFn lam_fn; item_loc = expr.expr_loc } in
+      synthesized_items := synth_item :: !synthesized_items;
+      TFn { params; ret = ret_ty; requires = []; ensures = [] }
+
 and check_stmts env stmts : env =
   let env' = List.fold_left check_stmt env stmts in
   (* Must-use check: Lin variables introduced in this block must be consumed.
@@ -2568,6 +2597,7 @@ let rec ind_cpa_scan_expr key_params expr =
                                ind_cpa_scan_expr key_params hi
   | ELoop stmts             -> List.iter (ind_cpa_scan_stmt key_params) stmts
   | EAssume _ | EAssert _ | EProof _ | ERaw _ -> ()
+  | ELambda (_, body, _) -> ind_cpa_scan_expr key_params body
 and ind_cpa_scan_stmt key_params stmt =
   match stmt.stmt_desc with
   | SLet (_, _, e, _)          -> ind_cpa_scan_expr key_params e

@@ -133,5 +133,6 @@ type token =
   | ARROW
   | QUESTION
   | DOTDOTEQ
+  | BACKSLASH
   | AMP
   | AFF

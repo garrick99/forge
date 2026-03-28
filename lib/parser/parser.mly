@@ -69,6 +69,8 @@ open Lexing
 (* Logical *)
 %token BANG LAND LOR IMPLIES IFF
 
+%token BACKSLASH   (* \ — lambda introducer: \(x: T) -> body *)
+
 %token EOF
 
 (* ------------------------------------------------------------------ *)
@@ -712,6 +714,10 @@ expr:
     RBRACE
     { mk_expr (EStruct (name, fields)) $startpos }
 
+  (* Lambda expression: \(x: T, y: U) -> body *)
+  | BACKSLASH LPAREN params = tlist(lambda_param) RPAREN ARROW body = expr
+    { mk_expr (ELambda (params, body, ref None)) $startpos }
+
   (* Atomic expressions *)
   | e = atom_expr     { e }
 
@@ -1090,3 +1096,7 @@ use_path_seg:
   | i = ident  { i }
   | RESULT     { mk_ident "result"  $startpos }
   | STR_TY     { mk_ident "str"     $startpos }
+
+(* Lambda parameter: name: type *)
+lambda_param:
+  | id = ident COLON t = ty { (id, t) }

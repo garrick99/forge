@@ -122,6 +122,7 @@ let rec collect_tuple_tys_expr acc e =
   | EStruct (_, fields) ->
       List.fold_left (fun a (_, e2) -> collect_tuple_tys_expr a e2) acc fields
   | ELoop stmts -> List.fold_left collect_tuple_tys_stmt acc stmts
+  | ELambda (_, body, _) -> collect_tuple_tys_expr acc body
   | _ -> acc
 and collect_tuple_tys_stmt acc s =
   match s.stmt_desc with
@@ -193,6 +194,7 @@ let rec collect_own_tys_expr acc e =
   | EStruct (_, fields) ->
       List.fold_left (fun a (_, e2) -> collect_own_tys_expr a e2) acc fields
   | ELoop stmts -> List.fold_left collect_own_tys_stmt acc stmts
+  | ELambda (_, body, _) -> collect_own_tys_expr acc body
   | _ -> acc
 and collect_own_tys_stmt acc s =
   match s.stmt_desc with
@@ -768,6 +770,13 @@ let rec emit_expr depth e =
   | ERange _ ->
       (* ERange is only valid as a for-loop iterator; should never be emitted standalone *)
       "/* invalid ERange */"
+
+  | ELambda (_, _, name_ref) ->
+      (* Lambda was lifted to a top-level function during typechecking.
+         Emit the function pointer value (just its name). *)
+      (match !name_ref with
+       | Some name -> name
+       | None -> "/* unlifted lambda */")  (* should not happen *)
 
   | ELoop stmts ->
       (* loop { stmts } — emits as GCC statement expression:
@@ -1824,6 +1833,7 @@ and collect_generic_named_expr_desc acc = function
   | ESubspan (e2, lo, hi) -> List.fold_left collect_generic_named_expr acc [e2; lo; hi]
   | ERange (lo, hi) -> collect_generic_named_expr (collect_generic_named_expr acc lo) hi
   | ELoop stmts -> List.fold_left collect_generic_named_stmt acc stmts
+  | ELambda (_, body, _) -> collect_generic_named_expr acc body
 
 and collect_generic_named_stmt acc s =
   match s.stmt_desc with

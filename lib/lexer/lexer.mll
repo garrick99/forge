@@ -194,6 +194,7 @@ rule token = parse
   | '?' { QUESTION }
   | '=' { EQ }       | '@' { AT }
   | '#' { HASH }     | '_' { UNDERSCORE }
+  | '\\' { BACKSLASH }
 
   | eof { EOF }
   | _ as c {

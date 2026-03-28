@@ -1,0 +1,52 @@
+// Demo 299: Lambda expressions — \(x: T) -> body
+//
+// Anonymous functions (lambdas) are lifted to top-level static functions.
+// \(params) -> body syntax; no environment capture (pure function values).
+//
+fn map_inplace(s: span<u64>, n: u64, f: fn(u64) -> u64)
+    requires s.len == n
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = f(s[i]);
+        i = i + 1u64;
+    }
+}
+
+fn apply_all(s: span<u64>, n: u64, f: fn(u64) -> u64) -> u64
+    requires s.len == n
+    ensures result >= 0u64
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant acc >= 0u64
+        decreases n - i
+    {
+        acc = acc + f(s[i]);
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn double(x: u64) -> u64 { x + x }
+
+fn demo_lambdas(s: span<u64>, n: u64) -> u64
+    requires s.len == n
+    requires n > 0u64
+{
+    // Lambda passed inline — lifted to __forge_lambda_N
+    map_inplace(s, n, \(x: u64) -> x + x);
+
+    // Named function also works interchangeably
+    let _result: u64 = apply_all(s, n, \(x: u64) -> x * 2u64);
+
+    // Call with named function
+    apply_all(s, n, double)
+}
+
+fn main() -> u64 { 0u64 }

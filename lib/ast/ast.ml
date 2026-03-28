@@ -147,6 +147,8 @@ and expr_desc =
   | EField_n     of expr * int              (* t.0, t.1 — tuple field projection *)
   | ESubspan     of expr * expr * expr      (* s[lo..hi] — sub-span with proven bounds *)
   | ERange       of expr * expr             (* lo..hi — integer range for for-loops *)
+  | ELambda     of (ident * ty) list * expr * string option ref
+    (* \(x: T, y: U) -> body  — lifted to __forge_lambda_N; ref filled by typechecking *)
 
 and lit =
   | LInt   of int64 * prim_ty option        (* 42u32, 5i64 — suffix sets type *)

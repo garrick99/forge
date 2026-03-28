@@ -60,6 +60,8 @@ type token =
   | AT       (* @ *)
   | HASH     (* # *)
   | UNDERSCORE (* _ *)
+  | QUESTION   (* ? *)
+  | BACKSLASH  (* \ — lambda introducer *)
 
   (* Arrows *)
   | ARROW    (* -> *)
