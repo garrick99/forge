@@ -9,3 +9,6 @@ _build/
 *.cmx
 *.o
 *.a
+*.exe
+divide.fg
+lib/tokens/
