@@ -1,0 +1,74 @@
+// Demo 307: Cast range injection
+//
+// When casting from a smaller integer type, the proof engine automatically
+// knows the resulting value is bounded by the source type's range:
+//   x: u8  → x as u64  ≤ 255
+//   x: u16 → x as u64  ≤ 65535
+//   x: u32 → x as u64  ≤ 4294967295
+//
+// This enables postconditions about extracted fields from byte buffers.
+
+fn byte_to_u64(b: u8) -> u64
+    ensures result <= 255u64
+{
+    b as u64
+}
+
+fn u16_to_u64(b: u16) -> u64
+    ensures result <= 65535u64
+{
+    b as u64
+}
+
+fn u32_to_u64(b: u32) -> u64
+    ensures result <= 4294967295u64
+{
+    b as u64
+}
+
+// Nibble extraction: upper nibble of a byte is always 0..15
+fn upper_nibble(b: u8) -> u64
+    ensures result <= 15u64
+{
+    let v: u64 = b as u64;   // v <= 255 (cast range fact)
+    v / 16u64                 // v/16 <= 255/16 = 15
+}
+
+// Lower nibble: 0..15
+fn lower_nibble(b: u8) -> u64
+    ensures result <= 15u64
+{
+    let v: u64 = b as u64;   // v <= 255
+    v % 16u64                 // v % 16 <= 15
+}
+
+// Big-endian u16 from two bytes: always 0..65535
+fn read_u16_be(hi: u8, lo: u8) -> u64
+    ensures result <= 65535u64
+{
+    let h: u64 = hi as u64;  // h <= 255
+    let l: u64 = lo as u64;  // l <= 255
+    h * 256u64 + l           // <= 255*256 + 255 = 65535
+}
+
+// Byte array sum: each element <= 255, sum <= n * 255
+fn byte_array_sum(buf: span<u8>, n: u64) -> u64
+    requires buf.len == n
+    requires n <= 1000u64
+    ensures result <= n * 255u64
+{
+    let mut sum: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant sum <= i * 255u64
+        decreases n - i
+    {
+        let b: u64 = buf[i] as u64;  // b <= 255 (cast range)
+        sum = sum + b;
+        i = i + 1u64;
+    };
+    sum
+}
+
+fn main() -> u64 { 0u64 }

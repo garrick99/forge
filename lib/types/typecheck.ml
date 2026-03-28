@@ -909,6 +909,18 @@ and stmt_final_env env stmt =
            let len_eq = PBinop (Eq, len_pred,
              PBinop (Sub, expr_to_pred_simple hi, expr_to_pred_simple lo)) in
            env_add_fact (env_add_fact env'' len_eq) (PBinop (Ge, len_pred, PInt 0L))
+       | ECast (inner, _) ->
+           (* Widening cast: inject upper-bound fact for the let-bound variable.
+              E.g. let x: u64 = some_u8 as u64  →  add fact  x <= 255 *)
+           let src_ty = match inner.expr_ty with Some t -> t | None -> TPrim TUnit in
+           (match src_ty with
+            | TPrim (TUint U8)  ->
+                env_add_fact env'' (PBinop (Le, PVar name, PInt 255L))
+            | TPrim (TUint U16) ->
+                env_add_fact env'' (PBinop (Le, PVar name, PInt 65535L))
+            | TPrim (TUint U32) ->
+                env_add_fact env'' (PBinop (Le, PVar name, PInt 4294967295L))
+            | _ -> env'')
        | _ -> env'' in
       (* For function calls: inject callee postconditions as facts about name.
          E.g. `let x = f(a, b)` where f ensures result < q  →  adds fact x < q.
@@ -2067,6 +2079,13 @@ and check_stmt env stmt : env =
               PBinop (Sub, expr_to_pred_simple hi, expr_to_pred_simple lo)) in
             let len_nonneg_fact = PBinop (Ge, len_pred, PInt 0L) in
             env_add_fact (env_add_fact env'' len_eq_fact) len_nonneg_fact
+        | ECast (inner, _) ->
+            let src_ty = match inner.expr_ty with Some t -> t | None -> TPrim TUnit in
+            (match src_ty with
+             | TPrim (TUint U8)  -> env_add_fact env'' (PBinop (Le, PVar name, PInt 255L))
+             | TPrim (TUint U16) -> env_add_fact env'' (PBinop (Le, PVar name, PInt 65535L))
+             | TPrim (TUint U32) -> env_add_fact env'' (PBinop (Le, PVar name, PInt 4294967295L))
+             | _ -> env'')
         | _ -> env''
       in
       (* Inject callee postconditions as facts about `name`.
@@ -2898,12 +2917,29 @@ let check_fn env fn =
          in
          (call_pred, enriched)
        in
+       (* Inject cast range facts into env when trailing expr is a cast *)
+       let inject_trailing_cast base_env cast_expr =
+         let ret_p = expr_to_pred_simple cast_expr in
+         let enriched = match cast_expr.expr_desc with
+           | ECast (inner, _) ->
+               let src_ty = match inner.expr_ty with Some t -> t | None -> TPrim TUnit in
+               (match src_ty with
+                | TPrim (TUint U8)  -> env_add_fact base_env (PBinop (Le, ret_p, PInt 255L))
+                | TPrim (TUint U16) -> env_add_fact base_env (PBinop (Le, ret_p, PInt 65535L))
+                | TPrim (TUint U32) -> env_add_fact base_env (PBinop (Le, ret_p, PInt 4294967295L))
+                | _ -> base_env)
+           | _ -> base_env
+         in
+         (ret_p, enriched)
+       in
        let ret_pred, proof_env = match body.expr_desc with
          | EBlock (_, Some ret) ->
              (match ret.expr_desc with
               | ECall ({ expr_desc = EVar fn_id; _ }, call_args) ->
                   inject_trailing_call body_env fn_id.name call_args ret.expr_loc
+              | ECast _ -> inject_trailing_cast body_env ret
               | _ -> (expr_to_pred_simple ret, body_env))
+         | ECast _ -> inject_trailing_cast body_env body
          | _ -> (expr_to_pred_simple body, body_env)
        in
        (* Generate postcondition obligations using the (possibly enriched) env *)
