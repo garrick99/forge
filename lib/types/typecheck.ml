@@ -934,6 +934,16 @@ and stmt_final_env env stmt =
                 let _ = n in
                 env_add_fact env'' (PBinop (Le, PVar name, expr_to_pred_simple dividend))
             | _ -> env'')
+       | EBinop (BitAnd, lhs, rhs) ->
+           (* x & mask <= mask  and  x & mask <= x  (bitwise AND masks both operands) *)
+           let lp = expr_to_pred_simple lhs in
+           let rp = expr_to_pred_simple rhs in
+           let e1 = env_add_fact env'' (PBinop (Le, PVar name, lp)) in
+           env_add_fact e1 (PBinop (Le, PVar name, rp))
+       | EBinop (Shr, lhs, shift) ->
+           (* x >> n  ≤  x  (right-shift is non-increasing for unsigned) *)
+           let _ = shift in
+           env_add_fact env'' (PBinop (Le, PVar name, expr_to_pred_simple lhs))
        | _ -> env'' in
       (* For function calls: inject callee postconditions as facts about name.
          E.g. `let x = f(a, b)` where f ensures result < q  →  adds fact x < q.
@@ -2110,6 +2120,13 @@ and check_stmt env stmt : env =
                  let _ = n in
                  env_add_fact env'' (PBinop (Le, PVar name, expr_to_pred_simple dividend))
              | _ -> env'')
+        | EBinop (BitAnd, lhs, rhs) ->
+            let lp = expr_to_pred_simple lhs in
+            let rp = expr_to_pred_simple rhs in
+            let e1 = env_add_fact env'' (PBinop (Le, PVar name, lp)) in
+            env_add_fact e1 (PBinop (Le, PVar name, rp))
+        | EBinop (Shr, lhs, _) ->
+            env_add_fact env'' (PBinop (Le, PVar name, expr_to_pred_simple lhs))
         | _ -> env''
       in
       (* Inject callee postconditions as facts about `name`.

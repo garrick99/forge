@@ -1,0 +1,52 @@
+// Demo 310: Bitwise operation range injection
+//
+// Automatic range facts for bitwise operations:
+//   x & mask  →  result <= mask  AND  result <= x
+//   x >> n    →  result <= x     (right-shift is non-increasing)
+//
+// These enable verified bit manipulation without manual ensures on helpers.
+
+// Mask to low 4 bits: result is always 0..15
+fn low4(x: u64) -> u64
+    ensures result <= 15u64
+{
+    x & 15u64
+}
+
+// Mask to low 8 bits: always a byte value
+fn low8(x: u64) -> u64
+    ensures result <= 255u64
+{
+    x & 255u64
+}
+
+// Right-shift by 4: always <= original
+fn shr4(x: u64) -> u64
+    ensures result <= x
+{
+    x >> 4u64
+}
+
+// Extract upper nibble via shift: result <= x >> 4 <= x, and <= 15 after mask
+fn upper_nibble_bits(x: u64) -> u64
+    ensures result <= 15u64
+{
+    let shifted: u64 = x >> 4u64;   // shifted <= x
+    shifted & 15u64                  // result <= 15
+}
+
+// Byte extraction via mask: extract any byte position
+fn byte0(x: u64) -> u64 ensures result <= 255u64 { x & 255u64 }
+fn byte1(x: u64) -> u64 ensures result <= 255u64 { (x >> 8u64) & 255u64 }
+fn byte2(x: u64) -> u64 ensures result <= 255u64 { (x >> 16u64) & 255u64 }
+fn byte3(x: u64) -> u64 ensures result <= 255u64 { (x >> 24u64) & 255u64 }
+
+// Mask and check: a & b <= a is always true
+fn mask_le_left(a: u64, b: u64) -> bool
+    ensures result == true
+{
+    let m: u64 = a & b;   // m <= a and m <= b (both facts injected)
+    m <= a
+}
+
+fn main() -> u64 { 0u64 }
