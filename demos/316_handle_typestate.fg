@@ -1,0 +1,94 @@
+// Demo 316: File handle typestate with position tracking
+//
+// An abstract file handle whose state machine is fully verified:
+//   state 0 = closed, state 1 = open_read, state 2 = open_write
+//
+// The proof engine verifies:
+//   - Only open() can transition from closed to open
+//   - read/write require the correct open mode
+//   - close() can be called from any open state
+//   - Sequential open/close cycles chain correctly
+//   - Byte position advances by the write count
+
+struct Handle {
+    state:  u64,   // 0=closed, 1=open_read, 2=open_write
+    pos:    u64,   // current byte position
+    size:   u64,   // content size
+}
+
+fn handle_new() -> Handle
+    ensures result.state == 0u64
+    ensures result.pos   == 0u64
+    ensures result.size  == 0u64
+{
+    struct Handle { state: 0u64, pos: 0u64, size: 0u64 }
+}
+
+fn handle_open_read(h: refmut<Handle>, size: u64)
+    requires (*h).state == 0u64
+    ensures  (*h).state == 1u64
+    ensures  (*h).pos   == 0u64
+    ensures  (*h).size  == size
+{
+    (*h).state = 1u64;
+    (*h).pos   = 0u64;
+    (*h).size  = size;
+}
+
+fn handle_open_write(h: refmut<Handle>)
+    requires (*h).state == 0u64
+    ensures  (*h).state == 2u64
+    ensures  (*h).pos   == 0u64
+{
+    (*h).state = 2u64;
+    (*h).pos   = 0u64;
+}
+
+fn handle_write(h: refmut<Handle>, nbytes: u64)
+    requires (*h).state == 2u64
+    ensures  (*h).state == 2u64
+    ensures  (*h).pos   == (*h).pos + nbytes
+{
+    (*h).pos = (*h).pos + nbytes;
+}
+
+fn handle_close(h: refmut<Handle>)
+    ensures (*h).state == 0u64
+{
+    (*h).state = 0u64;
+}
+
+// Open for read, then close: ends closed
+fn read_cycle(size: u64) -> u64
+    ensures result == 0u64
+{
+    let h: Handle = handle_new();       // state=0
+    handle_open_read(&mut h, size);     // state=1
+    handle_close(&mut h);               // state=0
+    h.state
+}
+
+// Open for write, write some bytes, close
+fn write_cycle(n: u64) -> u64
+    ensures result == 0u64
+{
+    let h: Handle = handle_new();       // state=0
+    handle_open_write(&mut h);          // state=2, pos=0
+    handle_write(&mut h, n);            // state=2, pos=n
+    handle_close(&mut h);               // state=0
+    h.state
+}
+
+// Reopen after close: closed -> write -> closed -> read -> closed
+fn reopen_cycle(size: u64) -> u64
+    ensures result == 0u64
+{
+    let h: Handle = handle_new();       // state=0
+    handle_open_write(&mut h);          // state=2
+    handle_close(&mut h);               // state=0
+    handle_open_read(&mut h, size);     // state=1
+    handle_close(&mut h);               // state=0
+    h.state
+}
+
+fn main() -> u64 { 0u64 }

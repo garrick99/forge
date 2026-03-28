@@ -1,0 +1,91 @@
+// Demo 315: Lock typestate verification
+//
+// A mutual exclusion lock with verified acquire/release sequencing.
+// The proof engine verifies:
+//   - acquire() requires the lock is free (state == 0)
+//   - release() requires the lock is held (state == 1)
+//   - A critical section always pairs acquire with release
+//   - Nested acquire is provably rejected at the precondition
+//
+// Lock state: 0 = free, 1 = held
+
+struct Lock {
+    state: u64,
+}
+
+fn lock_new() -> Lock
+    ensures result.state == 0u64
+{
+    struct Lock { state: 0u64 }
+}
+
+fn lock_acquire(l: refmut<Lock>)
+    requires (*l).state == 0u64
+    ensures  (*l).state == 1u64
+{
+    (*l).state = 1u64;
+}
+
+fn lock_release(l: refmut<Lock>)
+    requires (*l).state == 1u64
+    ensures  (*l).state == 0u64
+{
+    (*l).state = 0u64;
+}
+
+fn lock_is_held(l: refmut<Lock>) -> u64
+    ensures result == (*l).state
+{
+    (*l).state
+}
+
+// A verified critical section: acquire, do work, release
+// Returns the lock to state 0 (free)
+fn critical_section(work: u64) -> u64
+    ensures result == 0u64
+{
+    let l: Lock = lock_new();          // l.state == 0
+    lock_acquire(&mut l);              // l.state == 1
+    let _ = work;                      // critical section body
+    lock_release(&mut l);              // l.state == 0
+    l.state
+}
+
+// Double acquire is correctly rejected:
+// after acquire, state==1, but acquire requires state==0 — precondition fails.
+// This function is commented out because it is INTENTIONALLY unprovable.
+//
+// fn bad_double_acquire() -> u64 {
+//     let l: Lock = lock_new();
+//     lock_acquire(&mut l);   // l.state = 1
+//     lock_acquire(&mut l);   // FAILS: requires state==0 but state==1
+//     lock_release(&mut l);
+//     l.state
+// }
+
+// Two sequential critical sections: free -> held -> free -> held -> free
+fn two_critical_sections(a: u64, b: u64) -> u64
+    ensures result == 0u64
+{
+    let l: Lock = lock_new();      // state == 0
+    lock_acquire(&mut l);          // state == 1
+    let _ = a;
+    lock_release(&mut l);          // state == 0
+    lock_acquire(&mut l);          // state == 1  (reacquire after release)
+    let _ = b;
+    lock_release(&mut l);          // state == 0
+    l.state
+}
+
+// Reader: acquires lock, reads a value, releases
+fn locked_read(data: u64) -> u64
+    ensures result == data
+{
+    let l: Lock = lock_new();      // state == 0
+    lock_acquire(&mut l);          // state == 1
+    let v = data;
+    lock_release(&mut l);          // state == 0
+    v
+}
+
+fn main() -> u64 { 0u64 }

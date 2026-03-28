@@ -1,0 +1,112 @@
+// Demo 317: Transaction typestate — verified begin/commit/rollback
+//
+// A database transaction with three states:
+//   0 = idle (no active transaction)
+//   1 = active (transaction in progress)
+//   2 = committed
+//
+// The proof engine verifies:
+//   - begin() requires idle state
+//   - commit/rollback require active state
+//   - After commit/rollback the transaction returns to idle
+//   - write_op() is only allowed during active transaction
+//   - Complete transaction cycles are verified end-to-end
+
+struct Txn {
+    state:   u64,   // 0=idle, 1=active, 2=committed
+    ops:     u64,   // number of write operations in current tx
+    version: u64,   // monotonically increasing commit counter
+}
+
+fn txn_new() -> Txn
+    ensures result.state   == 0u64
+    ensures result.ops     == 0u64
+    ensures result.version == 0u64
+{
+    struct Txn { state: 0u64, ops: 0u64, version: 0u64 }
+}
+
+fn txn_begin(t: refmut<Txn>)
+    requires (*t).state == 0u64
+    ensures  (*t).state == 1u64
+    ensures  (*t).ops   == 0u64
+{
+    (*t).state = 1u64;
+    (*t).ops   = 0u64;
+}
+
+fn txn_write(t: refmut<Txn>)
+    requires (*t).state == 1u64
+    ensures  (*t).state == 1u64
+    ensures  (*t).ops   == (*t).ops + 1u64
+{
+    (*t).ops = (*t).ops + 1u64;
+}
+
+fn txn_commit(t: refmut<Txn>)
+    requires (*t).state == 1u64
+    ensures  (*t).state == 0u64
+    ensures  (*t).version == (*t).version + 1u64
+{
+    (*t).state   = 0u64;
+    (*t).version = (*t).version + 1u64;
+}
+
+fn txn_rollback(t: refmut<Txn>)
+    requires (*t).state == 1u64
+    ensures  (*t).state == 0u64
+{
+    (*t).state = 0u64;
+    (*t).ops   = 0u64;
+}
+
+// A single commit cycle: idle -> active -> idle
+fn commit_cycle() -> u64
+    ensures result == 0u64
+{
+    let t: Txn = txn_new();    // state=0
+    txn_begin(&mut t);         // state=1
+    txn_write(&mut t);         // state=1, ops=1
+    txn_commit(&mut t);        // state=0, version=1
+    t.state
+}
+
+// A rollback cycle: idle -> active -> idle (via rollback)
+fn rollback_cycle() -> u64
+    ensures result == 0u64
+{
+    let t: Txn = txn_new();    // state=0
+    txn_begin(&mut t);         // state=1
+    txn_write(&mut t);         // state=1
+    txn_rollback(&mut t);      // state=0
+    t.state
+}
+
+// Two sequential transactions: begin/commit, then begin/commit again
+fn two_commits() -> u64
+    ensures result == 0u64
+{
+    let t: Txn = txn_new();    // state=0
+    txn_begin(&mut t);         // state=1
+    txn_commit(&mut t);        // state=0
+    txn_begin(&mut t);         // state=1  (can begin again after commit)
+    txn_write(&mut t);
+    txn_commit(&mut t);        // state=0
+    t.state
+}
+
+// Retry pattern: begin/rollback/begin/commit
+fn retry_cycle() -> u64
+    ensures result == 0u64
+{
+    let t: Txn = txn_new();    // state=0
+    txn_begin(&mut t);         // state=1
+    txn_write(&mut t);
+    txn_rollback(&mut t);      // state=0 (discard)
+    txn_begin(&mut t);         // state=1 (retry)
+    txn_write(&mut t);
+    txn_commit(&mut t);        // state=0
+    t.state
+}
+
+fn main() -> u64 { 0u64 }
