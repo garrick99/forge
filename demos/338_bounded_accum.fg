@@ -1,0 +1,96 @@
+// Demo 338: Bounded accumulator — sum with overflow protection
+//
+// An accumulator that tracks a running total and enforces
+// that the sum never exceeds a bound. Uses old() to verify
+// that each add step correctly updates the sum.
+
+struct Accum {
+    sum:   u64,
+    count: u64,
+    bound: u64,
+}
+
+fn accum_new(bound: u64) -> Accum
+    requires bound > 0u64
+    ensures result.sum   == 0u64
+    ensures result.count == 0u64
+    ensures result.bound == bound
+{
+    struct Accum { sum: 0u64, count: 0u64, bound: bound }
+}
+
+fn accum_add(a: refmut<Accum>, v: u64)
+    requires (*a).sum + v <= (*a).bound
+    ensures  (*a).sum   == old((*a).sum) + v
+    ensures  (*a).count == old((*a).count) + 1u64
+{
+    (*a).sum   = (*a).sum + v;
+    (*a).count = (*a).count + 1u64;
+}
+
+fn accum_reset(a: refmut<Accum>)
+    ensures (*a).sum   == 0u64
+    ensures (*a).count == 0u64
+{
+    (*a).sum   = 0u64;
+    (*a).count = 0u64;
+}
+
+// Add 10 once: sum is 10
+fn add_10(bound: u64) -> u64
+    requires bound >= 10u64
+    ensures result == 10u64
+{
+    let a: Accum = accum_new(bound);
+    accum_add(&mut a, 10u64);
+    a.sum
+}
+
+// Add 3 + 5 + 2 = 10: sum is 10
+fn add_three_values(bound: u64) -> u64
+    requires bound >= 10u64
+    ensures result == 10u64
+{
+    let a: Accum = accum_new(bound);
+    accum_add(&mut a, 3u64);
+    accum_add(&mut a, 5u64);
+    accum_add(&mut a, 2u64);
+    a.sum
+}
+
+// Count is 3 after 3 adds
+fn three_adds_count(bound: u64) -> u64
+    requires bound >= 10u64
+    ensures result == 3u64
+{
+    let a: Accum = accum_new(bound);
+    accum_add(&mut a, 3u64);
+    accum_add(&mut a, 5u64);
+    accum_add(&mut a, 2u64);
+    a.count
+}
+
+// Add then reset: sum is 0
+fn add_reset(bound: u64) -> u64
+    requires bound >= 5u64
+    ensures result == 0u64
+{
+    let a: Accum = accum_new(bound);
+    accum_add(&mut a, 5u64);
+    accum_reset(&mut a);
+    a.sum
+}
+
+// After reset, count also resets
+fn reset_count(bound: u64) -> u64
+    requires bound >= 5u64
+    ensures result == 0u64
+{
+    let a: Accum = accum_new(bound);
+    accum_add(&mut a, 3u64);
+    accum_add(&mut a, 2u64);
+    accum_reset(&mut a);
+    a.count
+}
+
+fn main() -> u64 { 0u64 }
