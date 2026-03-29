@@ -1,0 +1,82 @@
+// Demo 653: checksum and hash variants
+
+fn sum_checksum(data: span<u64>, n: u64) -> u64
+    requires n <= data.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + data[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn xor_checksum(data: span<u64>, n: u64) -> u64
+    requires n <= data.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc ^ data[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn fletcher16(data: span<u64>, n: u64) -> u64
+    requires n <= data.len
+{
+    let mut s1: u64 = 0u64;
+    let mut s2: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant s1 < 255u64
+        invariant s2 < 65025u64
+        decreases n - i
+    {
+        s1 = (s1 + data[i] % 255u64) % 255u64;
+        s2 = (s2 + s1) % 65025u64;
+        i = i + 1u64;
+    };
+    s1 * 256u64 + s2
+}
+
+fn djb2_hash(data: span<u64>, n: u64) -> u64
+    requires n <= data.len
+{
+    let mut h: u64 = 5381u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        h = h * 33u64 + data[i];
+        i = i + 1u64;
+    };
+    h
+}
+
+fn fnv1a_hash(data: span<u64>, n: u64) -> u64
+    requires n <= data.len
+{
+    let mut h: u64 = 14695981039346656037u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        h = (h ^ data[i]) * 1099511628211u64;
+        i = i + 1u64;
+    };
+    h
+}
+
+fn main() -> u64 { 0u64 }

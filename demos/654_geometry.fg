@@ -1,0 +1,76 @@
+// Demo 654: 2D integer geometry — bounding box, area, containment
+
+fn bbox_width(x_lo: u64, x_hi: u64) -> u64
+    requires x_lo <= x_hi
+    ensures  result == x_hi - x_lo
+{
+    x_hi - x_lo
+}
+
+fn bbox_height(y_lo: u64, y_hi: u64) -> u64
+    requires y_lo <= y_hi
+    ensures  result == y_hi - y_lo
+{
+    y_hi - y_lo
+}
+
+fn bbox_area(x_lo: u64, x_hi: u64, y_lo: u64, y_hi: u64) -> u64
+    requires x_lo <= x_hi
+    requires y_lo <= y_hi
+{
+    (x_hi - x_lo) * (y_hi - y_lo)
+}
+
+fn point_in_box(px: u64, py: u64, x_lo: u64, x_hi: u64, y_lo: u64, y_hi: u64) -> bool
+    requires x_lo <= x_hi
+    requires y_lo <= y_hi
+{
+    px >= x_lo && px <= x_hi && py >= y_lo && py <= y_hi
+}
+
+fn boxes_overlap(ax_lo: u64, ax_hi: u64, ay_lo: u64, ay_hi: u64,
+                 bx_lo: u64, bx_hi: u64, by_lo: u64, by_hi: u64) -> bool
+    requires ax_lo <= ax_hi
+    requires ay_lo <= ay_hi
+    requires bx_lo <= bx_hi
+    requires by_lo <= by_hi
+{
+    ax_lo <= bx_hi && bx_lo <= ax_hi && ay_lo <= by_hi && by_lo <= ay_hi
+}
+
+fn manhattan_dist(ax: u64, ay: u64, bx: u64, by: u64) -> u64 {
+    let dx: u64 = if ax >= bx { ax - bx } else { bx - ax };
+    let dy: u64 = if ay >= by { ay - by } else { by - ay };
+    dx + dy
+}
+
+fn chebyshev_dist(ax: u64, ay: u64, bx: u64, by: u64) -> u64 {
+    let dx: u64 = if ax >= bx { ax - bx } else { bx - ax };
+    let dy: u64 = if ay >= by { ay - by } else { by - ay };
+    if dx >= dy { dx } else { dy }
+}
+
+fn count_points_in_box(xs: span<u64>, ys: span<u64>, n: u64,
+                       x_lo: u64, x_hi: u64, y_lo: u64, y_hi: u64) -> u64
+    requires n <= xs.len
+    requires n <= ys.len
+    requires x_lo <= x_hi
+    requires y_lo <= y_hi
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if xs[i] >= x_lo && xs[i] <= x_hi && ys[i] >= y_lo && ys[i] <= y_hi {
+            cnt = cnt + 1u64;
+        };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }

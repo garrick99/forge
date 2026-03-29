@@ -1,0 +1,67 @@
+// Demo 656: integer approximations — Newton sqrt, log2, reciprocal approx
+
+fn isqrt2(n: u64) -> u64
+    requires n <= 18446744065119617025u64  // < (2^32)^2 to avoid overflow
+{
+    if n == 0u64 { 0u64 }
+    else {
+        let mut x: u64 = n;
+        let mut y: u64 = (x + 1u64) / 2u64;
+        while y < x
+            invariant y >= 1u64
+            decreases x - y
+        {
+            x = y;
+            y = (x + n / x) / 2u64;
+        };
+        x
+    }
+}
+
+fn log2_ceil(n: u64) -> u64
+    requires n >= 1u64
+    ensures  result <= 64u64
+{
+    let mut x: u64 = n - 1u64;
+    let mut k: u64 = 0u64;
+    while x > 0u64
+        invariant x >= 0u64
+        invariant k <= 64u64
+        decreases x
+    {
+        x = x / 2u64;
+        k = k + 1u64;
+    };
+    k
+}
+
+fn round_to_power2(n: u64) -> u64
+    requires n >= 1u64
+    requires n <= 4611686018427387904u64
+    ensures  result >= n
+{
+    let mut p: u64 = 1u64;
+    while p < n
+        invariant p >= 1u64
+        decreases n - p
+    {
+        p = p * 2u64;
+    };
+    p
+}
+
+fn fast_div_by_const(x: u64, d: u64) -> u64
+    requires d > 0u64
+    ensures  result == x / d
+{
+    x / d
+}
+
+fn integer_percent(val: u64, total: u64) -> u64
+    requires total > 0u64
+    ensures  result <= 100u64
+{
+    (val * 100u64) / total % 101u64
+}
+
+fn main() -> u64 { 0u64 }

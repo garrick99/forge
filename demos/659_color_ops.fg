@@ -1,0 +1,77 @@
+// Demo 659: color/pixel operations (packed RGBA)
+
+fn rgba_pack(r: u64, g: u64, b: u64, a: u64) -> u64
+    requires r < 256u64
+    requires g < 256u64
+    requires b < 256u64
+    requires a < 256u64
+{
+    r | (g << 8u64) | (b << 16u64) | (a << 24u64)
+}
+
+fn rgba_red(pixel: u64) -> u64
+    ensures result < 256u64
+{
+    pixel % 256u64
+}
+
+fn rgba_green(pixel: u64) -> u64
+    ensures result < 256u64
+{
+    (pixel / 256u64) % 256u64
+}
+
+fn rgba_blue(pixel: u64) -> u64
+    ensures result < 256u64
+{
+    (pixel / 65536u64) % 256u64
+}
+
+fn rgba_alpha(pixel: u64) -> u64
+    ensures result < 256u64
+{
+    (pixel / 16777216u64) % 256u64
+}
+
+fn pixel_luminance(pixel: u64) -> u64
+    ensures result <= 255u64
+{
+    // approx: (r*3 + g*6 + b*1) / 10, clamped
+    let r: u64 = rgba_red(pixel);
+    let g: u64 = rgba_green(pixel);
+    let b: u64 = rgba_blue(pixel);
+    let lum: u64 = (r * 3u64 + g * 6u64 + b * 1u64) / 10u64;
+    if lum > 255u64 { 255u64 } else { lum }
+}
+
+fn pixel_blend(a: u64, b: u64, t: u64) -> u64
+    requires t <= 255u64
+{
+    // lerp r,g,b channels using t/255
+    let ra: u64 = rgba_red(a);
+    let rb: u64 = rgba_red(b);
+    let ga: u64 = rgba_green(a);
+    let gb: u64 = rgba_green(b);
+    let ba2: u64 = rgba_blue(a);
+    let bb: u64 = rgba_blue(b);
+    let r: u64 = (ra * (255u64 - t) + rb * t) / 255u64;
+    let g: u64 = (ga * (255u64 - t) + gb * t) / 255u64;
+    let bv: u64 = (ba2 * (255u64 - t) + bb * t) / 255u64;
+    r | (g << 8u64) | (bv << 16u64) | (255u64 << 24u64)
+}
+
+fn grayscale_image(pixels: span<u64>, n: u64)
+    requires n <= pixels.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let lum: u64 = pixel_luminance(pixels[i]);
+        pixels[i] = lum | (lum << 8u64) | (lum << 16u64) | (255u64 << 24u64);
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

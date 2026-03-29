@@ -1,0 +1,79 @@
+// Demo 655: trie-like key operations on sorted integer arrays
+
+fn trie_prefix_count(keys: span<u64>, n: u64, prefix: u64, prefix_bits: u64) -> u64
+    requires n <= keys.len
+    requires prefix_bits <= 64u64
+    ensures  result <= n
+{
+    // count keys sharing the same top prefix_bits
+    let shift: u64 = 64u64 - prefix_bits;
+    let mask: u64 = if prefix_bits == 0u64 { 0u64 } else { prefix };
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        let key_prefix: u64 = if prefix_bits == 0u64 { 0u64 } else { keys[i] >> shift };
+        if key_prefix == mask { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn key_in_sorted(keys: span<u64>, n: u64, target: u64) -> bool
+    requires n <= keys.len
+{
+    let mut lo: u64 = 0u64;
+    let mut hi: u64 = n;
+    let mut found: bool = false;
+    while lo < hi && !found
+        invariant lo <= hi
+        invariant hi <= n
+        decreases hi - lo
+    {
+        let mid: u64 = lo + (hi - lo) / 2u64;
+        if keys[mid] == target { found = true; }
+        else if keys[mid] < target { lo = mid + 1u64; }
+        else { hi = mid; };
+    };
+    found
+}
+
+fn keys_all_unique(keys: span<u64>, n: u64) -> bool
+    requires n >= 1u64
+    requires n <= keys.len
+{
+    // assumes sorted — check adjacent pairs
+    let mut ok: bool = true;
+    let mut i: u64 = 0u64;
+    while i + 1u64 < n && ok
+        invariant i <= n
+        decreases n - i
+    {
+        if keys[i] == keys[i + 1u64] { ok = false; };
+        i = i + 1u64;
+    };
+    ok
+}
+
+fn count_keys_in_range(keys: span<u64>, n: u64, lo: u64, hi: u64) -> u64
+    requires n <= keys.len
+    requires lo <= hi
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if keys[i] >= lo && keys[i] <= hi { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }

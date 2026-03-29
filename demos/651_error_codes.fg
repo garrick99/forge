@@ -1,0 +1,66 @@
+// Demo 651: error code utilities and result pattern
+
+fn is_ok(code: u64) -> bool {
+    code == 0u64
+}
+
+fn is_err(code: u64) -> bool {
+    code != 0u64
+}
+
+fn err_category(code: u64) -> u64
+    ensures result <= 15u64
+{
+    (code >> 4u64) % 16u64
+}
+
+fn err_index(code: u64) -> u64
+    ensures result <= 15u64
+{
+    code % 16u64
+}
+
+fn make_error(category: u64, index: u64) -> u64
+    requires category < 16u64
+    requires index < 16u64
+    ensures  result >= 1u64
+{
+    category * 16u64 + index + 1u64
+}
+
+fn count_errors(codes: span<u64>, n: u64) -> u64
+    requires n <= codes.len
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if codes[i] != 0u64 { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn first_error(codes: span<u64>, n: u64) -> u64
+    requires n <= codes.len
+    ensures  result <= n
+{
+    let mut i: u64 = 0u64;
+    let mut found: u64 = n;
+    let mut done: bool = false;
+    while i < n && !done
+        invariant i <= n
+        invariant found <= n
+        decreases n - i
+    {
+        if codes[i] != 0u64 { found = i; done = true; };
+        i = i + 1u64;
+    };
+    found
+}
+
+fn main() -> u64 { 0u64 }
