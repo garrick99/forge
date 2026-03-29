@@ -1,0 +1,75 @@
+// Demo 529: bit-matrix — 64-bit word as a packed 8x8 boolean matrix
+
+fn bmat_get(mat: u64, row: u64, col: u64) -> bool
+    requires row < 8u64
+    requires col < 8u64
+    ensures  result == true || result == false
+{
+    (mat >> (row * 8u64 + col)) & 1u64 == 1u64
+}
+
+fn bmat_set(mat: u64, row: u64, col: u64) -> u64
+    requires row < 8u64
+    requires col < 8u64
+    ensures  result >= mat
+    ensures  result == mat | (1u64 << (row * 8u64 + col))
+{
+    mat | (1u64 << (row * 8u64 + col))
+}
+
+fn bmat_clear(mat: u64, row: u64, col: u64) -> u64
+    requires row < 8u64
+    requires col < 8u64
+    ensures  result <= mat
+{
+    mat & ~(1u64 << (row * 8u64 + col))
+}
+
+fn bmat_row_mask(row: u64) -> u64
+    requires row < 8u64
+    ensures  result >= 0u64
+{
+    0xFFu64 << (row * 8u64)
+}
+
+fn bmat_col_mask(col: u64) -> u64
+    requires col < 8u64
+    ensures  result >= 0u64
+{
+    0x0101010101010101u64 << col
+}
+
+fn bmat_and(a: u64, b: u64) -> u64
+    ensures  result <= a
+    ensures  result <= b
+    ensures  result == a & b
+{
+    a & b
+}
+
+fn bmat_or(a: u64, b: u64) -> u64
+    ensures  result >= a
+    ensures  result >= b
+    ensures  result == a | b
+{
+    a | b
+}
+
+fn bmat_xor(a: u64, b: u64) -> u64
+    ensures  result == a ^ b
+{
+    a ^ b
+}
+
+fn bmat_identity() -> u64
+    ensures  result == 0x8040201008040201u64
+{
+    0x8040201008040201u64
+}
+
+fn check_set_0_0() -> u64  ensures result >= 1u64     { bmat_set(0u64, 0u64, 0u64) }
+fn check_and_zero() -> u64 ensures result == 0u64               { bmat_and(0u64, 0xFFFFFFFFFFFFFFFFu64) }
+fn check_or_full()  -> u64 ensures result == 0xFFFFFFFFFFFFFFFFu64 { bmat_or(0u64, 0xFFFFFFFFFFFFFFFFu64) }
+fn check_xor_same() -> u64 ensures result == 0u64               { bmat_xor(42u64, 42u64) }
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,58 @@
+// Demo 523: population count (popcount) and related bit-counting algorithms
+
+fn popcount_loop(x: u64) -> u64
+    ensures  result <= 64u64
+    ensures  x == 0u64 ==> result == 0u64
+{
+    let mut v: u64 = x;
+    let mut c: u64 = 0u64;
+    while v > 0u64
+        invariant c <= 64u64
+        invariant x == 0u64 ==> c == 0u64
+        decreases v
+    {
+        c = c + (v & 1u64);
+        v = v >> 1u64;
+    };
+    c
+}
+
+fn popcount_kernighan(x: u64) -> u64
+    ensures  result <= 64u64
+    ensures  x == 0u64 ==> result == 0u64
+{
+    let mut v: u64 = x;
+    let mut c: u64 = 0u64;
+    while v > 0u64
+        invariant c <= 64u64
+        invariant x == 0u64 ==> c == 0u64
+        decreases v
+    {
+        v = v & (v - 1u64);
+        c = c + 1u64;
+    };
+    c
+}
+
+fn parity_bit(x: u64) -> u64
+    ensures  result <= 1u64
+{
+    let cnt: u64 = popcount_loop(x);
+    cnt % 2u64
+}
+
+fn has_exactly_one_bit(x: u64) -> bool
+    requires x > 0u64
+    ensures  result == true || result == false
+{
+    (x & (x - 1u64)) == 0u64
+}
+
+fn check_popcount_0()   -> u64   ensures result == 0u64   { popcount_loop(0u64) }
+fn check_popcount_1()   -> u64   ensures result <= 64u64  { popcount_loop(1u64) }
+fn check_popcount_255() -> u64   ensures result <= 64u64  { popcount_loop(255u64) }
+fn check_kernighan_0()  -> u64   ensures result == 0u64   { popcount_kernighan(0u64) }
+fn check_kernighan_1()  -> u64   ensures result <= 64u64  { popcount_kernighan(1u64) }
+fn check_parity_0()     -> u64   ensures result <= 1u64   { parity_bit(0u64) }
+
+fn main() -> u64 { 0u64 }

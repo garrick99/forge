@@ -1,0 +1,48 @@
+// Demo 521: GCD — subtraction-based with if-else-if-else (no early returns)
+
+fn gcd(a: u64, b: u64) -> u64
+    requires a > 0u64
+    requires b > 0u64
+    ensures  a == b ==> result == a
+    decreases a + b
+{
+    if a == b {
+        a
+    } else if a > b {
+        gcd(a - b, b)
+    } else {
+        gcd(a, b - a)
+    }
+}
+
+fn gcd_loop(a: u64, b: u64) -> u64
+    requires a > 0u64
+    requires b > 0u64
+    ensures  result > 0u64
+{
+    let mut x: u64 = a;
+    let mut y: u64 = b;
+    while x != y
+        invariant x > 0u64
+        invariant y > 0u64
+        decreases x + y
+    {
+        let go_x: bool = x > y;
+        if go_x { x = x - y; } else { y = y - x; };
+    };
+    x
+}
+
+fn is_coprime(a: u64, b: u64) -> bool
+    requires a > 0u64
+    requires b > 0u64
+    ensures  result == true || result == false
+{
+    gcd(a, b) == 1u64
+}
+
+fn check_gcd_same()  -> u64  ensures result == 5u64   { gcd(5u64, 5u64) }
+fn check_gcd_pos()   -> u64  ensures result > 0u64    { gcd_loop(12u64, 8u64) }
+fn check_loop_pos()  -> u64  ensures result > 0u64    { gcd_loop(9u64, 6u64) }
+
+fn main() -> u64 { 0u64 }

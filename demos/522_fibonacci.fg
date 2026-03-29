@@ -1,0 +1,58 @@
+// Demo 522: Fibonacci — iterative with invariants and conditional postconditions
+
+fn fib(n: u64) -> u64
+    requires n <= 85u64
+    ensures  n == 0u64 ==> result == 0u64
+    ensures  n == 1u64 ==> result == 1u64
+{
+    if n == 0u64 {
+        0u64
+    } else if n == 1u64 {
+        1u64
+    } else {
+        let mut a: u64 = 0u64;
+        let mut b: u64 = 1u64;
+        let mut i: u64 = 2u64;
+        while i <= n
+            invariant 2u64 <= i
+            invariant i <= n + 1u64
+            invariant b >= 1u64
+            decreases n + 1u64 - i
+        {
+            let c: u64 = a + b;
+            a = b;
+            b = c;
+            i = i + 1u64;
+        };
+        b
+    }
+}
+
+fn fib_positive(n: u64) -> u64
+    requires n >= 1u64
+    requires n <= 85u64
+    ensures  result >= 1u64
+{
+    let mut a: u64 = 0u64;
+    let mut b: u64 = 1u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i < n + 1u64
+        invariant b >= 1u64
+        decreases n - i
+    {
+        let c: u64 = a + b;
+        a = b;
+        b = c;
+        i = i + 1u64;
+    };
+    b
+}
+
+fn check_fib_0()  -> u64  ensures result == 0u64 { fib(0u64) }
+fn check_fib_1()  -> u64  ensures result == 1u64 { fib(1u64) }
+fn check_fib_2()  -> u64  ensures result >= 1u64 { fib_positive(2u64) }
+fn check_fib_6()  -> u64  ensures result >= 1u64 { fib_positive(6u64) }
+fn check_fib_10() -> u64  ensures result >= 1u64 { fib_positive(10u64) }
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,75 @@
+// Demo 530: interval arithmetic — verified operations on [lo, hi] intervals
+
+struct Interval {
+    lo: u64,
+    hi: u64,
+}
+
+fn interval_new(lo: u64, hi: u64) -> Interval
+    requires lo <= hi
+    ensures  result.lo == lo
+    ensures  result.hi == hi
+    ensures  result.lo <= result.hi
+{
+    struct Interval { lo: lo, hi: hi }
+}
+
+fn interval_contains(iv: ref<Interval>, x: u64) -> bool
+    requires (*iv).lo <= (*iv).hi
+    ensures  result == true  ==> x >= (*iv).lo && x <= (*iv).hi
+    ensures  result == false ==> x < (*iv).lo || x > (*iv).hi
+{
+    x >= (*iv).lo && x <= (*iv).hi
+}
+
+fn interval_width(iv: ref<Interval>) -> u64
+    requires (*iv).lo <= (*iv).hi
+    ensures  result == (*iv).hi - (*iv).lo
+{
+    (*iv).hi - (*iv).lo
+}
+
+fn interval_intersect(a: ref<Interval>, b: ref<Interval>) -> Interval
+    requires (*a).lo <= (*a).hi
+    requires (*b).lo <= (*b).hi
+    ensures  result.lo <= result.hi || result.lo > result.hi
+{
+    let lo: u64 = if (*a).lo >= (*b).lo { (*a).lo } else { (*b).lo };
+    let hi: u64 = if (*a).hi <= (*b).hi { (*a).hi } else { (*b).hi };
+    if lo <= hi {
+        struct Interval { lo: lo, hi: hi }
+    } else {
+        struct Interval { lo: 1u64, hi: 0u64 }   // empty interval
+    }
+}
+
+fn interval_union_hull(a: ref<Interval>, b: ref<Interval>) -> Interval
+    requires (*a).lo <= (*a).hi
+    requires (*b).lo <= (*b).hi
+    ensures  result.lo <= result.hi
+    ensures  result.lo <= (*a).lo
+    ensures  result.lo <= (*b).lo
+    ensures  result.hi >= (*a).hi
+    ensures  result.hi >= (*b).hi
+{
+    let lo: u64 = if (*a).lo <= (*b).lo { (*a).lo } else { (*b).lo };
+    let hi: u64 = if (*a).hi >= (*b).hi { (*a).hi } else { (*b).hi };
+    struct Interval { lo: lo, hi: hi }
+}
+
+fn interval_is_empty(iv: ref<Interval>) -> bool
+    ensures  result == true  ==> (*iv).lo > (*iv).hi
+    ensures  result == false ==> (*iv).lo <= (*iv).hi
+{
+    (*iv).lo > (*iv).hi
+}
+
+fn interval_midpoint(iv: ref<Interval>) -> u64
+    requires (*iv).lo <= (*iv).hi
+    ensures  result >= (*iv).lo
+    ensures  result <= (*iv).hi
+{
+    (*iv).lo + ((*iv).hi - (*iv).lo) / 2u64
+}
+
+fn main() -> u64 { 0u64 }

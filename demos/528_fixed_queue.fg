@@ -1,0 +1,68 @@
+// Demo 528: verified fixed-size circular queue with enqueue/dequeue
+
+struct Queue {
+    data: span<u64>,
+    head: u64,
+    tail: u64,
+    size: u64,
+    cap: u64,
+}
+
+fn queue_new(buf: span<u64>, cap: u64) -> Queue
+    requires cap > 0u64
+    requires cap <= buf.len
+    ensures  result.size == 0u64
+    ensures  result.cap  == cap
+    ensures  result.head == 0u64
+    ensures  result.tail == 0u64
+{
+    struct Queue { data: buf, head: 0u64, tail: 0u64, size: 0u64, cap: cap }
+}
+
+fn queue_is_empty(q: ref<Queue>) -> bool
+    requires (*q).size <= (*q).cap
+    ensures result == true  ==> (*q).size == 0u64
+    ensures result == false ==> (*q).size > 0u64
+{
+    (*q).size == 0u64
+}
+
+fn queue_is_full(q: ref<Queue>) -> bool
+    requires (*q).size <= (*q).cap
+    ensures result == true  ==> (*q).size == (*q).cap
+    ensures result == false ==> (*q).size < (*q).cap
+{
+    (*q).size == (*q).cap
+}
+
+fn queue_enqueue(q: refmut<Queue>, v: u64)
+    requires (*q).size < (*q).cap
+    requires (*q).cap <= (*q).data.len
+    requires (*q).tail < (*q).cap
+    ensures  (*q).size == old((*q).size) + 1u64
+{
+    (*q).data[(*q).tail] = v;
+    (*q).tail = ((*q).tail + 1u64) % (*q).cap;
+    (*q).size = (*q).size + 1u64;
+}
+
+fn queue_dequeue(q: refmut<Queue>) -> u64
+    requires (*q).size > 0u64
+    requires (*q).size <= (*q).cap
+    requires (*q).cap <= (*q).data.len
+    requires (*q).head < (*q).cap
+    ensures  (*q).size == old((*q).size) - 1u64
+{
+    let v: u64 = (*q).data[(*q).head];
+    (*q).head = ((*q).head + 1u64) % (*q).cap;
+    (*q).size = (*q).size - 1u64;
+    v
+}
+
+fn queue_size(q: ref<Queue>) -> u64
+    ensures result == (*q).size
+{
+    (*q).size
+}
+
+fn main() -> u64 { 0u64 }

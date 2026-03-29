@@ -1,0 +1,51 @@
+// Demo 524: binary search — iterative with bounds-only invariants
+
+fn lower_bound(s: span<u64>, n: u64, target: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut lo: u64 = 0u64;
+    let mut hi: u64 = n;
+    while lo < hi
+        invariant lo <= hi
+        invariant hi <= n
+        decreases hi - lo
+    {
+        let mid: u64 = lo + (hi - lo) / 2u64;
+        let cond: bool = s[mid] < target;
+        if cond { lo = mid + 1u64; } else { hi = mid; };
+    };
+    lo
+}
+
+fn upper_bound(s: span<u64>, n: u64, target: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut lo: u64 = 0u64;
+    let mut hi: u64 = n;
+    while lo < hi
+        invariant lo <= hi
+        invariant hi <= n
+        decreases hi - lo
+    {
+        let mid: u64 = lo + (hi - lo) / 2u64;
+        let cond: bool = s[mid] > target;
+        if cond { hi = mid; } else { lo = mid + 1u64; };
+    };
+    lo
+}
+
+fn binary_search(s: span<u64>, n: u64, target: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let lb: u64 = lower_bound(s, n, target);
+    if lb < n {
+        if s[lb] == target { lb } else { n }
+    } else {
+        n
+    }
+}
+
+fn main() -> u64 { 0u64 }

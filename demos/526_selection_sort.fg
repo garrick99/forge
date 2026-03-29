@@ -1,0 +1,47 @@
+// Demo 526: selection sort — find minimum, swap into place
+
+fn find_min_index(s: span<u64>, lo: u64, n: u64) -> u64
+    requires lo < n
+    requires n <= s.len
+    ensures  result >= lo
+    ensures  result < n
+    ensures  forall k: u64, lo <= k && k < n ==> s[result] <= s[k]
+{
+    let mut min_idx: u64 = lo;
+    let mut i: u64 = lo + 1u64;
+    while i < n
+        invariant i <= n
+        invariant min_idx >= lo
+        invariant min_idx < n
+        invariant forall k: u64, lo <= k && k < i ==> s[min_idx] <= s[k]
+    {
+        if s[i] < s[min_idx] { min_idx = i; };
+        i = i + 1u64;
+    };
+    min_idx
+}
+
+fn swap(s: span<u64>, a: u64, b: u64)
+    requires a < s.len
+    requires b < s.len
+{
+    let tmp: u64 = s[a];
+    s[a] = s[b];
+    s[b] = tmp;
+}
+
+fn selection_sort(s: span<u64>, n: u64)
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let m: u64 = find_min_index(s, i, n);
+        swap(s, i, m);
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }
