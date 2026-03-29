@@ -1,0 +1,91 @@
+// Demo 668: sliding window algorithms — sum, max, min over windows
+
+fn window_sum(s: span<u64>, n: u64, w: u64, out: span<u64>)
+    requires w >= 1u64
+    requires w <= n
+    requires n <= s.len
+    requires n - w + 1u64 <= out.len
+{
+    // compute sum of first window
+    let mut sum: u64 = 0u64;
+    let mut j: u64 = 0u64;
+    while j < w
+        invariant j <= w
+        decreases w - j
+    {
+        sum = sum + s[j];
+        j = j + 1u64;
+    };
+    out[0u64] = sum;
+
+    // slide
+    let mut i: u64 = 1u64;
+    while i + w <= n
+        invariant i <= n
+        decreases n - i - w + 1u64
+    {
+        sum = sum + s[i + w - 1u64] - s[i - 1u64];
+        out[i] = sum;
+        i = i + 1u64;
+    };
+}
+
+fn window_max(s: span<u64>, n: u64, w: u64, out: span<u64>)
+    requires w >= 1u64
+    requires w <= n
+    requires n <= s.len
+    requires n - w + 1u64 <= out.len
+{
+    let mut i: u64 = 0u64;
+    while i + w <= n
+        invariant i <= n
+        decreases n - i - w + 1u64
+    {
+        let mut mx: u64 = s[i];
+        let mut j: u64 = 1u64;
+        while j < w
+            invariant j <= w
+            decreases w - j
+        {
+            if s[i + j] > mx { mx = s[i + j]; };
+            j = j + 1u64;
+        };
+        out[i] = mx;
+        i = i + 1u64;
+    };
+}
+
+fn window_min(s: span<u64>, n: u64, w: u64, out: span<u64>)
+    requires w >= 1u64
+    requires w <= n
+    requires n <= s.len
+    requires n - w + 1u64 <= out.len
+{
+    let mut i: u64 = 0u64;
+    while i + w <= n
+        invariant i <= n
+        decreases n - i - w + 1u64
+    {
+        let mut mn: u64 = s[i];
+        let mut j: u64 = 1u64;
+        while j < w
+            invariant j <= w
+            decreases w - j
+        {
+            if s[i + j] < mn { mn = s[i + j]; };
+            j = j + 1u64;
+        };
+        out[i] = mn;
+        i = i + 1u64;
+    };
+}
+
+fn window_count(n: u64, w: u64) -> u64
+    requires w >= 1u64
+    requires w <= n
+    ensures  result >= 1u64
+{
+    n - w + 1u64
+}
+
+fn main() -> u64 { 0u64 }

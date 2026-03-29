@@ -1,0 +1,123 @@
+// Demo 670: milestone 3 — verified algorithms combining prior patterns
+
+fn clamp_u64(x: u64, lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures  result >= lo
+    ensures  result <= hi
+{
+    if x < lo { lo } else if x > hi { hi } else { x }
+}
+
+fn array_clamp(s: span<u64>, n: u64, lo: u64, hi: u64)
+    requires lo <= hi
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let v: u64 = clamp_u64(s[i], lo, hi);
+        s[i] = v;
+        i = i + 1u64;
+    };
+}
+
+fn array_sum_bounded(s: span<u64>, n: u64, bound: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n * bound
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant acc <= i * bound
+        decreases n - i
+    {
+        if s[i] <= bound { acc = acc + s[i]; }
+        else { acc = acc + bound; };
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn count_in_range(s: span<u64>, n: u64, lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if s[i] >= lo && s[i] <= hi { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn array_min(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+{
+    let mut mn: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] < mn { mn = s[i]; };
+        i = i + 1u64;
+    };
+    mn
+}
+
+fn array_max(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+{
+    let mut mx: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] > mx { mx = s[i]; };
+        i = i + 1u64;
+    };
+    mx
+}
+
+fn normalize_to_range(s: span<u64>, n: u64, new_max: u64)
+    requires n >= 1u64
+    requires n <= s.len
+    requires new_max >= 1u64
+{
+    // find max
+    let mut mx: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] > mx { mx = s[i]; };
+        i = i + 1u64;
+    };
+
+    // scale (avoid division by zero)
+    if mx > 0u64 {
+        let mut j: u64 = 0u64;
+        while j < n
+            invariant j <= n
+            decreases n - j
+        {
+            s[j] = (s[j] * new_max) / mx;
+            j = j + 1u64;
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }

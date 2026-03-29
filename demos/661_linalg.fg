@@ -1,0 +1,94 @@
+// Demo 661: linear algebra operations — vector norms, dot products
+
+fn vec_dot(a: span<u64>, b: span<u64>, n: u64) -> u64
+    requires n <= a.len
+    requires n <= b.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + a[i] * b[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn vec_norm_sq(a: span<u64>, n: u64) -> u64
+    requires n <= a.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + a[i] * a[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn vec_add(a: span<u64>, b: span<u64>, out: span<u64>, n: u64)
+    requires n <= a.len
+    requires n <= b.len
+    requires n <= out.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        out[i] = a[i] + b[i];
+        i = i + 1u64;
+    };
+}
+
+fn vec_scale(a: span<u64>, out: span<u64>, n: u64, s: u64)
+    requires n <= a.len
+    requires n <= out.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        out[i] = a[i] * s;
+        i = i + 1u64;
+    };
+}
+
+fn vec_axpy(a: span<u64>, b: span<u64>, out: span<u64>, n: u64, alpha: u64)
+    requires n <= a.len
+    requires n <= b.len
+    requires n <= out.len
+{
+    // out = alpha * a + b
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        out[i] = alpha * a[i] + b[i];
+        i = i + 1u64;
+    };
+}
+
+fn vec_hadamard(a: span<u64>, b: span<u64>, out: span<u64>, n: u64)
+    requires n <= a.len
+    requires n <= b.len
+    requires n <= out.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        out[i] = a[i] * b[i];
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

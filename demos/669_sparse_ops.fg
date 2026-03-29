@@ -1,0 +1,83 @@
+// Demo 669: sparse array operations — CSR-style index/value arrays
+
+fn sparse_dot(idx: span<u64>, vals: span<u64>, nnz: u64, dense: span<u64>, dense_len: u64) -> u64
+    requires nnz <= idx.len
+    requires nnz <= vals.len
+    requires dense_len >= 1u64
+    requires dense_len <= dense.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < nnz
+        invariant i <= nnz
+        decreases nnz - i
+    {
+        let col: u64 = idx[i] % dense_len;
+        acc = acc + vals[i] * dense[col];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn sparse_scale(vals: span<u64>, nnz: u64, s: u64)
+    requires nnz <= vals.len
+{
+    let mut i: u64 = 0u64;
+    while i < nnz
+        invariant i <= nnz
+        decreases nnz - i
+    {
+        vals[i] = vals[i] * s;
+        i = i + 1u64;
+    };
+}
+
+fn sparse_sum(vals: span<u64>, nnz: u64) -> u64
+    requires nnz <= vals.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < nnz
+        invariant i <= nnz
+        decreases nnz - i
+    {
+        acc = acc + vals[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn sparse_max(vals: span<u64>, nnz: u64) -> u64
+    requires nnz >= 1u64
+    requires nnz <= vals.len
+{
+    let mut mx: u64 = vals[0u64];
+    let mut i: u64 = 1u64;
+    while i < nnz
+        invariant i <= nnz
+        decreases nnz - i
+    {
+        if vals[i] > mx { mx = vals[i]; };
+        i = i + 1u64;
+    };
+    mx
+}
+
+fn sparse_count_nonzero(vals: span<u64>, n: u64) -> u64
+    requires n <= vals.len
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if vals[i] != 0u64 { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }

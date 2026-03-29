@@ -1,0 +1,64 @@
+// Demo 663: I/O simulation — byte stream read/write helpers
+
+fn stream_write_u8(buf: span<u64>, pos: u64, val: u64) -> u64
+    requires pos < buf.len
+    ensures  result == pos + 1u64
+{
+    buf[pos] = val % 256u64;
+    pos + 1u64
+}
+
+fn stream_write_u16_be(buf: span<u64>, pos: u64, val: u64) -> u64
+    requires pos + 1u64 < buf.len
+    ensures  result == pos + 2u64
+{
+    buf[pos] = (val / 256u64) % 256u64;
+    buf[pos + 1u64] = val % 256u64;
+    pos + 2u64
+}
+
+fn stream_read_u8(buf: span<u64>, pos: u64) -> u64
+    requires pos < buf.len
+    ensures  result < 256u64
+{
+    buf[pos] % 256u64
+}
+
+fn stream_read_u16_be(buf: span<u64>, pos: u64) -> u64
+    requires pos + 1u64 < buf.len
+{
+    (buf[pos] % 256u64) * 256u64 + (buf[pos + 1u64] % 256u64)
+}
+
+fn stream_copy(src: span<u64>, src_pos: u64, dst: span<u64>, dst_pos: u64, n: u64) -> u64
+    requires src_pos + n <= src.len
+    requires dst_pos + n <= dst.len
+    ensures  result == dst_pos + n
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        dst[dst_pos + i] = src[src_pos + i];
+        i = i + 1u64;
+    };
+    dst_pos + n
+}
+
+fn stream_fill(buf: span<u64>, pos: u64, n: u64, val: u64) -> u64
+    requires pos + n <= buf.len
+    ensures  result == pos + n
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        buf[pos + i] = val % 256u64;
+        i = i + 1u64;
+    };
+    pos + n
+}
+
+fn main() -> u64 { 0u64 }

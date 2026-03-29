@@ -1,0 +1,80 @@
+// Demo 666: priority queue operations — insert, extract, peek
+
+fn pq_peek(h: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= h.len
+{
+    h[0u64]
+}
+
+fn pq_sift_up(h: span<u64>, n: u64)
+    requires n >= 1u64
+    requires n <= h.len
+{
+    let mut i: u64 = n - 1u64;
+    let mut done: bool = false;
+    while !done
+        invariant i < n
+        decreases i
+    {
+        if i == 0u64 {
+            done = true;
+        } else {
+            let p: u64 = (i - 1u64) / 2u64;
+            if h[i] < h[p] {
+                let tmp: u64 = h[i];
+                h[i] = h[p];
+                h[p] = tmp;
+                i = p;
+            } else {
+                done = true;
+            };
+        };
+    };
+}
+
+fn pq_sift_down(h: span<u64>, n: u64)
+    requires n >= 1u64
+    requires n <= h.len
+{
+    let mut cur: u64 = 0u64;
+    let mut done: bool = false;
+    while !done
+        invariant cur < n
+        decreases n - cur
+    {
+        let l: u64 = 2u64 * cur + 1u64;
+        let r: u64 = 2u64 * cur + 2u64;
+        let mut smallest: u64 = cur;
+        let mut min_val: u64 = h[cur];
+        if l < n {
+            if h[l] < min_val { smallest = l; min_val = h[l]; };
+        };
+        if r < n {
+            if h[r] < min_val { smallest = r; };
+        };
+        if smallest != cur {
+            let tmp: u64 = h[cur];
+            h[cur] = h[smallest];
+            h[smallest] = tmp;
+            cur = smallest;
+        } else {
+            done = true;
+        };
+    };
+}
+
+fn pq_size_after_push(n: u64) -> u64
+    ensures result == n + 1u64
+{
+    n + 1u64
+}
+
+fn pq_size_after_pop(n: u64) -> u64
+    requires n >= 1u64
+    ensures  result == n - 1u64
+{
+    n - 1u64
+}
+
+fn main() -> u64 { 0u64 }

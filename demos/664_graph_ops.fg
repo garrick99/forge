@@ -1,0 +1,77 @@
+// Demo 664: graph operations — degree, in/out degree, adjacency
+
+fn out_degree(adj: span<u64>, n: u64, node: u64) -> u64
+    requires n * n <= adj.len
+    requires node < n
+    ensures  result <= n
+{
+    let mut deg: u64 = 0u64;
+    let mut j: u64 = 0u64;
+    while j < n
+        invariant j <= n
+        invariant deg <= j
+        decreases n - j
+    {
+        if adj[node * n + j] > 0u64 { deg = deg + 1u64; };
+        j = j + 1u64;
+    };
+    deg
+}
+
+fn in_degree(adj: span<u64>, n: u64, node: u64) -> u64
+    requires n * n <= adj.len
+    requires node < n
+    ensures  result <= n
+{
+    let mut deg: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant deg <= i
+        decreases n - i
+    {
+        if adj[i * n + node] > 0u64 { deg = deg + 1u64; };
+        i = i + 1u64;
+    };
+    deg
+}
+
+fn is_symmetric(adj: span<u64>, n: u64) -> bool
+    requires n * n <= adj.len
+{
+    let mut ok: bool = true;
+    let mut i: u64 = 0u64;
+    while i < n && ok
+        invariant i <= n
+        decreases n - i
+    {
+        let mut j: u64 = 0u64;
+        while j < n && ok
+            invariant j <= n
+            decreases n - j
+        {
+            if adj[i * n + j] != adj[j * n + i] { ok = false; };
+            j = j + 1u64;
+        };
+        i = i + 1u64;
+    };
+    ok
+}
+
+fn count_edges(adj: span<u64>, n: u64) -> u64
+    requires n * n <= adj.len
+{
+    let total: u64 = n * n;
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < total
+        invariant i <= total
+        decreases total - i
+    {
+        if adj[i] > 0u64 { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,84 @@
+// Demo 662: buffer operations — append, prepend, drain, compact
+
+fn buf_append(buf: span<u64>, len: u64, val: u64) -> u64
+    requires len < buf.len
+    ensures  result == len + 1u64
+{
+    buf[len] = val;
+    len + 1u64
+}
+
+fn buf_prepend(buf: span<u64>, len: u64, val: u64) -> u64
+    requires len < buf.len
+    ensures  result == len + 1u64
+{
+    // shift everything right by 1
+    let mut i: u64 = len;
+    while i >= 1u64
+        invariant i <= len
+        decreases i
+    {
+        buf[i] = buf[i - 1u64];
+        i = i - 1u64;
+    };
+    buf[0u64] = val;
+    len + 1u64
+}
+
+fn buf_drain(buf: span<u64>, len: u64, k: u64) -> u64
+    requires k <= len
+    requires len <= buf.len
+    ensures  result == len - k
+{
+    // remove first k elements by shifting
+    let mut i: u64 = 0u64;
+    while i + k < len
+        invariant i <= len
+        decreases len - i - k
+    {
+        buf[i] = buf[i + k];
+        i = i + 1u64;
+    };
+    len - k
+}
+
+fn buf_compact(buf: span<u64>, len: u64, sentinel: u64) -> u64
+    requires len <= buf.len
+    ensures  result <= len
+{
+    // remove all sentinel values by compacting
+    let mut w: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < len
+        invariant i <= len
+        invariant w <= i
+        decreases len - i
+    {
+        if buf[i] != sentinel {
+            buf[w] = buf[i];
+            w = w + 1u64;
+        };
+        i = i + 1u64;
+    };
+    w
+}
+
+fn buf_find(buf: span<u64>, len: u64, val: u64) -> u64
+    requires len <= buf.len
+    ensures  result <= len
+{
+    let mut i: u64 = 0u64;
+    let mut found: u64 = len;
+    let mut done: bool = false;
+    while i < len && !done
+        invariant i <= len
+        invariant found <= len
+        decreases len - i
+    {
+        if buf[i] == val { found = i; done = true; };
+        i = i + 1u64;
+    };
+    found
+}
+
+fn main() -> u64 { 0u64 }

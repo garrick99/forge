@@ -1,0 +1,72 @@
+// Demo 665: ring arithmetic — modular operations over Z_n
+
+fn ring_add(a: u64, b: u64, n: u64) -> u64
+    requires n > 0u64
+    ensures  result < n
+{
+    (a % n + b % n) % n
+}
+
+fn ring_neg(a: u64, n: u64) -> u64
+    requires n > 0u64
+    ensures  result < n
+{
+    let am: u64 = a % n;
+    if am == 0u64 { 0u64 } else { n - am }
+}
+
+fn ring_sub(a: u64, b: u64, n: u64) -> u64
+    requires n > 0u64
+    ensures  result < n
+{
+    let bm: u64 = b % n;
+    let am: u64 = a % n;
+    if am >= bm { (am - bm) % n } else { (n - bm + am) % n }
+}
+
+fn ring_mul(a: u64, b: u64, n: u64) -> u64
+    requires n > 0u64
+    ensures  result < n
+{
+    (a % n) * (b % n) % n
+}
+
+fn ring_sum(s: span<u64>, k: u64, n: u64) -> u64
+    requires n > 0u64
+    requires k <= s.len
+    ensures  result < n
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < k
+        invariant i <= k
+        invariant acc < n
+        decreases k - i
+    {
+        acc = (acc + s[i] % n) % n;
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn ring_pow(base: u64, exp: u64, n: u64) -> u64
+    requires n > 0u64
+    ensures  result < n
+{
+    let mut acc: u64 = 1u64 % n;
+    let mut b: u64 = base % n;
+    let mut e: u64 = exp;
+    while e > 0u64
+        invariant e <= exp
+        invariant acc < n
+        invariant b < n
+        decreases e
+    {
+        if e % 2u64 == 1u64 { acc = (acc * b) % n; };
+        b = (b * b) % n;
+        e = e / 2u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

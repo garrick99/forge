@@ -1,0 +1,74 @@
+// Demo 667: encoding operations — nibble/byte packing, hex digits
+
+fn nibble_lo(x: u64) -> u64
+    ensures result < 16u64
+{
+    x % 16u64
+}
+
+fn nibble_hi(x: u64) -> u64
+    ensures result < 16u64
+{
+    (x / 16u64) % 16u64
+}
+
+fn hex_digit(n: u64) -> u64
+    requires n < 16u64
+{
+    if n < 10u64 { n + 48u64 } else { n - 10u64 + 65u64 }
+}
+
+fn byte_to_hex(buf: span<u64>, pos: u64, val: u64) -> u64
+    requires pos + 1u64 < buf.len
+    ensures  result == pos + 2u64
+{
+    let hi: u64 = nibble_hi(val);
+    let lo: u64 = nibble_lo(val);
+    buf[pos] = hex_digit(hi);
+    buf[pos + 1u64] = hex_digit(lo);
+    pos + 2u64
+}
+
+fn encode_bytes(src: span<u64>, n: u64, dst: span<u64>) -> u64
+    requires n <= src.len
+    requires 2u64 * n <= dst.len
+    ensures  result == 2u64 * n
+{
+    let mut i: u64 = 0u64;
+    let mut out: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant out == 2u64 * i
+        decreases n - i
+    {
+        let hi: u64 = nibble_hi(src[i]);
+        let lo: u64 = nibble_lo(src[i]);
+        dst[out] = hex_digit(hi);
+        dst[out + 1u64] = hex_digit(lo);
+        out = out + 2u64;
+        i = i + 1u64;
+    };
+    out
+}
+
+fn pack_nibbles(hi: u64, lo: u64) -> u64
+    requires hi < 16u64
+    requires lo < 16u64
+    ensures  result < 256u64
+{
+    hi * 16u64 + lo
+}
+
+fn unpack_hi(x: u64) -> u64
+    ensures result < 16u64
+{
+    (x / 16u64) % 16u64
+}
+
+fn unpack_lo(x: u64) -> u64
+    ensures result < 16u64
+{
+    x % 16u64
+}
+
+fn main() -> u64 { 0u64 }
