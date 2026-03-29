@@ -84,9 +84,19 @@ forge version
 
 ---
 
+## Documentation
+
+Full language reference: **[LANGUAGE.md](LANGUAGE.md)**
+
+Covers: all types, operators, proof system (requires/ensures/invariant/old()/forall/exists/ghost),
+ownership, spans, generics, traits, GPU backend, constant-time crypto, module system,
+standard library (math/mem/str/collections/crypto/prelude), error handling, and manual proof terms.
+
+---
+
 ## Demos
 
-All demos compile clean under `gcc -Wall -Wextra -Werror`.
+500 demos, all verified by Z3 and compiled clean under `gcc -Wall -Wextra -Werror`.
 
 | # | File | What it demonstrates |
 |---|------|----------------------|
@@ -190,6 +200,29 @@ apply-mask, stride copy, all-nonzero, upper bound, clamp/scale array, find-secon
 stable partition, copy-if, interleave sum, all-equal, saturating-add array,
 copy-bounded, elementwise max, zero count, and min-index range.
 
+Demos 298–499 cover: state machines, sliding window protocols, growable vectors,
+producer-consumer queues, retry machines, bounded accumulators, bounded counters,
+parser combinators, UTF-8 validators, parser hardenings, `!(cond) ==> rhs` conditional
+postconditions, byte-range operations, `u8` arithmetic, boolean algebra proofs, range
+checks, exact division, span predicates (count, max, min, sum), verified comparators
+(cmp, max, min, clamp, abs_diff), and verified linear/binary search with quantified
+existence and universally-quantified sortedness postconditions.
+
+| # | File | What it demonstrates |
+|---|------|----------------------|
+| 487 | `487_verified_utf8_ascii.fg` | UTF-8 ASCII validation: `!(cond) ==> rhs` conditional postconditions |
+| 488 | `488_not_implies_pattern.fg` | Regression test for `!(cond) ==> rhs` parser precedence |
+| 489 | `489_byte_range_ops.fg` | Nibble extraction, printability, hex classification |
+| 490 | `490_conditional_postconds.fg` | Three-way select, `max3`, `min3`, `clamp3` |
+| 491 | `491_u8_arithmetic.fg` | Safe u8 add/sub, half, triple-clamped, distance, average |
+| 492 | `492_bool_logic.fg` | Full boolean algebra with exact postconditions |
+| 493 | `493_range_checks.fg` | Saturating increment/decrement, bounded multiply |
+| 494 | `494_exact_division.fg` | Ceiling division, round-up, alignment — exact-value postconditions |
+| 497 | `497_span_predicates.fg` | count_nonzero, span_max, span_min, span_sum, span_all_bounded |
+| 498 | `498_verified_comparators.fg` | cmp_u64, max_u64, min_u64, clamp_u64, abs_diff_u64 |
+| 499 | `499_verified_search.fg` | find_first_ge, contains (exists postcondition), is_sorted (forall) |
+| 500 | `500_milestone.fg` | Algebraic laws: commutativity, clamp, identities, div-mul — 500th demo |
+
 ### Intentional failures (in `demos/bad/`)
 
 These demonstrate what FORGE catches:
@@ -270,7 +303,7 @@ lib/
   codegen/      C99 emitter (codegen_c.ml ~2100 lines) + PTX backend (codegen_ptx.ml)
 bin/
   main.ml       CLI driver + compiler pipeline (~290 lines)
-demos/          296 passing demos (01–297, excluding intentional 02_bad_divide)
+demos/          500 passing demos (01–500, excluding intentional failures)
   bad/          9 intentional failures
   std/          Standard library modules (prelude, option, result, math, iter,
                 collections, crypto)
