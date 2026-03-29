@@ -187,6 +187,56 @@ let env_assign_var env (var_id : ident) (rhs_pred : pred) =
   } in
   { env with proof_ctx = new_ctx }
 
+(* Field-write SSA: model base.field = rhs as a renamed snapshot.
+   Renames PField(base, field) -> PVar "__base__field__pN" in all existing
+   facts, then adds the new fact PField(base, field) == rhs.
+   This preserves semantic consistency: old facts about base.field use
+   the renamed version, while new facts use the current value. *)
+let env_assign_field env (base_pred : pred) (field_name : string) (rhs_pred : pred) =
+  let n = !fresh_counter in
+  incr fresh_counter;
+  (* Build the flat SMT name for this field access, e.g. c__state or r__br__x *)
+  let rec flatten_base = function
+    | PVar id        -> id.name
+    | PField (p, f)  -> flatten_base p ^ "__" ^ f
+    | _              -> "__unknown"
+  in
+  let flat_name = flatten_base base_pred ^ "__" ^ field_name in
+  let old_name  = Printf.sprintf "__%s_p%d" flat_name n in
+  let old_ty    = TPrim (TUint U64) in
+  (* Rename every occurrence of PField(base, field_name) in a pred.
+     We match structurally using pred equality on the base. *)
+  let rec pred_eq a b = match a, b with
+    | PVar ia, PVar ib -> ia.name = ib.name
+    | PField (pa, fa), PField (pb, fb) -> fa = fb && pred_eq pa pb
+    | _ -> false
+  in
+  let target = PField (base_pred, field_name) in
+  let rename_to = PVar { name = old_name; loc = dummy_loc } in
+  let rec rename_pred pred =
+    if pred_eq pred target then rename_to
+    else match pred with
+    | PBinop (op, l, r) -> PBinop (op, rename_pred l, rename_pred r)
+    | PUnop (op, p)     -> PUnop (op, rename_pred p)
+    | PIte (c, t, e)    -> PIte (rename_pred c, rename_pred t, rename_pred e)
+    | PApp (f, args)    -> PApp (f, List.map rename_pred args)
+    | PLex ps           -> PLex (List.map rename_pred ps)
+    | PField (p, f)     -> PField (rename_pred p, f)
+    | PStruct (s, flds) -> PStruct (s, List.map (fun (f, p) -> (f, rename_pred p)) flds)
+    | PIndex (arr, idx) -> PIndex (rename_pred arr, rename_pred idx)
+    | PForall (x, ty, p) -> PForall (x, ty, rename_pred p)
+    | PExists (x, ty, p) -> PExists (x, ty, rename_pred p)
+    | _                 -> pred
+  in
+  let renamed_assumes = List.map rename_pred env.proof_ctx.pc_assumes in
+  let renamed_rhs     = rename_pred rhs_pred in
+  let new_fact        = PBinop (Eq, target, renamed_rhs) in
+  let new_ctx = { env.proof_ctx with
+    pc_vars    = (old_name, old_ty) :: env.proof_ctx.pc_vars;
+    pc_assumes = new_fact :: renamed_assumes;
+  } in
+  { env with proof_ctx = new_ctx }
+
 (* Array-write SSA: model s[i] = v as s_new = store(s_old, i, v).
    Renames current s → __s_pN, then adds:
      s[idx] == rhs              (the write)
@@ -1048,8 +1098,7 @@ and stmt_final_env env stmt =
                   | EDeref inner -> expr_to_pred_simple inner
                   | _            -> expr_to_pred_simple outer
                 in
-                env_add_fact env (PBinop (Eq, PField (base_pred, fld.name),
-                                          expr_to_pred_simple rhs))
+                env_assign_field env base_pred fld.name (expr_to_pred_simple rhs)
             | EIndex ({ expr_desc = EVar arr_id; _ }, idx) ->
                 let idx_pred = expr_to_pred_simple idx in
                 let rhs_pred = expr_to_pred_simple rhs in
@@ -2248,15 +2297,14 @@ and check_stmt env stmt : env =
                  | EVar v -> env_assign_var env v (expr_to_pred_simple rhs)
                  | _      -> env)
             (* Field assignment: c.field = rhs, or deref-then-field = rhs.
-               Record c.field == rhs as a fact so postconditions can use it. *)
+               Uses SSA renaming via env_assign_field so old field values
+               are captured and new facts are consistent. *)
             | EField (outer, fld) ->
                 let base_pred = match outer.expr_desc with
                   | EDeref inner -> expr_to_pred_simple inner
                   | _            -> expr_to_pred_simple outer
                 in
-                let fact = PBinop (Eq, PField (base_pred, fld.name),
-                                   expr_to_pred_simple rhs) in
-                env_add_fact env fact
+                env_assign_field env base_pred fld.name (expr_to_pred_simple rhs)
             | EIndex (arr, idx) ->
                 (* Array element assignment: use SSA-style store model.
                    For a simple EVar base, use env_array_write which renames

@@ -27,7 +27,7 @@ fn counter_init(c: refmut<Counter>, max: u64)
 
 fn counter_inc(c: refmut<Counter>)
     requires (*c).value < (*c).max
-    ensures (*c).value == (*c).value + 1u64
+    ensures (*c).value == old((*c).value) + 1u64
 {
     (*c).value = (*c).value + 1u64;
 }
@@ -54,7 +54,7 @@ fn conn_open(c: refmut<ConnState>)
 fn conn_send(c: refmut<ConnState>)
     requires (*c).state == 1u64
     ensures (*c).state == 1u64
-    ensures (*c).count == (*c).count + 1u64
+    ensures (*c).count == old((*c).count) + 1u64
 {
     (*c).count = (*c).count + 1u64;
 }

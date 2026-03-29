@@ -47,7 +47,7 @@ fn handle_open_write(h: refmut<Handle>)
 fn handle_write(h: refmut<Handle>, nbytes: u64)
     requires (*h).state == 2u64
     ensures  (*h).state == 2u64
-    ensures  (*h).pos   == (*h).pos + nbytes
+    ensures  (*h).pos   == old((*h).pos) + nbytes
 {
     (*h).pos = (*h).pos + nbytes;
 }

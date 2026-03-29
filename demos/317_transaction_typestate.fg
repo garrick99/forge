@@ -38,7 +38,7 @@ fn txn_begin(t: refmut<Txn>)
 fn txn_write(t: refmut<Txn>)
     requires (*t).state == 1u64
     ensures  (*t).state == 1u64
-    ensures  (*t).ops   == (*t).ops + 1u64
+    ensures  (*t).ops   == old((*t).ops) + 1u64
 {
     (*t).ops = (*t).ops + 1u64;
 }
@@ -46,7 +46,7 @@ fn txn_write(t: refmut<Txn>)
 fn txn_commit(t: refmut<Txn>)
     requires (*t).state == 1u64
     ensures  (*t).state == 0u64
-    ensures  (*t).version == (*t).version + 1u64
+    ensures  (*t).version == old((*t).version) + 1u64
 {
     (*t).state   = 0u64;
     (*t).version = (*t).version + 1u64;
