@@ -1,0 +1,89 @@
+// Demo 337: Retry state machine with attempt tracking
+//
+// An operation retry controller: the state tracks the number
+// of attempts and whether the operation ultimately succeeded.
+// Proofs verify that retry counts increment correctly and that
+// the state transitions follow the protocol.
+
+struct Retry {
+    attempts: u64,
+    max_tries: u64,
+    succeeded: u64,  // 0=pending, 1=success, 2=exhausted
+}
+
+fn retry_new(max_tries: u64) -> Retry
+    requires max_tries > 0u64
+    ensures result.attempts  == 0u64
+    ensures result.max_tries == max_tries
+    ensures result.succeeded == 0u64
+{
+    struct Retry { attempts: 0u64, max_tries: max_tries, succeeded: 0u64 }
+}
+
+fn retry_attempt(r: refmut<Retry>)
+    requires (*r).succeeded == 0u64
+    requires (*r).attempts < (*r).max_tries
+    ensures  (*r).attempts  == old((*r).attempts) + 1u64
+    ensures  (*r).succeeded == 0u64
+{
+    (*r).attempts = (*r).attempts + 1u64;
+}
+
+fn retry_succeed(r: refmut<Retry>)
+    requires (*r).succeeded == 0u64
+    ensures  (*r).succeeded == 1u64
+{
+    (*r).succeeded = 1u64;
+}
+
+fn retry_exhaust(r: refmut<Retry>)
+    requires (*r).attempts == (*r).max_tries
+    ensures  (*r).succeeded == 2u64
+{
+    (*r).succeeded = 2u64;
+}
+
+// After one attempt, attempts == 1
+fn one_attempt(max: u64) -> u64
+    requires max > 1u64
+    ensures result == 1u64
+{
+    let r: Retry = retry_new(max);
+    retry_attempt(&mut r);
+    r.attempts
+}
+
+// After two attempts, attempts == 2
+fn two_attempts(max: u64) -> u64
+    requires max > 2u64
+    ensures result == 2u64
+{
+    let r: Retry = retry_new(max);
+    retry_attempt(&mut r);
+    retry_attempt(&mut r);
+    r.attempts
+}
+
+// Attempt then succeed: succeeded == 1
+fn attempt_then_succeed(max: u64) -> u64
+    requires max > 1u64
+    ensures result == 1u64
+{
+    let r: Retry = retry_new(max);
+    retry_attempt(&mut r);
+    retry_succeed(&mut r);
+    r.succeeded
+}
+
+// One attempt with max=1: can exhaust
+fn exhaust_after_one(max: u64) -> u64
+    requires max == 1u64
+    ensures result == 2u64
+{
+    let r: Retry = retry_new(max);
+    retry_attempt(&mut r);
+    retry_exhaust(&mut r);
+    r.succeeded
+}
+
+fn main() -> u64 { 0u64 }
