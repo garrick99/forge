@@ -1,0 +1,69 @@
+// Demo 520: typestate protocol — a verified state machine with transition proofs
+
+// States encoded as u64 constants
+// 0 = Closed, 1 = Opening, 2 = Open, 3 = Closing
+
+fn state_closed()  -> u64  ensures result == 0u64 { 0u64 }
+fn state_opening() -> u64  ensures result == 1u64 { 1u64 }
+fn state_open()    -> u64  ensures result == 2u64 { 2u64 }
+fn state_closing() -> u64  ensures result == 3u64 { 3u64 }
+
+fn can_open(state: u64) -> bool
+    ensures result == true  ==> state == 0u64
+    ensures result == false ==> state != 0u64
+{
+    state == 0u64
+}
+
+fn can_close(state: u64) -> bool
+    ensures result == true  ==> state == 2u64
+    ensures result == false ==> state != 2u64
+{
+    state == 2u64
+}
+
+fn transition_open(state: u64) -> u64
+    requires state == 0u64
+    ensures  result == 1u64
+{
+    1u64
+}
+
+fn transition_opened(state: u64) -> u64
+    requires state == 1u64
+    ensures  result == 2u64
+{
+    2u64
+}
+
+fn transition_close(state: u64) -> u64
+    requires state == 2u64
+    ensures  result == 3u64
+{
+    3u64
+}
+
+fn transition_closed(state: u64) -> u64
+    requires state == 3u64
+    ensures  result == 0u64
+{
+    0u64
+}
+
+fn open_then_close(init: u64) -> u64
+    requires init == 0u64
+    ensures  result == 0u64
+{
+    let s1: u64 = transition_open(init);
+    let s2: u64 = transition_opened(s1);
+    let s3: u64 = transition_close(s2);
+    transition_closed(s3)
+}
+
+fn is_stable(state: u64) -> bool
+    ensures result == true ==> state == 0u64 || state == 2u64
+{
+    state == 0u64 || state == 2u64
+}
+
+fn main() -> u64 { 0u64 }

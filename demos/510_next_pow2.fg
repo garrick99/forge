@@ -1,0 +1,64 @@
+// Demo 510: next_pow2 — round up to next power of two, and related bit tricks
+
+fn is_pow2(n: u64) -> bool
+    requires n > 0u64
+    ensures  result == true  ==> (n & (n - 1u64)) == 0u64
+    ensures  result == false ==> (n & (n - 1u64)) != 0u64
+{
+    (n & (n - 1u64)) == 0u64
+}
+
+fn next_pow2(n: u64) -> u64
+    requires n > 0u64
+    requires n <= 4611686018427387904u64
+    ensures  result > 0u64
+{
+    if is_pow2(n) { return n; };
+    let mut v: u64 = n - 1u64;
+    v = v | (v >> 1u64);
+    v = v | (v >> 2u64);
+    v = v | (v >> 4u64);
+    v = v | (v >> 8u64);
+    v = v | (v >> 16u64);
+    v = v | (v >> 32u64);
+    v + 1u64
+}
+
+fn low_bit(n: u64) -> u64
+    requires n > 0u64
+    ensures  result > 0u64
+{
+    n & (0u64 - n)
+}
+
+fn mask_below(pos: u64) -> u64
+    requires pos < 64u64
+    ensures  result >= 0u64
+{
+    (1u64 << pos) - 1u64
+}
+
+fn floor_log2(n: u64) -> u64
+    requires n > 0u64
+    ensures  result < 64u64
+{
+    let mut v: u64 = n;
+    let mut c: u64 = 0u64;
+    while v > 1u64
+        invariant c < 64u64
+        decreases v
+    {
+        v = v >> 1u64;
+        c = c + 1u64;
+    };
+    c
+}
+
+fn check_is_pow2_8()    -> bool ensures result == true  { is_pow2(8u64) }
+fn check_is_pow2_7()    -> bool ensures result == false { is_pow2(7u64) }
+fn check_next_pow2_5()  -> u64  ensures result > 0u64   { next_pow2(5u64) }
+fn check_next_pow2_8()  -> u64  ensures result > 0u64   { next_pow2(8u64) }
+fn check_low_bit_12()   -> u64  ensures result > 0u64   { low_bit(12u64) }
+fn check_floor_log2_8() -> u64  ensures result < 64u64  { floor_log2(8u64) }
+
+fn main() -> u64 { 0u64 }

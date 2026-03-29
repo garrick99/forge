@@ -1,0 +1,83 @@
+// Demo 505: parity — XOR reduction and bit-level boolean functions
+
+fn xor_reduce(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+    ensures  result >= 0u64
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+    {
+        acc = acc ^ s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn and_reduce(s: span<u64>, n: u64) -> u64
+    requires n > 0u64
+    requires n <= s.len
+    ensures  result >= 0u64
+{
+    let mut acc: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+    {
+        acc = acc & s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn or_reduce(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+    ensures  result >= 0u64
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+    {
+        acc = acc | s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn bit_parity(x: u64) -> u64
+    ensures result == 0u64 || result == 1u64
+{
+    let mut v: u64 = x;
+    v = v ^ (v >> 32u64);
+    v = v ^ (v >> 16u64);
+    v = v ^ (v >> 8u64);
+    v = v ^ (v >> 4u64);
+    v = v ^ (v >> 2u64);
+    v = v ^ (v >> 1u64);
+    v & 1u64
+}
+
+fn set_bit(x: u64, pos: u64) -> u64
+    requires pos < 64u64
+    ensures  result >= x
+{
+    x | (1u64 << pos)
+}
+
+fn clear_bit(x: u64, pos: u64) -> u64
+    requires pos < 64u64
+    ensures  result <= x
+{
+    x & ~(1u64 << pos)
+}
+
+fn test_bit(x: u64, pos: u64) -> bool
+    requires pos < 64u64
+    ensures  result == true || result == false
+{
+    (x >> pos) & 1u64 == 1u64
+}
+
+fn main() -> u64 { 0u64 }

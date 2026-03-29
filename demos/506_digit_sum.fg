@@ -1,0 +1,73 @@
+// Demo 506: digit_sum and decimal decomposition
+//
+// All arithmetic is u64. We bound inputs to avoid overflow.
+
+fn digit_sum(n: u64) -> u64
+    requires n <= 999999999u64
+    ensures  result <= 81u64
+{
+    let mut v: u64 = n;
+    let mut s: u64 = 0u64;
+    while v > 0u64
+        invariant s <= 81u64
+        decreases v
+    {
+        s = s + (v % 10u64);
+        v = v / 10u64;
+    };
+    s
+}
+
+fn count_digits(n: u64) -> u64
+    requires n > 0u64
+    ensures  result >= 1u64
+{
+    let mut v: u64 = n;
+    let mut d: u64 = 0u64;
+    while v > 0u64
+        invariant d <= 20u64
+        invariant v > 0u64 || d >= 1u64
+        decreases v
+    {
+        d = d + 1u64;
+        v = v / 10u64;
+    };
+    d
+}
+
+fn reverse_digits(n: u64) -> u64
+    requires n <= 99999u64
+    ensures  result >= 0u64
+{
+    let mut v: u64 = n;
+    let mut r: u64 = 0u64;
+    while v > 0u64
+        invariant r <= 99999u64
+        decreases v
+    {
+        r = r * 10u64 + (v % 10u64);
+        v = v / 10u64;
+    };
+    r
+}
+
+fn is_single_digit(n: u64) -> bool
+    ensures result == true ==> n <= 9u64
+    ensures result == false ==> n >= 10u64
+{
+    n <= 9u64
+}
+
+fn tens_digit(n: u64) -> u64
+    ensures result <= 9u64
+{
+    (n / 10u64) % 10u64
+}
+
+fn units_digit(n: u64) -> u64
+    ensures result <= 9u64
+{
+    n % 10u64
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,54 @@
+// Demo 519: modular arithmetic — add, sub, mul, pow with modular reduction
+
+fn mod_add(a: u64, b: u64, m: u64) -> u64
+    requires m > 0u64
+    requires a < m
+    requires b < m
+    ensures  result < m
+{
+    let s: u64 = a + b;
+    if s >= m { s - m } else { s }
+}
+
+fn mod_sub(a: u64, b: u64, m: u64) -> u64
+    requires m > 0u64
+    requires a < m
+    requires b < m
+    ensures  result < m
+{
+    if a >= b { a - b } else { m - (b - a) }
+}
+
+fn mod_double(a: u64, m: u64) -> u64
+    requires m > 0u64
+    requires a < m
+    requires 2u64 * m <= 18446744073709551615u64
+    ensures  result < m
+{
+    mod_add(a, a, m)
+}
+
+fn mod_neg(a: u64, m: u64) -> u64
+    requires m > 0u64
+    requires a < m
+    ensures  result < m
+    ensures  a == 0u64 ==> result == 0u64
+{
+    if a == 0u64 { 0u64 } else { m - a }
+}
+
+fn mod_reduce(x: u64, m: u64) -> u64
+    requires m > 0u64
+    ensures  result < m
+    ensures  result == x % m
+{
+    x % m
+}
+
+fn check_mod_add()    -> u64  ensures result < 7u64   { mod_add(3u64, 5u64, 7u64) }
+fn check_mod_sub()    -> u64  ensures result < 7u64   { mod_sub(2u64, 4u64, 7u64) }
+fn check_mod_neg_3()  -> u64  ensures result < 7u64   { mod_neg(3u64, 7u64) }
+fn check_mod_neg_0()  -> u64  ensures result == 0u64  { mod_neg(0u64, 7u64) }
+fn check_mod_reduce() -> u64  ensures result < 7u64   { mod_reduce(10u64, 7u64) }
+
+fn main() -> u64 { 0u64 }

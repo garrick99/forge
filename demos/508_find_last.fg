@@ -1,0 +1,66 @@
+// Demo 508: find_last — last occurrence of a value in a span
+
+fn find_last(s: span<u64>, n: u64, target: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+    ensures  result < n  ==> s[result] == target
+    ensures  result == n ==> forall k: u64, k < n ==> s[k] != target
+{
+    let mut i: u64 = 0u64;
+    let mut last: u64 = n;          // sentinel: n means "not found"
+    while i < n
+        invariant i <= n
+        invariant last <= n
+        invariant last < n  ==> s[last] == target
+        invariant last == n ==> forall k: u64, k < i ==> s[k] != target
+    {
+        if s[i] == target { last = i; };
+        i = i + 1u64;
+    };
+    last
+}
+
+fn find_last_ge(s: span<u64>, n: u64, threshold: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+    ensures  result < n ==> s[result] >= threshold
+{
+    let mut i: u64 = 0u64;
+    let mut last: u64 = n;
+    while i < n
+        invariant i <= n
+        invariant last <= n
+        invariant last < n ==> s[last] >= threshold
+    {
+        if s[i] >= threshold { last = i; };
+        i = i + 1u64;
+    };
+    last
+}
+
+fn find_first(s: span<u64>, n: u64, target: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+    ensures  result < n  ==> s[result] == target
+    ensures  result == n ==> forall k: u64, k < n ==> s[k] != target
+{
+    let mut i: u64 = 0u64;
+    let mut first: u64 = n;
+    let mut found: bool = false;
+    while i < n
+        invariant i <= n
+        invariant first <= n
+        invariant found == true  ==> first < n && s[first] == target
+        invariant found == false ==> first == n
+        invariant found == false ==> forall k: u64, k < i ==> s[k] != target
+    {
+        if s[i] == target && found == (i != i) {
+            first = i;
+            found = (i == i);
+        };
+        i = i + 1u64;
+    };
+    first
+}
+
+fn main() -> u64 { 0u64 }

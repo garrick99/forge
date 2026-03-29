@@ -1,0 +1,70 @@
+// Demo 502: count_ge / count_lt — counting elements relative to a threshold
+
+fn count_ge(s: span<u64>, n: u64, threshold: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut i: u64 = 0u64;
+    let mut cnt: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+    {
+        if s[i] >= threshold { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn count_lt(s: span<u64>, n: u64, threshold: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut i: u64 = 0u64;
+    let mut cnt: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+    {
+        if s[i] < threshold { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn count_eq(s: span<u64>, n: u64, val: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+    ensures  result == 0u64 ==> forall k: u64, k < n ==> s[k] != val
+{
+    let mut i: u64 = 0u64;
+    let mut cnt: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        invariant cnt == 0u64 ==> forall k: u64, k < i ==> s[k] != val
+    {
+        if s[i] == val { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn count_in_range(s: span<u64>, n: u64, lo: u64, hi: u64) -> u64
+    requires n <= s.len
+    requires lo <= hi
+    ensures  result <= n
+{
+    let mut i: u64 = 0u64;
+    let mut cnt: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+    {
+        if s[i] >= lo && s[i] <= hi { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }

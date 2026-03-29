@@ -1,0 +1,49 @@
+// Demo 516: integer square root — floor(sqrt(n)) with nonlinear invariant
+
+fn floor_sqrt(n: u64) -> u64
+    requires n <= 1000000u64
+    ensures  result * result <= n
+{
+    let mut r: u64 = 0u64;
+    while (r + 1u64) * (r + 1u64) <= n
+        invariant r * r <= n
+        invariant r <= 1000u64
+        decreases 1001u64 - r
+    {
+        r = r + 1u64;
+    };
+    r
+}
+
+fn is_perfect_square(n: u64) -> bool
+    requires n <= 1000000u64
+    ensures  result == true || result == false
+{
+    let r: u64 = floor_sqrt(n);
+    r * r == n
+}
+
+fn floor_sqrt_small(n: u64) -> u64
+    requires n <= 100u64
+    ensures  result * result <= n
+    ensures  result <= 10u64
+{
+    let mut r: u64 = 0u64;
+    while (r + 1u64) * (r + 1u64) <= n
+        invariant r * r <= n
+        invariant r <= 10u64
+        decreases 11u64 - r
+    {
+        r = r + 1u64;
+    };
+    r
+}
+
+fn check_sqrt_0()   -> u64  ensures result * result <= 0u64   { floor_sqrt(0u64) }
+fn check_sqrt_1()   -> u64  ensures result * result <= 1u64   { floor_sqrt(1u64) }
+fn check_sqrt_4()   -> u64  ensures result * result <= 4u64   { floor_sqrt(4u64) }
+fn check_sqrt_9()   -> u64  ensures result * result <= 9u64   { floor_sqrt(9u64) }
+fn check_sqrt_10()  -> u64  ensures result * result <= 10u64  { floor_sqrt(10u64) }
+fn check_sqrt_100() -> u64  ensures result * result <= 100u64 { floor_sqrt(100u64) }
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,66 @@
+// Demo 518: sliding window — fixed-size window min/max/sum
+
+fn window_sum(s: span<u64>, n: u64, w: u64, out: span<u64>)
+    requires w > 0u64
+    requires w <= n
+    requires n <= s.len
+    requires n - w + 1u64 <= out.len
+{
+    // Compute first window sum
+    let mut wsum: u64 = 0u64;
+    let mut k: u64 = 0u64;
+    while k < w
+        invariant k <= w
+    {
+        wsum = wsum + s[k];
+        k = k + 1u64;
+    };
+    out[0u64] = wsum;
+
+    // Slide window
+    let mut i: u64 = 1u64;
+    while i + w - 1u64 < n
+        invariant i <= n - w + 1u64
+    {
+        wsum = wsum + s[i + w - 1u64] - s[i - 1u64];
+        out[i] = wsum;
+        i = i + 1u64;
+    };
+}
+
+fn window_max(s: span<u64>, n: u64, w: u64) -> u64
+    requires w > 0u64
+    requires w <= n
+    requires n <= s.len
+    ensures  result >= 0u64
+{
+    let mut m: u64 = s[0u64];
+    let mut i: u64 = 0u64;
+    while i < w
+        invariant i <= w
+    {
+        if s[i] > m { m = s[i]; };
+        i = i + 1u64;
+    };
+    m
+}
+
+fn window_count_ge(s: span<u64>, n: u64, w: u64, start: u64, threshold: u64) -> u64
+    requires w > 0u64
+    requires start + w <= n
+    requires n <= s.len
+    ensures  result <= w
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = start;
+    while i < start + w
+        invariant i <= start + w
+        invariant cnt <= i - start
+    {
+        if s[i] >= threshold { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }

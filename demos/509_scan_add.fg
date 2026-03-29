@@ -1,0 +1,61 @@
+// Demo 509: scan_add — prefix-sum scan (in-place and out-of-place)
+//
+// scan_add([a, b, c, d]) => [a, a+b, a+b+c, a+b+c+d]
+
+fn scan_add(src: span<u64>, dst: span<u64>, n: u64)
+    requires n > 0u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures  dst[0u64] == src[0u64]
+{
+    dst[0u64] = src[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant dst[0u64] == src[0u64]
+    {
+        dst[i] = dst[i - 1u64] + src[i];
+        i = i + 1u64;
+    };
+}
+
+fn scan_max(src: span<u64>, dst: span<u64>, n: u64)
+    requires n > 0u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures  dst[0u64] == src[0u64]
+    ensures  forall k: u64, k < n ==> dst[k] >= src[k]
+{
+    dst[0u64] = src[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> dst[k] >= src[k]
+    {
+        let prev: u64 = dst[i - 1u64];
+        if src[i] > prev {
+            dst[i] = src[i];
+        } else {
+            dst[i] = prev;
+        };
+        i = i + 1u64;
+    };
+}
+
+fn scan_or(src: span<u64>, dst: span<u64>, n: u64)
+    requires n > 0u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures  dst[0u64] >= 0u64
+{
+    dst[0u64] = src[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+    {
+        dst[i] = dst[i - 1u64] | src[i];
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,57 @@
+// Demo 515: bounded counter — a saturating counter with proven bounds
+
+struct Counter {
+    value: u64,
+    max: u64,
+}
+
+fn counter_new(max: u64) -> Counter
+    requires max > 0u64
+    ensures  result.value == 0u64
+    ensures  result.max   == max
+    ensures  result.value <= result.max
+{
+    struct Counter { value: 0u64, max: max }
+}
+
+fn counter_inc(c: refmut<Counter>)
+    requires (*c).value <= (*c).max
+    ensures  (*c).value <= (*c).max
+{
+    if (*c).value < (*c).max {
+        (*c).value = (*c).value + 1u64;
+    };
+}
+
+fn counter_dec(c: refmut<Counter>)
+    requires (*c).value <= (*c).max
+    ensures  (*c).value <= (*c).max
+{
+    if (*c).value > 0u64 {
+        (*c).value = (*c).value - 1u64;
+    };
+}
+
+fn counter_reset(c: refmut<Counter>)
+    ensures (*c).value == 0u64
+{
+    (*c).value = 0u64;
+}
+
+fn counter_at_max(c: ref<Counter>) -> bool
+    requires (*c).value <= (*c).max
+    ensures result == true  ==> (*c).value == (*c).max
+    ensures result == false ==> (*c).value < (*c).max
+{
+    (*c).value == (*c).max
+}
+
+fn counter_value(c: ref<Counter>) -> u64
+    requires (*c).value <= (*c).max
+    ensures  result == (*c).value
+    ensures  result <= (*c).max
+{
+    (*c).value
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,58 @@
+// Demo 507: running statistics — min, max, and sum tracked simultaneously
+
+struct Stats {
+    min: u64,
+    max: u64,
+    sum: u64,
+    count: u64,
+}
+
+fn stats_new(first: u64) -> Stats
+    ensures result.min   == first
+    ensures result.max   == first
+    ensures result.sum   == first
+    ensures result.count == 1u64
+{
+    struct Stats { min: first, max: first, sum: first, count: 1u64 }
+}
+
+fn stats_update(st: refmut<Stats>, v: u64)
+    requires (*st).sum <= 999999999000000000u64
+    ensures  (*st).count == old((*st).count) + 1u64
+{
+    if v < (*st).min { (*st).min = v; };
+    if v > (*st).max { (*st).max = v; };
+    (*st).sum   = (*st).sum + v;
+    (*st).count = (*st).count + 1u64;
+}
+
+fn span_stats(s: span<u64>, n: u64) -> Stats
+    requires n > 0u64
+    requires n <= s.len
+    ensures  result.count == n
+    ensures  result.min <= s[0u64]
+    ensures  result.max >= s[0u64]
+{
+    let mut st: Stats = stats_new(s[0u64]);
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant st.count == i
+        invariant st.min <= s[0u64]
+        invariant st.max >= s[0u64]
+    {
+        if s[i] < st.min { st.min = s[i]; };
+        if s[i] > st.max { st.max = s[i]; };
+        st.count = st.count + 1u64;
+        i = i + 1u64;
+    };
+    st
+}
+
+fn stats_range(st: ref<Stats>) -> u64
+    ensures result == (*st).max - (*st).min || (*st).max < (*st).min
+{
+    if (*st).max >= (*st).min { (*st).max - (*st).min } else { 0u64 }
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,44 @@
+// Demo 501: prefix_min — running minimum with quantified postcondition
+
+fn prefix_min(s: span<u64>, n: u64, out: span<u64>)
+    requires n > 0u64
+    requires n <= s.len
+    requires n <= out.len
+    ensures  forall k: u64, k < n ==> out[k] <= s[k]
+    ensures  forall k: u64, k < n ==> out[k] <= out[0u64]
+{
+    out[0u64] = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> out[k] <= s[k]
+        invariant forall k: u64, k < i ==> out[k] <= out[0u64]
+    {
+        let prev: u64 = out[i - 1u64];
+        if s[i] < prev {
+            out[i] = s[i];
+        } else {
+            out[i] = prev;
+        };
+        i = i + 1u64;
+    };
+}
+
+fn prefix_min_val(s: span<u64>, n: u64) -> u64
+    requires n > 0u64
+    requires n <= s.len
+    ensures  forall k: u64, k < n ==> result <= s[k]
+{
+    let mut m: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> m <= s[k]
+    {
+        if s[i] < m { m = s[i]; };
+        i = i + 1u64;
+    };
+    m
+}
+
+fn main() -> u64 { 0u64 }

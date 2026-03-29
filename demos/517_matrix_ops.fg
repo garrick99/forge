@@ -1,0 +1,66 @@
+// Demo 517: 1D-layout matrix operations on spans
+//
+// Row-major: element (r, c) at index r * cols + c.
+// Caller computes the index; bounds are stated directly.
+
+fn mat_get(m: span<u64>, idx: u64) -> u64
+    requires idx < m.len
+    ensures  result >= 0u64
+{
+    m[idx]
+}
+
+fn mat_set(m: span<u64>, idx: u64, v: u64)
+    requires idx < m.len
+{
+    m[idx] = v;
+}
+
+fn mat_zero_n(m: span<u64>, n: u64)
+    requires n <= m.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+    {
+        m[i] = 0u64;
+        i = i + 1u64;
+    };
+}
+
+fn mat_row_sum(m: span<u64>, row_start: u64, cols: u64) -> u64
+    requires row_start + cols <= m.len
+    ensures  result >= 0u64
+{
+    let mut acc: u64 = 0u64;
+    let mut c: u64 = 0u64;
+    while c < cols
+        invariant c <= cols
+        invariant row_start + c <= m.len
+    {
+        acc = acc + m[row_start + c];
+        c = c + 1u64;
+    };
+    acc
+}
+
+fn mat_col_max(m: span<u64>, col: u64, cols: u64, rows: u64) -> u64
+    requires rows > 0u64
+    requires col < cols
+    requires rows * cols <= m.len
+    requires col + (rows - 1u64) * cols < m.len
+    ensures  result >= 0u64
+{
+    let mut mx: u64 = m[col];
+    let mut r: u64 = 1u64;
+    while r < rows
+        invariant r <= rows
+    {
+        let v: u64 = m[col + r * cols];
+        if v > mx { mx = v; };
+        r = r + 1u64;
+    };
+    mx
+}
+
+fn main() -> u64 { 0u64 }

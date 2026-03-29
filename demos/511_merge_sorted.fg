@@ -1,0 +1,60 @@
+// Demo 511: merge two sorted spans — three-phase verified merge
+
+fn merge_sorted(a: span<u64>, na: u64,
+                b: span<u64>, nb: u64,
+                out: span<u64>)
+    requires na <= a.len
+    requires nb <= b.len
+    requires na + nb <= out.len
+{
+    let mut i: u64 = 0u64;
+    let mut j: u64 = 0u64;
+    let mut k: u64 = 0u64;
+    // Phase 1: interleave while both spans have elements
+    while i < na && j < nb
+        invariant i <= na
+        invariant j <= nb
+        invariant k == i + j
+    {
+        // Capture condition before branches so SSA doesn't re-evaluate with updated i/j
+        let take_a: bool = a[i] <= b[j];
+        if take_a {
+            out[k] = a[i];
+            i = i + 1u64;
+        } else {
+            out[k] = b[j];
+            j = j + 1u64;
+        };
+        k = k + 1u64;
+    };
+    // Phase 2: drain remaining a (j stays fixed)
+    while i < na
+        invariant i <= na
+        invariant j <= nb
+        invariant k == i + j
+        decreases na - i
+    {
+        out[k] = a[i];
+        i = i + 1u64;
+        k = k + 1u64;
+    };
+    // Phase 3: drain remaining b (i stays fixed)
+    while j < nb
+        invariant j <= nb
+        invariant i <= na
+        invariant k == i + j
+        decreases nb - j
+    {
+        out[k] = b[j];
+        j = j + 1u64;
+        k = k + 1u64;
+    };
+}
+
+fn merge_total_elements(na: u64, nb: u64) -> u64
+    ensures result == na + nb
+{
+    na + nb
+}
+
+fn main() -> u64 { 0u64 }

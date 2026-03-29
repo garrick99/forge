@@ -1,0 +1,51 @@
+// Demo 504: rotate_left_one — rotate a span left by one position
+//
+// rotate_left_one([a, b, c, d], 4) => [b, c, d, a]
+//
+// Two-step: save head, shift left, restore at tail.
+
+fn rotate_left_one(s: span<u64>, n: u64)
+    requires n > 0u64
+    requires n <= s.len
+{
+    let head: u64 = s[0u64];
+    let mut i: u64 = 0u64;
+    while i + 1u64 < n
+        invariant i + 1u64 <= n
+    {
+        s[i] = s[i + 1u64];
+        i = i + 1u64;
+    };
+    s[n - 1u64] = head;
+}
+
+fn rotate_right_one(s: span<u64>, n: u64)
+    requires n > 0u64
+    requires n <= s.len
+{
+    let tail: u64 = s[n - 1u64];
+    let mut i: u64 = n - 1u64;
+    while i > 0u64
+        invariant i <= n
+        decreases i
+    {
+        s[i] = s[i - 1u64];
+        i = i - 1u64;
+    };
+    s[0u64] = tail;
+}
+
+fn rotate_left_k(s: span<u64>, n: u64, k: u64)
+    requires n <= s.len
+    requires k <= n
+{
+    let mut j: u64 = 0u64;
+    while j < k
+        invariant j <= k
+    {
+        rotate_left_one(s, n);
+        j = j + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

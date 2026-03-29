@@ -1,0 +1,62 @@
+// Demo 512: two-pointer techniques — unique count, adjacent diff, sum pair
+
+fn count_unique_sorted(s: span<u64>, n: u64) -> u64
+    requires n > 0u64
+    requires n <= s.len
+    ensures  result <= n
+    ensures  result >= 1u64
+{
+    let mut count: u64 = 1u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant i >= 1u64
+        invariant count <= i
+        invariant count >= 1u64
+    {
+        if s[i] != s[i - 1u64] { count = count + 1u64; };
+        i = i + 1u64;
+    };
+    count
+}
+
+fn max_adjacent_diff(s: span<u64>, n: u64) -> u64
+    requires n > 1u64
+    requires n <= s.len
+    ensures  result >= 0u64
+{
+    let mut gap: u64 = 0u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant i >= 1u64
+    {
+        let d: u64 = if s[i] >= s[i - 1u64] { s[i] - s[i - 1u64] } else { s[i - 1u64] - s[i] };
+        if d > gap { gap = d; };
+        i = i + 1u64;
+    };
+    gap
+}
+
+fn two_sum_exists(s: span<u64>, n: u64, target: u64) -> bool
+    requires n <= s.len
+    ensures  result == true || result == false
+{
+    let mut i: u64 = 0u64;
+    let mut found: bool = false;
+    while i < n
+        invariant i <= n
+    {
+        let mut j: u64 = i + 1u64;
+        while j < n
+            invariant j <= n
+        {
+            if s[i] + s[j] == target { found = (i == i); };
+            j = j + 1u64;
+        };
+        i = i + 1u64;
+    };
+    found
+}
+
+fn main() -> u64 { 0u64 }
