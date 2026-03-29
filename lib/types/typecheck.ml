@@ -690,6 +690,48 @@ let rec subst_pred (subst : (string * pred) list) pred =
   | PIndex (arr, idx) -> PIndex (subst_pred subst arr, subst_pred subst idx)
   | _                 -> pred
 
+(* Resolve old(e) expressions in a callee postcondition being injected
+   into the caller context. For each old(field_access), look up the
+   current known value of that field in the caller's assumption list
+   and substitute it. This enables count == old(count) + 1 to become
+   count == 0 + 1 (when count was 0 at the call site).
+
+   Operates on the substituted postcondition (after arg_subst). *)
+let resolve_old_for_injection env pred =
+  (* Structural equality on pred (for matching field targets) *)
+  let rec pred_eq a b = match a, b with
+    | PVar ia, PVar ib -> ia.name = ib.name
+    | PField (pa, fa), PField (pb, fb) -> fa = fb && pred_eq pa pb
+    | PResult, PResult -> true
+    | _ -> false
+  in
+  (* Look up the most recent equality fact for a pred expression *)
+  let lookup_value target =
+    List.find_map (fun p ->
+      match p with
+      | PBinop (Eq, lhs, rhs) when pred_eq lhs target -> Some rhs
+      | PBinop (Eq, lhs, rhs) when pred_eq rhs target -> Some lhs
+      | _ -> None
+    ) env.proof_ctx.pc_assumes
+  in
+  let rec go p = match p with
+    | POld inner ->
+        (match lookup_value inner with
+         | Some v -> v
+         | None   -> p)
+    | PBinop (op, l, r) -> PBinop (op, go l, go r)
+    | PUnop (op, q)     -> PUnop (op, go q)
+    | PIte (c, t, e)    -> PIte (go c, go t, go e)
+    | PApp (f, args)    -> PApp (f, List.map go args)
+    | PLex ps           -> PLex (List.map go ps)
+    | PField (q, f)     -> PField (go q, f)
+    | PIndex (q, i)     -> PIndex (go q, go i)
+    | PForall (x, t, q) -> PForall (x, t, go q)
+    | PExists (x, t, q) -> PExists (x, t, go q)
+    | _                 -> p
+  in
+  go pred
+
 (* ------------------------------------------------------------------ *)
 (* Post-expression environment — for postcondition checking            *)
 (*                                                                      *)
@@ -1158,16 +1200,20 @@ and stmt_final_env env stmt =
            in
            env2
        | ECall ({ expr_desc = EVar fn_id; _ }, call_args) ->
-           (* Void function call as a statement: inject callee postconditions. *)
+           (* Void function call as a statement: inject callee postconditions.
+              resolve_old_for_injection substitutes old(x.f) with the current
+              value of x.f from the proof context, so postconditions like
+              "ensures b.count == old(b.count) + 1" chain correctly. *)
            (match env_lookup_fn env fn_id.name with
             | Some sig_ when sig_.fs_ensures <> [] &&
                 List.length sig_.fs_params = List.length call_args ->
                 let arg_subst = List.map2 (fun (pid, _) arg ->
                   (pid.name, expr_to_pred_simple arg)
                 ) sig_.fs_params call_args in
-                let result_subst = ("result", PBool true) :: arg_subst in
                 List.fold_left (fun e ens ->
-                  env_add_fact e (subst_pred result_subst ens)
+                  let subst_ens = subst_pred arg_subst ens in
+                  let resolved  = resolve_old_for_injection e subst_ens in
+                  env_add_fact e resolved
                 ) env sig_.fs_ensures
             | _ -> env)
        | _ -> expr_final_env env e)
@@ -2391,7 +2437,9 @@ and check_stmt env stmt : env =
                   (pid.name, expr_to_pred_simple arg)
                 ) sig_.fs_params call_args in
                 List.fold_left (fun e ens ->
-                  env_add_fact e (subst_pred arg_subst ens)
+                  let subst_ens  = subst_pred arg_subst ens in
+                  let resolved   = resolve_old_for_injection e subst_ens in
+                  env_add_fact e resolved
                 ) env sig_.fs_ensures
             | _ -> env)
        | _ ->

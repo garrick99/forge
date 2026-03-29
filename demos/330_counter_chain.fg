@@ -1,0 +1,103 @@
+// Demo 330: Counter chaining — old() injection across call boundaries
+//
+// Demonstrates that ensures x == old(x) + k postconditions from void
+// calls chain correctly through multiple sequential calls.
+// The proof engine resolves old() at each call site using the current
+// value of the field from the caller's proof context.
+
+struct Counter {
+    value: u64,
+    limit: u64,
+}
+
+fn ctr_new(limit: u64) -> Counter
+    requires limit > 0u64
+    ensures result.value == 0u64
+    ensures result.limit == limit
+{
+    struct Counter { value: 0u64, limit: limit }
+}
+
+fn ctr_inc(c: refmut<Counter>)
+    requires (*c).value < (*c).limit
+    ensures  (*c).value == old((*c).value) + 1u64
+{
+    (*c).value = (*c).value + 1u64;
+}
+
+fn ctr_add(c: refmut<Counter>, n: u64)
+    requires (*c).value + n <= (*c).limit
+    ensures  (*c).value == old((*c).value) + n
+{
+    (*c).value = (*c).value + n;
+}
+
+fn ctr_reset(c: refmut<Counter>)
+    ensures (*c).value == 0u64
+{
+    (*c).value = 0u64;
+}
+
+// After new: value is 0
+fn starts_zero(limit: u64) -> u64
+    requires limit > 0u64
+    ensures result == 0u64
+{
+    let c: Counter = ctr_new(limit);
+    c.value
+}
+
+// One increment: value becomes 1
+fn inc_once(limit: u64) -> u64
+    requires limit > 1u64
+    ensures result == 1u64
+{
+    let c: Counter = ctr_new(limit);
+    ctr_inc(&mut c);
+    c.value
+}
+
+// Two increments: value becomes 2
+fn inc_twice(limit: u64) -> u64
+    requires limit > 2u64
+    ensures result == 2u64
+{
+    let c: Counter = ctr_new(limit);
+    ctr_inc(&mut c);
+    ctr_inc(&mut c);
+    c.value
+}
+
+// Add 5: value becomes 5
+fn add_five(limit: u64) -> u64
+    requires limit > 5u64
+    ensures result == 5u64
+{
+    let c: Counter = ctr_new(limit);
+    ctr_add(&mut c, 5u64);
+    c.value
+}
+
+// Increment then reset: value is 0
+fn inc_reset(limit: u64) -> u64
+    requires limit > 1u64
+    ensures result == 0u64
+{
+    let c: Counter = ctr_new(limit);
+    ctr_inc(&mut c);
+    ctr_reset(&mut c);
+    c.value
+}
+
+// Add 3 then increment: value is 4
+fn add3_inc(limit: u64) -> u64
+    requires limit > 4u64
+    ensures result == 4u64
+{
+    let c: Counter = ctr_new(limit);
+    ctr_add(&mut c, 3u64);
+    ctr_inc(&mut c);
+    c.value
+}
+
+fn main() -> u64 { 0u64 }

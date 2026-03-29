@@ -1,0 +1,109 @@
+// Demo 329: Stack typestate — size tracking with old() across calls
+//
+// A bounded stack with verified size invariants:
+//   - push() requires not-full (size < cap)
+//   - pop() requires not-empty (size > 0)
+//   - Each push increments size by 1, each pop decrements by 1
+//   - Sequences of pushes/pops are fully verified
+
+struct Stack {
+    size: u64,
+    cap:  u64,
+}
+
+fn stack_new(cap: u64) -> Stack
+    requires cap > 0u64
+    ensures result.size == 0u64
+    ensures result.cap  == cap
+{
+    struct Stack { size: 0u64, cap: cap }
+}
+
+fn stack_push(s: refmut<Stack>)
+    requires (*s).size < (*s).cap
+    ensures  (*s).size == old((*s).size) + 1u64
+{
+    (*s).size = (*s).size + 1u64;
+}
+
+fn stack_pop(s: refmut<Stack>)
+    requires (*s).size > 0u64
+    ensures  (*s).size == old((*s).size) - 1u64
+{
+    (*s).size = (*s).size - 1u64;
+}
+
+fn stack_clear(s: refmut<Stack>)
+    ensures (*s).size == 0u64
+{
+    (*s).size = 0u64;
+}
+
+// After new, size is 0
+fn new_is_empty(cap: u64) -> u64
+    requires cap > 0u64
+    ensures result == 0u64
+{
+    let s: Stack = stack_new(cap);
+    s.size
+}
+
+// One push: size becomes 1
+fn push_once(cap: u64) -> u64
+    requires cap > 1u64
+    ensures result == 1u64
+{
+    let s: Stack = stack_new(cap);
+    stack_push(&mut s);
+    s.size
+}
+
+// Three pushes: size becomes 3
+fn push_three(cap: u64) -> u64
+    requires cap > 3u64
+    ensures result == 3u64
+{
+    let s: Stack = stack_new(cap);
+    stack_push(&mut s);
+    stack_push(&mut s);
+    stack_push(&mut s);
+    s.size
+}
+
+// Push then pop: size returns to 0
+fn push_pop(cap: u64) -> u64
+    requires cap > 1u64
+    ensures result == 0u64
+{
+    let s: Stack = stack_new(cap);
+    stack_push(&mut s);
+    stack_pop(&mut s);
+    s.size
+}
+
+// Push two, pop one: size is 1
+fn push2_pop1(cap: u64) -> u64
+    requires cap > 2u64
+    ensures result == 1u64
+{
+    let s: Stack = stack_new(cap);
+    stack_push(&mut s);
+    stack_push(&mut s);
+    stack_pop(&mut s);
+    s.size
+}
+
+// Push three, clear: size is 0
+fn push3_clear(cap: u64) -> u64
+    requires cap > 3u64
+    ensures result == 0u64
+{
+    let s: Stack = stack_new(cap);
+    stack_push(&mut s);
+    stack_push(&mut s);
+    stack_push(&mut s);
+    stack_clear(&mut s);
+    s.size
+}
+
+fn main() -> u64 { 0u64 }
