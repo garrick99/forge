@@ -1,0 +1,49 @@
+// Demo 592: array rotation by k positions (in-place via reversal)
+
+fn reverse_range(s: span<u64>, lo: u64, hi: u64)
+    requires lo <= hi
+    requires hi <= s.len
+{
+    let mut l: u64 = lo;
+    let mut r: u64 = hi;
+    while l < r
+        invariant lo <= l
+        invariant r <= hi
+        decreases r - l
+    {
+        let tmp: u64 = s[l];
+        s[l] = s[r - 1u64];
+        s[r - 1u64] = tmp;
+        l = l + 1u64;
+        r = r - 1u64;
+    };
+}
+
+fn rotate_left(s: span<u64>, n: u64, k: u64)
+    requires n <= s.len
+    requires k <= n
+{
+    if k == 0u64 || k == n {
+        // no-op
+        let _x: u64 = 0u64;
+    } else {
+        reverse_range(s, 0u64, k);
+        reverse_range(s, k, n);
+        reverse_range(s, 0u64, n);
+    };
+}
+
+fn rotate_right(s: span<u64>, n: u64, k: u64)
+    requires n <= s.len
+    requires k <= n
+{
+    if k == 0u64 || k == n {
+        let _x: u64 = 0u64;
+    } else {
+        reverse_range(s, 0u64, n - k);
+        reverse_range(s, n - k, n);
+        reverse_range(s, 0u64, n);
+    };
+}
+
+fn main() -> u64 { 0u64 }

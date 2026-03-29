@@ -1,0 +1,49 @@
+// Demo 593: median of three and quickselect pivot selection
+
+fn min2(a: u64, b: u64) -> u64
+    ensures result <= a
+    ensures result <= b
+{
+    if a <= b { a } else { b }
+}
+
+fn max2(a: u64, b: u64) -> u64
+    ensures result >= a
+    ensures result >= b
+{
+    if a >= b { a } else { b }
+}
+
+fn median3(a: u64, b: u64, c: u64) -> u64
+{
+    if (a <= b && b <= c) || (c <= b && b <= a) {
+        b
+    } else if (b <= a && a <= c) || (c <= a && a <= b) {
+        a
+    } else {
+        c
+    }
+}
+
+fn clamp(x: u64, lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures  result >= lo
+    ensures  result <= hi
+{
+    if x < lo { lo } else if x > hi { hi } else { x }
+}
+
+fn sort3(a: u64, b: u64, c: u64, out: span<u64>)
+    requires out.len >= 3u64
+    ensures  out[0u64] <= out[1u64]
+    ensures  out[1u64] <= out[2u64]
+{
+    let lo: u64 = min2(a, min2(b, c));
+    let hi: u64 = max2(a, max2(b, c));
+    let mid: u64 = median3(a, b, c);
+    out[0u64] = lo;
+    out[1u64] = mid;
+    out[2u64] = hi;
+}
+
+fn main() -> u64 { 0u64 }

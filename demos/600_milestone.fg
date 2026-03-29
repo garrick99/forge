@@ -1,0 +1,103 @@
+// Demo 600: milestone — diverse verified utilities
+
+fn abs_diff(a: u64, b: u64) -> u64 {
+    if a >= b { a - b } else { b - a }
+}
+
+fn gcd(a: u64, b: u64) -> u64
+    requires a > 0u64
+    requires b > 0u64
+    ensures  result >= 1u64
+{
+    let mut x: u64 = a;
+    let mut y: u64 = b;
+    while y > 0u64
+        invariant x >= 1u64
+        invariant y >= 0u64
+        decreases y
+    {
+        let t: u64 = y;
+        y = x % y;
+        x = t;
+    };
+    x
+}
+
+fn lcm(a: u64, b: u64) -> u64
+    requires a > 0u64
+    requires b > 0u64
+{
+    let g: u64 = gcd(a, b);
+    (a / g) * b
+}
+
+fn sum_range(lo: u64, hi: u64) -> u64
+    requires lo <= hi
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = lo;
+    while i <= hi
+        invariant i >= lo
+        invariant i <= hi + 1u64
+        decreases hi + 1u64 - i
+    {
+        acc = acc + i;
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn product_range(lo: u64, hi: u64) -> u64
+    requires lo >= 1u64
+    requires lo <= hi
+    requires hi <= 20u64
+{
+    let mut acc: u64 = 1u64;
+    let mut i: u64 = lo;
+    while i <= hi
+        invariant i >= lo
+        invariant i <= hi + 1u64
+        invariant acc >= 1u64
+        decreases hi + 1u64 - i
+    {
+        acc = acc * i;
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn count_divisors(n: u64) -> u64
+    requires n >= 1u64
+    ensures  result >= 1u64
+{
+    // 1 always divides n — peel first iteration
+    let mut cnt: u64 = 1u64;
+    let mut i: u64 = 2u64;
+    while i <= n
+        invariant i >= 2u64
+        invariant i <= n + 1u64
+        invariant cnt >= 1u64
+        decreases n + 1u64 - i
+    {
+        if n % i == 0u64 { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn is_prime(n: u64) -> bool
+    requires n >= 2u64
+{
+    let mut i: u64 = 2u64;
+    let mut prime: bool = true;
+    while i * i <= n && prime
+        invariant i >= 2u64
+        decreases n - i
+    {
+        if n % i == 0u64 { prime = false; };
+        i = i + 1u64;
+    };
+    prime
+}
+
+fn main() -> u64 { 0u64 }

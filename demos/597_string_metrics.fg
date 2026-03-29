@@ -1,0 +1,86 @@
+// Demo 597: string/array metrics — prefix length, matching count
+
+fn prefix_len(a: span<u64>, b: span<u64>, n: u64) -> u64
+    requires n <= a.len
+    requires n <= b.len
+    ensures  result <= n
+{
+    let mut i: u64 = 0u64;
+    let mut found: bool = false;
+    while i < n && !found
+        invariant i <= n
+        decreases n - i
+    {
+        if a[i] != b[i] {
+            found = true;
+        } else {
+            i = i + 1u64;
+        };
+    };
+    i
+}
+
+fn arrays_equal(a: span<u64>, b: span<u64>, n: u64) -> bool
+    requires n <= a.len
+    requires n <= b.len
+{
+    let p: u64 = prefix_len(a, b, n);
+    p == n
+}
+
+fn count_matching(a: span<u64>, b: span<u64>, n: u64) -> u64
+    requires n <= a.len
+    requires n <= b.len
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if a[i] == b[i] { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn count_diff(a: span<u64>, b: span<u64>, n: u64) -> u64
+    requires n <= a.len
+    requires n <= b.len
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if a[i] != b[i] { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn lexicmp(a: span<u64>, b: span<u64>, n: u64) -> u64
+    requires n <= a.len
+    requires n <= b.len
+{
+    // returns 0 if equal, 1 if a < b, 2 if a > b
+    let mut i: u64 = 0u64;
+    let mut res: u64 = 0u64;
+    let mut done: bool = false;
+    while i < n && !done
+        invariant i <= n
+        decreases n - i
+    {
+        if a[i] < b[i] { res = 1u64; done = true; }
+        else if a[i] > b[i] { res = 2u64; done = true; }
+        else { i = i + 1u64; };
+    };
+    res
+}
+
+fn main() -> u64 { 0u64 }

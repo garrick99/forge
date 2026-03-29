@@ -1,0 +1,43 @@
+// Demo 598: integer ceil-division and rounding utilities
+
+fn ceil_div(a: u64, b: u64) -> u64
+    requires b > 0u64
+{
+    (a + b - 1u64) / b
+}
+
+fn round_up(a: u64, align: u64) -> u64
+    requires align > 0u64
+    ensures  result >= a
+{
+    ((a + align - 1u64) / align) * align
+}
+
+fn round_down(a: u64, align: u64) -> u64
+    requires align > 0u64
+    ensures  result <= a
+{
+    (a / align) * align
+}
+
+fn is_aligned(a: u64, align: u64) -> bool
+    requires align > 0u64
+{
+    a % align == 0u64
+}
+
+fn align_offset(base: u64, size: u64, align: u64) -> u64
+    requires align > 0u64
+    requires size <= 18446744073709551615u64 - base
+    ensures  result >= base
+{
+    round_up(base, align)
+}
+
+fn blocks_needed(total: u64, block_size: u64) -> u64
+    requires block_size > 0u64
+{
+    ceil_div(total, block_size)
+}
+
+fn main() -> u64 { 0u64 }

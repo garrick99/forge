@@ -1,0 +1,59 @@
+// Demo 594: array-backed stack operations
+
+fn stack_push(s: span<u64>, top: u64, val: u64) -> u64
+    requires top < s.len
+    ensures  result == top + 1u64
+{
+    s[top] = val;
+    top + 1u64
+}
+
+fn stack_pop(s: span<u64>, top: u64) -> u64
+    requires top >= 1u64
+    requires top <= s.len
+    ensures  result == top - 1u64
+{
+    top - 1u64
+}
+
+fn stack_peek(s: span<u64>, top: u64) -> u64
+    requires top >= 1u64
+    requires top <= s.len
+{
+    s[top - 1u64]
+}
+
+fn stack_fill(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+    ensures  result == n
+{
+    let mut top: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant top == i
+        decreases n - i
+    {
+        s[top] = i;
+        top = top + 1u64;
+        i = i + 1u64;
+    };
+    top
+}
+
+fn stack_sum(s: span<u64>, top: u64) -> u64
+    requires top <= s.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < top
+        invariant i <= top
+        decreases top - i
+    {
+        acc = acc + s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

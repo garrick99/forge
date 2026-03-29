@@ -1,0 +1,59 @@
+// Demo 595: bit counting operations (popcount, leading/trailing zeros approx)
+
+fn popcount(x: u64) -> u64
+    ensures result <= 64u64
+{
+    let mut n: u64 = x;
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < 64u64
+        invariant i <= 64u64
+        invariant cnt <= i
+        decreases 64u64 - i
+    {
+        cnt = cnt + n % 2u64;
+        n = n / 2u64;
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn count_trailing_zeros(x: u64) -> u64
+    requires x > 0u64
+    ensures  result <= 63u64
+{
+    let mut n: u64 = x;
+    let mut cnt: u64 = 0u64;
+    while n % 2u64 == 0u64
+        invariant cnt <= 63u64
+        invariant n > 0u64
+        decreases n
+    {
+        n = n / 2u64;
+        cnt = cnt + 1u64;
+    };
+    cnt
+}
+
+fn is_power_of_two(x: u64) -> bool
+    requires x > 0u64
+{
+    (x & (x - 1u64)) == 0u64
+}
+
+fn next_power_of_two(x: u64) -> u64
+    requires x >= 1u64
+    requires x <= 4611686018427387904u64
+    ensures  result >= x
+{
+    let mut p: u64 = 1u64;
+    while p < x
+        invariant p >= 1u64
+        decreases x - p
+    {
+        p = p * 2u64;
+    };
+    p
+}
+
+fn main() -> u64 { 0u64 }
