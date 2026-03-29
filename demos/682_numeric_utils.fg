@@ -1,0 +1,59 @@
+// Demo 682: numeric utilities — clamping, rounding, alignment
+
+fn clamp(x: u64, lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures  result >= lo
+    ensures  result <= hi
+{
+    if x < lo { lo } else if x > hi { hi } else { x }
+}
+
+fn round_to_multiple(x: u64, m: u64) -> u64
+    requires m >= 1u64
+{
+    (x / m) * m
+}
+
+fn round_up_to_multiple(x: u64, m: u64) -> u64
+    requires m >= 1u64
+    ensures  result >= x
+{
+    if x % m == 0u64 { x } else { (x / m + 1u64) * m }
+}
+
+fn align_down(addr: u64, align: u64) -> u64
+    requires align >= 1u64
+    ensures  result <= addr
+{
+    (addr / align) * align
+}
+
+fn align_up(addr: u64, align: u64) -> u64
+    requires align >= 1u64
+    ensures  result >= addr
+{
+    if addr % align == 0u64 { addr }
+    else { (addr / align + 1u64) * align }
+}
+
+fn min3(a: u64, b: u64, c: u64) -> u64
+    ensures result <= a
+    ensures result <= b
+    ensures result <= c
+{
+    if a <= b && a <= c { a }
+    else if b <= c { b }
+    else { c }
+}
+
+fn max3(a: u64, b: u64, c: u64) -> u64
+    ensures result >= a
+    ensures result >= b
+    ensures result >= c
+{
+    if a >= b && a >= c { a }
+    else if b >= c { b }
+    else { c }
+}
+
+fn main() -> u64 { 0u64 }

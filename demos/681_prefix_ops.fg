@@ -1,0 +1,80 @@
+// Demo 681: prefix operations — prefix sum, max, product (mod)
+
+fn prefix_sum(src: span<u64>, dst: span<u64>, n: u64)
+    requires n <= src.len
+    requires n <= dst.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + src[i];
+        dst[i] = acc;
+        i = i + 1u64;
+    };
+}
+
+fn prefix_max(src: span<u64>, dst: span<u64>, n: u64)
+    requires n >= 1u64
+    requires n <= src.len
+    requires n <= dst.len
+{
+    dst[0u64] = src[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if src[i] > dst[i - 1u64] { dst[i] = src[i]; }
+        else { dst[i] = dst[i - 1u64]; };
+        i = i + 1u64;
+    };
+}
+
+fn prefix_min(src: span<u64>, dst: span<u64>, n: u64)
+    requires n >= 1u64
+    requires n <= src.len
+    requires n <= dst.len
+{
+    dst[0u64] = src[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if src[i] < dst[i - 1u64] { dst[i] = src[i]; }
+        else { dst[i] = dst[i - 1u64]; };
+        i = i + 1u64;
+    };
+}
+
+fn prefix_sum_mod(src: span<u64>, dst: span<u64>, n: u64, m: u64)
+    requires m >= 2u64
+    requires n <= src.len
+    requires n <= dst.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant acc < m
+        decreases n - i
+    {
+        acc = (acc + src[i] % m) % m;
+        dst[i] = acc;
+        i = i + 1u64;
+    };
+}
+
+fn range_sum(dst: span<u64>, n: u64, lo: u64, hi: u64) -> u64
+    requires hi < n
+    requires lo <= hi
+    requires n <= dst.len
+{
+    if lo == 0u64 { dst[hi] }
+    else { dst[hi] - dst[lo - 1u64] }
+}
+
+fn main() -> u64 { 0u64 }

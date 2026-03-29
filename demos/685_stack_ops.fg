@@ -1,0 +1,71 @@
+// Demo 685: stack operations — push, pop, peek, depth
+
+fn stack_push(s: span<u64>, top: u64, val: u64) -> u64
+    requires top < s.len
+    ensures  result == top + 1u64
+{
+    s[top] = val;
+    top + 1u64
+}
+
+fn stack_pop(s: span<u64>, top: u64) -> u64
+    requires top >= 1u64
+    requires top <= s.len
+    ensures  result == top - 1u64
+{
+    top - 1u64
+}
+
+fn stack_peek(s: span<u64>, top: u64) -> u64
+    requires top >= 1u64
+    requires top <= s.len
+{
+    s[top - 1u64]
+}
+
+fn stack_is_empty(top: u64) -> bool
+    ensures result == (top == 0u64)
+{
+    top == 0u64
+}
+
+fn stack_depth(top: u64) -> u64
+    ensures result == top
+{
+    top
+}
+
+fn stack_dup(s: span<u64>, top: u64) -> u64
+    requires top >= 1u64
+    requires top < s.len
+    ensures  result == top + 1u64
+{
+    s[top] = s[top - 1u64];
+    top + 1u64
+}
+
+fn stack_swap(s: span<u64>, top: u64)
+    requires top >= 2u64
+    requires top <= s.len
+{
+    let tmp: u64 = s[top - 1u64];
+    s[top - 1u64] = s[top - 2u64];
+    s[top - 2u64] = tmp;
+}
+
+fn stack_sum(s: span<u64>, top: u64) -> u64
+    requires top <= s.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < top
+        invariant i <= top
+        decreases top - i
+    {
+        acc = acc + s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

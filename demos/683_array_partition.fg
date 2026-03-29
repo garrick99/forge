@@ -1,0 +1,95 @@
+// Demo 683: array partitioning — stable and unstable partitions
+
+fn partition_lt(s: span<u64>, n: u64, pivot: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut lo: u64 = 0u64;
+    let mut hi: u64 = n;
+    while lo < hi
+        invariant lo <= hi
+        invariant hi <= n
+        decreases hi - lo
+    {
+        if s[lo] < pivot { lo = lo + 1u64; }
+        else {
+            hi = hi - 1u64;
+            let tmp: u64 = s[lo];
+            s[lo] = s[hi];
+            s[hi] = tmp;
+        };
+    };
+    lo
+}
+
+fn count_lt(s: span<u64>, n: u64, val: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if s[i] < val { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn count_eq(s: span<u64>, n: u64, val: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if s[i] == val { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn copy_if_lt(src: span<u64>, n: u64, dst: span<u64>, pivot: u64) -> u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures  result <= n
+{
+    let mut wi: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant wi <= i
+        decreases n - i
+    {
+        if src[i] < pivot { dst[wi] = src[i]; wi = wi + 1u64; };
+        i = i + 1u64;
+    };
+    wi
+}
+
+fn copy_if_ge(src: span<u64>, n: u64, dst: span<u64>, pivot: u64) -> u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures  result <= n
+{
+    let mut wi: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant wi <= i
+        decreases n - i
+    {
+        if src[i] >= pivot { dst[wi] = src[i]; wi = wi + 1u64; };
+        i = i + 1u64;
+    };
+    wi
+}
+
+fn main() -> u64 { 0u64 }

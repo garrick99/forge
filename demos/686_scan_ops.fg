@@ -1,0 +1,82 @@
+// Demo 686: scan operations — inclusive/exclusive scan, segmented scan
+
+fn scan_inclusive(src: span<u64>, dst: span<u64>, n: u64)
+    requires n <= src.len
+    requires n <= dst.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + src[i];
+        dst[i] = acc;
+        i = i + 1u64;
+    };
+}
+
+fn scan_exclusive(src: span<u64>, dst: span<u64>, n: u64)
+    requires n <= src.len
+    requires n <= dst.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        dst[i] = acc;
+        acc = acc + src[i];
+        i = i + 1u64;
+    };
+}
+
+fn scan_max_inclusive(src: span<u64>, dst: span<u64>, n: u64)
+    requires n >= 1u64
+    requires n <= src.len
+    requires n <= dst.len
+{
+    dst[0u64] = src[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if src[i] > dst[i - 1u64] { dst[i] = src[i]; }
+        else { dst[i] = dst[i - 1u64]; };
+        i = i + 1u64;
+    };
+}
+
+fn scan_total(src: span<u64>, n: u64) -> u64
+    requires n <= src.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + src[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn scan_any_nonzero(src: span<u64>, n: u64) -> bool
+    requires n <= src.len
+{
+    let mut found: bool = false;
+    let mut i: u64 = 0u64;
+    while i < n && !found
+        invariant i <= n
+        decreases n - i
+    {
+        if src[i] != 0u64 { found = true; };
+        i = i + 1u64;
+    };
+    found
+}
+
+fn main() -> u64 { 0u64 }

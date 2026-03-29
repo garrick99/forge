@@ -1,0 +1,73 @@
+// Demo 684: digit operations — base-10 digit extraction, digit sum
+
+fn digit_count(x: u64) -> u64
+    requires x >= 1u64
+    ensures  result >= 1u64
+{
+    let mut n: u64 = x / 10u64;
+    let mut cnt: u64 = 1u64;
+    while n > 0u64
+        invariant cnt >= 1u64
+        decreases n
+    {
+        n = n / 10u64;
+        cnt = cnt + 1u64;
+    };
+    cnt
+}
+
+fn digit_sum(x: u64) -> u64 {
+    let mut n: u64 = x;
+    let mut s: u64 = 0u64;
+    while n > 0u64
+        decreases n
+    {
+        s = s + n % 10u64;
+        n = n / 10u64;
+    };
+    s
+}
+
+fn digit_at(x: u64, pos: u64) -> u64
+    ensures result < 10u64
+{
+    let mut n: u64 = x;
+    let mut i: u64 = 0u64;
+    while i < pos
+        decreases pos - i
+    {
+        n = n / 10u64;
+        i = i + 1u64;
+    };
+    n % 10u64
+}
+
+fn reverse_digits(x: u64) -> u64 {
+    let mut n: u64 = x;
+    let mut r: u64 = 0u64;
+    while n > 0u64
+        decreases n
+    {
+        r = r * 10u64 + n % 10u64;
+        n = n / 10u64;
+    };
+    r
+}
+
+fn array_digit_sum(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let ds: u64 = digit_sum(s[i]);
+        acc = acc + ds;
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

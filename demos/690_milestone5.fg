@@ -1,0 +1,97 @@
+// Demo 690: milestone 5 — verified core algorithms
+
+fn binary_search(s: span<u64>, n: u64, val: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut lo: u64 = 0u64;
+    let mut hi: u64 = n;
+    while lo < hi
+        invariant lo <= hi
+        invariant hi <= n
+        decreases hi - lo
+    {
+        let mid: u64 = lo + (hi - lo) / 2u64;
+        if s[mid] == val { lo = mid; hi = mid; }
+        else if s[mid] < val { lo = mid + 1u64; }
+        else { hi = mid; };
+    };
+    lo
+}
+
+fn selection_sort(s: span<u64>, n: u64)
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i + 1u64 < n
+        invariant i <= n
+        decreases n - i
+    {
+        let mut min_idx: u64 = i;
+        let mut j: u64 = i + 1u64;
+        while j < n
+            invariant j <= n
+            invariant min_idx < n
+            decreases n - j
+        {
+            if s[j] < s[min_idx] { min_idx = j; };
+            j = j + 1u64;
+        };
+        if min_idx != i {
+            let tmp: u64 = s[i];
+            s[i] = s[min_idx];
+            s[min_idx] = tmp;
+        };
+        i = i + 1u64;
+    };
+}
+
+fn array_sum(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn array_product_mod(s: span<u64>, n: u64, m: u64) -> u64
+    requires n <= s.len
+    requires m >= 2u64
+    ensures  result < m
+{
+    let mut acc: u64 = 1u64 % m;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant acc < m
+        decreases n - i
+    {
+        acc = acc * (s[i] % m) % m;
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn is_palindrome(s: span<u64>, n: u64) -> bool
+    requires n <= s.len
+{
+    let mut ok: bool = true;
+    let mut i: u64 = 0u64;
+    while i < n / 2u64 && ok
+        invariant i <= n
+        decreases n / 2u64 - i
+    {
+        if s[i] != s[n - 1u64 - i] { ok = false; };
+        i = i + 1u64;
+    };
+    ok
+}
+
+fn main() -> u64 { 0u64 }

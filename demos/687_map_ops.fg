@@ -1,0 +1,89 @@
+// Demo 687: map operations — apply functions to arrays
+
+fn map_add_scalar(s: span<u64>, n: u64, k: u64)
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = s[i] + k;
+        i = i + 1u64;
+    };
+}
+
+fn map_mul_scalar(s: span<u64>, n: u64, k: u64)
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = s[i] * k;
+        i = i + 1u64;
+    };
+}
+
+fn map_mod(s: span<u64>, n: u64, m: u64)
+    requires m >= 1u64
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = s[i] % m;
+        i = i + 1u64;
+    };
+}
+
+fn map_clamp(s: span<u64>, n: u64, lo: u64, hi: u64)
+    requires lo <= hi
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] < lo { s[i] = lo; }
+        else if s[i] > hi { s[i] = hi; };
+        i = i + 1u64;
+    };
+}
+
+fn map_copy_add(src: span<u64>, dst: span<u64>, n: u64, k: u64)
+    requires n <= src.len
+    requires n <= dst.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        dst[i] = src[i] + k;
+        i = i + 1u64;
+    };
+}
+
+fn map_count_gt(s: span<u64>, n: u64, threshold: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if s[i] > threshold { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }

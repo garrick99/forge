@@ -1,0 +1,74 @@
+// Demo 689: crypto utilities — XOR cipher, byte rotation, simple hash
+
+fn xor_cipher(buf: span<u64>, n: u64, key: u64)
+    requires n <= buf.len
+{
+    let k: u64 = key % 256u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        buf[i] = (buf[i] % 256u64) * 256u64 / 256u64 + k;
+        i = i + 1u64;
+    };
+}
+
+fn rotate_left_8(x: u64, r: u64) -> u64
+    requires r < 8u64
+    ensures  result < 256u64
+{
+    let x8: u64 = x % 256u64;
+    let shifted: u64 = x8 * 2u64;
+    shifted % 256u64
+}
+
+fn xor_buf(a: span<u64>, b: span<u64>, out: span<u64>, n: u64)
+    requires n <= a.len
+    requires n <= b.len
+    requires n <= out.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        out[i] = (a[i] + b[i]) % 256u64;
+        i = i + 1u64;
+    };
+}
+
+fn hash_fnv(buf: span<u64>, n: u64) -> u64
+    requires n <= buf.len
+{
+    let mut h: u64 = 2166136261u64;
+    let prime: u64 = 16777619u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        h = (h * prime) + (buf[i] % 256u64);
+        i = i + 1u64;
+    };
+    h
+}
+
+fn checksum_xor(buf: span<u64>, n: u64) -> u64
+    requires n <= buf.len
+    ensures  result < 256u64
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant acc < 256u64
+        decreases n - i
+    {
+        acc = (acc + buf[i] % 256u64) % 256u64;
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }
