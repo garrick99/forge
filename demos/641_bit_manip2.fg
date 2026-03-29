@@ -1,0 +1,50 @@
+// Demo 641: bit manipulation — rotate, extract, deposit, pack/unpack nibbles
+
+fn rotate_left32(x: u64, n: u64) -> u64
+    requires n < 32u64
+{
+    let lo: u64 = x % 4294967296u64; // mask to 32 bits
+    ((lo << n) | (lo >> (32u64 - n))) % 4294967296u64
+}
+
+fn extract_bits(x: u64, pos: u64, width: u64) -> u64
+    requires pos < 64u64
+    requires width >= 1u64
+    requires pos + width <= 64u64
+{
+    (x >> pos) % (1u64 << width)
+}
+
+fn deposit_bit(x: u64, pos: u64, val: u64) -> u64
+    requires pos < 64u64
+    requires val <= 1u64
+{
+    if val == 1u64 {
+        x | (1u64 << pos)
+    } else {
+        x & !(1u64 << pos)
+    }
+}
+
+fn get_nibble(x: u64, n: u64) -> u64
+    requires n < 16u64
+    ensures  result < 16u64
+{
+    (x >> (n * 4u64)) % 16u64
+}
+
+fn set_nibble(x: u64, n: u64, val: u64) -> u64
+    requires n < 16u64
+    requires val < 16u64
+{
+    let mask: u64 = 15u64 << (n * 4u64);
+    (x & !mask) | (val << (n * 4u64))
+}
+
+fn swap_nibbles(x: u64) -> u64 {
+    let lo: u64 = x % 16u64;
+    let hi: u64 = (x / 16u64) % 16u64;
+    (lo * 16u64) | hi | (x & !255u64)
+}
+
+fn main() -> u64 { 0u64 }

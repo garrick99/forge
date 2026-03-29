@@ -1,0 +1,64 @@
+// Demo 646: modular arithmetic — add, sub, mul mod m
+
+fn mod_add(a: u64, b: u64, m: u64) -> u64
+    requires m > 0u64
+    ensures  result < m
+{
+    (a % m + b % m) % m
+}
+
+fn mod_sub(a: u64, b: u64, m: u64) -> u64
+    requires m > 0u64
+    ensures  result < m
+{
+    let am: u64 = a % m;
+    let bm: u64 = b % m;
+    if am >= bm { (am - bm) % m } else { (m - bm + am) % m }
+}
+
+fn mod_mul(a: u64, b: u64, m: u64) -> u64
+    requires m > 0u64
+    ensures  result < m
+{
+    (a % m) * (b % m) % m
+}
+
+fn mod_pow(base: u64, exp: u64, m: u64) -> u64
+    requires m > 0u64
+    ensures  result < m
+{
+    let mut acc: u64 = 1u64 % m;
+    let mut b: u64 = base % m;
+    let mut e: u64 = exp;
+    while e > 0u64
+        invariant e <= exp
+        invariant acc < m
+        invariant b < m
+        decreases e
+    {
+        if e % 2u64 == 1u64 { acc = (acc * b) % m; };
+        b = (b * b) % m;
+        e = e / 2u64;
+    };
+    acc
+}
+
+fn mod_sum_array(s: span<u64>, n: u64, m: u64) -> u64
+    requires m > 0u64
+    requires n <= s.len
+    ensures  result < m
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant acc < m
+        decreases n - i
+    {
+        acc = (acc + s[i] % m) % m;
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

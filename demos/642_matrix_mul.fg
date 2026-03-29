@@ -1,0 +1,71 @@
+// Demo 642: matrix multiplication (square matrices, row-major)
+
+fn matmul_sq(a: span<u64>, b: span<u64>, out: span<u64>, n: u64)
+    requires n * n <= a.len
+    requires n * n <= b.len
+    requires n * n <= out.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let mut j: u64 = 0u64;
+        while j < n
+            invariant j <= n
+            decreases n - j
+        {
+            let mut acc: u64 = 0u64;
+            let mut k: u64 = 0u64;
+            while k < n
+                invariant k <= n
+                decreases n - k
+            {
+                acc = acc + a[i * n + k] * b[k * n + j];
+                k = k + 1u64;
+            };
+            out[i * n + j] = acc;
+            j = j + 1u64;
+        };
+        i = i + 1u64;
+    };
+}
+
+fn mat_identity(out: span<u64>, n: u64)
+    requires n * n <= out.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let mut j: u64 = 0u64;
+        while j < n
+            invariant j <= n
+            decreases n - j
+        {
+            out[i * n + j] = if i == j { 1u64 } else { 0u64 };
+            j = j + 1u64;
+        };
+        i = i + 1u64;
+    };
+}
+
+fn mat_frobenius_sq(m: span<u64>, n: u64) -> u64
+    requires n * n <= m.len
+{
+    // sum of squares of all elements
+    let total: u64 = n * n;
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < total
+        invariant i <= total
+        decreases total - i
+    {
+        acc = acc + m[i] * m[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

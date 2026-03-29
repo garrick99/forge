@@ -1,0 +1,78 @@
+// Demo 649: codec operations — variable-length encoding, delta encoding
+
+fn delta_encode(src: span<u64>, dst: span<u64>, n: u64)
+    requires n >= 1u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures  dst[0u64] == src[0u64]
+{
+    dst[0u64] = src[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i >= 1u64
+        invariant i <= n
+        decreases n - i
+    {
+        dst[i] = if src[i] >= src[i - 1u64] {
+            src[i] - src[i - 1u64]
+        } else {
+            0u64
+        };
+        i = i + 1u64;
+    };
+}
+
+fn delta_decode(src: span<u64>, dst: span<u64>, n: u64)
+    requires n >= 1u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures  dst[0u64] == src[0u64]
+{
+    dst[0u64] = src[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i >= 1u64
+        invariant i <= n
+        decreases n - i
+    {
+        dst[i] = dst[i - 1u64] + src[i];
+        i = i + 1u64;
+    };
+}
+
+fn zigzag_encode(n: u64) -> u64 {
+    if n % 2u64 == 0u64 { n / 2u64 } else { n / 2u64 + 1u64 }
+}
+
+fn encode_lengths(src: span<u64>, n: u64, out: span<u64>, max_len: u64)
+    requires n <= src.len
+    requires n <= out.len
+    requires max_len > 0u64
+{
+    // clip all values to max_len
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        out[i] = if src[i] <= max_len { src[i] } else { max_len };
+        i = i + 1u64;
+    };
+}
+
+fn sum_lengths(lens: span<u64>, n: u64) -> u64
+    requires n <= lens.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + lens[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

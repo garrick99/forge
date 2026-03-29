@@ -1,0 +1,58 @@
+// Demo 644: simple finite state machine — state transitions and validation
+
+fn fsm_transition(state: u64, input: u64, table: span<u64>, nstates: u64, ninputs: u64) -> u64
+    requires nstates >= 1u64
+    requires ninputs >= 1u64
+    requires nstates * ninputs <= table.len
+    requires state < nstates
+    ensures  result < nstates
+{
+    // use modulo on combined index to avoid nonlinear bounds reasoning
+    let idx: u64 = (state * ninputs + (input % ninputs)) % (nstates * ninputs);
+    let next: u64 = table[idx] % nstates;
+    next
+}
+
+fn fsm_run(states_out: span<u64>, inputs: span<u64>, n: u64,
+           table: span<u64>, nstates: u64, ninputs: u64,
+           init_state: u64)
+    requires n <= inputs.len
+    requires n + 1u64 <= states_out.len
+    requires nstates >= 1u64
+    requires ninputs >= 1u64
+    requires nstates * ninputs <= table.len
+    requires init_state < nstates
+{
+    states_out[0u64] = init_state;
+    let mut s: u64 = init_state;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant s < nstates
+        decreases n - i
+    {
+        let ns: u64 = fsm_transition(s, inputs[i], table, nstates, ninputs);
+        s = ns;
+        states_out[i + 1u64] = s;
+        i = i + 1u64;
+    };
+}
+
+fn fsm_count_state(states: span<u64>, n: u64, target: u64) -> u64
+    requires n <= states.len
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if states[i] == target { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,80 @@
+// Demo 643: frequency analysis — character/symbol frequency counting
+
+fn freq_count(data: span<u64>, n: u64, freq: span<u64>, nbuckets: u64)
+    requires n <= data.len
+    requires nbuckets >= 1u64
+    requires nbuckets <= freq.len
+{
+    // zero the frequency table
+    let mut i: u64 = 0u64;
+    while i < nbuckets
+        invariant i <= nbuckets
+        decreases nbuckets - i
+    {
+        freq[i] = 0u64;
+        i = i + 1u64;
+    };
+    // count
+    let mut j: u64 = 0u64;
+    while j < n
+        invariant j <= n
+        decreases n - j
+    {
+        let sym: u64 = data[j] % nbuckets;
+        freq[sym] = freq[sym] + 1u64;
+        j = j + 1u64;
+    };
+}
+
+fn freq_max(freq: span<u64>, nbuckets: u64) -> u64
+    requires nbuckets >= 1u64
+    requires nbuckets <= freq.len
+    ensures  result < nbuckets
+{
+    let mut best: u64 = 0u64;
+    let mut best_idx: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < nbuckets
+        invariant i <= nbuckets
+        invariant best_idx < nbuckets
+        decreases nbuckets - i
+    {
+        if freq[i] > best { best = freq[i]; best_idx = i; };
+        i = i + 1u64;
+    };
+    best_idx
+}
+
+fn freq_total(freq: span<u64>, nbuckets: u64) -> u64
+    requires nbuckets <= freq.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < nbuckets
+        invariant i <= nbuckets
+        decreases nbuckets - i
+    {
+        acc = acc + freq[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn freq_nonzero(freq: span<u64>, nbuckets: u64) -> u64
+    requires nbuckets <= freq.len
+    ensures  result <= nbuckets
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < nbuckets
+        invariant i <= nbuckets
+        invariant cnt <= i
+        decreases nbuckets - i
+    {
+        if freq[i] > 0u64 { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,83 @@
+// Demo 647: simple signal processing — threshold, peak detection, normalization
+
+fn threshold_signal(s: span<u64>, n: u64, thresh: u64)
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = if s[i] >= thresh { 1u64 } else { 0u64 };
+        i = i + 1u64;
+    };
+}
+
+fn count_peaks(s: span<u64>, n: u64) -> u64
+    requires n >= 3u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    // a peak is s[i] > s[i-1] and s[i] > s[i+1]
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 1u64;
+    while i + 1u64 < n
+        invariant i >= 1u64
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if s[i] > s[i - 1u64] && s[i] > s[i + 1u64] {
+            cnt = cnt + 1u64;
+        };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn signal_energy(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + s[i] * s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn dc_offset(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + s[i];
+        i = i + 1u64;
+    };
+    acc / n
+}
+
+fn scale_signal(s: span<u64>, n: u64, factor: u64, divisor: u64)
+    requires divisor > 0u64
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = s[i] * factor / divisor;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

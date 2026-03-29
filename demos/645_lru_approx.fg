@@ -1,0 +1,68 @@
+// Demo 645: LRU-approximate cache — array-backed with age tracking
+
+fn cache_find(keys: span<u64>, n: u64, key: u64) -> u64
+    requires n <= keys.len
+    ensures  result <= n
+{
+    let mut i: u64 = 0u64;
+    let mut found: u64 = n; // n = not found
+    let mut done: bool = false;
+    while i < n && !done
+        invariant i <= n
+        invariant found <= n
+        decreases n - i
+    {
+        if keys[i] == key { found = i; done = true; };
+        i = i + 1u64;
+    };
+    found
+}
+
+fn cache_oldest(ages: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= ages.len
+    ensures  result < n
+{
+    let mut oldest: u64 = 0u64;
+    let mut max_age: u64 = ages[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant oldest < n
+        decreases n - i
+    {
+        if ages[i] > max_age { max_age = ages[i]; oldest = i; };
+        i = i + 1u64;
+    };
+    oldest
+}
+
+fn cache_update_ages(ages: span<u64>, n: u64, hit_idx: u64)
+    requires n <= ages.len
+    requires hit_idx < n
+{
+    // increment all ages, reset hit_idx to 0
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        ages[i] = ages[i] + 1u64;
+        i = i + 1u64;
+    };
+    ages[hit_idx] = 0u64;
+}
+
+fn cache_evict_insert(keys: span<u64>, ages: span<u64>, n: u64, new_key: u64) -> u64
+    requires n >= 1u64
+    requires n <= keys.len
+    requires n <= ages.len
+    ensures  result < n
+{
+    let slot: u64 = cache_oldest(ages, n);
+    keys[slot] = new_key;
+    ages[slot] = 0u64;
+    slot
+}
+
+fn main() -> u64 { 0u64 }

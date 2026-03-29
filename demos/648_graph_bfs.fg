@@ -1,0 +1,65 @@
+// Demo 648: simple BFS on adjacency matrix
+
+fn adj_get(adj: span<u64>, n: u64, u: u64, v: u64) -> u64
+    requires n * n <= adj.len
+    requires u < n
+    requires v < n
+{
+    adj[u * n + v]
+}
+
+fn bfs_level(adj: span<u64>, n: u64, visited: span<u64>, frontier: span<u64>,
+             nf: u64, next_frontier: span<u64>) -> u64
+    requires n * n <= adj.len
+    requires n <= visited.len
+    requires nf <= frontier.len
+    requires nf <= n
+    requires n <= next_frontier.len
+    ensures  result <= n
+{
+    let mut nn: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < nf
+        invariant i <= nf
+        invariant nn <= n
+        decreases nf - i
+    {
+        let u: u64 = frontier[i] % n; // ensure u < n
+        let mut v: u64 = 0u64;
+        while v < n
+            invariant v <= n
+            invariant nn <= n
+            decreases n - v
+        {
+            if adj_get(adj, n, u, v) > 0u64 && visited[v] == 0u64 {
+                if nn < n {
+                    next_frontier[nn] = v;
+                    visited[v] = 1u64;
+                    nn = nn + 1u64;
+                };
+            };
+            v = v + 1u64;
+        };
+        i = i + 1u64;
+    };
+    nn
+}
+
+fn count_reachable(visited: span<u64>, n: u64) -> u64
+    requires n <= visited.len
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if visited[i] > 0u64 { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }
