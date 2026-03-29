@@ -1,0 +1,71 @@
+// Demo 628: interval operations — overlap, containment, merge
+
+fn interval_overlaps(a_lo: u64, a_hi: u64, b_lo: u64, b_hi: u64) -> bool
+    requires a_lo <= a_hi
+    requires b_lo <= b_hi
+{
+    a_lo <= b_hi && b_lo <= a_hi
+}
+
+fn interval_contains(outer_lo: u64, outer_hi: u64, inner_lo: u64, inner_hi: u64) -> bool
+    requires outer_lo <= outer_hi
+    requires inner_lo <= inner_hi
+{
+    outer_lo <= inner_lo && inner_hi <= outer_hi
+}
+
+fn interval_length(lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures  result == hi - lo
+{
+    hi - lo
+}
+
+fn count_covering(lo_arr: span<u64>, hi_arr: span<u64>, n: u64, point: u64) -> u64
+    requires n <= lo_arr.len
+    requires n <= hi_arr.len
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if lo_arr[i] <= point && point <= hi_arr[i] {
+            cnt = cnt + 1u64;
+        };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn total_coverage(lo_arr: span<u64>, hi_arr: span<u64>, n: u64) -> u64
+    requires n <= lo_arr.len
+    requires n <= hi_arr.len
+{
+    let mut total: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if hi_arr[i] >= lo_arr[i] {
+            total = total + (hi_arr[i] - lo_arr[i]);
+        };
+        i = i + 1u64;
+    };
+    total
+}
+
+fn merge_interval(a_lo: u64, a_hi: u64, b_lo: u64, b_hi: u64,
+                  out_lo: refmut<u64>, out_hi: refmut<u64>)
+    requires a_lo <= a_hi
+    requires b_lo <= b_hi
+{
+    *out_lo = if a_lo <= b_lo { a_lo } else { b_lo };
+    *out_hi = if a_hi >= b_hi { a_hi } else { b_hi };
+}
+
+fn main() -> u64 { 0u64 }

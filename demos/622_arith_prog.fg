@@ -1,0 +1,79 @@
+// Demo 622: arithmetic and geometric progressions
+
+fn arith_sum(first: u64, last: u64, n: u64) -> u64
+    requires n >= 1u64
+    requires last >= first
+{
+    // sum of arithmetic progression: n * (first + last) / 2
+    n * (first + last) / 2u64
+}
+
+fn fill_arith(s: span<u64>, n: u64, start: u64, step: u64)
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    let mut val: u64 = start;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = val;
+        val = val + step;
+        i = i + 1u64;
+    };
+}
+
+fn sum_arith_array(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn geom_sum_approx(ratio: u64, n: u64) -> u64
+    requires ratio >= 2u64
+    requires n <= 62u64
+{
+    // sum of geometric series: r^0 + r^1 + ... + r^(n-1)
+    let mut acc: u64 = 0u64;
+    let mut term: u64 = 1u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant term >= 1u64
+        decreases n - i
+    {
+        acc = acc + term;
+        term = term * ratio;
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn triangular(n: u64) -> u64 {
+    n * (n + 1u64) / 2u64
+}
+
+fn is_triangular(k: u64) -> bool {
+    // check if k is a triangular number by linear search
+    let mut n: u64 = 0u64;
+    let mut found: bool = false;
+    while n * (n + 1u64) / 2u64 <= k
+        invariant n <= k + 1u64
+        decreases k + 1u64 - n
+    {
+        if n * (n + 1u64) / 2u64 == k { found = true; };
+        n = n + 1u64;
+    };
+    found
+}
+
+fn main() -> u64 { 0u64 }

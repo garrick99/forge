@@ -1,0 +1,77 @@
+// Demo 627: discrete convolution and correlation
+
+fn convolve(a: span<u64>, na: u64, b: span<u64>, nb: u64, out: span<u64>)
+    requires na <= a.len
+    requires nb <= b.len
+    requires na + nb <= out.len
+{
+    // out[k] = sum_{j=0}^{k} a[j] * b[k-j] for k in 0..na+nb-1
+    let nc: u64 = na + nb;
+    let mut k: u64 = 0u64;
+    while k < nc
+        invariant k <= nc
+        decreases nc - k
+    {
+        out[k] = 0u64;
+        k = k + 1u64;
+    };
+    let mut i: u64 = 0u64;
+    while i < na
+        invariant i <= na
+        decreases na - i
+    {
+        let mut j: u64 = 0u64;
+        while j < nb
+            invariant j <= nb
+            decreases nb - j
+        {
+            out[i + j] = out[i + j] + a[i] * b[j];
+            j = j + 1u64;
+        };
+        i = i + 1u64;
+    };
+}
+
+fn dot_product(a: span<u64>, b: span<u64>, n: u64) -> u64
+    requires n <= a.len
+    requires n <= b.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + a[i] * b[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn cross_correlate(signal: span<u64>, ns: u64, kernel: span<u64>, nk: u64, out: span<u64>)
+    requires nk <= ns
+    requires ns <= signal.len
+    requires nk <= kernel.len
+    requires ns - nk + 1u64 <= out.len
+{
+    let nout: u64 = ns - nk + 1u64;
+    let mut i: u64 = 0u64;
+    while i < nout
+        invariant i <= nout
+        decreases nout - i
+    {
+        let mut acc: u64 = 0u64;
+        let mut j: u64 = 0u64;
+        while j < nk
+            invariant j <= nk
+            decreases nk - j
+        {
+            acc = acc + signal[i + j] * kernel[j];
+            j = j + 1u64;
+        };
+        out[i] = acc;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

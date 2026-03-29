@@ -1,0 +1,64 @@
+// Demo 629: priority queue operations on sorted array
+
+fn pq_insert_sorted(s: span<u64>, n: u64, val: u64) -> u64
+    requires n >= 1u64
+    requires n < s.len
+    ensures  result == n + 1u64
+{
+    // insert val into sorted array s[0..n], maintaining order (ascending)
+    let mut i: u64 = n;
+    while i >= 1u64 && s[i - 1u64] > val
+        invariant i <= n
+        decreases i
+    {
+        s[i] = s[i - 1u64];
+        i = i - 1u64;
+    };
+    s[i] = val;
+    n + 1u64
+}
+
+fn pq_remove_min(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures  result == s[0u64]
+{
+    let min_val: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i - 1u64] = s[i];
+        i = i + 1u64;
+    };
+    min_val
+}
+
+fn pq_peek_min(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures  result == s[0u64]
+{
+    s[0u64]
+}
+
+fn pq_find_rank(s: span<u64>, n: u64, val: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    // how many elements are strictly less than val
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if s[i] < val { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }

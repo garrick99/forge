@@ -1,0 +1,97 @@
+// Demo 623: set operations on sorted arrays — intersection, union, difference
+
+fn set_intersect(a: span<u64>, na: u64, b: span<u64>, nb: u64, out: span<u64>) -> u64
+    requires na <= a.len
+    requires nb <= b.len
+    requires na + nb <= out.len
+    ensures  result <= na
+{
+    let mut ia: u64 = 0u64;
+    let mut ib: u64 = 0u64;
+    let mut k: u64 = 0u64;
+    while ia < na && ib < nb
+        invariant ia <= na
+        invariant ib <= nb
+        invariant k <= ia
+        decreases (na - ia) + (nb - ib)
+    {
+        if a[ia] == b[ib] {
+            out[k] = a[ia];
+            k = k + 1u64;
+            ia = ia + 1u64;
+            ib = ib + 1u64;
+        } else if a[ia] < b[ib] {
+            ia = ia + 1u64;
+        } else {
+            ib = ib + 1u64;
+        };
+    };
+    k
+}
+
+fn set_union(a: span<u64>, na: u64, b: span<u64>, nb: u64, out: span<u64>) -> u64
+    requires na <= a.len
+    requires nb <= b.len
+    requires na + nb <= out.len
+    ensures  result <= na + nb
+{
+    let mut ia: u64 = 0u64;
+    let mut ib: u64 = 0u64;
+    let mut k: u64 = 0u64;
+    while ia < na || ib < nb
+        invariant ia <= na
+        invariant ib <= nb
+        invariant k <= ia + ib
+        decreases (na - ia) + (nb - ib)
+    {
+        if ia >= na {
+            out[k] = b[ib]; ib = ib + 1u64; k = k + 1u64;
+        } else if ib >= nb {
+            out[k] = a[ia]; ia = ia + 1u64; k = k + 1u64;
+        } else if a[ia] == b[ib] {
+            out[k] = a[ia]; ia = ia + 1u64; ib = ib + 1u64; k = k + 1u64;
+        } else if a[ia] < b[ib] {
+            out[k] = a[ia]; ia = ia + 1u64; k = k + 1u64;
+        } else {
+            out[k] = b[ib]; ib = ib + 1u64; k = k + 1u64;
+        };
+    };
+    k
+}
+
+fn set_difference(a: span<u64>, na: u64, b: span<u64>, nb: u64, out: span<u64>) -> u64
+    requires na <= a.len
+    requires nb <= b.len
+    requires na <= out.len
+    ensures  result <= na
+{
+    let mut ia: u64 = 0u64;
+    let mut ib: u64 = 0u64;
+    let mut k: u64 = 0u64;
+    while ia < na
+        invariant ia <= na
+        invariant ib <= nb
+        invariant k <= ia
+        decreases na - ia
+    {
+        let mut skip: bool = false;
+        while ib < nb && !skip
+            invariant ib <= nb
+            decreases nb - ib
+        {
+            if b[ib] < a[ia] { ib = ib + 1u64; }
+            else { skip = true; };
+        };
+        if ib >= nb {
+            out[k] = a[ia];
+            k = k + 1u64;
+        } else if b[ib] != a[ia] {
+            out[k] = a[ia];
+            k = k + 1u64;
+        };
+        ia = ia + 1u64;
+    };
+    k
+}
+
+fn main() -> u64 { 0u64 }

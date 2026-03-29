@@ -1,0 +1,64 @@
+// Demo 624: 3D integer vector operations
+
+fn vec3_add(ax: u64, ay: u64, az: u64, bx: u64, by: u64, bz: u64,
+            ox: refmut<u64>, oy: refmut<u64>, oz: refmut<u64>)
+{
+    *ox = ax + bx;
+    *oy = ay + by;
+    *oz = az + bz;
+}
+
+fn vec3_dot(ax: u64, ay: u64, az: u64, bx: u64, by: u64, bz: u64) -> u64 {
+    ax * bx + ay * by + az * bz
+}
+
+fn vec3_norm_sq(x: u64, y: u64, z: u64) -> u64 {
+    x * x + y * y + z * z
+}
+
+fn vec3_scale(x: refmut<u64>, y: refmut<u64>, z: refmut<u64>, s: u64) {
+    *x = *x * s;
+    *y = *y * s;
+    *z = *z * s;
+}
+
+fn vec3_max_component(x: u64, y: u64, z: u64) -> u64
+    ensures result >= x
+    ensures result >= y
+    ensures result >= z
+{
+    if x >= y && x >= z { x }
+    else if y >= z { y }
+    else { z }
+}
+
+fn vec3_min_component(x: u64, y: u64, z: u64) -> u64
+    ensures result <= x
+    ensures result <= y
+    ensures result <= z
+{
+    if x <= y && x <= z { x }
+    else if y <= z { y }
+    else { z }
+}
+
+fn array_vec3_sum(pts: span<u64>, n: u64,
+                  ox: refmut<u64>, oy: refmut<u64>, oz: refmut<u64>)
+    requires n * 3u64 <= pts.len
+{
+    *ox = 0u64;
+    *oy = 0u64;
+    *oz = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        *ox = *ox + pts[i * 3u64];
+        *oy = *oy + pts[i * 3u64 + 1u64];
+        *oz = *oz + pts[i * 3u64 + 2u64];
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,92 @@
+// Demo 626: Fibonacci variants — iterative, memoized in array, tribonacci
+
+fn fib(n: u64) -> u64
+    requires n <= 92u64
+{
+    if n <= 1u64 {
+        n
+    } else {
+        let mut a: u64 = 0u64;
+        let mut b: u64 = 1u64;
+        let mut i: u64 = 2u64;
+        while i <= n
+            invariant i >= 2u64
+            invariant i <= n + 1u64
+            decreases n + 1u64 - i
+        {
+            let c: u64 = a + b;
+            a = b;
+            b = c;
+            i = i + 1u64;
+        };
+        b
+    }
+}
+
+fn fib_array(out: span<u64>, n: u64)
+    requires n >= 2u64
+    requires n <= out.len
+    ensures  out[0u64] == 0u64
+    ensures  out[1u64] == 1u64
+{
+    out[0u64] = 0u64;
+    out[1u64] = 1u64;
+    let mut i: u64 = 2u64;
+    while i < n
+        invariant i >= 2u64
+        invariant i <= n
+        decreases n - i
+    {
+        out[i] = out[i - 1u64] + out[i - 2u64];
+        i = i + 1u64;
+    };
+}
+
+fn tribonacci(n: u64) -> u64
+    requires n <= 36u64
+{
+    if n == 0u64 { 0u64 }
+    else if n == 1u64 { 0u64 }
+    else if n == 2u64 { 1u64 }
+    else {
+        let mut a: u64 = 0u64;
+        let mut b: u64 = 0u64;
+        let mut c: u64 = 1u64;
+        let mut i: u64 = 3u64;
+        while i <= n
+            invariant i >= 3u64
+            invariant i <= n + 1u64
+            decreases n + 1u64 - i
+        {
+            let d: u64 = a + b + c;
+            a = b;
+            b = c;
+            c = d;
+            i = i + 1u64;
+        };
+        c
+    }
+}
+
+fn fib_sum(n: u64) -> u64
+    requires n <= 92u64
+{
+    // sum of first n+1 Fibonacci numbers = fib(n+2) - 1
+    let mut a: u64 = 0u64;
+    let mut b: u64 = 1u64;
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i <= n
+        invariant i <= n + 1u64
+        decreases n + 1u64 - i
+    {
+        acc = acc + a;
+        let c: u64 = a + b;
+        a = b;
+        b = c;
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

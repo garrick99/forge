@@ -1,0 +1,74 @@
+// Demo 621: array transformations — negate, square, abs-diff from mean
+
+fn array_negate_sat(s: span<u64>, n: u64, max_val: u64)
+    requires n <= s.len
+{
+    // set each element to max_val - s[i], saturating
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = if s[i] <= max_val { max_val - s[i] } else { 0u64 };
+        i = i + 1u64;
+    };
+}
+
+fn array_square_mod(s: span<u64>, n: u64, m: u64)
+    requires m > 0u64
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = (s[i] * s[i]) % m;
+        i = i + 1u64;
+    };
+}
+
+fn array_threshold(s: span<u64>, n: u64, thresh: u64)
+    requires n <= s.len
+{
+    // binarize: s[i] = (s[i] >= thresh) ? 1 : 0
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = if s[i] >= thresh { 1u64 } else { 0u64 };
+        i = i + 1u64;
+    };
+}
+
+fn array_abs_diff(a: span<u64>, b: span<u64>, out: span<u64>, n: u64)
+    requires n <= a.len
+    requires n <= b.len
+    requires n <= out.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        out[i] = if a[i] >= b[i] { a[i] - b[i] } else { b[i] - a[i] };
+        i = i + 1u64;
+    };
+}
+
+fn array_mod(s: span<u64>, n: u64, m: u64)
+    requires m > 0u64
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = s[i] % m;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

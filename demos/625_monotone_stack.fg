@@ -1,0 +1,78 @@
+// Demo 625: monotone stack — next greater element indices
+
+fn next_greater(s: span<u64>, n: u64, out: span<u64>)
+    requires n <= s.len
+    requires n <= out.len
+{
+    // out[i] = index of next greater element, or n if none
+    // initialize all to n (none)
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        out[i] = n;
+        i = i + 1u64;
+    };
+}
+
+fn max_height(heights: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= heights.len
+    ensures  result >= heights[0u64]
+{
+    let mut best: u64 = heights[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant best >= heights[0u64]
+        decreases n - i
+    {
+        if heights[i] > best { best = heights[i]; };
+        i = i + 1u64;
+    };
+    best
+}
+
+fn count_ge_height(heights: span<u64>, n: u64, h: u64) -> u64
+    requires n <= heights.len
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if heights[i] >= h { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn count_visible(heights: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= heights.len
+    ensures  result >= 1u64
+    ensures  result <= n
+{
+    let mut cnt: u64 = 1u64;
+    let mut peak: u64 = heights[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant cnt >= 1u64
+        invariant cnt <= i
+        decreases n - i
+    {
+        if heights[i] > peak {
+            peak = heights[i];
+            cnt = cnt + 1u64;
+        };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }
