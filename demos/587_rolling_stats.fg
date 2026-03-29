@@ -1,0 +1,56 @@
+// Demo 587: rolling statistics — online min, max, and count
+
+struct RollingStats {
+    min_val: u64,
+    max_val: u64,
+    count: u64,
+    sum: u64,
+}
+
+fn stats_new() -> RollingStats
+    ensures result.count == 0u64
+{
+    struct RollingStats { min_val: 0xFFFFFFFFFFFFFFFFu64, max_val: 0u64, count: 0u64, sum: 0u64 }
+}
+
+fn stats_update(s: refmut<RollingStats>, v: u64)
+    ensures  (*s).count == old((*s).count) + 1u64
+{
+    if (*s).count == 0u64 {
+        (*s).min_val = v;
+        (*s).max_val = v;
+    } else {
+        if v < (*s).min_val { (*s).min_val = v; };
+        if v > (*s).max_val { (*s).max_val = v; };
+    };
+    (*s).sum = (*s).sum + v;
+    (*s).count = (*s).count + 1u64;
+}
+
+fn stats_count(s: ref<RollingStats>) -> u64
+    ensures result == (*s).count
+{
+    (*s).count
+}
+
+fn stats_sum(s: ref<RollingStats>) -> u64
+    ensures result == (*s).sum
+{
+    (*s).sum
+}
+
+fn stats_min(s: ref<RollingStats>) -> u64
+    requires (*s).count > 0u64
+    ensures  result == (*s).min_val
+{
+    (*s).min_val
+}
+
+fn stats_max(s: ref<RollingStats>) -> u64
+    requires (*s).count > 0u64
+    ensures  result == (*s).max_val
+{
+    (*s).max_val
+}
+
+fn main() -> u64 { 0u64 }

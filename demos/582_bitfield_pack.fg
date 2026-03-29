@@ -1,0 +1,57 @@
+// Demo 582: packing and unpacking multiple fields into a u64
+
+fn pack2(a: u64, b: u64, a_bits: u64) -> u64
+    requires a_bits < 64u64
+    requires a < (1u64 << a_bits)
+{
+    (b << a_bits) | a
+}
+
+fn unpack_lo(word: u64, a_bits: u64) -> u64
+    requires a_bits < 64u64
+    ensures  result == word % (1u64 << a_bits)
+{
+    word % (1u64 << a_bits)
+}
+
+fn unpack_hi(word: u64, a_bits: u64) -> u64
+    requires a_bits < 64u64
+{
+    word >> a_bits
+}
+
+fn pack_rgb(r: u64, g: u64, b: u64) -> u64
+    requires r < 256u64
+    requires g < 256u64
+    requires b < 256u64
+    ensures  result < 0x1000000u64
+{
+    (r << 16u64) | (g << 8u64) | b
+}
+
+fn unpack_r(rgb: u64) -> u64
+    ensures result < 256u64
+{
+    (rgb >> 16u64) % 256u64
+}
+
+fn unpack_g(rgb: u64) -> u64
+    ensures result < 256u64
+{
+    (rgb >> 8u64) % 256u64
+}
+
+fn unpack_b(rgb: u64) -> u64
+    ensures result < 256u64
+{
+    rgb % 256u64
+}
+
+fn check_pack_unpack_b() -> u64
+    ensures result < 256u64
+{
+    let packed: u64 = pack_rgb(0u64, 0u64, 42u64);
+    unpack_b(packed)
+}
+
+fn main() -> u64 { 0u64 }

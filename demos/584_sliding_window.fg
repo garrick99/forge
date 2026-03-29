@@ -1,0 +1,58 @@
+// Demo 584: sliding window maximum and sum
+
+fn sliding_sum(s: span<u64>, n: u64, k: u64) -> u64
+    requires k >= 1u64
+    requires k <= n
+    requires n <= s.len
+{
+    let mut window: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < k
+        invariant i <= k
+        decreases k - i
+    {
+        window = window + s[i];
+        i = i + 1u64;
+    };
+    window
+}
+
+fn sliding_sum_all(s: span<u64>, n: u64, k: u64, out: span<u64>)
+    requires k >= 1u64
+    requires k <= n
+    requires n <= s.len
+    requires n - k + 1u64 <= out.len
+{
+    let mut window: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < k
+        invariant i <= k
+        decreases k - i
+    {
+        window = window + s[i];
+        i = i + 1u64;
+    };
+    out[0u64] = window;
+    let mut pos: u64 = 1u64;
+    let mut right: u64 = k;
+    while right < n
+        invariant right <= n
+        invariant pos <= right
+        decreases n - right
+    {
+        window = window + s[right] - s[right - k];
+        out[pos] = window;
+        pos = pos + 1u64;
+        right = right + 1u64;
+    };
+}
+
+fn window_count(n: u64, k: u64) -> u64
+    requires k >= 1u64
+    requires k <= n
+    ensures  result == n - k + 1u64
+{
+    n - k + 1u64
+}
+
+fn main() -> u64 { 0u64 }

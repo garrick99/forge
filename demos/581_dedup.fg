@@ -1,0 +1,62 @@
+// Demo 581: deduplicate consecutive equal elements (sorted span)
+
+fn dedup_sorted(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures  result >= 1u64
+    ensures  result <= n
+{
+    let mut write: u64 = 1u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant write <= i
+        invariant write >= 1u64
+        decreases n - i
+    {
+        if s[i] != s[write - 1u64] {
+            s[write] = s[i];
+            write = write + 1u64;
+        };
+        i = i + 1u64;
+    };
+    write
+}
+
+fn count_unique_sorted(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures  result >= 1u64
+    ensures  result <= n
+{
+    let mut count: u64 = 1u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant count <= i
+        invariant count >= 1u64
+        decreases n - i
+    {
+        if s[i] != s[i - 1u64] { count = count + 1u64; };
+        i = i + 1u64;
+    };
+    count
+}
+
+fn all_equal(s: span<u64>, n: u64) -> bool
+    requires n >= 1u64
+    requires n <= s.len
+{
+    let mut i: u64 = 1u64;
+    let mut eq: bool = true;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] != s[0u64] { eq = false; };
+        i = i + 1u64;
+    };
+    eq
+}
+
+fn main() -> u64 { 0u64 }

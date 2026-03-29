@@ -1,0 +1,84 @@
+// Demo 588: find array bounds — min, max, and their indices
+
+fn find_min(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures  result <= s[0u64]
+{
+    let mut m: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant m <= s[0u64]
+        decreases n - i
+    {
+        if s[i] < m { m = s[i]; };
+        i = i + 1u64;
+    };
+    m
+}
+
+fn find_max(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures  result >= s[0u64]
+{
+    let mut m: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant m >= s[0u64]
+        decreases n - i
+    {
+        if s[i] > m { m = s[i]; };
+        i = i + 1u64;
+    };
+    m
+}
+
+fn find_min_index(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures  result < n
+{
+    let mut best: u64 = 0u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant best < n
+        decreases n - i
+    {
+        if s[i] < s[best] { best = i; };
+        i = i + 1u64;
+    };
+    best
+}
+
+fn find_max_index(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures  result < n
+{
+    let mut best: u64 = 0u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant best < n
+        decreases n - i
+    {
+        if s[i] > s[best] { best = i; };
+        i = i + 1u64;
+    };
+    best
+}
+
+fn span_range_width(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+{
+    let lo: u64 = find_min(s, n);
+    let hi: u64 = find_max(s, n);
+    if hi >= lo { hi - lo } else { 0u64 }
+}
+
+fn main() -> u64 { 0u64 }

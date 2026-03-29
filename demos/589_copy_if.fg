@@ -1,0 +1,88 @@
+// Demo 589: conditional copy — copy elements satisfying a predicate
+
+fn copy_lt(src: span<u64>, n: u64, dst: span<u64>, thresh: u64) -> u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures  result <= n
+{
+    let mut k: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant k <= i
+        decreases n - i
+    {
+        if src[i] < thresh {
+            dst[k] = src[i];
+            k = k + 1u64;
+        };
+        i = i + 1u64;
+    };
+    k
+}
+
+fn copy_gt(src: span<u64>, n: u64, dst: span<u64>, thresh: u64) -> u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures  result <= n
+{
+    let mut k: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant k <= i
+        decreases n - i
+    {
+        if src[i] > thresh {
+            dst[k] = src[i];
+            k = k + 1u64;
+        };
+        i = i + 1u64;
+    };
+    k
+}
+
+fn copy_eq(src: span<u64>, n: u64, dst: span<u64>, val: u64) -> u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures  result <= n
+{
+    let mut k: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant k <= i
+        decreases n - i
+    {
+        if src[i] == val {
+            dst[k] = src[i];
+            k = k + 1u64;
+        };
+        i = i + 1u64;
+    };
+    k
+}
+
+fn copy_bounded(src: span<u64>, n: u64, dst: span<u64>, lo: u64, hi: u64) -> u64
+    requires n <= src.len
+    requires n <= dst.len
+    requires lo <= hi
+    ensures  result <= n
+{
+    let mut k: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant k <= i
+        decreases n - i
+    {
+        if src[i] >= lo && src[i] <= hi {
+            dst[k] = src[i];
+            k = k + 1u64;
+        };
+        i = i + 1u64;
+    };
+    k
+}
+
+fn main() -> u64 { 0u64 }

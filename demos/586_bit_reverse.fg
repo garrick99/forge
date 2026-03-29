@@ -1,0 +1,47 @@
+// Demo 586: bit reversal permutation for FFT index reordering
+
+fn reverse_bits_8(x: u64) -> u64
+    requires x < 256u64
+    ensures  result < 256u64
+{
+    let mut v: u64 = x;
+    let mut r: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < 8u64
+        invariant r < 256u64
+        invariant i <= 8u64
+        decreases 8u64 - i
+    {
+        r = (r * 2u64) % 256u64 + (v & 1u64);
+        v = v >> 1u64;
+        i = i + 1u64;
+    };
+    r
+}
+
+fn reverse_bits_n(x: u64, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= 32u64
+{
+    let mut v: u64 = x;
+    let mut r: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        r = r * 2u64 + (v & 1u64);
+        v = v >> 1u64;
+        i = i + 1u64;
+    };
+    r
+}
+
+fn bit_rev_index(i: u64, log2n: u64) -> u64
+    requires log2n >= 1u64
+    requires log2n <= 32u64
+{
+    reverse_bits_n(i, log2n)
+}
+
+fn main() -> u64 { 0u64 }

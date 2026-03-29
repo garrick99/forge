@@ -1,0 +1,58 @@
+// Demo 590: matrix-vector multiply and matrix fill (row-major layout)
+
+fn mat_get(m: span<u64>, rows: u64, cols: u64, r: u64, c: u64) -> u64
+    requires r < rows
+    requires c < cols
+    requires rows * cols <= m.len
+    ensures  result == m[r * cols + c]
+{
+    m[r * cols + c]
+}
+
+fn mat_fill(m: span<u64>, rows: u64, cols: u64, val: u64)
+    requires rows * cols <= m.len
+{
+    let mut i: u64 = 0u64;
+    let total: u64 = rows * cols;
+    while i < total
+        invariant i <= total
+        decreases total - i
+    {
+        m[i] = val;
+        i = i + 1u64;
+    };
+}
+
+fn mat_row_sum(m: span<u64>, cols: u64, row: u64) -> u64
+    requires (row + 1u64) * cols <= m.len
+{
+    let base: u64 = row * cols;
+    let mut s: u64 = 0u64;
+    let mut j: u64 = 0u64;
+    while j < cols
+        invariant j <= cols
+        decreases cols - j
+    {
+        s = s + m[base + j];
+        j = j + 1u64;
+    };
+    s
+}
+
+fn mat_col_sum(m: span<u64>, rows: u64, cols: u64, col: u64) -> u64
+    requires col < cols
+    requires rows * cols <= m.len
+{
+    let mut s: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < rows
+        invariant i <= rows
+        decreases rows - i
+    {
+        s = s + m[i * cols + col];
+        i = i + 1u64;
+    };
+    s
+}
+
+fn main() -> u64 { 0u64 }
