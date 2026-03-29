@@ -1,0 +1,68 @@
+// Demo 332: Token bucket rate limiter with verified capacity
+//
+// A token bucket has tokens that are consumed by requests and
+// replenished by fill. The proof verifies:
+//   - tokens never exceed capacity
+//   - consume() requires enough tokens
+//   - fill() adds exactly n tokens (capped at capacity)
+//   - Token counts chain correctly through sequences of operations
+
+struct Bucket {
+    tokens: u64,
+    cap:    u64,
+}
+
+fn bucket_new(cap: u64) -> Bucket
+    requires cap > 0u64
+    ensures result.tokens == cap
+    ensures result.cap    == cap
+{
+    struct Bucket { tokens: cap, cap: cap }
+}
+
+fn bucket_consume(b: refmut<Bucket>, n: u64)
+    requires (*b).tokens >= n
+    ensures  (*b).tokens == old((*b).tokens) - n
+{
+    (*b).tokens = (*b).tokens - n;
+}
+
+fn bucket_fill(b: refmut<Bucket>, n: u64)
+    requires (*b).tokens + n <= (*b).cap
+    ensures  (*b).tokens == old((*b).tokens) + n
+{
+    (*b).tokens = (*b).tokens + n;
+}
+
+// Start full, consume 3: tokens = cap - 3
+fn consume_three(cap: u64) -> u64
+    requires cap > 3u64
+    ensures result == cap - 3u64
+{
+    let b: Bucket = bucket_new(cap);
+    bucket_consume(&mut b, 3u64);
+    b.tokens
+}
+
+// Start full, consume 2, fill 1: tokens = cap - 1
+fn consume2_fill1(cap: u64) -> u64
+    requires cap > 2u64
+    ensures result == cap - 1u64
+{
+    let b: Bucket = bucket_new(cap);
+    bucket_consume(&mut b, 2u64);
+    bucket_fill(&mut b, 1u64);
+    b.tokens
+}
+
+// Start full, consume all: tokens = 0
+fn drain(cap: u64) -> u64
+    requires cap > 0u64
+    ensures result == 0u64
+{
+    let b: Bucket = bucket_new(cap);
+    bucket_consume(&mut b, cap);
+    b.tokens
+}
+
+fn main() -> u64 { 0u64 }

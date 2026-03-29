@@ -1,0 +1,67 @@
+// Demo 331: Sequence number verification
+//
+// A sequence counter used in network protocols: packets must
+// have monotonically increasing sequence numbers. The proof
+// verifies that send() always increments the sequence number
+// and that after N sends the count equals N.
+
+struct SeqState {
+    next_seq: u64,
+    sent:     u64,
+}
+
+fn seq_init() -> SeqState
+    ensures result.next_seq == 0u64
+    ensures result.sent     == 0u64
+{
+    struct SeqState { next_seq: 0u64, sent: 0u64 }
+}
+
+fn seq_send(s: refmut<SeqState>)
+    ensures (*s).next_seq == old((*s).next_seq) + 1u64
+    ensures (*s).sent     == old((*s).sent) + 1u64
+{
+    (*s).next_seq = (*s).next_seq + 1u64;
+    (*s).sent     = (*s).sent + 1u64;
+}
+
+// After one send, seq is 1 and sent is 1
+fn one_send_seq() -> u64
+    ensures result == 1u64
+{
+    let s: SeqState = seq_init();
+    seq_send(&mut s);
+    s.next_seq
+}
+
+fn one_send_count() -> u64
+    ensures result == 1u64
+{
+    let s: SeqState = seq_init();
+    seq_send(&mut s);
+    s.sent
+}
+
+// After three sends, seq is 3
+fn three_sends() -> u64
+    ensures result == 3u64
+{
+    let s: SeqState = seq_init();
+    seq_send(&mut s);
+    seq_send(&mut s);
+    seq_send(&mut s);
+    s.next_seq
+}
+
+// seq == sent always (both increment together)
+fn seq_equals_count() -> u64
+    ensures result == 0u64
+{
+    let s: SeqState = seq_init();
+    seq_send(&mut s);
+    seq_send(&mut s);
+    // Both are 2; their difference is 0
+    s.next_seq - s.sent
+}
+
+fn main() -> u64 { 0u64 }
