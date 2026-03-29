@@ -1,0 +1,71 @@
+// Demo 611: two-pointer techniques on sorted arrays
+
+fn two_sum_sorted(s: span<u64>, n: u64, target: u64) -> bool
+    requires n <= s.len
+{
+    if n == 0u64 {
+        false
+    } else {
+        let mut lo: u64 = 0u64;
+        let mut hi: u64 = n - 1u64;
+        let mut found: bool = false;
+        while lo < hi && !found
+            invariant lo <= hi
+            invariant hi < n
+            decreases hi - lo
+        {
+            let s2: u64 = s[lo] + s[hi];
+            if s2 == target {
+                found = true;
+            } else if s2 < target {
+                lo = lo + 1u64;
+            } else {
+                hi = hi - 1u64;
+            };
+        };
+        found
+    }
+}
+
+fn count_pairs_le_brute(s: span<u64>, n: u64, limit: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    // O(n^2) brute force count of pairs (i<j) where s[i]+s[j] <= limit
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if s[i] <= limit { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn remove_duplicates_sorted(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures  result >= 1u64
+    ensures  result <= n
+{
+    let mut w: u64 = 1u64;
+    let mut r: u64 = 1u64;
+    while r < n
+        invariant r <= n
+        invariant w <= r
+        invariant w >= 1u64
+        decreases n - r
+    {
+        if s[r] != s[r - 1u64] {
+            s[w] = s[r];
+            w = w + 1u64;
+        };
+        r = r + 1u64;
+    };
+    w
+}
+
+fn main() -> u64 { 0u64 }

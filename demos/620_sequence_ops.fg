@@ -1,0 +1,87 @@
+// Demo 620: sequence predicates — all, any, none, find
+
+fn all_positive(s: span<u64>, n: u64) -> bool
+    requires n <= s.len
+{
+    let mut ok: bool = true;
+    let mut i: u64 = 0u64;
+    while i < n && ok
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] == 0u64 { ok = false; };
+        i = i + 1u64;
+    };
+    ok
+}
+
+fn any_zero(s: span<u64>, n: u64) -> bool
+    requires n <= s.len
+{
+    let mut found: bool = false;
+    let mut i: u64 = 0u64;
+    while i < n && !found
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] == 0u64 { found = true; };
+        i = i + 1u64;
+    };
+    found
+}
+
+fn none_above(s: span<u64>, n: u64, limit: u64) -> bool
+    requires n <= s.len
+{
+    let mut ok: bool = true;
+    let mut i: u64 = 0u64;
+    while i < n && ok
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] > limit { ok = false; };
+        i = i + 1u64;
+    };
+    ok
+}
+
+fn find_first_ge(s: span<u64>, n: u64, target: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut i: u64 = 0u64;
+    let mut found: u64 = n;
+    let mut done: bool = false;
+    while i < n && !done
+        invariant i <= n
+        invariant found <= n
+        decreases n - i
+    {
+        if s[i] >= target {
+            found = i;
+            done = true;
+        };
+        i = i + 1u64;
+    };
+    found
+}
+
+fn count_between(s: span<u64>, n: u64, lo: u64, hi: u64) -> u64
+    requires n <= s.len
+    requires lo <= hi
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if s[i] >= lo && s[i] <= hi { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }

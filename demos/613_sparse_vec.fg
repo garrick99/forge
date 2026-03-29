@@ -1,0 +1,74 @@
+// Demo 613: sparse vector operations (index-value pairs)
+
+fn sparse_dot(idx_a: span<u64>, val_a: span<u64>, na: u64,
+              idx_b: span<u64>, val_b: span<u64>, nb: u64) -> u64
+    requires na <= idx_a.len
+    requires na <= val_a.len
+    requires nb <= idx_b.len
+    requires nb <= val_b.len
+{
+    let mut acc: u64 = 0u64;
+    let mut ia: u64 = 0u64;
+    let mut ib: u64 = 0u64;
+    while ia < na && ib < nb
+        invariant ia <= na
+        invariant ib <= nb
+        decreases (na - ia) + (nb - ib)
+    {
+        if idx_a[ia] == idx_b[ib] {
+            acc = acc + val_a[ia] * val_b[ib];
+            ia = ia + 1u64;
+            ib = ib + 1u64;
+        } else if idx_a[ia] < idx_b[ib] {
+            ia = ia + 1u64;
+        } else {
+            ib = ib + 1u64;
+        };
+    };
+    acc
+}
+
+fn sparse_norm_sq(vals: span<u64>, n: u64) -> u64
+    requires n <= vals.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + vals[i] * vals[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn sparse_sum(vals: span<u64>, n: u64) -> u64
+    requires n <= vals.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + vals[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn sparse_scale(vals: span<u64>, n: u64, factor: u64)
+    requires n <= vals.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        vals[i] = vals[i] * factor;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

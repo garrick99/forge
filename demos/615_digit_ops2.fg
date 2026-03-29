@@ -1,0 +1,63 @@
+// Demo 615: digit operations — extract digits, digit sum, digit product
+
+fn digit_sum(n: u64) -> u64 {
+    let mut x: u64 = n;
+    let mut s: u64 = 0u64;
+    while x > 0u64
+        invariant x >= 0u64
+        decreases x
+    {
+        s = s + x % 10u64;
+        x = x / 10u64;
+    };
+    s
+}
+
+fn digit_count(n: u64) -> u64
+    ensures result >= 1u64
+{
+    let mut v: u64 = n / 10u64;
+    let mut d: u64 = 1u64;
+    while v > 0u64
+        invariant d >= 1u64
+        decreases v
+    {
+        d = d + 1u64;
+        v = v / 10u64;
+    };
+    d
+}
+
+fn reverse_digits(n: u64) -> u64 {
+    let mut x: u64 = n;
+    let mut rev: u64 = 0u64;
+    while x > 0u64
+        invariant x >= 0u64
+        decreases x
+    {
+        rev = rev * 10u64 + x % 10u64;
+        x = x / 10u64;
+    };
+    rev
+}
+
+fn is_palindrome_num(n: u64) -> bool {
+    reverse_digits(n) == n
+}
+
+fn nth_digit(n: u64, pos: u64) -> u64
+    requires pos <= 18u64
+{
+    let mut x: u64 = n;
+    let mut i: u64 = 0u64;
+    while i < pos
+        invariant i <= pos
+        decreases pos - i
+    {
+        x = x / 10u64;
+        i = i + 1u64;
+    };
+    x % 10u64
+}
+
+fn main() -> u64 { 0u64 }

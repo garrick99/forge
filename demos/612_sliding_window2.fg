@@ -1,0 +1,89 @@
+// Demo 612: sliding window — fixed and variable size
+
+fn window_sum_fixed(s: span<u64>, n: u64, k: u64, out: span<u64>)
+    requires k >= 1u64
+    requires k <= n
+    requires n <= s.len
+    requires n - k + 1u64 <= out.len
+{
+    // compute sum of first window
+    let mut wsum: u64 = 0u64;
+    let mut j: u64 = 0u64;
+    while j < k
+        invariant j <= k
+        decreases k - j
+    {
+        wsum = wsum + s[j];
+        j = j + 1u64;
+    };
+    out[0u64] = wsum;
+    // slide the window
+    let mut i: u64 = 1u64;
+    while i <= n - k
+        invariant i <= n - k + 1u64
+        decreases n - k + 1u64 - i
+    {
+        wsum = wsum - s[i - 1u64] + s[i + k - 1u64];
+        out[i] = wsum;
+        i = i + 1u64;
+    };
+}
+
+fn window_max_fixed(s: span<u64>, n: u64, k: u64) -> u64
+    requires k >= 1u64
+    requires k <= n
+    requires n <= s.len
+{
+    let mut best: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i <= n - k
+        invariant i <= n - k + 1u64
+        decreases n - k + 1u64 - i
+    {
+        let mut wsum: u64 = 0u64;
+        let mut j: u64 = 0u64;
+        while j < k
+            invariant j <= k
+            decreases k - j
+        {
+            wsum = wsum + s[i + j];
+            j = j + 1u64;
+        };
+        if wsum > best { best = wsum; };
+        i = i + 1u64;
+    };
+    best
+}
+
+fn window_min_subarray_ge(s: span<u64>, n: u64, target: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n + 1u64
+{
+    // returns smallest window length with sum >= target, or n+1 if none
+    let mut best: u64 = n + 1u64;
+    let mut wsum: u64 = 0u64;
+    let mut lo: u64 = 0u64;
+    let mut hi: u64 = 0u64;
+    while hi < n
+        invariant hi <= n
+        invariant lo <= hi
+        invariant best <= n + 1u64
+        decreases n - hi
+    {
+        wsum = wsum + s[hi];
+        hi = hi + 1u64;
+        while wsum >= target && lo < hi
+            invariant lo <= hi
+            invariant best <= n + 1u64
+            decreases hi - lo
+        {
+            let len: u64 = hi - lo;
+            if len < best { best = len; };
+            wsum = wsum - s[lo];
+            lo = lo + 1u64;
+        };
+    };
+    best
+}
+
+fn main() -> u64 { 0u64 }

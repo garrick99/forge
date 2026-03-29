@@ -1,0 +1,79 @@
+// Demo 618: matrix operations — add, scale, transpose
+
+fn mat_add(a: span<u64>, b: span<u64>, out: span<u64>, rows: u64, cols: u64)
+    requires rows * cols <= a.len
+    requires rows * cols <= b.len
+    requires rows * cols <= out.len
+{
+    let total: u64 = rows * cols;
+    let mut i: u64 = 0u64;
+    while i < total
+        invariant i <= total
+        decreases total - i
+    {
+        out[i] = a[i] + b[i];
+        i = i + 1u64;
+    };
+}
+
+fn mat_scale(m: span<u64>, rows: u64, cols: u64, factor: u64)
+    requires rows * cols <= m.len
+{
+    let total: u64 = rows * cols;
+    let mut i: u64 = 0u64;
+    while i < total
+        invariant i <= total
+        decreases total - i
+    {
+        m[i] = m[i] * factor;
+        i = i + 1u64;
+    };
+}
+
+fn mat_trace(m: span<u64>, n: u64) -> u64
+    requires n * n <= m.len
+{
+    // trace of square matrix (sum of diagonal)
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + m[i * n + i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn mat_row_copy(src: span<u64>, dst: span<u64>, cols: u64, src_row: u64, dst_row: u64)
+    requires (src_row + 1u64) * cols <= src.len
+    requires (dst_row + 1u64) * cols <= dst.len
+{
+    let sb: u64 = src_row * cols;
+    let db: u64 = dst_row * cols;
+    let mut j: u64 = 0u64;
+    while j < cols
+        invariant j <= cols
+        decreases cols - j
+    {
+        dst[db + j] = src[sb + j];
+        j = j + 1u64;
+    };
+}
+
+fn mat_zero(m: span<u64>, rows: u64, cols: u64)
+    requires rows * cols <= m.len
+{
+    let total: u64 = rows * cols;
+    let mut i: u64 = 0u64;
+    while i < total
+        invariant i <= total
+        decreases total - i
+    {
+        m[i] = 0u64;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

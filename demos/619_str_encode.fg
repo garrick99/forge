@@ -1,0 +1,70 @@
+// Demo 619: simple encoding — XOR cipher and byte packing/unpacking
+
+fn xor_cipher(data: span<u64>, n: u64, key: u64)
+    requires n <= data.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        data[i] = data[i] ^ key;
+        i = i + 1u64;
+    };
+}
+
+fn pack_bytes(b0: u64, b1: u64, b2: u64, b3: u64) -> u64
+    requires b0 < 256u64
+    requires b1 < 256u64
+    requires b2 < 256u64
+    requires b3 < 256u64
+{
+    b0 | (b1 << 8u64) | (b2 << 16u64) | (b3 << 24u64)
+}
+
+fn unpack_byte0(word: u64) -> u64 {
+    word % 256u64
+}
+
+fn unpack_byte1(word: u64) -> u64 {
+    (word / 256u64) % 256u64
+}
+
+fn unpack_byte2(word: u64) -> u64 {
+    (word / 65536u64) % 256u64
+}
+
+fn unpack_byte3(word: u64) -> u64 {
+    (word / 16777216u64) % 256u64
+}
+
+fn copy_xor(src: span<u64>, dst: span<u64>, n: u64, key: u64)
+    requires n <= src.len
+    requires n <= dst.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        dst[i] = src[i] ^ key;
+        i = i + 1u64;
+    };
+}
+
+fn sum_xor_key(data: span<u64>, n: u64, key: u64) -> u64
+    requires n <= data.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc ^ data[i] ^ key;
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }
