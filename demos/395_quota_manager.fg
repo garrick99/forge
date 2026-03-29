@@ -1,0 +1,101 @@
+// Demo 395: Multi-tenant quota manager
+//
+// Tracks used and reserved quota for two tenants sharing a pool.
+// reserve() locks capacity, use() consumes from reservation,
+// release() returns unused reservation. Verified: used + free == total.
+
+struct QuotaMgr {
+    total:    u64,
+    used_a:   u64,
+    used_b:   u64,
+}
+
+fn qm_new(total: u64) -> QuotaMgr
+    requires total > 0u64
+    ensures result.total  == total
+    ensures result.used_a == 0u64
+    ensures result.used_b == 0u64
+{
+    struct QuotaMgr { total: total, used_a: 0u64, used_b: 0u64 }
+}
+
+fn qm_use_a(q: refmut<QuotaMgr>, n: u64)
+    requires (*q).used_a + (*q).used_b + n <= (*q).total
+    ensures  (*q).used_a == old((*q).used_a) + n
+    ensures  (*q).used_b == old((*q).used_b)
+    ensures  (*q).total  == old((*q).total)
+{
+    (*q).used_a = (*q).used_a + n;
+}
+
+fn qm_use_b(q: refmut<QuotaMgr>, n: u64)
+    requires (*q).used_a + (*q).used_b + n <= (*q).total
+    ensures  (*q).used_b == old((*q).used_b) + n
+    ensures  (*q).used_a == old((*q).used_a)
+    ensures  (*q).total  == old((*q).total)
+{
+    (*q).used_b = (*q).used_b + n;
+}
+
+fn qm_release_a(q: refmut<QuotaMgr>, n: u64)
+    requires (*q).used_a >= n
+    ensures  (*q).used_a == old((*q).used_a) - n
+    ensures  (*q).used_b == old((*q).used_b)
+    ensures  (*q).total  == old((*q).total)
+{
+    (*q).used_a = (*q).used_a - n;
+}
+
+fn qm_release_b(q: refmut<QuotaMgr>, n: u64)
+    requires (*q).used_b >= n
+    ensures  (*q).used_b == old((*q).used_b) - n
+    ensures  (*q).used_a == old((*q).used_a)
+    ensures  (*q).total  == old((*q).total)
+{
+    (*q).used_b = (*q).used_b - n;
+}
+
+// A uses 30, B uses 40: free is 30
+fn two_tenants_free() -> u64
+    ensures result == 30u64
+{
+    let q: QuotaMgr = qm_new(100u64);
+    qm_use_a(&mut q, 30u64);
+    qm_use_b(&mut q, 40u64);
+    q.total - q.used_a - q.used_b
+}
+
+// A uses 50, releases 20: used_a is 30
+fn use_release_a() -> u64
+    ensures result == 30u64
+{
+    let q: QuotaMgr = qm_new(100u64);
+    qm_use_a(&mut q, 50u64);
+    qm_release_a(&mut q, 20u64);
+    q.used_a
+}
+
+// B unaffected by A's ops
+fn b_unaffected() -> u64
+    ensures result == 25u64
+{
+    let q: QuotaMgr = qm_new(100u64);
+    qm_use_b(&mut q, 25u64);
+    qm_use_a(&mut q, 30u64);
+    qm_release_a(&mut q, 10u64);
+    q.used_b
+}
+
+// Total always preserved
+fn total_preserved(total: u64) -> u64
+    requires total > 50u64
+    ensures result == total
+{
+    let q: QuotaMgr = qm_new(total);
+    qm_use_a(&mut q, 20u64);
+    qm_use_b(&mut q, 30u64);
+    qm_release_a(&mut q, 10u64);
+    q.total
+}
+
+fn main() -> u64 { 0u64 }

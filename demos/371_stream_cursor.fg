@@ -1,0 +1,97 @@
+// Demo 371: Stream cursor with mark/reset
+//
+// A stream cursor tracks position and a saved mark.
+// advance() moves forward, set_mark() saves current position,
+// reset_to_mark() restores position to mark.
+// Verified: position tracks advances and mark/reset round-trips.
+
+struct StreamCursor {
+    pos:    u64,
+    mark:   u64,
+    limit:  u64,
+}
+
+fn cursor_new(limit: u64) -> StreamCursor
+    requires limit > 0u64
+    ensures result.pos   == 0u64
+    ensures result.mark  == 0u64
+    ensures result.limit == limit
+{
+    struct StreamCursor { pos: 0u64, mark: 0u64, limit: limit }
+}
+
+fn cursor_advance(c: refmut<StreamCursor>, n: u64)
+    requires (*c).pos + n <= (*c).limit
+    ensures  (*c).pos   == old((*c).pos) + n
+    ensures  (*c).mark  == old((*c).mark)
+    ensures  (*c).limit == old((*c).limit)
+{
+    (*c).pos = (*c).pos + n;
+}
+
+fn cursor_set_mark(c: refmut<StreamCursor>)
+    ensures (*c).mark  == (*c).pos
+    ensures (*c).pos   == old((*c).pos)
+    ensures (*c).limit == old((*c).limit)
+{
+    (*c).mark = (*c).pos;
+}
+
+fn cursor_reset_to_mark(c: refmut<StreamCursor>)
+    ensures (*c).pos   == (*c).mark
+    ensures (*c).mark  == old((*c).mark)
+    ensures (*c).limit == old((*c).limit)
+{
+    (*c).pos = (*c).mark;
+}
+
+// Advance 10: pos is 10
+fn advance_10(limit: u64) -> u64
+    requires limit > 10u64
+    ensures result == 10u64
+{
+    let c: StreamCursor = cursor_new(limit);
+    cursor_advance(&mut c, 10u64);
+    c.pos
+}
+
+// Advance 5, set_mark, advance 3: mark is 5
+fn mark_at_5(limit: u64) -> u64
+    requires limit > 8u64
+    ensures result == 5u64
+{
+    let c: StreamCursor = cursor_new(limit);
+    cursor_advance(&mut c, 5u64);
+    cursor_set_mark(&mut c);
+    cursor_advance(&mut c, 3u64);
+    c.mark
+}
+
+// Advance 5, set_mark, advance 3, reset: pos back to 5
+fn reset_to_mark(limit: u64) -> u64
+    requires limit > 8u64
+    ensures result == 5u64
+{
+    let c: StreamCursor = cursor_new(limit);
+    cursor_advance(&mut c, 5u64);
+    cursor_set_mark(&mut c);
+    cursor_advance(&mut c, 3u64);
+    cursor_reset_to_mark(&mut c);
+    c.pos
+}
+
+// After reset, can advance again from mark
+fn reset_and_readvance(limit: u64) -> u64
+    requires limit > 12u64
+    ensures result == 7u64
+{
+    let c: StreamCursor = cursor_new(limit);
+    cursor_advance(&mut c, 5u64);
+    cursor_set_mark(&mut c);
+    cursor_advance(&mut c, 3u64);
+    cursor_reset_to_mark(&mut c);
+    cursor_advance(&mut c, 2u64);
+    c.pos
+}
+
+fn main() -> u64 { 0u64 }

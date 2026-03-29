@@ -1,0 +1,85 @@
+// Demo 497: span predicates — verified element classification over arrays
+
+fn count_nonzero(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut i: u64 = 0u64;
+    let mut cnt: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+    {
+        if s[i] != 0u64 { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn span_max(s: span<u64>, n: u64) -> u64
+    requires n > 0u64
+    requires n <= s.len
+    ensures  forall k: u64, k < n ==> result >= s[k]
+{
+    let mut i: u64 = 1u64;
+    let mut m: u64 = s[0u64];
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> m >= s[k]
+    {
+        if s[i] > m { m = s[i]; };
+        i = i + 1u64;
+    };
+    m
+}
+
+fn span_min(s: span<u64>, n: u64) -> u64
+    requires n > 0u64
+    requires n <= s.len
+    ensures  forall k: u64, k < n ==> result <= s[k]
+{
+    let mut i: u64 = 1u64;
+    let mut m: u64 = s[0u64];
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> m <= s[k]
+    {
+        if s[i] < m { m = s[i]; };
+        i = i + 1u64;
+    };
+    m
+}
+
+fn span_sum_loop(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+    ensures  result >= 0u64
+{
+    let mut i: u64 = 0u64;
+    let mut acc: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant acc >= 0u64
+    {
+        acc = acc + s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn span_all_bounded(s: span<u64>, n: u64, cap: u64) -> bool
+    requires n <= s.len
+    ensures  result == true ==> forall k: u64, k < n ==> s[k] <= cap
+{
+    let mut i: u64 = 0u64;
+    let mut ok: bool = true;
+    while i < n
+        invariant i <= n
+        invariant ok == true ==> forall k: u64, k < i ==> s[k] <= cap
+    {
+        if s[i] > cap { ok = (i != i); };
+        i = i + 1u64;
+    };
+    ok
+}
+
+fn main() -> u64 { 0u64 }

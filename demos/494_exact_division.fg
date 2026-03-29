@@ -1,0 +1,93 @@
+// Demo 494: exact division and modular arithmetic postconditions
+//
+// Verified division/modulo properties: quotient bounds, remainder bounds,
+// division floor property, exact divisibility checks.
+
+fn div_floor(a: u64, b: u64) -> u64
+    requires b > 0u64
+    ensures  result == a / b
+    ensures  result * b <= a
+    ensures  a - result * b < b
+{
+    a / b
+}
+
+fn rem_bound(a: u64, b: u64) -> u64
+    requires b > 0u64
+    ensures  result == a % b
+    ensures  result < b
+{
+    a % b
+}
+
+fn is_divisible(a: u64, b: u64) -> bool
+    requires b > 0u64
+    ensures  result == (a % b == 0u64)
+    ensures  !(a % b == 0u64) ==> result == false
+    ensures  a % b == 0u64    ==> result == true
+{
+    a % b == 0u64
+}
+
+fn align_down(v: u64, align: u64) -> u64
+    requires align > 0u64
+    ensures  result == (v / align) * align
+    ensures  result <= v
+    ensures  v - result < align
+{
+    (v / align) * align
+}
+
+fn align_up(v: u64, align: u64) -> u64
+    requires align > 0u64
+    requires v <= 18446744073709551615u64 - (align - 1u64)
+    ensures  result >= v
+    ensures  result % align == 0u64
+    ensures  result == ((v + align - 1u64) / align) * align
+{
+    ((v + align - 1u64) / align) * align
+}
+
+fn check_div_floor_10_3() -> u64
+    ensures result == 3u64
+{
+    div_floor(10u64, 3u64)
+}
+
+fn check_rem_10_3() -> u64
+    ensures result == 1u64
+{
+    rem_bound(10u64, 3u64)
+}
+
+fn check_divisible_12_4() -> bool
+    ensures result == true
+{
+    is_divisible(12u64, 4u64)
+}
+
+fn check_not_divisible_10_3() -> bool
+    ensures result == false
+{
+    is_divisible(10u64, 3u64)
+}
+
+fn check_align_down_10_4() -> u64
+    ensures result == 8u64
+{
+    align_down(10u64, 4u64)
+}
+
+fn check_align_up_9_4() -> u64
+    ensures result == 12u64
+{
+    align_up(9u64, 4u64)
+}
+
+fn check_align_up_exact() -> u64
+    ensures result == 8u64
+{
+    align_up(8u64, 4u64)
+}
+
+fn main() -> u64 { 0u64 }

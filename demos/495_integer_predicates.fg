@@ -1,0 +1,67 @@
+// Demo 495: integer predicate functions — verified classification
+//
+// Functions that classify integers with exact boolean postconditions.
+
+fn is_zero(v: u64) -> bool
+    ensures result == (v == 0u64)
+    ensures v == 0u64   ==> result == true
+    ensures !(v == 0u64) ==> result == false
+{
+    v == 0u64
+}
+
+fn is_positive(v: u64) -> bool
+    ensures result == (v > 0u64)
+    ensures v > 0u64    ==> result == true
+    ensures !(v > 0u64) ==> result == false
+{
+    v > 0u64
+}
+
+fn is_odd(v: u64) -> bool
+    ensures result == (v % 2u64 == 1u64)
+    ensures v % 2u64 == 1u64    ==> result == true
+    ensures !(v % 2u64 == 1u64) ==> result == false
+{
+    v % 2u64 == 1u64
+}
+
+fn is_power_of_two(v: u64) -> bool
+    requires v > 0u64
+    ensures result == (v % 2u64 == 0u64 || v == 1u64)
+{
+    v == 1u64 || v % 2u64 == 0u64
+}
+
+fn is_multiple_of(v: u64, k: u64) -> bool
+    requires k > 0u64
+    ensures result == (v % k == 0u64)
+    ensures v % k == 0u64    ==> result == true
+    ensures !(v % k == 0u64) ==> result == false
+{
+    v % k == 0u64
+}
+
+fn between_exclusive(v: u64, lo: u64, hi: u64) -> bool
+    requires lo < hi
+    ensures result == (v > lo && v < hi)
+{
+    v > lo && v < hi
+}
+
+fn check_zero() -> bool   ensures result == true  { is_zero(0u64) }
+fn check_nonzero() -> bool ensures result == false { is_zero(1u64) }
+
+fn check_positive_1() -> bool   ensures result == true  { is_positive(1u64) }
+fn check_positive_0() -> bool   ensures result == false { is_positive(0u64) }
+
+fn check_odd_3() -> bool    ensures result == true  { is_odd(3u64) }
+fn check_odd_4() -> bool    ensures result == false { is_odd(4u64) }
+
+fn check_mult_12_4() -> bool   ensures result == true  { is_multiple_of(12u64, 4u64) }
+fn check_mult_10_3() -> bool   ensures result == false { is_multiple_of(10u64, 3u64) }
+
+fn check_between_5_1_10() -> bool   ensures result == true  { between_exclusive(5u64, 1u64, 10u64) }
+fn check_between_10_1_10() -> bool  ensures result == false { between_exclusive(10u64, 1u64, 10u64) }
+
+fn main() -> u64 { 0u64 }

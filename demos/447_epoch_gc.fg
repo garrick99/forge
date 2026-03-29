@@ -1,0 +1,91 @@
+// Demo 447: Epoch-based garbage collection state
+//
+// Objects are allocated into current epoch. On GC, epoch advances and
+// old objects are reclaimed. Verified: live == allocated - reclaimed.
+
+struct EpochGC {
+    epoch:     u64,
+    allocated: u64,
+    reclaimed: u64,
+    live:      u64,
+    gc_runs:   u64,
+}
+
+fn egc_new() -> EpochGC
+    ensures result.epoch     == 1u64
+    ensures result.allocated == 0u64
+    ensures result.reclaimed == 0u64
+    ensures result.live      == 0u64
+    ensures result.gc_runs   == 0u64
+{
+    struct EpochGC { epoch: 1u64, allocated: 0u64, reclaimed: 0u64, live: 0u64, gc_runs: 0u64 }
+}
+
+fn egc_alloc(e: refmut<EpochGC>, n: u64)
+    ensures (*e).allocated == old((*e).allocated) + n
+    ensures (*e).live      == old((*e).live) + n
+    ensures (*e).epoch     == old((*e).epoch)
+    ensures (*e).reclaimed == old((*e).reclaimed)
+    ensures (*e).gc_runs   == old((*e).gc_runs)
+{
+    (*e).allocated = (*e).allocated + n;
+    (*e).live      = (*e).live      + n;
+}
+
+fn egc_collect(e: refmut<EpochGC>, n: u64)
+    requires (*e).live >= n
+    ensures  (*e).reclaimed == old((*e).reclaimed) + n
+    ensures  (*e).live      == old((*e).live) - n
+    ensures  (*e).epoch     == old((*e).epoch) + 1u64
+    ensures  (*e).gc_runs   == old((*e).gc_runs) + 1u64
+    ensures  (*e).allocated == old((*e).allocated)
+{
+    (*e).reclaimed = (*e).reclaimed + n;
+    (*e).live      = (*e).live      - n;
+    (*e).epoch     = (*e).epoch     + 1u64;
+    (*e).gc_runs   = (*e).gc_runs   + 1u64;
+}
+
+// Alloc 10: live==10
+fn alloc_10() -> u64
+    ensures result == 10u64
+{
+    let e: EpochGC = egc_new();
+    egc_alloc(&mut e, 10u64);
+    e.live
+}
+
+// Alloc 10, collect 4: live==6
+fn collect_4() -> u64
+    ensures result == 6u64
+{
+    let e: EpochGC = egc_new();
+    egc_alloc(&mut e, 10u64);
+    egc_collect(&mut e, 4u64);
+    e.live
+}
+
+// live == allocated - reclaimed
+fn live_invariant() -> u64
+    ensures result == 0u64
+{
+    let e: EpochGC = egc_new();
+    egc_alloc(&mut e, 20u64);
+    egc_collect(&mut e, 8u64);
+    egc_alloc(&mut e, 5u64);
+    egc_collect(&mut e, 3u64);
+    e.live - (e.allocated - e.reclaimed)
+}
+
+// Epoch advances with each GC
+fn epoch_advances() -> u64
+    ensures result == 3u64
+{
+    let e: EpochGC = egc_new();
+    egc_alloc(&mut e, 10u64);
+    egc_collect(&mut e, 3u64);
+    egc_collect(&mut e, 2u64);
+    e.epoch
+}
+
+fn main() -> u64 { 0u64 }

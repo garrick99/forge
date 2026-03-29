@@ -1,0 +1,114 @@
+// Demo 356: Multi-field state flags with combined transitions
+//
+// A device state with three boolean flags: powered, initialized, active.
+// Valid transitions: power_on → init → activate → deactivate → power_off.
+// Verified: each transition maintains its field contract via old() chaining.
+
+struct Device {
+    powered:     u64,  // 0=off, 1=on
+    initialized: u64,  // 0=no, 1=yes
+    active:      u64,  // 0=inactive, 1=active
+    ops:         u64,  // operation count
+}
+
+fn dev_new() -> Device
+    ensures result.powered     == 0u64
+    ensures result.initialized == 0u64
+    ensures result.active      == 0u64
+    ensures result.ops         == 0u64
+{
+    struct Device { powered: 0u64, initialized: 0u64, active: 0u64, ops: 0u64 }
+}
+
+fn dev_power_on(d: refmut<Device>)
+    requires (*d).powered == 0u64
+    ensures  (*d).powered == 1u64
+    ensures  (*d).ops     == old((*d).ops) + 1u64
+    ensures  (*d).initialized == old((*d).initialized)
+    ensures  (*d).active      == old((*d).active)
+{
+    (*d).powered = 1u64;
+    (*d).ops     = (*d).ops + 1u64;
+}
+
+fn dev_init(d: refmut<Device>)
+    requires (*d).powered == 1u64
+    requires (*d).initialized == 0u64
+    ensures  (*d).initialized == 1u64
+    ensures  (*d).ops         == old((*d).ops) + 1u64
+    ensures  (*d).powered     == old((*d).powered)
+    ensures  (*d).active      == old((*d).active)
+{
+    (*d).initialized = 1u64;
+    (*d).ops         = (*d).ops + 1u64;
+}
+
+fn dev_activate(d: refmut<Device>)
+    requires (*d).initialized == 1u64
+    requires (*d).active == 0u64
+    ensures  (*d).active == 1u64
+    ensures  (*d).ops    == old((*d).ops) + 1u64
+    ensures  (*d).powered     == old((*d).powered)
+    ensures  (*d).initialized == old((*d).initialized)
+{
+    (*d).active = 1u64;
+    (*d).ops    = (*d).ops + 1u64;
+}
+
+fn dev_deactivate(d: refmut<Device>)
+    requires (*d).active == 1u64
+    ensures  (*d).active == 0u64
+    ensures  (*d).ops    == old((*d).ops) + 1u64
+    ensures  (*d).powered     == old((*d).powered)
+    ensures  (*d).initialized == old((*d).initialized)
+{
+    (*d).active = 0u64;
+    (*d).ops    = (*d).ops + 1u64;
+}
+
+// Full startup: powered=1, initialized=1, active=1
+fn full_startup_active() -> u64
+    ensures result == 1u64
+{
+    let d: Device = dev_new();
+    dev_power_on(&mut d);
+    dev_init(&mut d);
+    dev_activate(&mut d);
+    d.active
+}
+
+fn full_startup_ops() -> u64
+    ensures result == 3u64
+{
+    let d: Device = dev_new();
+    dev_power_on(&mut d);
+    dev_init(&mut d);
+    dev_activate(&mut d);
+    d.ops
+}
+
+// Activate then deactivate: active is 0
+fn activate_deactivate() -> u64
+    ensures result == 0u64
+{
+    let d: Device = dev_new();
+    dev_power_on(&mut d);
+    dev_init(&mut d);
+    dev_activate(&mut d);
+    dev_deactivate(&mut d);
+    d.active
+}
+
+// 4 ops total
+fn four_ops() -> u64
+    ensures result == 4u64
+{
+    let d: Device = dev_new();
+    dev_power_on(&mut d);
+    dev_init(&mut d);
+    dev_activate(&mut d);
+    dev_deactivate(&mut d);
+    d.ops
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,93 @@
+// Demo 431: Sliding window send/receive protocol
+//
+// Sender window: next_send advances on send, ack_base advances on ack.
+// Window size = next_send - ack_base (must stay <= window_size).
+// Verified: inflight == next_send - ack_base, acks reduce inflight.
+
+struct WindowProto {
+    next_send:   u64,
+    ack_base:    u64,
+    window_size: u64,
+    total_acked: u64,
+}
+
+fn wp_new(window_size: u64) -> WindowProto
+    requires window_size > 0u64
+    ensures result.next_send   == 0u64
+    ensures result.ack_base    == 0u64
+    ensures result.window_size == window_size
+    ensures result.total_acked == 0u64
+{
+    struct WindowProto { next_send: 0u64, ack_base: 0u64, window_size: window_size, total_acked: 0u64 }
+}
+
+fn wp_send(w: refmut<WindowProto>)
+    requires (*w).next_send - (*w).ack_base < (*w).window_size
+    ensures  (*w).next_send   == old((*w).next_send) + 1u64
+    ensures  (*w).ack_base    == old((*w).ack_base)
+    ensures  (*w).window_size == old((*w).window_size)
+    ensures  (*w).total_acked == old((*w).total_acked)
+{
+    (*w).next_send = (*w).next_send + 1u64;
+}
+
+fn wp_ack(w: refmut<WindowProto>, n: u64)
+    requires n > 0u64
+    requires (*w).ack_base + n <= (*w).next_send
+    ensures  (*w).ack_base    == old((*w).ack_base) + n
+    ensures  (*w).total_acked == old((*w).total_acked) + n
+    ensures  (*w).next_send   == old((*w).next_send)
+    ensures  (*w).window_size == old((*w).window_size)
+{
+    (*w).ack_base    = (*w).ack_base    + n;
+    (*w).total_acked = (*w).total_acked + n;
+}
+
+// Send 3 packets: next_send==3
+fn send_3() -> u64
+    ensures result == 3u64
+{
+    let w: WindowProto = wp_new(4u64);
+    wp_send(&mut w);
+    wp_send(&mut w);
+    wp_send(&mut w);
+    w.next_send
+}
+
+// Send 2, ack 1: inflight==1
+fn inflight_after_ack() -> u64
+    ensures result == 1u64
+{
+    let w: WindowProto = wp_new(4u64);
+    wp_send(&mut w);
+    wp_send(&mut w);
+    wp_ack(&mut w, 1u64);
+    w.next_send - w.ack_base
+}
+
+// Ack 2: ack_base advances
+fn ack_base_advances() -> u64
+    ensures result == 2u64
+{
+    let w: WindowProto = wp_new(4u64);
+    wp_send(&mut w);
+    wp_send(&mut w);
+    wp_send(&mut w);
+    wp_ack(&mut w, 2u64);
+    w.ack_base
+}
+
+// Total acked across two ack calls
+fn total_acked() -> u64
+    ensures result == 3u64
+{
+    let w: WindowProto = wp_new(4u64);
+    wp_send(&mut w);
+    wp_send(&mut w);
+    wp_send(&mut w);
+    wp_ack(&mut w, 1u64);
+    wp_ack(&mut w, 2u64);
+    w.total_acked
+}
+
+fn main() -> u64 { 0u64 }

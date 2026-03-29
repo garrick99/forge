@@ -1,0 +1,96 @@
+// Demo 381: Frame counter with frame/subframe tracking
+//
+// A media frame counter: each tick advances the subframe,
+// every N subframes advances the frame and resets the subframe.
+// Verified: frame and subframe counts track ticks correctly.
+
+struct FrameCounter {
+    frame:         u64,
+    subframe:      u64,
+    subframes_per: u64,
+    total_ticks:   u64,
+}
+
+fn fc_new(subframes_per: u64) -> FrameCounter
+    requires subframes_per > 0u64
+    ensures result.frame         == 0u64
+    ensures result.subframe      == 0u64
+    ensures result.subframes_per == subframes_per
+    ensures result.total_ticks   == 0u64
+{
+    struct FrameCounter { frame: 0u64, subframe: 0u64, subframes_per: subframes_per, total_ticks: 0u64 }
+}
+
+fn fc_tick(f: refmut<FrameCounter>)
+    requires (*f).subframe + 1u64 < (*f).subframes_per
+    ensures  (*f).subframe    == old((*f).subframe) + 1u64
+    ensures  (*f).frame       == old((*f).frame)
+    ensures  (*f).total_ticks == old((*f).total_ticks) + 1u64
+    ensures  (*f).subframes_per == old((*f).subframes_per)
+{
+    (*f).subframe    = (*f).subframe + 1u64;
+    (*f).total_ticks = (*f).total_ticks + 1u64;
+}
+
+fn fc_frame_advance(f: refmut<FrameCounter>)
+    requires (*f).subframe + 1u64 == (*f).subframes_per
+    ensures  (*f).frame       == old((*f).frame) + 1u64
+    ensures  (*f).subframe    == 0u64
+    ensures  (*f).total_ticks == old((*f).total_ticks) + 1u64
+    ensures  (*f).subframes_per == old((*f).subframes_per)
+{
+    (*f).frame       = (*f).frame + 1u64;
+    (*f).subframe    = 0u64;
+    (*f).total_ticks = (*f).total_ticks + 1u64;
+}
+
+// 3 ticks (subframes_per=5): subframe is 3
+fn three_ticks() -> u64
+    ensures result == 3u64
+{
+    let f: FrameCounter = fc_new(5u64);
+    fc_tick(&mut f);
+    fc_tick(&mut f);
+    fc_tick(&mut f);
+    f.subframe
+}
+
+// 4 ticks then frame_advance (subframes_per=5): frame is 1, subframe is 0
+fn one_full_frame_frame() -> u64
+    ensures result == 1u64
+{
+    let f: FrameCounter = fc_new(5u64);
+    fc_tick(&mut f);
+    fc_tick(&mut f);
+    fc_tick(&mut f);
+    fc_tick(&mut f);
+    fc_frame_advance(&mut f);
+    f.frame
+}
+
+fn one_full_frame_subframe() -> u64
+    ensures result == 0u64
+{
+    let f: FrameCounter = fc_new(5u64);
+    fc_tick(&mut f);
+    fc_tick(&mut f);
+    fc_tick(&mut f);
+    fc_tick(&mut f);
+    fc_frame_advance(&mut f);
+    f.subframe
+}
+
+// Total ticks tracked across frames
+fn total_ticks_tracked() -> u64
+    ensures result == 5u64
+{
+    let f: FrameCounter = fc_new(5u64);
+    fc_tick(&mut f);
+    fc_tick(&mut f);
+    fc_tick(&mut f);
+    fc_tick(&mut f);
+    fc_frame_advance(&mut f);
+    f.total_ticks
+}
+
+fn main() -> u64 { 0u64 }

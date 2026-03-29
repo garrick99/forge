@@ -1,0 +1,85 @@
+// Demo 401: Merkle proof path tracker
+//
+// Tracks the depth and sibling count of a Merkle proof path.
+// Each step descends one level and records one sibling hash.
+// Verified: depth == siblings at every point in the path.
+
+struct MerklePath {
+    depth:    u64,
+    siblings: u64,
+    root_set: u64,  // 0=no root, 1=root known
+}
+
+fn mp_new() -> MerklePath
+    ensures result.depth    == 0u64
+    ensures result.siblings == 0u64
+    ensures result.root_set == 0u64
+{
+    struct MerklePath { depth: 0u64, siblings: 0u64, root_set: 0u64 }
+}
+
+fn mp_descend(p: refmut<MerklePath>)
+    ensures (*p).depth    == old((*p).depth) + 1u64
+    ensures (*p).siblings == old((*p).siblings) + 1u64
+    ensures (*p).root_set == old((*p).root_set)
+{
+    (*p).depth    = (*p).depth    + 1u64;
+    (*p).siblings = (*p).siblings + 1u64;
+}
+
+fn mp_set_root(p: refmut<MerklePath>)
+    requires (*p).root_set == 0u64
+    ensures  (*p).root_set == 1u64
+    ensures  (*p).depth    == old((*p).depth)
+    ensures  (*p).siblings == old((*p).siblings)
+{
+    (*p).root_set = 1u64;
+}
+
+// 4-level tree: depth is 4, siblings is 4
+fn four_levels_depth() -> u64
+    ensures result == 4u64
+{
+    let p: MerklePath = mp_new();
+    mp_descend(&mut p);
+    mp_descend(&mut p);
+    mp_descend(&mut p);
+    mp_descend(&mut p);
+    p.depth
+}
+
+fn four_levels_siblings() -> u64
+    ensures result == 4u64
+{
+    let p: MerklePath = mp_new();
+    mp_descend(&mut p);
+    mp_descend(&mut p);
+    mp_descend(&mut p);
+    mp_descend(&mut p);
+    p.siblings
+}
+
+// Depth always equals siblings
+fn depth_eq_siblings() -> u64
+    ensures result == 0u64
+{
+    let p: MerklePath = mp_new();
+    mp_descend(&mut p);
+    mp_descend(&mut p);
+    mp_descend(&mut p);
+    p.depth - p.siblings
+}
+
+// Root set after path
+fn root_set_after_path() -> u64
+    ensures result == 1u64
+{
+    let p: MerklePath = mp_new();
+    mp_descend(&mut p);
+    mp_descend(&mut p);
+    mp_descend(&mut p);
+    mp_set_root(&mut p);
+    p.root_set
+}
+
+fn main() -> u64 { 0u64 }

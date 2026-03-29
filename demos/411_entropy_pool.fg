@@ -1,0 +1,88 @@
+// Demo 411: Entropy pool for a CSPRNG
+//
+// An entropy pool accumulates entropy bits and tracks how many
+// have been consumed. Seeding adds entropy, drawing reduces it.
+// Verified: bits_available == bits_added - bits_drawn.
+
+struct EntropyPool {
+    bits_available: u64,
+    bits_added:     u64,
+    bits_drawn:     u64,
+    reseeds:        u64,
+}
+
+fn ep_new() -> EntropyPool
+    ensures result.bits_available == 0u64
+    ensures result.bits_added     == 0u64
+    ensures result.bits_drawn     == 0u64
+    ensures result.reseeds        == 0u64
+{
+    struct EntropyPool { bits_available: 0u64, bits_added: 0u64, bits_drawn: 0u64, reseeds: 0u64 }
+}
+
+fn ep_seed(e: refmut<EntropyPool>, bits: u64)
+    requires bits > 0u64
+    ensures  (*e).bits_available == old((*e).bits_available) + bits
+    ensures  (*e).bits_added     == old((*e).bits_added) + bits
+    ensures  (*e).reseeds        == old((*e).reseeds) + 1u64
+    ensures  (*e).bits_drawn     == old((*e).bits_drawn)
+{
+    (*e).bits_available = (*e).bits_available + bits;
+    (*e).bits_added     = (*e).bits_added     + bits;
+    (*e).reseeds        = (*e).reseeds        + 1u64;
+}
+
+fn ep_draw(e: refmut<EntropyPool>, bits: u64)
+    requires (*e).bits_available >= bits
+    ensures  (*e).bits_available == old((*e).bits_available) - bits
+    ensures  (*e).bits_drawn     == old((*e).bits_drawn) + bits
+    ensures  (*e).bits_added     == old((*e).bits_added)
+    ensures  (*e).reseeds        == old((*e).reseeds)
+{
+    (*e).bits_available = (*e).bits_available - bits;
+    (*e).bits_drawn     = (*e).bits_drawn     + bits;
+}
+
+// Seed 256 bits: available is 256
+fn seed_256() -> u64
+    ensures result == 256u64
+{
+    let e: EntropyPool = ep_new();
+    ep_seed(&mut e, 256u64);
+    e.bits_available
+}
+
+// Seed 256, draw 128: available is 128
+fn seed_draw() -> u64
+    ensures result == 128u64
+{
+    let e: EntropyPool = ep_new();
+    ep_seed(&mut e, 256u64);
+    ep_draw(&mut e, 128u64);
+    e.bits_available
+}
+
+// Conservation: added - drawn == available
+fn conservation() -> u64
+    ensures result == 0u64
+{
+    let e: EntropyPool = ep_new();
+    ep_seed(&mut e, 256u64);
+    ep_seed(&mut e, 128u64);
+    ep_draw(&mut e, 100u64);
+    ep_draw(&mut e, 50u64);
+    e.bits_added - e.bits_drawn - e.bits_available
+}
+
+// Reseed count
+fn reseed_count() -> u64
+    ensures result == 3u64
+{
+    let e: EntropyPool = ep_new();
+    ep_seed(&mut e, 64u64);
+    ep_seed(&mut e, 64u64);
+    ep_seed(&mut e, 128u64);
+    e.reseeds
+}
+
+fn main() -> u64 { 0u64 }

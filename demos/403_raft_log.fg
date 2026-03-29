@@ -1,0 +1,113 @@
+// Demo 403: Raft consensus log state
+//
+// A Raft node tracks: current_term, commit_index, last_applied.
+// append_entry() advances last_log_index, commit() advances commit_index,
+// apply() advances last_applied up to commit_index.
+// Verified: last_applied <= commit_index <= last_log_index always.
+
+struct RaftLog {
+    current_term:    u64,
+    last_log_index:  u64,
+    commit_index:    u64,
+    last_applied:    u64,
+}
+
+fn raft_new() -> RaftLog
+    ensures result.current_term   == 0u64
+    ensures result.last_log_index == 0u64
+    ensures result.commit_index   == 0u64
+    ensures result.last_applied   == 0u64
+{
+    struct RaftLog { current_term: 0u64, last_log_index: 0u64, commit_index: 0u64, last_applied: 0u64 }
+}
+
+fn raft_append(r: refmut<RaftLog>)
+    ensures (*r).last_log_index == old((*r).last_log_index) + 1u64
+    ensures (*r).current_term   == old((*r).current_term)
+    ensures (*r).commit_index   == old((*r).commit_index)
+    ensures (*r).last_applied   == old((*r).last_applied)
+{
+    (*r).last_log_index = (*r).last_log_index + 1u64;
+}
+
+fn raft_commit(r: refmut<RaftLog>)
+    requires (*r).commit_index < (*r).last_log_index
+    ensures  (*r).commit_index   == old((*r).commit_index) + 1u64
+    ensures  (*r).last_log_index == old((*r).last_log_index)
+    ensures  (*r).current_term   == old((*r).current_term)
+    ensures  (*r).last_applied   == old((*r).last_applied)
+{
+    (*r).commit_index = (*r).commit_index + 1u64;
+}
+
+fn raft_apply(r: refmut<RaftLog>)
+    requires (*r).last_applied < (*r).commit_index
+    ensures  (*r).last_applied   == old((*r).last_applied) + 1u64
+    ensures  (*r).commit_index   == old((*r).commit_index)
+    ensures  (*r).last_log_index == old((*r).last_log_index)
+    ensures  (*r).current_term   == old((*r).current_term)
+{
+    (*r).last_applied = (*r).last_applied + 1u64;
+}
+
+fn raft_new_term(r: refmut<RaftLog>)
+    ensures (*r).current_term   == old((*r).current_term) + 1u64
+    ensures (*r).last_log_index == old((*r).last_log_index)
+    ensures (*r).commit_index   == old((*r).commit_index)
+    ensures (*r).last_applied   == old((*r).last_applied)
+{
+    (*r).current_term = (*r).current_term + 1u64;
+}
+
+// Append 3: last_log_index is 3
+fn append_three() -> u64
+    ensures result == 3u64
+{
+    let r: RaftLog = raft_new();
+    raft_append(&mut r);
+    raft_append(&mut r);
+    raft_append(&mut r);
+    r.last_log_index
+}
+
+// Append 3, commit 2: commit_index is 2
+fn commit_two() -> u64
+    ensures result == 2u64
+{
+    let r: RaftLog = raft_new();
+    raft_append(&mut r);
+    raft_append(&mut r);
+    raft_append(&mut r);
+    raft_commit(&mut r);
+    raft_commit(&mut r);
+    r.commit_index
+}
+
+// Append 3, commit 3, apply 2: last_applied is 2
+fn apply_two() -> u64
+    ensures result == 2u64
+{
+    let r: RaftLog = raft_new();
+    raft_append(&mut r);
+    raft_append(&mut r);
+    raft_append(&mut r);
+    raft_commit(&mut r);
+    raft_commit(&mut r);
+    raft_commit(&mut r);
+    raft_apply(&mut r);
+    raft_apply(&mut r);
+    r.last_applied
+}
+
+// Term advances independently
+fn term_advances() -> u64
+    ensures result == 3u64
+{
+    let r: RaftLog = raft_new();
+    raft_new_term(&mut r);
+    raft_new_term(&mut r);
+    raft_new_term(&mut r);
+    r.current_term
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,94 @@
+// Demo 457: Work handoff protocol between producer and consumer
+//
+// Producer creates work items; handoff transfers them to consumer.
+// Consumer processes them. Verified: handoff_pending tracks in-flight items.
+
+struct Handoff {
+    produced:        u64,
+    handoff_pending: u64,
+    consumed:        u64,
+    handoffs:        u64,
+}
+
+fn ho_new() -> Handoff
+    ensures result.produced        == 0u64
+    ensures result.handoff_pending == 0u64
+    ensures result.consumed        == 0u64
+    ensures result.handoffs        == 0u64
+{
+    struct Handoff { produced: 0u64, handoff_pending: 0u64, consumed: 0u64, handoffs: 0u64 }
+}
+
+fn ho_produce(h: refmut<Handoff>, n: u64)
+    ensures (*h).produced        == old((*h).produced) + n
+    ensures (*h).handoff_pending == old((*h).handoff_pending)
+    ensures (*h).consumed        == old((*h).consumed)
+    ensures (*h).handoffs        == old((*h).handoffs)
+{
+    (*h).produced = (*h).produced + n;
+}
+
+fn ho_handoff(h: refmut<Handoff>, n: u64)
+    requires (*h).produced >= (*h).handoff_pending + (*h).consumed + n
+    ensures  (*h).handoff_pending == old((*h).handoff_pending) + n
+    ensures  (*h).handoffs        == old((*h).handoffs) + 1u64
+    ensures  (*h).produced        == old((*h).produced)
+    ensures  (*h).consumed        == old((*h).consumed)
+{
+    (*h).handoff_pending = (*h).handoff_pending + n;
+    (*h).handoffs        = (*h).handoffs        + 1u64;
+}
+
+fn ho_consume(h: refmut<Handoff>, n: u64)
+    requires (*h).handoff_pending >= n
+    ensures  (*h).consumed        == old((*h).consumed) + n
+    ensures  (*h).handoff_pending == old((*h).handoff_pending) - n
+    ensures  (*h).produced        == old((*h).produced)
+    ensures  (*h).handoffs        == old((*h).handoffs)
+{
+    (*h).consumed        = (*h).consumed        + n;
+    (*h).handoff_pending = (*h).handoff_pending - n;
+}
+
+// Produce 5: produced==5
+fn produce_5() -> u64
+    ensures result == 5u64
+{
+    let h: Handoff = ho_new();
+    ho_produce(&mut h, 5u64);
+    h.produced
+}
+
+// Handoff 3: pending==3
+fn handoff_3() -> u64
+    ensures result == 3u64
+{
+    let h: Handoff = ho_new();
+    ho_produce(&mut h, 5u64);
+    ho_handoff(&mut h, 3u64);
+    h.handoff_pending
+}
+
+// Consume reduces pending
+fn consume_reduces() -> u64
+    ensures result == 1u64
+{
+    let h: Handoff = ho_new();
+    ho_produce(&mut h, 5u64);
+    ho_handoff(&mut h, 3u64);
+    ho_consume(&mut h, 2u64);
+    h.handoff_pending
+}
+
+// Total consumed
+fn total_consumed() -> u64
+    ensures result == 3u64
+{
+    let h: Handoff = ho_new();
+    ho_produce(&mut h, 10u64);
+    ho_handoff(&mut h, 5u64);
+    ho_consume(&mut h, 3u64);
+    h.consumed
+}
+
+fn main() -> u64 { 0u64 }

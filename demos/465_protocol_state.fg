@@ -1,0 +1,111 @@
+// Demo 465: Protocol state machine (init → negotiating → established → closed)
+//
+// Each transition increments its counter. Only valid forward transitions.
+// Verified: state counters track transitions, total == sum of all transitions.
+
+struct ProtocolState {
+    init_to_neg:    u64,
+    neg_to_est:     u64,
+    est_to_closed:  u64,
+    errors:         u64,
+    total_transitions: u64,
+}
+
+fn ps_new() -> ProtocolState
+    ensures result.init_to_neg       == 0u64
+    ensures result.neg_to_est        == 0u64
+    ensures result.est_to_closed     == 0u64
+    ensures result.errors            == 0u64
+    ensures result.total_transitions == 0u64
+{
+    struct ProtocolState { init_to_neg: 0u64, neg_to_est: 0u64, est_to_closed: 0u64, errors: 0u64, total_transitions: 0u64 }
+}
+
+fn ps_negotiate(p: refmut<ProtocolState>)
+    ensures (*p).init_to_neg       == old((*p).init_to_neg) + 1u64
+    ensures (*p).total_transitions == old((*p).total_transitions) + 1u64
+    ensures (*p).neg_to_est        == old((*p).neg_to_est)
+    ensures (*p).est_to_closed     == old((*p).est_to_closed)
+    ensures (*p).errors            == old((*p).errors)
+{
+    (*p).init_to_neg       = (*p).init_to_neg       + 1u64;
+    (*p).total_transitions = (*p).total_transitions + 1u64;
+}
+
+fn ps_establish(p: refmut<ProtocolState>)
+    ensures (*p).neg_to_est        == old((*p).neg_to_est) + 1u64
+    ensures (*p).total_transitions == old((*p).total_transitions) + 1u64
+    ensures (*p).init_to_neg       == old((*p).init_to_neg)
+    ensures (*p).est_to_closed     == old((*p).est_to_closed)
+    ensures (*p).errors            == old((*p).errors)
+{
+    (*p).neg_to_est        = (*p).neg_to_est        + 1u64;
+    (*p).total_transitions = (*p).total_transitions + 1u64;
+}
+
+fn ps_close(p: refmut<ProtocolState>)
+    ensures (*p).est_to_closed     == old((*p).est_to_closed) + 1u64
+    ensures (*p).total_transitions == old((*p).total_transitions) + 1u64
+    ensures (*p).init_to_neg       == old((*p).init_to_neg)
+    ensures (*p).neg_to_est        == old((*p).neg_to_est)
+    ensures (*p).errors            == old((*p).errors)
+{
+    (*p).est_to_closed     = (*p).est_to_closed     + 1u64;
+    (*p).total_transitions = (*p).total_transitions + 1u64;
+}
+
+fn ps_error(p: refmut<ProtocolState>)
+    ensures (*p).errors            == old((*p).errors) + 1u64
+    ensures (*p).total_transitions == old((*p).total_transitions) + 1u64
+    ensures (*p).init_to_neg       == old((*p).init_to_neg)
+    ensures (*p).neg_to_est        == old((*p).neg_to_est)
+    ensures (*p).est_to_closed     == old((*p).est_to_closed)
+{
+    (*p).errors            = (*p).errors            + 1u64;
+    (*p).total_transitions = (*p).total_transitions + 1u64;
+}
+
+// Full connection: 3 transitions
+fn full_connect() -> u64
+    ensures result == 3u64
+{
+    let p: ProtocolState = ps_new();
+    ps_negotiate(&mut p);
+    ps_establish(&mut p);
+    ps_close(&mut p);
+    p.total_transitions
+}
+
+// Established count
+fn established() -> u64
+    ensures result == 1u64
+{
+    let p: ProtocolState = ps_new();
+    ps_negotiate(&mut p);
+    ps_establish(&mut p);
+    p.neg_to_est
+}
+
+// Error tracked
+fn error_tracked() -> u64
+    ensures result == 1u64
+{
+    let p: ProtocolState = ps_new();
+    ps_negotiate(&mut p);
+    ps_error(&mut p);
+    p.errors
+}
+
+// Total == sum of all transition types
+fn total_sum() -> u64
+    ensures result == 0u64
+{
+    let p: ProtocolState = ps_new();
+    ps_negotiate(&mut p);
+    ps_establish(&mut p);
+    ps_close(&mut p);
+    ps_error(&mut p);
+    p.total_transitions - p.init_to_neg - p.neg_to_est - p.est_to_closed - p.errors
+}
+
+fn main() -> u64 { 0u64 }

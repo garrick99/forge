@@ -1,0 +1,107 @@
+// Demo 445: Frequency table for three symbol classes
+//
+// Counts occurrences of class A, B, C symbols.
+// total == count_a + count_b + count_c always holds.
+// Verified: per-class counts are independent, total is preserved.
+
+struct FreqTable {
+    count_a: u64,
+    count_b: u64,
+    count_c: u64,
+    total:   u64,
+}
+
+fn ft_new() -> FreqTable
+    ensures result.count_a == 0u64
+    ensures result.count_b == 0u64
+    ensures result.count_c == 0u64
+    ensures result.total   == 0u64
+{
+    struct FreqTable { count_a: 0u64, count_b: 0u64, count_c: 0u64, total: 0u64 }
+}
+
+fn ft_observe_a(f: refmut<FreqTable>)
+    ensures (*f).count_a == old((*f).count_a) + 1u64
+    ensures (*f).total   == old((*f).total) + 1u64
+    ensures (*f).count_b == old((*f).count_b)
+    ensures (*f).count_c == old((*f).count_c)
+{
+    (*f).count_a = (*f).count_a + 1u64;
+    (*f).total   = (*f).total   + 1u64;
+}
+
+fn ft_observe_b(f: refmut<FreqTable>)
+    ensures (*f).count_b == old((*f).count_b) + 1u64
+    ensures (*f).total   == old((*f).total) + 1u64
+    ensures (*f).count_a == old((*f).count_a)
+    ensures (*f).count_c == old((*f).count_c)
+{
+    (*f).count_b = (*f).count_b + 1u64;
+    (*f).total   = (*f).total   + 1u64;
+}
+
+fn ft_observe_c(f: refmut<FreqTable>)
+    ensures (*f).count_c == old((*f).count_c) + 1u64
+    ensures (*f).total   == old((*f).total) + 1u64
+    ensures (*f).count_a == old((*f).count_a)
+    ensures (*f).count_b == old((*f).count_b)
+{
+    (*f).count_c = (*f).count_c + 1u64;
+    (*f).total   = (*f).total   + 1u64;
+}
+
+// Observe AABB CC: count_a==2
+fn count_a_two() -> u64
+    ensures result == 2u64
+{
+    let f: FreqTable = ft_new();
+    ft_observe_a(&mut f);
+    ft_observe_a(&mut f);
+    ft_observe_b(&mut f);
+    ft_observe_b(&mut f);
+    ft_observe_c(&mut f);
+    ft_observe_c(&mut f);
+    f.count_a
+}
+
+// Total == 6
+fn total_six() -> u64
+    ensures result == 6u64
+{
+    let f: FreqTable = ft_new();
+    ft_observe_a(&mut f);
+    ft_observe_a(&mut f);
+    ft_observe_b(&mut f);
+    ft_observe_b(&mut f);
+    ft_observe_c(&mut f);
+    ft_observe_c(&mut f);
+    f.total
+}
+
+// total == count_a + count_b + count_c
+fn sum_invariant() -> u64
+    ensures result == 0u64
+{
+    let f: FreqTable = ft_new();
+    ft_observe_a(&mut f);
+    ft_observe_b(&mut f);
+    ft_observe_b(&mut f);
+    ft_observe_c(&mut f);
+    f.total - f.count_a - f.count_b - f.count_c
+}
+
+// B independent of A observations
+fn b_independent() -> u64
+    ensures result == 3u64
+{
+    let f: FreqTable = ft_new();
+    ft_observe_a(&mut f);
+    ft_observe_a(&mut f);
+    ft_observe_a(&mut f);
+    ft_observe_b(&mut f);
+    ft_observe_b(&mut f);
+    ft_observe_b(&mut f);
+    f.count_b
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,112 @@
+// Demo 412: Memory fragmentation tracker
+//
+// Tracks allocated blocks and free fragments. split() divides a free
+// block into two, merge() combines two adjacent free blocks.
+// Verified: blocks + free_fragments reflects all split/merge ops.
+
+struct FragTracker {
+    alloc_blocks:   u64,
+    free_fragments: u64,
+    splits:         u64,
+    merges:         u64,
+}
+
+fn ft_new(free_fragments: u64) -> FragTracker
+    requires free_fragments > 0u64
+    ensures result.alloc_blocks   == 0u64
+    ensures result.free_fragments == free_fragments
+    ensures result.splits         == 0u64
+    ensures result.merges         == 0u64
+{
+    struct FragTracker { alloc_blocks: 0u64, free_fragments: free_fragments, splits: 0u64, merges: 0u64 }
+}
+
+fn ft_alloc(f: refmut<FragTracker>)
+    requires (*f).free_fragments > 0u64
+    ensures  (*f).alloc_blocks   == old((*f).alloc_blocks) + 1u64
+    ensures  (*f).free_fragments == old((*f).free_fragments) - 1u64
+    ensures  (*f).splits         == old((*f).splits)
+    ensures  (*f).merges         == old((*f).merges)
+{
+    (*f).alloc_blocks   = (*f).alloc_blocks   + 1u64;
+    (*f).free_fragments = (*f).free_fragments - 1u64;
+}
+
+fn ft_free(f: refmut<FragTracker>)
+    requires (*f).alloc_blocks > 0u64
+    ensures  (*f).free_fragments == old((*f).free_fragments) + 1u64
+    ensures  (*f).alloc_blocks   == old((*f).alloc_blocks) - 1u64
+    ensures  (*f).splits         == old((*f).splits)
+    ensures  (*f).merges         == old((*f).merges)
+{
+    (*f).free_fragments = (*f).free_fragments + 1u64;
+    (*f).alloc_blocks   = (*f).alloc_blocks   - 1u64;
+}
+
+fn ft_split(f: refmut<FragTracker>)
+    requires (*f).free_fragments > 0u64
+    ensures  (*f).free_fragments == old((*f).free_fragments) + 1u64
+    ensures  (*f).splits         == old((*f).splits) + 1u64
+    ensures  (*f).alloc_blocks   == old((*f).alloc_blocks)
+    ensures  (*f).merges         == old((*f).merges)
+{
+    (*f).free_fragments = (*f).free_fragments + 1u64;
+    (*f).splits         = (*f).splits         + 1u64;
+}
+
+fn ft_merge(f: refmut<FragTracker>)
+    requires (*f).free_fragments > 1u64
+    ensures  (*f).free_fragments == old((*f).free_fragments) - 1u64
+    ensures  (*f).merges         == old((*f).merges) + 1u64
+    ensures  (*f).alloc_blocks   == old((*f).alloc_blocks)
+    ensures  (*f).splits         == old((*f).splits)
+{
+    (*f).free_fragments = (*f).free_fragments - 1u64;
+    (*f).merges         = (*f).merges         + 1u64;
+}
+
+// Alloc 3 from 5: alloc is 3, free is 2
+fn alloc_three_free() -> u64
+    ensures result == 2u64
+{
+    let f: FragTracker = ft_new(5u64);
+    ft_alloc(&mut f);
+    ft_alloc(&mut f);
+    ft_alloc(&mut f);
+    f.free_fragments
+}
+
+// Split 2 times: free grows
+fn two_splits() -> u64
+    ensures result == 7u64
+{
+    let f: FragTracker = ft_new(5u64);
+    ft_split(&mut f);
+    ft_split(&mut f);
+    f.free_fragments
+}
+
+// Split then merge: net zero change
+fn split_merge_net() -> u64
+    ensures result == 5u64
+{
+    let f: FragTracker = ft_new(5u64);
+    ft_split(&mut f);
+    ft_merge(&mut f);
+    f.free_fragments
+}
+
+// Total preserved: alloc + free == initial + splits - merges
+fn total_blocks(init: u64) -> u64
+    requires init > 3u64
+    ensures result == init + 1u64
+{
+    let f: FragTracker = ft_new(init);
+    ft_alloc(&mut f);
+    ft_split(&mut f);
+    ft_split(&mut f);
+    ft_merge(&mut f);
+    f.alloc_blocks + f.free_fragments
+}
+
+fn main() -> u64 { 0u64 }

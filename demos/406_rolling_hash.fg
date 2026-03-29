@@ -1,0 +1,97 @@
+// Demo 406: Rolling hash state tracker
+//
+// A Rabin-Karp style rolling hash: each add() incorporates a new
+// symbol into the hash. The window_size and symbol_count are tracked.
+// Verified: symbol_count increments and hash_value updates correctly.
+
+struct RollingHash {
+    hash_value:   u64,
+    symbol_count: u64,
+    window_size:  u64,
+    base:         u64,
+}
+
+fn rh_new(window_size: u64, base: u64) -> RollingHash
+    requires window_size > 0u64
+    requires base > 1u64
+    ensures result.hash_value   == 0u64
+    ensures result.symbol_count == 0u64
+    ensures result.window_size  == window_size
+    ensures result.base         == base
+{
+    struct RollingHash { hash_value: 0u64, symbol_count: 0u64, window_size: window_size, base: base }
+}
+
+fn rh_add(r: refmut<RollingHash>, symbol: u64)
+    ensures (*r).hash_value   == old((*r).hash_value) * (*r).base + symbol
+    ensures (*r).symbol_count == old((*r).symbol_count) + 1u64
+    ensures (*r).window_size  == old((*r).window_size)
+    ensures (*r).base         == old((*r).base)
+{
+    (*r).hash_value   = (*r).hash_value * (*r).base + symbol;
+    (*r).symbol_count = (*r).symbol_count + 1u64;
+}
+
+fn rh_reset(r: refmut<RollingHash>)
+    ensures (*r).hash_value   == 0u64
+    ensures (*r).symbol_count == 0u64
+    ensures (*r).window_size  == old((*r).window_size)
+    ensures (*r).base         == old((*r).base)
+{
+    (*r).hash_value   = 0u64;
+    (*r).symbol_count = 0u64;
+}
+
+// Add symbol 5 with base 10: hash is 5
+fn one_symbol() -> u64
+    ensures result == 5u64
+{
+    let r: RollingHash = rh_new(4u64, 10u64);
+    rh_add(&mut r, 5u64);
+    r.hash_value
+}
+
+// Add 1, 2 with base 10: hash is 12
+fn two_symbols() -> u64
+    ensures result == 12u64
+{
+    let r: RollingHash = rh_new(4u64, 10u64);
+    rh_add(&mut r, 1u64);
+    rh_add(&mut r, 2u64);
+    r.hash_value
+}
+
+// Add 1, 2, 3 with base 10: hash is 123
+fn three_symbols() -> u64
+    ensures result == 123u64
+{
+    let r: RollingHash = rh_new(4u64, 10u64);
+    rh_add(&mut r, 1u64);
+    rh_add(&mut r, 2u64);
+    rh_add(&mut r, 3u64);
+    r.hash_value
+}
+
+// Symbol count tracks additions
+fn symbol_count() -> u64
+    ensures result == 3u64
+{
+    let r: RollingHash = rh_new(4u64, 10u64);
+    rh_add(&mut r, 1u64);
+    rh_add(&mut r, 2u64);
+    rh_add(&mut r, 3u64);
+    r.symbol_count
+}
+
+// Reset clears state
+fn reset_clears() -> u64
+    ensures result == 0u64
+{
+    let r: RollingHash = rh_new(4u64, 10u64);
+    rh_add(&mut r, 5u64);
+    rh_add(&mut r, 7u64);
+    rh_reset(&mut r);
+    r.hash_value + r.symbol_count
+}
+
+fn main() -> u64 { 0u64 }

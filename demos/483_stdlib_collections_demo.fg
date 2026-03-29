@@ -1,0 +1,47 @@
+// Demo 483: std::collections showcase — Vec_u64 set, fill, sum, max, min
+//
+// Exercises vec_u64_set, vec_u64_fill, vec_u64_sum, vec_u64_max, vec_u64_min.
+
+use std::collections;
+
+fn check_set_get(data: span<u64>) -> u64
+    requires data.len == 4u64
+    ensures  result == 42u64
+{
+    let v: Vec_u64 = vec_u64_new(data);
+    vec_u64_push(&mut v, 99u64);
+    vec_u64_set(&mut v, 0u64, 42u64);
+    vec_u64_get(&v, 0u64)
+}
+
+fn check_fill_capacity(data: span<u64>) -> u64
+    requires data.len == 4u64
+    ensures  result == 4u64
+{
+    let v: Vec_u64 = vec_u64_new(data);
+    vec_u64_push(&mut v, 1u64);
+    vec_u64_push(&mut v, 2u64);
+    vec_u64_push(&mut v, 3u64);
+    vec_u64_fill(&mut v, 0u64);
+    vec_u64_capacity(&v)
+}
+
+fn check_peek(data: span<u64>) -> u64
+    requires data.len == 4u64
+    ensures  result == 77u64
+{
+    let v: Vec_u64 = vec_u64_new(data);
+    vec_u64_push(&mut v, 77u64);
+    vec_u64_peek(&v)
+}
+
+fn check_not_empty_after_push(data: span<u64>) -> bool
+    requires data.len == 2u64
+    ensures  result == false
+{
+    let v: Vec_u64 = vec_u64_new(data);
+    vec_u64_push(&mut v, 5u64);
+    vec_u64_is_empty(&v)
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,101 @@
+// Demo 440: Alarm manager with armed/disarmed states
+//
+// Alarms can be armed, triggered, or silenced.
+// armed_count tracks active alarms; trigger() fires one; silence() clears all.
+// Verified: triggered + armed + silenced tracks all alarm events.
+
+struct AlarmManager {
+    armed:     u64,
+    triggered: u64,
+    silenced:  u64,
+    total:     u64,
+}
+
+fn am_new() -> AlarmManager
+    ensures result.armed     == 0u64
+    ensures result.triggered == 0u64
+    ensures result.silenced  == 0u64
+    ensures result.total     == 0u64
+{
+    struct AlarmManager { armed: 0u64, triggered: 0u64, silenced: 0u64, total: 0u64 }
+}
+
+fn am_arm(a: refmut<AlarmManager>)
+    ensures (*a).armed     == old((*a).armed) + 1u64
+    ensures (*a).total     == old((*a).total) + 1u64
+    ensures (*a).triggered == old((*a).triggered)
+    ensures (*a).silenced  == old((*a).silenced)
+{
+    (*a).armed = (*a).armed + 1u64;
+    (*a).total = (*a).total + 1u64;
+}
+
+fn am_trigger(a: refmut<AlarmManager>)
+    requires (*a).armed > 0u64
+    ensures  (*a).armed     == old((*a).armed) - 1u64
+    ensures  (*a).triggered == old((*a).triggered) + 1u64
+    ensures  (*a).total     == old((*a).total)
+    ensures  (*a).silenced  == old((*a).silenced)
+{
+    (*a).armed     = (*a).armed     - 1u64;
+    (*a).triggered = (*a).triggered + 1u64;
+}
+
+fn am_silence(a: refmut<AlarmManager>)
+    requires (*a).triggered > 0u64
+    ensures  (*a).triggered == old((*a).triggered) - 1u64
+    ensures  (*a).silenced  == old((*a).silenced) + 1u64
+    ensures  (*a).armed     == old((*a).armed)
+    ensures  (*a).total     == old((*a).total)
+{
+    (*a).triggered = (*a).triggered - 1u64;
+    (*a).silenced  = (*a).silenced  + 1u64;
+}
+
+// Arm 3: armed==3
+fn arm_3() -> u64
+    ensures result == 3u64
+{
+    let a: AlarmManager = am_new();
+    am_arm(&mut a);
+    am_arm(&mut a);
+    am_arm(&mut a);
+    a.armed
+}
+
+// Arm 2, trigger 1: triggered==1
+fn trigger_one() -> u64
+    ensures result == 1u64
+{
+    let a: AlarmManager = am_new();
+    am_arm(&mut a);
+    am_arm(&mut a);
+    am_trigger(&mut a);
+    a.triggered
+}
+
+// Trigger then silence: silenced==1
+fn silence_count() -> u64
+    ensures result == 1u64
+{
+    let a: AlarmManager = am_new();
+    am_arm(&mut a);
+    am_trigger(&mut a);
+    am_silence(&mut a);
+    a.silenced
+}
+
+// Total is preserved through state changes
+fn total_preserved() -> u64
+    ensures result == 3u64
+{
+    let a: AlarmManager = am_new();
+    am_arm(&mut a);
+    am_arm(&mut a);
+    am_arm(&mut a);
+    am_trigger(&mut a);
+    am_silence(&mut a);
+    a.total
+}
+
+fn main() -> u64 { 0u64 }

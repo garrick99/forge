@@ -1,0 +1,82 @@
+// std/fmt.fg — number formatting utilities
+//
+// Include with:  use std::fmt;
+//
+// Pure functions for digit counting and hex digit encoding.
+// For actual output, use std::io (print_u64, print_hex, etc.).
+// For Str-buffer formatting, use std::io's putchar-based variants.
+
+use str;
+
+// ---- Digit counting --------------------------------------------------------
+
+// Count the number of decimal digits in n (minimum 1 for n == 0).
+fn count_digits_u64(n: u64) -> u64
+    ensures result >= 1u64
+    decreases n
+{
+    if n < 10u64 { 1u64 } else { 1u64 + count_digits_u64(n / 10u64) }
+}
+
+// Count the number of hex digits needed for n (minimum 1).
+fn count_hex_digits(n: u64) -> u64
+    ensures result >= 1u64
+    decreases n
+{
+    if n < 16u64 { 1u64 } else { 1u64 + count_hex_digits(n / 16u64) }
+}
+
+// ---- Digit encoding --------------------------------------------------------
+
+// Hex digit (lowercase) for value v in [0, 15].
+fn hex_digit(v: u64) -> u8
+    requires v < 16u64
+    ensures  result >= 48u8
+    ensures  v < 10u64  ==> result == 48u8 + v
+    ensures  v >= 10u64 ==> result == 87u8 + v
+{
+    if v < 10u64 {
+        48u8 + v as u8
+    } else {
+        87u8 + v as u8    // 'a' - 10 = 87
+    }
+}
+
+// Decimal digit byte for value v in [0, 9].
+fn dec_digit(v: u64) -> u8
+    requires v < 10u64
+    ensures  result >= 48u8
+    ensures  result == 48u8 + v
+{
+    48u8 + v as u8
+}
+
+// ---- Parsing ---------------------------------------------------------------
+
+// Parse a decimal u64 from a Str buffer, starting at offset off.
+// Stops at first non-digit byte or end of string.
+fn parse_u64_at(s: ref<Str>, off: u64) -> u64
+    requires off <= (*s).len
+    requires (*s).len <= (*s).data.len
+    ensures  off >= (*s).len ==> result == 0u64
+{
+    let acc: u64 = 0u64;
+    let i: u64 = off;
+    let parsing: bool = true;
+    while i < (*s).len && parsing
+        invariant i >= off
+        invariant i <= (*s).len
+        invariant (*s).len <= (*s).data.len
+        invariant off >= (*s).len ==> acc == 0u64
+        decreases (*s).len - i
+    {
+        let b: u8 = (*s).data[i];
+        if b >= 48u8 && b <= 57u8 {
+            acc = acc * 10u64 + (b - 48u8) as u64;
+            i = i + 1u64;
+        } else {
+            parsing = false;
+        };
+    };
+    acc
+}

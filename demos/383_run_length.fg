@@ -1,0 +1,92 @@
+// Demo 383: Run-length encoding state tracker
+//
+// Tracks the current run: symbol and consecutive count.
+// extend_run() increments count (same symbol continuing),
+// new_run() resets count to 1 and bumps run_count.
+// Verified: run_count and current_run_len track state correctly.
+
+struct RunState {
+    current_symbol:  u64,
+    current_run_len: u64,
+    run_count:       u64,
+}
+
+fn rs_new(first_symbol: u64) -> RunState
+    ensures result.current_symbol  == first_symbol
+    ensures result.current_run_len == 1u64
+    ensures result.run_count       == 1u64
+{
+    struct RunState { current_symbol: first_symbol, current_run_len: 1u64, run_count: 1u64 }
+}
+
+fn rs_extend(r: refmut<RunState>)
+    ensures (*r).current_run_len == old((*r).current_run_len) + 1u64
+    ensures (*r).current_symbol  == old((*r).current_symbol)
+    ensures (*r).run_count       == old((*r).run_count)
+{
+    (*r).current_run_len = (*r).current_run_len + 1u64;
+}
+
+fn rs_new_run(r: refmut<RunState>, symbol: u64)
+    ensures (*r).current_symbol  == symbol
+    ensures (*r).current_run_len == 1u64
+    ensures (*r).run_count       == old((*r).run_count) + 1u64
+{
+    (*r).current_symbol  = symbol;
+    (*r).current_run_len = 1u64;
+    (*r).run_count       = (*r).run_count + 1u64;
+}
+
+// Extend 3 times: run_len is 4
+fn extend_three() -> u64
+    ensures result == 4u64
+{
+    let r: RunState = rs_new(5u64);
+    rs_extend(&mut r);
+    rs_extend(&mut r);
+    rs_extend(&mut r);
+    r.current_run_len
+}
+
+// New run resets length to 1
+fn new_run_length() -> u64
+    ensures result == 1u64
+{
+    let r: RunState = rs_new(5u64);
+    rs_extend(&mut r);
+    rs_extend(&mut r);
+    rs_new_run(&mut r, 7u64);
+    r.current_run_len
+}
+
+// New run updates symbol
+fn new_run_symbol() -> u64
+    ensures result == 7u64
+{
+    let r: RunState = rs_new(5u64);
+    rs_extend(&mut r);
+    rs_new_run(&mut r, 7u64);
+    r.current_symbol
+}
+
+// Run count tracks distinct runs
+fn run_count() -> u64
+    ensures result == 3u64
+{
+    let r: RunState = rs_new(1u64);
+    rs_extend(&mut r);
+    rs_new_run(&mut r, 2u64);
+    rs_extend(&mut r);
+    rs_new_run(&mut r, 1u64);
+    r.run_count
+}
+
+// Initial state: run_len is 1, run_count is 1
+fn initial_state() -> u64
+    ensures result == 1u64
+{
+    let r: RunState = rs_new(42u64);
+    r.run_count
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,91 @@
+// Demo 365: Flow control — bytes sent/received/dropped
+//
+// A network flow tracker: send() adds to sent, receive() adds to received,
+// drop() adds to dropped. Conservation: sent == received + dropped + in_flight.
+// Verified: each counter increments independently.
+
+struct Flow {
+    sent:     u64,
+    received: u64,
+    dropped:  u64,
+}
+
+fn flow_new() -> Flow
+    ensures result.sent     == 0u64
+    ensures result.received == 0u64
+    ensures result.dropped  == 0u64
+{
+    struct Flow { sent: 0u64, received: 0u64, dropped: 0u64 }
+}
+
+fn flow_send(f: refmut<Flow>, n: u64)
+    requires n > 0u64
+    ensures (*f).sent     == old((*f).sent) + n
+    ensures (*f).received == old((*f).received)
+    ensures (*f).dropped  == old((*f).dropped)
+{
+    (*f).sent = (*f).sent + n;
+}
+
+fn flow_receive(f: refmut<Flow>, n: u64)
+    requires n > 0u64
+    requires (*f).sent >= (*f).received + (*f).dropped + n
+    ensures  (*f).received == old((*f).received) + n
+    ensures  (*f).sent     == old((*f).sent)
+    ensures  (*f).dropped  == old((*f).dropped)
+{
+    (*f).received = (*f).received + n;
+}
+
+fn flow_drop(f: refmut<Flow>, n: u64)
+    requires n > 0u64
+    requires (*f).sent >= (*f).received + (*f).dropped + n
+    ensures  (*f).dropped == old((*f).dropped) + n
+    ensures  (*f).sent    == old((*f).sent)
+    ensures  (*f).received == old((*f).received)
+{
+    (*f).dropped = (*f).dropped + n;
+}
+
+// Send 100: sent is 100
+fn send_100() -> u64
+    ensures result == 100u64
+{
+    let f: Flow = flow_new();
+    flow_send(&mut f, 100u64);
+    f.sent
+}
+
+// Send 100, receive 80: received is 80
+fn send_receive() -> u64
+    ensures result == 80u64
+{
+    let f: Flow = flow_new();
+    flow_send(&mut f, 100u64);
+    flow_receive(&mut f, 80u64);
+    f.received
+}
+
+// Send 100, receive 70, drop 20: in-flight is 10
+fn in_flight() -> u64
+    ensures result == 10u64
+{
+    let f: Flow = flow_new();
+    flow_send(&mut f, 100u64);
+    flow_receive(&mut f, 70u64);
+    flow_drop(&mut f, 20u64);
+    f.sent - f.received - f.dropped
+}
+
+// Multiple sends: 30 + 50 + 20 = 100
+fn multi_send() -> u64
+    ensures result == 100u64
+{
+    let f: Flow = flow_new();
+    flow_send(&mut f, 30u64);
+    flow_send(&mut f, 50u64);
+    flow_send(&mut f, 20u64);
+    f.sent
+}
+
+fn main() -> u64 { 0u64 }

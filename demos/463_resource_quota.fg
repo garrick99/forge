@@ -1,0 +1,104 @@
+// Demo 463: Resource quota with soft and hard limits
+//
+// soft_limit: warning threshold. hard_limit: absolute max.
+// Allocations that exceed soft but not hard are "over_soft".
+// Verified: used <= hard_limit enforced by precondition.
+
+struct ResourceQuota {
+    used:       u64,
+    soft_limit: u64,
+    hard_limit: u64,
+    over_soft:  u64,
+    allocations: u64,
+}
+
+fn rq_new(soft: u64, hard: u64) -> ResourceQuota
+    requires soft > 0u64
+    requires hard >= soft
+    ensures result.used        == 0u64
+    ensures result.soft_limit  == soft
+    ensures result.hard_limit  == hard
+    ensures result.over_soft   == 0u64
+    ensures result.allocations == 0u64
+{
+    struct ResourceQuota { used: 0u64, soft_limit: soft, hard_limit: hard, over_soft: 0u64, allocations: 0u64 }
+}
+
+fn rq_alloc_normal(r: refmut<ResourceQuota>, n: u64)
+    requires (*r).used + n <= (*r).soft_limit
+    ensures  (*r).used        == old((*r).used) + n
+    ensures  (*r).allocations == old((*r).allocations) + 1u64
+    ensures  (*r).soft_limit  == old((*r).soft_limit)
+    ensures  (*r).hard_limit  == old((*r).hard_limit)
+    ensures  (*r).over_soft   == old((*r).over_soft)
+{
+    (*r).used        = (*r).used        + n;
+    (*r).allocations = (*r).allocations + 1u64;
+}
+
+fn rq_alloc_over_soft(r: refmut<ResourceQuota>, n: u64)
+    requires (*r).used + n > (*r).soft_limit
+    requires (*r).used + n <= (*r).hard_limit
+    ensures  (*r).used        == old((*r).used) + n
+    ensures  (*r).over_soft   == old((*r).over_soft) + 1u64
+    ensures  (*r).allocations == old((*r).allocations) + 1u64
+    ensures  (*r).soft_limit  == old((*r).soft_limit)
+    ensures  (*r).hard_limit  == old((*r).hard_limit)
+{
+    (*r).used        = (*r).used        + n;
+    (*r).over_soft   = (*r).over_soft   + 1u64;
+    (*r).allocations = (*r).allocations + 1u64;
+}
+
+fn rq_free(r: refmut<ResourceQuota>, n: u64)
+    requires (*r).used >= n
+    ensures  (*r).used        == old((*r).used) - n
+    ensures  (*r).soft_limit  == old((*r).soft_limit)
+    ensures  (*r).hard_limit  == old((*r).hard_limit)
+    ensures  (*r).over_soft   == old((*r).over_soft)
+    ensures  (*r).allocations == old((*r).allocations)
+{
+    (*r).used = (*r).used - n;
+}
+
+// Normal alloc: used==50
+fn normal_alloc() -> u64
+    ensures result == 50u64
+{
+    let r: ResourceQuota = rq_new(100u64, 200u64);
+    rq_alloc_normal(&mut r, 50u64);
+    r.used
+}
+
+// Over-soft alloc: over_soft==1
+fn over_soft_alloc() -> u64
+    ensures result == 1u64
+{
+    let r: ResourceQuota = rq_new(100u64, 200u64);
+    rq_alloc_normal(&mut r, 80u64);
+    rq_alloc_over_soft(&mut r, 50u64);
+    r.over_soft
+}
+
+// Free reduces used
+fn free_reduces() -> u64
+    ensures result == 30u64
+{
+    let r: ResourceQuota = rq_new(100u64, 200u64);
+    rq_alloc_normal(&mut r, 80u64);
+    rq_free(&mut r, 50u64);
+    r.used
+}
+
+// Total allocations
+fn total_allocs() -> u64
+    ensures result == 3u64
+{
+    let r: ResourceQuota = rq_new(100u64, 300u64);
+    rq_alloc_normal(&mut r, 50u64);
+    rq_alloc_normal(&mut r, 40u64);
+    rq_alloc_over_soft(&mut r, 80u64);
+    r.allocations
+}
+
+fn main() -> u64 { 0u64 }

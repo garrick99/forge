@@ -9,20 +9,21 @@
 #endif
 
 /* Forward declarations */
-uint64_t abs_diff(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 uint64_t min64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 uint64_t max64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 uint64_t clamp64(uint64_t v __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused)));
+uint64_t abs_diff(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 uint64_t pow64(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused)));
+uint64_t ceil_div(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
+uint64_t round_up(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
+uint64_t gcd64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
+uint64_t sat_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
+uint64_t sat_sub(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
+uint64_t sat_mul(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
+_Bool is_pow2(uint64_t n __attribute__((unused)));
+uint64_t popcount64(uint64_t n __attribute__((unused)));
+uint64_t floor_log2(uint64_t n __attribute__((unused)));
 int main();
-
-uint64_t abs_diff(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if ((a >= b)) {
-    return (a - b);
-  } else {
-    return (b - a);
-  }
-}
 
 uint64_t min64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
   if ((a <= b)) {
@@ -52,11 +53,83 @@ uint64_t clamp64(uint64_t v __attribute__((unused)), uint64_t lo __attribute__((
   }
 }
 
+uint64_t abs_diff(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
+  if ((a >= b)) {
+    return (a - b);
+  } else {
+    return (b - a);
+  }
+}
+
 uint64_t pow64(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused))) {
   if ((exp == 0)) {
     return 1;
   } else {
     return (base * pow64(base, (exp - 1)));
+  }
+}
+
+uint64_t ceil_div(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
+  return (((a + b) - 1) / b);
+}
+
+uint64_t round_up(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
+  return (ceil_div(a, b) * b);
+}
+
+uint64_t gcd64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
+  if ((b == 0)) {
+    return a;
+  } else {
+    return gcd64(b, (a % b));
+  }
+}
+
+uint64_t sat_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
+  if ((a > (-1 - b))) {
+    return -1;
+  } else {
+    return (a + b);
+  }
+}
+
+uint64_t sat_sub(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
+  if ((a < b)) {
+    return 0;
+  } else {
+    return (a - b);
+  }
+}
+
+uint64_t sat_mul(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
+  if ((b == 0)) {
+    return 0;
+  } else {
+    if ((a > (-1 / b))) {
+      return -1;
+    } else {
+      return (a * b);
+    }
+  }
+}
+
+_Bool is_pow2(uint64_t n __attribute__((unused))) {
+  return ((n & (n - 1)) == 0);
+}
+
+uint64_t popcount64(uint64_t n __attribute__((unused))) {
+  if ((n == 0)) {
+    return 0;
+  } else {
+    return (1 + popcount64((n & (n - 1))));
+  }
+}
+
+uint64_t floor_log2(uint64_t n __attribute__((unused))) {
+  if ((n == 1)) {
+    return 0;
+  } else {
+    return (1 + floor_log2((n / 2)));
   }
 }
 

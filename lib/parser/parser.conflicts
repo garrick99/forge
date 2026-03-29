@@ -1552,7 +1552,7 @@ EXISTS ident COLON ty COMMA pred
 pred STAR pred // lookahead token appears
 EXISTS ident COLON ty COMMA pred . 
 
-** Conflict (shift/reduce) in state 105.
+** Conflict (shift/reduce) in state 103.
 ** Token involved: LPAREN
 ** This state is reached from program after reading:
 
@@ -1569,7 +1569,7 @@ IMPL ty LBRACE list(impl_item) RBRACE
      LBRACKET ty SEMI expr RBRACKET 
                       (?)
 
-** In state 105, looking ahead at LPAREN, shifting is permitted
+** In state 103, looking ahead at LPAREN, shifting is permitted
 ** because of the following sub-derivation:
 
 expr AS ty 
@@ -1578,7 +1578,7 @@ expr AS ty
                                                                              REQUIRES pred 
                                                                                       ident . LPAREN loption(separated_nonempty_list(COMMA,pred)) RPAREN 
 
-** In state 105, looking ahead at LPAREN, reducing production
+** In state 103, looking ahead at LPAREN, reducing production
 ** pred -> ident
 ** is permitted because of the following sub-derivation:
 
@@ -1588,37 +1588,6 @@ expr AS ty // lookahead token is inherited
                                                                              fn_ty_requires_clause list(fn_ty_requires_clause) // lookahead token is inherited because list(fn_ty_requires_clause) can vanish
                                                                              REQUIRES pred // lookahead token is inherited
                                                                                       ident . 
-
-** Conflict (shift/reduce) in state 95.
-** Tokens involved: STAR SLASH SHR SHL PLUS PIPE PERCENT NEQ MINUS LT LOR LE LBRACKET LAND IMPLIES IFF GT GE EQEQ DOT CARET AMP
-** The following explanations concentrate on token STAR.
-** This state is reached from program after reading:
-
-IMPL prim_ty_kw LBRACKET ident PIPE BANG pred
-
-** The derivations that appear below have the following common factor:
-** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
-
-program 
-list(item) EOF 
-item list(item) 
-impl_def 
-IMPL ty LBRACE list(impl_item) RBRACE 
-     prim_ty_kw LBRACKET ident PIPE pred RBRACKET 
-                                    (?)
-
-** In state 95, looking ahead at STAR, shifting is permitted
-** because of the following sub-derivation:
-
-BANG pred 
-     pred . STAR pred 
-
-** In state 95, looking ahead at STAR, reducing production
-** pred -> BANG pred
-** is permitted because of the following sub-derivation:
-
-pred STAR pred // lookahead token appears
-BANG pred . 
 
 ** Conflict (shift/reduce) in state 69.
 ** Token involved: LBRACKET

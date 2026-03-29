@@ -1,0 +1,106 @@
+// Demo 432: Budget tracker with categories
+//
+// Three spending categories: food, transport, other.
+// Each spend reduces remaining budget and updates category total.
+// Verified: spent_food + spent_transport + spent_other == total_spent.
+
+struct Budget {
+    remaining:       u64,
+    spent_food:      u64,
+    spent_transport: u64,
+    spent_other:     u64,
+    total_spent:     u64,
+}
+
+fn budget_new(amount: u64) -> Budget
+    requires amount > 0u64
+    ensures result.remaining       == amount
+    ensures result.spent_food      == 0u64
+    ensures result.spent_transport == 0u64
+    ensures result.spent_other     == 0u64
+    ensures result.total_spent     == 0u64
+{
+    struct Budget { remaining: amount, spent_food: 0u64, spent_transport: 0u64, spent_other: 0u64, total_spent: 0u64 }
+}
+
+fn budget_spend_food(b: refmut<Budget>, n: u64)
+    requires (*b).remaining >= n
+    ensures  (*b).remaining       == old((*b).remaining) - n
+    ensures  (*b).spent_food      == old((*b).spent_food) + n
+    ensures  (*b).total_spent     == old((*b).total_spent) + n
+    ensures  (*b).spent_transport == old((*b).spent_transport)
+    ensures  (*b).spent_other     == old((*b).spent_other)
+{
+    (*b).remaining   = (*b).remaining   - n;
+    (*b).spent_food  = (*b).spent_food  + n;
+    (*b).total_spent = (*b).total_spent + n;
+}
+
+fn budget_spend_transport(b: refmut<Budget>, n: u64)
+    requires (*b).remaining >= n
+    ensures  (*b).remaining       == old((*b).remaining) - n
+    ensures  (*b).spent_transport == old((*b).spent_transport) + n
+    ensures  (*b).total_spent     == old((*b).total_spent) + n
+    ensures  (*b).spent_food      == old((*b).spent_food)
+    ensures  (*b).spent_other     == old((*b).spent_other)
+{
+    (*b).remaining        = (*b).remaining        - n;
+    (*b).spent_transport  = (*b).spent_transport  + n;
+    (*b).total_spent      = (*b).total_spent      + n;
+}
+
+fn budget_spend_other(b: refmut<Budget>, n: u64)
+    requires (*b).remaining >= n
+    ensures  (*b).remaining       == old((*b).remaining) - n
+    ensures  (*b).spent_other     == old((*b).spent_other) + n
+    ensures  (*b).total_spent     == old((*b).total_spent) + n
+    ensures  (*b).spent_food      == old((*b).spent_food)
+    ensures  (*b).spent_transport == old((*b).spent_transport)
+{
+    (*b).remaining    = (*b).remaining    - n;
+    (*b).spent_other  = (*b).spent_other  + n;
+    (*b).total_spent  = (*b).total_spent  + n;
+}
+
+// Spend 30 on food from 100: remaining==70
+fn food_spend() -> u64
+    ensures result == 70u64
+{
+    let b: Budget = budget_new(100u64);
+    budget_spend_food(&mut b, 30u64);
+    b.remaining
+}
+
+// Mixed spend: total_spent==50
+fn mixed_total() -> u64
+    ensures result == 50u64
+{
+    let b: Budget = budget_new(100u64);
+    budget_spend_food(&mut b, 20u64);
+    budget_spend_transport(&mut b, 15u64);
+    budget_spend_other(&mut b, 15u64);
+    b.total_spent
+}
+
+// Categories sum to total
+fn categories_sum() -> u64
+    ensures result == 0u64
+{
+    let b: Budget = budget_new(100u64);
+    budget_spend_food(&mut b, 20u64);
+    budget_spend_transport(&mut b, 15u64);
+    budget_spend_other(&mut b, 10u64);
+    b.total_spent - b.spent_food - b.spent_transport - b.spent_other
+}
+
+// Food independent of transport
+fn food_independent() -> u64
+    ensures result == 20u64
+{
+    let b: Budget = budget_new(100u64);
+    budget_spend_food(&mut b, 20u64);
+    budget_spend_transport(&mut b, 30u64);
+    b.spent_food
+}
+
+fn main() -> u64 { 0u64 }

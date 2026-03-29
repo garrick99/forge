@@ -1,0 +1,88 @@
+// Demo 413: Linear congruential generator state
+//
+// LCG: state = (a * state + c) % m
+// Each step() advances the state by one LCG iteration.
+// Verified: step count tracks iterations, state follows formula.
+
+struct LCG {
+    state: u64,
+    a:     u64,
+    c:     u64,
+    steps: u64,
+}
+
+fn lcg_new(seed: u64, a: u64, c: u64) -> LCG
+    requires a > 0u64
+    ensures result.state == seed
+    ensures result.a     == a
+    ensures result.c     == c
+    ensures result.steps == 0u64
+{
+    struct LCG { state: seed, a: a, c: c, steps: 0u64 }
+}
+
+fn lcg_step(g: refmut<LCG>)
+    ensures (*g).state == old((*g).a) * old((*g).state) + old((*g).c)
+    ensures (*g).steps == old((*g).steps) + 1u64
+    ensures (*g).a     == old((*g).a)
+    ensures (*g).c     == old((*g).c)
+{
+    (*g).state = (*g).a * (*g).state + (*g).c;
+    (*g).steps = (*g).steps + 1u64;
+}
+
+// One step: state is a*seed + c
+fn one_step_state() -> u64
+    ensures result == 13u64
+{
+    let g: LCG = lcg_new(1u64, 5u64, 8u64);
+    lcg_step(&mut g);
+    g.state
+}
+
+// Two steps: state is a*(a*seed+c)+c = 5*13+8 = 73
+fn two_steps_state() -> u64
+    ensures result == 73u64
+{
+    let g: LCG = lcg_new(1u64, 5u64, 8u64);
+    lcg_step(&mut g);
+    lcg_step(&mut g);
+    g.state
+}
+
+// Step count tracks iterations
+fn step_count() -> u64
+    ensures result == 4u64
+{
+    let g: LCG = lcg_new(0u64, 3u64, 1u64);
+    lcg_step(&mut g);
+    lcg_step(&mut g);
+    lcg_step(&mut g);
+    lcg_step(&mut g);
+    g.steps
+}
+
+// Parameters preserved
+fn params_preserved() -> u64
+    ensures result == 7u64
+{
+    let g: LCG = lcg_new(0u64, 7u64, 3u64);
+    lcg_step(&mut g);
+    lcg_step(&mut g);
+    g.a
+}
+
+// Simple: a=1, c=1 → state increments by 1 each step
+fn increment_lcg() -> u64
+    ensures result == 5u64
+{
+    let g: LCG = lcg_new(0u64, 1u64, 1u64);
+    lcg_step(&mut g);
+    lcg_step(&mut g);
+    lcg_step(&mut g);
+    lcg_step(&mut g);
+    lcg_step(&mut g);
+    g.state
+}
+
+fn main() -> u64 { 0u64 }

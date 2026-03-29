@@ -1,0 +1,95 @@
+// Demo 374: Credit limit enforcement
+//
+// A credit account with a limit: spend reduces available credit,
+// pay reduces debt and restores credit, overlimit tracks violations.
+// Verified: available == limit - debt after any sequence.
+
+struct CreditAccount {
+    limit:     u64,
+    debt:      u64,
+    payments:  u64,
+    purchases: u64,
+}
+
+fn ca_new(limit: u64) -> CreditAccount
+    requires limit > 0u64
+    ensures result.limit     == limit
+    ensures result.debt      == 0u64
+    ensures result.payments  == 0u64
+    ensures result.purchases == 0u64
+{
+    struct CreditAccount { limit: limit, debt: 0u64, payments: 0u64, purchases: 0u64 }
+}
+
+fn ca_purchase(c: refmut<CreditAccount>, amount: u64)
+    requires (*c).debt + amount <= (*c).limit
+    ensures  (*c).debt      == old((*c).debt) + amount
+    ensures  (*c).purchases == old((*c).purchases) + 1u64
+    ensures  (*c).limit     == old((*c).limit)
+    ensures  (*c).payments  == old((*c).payments)
+{
+    (*c).debt      = (*c).debt + amount;
+    (*c).purchases = (*c).purchases + 1u64;
+}
+
+fn ca_pay(c: refmut<CreditAccount>, amount: u64)
+    requires (*c).debt >= amount
+    ensures  (*c).debt     == old((*c).debt) - amount
+    ensures  (*c).payments == old((*c).payments) + 1u64
+    ensures  (*c).limit    == old((*c).limit)
+    ensures  (*c).purchases == old((*c).purchases)
+{
+    (*c).debt     = (*c).debt - amount;
+    (*c).payments = (*c).payments + 1u64;
+}
+
+// Purchase 200: debt is 200
+fn purchase_200() -> u64
+    ensures result == 200u64
+{
+    let c: CreditAccount = ca_new(500u64);
+    ca_purchase(&mut c, 200u64);
+    c.debt
+}
+
+// Available credit = limit - debt
+fn available_credit() -> u64
+    ensures result == 300u64
+{
+    let c: CreditAccount = ca_new(500u64);
+    ca_purchase(&mut c, 200u64);
+    c.limit - c.debt
+}
+
+// Purchase 300, pay 100: debt is 200
+fn purchase_pay() -> u64
+    ensures result == 200u64
+{
+    let c: CreditAccount = ca_new(500u64);
+    ca_purchase(&mut c, 300u64);
+    ca_pay(&mut c, 100u64);
+    c.debt
+}
+
+// Three purchases: purchase count is 3
+fn purchase_count() -> u64
+    ensures result == 3u64
+{
+    let c: CreditAccount = ca_new(500u64);
+    ca_purchase(&mut c, 100u64);
+    ca_purchase(&mut c, 50u64);
+    ca_purchase(&mut c, 75u64);
+    c.purchases
+}
+
+// Pay full debt: available == limit
+fn pay_off() -> u64
+    ensures result == 500u64
+{
+    let c: CreditAccount = ca_new(500u64);
+    ca_purchase(&mut c, 300u64);
+    ca_pay(&mut c, 300u64);
+    c.limit - c.debt
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,104 @@
+// Demo 433: Pipeline buffer with backpressure
+//
+// A bounded buffer: items are pushed in, popped out.
+// size = pushed - popped. Backpressure: push blocked when full.
+// Verified: size invariant, stalls track backpressure events.
+
+struct PipelineBuffer {
+    pushed:   u64,
+    popped:   u64,
+    capacity: u64,
+    stalls:   u64,
+}
+
+fn pb_new(capacity: u64) -> PipelineBuffer
+    requires capacity > 0u64
+    ensures result.pushed   == 0u64
+    ensures result.popped   == 0u64
+    ensures result.capacity == capacity
+    ensures result.stalls   == 0u64
+{
+    struct PipelineBuffer { pushed: 0u64, popped: 0u64, capacity: capacity, stalls: 0u64 }
+}
+
+fn pb_push(b: refmut<PipelineBuffer>)
+    requires (*b).pushed - (*b).popped < (*b).capacity
+    ensures  (*b).pushed   == old((*b).pushed) + 1u64
+    ensures  (*b).popped   == old((*b).popped)
+    ensures  (*b).capacity == old((*b).capacity)
+    ensures  (*b).stalls   == old((*b).stalls)
+{
+    (*b).pushed = (*b).pushed + 1u64;
+}
+
+fn pb_stall(b: refmut<PipelineBuffer>)
+    requires (*b).pushed - (*b).popped == (*b).capacity
+    ensures  (*b).stalls   == old((*b).stalls) + 1u64
+    ensures  (*b).pushed   == old((*b).pushed)
+    ensures  (*b).popped   == old((*b).popped)
+    ensures  (*b).capacity == old((*b).capacity)
+{
+    (*b).stalls = (*b).stalls + 1u64;
+}
+
+fn pb_pop(b: refmut<PipelineBuffer>)
+    requires (*b).pushed > (*b).popped
+    ensures  (*b).popped   == old((*b).popped) + 1u64
+    ensures  (*b).pushed   == old((*b).pushed)
+    ensures  (*b).capacity == old((*b).capacity)
+    ensures  (*b).stalls   == old((*b).stalls)
+{
+    (*b).popped = (*b).popped + 1u64;
+}
+
+// Push 3 items: size==3
+fn push_3() -> u64
+    ensures result == 3u64
+{
+    let b: PipelineBuffer = pb_new(4u64);
+    pb_push(&mut b);
+    pb_push(&mut b);
+    pb_push(&mut b);
+    b.pushed - b.popped
+}
+
+// Push 2, pop 1: size==1
+fn push_pop_size() -> u64
+    ensures result == 1u64
+{
+    let b: PipelineBuffer = pb_new(4u64);
+    pb_push(&mut b);
+    pb_push(&mut b);
+    pb_pop(&mut b);
+    b.pushed - b.popped
+}
+
+// Stall when full
+fn stall_count() -> u64
+    ensures result == 2u64
+{
+    let b: PipelineBuffer = pb_new(2u64);
+    pb_push(&mut b);
+    pb_push(&mut b);
+    pb_stall(&mut b);
+    pb_pop(&mut b);
+    pb_push(&mut b);
+    pb_stall(&mut b);
+    b.stalls
+}
+
+// Total popped
+fn total_popped() -> u64
+    ensures result == 3u64
+{
+    let b: PipelineBuffer = pb_new(4u64);
+    pb_push(&mut b);
+    pb_push(&mut b);
+    pb_push(&mut b);
+    pb_pop(&mut b);
+    pb_pop(&mut b);
+    pb_pop(&mut b);
+    b.popped
+}
+
+fn main() -> u64 { 0u64 }

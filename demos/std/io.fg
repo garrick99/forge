@@ -1,0 +1,136 @@
+// std/io.fg — I/O primitives for FORGE
+//
+// Include with:  use std::io;
+//
+// Provides character, integer, and newline output over stdout.
+// All numeric formatting is pure FORGE (no printf): each decimal digit
+// is produced by repeated division and printed via putchar.
+//
+// Note: I/O functions have side effects on stdout. No postconditions
+// can be expressed for output-only functions, so they are spec-free.
+
+use prelude;
+
+// ---- Character output ------------------------------------------------------
+
+// Print a single ASCII character (given as its code point).
+fn print_char(c: u64) {
+    putchar(c);
+}
+
+// Print a newline.
+fn print_newline() {
+    putchar(10u64);
+}
+
+// ---- Unsigned decimal output -----------------------------------------------
+
+// Print a u64 in decimal.  Recursive: print_u64(n) prints the most-significant
+// digits first by recursing on n/10, then appends the least-significant digit.
+// Termination: each recursive call has argument n/10 < n (holds when n >= 10).
+fn print_u64(n: u64)
+    decreases n
+{
+    if n >= 10u64 {
+        print_u64(n / 10u64);
+    };
+    putchar(48u64 + n % 10u64);
+}
+
+// Print a u64 followed by a newline.
+fn println_u64(n: u64) {
+    print_u64(n);
+    print_newline();
+}
+
+// ---- Signed decimal output -------------------------------------------------
+
+// Print an i64 in decimal (with leading '-' for negatives).
+fn print_i64(n: i64) {
+    if n < 0i64 {
+        putchar(45u64);                         // '-'
+        print_u64(0u64 - (n as u64));           // negate via unsigned wrap
+    } else {
+        print_u64(n as u64);
+    }
+}
+
+// Print an i64 followed by a newline.
+fn println_i64(n: i64) {
+    print_i64(n);
+    print_newline();
+}
+
+// ---- Hexadecimal output ----------------------------------------------------
+
+// Emit one hex nibble (0-15) as a lowercase ASCII character.
+fn print_hex_nibble(v: u64)
+    requires v < 16u64
+{
+    if v < 10u64 {
+        putchar(48u64 + v);          // '0'..'9'
+    } else {
+        putchar(87u64 + v);          // 'a'..'f'  (87 = 'a' - 10)
+    }
+}
+
+// Print a u64 as lowercase hexadecimal (no "0x" prefix, no leading zeros
+// except when n == 0).
+fn print_hex_u64(n: u64)
+    decreases n
+{
+    if n >= 16u64 {
+        print_hex_u64(n / 16u64);
+    };
+    print_hex_nibble(n % 16u64);
+}
+
+// Print a u64 as 16-digit zero-padded hex (useful for addresses/hashes).
+fn print_hex_u64_padded(n: u64) {
+    let shift: u64 = 60u64;
+    let i: u64 = 0u64;
+    while i < 16u64
+        invariant i <= 16u64
+        decreases 16u64 - i
+    {
+        let nibble: u64 = (n >> (60u64 - i * 4u64)) & 15u64;
+        print_hex_nibble(nibble);
+        i = i + 1u64;
+    }
+}
+
+// Print "0x" prefix then print_hex_u64.
+fn print_hex(n: u64) {
+    putchar(48u64);    // '0'
+    putchar(120u64);   // 'x'
+    if n == 0u64 {
+        putchar(48u64);
+    } else {
+        print_hex_u64(n);
+    }
+}
+
+// ---- Boolean output --------------------------------------------------------
+
+fn print_bool(b: bool) {
+    if b {
+        // 't','r','u','e'
+        putchar(116u64);
+        putchar(114u64);
+        putchar(117u64);
+        putchar(101u64);
+    } else {
+        // 'f','a','l','s','e'
+        putchar(102u64);
+        putchar(97u64);
+        putchar(108u64);
+        putchar(115u64);
+        putchar(101u64);
+    }
+}
+
+// ---- Flush -----------------------------------------------------------------
+
+fn flush_stdout() {
+    fflush(0u64);   // fflush(stdout) — passing 0 flushes all streams on most libc
+}

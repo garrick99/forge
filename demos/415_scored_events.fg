@@ -1,0 +1,114 @@
+// Demo 415: Scored event accumulator
+//
+// Events have scores; the accumulator tracks total_score, max_score
+// seen so far, and event count. Verified: total and max track correctly.
+
+struct ScoredEvents {
+    total_score: u64,
+    max_score:   u64,
+    count:       u64,
+    has_data:    u64,
+}
+
+fn se_new() -> ScoredEvents
+    ensures result.total_score == 0u64
+    ensures result.max_score   == 0u64
+    ensures result.count       == 0u64
+    ensures result.has_data    == 0u64
+{
+    struct ScoredEvents { total_score: 0u64, max_score: 0u64, count: 0u64, has_data: 0u64 }
+}
+
+fn se_add_first(s: refmut<ScoredEvents>, score: u64)
+    requires (*s).has_data == 0u64
+    ensures  (*s).total_score == score
+    ensures  (*s).max_score   == score
+    ensures  (*s).count       == 1u64
+    ensures  (*s).has_data    == 1u64
+{
+    (*s).total_score = score;
+    (*s).max_score   = score;
+    (*s).count       = 1u64;
+    (*s).has_data    = 1u64;
+}
+
+fn se_add_higher(s: refmut<ScoredEvents>, score: u64)
+    requires (*s).has_data == 1u64
+    requires score > (*s).max_score
+    ensures  (*s).total_score == old((*s).total_score) + score
+    ensures  (*s).max_score   == score
+    ensures  (*s).count       == old((*s).count) + 1u64
+    ensures  (*s).has_data    == 1u64
+{
+    (*s).total_score = (*s).total_score + score;
+    (*s).max_score   = score;
+    (*s).count       = (*s).count + 1u64;
+}
+
+fn se_add_lower(s: refmut<ScoredEvents>, score: u64)
+    requires (*s).has_data == 1u64
+    requires score <= (*s).max_score
+    ensures  (*s).total_score == old((*s).total_score) + score
+    ensures  (*s).max_score   == old((*s).max_score)
+    ensures  (*s).count       == old((*s).count) + 1u64
+    ensures  (*s).has_data    == 1u64
+{
+    (*s).total_score = (*s).total_score + score;
+    (*s).count       = (*s).count + 1u64;
+}
+
+// First event: total and max equal score
+fn first_event_total() -> u64
+    ensures result == 50u64
+{
+    let s: ScoredEvents = se_new();
+    se_add_first(&mut s, 50u64);
+    s.total_score
+}
+
+// Rising scores: max is highest
+fn rising_max() -> u64
+    ensures result == 90u64
+{
+    let s: ScoredEvents = se_new();
+    se_add_first(&mut s, 30u64);
+    se_add_higher(&mut s, 60u64);
+    se_add_higher(&mut s, 90u64);
+    s.max_score
+}
+
+// Total accumulates all scores
+fn total_three() -> u64
+    ensures result == 180u64
+{
+    let s: ScoredEvents = se_new();
+    se_add_first(&mut s, 30u64);
+    se_add_higher(&mut s, 60u64);
+    se_add_higher(&mut s, 90u64);
+    s.total_score
+}
+
+// Add lower: max unchanged
+fn lower_no_max_change() -> u64
+    ensures result == 90u64
+{
+    let s: ScoredEvents = se_new();
+    se_add_first(&mut s, 90u64);
+    se_add_lower(&mut s, 20u64);
+    se_add_lower(&mut s, 45u64);
+    s.max_score
+}
+
+// Count tracks all events
+fn event_count() -> u64
+    ensures result == 4u64
+{
+    let s: ScoredEvents = se_new();
+    se_add_first(&mut s, 10u64);
+    se_add_higher(&mut s, 20u64);
+    se_add_lower(&mut s, 5u64);
+    se_add_lower(&mut s, 8u64);
+    s.count
+}
+
+fn main() -> u64 { 0u64 }

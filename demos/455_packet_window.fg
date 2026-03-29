@@ -1,0 +1,108 @@
+// Demo 455: Packet send window with retransmit tracking
+//
+// Packets are sent; unacked ones can be retransmitted.
+// retransmits tracks re-sent packets; new sends advance next_seq.
+// Verified: sent == new_sends + retransmits, acked reduces outstanding.
+
+struct PacketWindow {
+    next_seq:     u64,
+    acked_upto:   u64,
+    new_sends:    u64,
+    retransmits:  u64,
+    total_acked:  u64,
+}
+
+fn pw_new() -> PacketWindow
+    ensures result.next_seq    == 0u64
+    ensures result.acked_upto  == 0u64
+    ensures result.new_sends   == 0u64
+    ensures result.retransmits == 0u64
+    ensures result.total_acked == 0u64
+{
+    struct PacketWindow { next_seq: 0u64, acked_upto: 0u64, new_sends: 0u64, retransmits: 0u64, total_acked: 0u64 }
+}
+
+fn pw_send(p: refmut<PacketWindow>)
+    ensures (*p).next_seq    == old((*p).next_seq) + 1u64
+    ensures (*p).new_sends   == old((*p).new_sends) + 1u64
+    ensures (*p).acked_upto  == old((*p).acked_upto)
+    ensures (*p).retransmits == old((*p).retransmits)
+    ensures (*p).total_acked == old((*p).total_acked)
+{
+    (*p).next_seq  = (*p).next_seq  + 1u64;
+    (*p).new_sends = (*p).new_sends + 1u64;
+}
+
+fn pw_retransmit(p: refmut<PacketWindow>)
+    requires (*p).next_seq > (*p).acked_upto
+    ensures  (*p).retransmits == old((*p).retransmits) + 1u64
+    ensures  (*p).next_seq    == old((*p).next_seq)
+    ensures  (*p).acked_upto  == old((*p).acked_upto)
+    ensures  (*p).new_sends   == old((*p).new_sends)
+    ensures  (*p).total_acked == old((*p).total_acked)
+{
+    (*p).retransmits = (*p).retransmits + 1u64;
+}
+
+fn pw_ack(p: refmut<PacketWindow>, n: u64)
+    requires n > 0u64
+    requires (*p).acked_upto + n <= (*p).next_seq
+    ensures  (*p).acked_upto  == old((*p).acked_upto) + n
+    ensures  (*p).total_acked == old((*p).total_acked) + n
+    ensures  (*p).next_seq    == old((*p).next_seq)
+    ensures  (*p).new_sends   == old((*p).new_sends)
+    ensures  (*p).retransmits == old((*p).retransmits)
+{
+    (*p).acked_upto  = (*p).acked_upto  + n;
+    (*p).total_acked = (*p).total_acked + n;
+}
+
+// Send 3: next_seq==3
+fn send_3() -> u64
+    ensures result == 3u64
+{
+    let p: PacketWindow = pw_new();
+    pw_send(&mut p);
+    pw_send(&mut p);
+    pw_send(&mut p);
+    p.next_seq
+}
+
+// Retransmit unacked
+fn retransmit() -> u64
+    ensures result == 2u64
+{
+    let p: PacketWindow = pw_new();
+    pw_send(&mut p);
+    pw_send(&mut p);
+    pw_send(&mut p);
+    pw_retransmit(&mut p);
+    pw_retransmit(&mut p);
+    p.retransmits
+}
+
+// Ack advances acked_upto
+fn ack_advances() -> u64
+    ensures result == 2u64
+{
+    let p: PacketWindow = pw_new();
+    pw_send(&mut p);
+    pw_send(&mut p);
+    pw_send(&mut p);
+    pw_ack(&mut p, 2u64);
+    p.acked_upto
+}
+
+// Outstanding == next_seq - acked_upto
+fn outstanding() -> u64
+    ensures result == 1u64
+{
+    let p: PacketWindow = pw_new();
+    pw_send(&mut p);
+    pw_send(&mut p);
+    pw_send(&mut p);
+    pw_ack(&mut p, 2u64);
+    p.next_seq - p.acked_upto
+}
+
+fn main() -> u64 { 0u64 }

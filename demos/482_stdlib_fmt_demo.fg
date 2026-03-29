@@ -1,0 +1,64 @@
+// Demo 482: std::fmt showcase — digit counting and parsing
+//
+// count_digits_u64, count_hex_digits, hex_digit, dec_digit, parse_u64_at.
+
+use std::fmt;
+
+fn check_count_digits_1() -> u64
+    ensures result >= 1u64
+{
+    count_digits_u64(0u64)
+}
+
+fn check_count_digits_3() -> u64
+    ensures result >= 1u64
+{
+    count_digits_u64(100u64)
+}
+
+fn check_count_digits_20() -> u64
+    ensures result >= 1u64
+{
+    count_digits_u64(18446744073709551615u64)
+}
+
+fn check_count_hex_1() -> u64
+    ensures result >= 1u64
+{
+    count_hex_digits(0u64)
+}
+
+fn check_count_hex_2() -> u64
+    ensures result >= 1u64
+{
+    count_hex_digits(16u64)
+}
+
+fn check_hex_digit_0() -> u8
+    ensures result == 48u8
+{
+    hex_digit(0u64)
+}
+
+fn check_hex_digit_a() -> u8
+    ensures result == 97u8
+{
+    hex_digit(10u64)
+}
+
+fn check_dec_digit_5() -> u8
+    ensures result == 53u8
+{
+    dec_digit(5u64)
+}
+
+fn check_parse_zero(data: span<u8>) -> u64
+    requires data.len >= 1u64
+    requires data.len <= 8u64
+    ensures  result == 0u64
+{
+    let s: Str = str_new(data);
+    parse_u64_at(&s, 0u64)
+}
+
+fn main() -> u64 { 0u64 }

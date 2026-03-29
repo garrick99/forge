@@ -1,0 +1,93 @@
+// Demo 373: Monotonic nonce counter
+//
+// A nonce generator that only ever increments. Each call to
+// nonce_next() bumps the counter and stores the issued value
+// in the `last` field. Verified: nonce is strictly monotonic.
+
+struct Nonce {
+    current: u64,
+    last:    u64,
+    issued:  u64,
+}
+
+fn nonce_new(start: u64) -> Nonce
+    ensures result.current == start
+    ensures result.last    == 0u64
+    ensures result.issued  == 0u64
+{
+    struct Nonce { current: start, last: 0u64, issued: 0u64 }
+}
+
+fn nonce_next(n: refmut<Nonce>)
+    ensures (*n).last    == old((*n).current)
+    ensures (*n).current == old((*n).current) + 1u64
+    ensures (*n).issued  == old((*n).issued)  + 1u64
+{
+    (*n).last    = (*n).current;
+    (*n).current = (*n).current + 1u64;
+    (*n).issued  = (*n).issued  + 1u64;
+}
+
+// First nonce from 0: last is 0
+fn first_nonce() -> u64
+    ensures result == 0u64
+{
+    let n: Nonce = nonce_new(0u64);
+    nonce_next(&mut n);
+    n.last
+}
+
+// Second nonce from 0: last is 1
+fn second_nonce() -> u64
+    ensures result == 1u64
+{
+    let n: Nonce = nonce_new(0u64);
+    nonce_next(&mut n);
+    nonce_next(&mut n);
+    n.last
+}
+
+// After 3 nexts, current is 3
+fn current_after_three() -> u64
+    ensures result == 3u64
+{
+    let n: Nonce = nonce_new(0u64);
+    nonce_next(&mut n);
+    nonce_next(&mut n);
+    nonce_next(&mut n);
+    n.current
+}
+
+// Issued count tracks calls
+fn issued_count() -> u64
+    ensures result == 4u64
+{
+    let n: Nonce = nonce_new(0u64);
+    nonce_next(&mut n);
+    nonce_next(&mut n);
+    nonce_next(&mut n);
+    nonce_next(&mut n);
+    n.issued
+}
+
+// Start from offset 100: first issued is 100
+fn offset_nonce() -> u64
+    ensures result == 100u64
+{
+    let n: Nonce = nonce_new(100u64);
+    nonce_next(&mut n);
+    n.last
+}
+
+// Third nonce from offset 10 is 12
+fn offset_third() -> u64
+    ensures result == 12u64
+{
+    let n: Nonce = nonce_new(10u64);
+    nonce_next(&mut n);
+    nonce_next(&mut n);
+    nonce_next(&mut n);
+    n.last
+}
+
+fn main() -> u64 { 0u64 }

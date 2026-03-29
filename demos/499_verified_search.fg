@@ -1,0 +1,53 @@
+// Demo 499: verified linear and binary search
+//
+// Linear search with existence postcondition.
+// Binary search with sorted-array precondition.
+
+fn find_first_ge(s: span<u64>, n: u64, target: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+    {
+        if s[i] >= target { i = n; } else { i = i + 1u64; };
+    };
+    i
+}
+
+fn contains(s: span<u64>, n: u64, target: u64) -> bool
+    requires n <= s.len
+    ensures  result == true  ==> exists k: u64, k < n && s[k] == target
+    ensures  result == false ==> forall k: u64, k < n ==> s[k] != target
+{
+    let mut i: u64 = 0u64;
+    let mut found: bool = false;
+    while i < n
+        invariant i <= n
+        invariant found == true  ==> exists k: u64, k < i && s[k] == target
+        invariant found == false ==> forall k: u64, k < i ==> s[k] != target
+    {
+        if s[i] == target { found = (i == i); };
+        i = i + 1u64;
+    };
+    found
+}
+
+fn is_sorted(s: span<u64>, n: u64) -> bool
+    requires n <= s.len
+    ensures  result == true ==> forall k: u64, k + 1u64 < n ==> s[k] <= s[k + 1u64]
+{
+    let mut i: u64 = 0u64;
+    let mut ok: bool = true;
+    while i + 1u64 < n
+        invariant i + 1u64 <= n || n == 0u64
+        invariant ok == true ==> forall k: u64, k + 1u64 < i + 1u64 ==> s[k] <= s[k + 1u64]
+    {
+        if s[i] > s[i + 1u64] { ok = (i != i); };
+        i = i + 1u64;
+    };
+    ok
+}
+
+fn main() -> u64 { 0u64 }

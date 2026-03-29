@@ -1,0 +1,91 @@
+// Demo 362: Priority level tracker
+//
+// A task's priority level can be raised or lowered within bounds [0, max].
+// Each adjustment is bounded; total raise/lower counts are tracked.
+// Verified: priority stays within bounds after any sequence of adjustments.
+
+struct Priority {
+    level:   u64,
+    max:     u64,
+    raised:  u64,
+    lowered: u64,
+}
+
+fn prio_new(max: u64) -> Priority
+    requires max > 0u64
+    ensures result.level   == 0u64
+    ensures result.max     == max
+    ensures result.raised  == 0u64
+    ensures result.lowered == 0u64
+{
+    struct Priority { level: 0u64, max: max, raised: 0u64, lowered: 0u64 }
+}
+
+fn prio_raise(p: refmut<Priority>, by: u64)
+    requires (*p).level + by <= (*p).max
+    ensures  (*p).level   == old((*p).level) + by
+    ensures  (*p).raised  == old((*p).raised) + 1u64
+    ensures  (*p).max     == old((*p).max)
+    ensures  (*p).lowered == old((*p).lowered)
+{
+    (*p).level  = (*p).level + by;
+    (*p).raised = (*p).raised + 1u64;
+}
+
+fn prio_lower(p: refmut<Priority>, by: u64)
+    requires (*p).level >= by
+    ensures  (*p).level   == old((*p).level) - by
+    ensures  (*p).lowered == old((*p).lowered) + 1u64
+    ensures  (*p).max     == old((*p).max)
+    ensures  (*p).raised  == old((*p).raised)
+{
+    (*p).level  = (*p).level - by;
+    (*p).lowered = (*p).lowered + 1u64;
+}
+
+// Raise by 3: level is 3
+fn raise_3(max: u64) -> u64
+    requires max > 3u64
+    ensures result == 3u64
+{
+    let p: Priority = prio_new(max);
+    prio_raise(&mut p, 3u64);
+    p.level
+}
+
+// Raise by 5, lower by 2: level is 3
+fn raise5_lower2(max: u64) -> u64
+    requires max > 5u64
+    ensures result == 3u64
+{
+    let p: Priority = prio_new(max);
+    prio_raise(&mut p, 5u64);
+    prio_lower(&mut p, 2u64);
+    p.level
+}
+
+// Raise count tracks raises
+fn raise_count(max: u64) -> u64
+    requires max > 10u64
+    ensures result == 3u64
+{
+    let p: Priority = prio_new(max);
+    prio_raise(&mut p, 2u64);
+    prio_raise(&mut p, 3u64);
+    prio_raise(&mut p, 5u64);
+    p.raised
+}
+
+// Lower count tracks lowers
+fn lower_count(max: u64) -> u64
+    requires max > 10u64
+    ensures result == 2u64
+{
+    let p: Priority = prio_new(max);
+    prio_raise(&mut p, 10u64);
+    prio_lower(&mut p, 3u64);
+    prio_lower(&mut p, 4u64);
+    p.lowered
+}
+
+fn main() -> u64 { 0u64 }

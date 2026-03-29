@@ -1,0 +1,92 @@
+// Demo 429: Health monitor with consecutive failures
+//
+// Tracks consecutive failures and total checks.
+// fail() increments both; pass() resets consecutive_fails but keeps total.
+// Verified: consecutive_fails resets on pass, total_checks monotone.
+
+struct HealthMonitor {
+    consecutive_fails: u64,
+    total_checks:      u64,
+    total_fails:       u64,
+    passes:            u64,
+}
+
+fn hm_new() -> HealthMonitor
+    ensures result.consecutive_fails == 0u64
+    ensures result.total_checks      == 0u64
+    ensures result.total_fails       == 0u64
+    ensures result.passes            == 0u64
+{
+    struct HealthMonitor { consecutive_fails: 0u64, total_checks: 0u64, total_fails: 0u64, passes: 0u64 }
+}
+
+fn hm_fail(h: refmut<HealthMonitor>)
+    ensures (*h).consecutive_fails == old((*h).consecutive_fails) + 1u64
+    ensures (*h).total_checks      == old((*h).total_checks) + 1u64
+    ensures (*h).total_fails       == old((*h).total_fails) + 1u64
+    ensures (*h).passes            == old((*h).passes)
+{
+    (*h).consecutive_fails = (*h).consecutive_fails + 1u64;
+    (*h).total_checks      = (*h).total_checks      + 1u64;
+    (*h).total_fails       = (*h).total_fails       + 1u64;
+}
+
+fn hm_pass(h: refmut<HealthMonitor>)
+    ensures (*h).consecutive_fails == 0u64
+    ensures (*h).total_checks      == old((*h).total_checks) + 1u64
+    ensures (*h).passes            == old((*h).passes) + 1u64
+    ensures (*h).total_fails       == old((*h).total_fails)
+{
+    (*h).consecutive_fails = 0u64;
+    (*h).total_checks      = (*h).total_checks + 1u64;
+    (*h).passes            = (*h).passes       + 1u64;
+}
+
+// 3 fails: consecutive==3
+fn three_fails() -> u64
+    ensures result == 3u64
+{
+    let h: HealthMonitor = hm_new();
+    hm_fail(&mut h);
+    hm_fail(&mut h);
+    hm_fail(&mut h);
+    h.consecutive_fails
+}
+
+// Fail, pass: consecutive resets to 0
+fn fail_then_pass() -> u64
+    ensures result == 0u64
+{
+    let h: HealthMonitor = hm_new();
+    hm_fail(&mut h);
+    hm_fail(&mut h);
+    hm_pass(&mut h);
+    h.consecutive_fails
+}
+
+// Total checks across mix
+fn total_checks() -> u64
+    ensures result == 5u64
+{
+    let h: HealthMonitor = hm_new();
+    hm_fail(&mut h);
+    hm_pass(&mut h);
+    hm_fail(&mut h);
+    hm_fail(&mut h);
+    hm_pass(&mut h);
+    h.total_checks
+}
+
+// Total fails preserved across passes
+fn total_fails_preserved() -> u64
+    ensures result == 3u64
+{
+    let h: HealthMonitor = hm_new();
+    hm_fail(&mut h);
+    hm_fail(&mut h);
+    hm_fail(&mut h);
+    hm_pass(&mut h);
+    h.total_fails
+}
+
+fn main() -> u64 { 0u64 }

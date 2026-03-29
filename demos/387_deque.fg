@@ -1,0 +1,104 @@
+// Demo 387: Double-ended queue length tracking
+//
+// A deque tracks length and capacity. push_front and push_back
+// both increment length; pop_front and pop_back decrement it.
+// Verified: length accurately tracks all enqueue/dequeue operations.
+
+struct Deque {
+    len: u64,
+    cap: u64,
+}
+
+fn deque_new(cap: u64) -> Deque
+    requires cap > 0u64
+    ensures result.len == 0u64
+    ensures result.cap == cap
+{
+    struct Deque { len: 0u64, cap: cap }
+}
+
+fn deque_push_front(d: refmut<Deque>)
+    requires (*d).len < (*d).cap
+    ensures  (*d).len == old((*d).len) + 1u64
+    ensures  (*d).cap == old((*d).cap)
+{
+    (*d).len = (*d).len + 1u64;
+}
+
+fn deque_push_back(d: refmut<Deque>)
+    requires (*d).len < (*d).cap
+    ensures  (*d).len == old((*d).len) + 1u64
+    ensures  (*d).cap == old((*d).cap)
+{
+    (*d).len = (*d).len + 1u64;
+}
+
+fn deque_pop_front(d: refmut<Deque>)
+    requires (*d).len > 0u64
+    ensures  (*d).len == old((*d).len) - 1u64
+    ensures  (*d).cap == old((*d).cap)
+{
+    (*d).len = (*d).len - 1u64;
+}
+
+fn deque_pop_back(d: refmut<Deque>)
+    requires (*d).len > 0u64
+    ensures  (*d).len == old((*d).len) - 1u64
+    ensures  (*d).cap == old((*d).cap)
+{
+    (*d).len = (*d).len - 1u64;
+}
+
+// Push 3 front: len is 3
+fn push_front_three(cap: u64) -> u64
+    requires cap > 3u64
+    ensures result == 3u64
+{
+    let d: Deque = deque_new(cap);
+    deque_push_front(&mut d);
+    deque_push_front(&mut d);
+    deque_push_front(&mut d);
+    d.len
+}
+
+// Mix front and back pushes: len is 4
+fn push_mixed(cap: u64) -> u64
+    requires cap > 4u64
+    ensures result == 4u64
+{
+    let d: Deque = deque_new(cap);
+    deque_push_front(&mut d);
+    deque_push_back(&mut d);
+    deque_push_front(&mut d);
+    deque_push_back(&mut d);
+    d.len
+}
+
+// Push 4, pop 2: len is 2
+fn push4_pop2(cap: u64) -> u64
+    requires cap > 4u64
+    ensures result == 2u64
+{
+    let d: Deque = deque_new(cap);
+    deque_push_front(&mut d);
+    deque_push_back(&mut d);
+    deque_push_front(&mut d);
+    deque_push_back(&mut d);
+    deque_pop_front(&mut d);
+    deque_pop_back(&mut d);
+    d.len
+}
+
+// Cap preserved throughout
+fn cap_preserved(cap: u64) -> u64
+    requires cap > 3u64
+    ensures result == cap
+{
+    let d: Deque = deque_new(cap);
+    deque_push_front(&mut d);
+    deque_push_back(&mut d);
+    deque_pop_front(&mut d);
+    d.cap
+}
+
+fn main() -> u64 { 0u64 }

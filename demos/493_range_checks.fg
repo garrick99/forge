@@ -1,0 +1,98 @@
+// Demo 493: verified range checks and guards
+//
+// Functions that gate computation on range preconditions,
+// with exact postconditions covering in-range and out-of-range cases.
+
+fn in_range_u64(v: u64, lo: u64, hi: u64) -> bool
+    requires lo <= hi
+    ensures result == (v >= lo && v <= hi)
+    ensures !(v >= lo && v <= hi) ==> result == false
+    ensures v >= lo && v <= hi    ==> result == true
+{
+    v >= lo && v <= hi
+}
+
+fn saturating_inc(v: u64, max: u64) -> u64
+    ensures v < max  ==> result == v + 1u64
+    ensures !(v < max) ==> result == max
+    ensures result <= max
+{
+    if v < max { v + 1u64 } else { max }
+}
+
+fn saturating_dec(v: u64, min: u64) -> u64
+    ensures v > min  ==> result == v - 1u64
+    ensures !(v > min) ==> result == min
+    ensures result >= min
+{
+    if v > min { v - 1u64 } else { min }
+}
+
+fn wrap_inc(v: u64, bound: u64) -> u64
+    requires bound > 0u64
+    ensures v + 1u64 < bound ==> result == v + 1u64
+    ensures !(v + 1u64 < bound) ==> result == 0u64
+    ensures result < bound
+{
+    if v + 1u64 < bound { v + 1u64 } else { 0u64 }
+}
+
+fn bounded_mul(a: u64, b: u64, cap: u64) -> u64
+    requires a <= cap
+    requires b <= cap
+    requires a * b <= cap
+    ensures  result == a * b
+    ensures  result <= cap
+{
+    a * b
+}
+
+fn check_in_range_true() -> bool
+    ensures result == true
+{
+    in_range_u64(5u64, 1u64, 10u64)
+}
+
+fn check_in_range_false() -> bool
+    ensures result == false
+{
+    in_range_u64(15u64, 1u64, 10u64)
+}
+
+fn check_sat_inc_mid() -> u64
+    ensures result == 6u64
+{
+    saturating_inc(5u64, 10u64)
+}
+
+fn check_sat_inc_top() -> u64
+    ensures result == 10u64
+{
+    saturating_inc(10u64, 10u64)
+}
+
+fn check_sat_dec_mid() -> u64
+    ensures result == 4u64
+{
+    saturating_dec(5u64, 0u64)
+}
+
+fn check_sat_dec_bot() -> u64
+    ensures result == 0u64
+{
+    saturating_dec(0u64, 0u64)
+}
+
+fn check_wrap_inc_mid() -> u64
+    ensures result == 3u64
+{
+    wrap_inc(2u64, 10u64)
+}
+
+fn check_wrap_inc_top() -> u64
+    ensures result == 0u64
+{
+    wrap_inc(9u64, 10u64)
+}
+
+fn main() -> u64 { 0u64 }

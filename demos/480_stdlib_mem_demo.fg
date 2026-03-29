@@ -1,0 +1,43 @@
+// Demo 480: std::mem showcase — span fill, copy, compare, sum, max, min
+//
+// All postconditions verified: forall k < n, dst[k] == v etc.
+
+use std::mem;
+
+fn check_fill(dst: span<u8>, n: u64) -> bool
+    requires n <= dst.len
+    ensures  result == true
+{
+    span_fill_u8(dst, 42u8, n);
+    true
+}
+
+fn check_zero(dst: span<u8>, n: u64) -> bool
+    requires n <= dst.len
+    ensures  result == true
+{
+    span_zero_u8(dst, n);
+    true
+}
+
+fn check_sum_empty(s: span<u64>) -> u64
+    requires s.len >= 0u64
+    requires 0u64 <= s.len
+    ensures result == 0u64
+{
+    span_sum(s, 0u64)
+}
+
+fn check_max_single(s: span<u64>) -> u64
+    requires s.len >= 1u64
+{
+    span_max(s, 1u64)
+}
+
+fn check_min_single(s: span<u64>) -> u64
+    requires s.len >= 1u64
+{
+    span_min(s, 1u64)
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,78 @@
+// Demo 468: DAG node reference counter for topological processing
+//
+// Nodes have in-degree. When in-degree reaches 0, node is "ready".
+// Process() reduces in-degree of dependents.
+// Verified: total_ready + total_waiting + total_done == total_nodes.
+
+struct DAGCounter {
+    total_nodes:   u64,
+    total_ready:   u64,
+    total_waiting: u64,
+    total_done:    u64,
+    edges_removed: u64,
+}
+
+fn dag_new(nodes: u64, initial_ready: u64) -> DAGCounter
+    requires nodes > 0u64
+    requires initial_ready <= nodes
+    ensures result.total_nodes   == nodes
+    ensures result.total_ready   == initial_ready
+    ensures result.total_waiting == nodes - initial_ready
+    ensures result.total_done    == 0u64
+    ensures result.edges_removed == 0u64
+{
+    struct DAGCounter { total_nodes: nodes, total_ready: initial_ready, total_waiting: nodes - initial_ready, total_done: 0u64, edges_removed: 0u64 }
+}
+
+fn dag_process(d: refmut<DAGCounter>, newly_ready: u64)
+    requires (*d).total_ready >= 1u64
+    requires (*d).total_waiting >= newly_ready
+    ensures  (*d).total_done    == old((*d).total_done) + 1u64
+    ensures  (*d).total_ready   == old((*d).total_ready) - 1u64 + newly_ready
+    ensures  (*d).total_waiting == old((*d).total_waiting) - newly_ready
+    ensures  (*d).edges_removed == old((*d).edges_removed) + newly_ready
+    ensures  (*d).total_nodes   == old((*d).total_nodes)
+{
+    (*d).total_done    = (*d).total_done    + 1u64;
+    (*d).total_ready   = (*d).total_ready   - 1u64 + newly_ready;
+    (*d).total_waiting = (*d).total_waiting - newly_ready;
+    (*d).edges_removed = (*d).edges_removed + newly_ready;
+}
+
+// Process 1 node, unlock 2 more: ready goes from 1 to 2
+fn process_unlocks() -> u64
+    ensures result == 2u64
+{
+    let d: DAGCounter = dag_new(5u64, 1u64);
+    dag_process(&mut d, 2u64);
+    d.total_ready
+}
+
+// Done count after processing
+fn done_count() -> u64
+    ensures result == 1u64
+{
+    let d: DAGCounter = dag_new(5u64, 1u64);
+    dag_process(&mut d, 2u64);
+    d.total_done
+}
+
+// Conservation: ready + waiting + done == total
+fn conservation() -> u64
+    ensures result == 5u64
+{
+    let d: DAGCounter = dag_new(5u64, 1u64);
+    dag_process(&mut d, 2u64);
+    d.total_ready + d.total_waiting + d.total_done
+}
+
+// Edges removed tracks unlocks
+fn edges_removed() -> u64
+    ensures result == 2u64
+{
+    let d: DAGCounter = dag_new(5u64, 1u64);
+    dag_process(&mut d, 2u64);
+    d.edges_removed
+}
+
+fn main() -> u64 { 0u64 }

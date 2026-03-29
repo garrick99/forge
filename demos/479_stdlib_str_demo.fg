@@ -1,0 +1,59 @@
+// Demo 479: std::str showcase — Str type operations
+//
+// Demonstrates str_new, str_push, str_at, str_len, str_clear,
+// is_ascii_digit, is_ascii_lower, is_ascii_upper, to_ascii_lower/upper.
+
+use std::str;
+
+fn check_new_len(data: span<u8>) -> u64
+    requires data.len == 16u64
+    ensures result == 0u64
+{
+    let s: Str = str_new(data);
+    str_len(&s)
+}
+
+fn check_push_len(data: span<u8>) -> u64
+    requires data.len == 16u64
+    ensures result == 3u64
+{
+    let s: Str = str_new(data);
+    str_push(&mut s, 72u8);   // 'H'
+    str_push(&mut s, 105u8);  // 'i'
+    str_push(&mut s, 33u8);   // '!'
+    str_len(&s)
+}
+
+fn check_is_digit() -> bool
+    ensures result == true
+{
+    is_ascii_digit(57u8)  // '9'
+}
+
+fn check_not_digit() -> bool
+    ensures result == false
+{
+    is_ascii_digit(65u8)  // 'A'
+}
+
+fn check_is_lower() -> bool
+    ensures result == true
+{
+    is_ascii_lower(97u8)  // 'a'
+}
+
+fn check_is_upper() -> bool
+    ensures result == true
+{
+    is_ascii_upper(90u8)  // 'Z'
+}
+
+fn check_to_lower() -> u8 {
+    to_ascii_lower(65u8)  // 'A' -> 'a' = 97
+}
+
+fn check_to_upper() -> u8 {
+    to_ascii_upper(97u8)  // 'a' -> 'A' = 65
+}
+
+fn main() -> u64 { 0u64 }

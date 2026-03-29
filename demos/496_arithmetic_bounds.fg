@@ -1,0 +1,75 @@
+// Demo 496: arithmetic bounds — verified upper/lower bounds on expressions
+//
+// Establishes invariants like: product <= max, sum <= cap, ratio <= 1.
+
+fn product_bounded(a: u64, b: u64, cap: u64) -> bool
+    ensures result == (a * b <= cap)
+    ensures a * b <= cap    ==> result == true
+    ensures !(a * b <= cap) ==> result == false
+{
+    a * b <= cap
+}
+
+fn sum_bounded(a: u64, b: u64, cap: u64) -> bool
+    ensures result == (a + b <= cap)
+    ensures a + b <= cap    ==> result == true
+    ensures !(a + b <= cap) ==> result == false
+{
+    a + b <= cap
+}
+
+fn ratio_le_one(numer: u64, denom: u64) -> bool
+    requires denom > 0u64
+    ensures result == (numer <= denom)
+    ensures numer <= denom    ==> result == true
+    ensures !(numer <= denom) ==> result == false
+{
+    numer <= denom
+}
+
+fn safe_add(a: u64, b: u64) -> u64
+    requires a <= 18446744073709551615u64 - b
+    ensures  result == a + b
+    ensures  result >= a
+    ensures  result >= b
+{
+    a + b
+}
+
+fn safe_mul(a: u64, b: u64) -> u64
+    requires b == 0u64 || a <= 18446744073709551615u64 / b
+    ensures  result == a * b
+{
+    a * b
+}
+
+fn div_upper_bound(a: u64, b: u64) -> u64
+    requires b > 0u64
+    ensures  result == a / b
+    ensures  result <= a
+{
+    a / b
+}
+
+fn check_product_ok() -> bool   ensures result == true  { product_bounded(3u64, 4u64, 12u64) }
+fn check_product_big() -> bool  ensures result == false { product_bounded(5u64, 5u64, 20u64) }
+
+fn check_sum_ok() -> bool    ensures result == true  { sum_bounded(3u64, 4u64, 10u64) }
+fn check_sum_big() -> bool   ensures result == false { sum_bounded(8u64, 5u64, 10u64) }
+
+fn check_ratio_ok() -> bool   ensures result == true  { ratio_le_one(5u64, 10u64) }
+fn check_ratio_big() -> bool  ensures result == false { ratio_le_one(11u64, 10u64) }
+
+fn check_safe_add() -> u64
+    ensures result == 15u64
+{ safe_add(7u64, 8u64) }
+
+fn check_safe_mul() -> u64
+    ensures result == 42u64
+{ safe_mul(6u64, 7u64) }
+
+fn check_div_upper() -> u64
+    ensures result == 3u64
+{ div_upper_bound(10u64, 3u64) }
+
+fn main() -> u64 { 0u64 }

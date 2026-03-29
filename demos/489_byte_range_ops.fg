@@ -1,0 +1,94 @@
+// Demo 489: byte-range arithmetic and classification
+//
+// Verified operations on u8 bytes: range checks, negation, parity, nibbles.
+
+fn high_nibble(b: u8) -> u8
+    ensures result == b / 16u8
+    ensures result <= 15u8
+{
+    b / 16u8
+}
+
+fn low_nibble(b: u8) -> u8
+    ensures result == b % 16u8
+    ensures result <= 15u8
+{
+    b % 16u8
+}
+
+fn is_printable(b: u8) -> bool
+    ensures result == (b >= 32u8 && b <= 126u8)
+{
+    b >= 32u8 && b <= 126u8
+}
+
+fn is_hex_digit(b: u8) -> bool
+    ensures result == ((b >= 48u8 && b <= 57u8) || (b >= 65u8 && b <= 70u8) || (b >= 97u8 && b <= 102u8))
+{
+    (b >= 48u8 && b <= 57u8) || (b >= 65u8 && b <= 70u8) || (b >= 97u8 && b <= 102u8)
+}
+
+fn byte_complement(b: u8) -> u8
+    ensures result == 255u8 - b
+    ensures !(b == 0u8) ==> result < 255u8
+    ensures b == 0u8    ==> result == 255u8
+{
+    255u8 - b
+}
+
+fn byte_mirror(b: u8) -> u8
+    ensures b <= 127u8 ==> result == b + b
+    ensures !(b <= 127u8) ==> result <= 255u8
+{
+    if b <= 127u8 { b + b } else { 255u8 }
+}
+
+fn check_high_nibble_0xAB() -> u8
+    ensures result == 10u8
+{
+    high_nibble(171u8)   // 0xAB >> 4 = 0xA = 10
+}
+
+fn check_low_nibble_0xAB() -> u8
+    ensures result == 11u8
+{
+    low_nibble(171u8)    // 0xAB & 0xF = 0xB = 11
+}
+
+fn check_printable_space() -> bool
+    ensures result == true
+{
+    is_printable(32u8)   // ' '
+}
+
+fn check_not_printable_del() -> bool
+    ensures result == false
+{
+    is_printable(127u8)  // DEL
+}
+
+fn check_hex_digit_A() -> bool
+    ensures result == true
+{
+    is_hex_digit(65u8)   // 'A'
+}
+
+fn check_complement_zero() -> u8
+    ensures result == 255u8
+{
+    byte_complement(0u8)
+}
+
+fn check_complement_255() -> u8
+    ensures result == 0u8
+{
+    byte_complement(255u8)
+}
+
+fn check_mirror_50() -> u8
+    ensures result == 100u8
+{
+    byte_mirror(50u8)
+}
+
+fn main() -> u64 { 0u64 }

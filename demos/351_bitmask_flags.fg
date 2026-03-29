@@ -1,0 +1,104 @@
+// Demo 351: Bitmask flag register with set/toggle
+//
+// A flags register where individual bits represent boolean flags.
+// set_flag ORs in a mask, toggle_flag XORs a mask.
+// Verified: set/toggle operations compose correctly on the flags field.
+
+struct Flags {
+    bits:    u64,
+    changes: u64,
+}
+
+fn flags_new() -> Flags
+    ensures result.bits    == 0u64
+    ensures result.changes == 0u64
+{
+    struct Flags { bits: 0u64, changes: 0u64 }
+}
+
+fn flags_set(f: refmut<Flags>, mask: u64)
+    ensures (*f).bits    == old((*f).bits) | mask
+    ensures (*f).changes == old((*f).changes) + 1u64
+{
+    (*f).bits    = (*f).bits | mask;
+    (*f).changes = (*f).changes + 1u64;
+}
+
+fn flags_toggle(f: refmut<Flags>, mask: u64)
+    ensures (*f).bits    == old((*f).bits) ^ mask
+    ensures (*f).changes == old((*f).changes) + 1u64
+{
+    (*f).bits    = (*f).bits ^ mask;
+    (*f).changes = (*f).changes + 1u64;
+}
+
+fn flags_and(f: refmut<Flags>, mask: u64)
+    ensures (*f).bits    == old((*f).bits) & mask
+    ensures (*f).changes == old((*f).changes) + 1u64
+{
+    (*f).bits    = (*f).bits & mask;
+    (*f).changes = (*f).changes + 1u64;
+}
+
+// Set bit 0 (mask=1): bits is 1
+fn set_bit0() -> u64
+    ensures result == 1u64
+{
+    let f: Flags = flags_new();
+    flags_set(&mut f, 1u64);
+    f.bits
+}
+
+// Set bits 1 and 2 (mask=1 then mask=2): bits is 3
+fn set_two_bits() -> u64
+    ensures result == 3u64
+{
+    let f: Flags = flags_new();
+    flags_set(&mut f, 1u64);
+    flags_set(&mut f, 2u64);
+    f.bits
+}
+
+// Set 7 (0b111), AND 5 (0b101): bits is 5
+fn set7_and5() -> u64
+    ensures result == 5u64
+{
+    let f: Flags = flags_new();
+    flags_set(&mut f, 7u64);
+    flags_and(&mut f, 5u64);
+    f.bits
+}
+
+// Set 3, toggle 1: bits is 2
+fn set3_toggle1() -> u64
+    ensures result == 2u64
+{
+    let f: Flags = flags_new();
+    flags_set(&mut f, 3u64);
+    flags_toggle(&mut f, 1u64);
+    f.bits
+}
+
+// Toggle twice returns to original: set 5, toggle 2 twice → 5
+fn double_toggle() -> u64
+    ensures result == 5u64
+{
+    let f: Flags = flags_new();
+    flags_set(&mut f, 5u64);
+    flags_toggle(&mut f, 2u64);
+    flags_toggle(&mut f, 2u64);
+    f.bits
+}
+
+// Changes count: 3 ops
+fn change_count() -> u64
+    ensures result == 3u64
+{
+    let f: Flags = flags_new();
+    flags_set(&mut f, 1u64);
+    flags_set(&mut f, 2u64);
+    flags_toggle(&mut f, 1u64);
+    f.changes
+}
+
+fn main() -> u64 { 0u64 }

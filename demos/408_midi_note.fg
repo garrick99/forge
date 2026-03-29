@@ -1,0 +1,106 @@
+// Demo 408: MIDI note state tracker
+//
+// Models MIDI note-on/note-off events. Tracks active notes,
+// total note-on and note-off events. A note is active between
+// note-on and note-off. Verified: active <= 128 (MIDI max).
+
+struct MidiState {
+    active:   u64,
+    note_ons: u64,
+    note_offs: u64,
+    max_active: u64,
+}
+
+fn midi_new() -> MidiState
+    ensures result.active     == 0u64
+    ensures result.note_ons   == 0u64
+    ensures result.note_offs  == 0u64
+    ensures result.max_active == 128u64
+{
+    struct MidiState { active: 0u64, note_ons: 0u64, note_offs: 0u64, max_active: 128u64 }
+}
+
+fn midi_note_on(m: refmut<MidiState>)
+    requires (*m).active < (*m).max_active
+    ensures  (*m).active    == old((*m).active) + 1u64
+    ensures  (*m).note_ons  == old((*m).note_ons) + 1u64
+    ensures  (*m).note_offs == old((*m).note_offs)
+    ensures  (*m).max_active == old((*m).max_active)
+{
+    (*m).active   = (*m).active   + 1u64;
+    (*m).note_ons = (*m).note_ons + 1u64;
+}
+
+fn midi_note_off(m: refmut<MidiState>)
+    requires (*m).active > 0u64
+    ensures  (*m).active     == old((*m).active) - 1u64
+    ensures  (*m).note_offs  == old((*m).note_offs) + 1u64
+    ensures  (*m).note_ons   == old((*m).note_ons)
+    ensures  (*m).max_active == old((*m).max_active)
+{
+    (*m).active    = (*m).active    - 1u64;
+    (*m).note_offs = (*m).note_offs + 1u64;
+}
+
+// 4 notes on: active is 4
+fn four_notes_on() -> u64
+    ensures result == 4u64
+{
+    let m: MidiState = midi_new();
+    midi_note_on(&mut m);
+    midi_note_on(&mut m);
+    midi_note_on(&mut m);
+    midi_note_on(&mut m);
+    m.active
+}
+
+// 3 on, 2 off: active is 1
+fn chord_partial_release() -> u64
+    ensures result == 1u64
+{
+    let m: MidiState = midi_new();
+    midi_note_on(&mut m);
+    midi_note_on(&mut m);
+    midi_note_on(&mut m);
+    midi_note_off(&mut m);
+    midi_note_off(&mut m);
+    m.active
+}
+
+// Note-ons and note-offs tracked
+fn event_counts() -> u64
+    ensures result == 3u64
+{
+    let m: MidiState = midi_new();
+    midi_note_on(&mut m);
+    midi_note_on(&mut m);
+    midi_note_on(&mut m);
+    midi_note_off(&mut m);
+    m.note_ons
+}
+
+fn note_off_count() -> u64
+    ensures result == 2u64
+{
+    let m: MidiState = midi_new();
+    midi_note_on(&mut m);
+    midi_note_on(&mut m);
+    midi_note_on(&mut m);
+    midi_note_off(&mut m);
+    midi_note_off(&mut m);
+    m.note_offs
+}
+
+// All notes released: active is 0
+fn all_released() -> u64
+    ensures result == 0u64
+{
+    let m: MidiState = midi_new();
+    midi_note_on(&mut m);
+    midi_note_on(&mut m);
+    midi_note_off(&mut m);
+    midi_note_off(&mut m);
+    m.active
+}
+
+fn main() -> u64 { 0u64 }

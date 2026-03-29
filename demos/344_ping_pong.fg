@@ -1,0 +1,100 @@
+// Demo 344: Ping-pong alternating ownership
+//
+// Two roles (A and B) alternate turns. A "ping" increments pings
+// and toggles turn to B; a "pong" increments pongs and toggles back.
+// Verified: after N ping-pong cycles, pings == pongs == N.
+
+struct PingPong {
+    pings:   u64,
+    pongs:   u64,
+    turn:    u64,  // 0 = A's turn, 1 = B's turn
+}
+
+fn pp_new() -> PingPong
+    ensures result.pings == 0u64
+    ensures result.pongs == 0u64
+    ensures result.turn  == 0u64
+{
+    struct PingPong { pings: 0u64, pongs: 0u64, turn: 0u64 }
+}
+
+fn pp_ping(p: refmut<PingPong>)
+    requires (*p).turn == 0u64
+    ensures  (*p).pings == old((*p).pings) + 1u64
+    ensures  (*p).turn  == 1u64
+    ensures  (*p).pongs == old((*p).pongs)
+{
+    (*p).pings = (*p).pings + 1u64;
+    (*p).turn  = 1u64;
+}
+
+fn pp_pong(p: refmut<PingPong>)
+    requires (*p).turn == 1u64
+    ensures  (*p).pongs == old((*p).pongs) + 1u64
+    ensures  (*p).turn  == 0u64
+    ensures  (*p).pings == old((*p).pings)
+{
+    (*p).pongs = (*p).pongs + 1u64;
+    (*p).turn  = 0u64;
+}
+
+// One ping: pings is 1, turn is B's
+fn one_ping_count() -> u64
+    ensures result == 1u64
+{
+    let p: PingPong = pp_new();
+    pp_ping(&mut p);
+    p.pings
+}
+
+fn one_ping_turn() -> u64
+    ensures result == 1u64
+{
+    let p: PingPong = pp_new();
+    pp_ping(&mut p);
+    p.turn
+}
+
+// One full cycle: pings == pongs == 1, turn back to 0
+fn one_cycle_pings() -> u64
+    ensures result == 1u64
+{
+    let p: PingPong = pp_new();
+    pp_ping(&mut p);
+    pp_pong(&mut p);
+    p.pings
+}
+
+fn one_cycle_pongs() -> u64
+    ensures result == 1u64
+{
+    let p: PingPong = pp_new();
+    pp_ping(&mut p);
+    pp_pong(&mut p);
+    p.pongs
+}
+
+fn one_cycle_turn() -> u64
+    ensures result == 0u64
+{
+    let p: PingPong = pp_new();
+    pp_ping(&mut p);
+    pp_pong(&mut p);
+    p.turn
+}
+
+// Three full cycles: pings == pongs == 3
+fn three_cycles_pings() -> u64
+    ensures result == 3u64
+{
+    let p: PingPong = pp_new();
+    pp_ping(&mut p);
+    pp_pong(&mut p);
+    pp_ping(&mut p);
+    pp_pong(&mut p);
+    pp_ping(&mut p);
+    pp_pong(&mut p);
+    p.pings
+}
+
+fn main() -> u64 { 0u64 }

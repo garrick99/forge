@@ -1,0 +1,106 @@
+// Demo 459: Cache eviction policy tracker
+//
+// Cache has capacity slots. On miss, evict oldest if full.
+// Verified: used <= capacity, evictions track capacity overflows.
+
+struct CacheEviction {
+    used:      u64,
+    capacity:  u64,
+    hits:      u64,
+    misses:    u64,
+    evictions: u64,
+}
+
+fn ce_new(cap: u64) -> CacheEviction
+    requires cap > 0u64
+    ensures result.used      == 0u64
+    ensures result.capacity  == cap
+    ensures result.hits      == 0u64
+    ensures result.misses    == 0u64
+    ensures result.evictions == 0u64
+{
+    struct CacheEviction { used: 0u64, capacity: cap, hits: 0u64, misses: 0u64, evictions: 0u64 }
+}
+
+fn ce_hit(c: refmut<CacheEviction>)
+    ensures (*c).hits      == old((*c).hits) + 1u64
+    ensures (*c).used      == old((*c).used)
+    ensures (*c).capacity  == old((*c).capacity)
+    ensures (*c).misses    == old((*c).misses)
+    ensures (*c).evictions == old((*c).evictions)
+{
+    (*c).hits = (*c).hits + 1u64;
+}
+
+fn ce_miss_insert(c: refmut<CacheEviction>)
+    requires (*c).used < (*c).capacity
+    ensures  (*c).misses   == old((*c).misses) + 1u64
+    ensures  (*c).used     == old((*c).used) + 1u64
+    ensures  (*c).capacity == old((*c).capacity)
+    ensures  (*c).hits     == old((*c).hits)
+    ensures  (*c).evictions == old((*c).evictions)
+{
+    (*c).misses = (*c).misses + 1u64;
+    (*c).used   = (*c).used   + 1u64;
+}
+
+fn ce_miss_evict(c: refmut<CacheEviction>)
+    requires (*c).used == (*c).capacity
+    ensures  (*c).misses    == old((*c).misses) + 1u64
+    ensures  (*c).evictions == old((*c).evictions) + 1u64
+    ensures  (*c).used      == old((*c).used)
+    ensures  (*c).capacity  == old((*c).capacity)
+    ensures  (*c).hits      == old((*c).hits)
+{
+    (*c).misses    = (*c).misses    + 1u64;
+    (*c).evictions = (*c).evictions + 1u64;
+}
+
+// 3 cold misses: used==3
+fn cold_misses() -> u64
+    ensures result == 3u64
+{
+    let c: CacheEviction = ce_new(4u64);
+    ce_miss_insert(&mut c);
+    ce_miss_insert(&mut c);
+    ce_miss_insert(&mut c);
+    c.used
+}
+
+// Eviction when full
+fn eviction_when_full() -> u64
+    ensures result == 2u64
+{
+    let c: CacheEviction = ce_new(2u64);
+    ce_miss_insert(&mut c);
+    ce_miss_insert(&mut c);
+    ce_miss_evict(&mut c);
+    ce_miss_evict(&mut c);
+    c.evictions
+}
+
+// Hit rate: hits tracked
+fn hit_count() -> u64
+    ensures result == 3u64
+{
+    let c: CacheEviction = ce_new(4u64);
+    ce_miss_insert(&mut c);
+    ce_hit(&mut c);
+    ce_hit(&mut c);
+    ce_hit(&mut c);
+    c.hits
+}
+
+// Capacity stays bounded after evictions
+fn capacity_stable() -> u64
+    ensures result == 2u64
+{
+    let c: CacheEviction = ce_new(2u64);
+    ce_miss_insert(&mut c);
+    ce_miss_insert(&mut c);
+    ce_miss_evict(&mut c);
+    ce_miss_evict(&mut c);
+    c.used
+}
+
+fn main() -> u64 { 0u64 }

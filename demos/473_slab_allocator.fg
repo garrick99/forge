@@ -1,0 +1,100 @@
+// Demo 473: Slab allocator with free list tracking
+//
+// A slab has a fixed number of objects. alloc() takes from free list.
+// free() returns to free list. Verified: free + used == total_objects.
+
+struct SlabAllocator {
+    total_objects: u64,
+    free_count:    u64,
+    used_count:    u64,
+    alloc_ops:     u64,
+    free_ops:      u64,
+}
+
+fn sa_new(total: u64) -> SlabAllocator
+    requires total > 0u64
+    ensures result.total_objects == total
+    ensures result.free_count    == total
+    ensures result.used_count    == 0u64
+    ensures result.alloc_ops     == 0u64
+    ensures result.free_ops      == 0u64
+{
+    struct SlabAllocator { total_objects: total, free_count: total, used_count: 0u64, alloc_ops: 0u64, free_ops: 0u64 }
+}
+
+fn sa_alloc(s: refmut<SlabAllocator>)
+    requires (*s).free_count > 0u64
+    ensures  (*s).free_count    == old((*s).free_count) - 1u64
+    ensures  (*s).used_count    == old((*s).used_count) + 1u64
+    ensures  (*s).alloc_ops     == old((*s).alloc_ops) + 1u64
+    ensures  (*s).total_objects == old((*s).total_objects)
+    ensures  (*s).free_ops      == old((*s).free_ops)
+{
+    (*s).free_count = (*s).free_count - 1u64;
+    (*s).used_count = (*s).used_count + 1u64;
+    (*s).alloc_ops  = (*s).alloc_ops  + 1u64;
+}
+
+fn sa_free(s: refmut<SlabAllocator>)
+    requires (*s).used_count > 0u64
+    ensures  (*s).used_count    == old((*s).used_count) - 1u64
+    ensures  (*s).free_count    == old((*s).free_count) + 1u64
+    ensures  (*s).free_ops      == old((*s).free_ops) + 1u64
+    ensures  (*s).total_objects == old((*s).total_objects)
+    ensures  (*s).alloc_ops     == old((*s).alloc_ops)
+{
+    (*s).used_count = (*s).used_count - 1u64;
+    (*s).free_count = (*s).free_count + 1u64;
+    (*s).free_ops   = (*s).free_ops   + 1u64;
+}
+
+// Alloc 3: used==3
+fn alloc_3() -> u64
+    ensures result == 3u64
+{
+    let s: SlabAllocator = sa_new(8u64);
+    sa_alloc(&mut s);
+    sa_alloc(&mut s);
+    sa_alloc(&mut s);
+    s.used_count
+}
+
+// free + used == total
+fn conservation() -> u64
+    ensures result == 8u64
+{
+    let s: SlabAllocator = sa_new(8u64);
+    sa_alloc(&mut s);
+    sa_alloc(&mut s);
+    sa_alloc(&mut s);
+    sa_free(&mut s);
+    s.free_count + s.used_count
+}
+
+// Free reduces used
+fn free_reduces() -> u64
+    ensures result == 1u64
+{
+    let s: SlabAllocator = sa_new(8u64);
+    sa_alloc(&mut s);
+    sa_alloc(&mut s);
+    sa_alloc(&mut s);
+    sa_free(&mut s);
+    sa_free(&mut s);
+    s.used_count
+}
+
+// Op counts tracked
+fn op_counts() -> u64
+    ensures result == 5u64
+{
+    let s: SlabAllocator = sa_new(8u64);
+    sa_alloc(&mut s);
+    sa_alloc(&mut s);
+    sa_alloc(&mut s);
+    sa_free(&mut s);
+    sa_free(&mut s);
+    s.alloc_ops + s.free_ops
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,110 @@
+// Demo 436: Admission control with concurrency limit
+//
+// active requests must not exceed max_concurrent.
+// admit() increments active; complete() decrements.
+// rejected tracks turned-away requests when at capacity.
+// Verified: active <= max_concurrent always holds via preconditions.
+
+struct AdmissionCtrl {
+    active:         u64,
+    max_concurrent: u64,
+    total_admitted: u64,
+    rejected:       u64,
+    completed:      u64,
+}
+
+fn ac_new(max: u64) -> AdmissionCtrl
+    requires max > 0u64
+    ensures result.active         == 0u64
+    ensures result.max_concurrent == max
+    ensures result.total_admitted == 0u64
+    ensures result.rejected       == 0u64
+    ensures result.completed      == 0u64
+{
+    struct AdmissionCtrl { active: 0u64, max_concurrent: max, total_admitted: 0u64, rejected: 0u64, completed: 0u64 }
+}
+
+fn ac_admit(a: refmut<AdmissionCtrl>)
+    requires (*a).active < (*a).max_concurrent
+    ensures  (*a).active         == old((*a).active) + 1u64
+    ensures  (*a).total_admitted == old((*a).total_admitted) + 1u64
+    ensures  (*a).max_concurrent == old((*a).max_concurrent)
+    ensures  (*a).rejected       == old((*a).rejected)
+    ensures  (*a).completed      == old((*a).completed)
+{
+    (*a).active         = (*a).active         + 1u64;
+    (*a).total_admitted = (*a).total_admitted + 1u64;
+}
+
+fn ac_reject(a: refmut<AdmissionCtrl>)
+    requires (*a).active == (*a).max_concurrent
+    ensures  (*a).rejected       == old((*a).rejected) + 1u64
+    ensures  (*a).active         == old((*a).active)
+    ensures  (*a).max_concurrent == old((*a).max_concurrent)
+    ensures  (*a).total_admitted == old((*a).total_admitted)
+    ensures  (*a).completed      == old((*a).completed)
+{
+    (*a).rejected = (*a).rejected + 1u64;
+}
+
+fn ac_complete(a: refmut<AdmissionCtrl>)
+    requires (*a).active > 0u64
+    ensures  (*a).active     == old((*a).active) - 1u64
+    ensures  (*a).completed  == old((*a).completed) + 1u64
+    ensures  (*a).max_concurrent == old((*a).max_concurrent)
+    ensures  (*a).total_admitted == old((*a).total_admitted)
+    ensures  (*a).rejected    == old((*a).rejected)
+{
+    (*a).active    = (*a).active    - 1u64;
+    (*a).completed = (*a).completed + 1u64;
+}
+
+// Admit 3 with max=4: active==3
+fn admit_3() -> u64
+    ensures result == 3u64
+{
+    let a: AdmissionCtrl = ac_new(4u64);
+    ac_admit(&mut a);
+    ac_admit(&mut a);
+    ac_admit(&mut a);
+    a.active
+}
+
+// Reject when full
+fn reject_when_full() -> u64
+    ensures result == 2u64
+{
+    let a: AdmissionCtrl = ac_new(2u64);
+    ac_admit(&mut a);
+    ac_admit(&mut a);
+    ac_reject(&mut a);
+    ac_reject(&mut a);
+    a.rejected
+}
+
+// Complete reduces active
+fn complete_reduces() -> u64
+    ensures result == 1u64
+{
+    let a: AdmissionCtrl = ac_new(4u64);
+    ac_admit(&mut a);
+    ac_admit(&mut a);
+    ac_admit(&mut a);
+    ac_complete(&mut a);
+    ac_complete(&mut a);
+    a.active
+}
+
+// Total admitted independent of completions
+fn total_admitted() -> u64
+    ensures result == 3u64
+{
+    let a: AdmissionCtrl = ac_new(4u64);
+    ac_admit(&mut a);
+    ac_admit(&mut a);
+    ac_admit(&mut a);
+    ac_complete(&mut a);
+    a.total_admitted
+}
+
+fn main() -> u64 { 0u64 }

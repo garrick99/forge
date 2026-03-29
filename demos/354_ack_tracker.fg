@@ -1,0 +1,93 @@
+// Demo 354: Acknowledgement tracker (send/ack protocol)
+//
+// Tracks sent and acknowledged sequence numbers.
+// send() advances next_send, ack(n) advances ack_up_to.
+// Verified: window = next_send - ack_up_to tracks in-flight items.
+
+struct AckTracker {
+    next_send:  u64,
+    ack_up_to:  u64,
+    window:     u64,  // max in-flight
+}
+
+fn ack_new(window: u64) -> AckTracker
+    requires window > 0u64
+    ensures result.next_send == 0u64
+    ensures result.ack_up_to == 0u64
+    ensures result.window    == window
+{
+    struct AckTracker { next_send: 0u64, ack_up_to: 0u64, window: window }
+}
+
+fn ack_send(a: refmut<AckTracker>)
+    requires (*a).next_send - (*a).ack_up_to < (*a).window
+    ensures  (*a).next_send == old((*a).next_send) + 1u64
+    ensures  (*a).ack_up_to == old((*a).ack_up_to)
+    ensures  (*a).window    == old((*a).window)
+{
+    (*a).next_send = (*a).next_send + 1u64;
+}
+
+fn ack_ack(a: refmut<AckTracker>)
+    requires (*a).ack_up_to < (*a).next_send
+    ensures  (*a).ack_up_to == old((*a).ack_up_to) + 1u64
+    ensures  (*a).next_send == old((*a).next_send)
+    ensures  (*a).window    == old((*a).window)
+{
+    (*a).ack_up_to = (*a).ack_up_to + 1u64;
+}
+
+// Send 3: next_send is 3
+fn send_three(w: u64) -> u64
+    requires w > 3u64
+    ensures result == 3u64
+{
+    let a: AckTracker = ack_new(w);
+    ack_send(&mut a);
+    ack_send(&mut a);
+    ack_send(&mut a);
+    a.next_send
+}
+
+// Send 3, ack 2: in-flight is 1
+fn in_flight(w: u64) -> u64
+    requires w > 3u64
+    ensures result == 1u64
+{
+    let a: AckTracker = ack_new(w);
+    ack_send(&mut a);
+    ack_send(&mut a);
+    ack_send(&mut a);
+    ack_ack(&mut a);
+    ack_ack(&mut a);
+    a.next_send - a.ack_up_to
+}
+
+// Send then ack all: in-flight is 0
+fn fully_acked(w: u64) -> u64
+    requires w > 3u64
+    ensures result == 0u64
+{
+    let a: AckTracker = ack_new(w);
+    ack_send(&mut a);
+    ack_send(&mut a);
+    ack_send(&mut a);
+    ack_ack(&mut a);
+    ack_ack(&mut a);
+    ack_ack(&mut a);
+    a.next_send - a.ack_up_to
+}
+
+// Window preserved across sends and acks
+fn window_preserved(w: u64) -> u64
+    requires w > 2u64
+    ensures result == w
+{
+    let a: AckTracker = ack_new(w);
+    ack_send(&mut a);
+    ack_send(&mut a);
+    ack_ack(&mut a);
+    a.window
+}
+
+fn main() -> u64 { 0u64 }

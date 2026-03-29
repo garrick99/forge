@@ -1,0 +1,99 @@
+// Demo 435: Sequence generator with step and wrap tracking
+//
+// Generates values: current += step each call.
+// wrap_at: when current >= wrap_at, wraps back to 0 and increments wraps.
+// Verified: current tracks steps, wraps count wrap events.
+
+struct SeqGen {
+    current: u64,
+    step:    u64,
+    wrap_at: u64,
+    wraps:   u64,
+    ticks:   u64,
+}
+
+fn sg_new(step: u64, wrap_at: u64) -> SeqGen
+    requires step > 0u64
+    requires wrap_at > step
+    ensures result.current == 0u64
+    ensures result.step    == step
+    ensures result.wrap_at == wrap_at
+    ensures result.wraps   == 0u64
+    ensures result.ticks   == 0u64
+{
+    struct SeqGen { current: 0u64, step: step, wrap_at: wrap_at, wraps: 0u64, ticks: 0u64 }
+}
+
+fn sg_tick(s: refmut<SeqGen>)
+    requires (*s).current + (*s).step < (*s).wrap_at
+    ensures  (*s).current == old((*s).current) + (*s).step
+    ensures  (*s).ticks   == old((*s).ticks) + 1u64
+    ensures  (*s).wraps   == old((*s).wraps)
+    ensures  (*s).step    == old((*s).step)
+    ensures  (*s).wrap_at == old((*s).wrap_at)
+{
+    (*s).current = (*s).current + (*s).step;
+    (*s).ticks   = (*s).ticks   + 1u64;
+}
+
+fn sg_tick_wrap(s: refmut<SeqGen>)
+    requires (*s).current + (*s).step >= (*s).wrap_at
+    ensures  (*s).current == 0u64
+    ensures  (*s).wraps   == old((*s).wraps) + 1u64
+    ensures  (*s).ticks   == old((*s).ticks) + 1u64
+    ensures  (*s).step    == old((*s).step)
+    ensures  (*s).wrap_at == old((*s).wrap_at)
+{
+    (*s).current = 0u64;
+    (*s).wraps   = (*s).wraps + 1u64;
+    (*s).ticks   = (*s).ticks + 1u64;
+}
+
+// 3 ticks with step=10: current==30
+fn three_ticks() -> u64
+    ensures result == 30u64
+{
+    let s: SeqGen = sg_new(10u64, 100u64);
+    sg_tick(&mut s);
+    sg_tick(&mut s);
+    sg_tick(&mut s);
+    s.current
+}
+
+// Wrap: current resets to 0
+fn wrap_resets() -> u64
+    ensures result == 0u64
+{
+    let s: SeqGen = sg_new(10u64, 30u64);
+    sg_tick(&mut s);
+    sg_tick(&mut s);
+    sg_tick_wrap(&mut s);
+    s.current
+}
+
+// Wrap count after two wraps
+fn two_wraps() -> u64
+    ensures result == 2u64
+{
+    let s: SeqGen = sg_new(10u64, 20u64);
+    sg_tick(&mut s);
+    sg_tick_wrap(&mut s);
+    sg_tick(&mut s);
+    sg_tick_wrap(&mut s);
+    s.wraps
+}
+
+// Total ticks
+fn total_ticks() -> u64
+    ensures result == 5u64
+{
+    let s: SeqGen = sg_new(10u64, 30u64);
+    sg_tick(&mut s);
+    sg_tick(&mut s);
+    sg_tick_wrap(&mut s);
+    sg_tick(&mut s);
+    sg_tick(&mut s);
+    s.ticks
+}
+
+fn main() -> u64 { 0u64 }

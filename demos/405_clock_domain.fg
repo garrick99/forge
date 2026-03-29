@@ -1,0 +1,94 @@
+// Demo 405: Clock domain crossing tracker
+//
+// Two clock domains A and B exchange data via a synchronizer.
+// write_a() increments the A-domain write count,
+// sync_to_b() moves pending writes to B-visible count.
+// Verified: b_visible <= a_written at all times.
+
+struct ClockDomain {
+    a_written: u64,
+    b_visible: u64,
+    syncs:     u64,
+}
+
+fn cd_new() -> ClockDomain
+    ensures result.a_written == 0u64
+    ensures result.b_visible == 0u64
+    ensures result.syncs     == 0u64
+{
+    struct ClockDomain { a_written: 0u64, b_visible: 0u64, syncs: 0u64 }
+}
+
+fn cd_write_a(c: refmut<ClockDomain>)
+    ensures (*c).a_written == old((*c).a_written) + 1u64
+    ensures (*c).b_visible == old((*c).b_visible)
+    ensures (*c).syncs     == old((*c).syncs)
+{
+    (*c).a_written = (*c).a_written + 1u64;
+}
+
+fn cd_sync(c: refmut<ClockDomain>)
+    requires (*c).b_visible < (*c).a_written
+    ensures  (*c).b_visible == old((*c).b_visible) + 1u64
+    ensures  (*c).a_written == old((*c).a_written)
+    ensures  (*c).syncs     == old((*c).syncs) + 1u64
+{
+    (*c).b_visible = (*c).b_visible + 1u64;
+    (*c).syncs     = (*c).syncs     + 1u64;
+}
+
+// Write 4 to A: a_written is 4
+fn write_four() -> u64
+    ensures result == 4u64
+{
+    let c: ClockDomain = cd_new();
+    cd_write_a(&mut c);
+    cd_write_a(&mut c);
+    cd_write_a(&mut c);
+    cd_write_a(&mut c);
+    c.a_written
+}
+
+// Write 3, sync 2: b_visible is 2
+fn sync_two() -> u64
+    ensures result == 2u64
+{
+    let c: ClockDomain = cd_new();
+    cd_write_a(&mut c);
+    cd_write_a(&mut c);
+    cd_write_a(&mut c);
+    cd_sync(&mut c);
+    cd_sync(&mut c);
+    c.b_visible
+}
+
+// Sync all: b_visible == a_written
+fn sync_all() -> u64
+    ensures result == 0u64
+{
+    let c: ClockDomain = cd_new();
+    cd_write_a(&mut c);
+    cd_write_a(&mut c);
+    cd_write_a(&mut c);
+    cd_sync(&mut c);
+    cd_sync(&mut c);
+    cd_sync(&mut c);
+    c.a_written - c.b_visible
+}
+
+// Sync count tracked
+fn sync_count() -> u64
+    ensures result == 3u64
+{
+    let c: ClockDomain = cd_new();
+    cd_write_a(&mut c);
+    cd_write_a(&mut c);
+    cd_write_a(&mut c);
+    cd_write_a(&mut c);
+    cd_sync(&mut c);
+    cd_sync(&mut c);
+    cd_sync(&mut c);
+    c.syncs
+}
+
+fn main() -> u64 { 0u64 }

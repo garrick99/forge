@@ -1,0 +1,108 @@
+// Demo 398: Signal edge detector
+//
+// Detects rising and falling edges on a digital signal.
+// set_high() transitions 0→1 (rising edge), set_low() transitions 1→0
+// (falling edge). Edge counts are tracked separately.
+// Verified: edge counts and signal state track transitions.
+
+struct EdgeDetector {
+    signal:        u64,  // 0=low, 1=high
+    rising_edges:  u64,
+    falling_edges: u64,
+}
+
+fn ed_new() -> EdgeDetector
+    ensures result.signal        == 0u64
+    ensures result.rising_edges  == 0u64
+    ensures result.falling_edges == 0u64
+{
+    struct EdgeDetector { signal: 0u64, rising_edges: 0u64, falling_edges: 0u64 }
+}
+
+fn ed_set_high(e: refmut<EdgeDetector>)
+    requires (*e).signal == 0u64
+    ensures  (*e).signal        == 1u64
+    ensures  (*e).rising_edges  == old((*e).rising_edges) + 1u64
+    ensures  (*e).falling_edges == old((*e).falling_edges)
+{
+    (*e).signal       = 1u64;
+    (*e).rising_edges = (*e).rising_edges + 1u64;
+}
+
+fn ed_set_low(e: refmut<EdgeDetector>)
+    requires (*e).signal == 1u64
+    ensures  (*e).signal        == 0u64
+    ensures  (*e).falling_edges == old((*e).falling_edges) + 1u64
+    ensures  (*e).rising_edges  == old((*e).rising_edges)
+{
+    (*e).signal        = 0u64;
+    (*e).falling_edges = (*e).falling_edges + 1u64;
+}
+
+// One rising edge: signal is 1
+fn one_rising() -> u64
+    ensures result == 1u64
+{
+    let e: EdgeDetector = ed_new();
+    ed_set_high(&mut e);
+    e.signal
+}
+
+// Rising count after one pulse
+fn rising_count() -> u64
+    ensures result == 1u64
+{
+    let e: EdgeDetector = ed_new();
+    ed_set_high(&mut e);
+    ed_set_low(&mut e);
+    e.rising_edges
+}
+
+// Falling count after one pulse
+fn falling_count() -> u64
+    ensures result == 1u64
+{
+    let e: EdgeDetector = ed_new();
+    ed_set_high(&mut e);
+    ed_set_low(&mut e);
+    e.falling_edges
+}
+
+// Three pulses: 3 rising, 3 falling
+fn three_pulses_rising() -> u64
+    ensures result == 3u64
+{
+    let e: EdgeDetector = ed_new();
+    ed_set_high(&mut e);
+    ed_set_low(&mut e);
+    ed_set_high(&mut e);
+    ed_set_low(&mut e);
+    ed_set_high(&mut e);
+    ed_set_low(&mut e);
+    e.rising_edges
+}
+
+fn three_pulses_falling() -> u64
+    ensures result == 3u64
+{
+    let e: EdgeDetector = ed_new();
+    ed_set_high(&mut e);
+    ed_set_low(&mut e);
+    ed_set_high(&mut e);
+    ed_set_low(&mut e);
+    ed_set_high(&mut e);
+    ed_set_low(&mut e);
+    e.falling_edges
+}
+
+// Signal low after full pulse
+fn signal_after_pulse() -> u64
+    ensures result == 0u64
+{
+    let e: EdgeDetector = ed_new();
+    ed_set_high(&mut e);
+    ed_set_low(&mut e);
+    e.signal
+}
+
+fn main() -> u64 { 0u64 }

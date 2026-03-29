@@ -1,0 +1,103 @@
+// Demo 353: Resource pool with alloc/free tracking
+//
+// A fixed pool of resources. alloc takes one (free > 0),
+// free returns one (used > 0). The invariant free + used == total.
+// Verified: alloc/free maintain pool balance.
+
+struct Pool {
+    free:  u64,
+    used:  u64,
+    total: u64,
+}
+
+fn pool_new(total: u64) -> Pool
+    requires total > 0u64
+    ensures result.free  == total
+    ensures result.used  == 0u64
+    ensures result.total == total
+{
+    struct Pool { free: total, used: 0u64, total: total }
+}
+
+fn pool_alloc(p: refmut<Pool>)
+    requires (*p).free > 0u64
+    ensures  (*p).free  == old((*p).free)  - 1u64
+    ensures  (*p).used  == old((*p).used)  + 1u64
+    ensures  (*p).total == old((*p).total)
+{
+    (*p).free = (*p).free - 1u64;
+    (*p).used = (*p).used + 1u64;
+}
+
+fn pool_free(p: refmut<Pool>)
+    requires (*p).used > 0u64
+    ensures  (*p).used  == old((*p).used)  - 1u64
+    ensures  (*p).free  == old((*p).free)  + 1u64
+    ensures  (*p).total == old((*p).total)
+{
+    (*p).used = (*p).used - 1u64;
+    (*p).free = (*p).free + 1u64;
+}
+
+// New pool of 5: free is 5
+fn initial_free() -> u64
+    ensures result == 5u64
+{
+    let p: Pool = pool_new(5u64);
+    p.free
+}
+
+// Alloc 3: free is 2, used is 3
+fn alloc_three_free(total: u64) -> u64
+    requires total > 3u64
+    ensures result == total - 3u64
+{
+    let p: Pool = pool_new(total);
+    pool_alloc(&mut p);
+    pool_alloc(&mut p);
+    pool_alloc(&mut p);
+    p.free
+}
+
+fn alloc_three_used(total: u64) -> u64
+    requires total > 3u64
+    ensures result == 3u64
+{
+    let p: Pool = pool_new(total);
+    pool_alloc(&mut p);
+    pool_alloc(&mut p);
+    pool_alloc(&mut p);
+    p.used
+}
+
+// Alloc 3, free 2: free + used == total
+fn balance_preserved(total: u64) -> u64
+    requires total > 3u64
+    ensures result == total
+{
+    let p: Pool = pool_new(total);
+    pool_alloc(&mut p);
+    pool_alloc(&mut p);
+    pool_alloc(&mut p);
+    pool_free(&mut p);
+    pool_free(&mut p);
+    p.free + p.used
+}
+
+// Full alloc then full free: back to initial
+fn alloc_free_cycle() -> u64
+    ensures result == 4u64
+{
+    let p: Pool = pool_new(4u64);
+    pool_alloc(&mut p);
+    pool_alloc(&mut p);
+    pool_alloc(&mut p);
+    pool_alloc(&mut p);
+    pool_free(&mut p);
+    pool_free(&mut p);
+    pool_free(&mut p);
+    pool_free(&mut p);
+    p.free
+}
+
+fn main() -> u64 { 0u64 }

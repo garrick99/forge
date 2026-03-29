@@ -1,0 +1,111 @@
+// Demo 394: Task scheduler with priority queues
+//
+// A scheduler has high-priority and low-priority queues.
+// enqueue_hi/lo add tasks; dispatch always takes from hi first,
+// then lo. Verified: task counts track enqueue and dispatch.
+
+struct Scheduler {
+    hi_count: u64,
+    lo_count: u64,
+    dispatched: u64,
+}
+
+fn sched_new() -> Scheduler
+    ensures result.hi_count   == 0u64
+    ensures result.lo_count   == 0u64
+    ensures result.dispatched == 0u64
+{
+    struct Scheduler { hi_count: 0u64, lo_count: 0u64, dispatched: 0u64 }
+}
+
+fn sched_enqueue_hi(s: refmut<Scheduler>)
+    ensures (*s).hi_count   == old((*s).hi_count) + 1u64
+    ensures (*s).lo_count   == old((*s).lo_count)
+    ensures (*s).dispatched == old((*s).dispatched)
+{
+    (*s).hi_count = (*s).hi_count + 1u64;
+}
+
+fn sched_enqueue_lo(s: refmut<Scheduler>)
+    ensures (*s).lo_count   == old((*s).lo_count) + 1u64
+    ensures (*s).hi_count   == old((*s).hi_count)
+    ensures (*s).dispatched == old((*s).dispatched)
+{
+    (*s).lo_count = (*s).lo_count + 1u64;
+}
+
+fn sched_dispatch_hi(s: refmut<Scheduler>)
+    requires (*s).hi_count > 0u64
+    ensures  (*s).hi_count   == old((*s).hi_count) - 1u64
+    ensures  (*s).dispatched == old((*s).dispatched) + 1u64
+    ensures  (*s).lo_count   == old((*s).lo_count)
+{
+    (*s).hi_count   = (*s).hi_count   - 1u64;
+    (*s).dispatched = (*s).dispatched + 1u64;
+}
+
+fn sched_dispatch_lo(s: refmut<Scheduler>)
+    requires (*s).lo_count > 0u64
+    requires (*s).hi_count == 0u64
+    ensures  (*s).lo_count   == old((*s).lo_count) - 1u64
+    ensures  (*s).dispatched == old((*s).dispatched) + 1u64
+    ensures  (*s).hi_count   == 0u64
+{
+    (*s).lo_count   = (*s).lo_count   - 1u64;
+    (*s).dispatched = (*s).dispatched + 1u64;
+}
+
+// Enqueue 3 hi: hi_count is 3
+fn enqueue_hi_three() -> u64
+    ensures result == 3u64
+{
+    let s: Scheduler = sched_new();
+    sched_enqueue_hi(&mut s);
+    sched_enqueue_hi(&mut s);
+    sched_enqueue_hi(&mut s);
+    s.hi_count
+}
+
+// Enqueue 2 hi, 3 lo, dispatch 2 hi: hi is 0, lo is 3
+fn dispatch_all_hi_lo() -> u64
+    ensures result == 3u64
+{
+    let s: Scheduler = sched_new();
+    sched_enqueue_hi(&mut s);
+    sched_enqueue_hi(&mut s);
+    sched_enqueue_lo(&mut s);
+    sched_enqueue_lo(&mut s);
+    sched_enqueue_lo(&mut s);
+    sched_dispatch_hi(&mut s);
+    sched_dispatch_hi(&mut s);
+    s.lo_count
+}
+
+// Total dispatched
+fn total_dispatched() -> u64
+    ensures result == 3u64
+{
+    let s: Scheduler = sched_new();
+    sched_enqueue_hi(&mut s);
+    sched_enqueue_hi(&mut s);
+    sched_enqueue_lo(&mut s);
+    sched_enqueue_lo(&mut s);
+    sched_dispatch_hi(&mut s);
+    sched_dispatch_hi(&mut s);
+    sched_dispatch_lo(&mut s);
+    s.dispatched
+}
+
+// Dispatch lo only after hi empty
+fn lo_dispatch_after_hi() -> u64
+    ensures result == 0u64
+{
+    let s: Scheduler = sched_new();
+    sched_enqueue_hi(&mut s);
+    sched_enqueue_lo(&mut s);
+    sched_dispatch_hi(&mut s);
+    sched_dispatch_lo(&mut s);
+    s.hi_count + s.lo_count
+}
+
+fn main() -> u64 { 0u64 }

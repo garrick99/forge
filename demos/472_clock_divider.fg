@@ -1,0 +1,97 @@
+// Demo 472: Clock divider with output pulse tracking
+//
+// Input clock divided by N. Every N input ticks, one output pulse fires.
+// Verified: output_pulses == input_ticks / divisor (integer division via counter).
+
+struct ClockDivider {
+    count:         u64,
+    divisor:       u64,
+    output_pulses: u64,
+    input_ticks:   u64,
+}
+
+fn cd_new(divisor: u64) -> ClockDivider
+    requires divisor > 1u64
+    ensures result.count         == 0u64
+    ensures result.divisor       == divisor
+    ensures result.output_pulses == 0u64
+    ensures result.input_ticks   == 0u64
+{
+    struct ClockDivider { count: 0u64, divisor: divisor, output_pulses: 0u64, input_ticks: 0u64 }
+}
+
+fn cd_tick(c: refmut<ClockDivider>)
+    requires (*c).count + 1u64 < (*c).divisor
+    ensures  (*c).count        == old((*c).count) + 1u64
+    ensures  (*c).input_ticks  == old((*c).input_ticks) + 1u64
+    ensures  (*c).output_pulses == old((*c).output_pulses)
+    ensures  (*c).divisor      == old((*c).divisor)
+{
+    (*c).count       = (*c).count       + 1u64;
+    (*c).input_ticks = (*c).input_ticks + 1u64;
+}
+
+fn cd_tick_pulse(c: refmut<ClockDivider>)
+    requires (*c).count + 1u64 == (*c).divisor
+    ensures  (*c).count         == 0u64
+    ensures  (*c).output_pulses == old((*c).output_pulses) + 1u64
+    ensures  (*c).input_ticks   == old((*c).input_ticks) + 1u64
+    ensures  (*c).divisor       == old((*c).divisor)
+{
+    (*c).count         = 0u64;
+    (*c).output_pulses = (*c).output_pulses + 1u64;
+    (*c).input_ticks   = (*c).input_ticks   + 1u64;
+}
+
+// 3 ticks (divisor=4): count==3
+fn three_ticks() -> u64
+    ensures result == 3u64
+{
+    let c: ClockDivider = cd_new(4u64);
+    cd_tick(&mut c);
+    cd_tick(&mut c);
+    cd_tick(&mut c);
+    c.count
+}
+
+// 4th tick fires pulse: output_pulses==1
+fn pulse_fires() -> u64
+    ensures result == 1u64
+{
+    let c: ClockDivider = cd_new(4u64);
+    cd_tick(&mut c);
+    cd_tick(&mut c);
+    cd_tick(&mut c);
+    cd_tick_pulse(&mut c);
+    c.output_pulses
+}
+
+// Pulse resets count to 0
+fn count_resets() -> u64
+    ensures result == 0u64
+{
+    let c: ClockDivider = cd_new(4u64);
+    cd_tick(&mut c);
+    cd_tick(&mut c);
+    cd_tick(&mut c);
+    cd_tick_pulse(&mut c);
+    c.count
+}
+
+// Two pulses after 8 ticks (divisor=4)
+fn two_pulses() -> u64
+    ensures result == 2u64
+{
+    let c: ClockDivider = cd_new(4u64);
+    cd_tick(&mut c);
+    cd_tick(&mut c);
+    cd_tick(&mut c);
+    cd_tick_pulse(&mut c);
+    cd_tick(&mut c);
+    cd_tick(&mut c);
+    cd_tick(&mut c);
+    cd_tick_pulse(&mut c);
+    c.output_pulses
+}
+
+fn main() -> u64 { 0u64 }

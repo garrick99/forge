@@ -1,0 +1,97 @@
+// Demo 434: Reward points with tiers and expiry tracking
+//
+// Points earned accumulate; redemptions reduce balance.
+// expired tracks voided points.
+// Verified: balance == earned - redeemed - expired.
+
+struct RewardPoints {
+    earned:   u64,
+    redeemed: u64,
+    expired:  u64,
+    balance:  u64,
+}
+
+fn rp_new() -> RewardPoints
+    ensures result.earned   == 0u64
+    ensures result.redeemed == 0u64
+    ensures result.expired  == 0u64
+    ensures result.balance  == 0u64
+{
+    struct RewardPoints { earned: 0u64, redeemed: 0u64, expired: 0u64, balance: 0u64 }
+}
+
+fn rp_earn(r: refmut<RewardPoints>, n: u64)
+    ensures (*r).earned  == old((*r).earned) + n
+    ensures (*r).balance == old((*r).balance) + n
+    ensures (*r).redeemed == old((*r).redeemed)
+    ensures (*r).expired  == old((*r).expired)
+{
+    (*r).earned  = (*r).earned  + n;
+    (*r).balance = (*r).balance + n;
+}
+
+fn rp_redeem(r: refmut<RewardPoints>, n: u64)
+    requires (*r).balance >= n
+    ensures (*r).redeemed == old((*r).redeemed) + n
+    ensures (*r).balance  == old((*r).balance) - n
+    ensures (*r).earned   == old((*r).earned)
+    ensures (*r).expired  == old((*r).expired)
+{
+    (*r).redeemed = (*r).redeemed + n;
+    (*r).balance  = (*r).balance  - n;
+}
+
+fn rp_expire(r: refmut<RewardPoints>, n: u64)
+    requires (*r).balance >= n
+    ensures (*r).expired == old((*r).expired) + n
+    ensures (*r).balance == old((*r).balance) - n
+    ensures (*r).earned  == old((*r).earned)
+    ensures (*r).redeemed == old((*r).redeemed)
+{
+    (*r).expired = (*r).expired + n;
+    (*r).balance = (*r).balance - n;
+}
+
+// Earn 200: balance==200
+fn earn_200() -> u64
+    ensures result == 200u64
+{
+    let r: RewardPoints = rp_new();
+    rp_earn(&mut r, 100u64);
+    rp_earn(&mut r, 100u64);
+    r.balance
+}
+
+// Earn 200, redeem 50: balance==150
+fn redeem_50() -> u64
+    ensures result == 150u64
+{
+    let r: RewardPoints = rp_new();
+    rp_earn(&mut r, 200u64);
+    rp_redeem(&mut r, 50u64);
+    r.balance
+}
+
+// Balance == earned - redeemed - expired
+fn balance_invariant() -> u64
+    ensures result == 0u64
+{
+    let r: RewardPoints = rp_new();
+    rp_earn(&mut r, 300u64);
+    rp_redeem(&mut r, 100u64);
+    rp_expire(&mut r, 50u64);
+    r.balance - (r.earned - r.redeemed - r.expired)
+}
+
+// Expiry count
+fn expire_count() -> u64
+    ensures result == 75u64
+{
+    let r: RewardPoints = rp_new();
+    rp_earn(&mut r, 200u64);
+    rp_expire(&mut r, 25u64);
+    rp_expire(&mut r, 50u64);
+    r.expired
+}
+
+fn main() -> u64 { 0u64 }

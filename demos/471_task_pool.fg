@@ -1,0 +1,124 @@
+// Demo 471: Task pool with priority stealing
+//
+// Three priority queues share a pool. steal() moves from low to high queue.
+// Verified: high + med + low == total_tasks after steals.
+
+struct TaskPool {
+    high_q: u64,
+    med_q:  u64,
+    low_q:  u64,
+    total:  u64,
+    steals: u64,
+}
+
+fn tp_new() -> TaskPool
+    ensures result.high_q == 0u64
+    ensures result.med_q  == 0u64
+    ensures result.low_q  == 0u64
+    ensures result.total  == 0u64
+    ensures result.steals == 0u64
+{
+    struct TaskPool { high_q: 0u64, med_q: 0u64, low_q: 0u64, total: 0u64, steals: 0u64 }
+}
+
+fn tp_submit_high(t: refmut<TaskPool>)
+    ensures (*t).high_q == old((*t).high_q) + 1u64
+    ensures (*t).total  == old((*t).total) + 1u64
+    ensures (*t).med_q  == old((*t).med_q)
+    ensures (*t).low_q  == old((*t).low_q)
+    ensures (*t).steals == old((*t).steals)
+{
+    (*t).high_q = (*t).high_q + 1u64;
+    (*t).total  = (*t).total  + 1u64;
+}
+
+fn tp_submit_low(t: refmut<TaskPool>)
+    ensures (*t).low_q  == old((*t).low_q) + 1u64
+    ensures (*t).total  == old((*t).total) + 1u64
+    ensures (*t).high_q == old((*t).high_q)
+    ensures (*t).med_q  == old((*t).med_q)
+    ensures (*t).steals == old((*t).steals)
+{
+    (*t).low_q = (*t).low_q + 1u64;
+    (*t).total = (*t).total + 1u64;
+}
+
+fn tp_steal_low_to_high(t: refmut<TaskPool>, n: u64)
+    requires (*t).low_q >= n
+    ensures  (*t).low_q  == old((*t).low_q) - n
+    ensures  (*t).high_q == old((*t).high_q) + n
+    ensures  (*t).total  == old((*t).total)
+    ensures  (*t).steals == old((*t).steals) + 1u64
+    ensures  (*t).med_q  == old((*t).med_q)
+{
+    (*t).low_q  = (*t).low_q  - n;
+    (*t).high_q = (*t).high_q + n;
+    (*t).steals = (*t).steals + 1u64;
+}
+
+fn tp_complete_high(t: refmut<TaskPool>)
+    requires (*t).high_q > 0u64
+    ensures  (*t).high_q == old((*t).high_q) - 1u64
+    ensures  (*t).total  == old((*t).total) - 1u64
+    ensures  (*t).med_q  == old((*t).med_q)
+    ensures  (*t).low_q  == old((*t).low_q)
+    ensures  (*t).steals == old((*t).steals)
+{
+    (*t).high_q = (*t).high_q - 1u64;
+    (*t).total  = (*t).total  - 1u64;
+}
+
+// Submit 3 high: high_q==3
+fn submit_high() -> u64
+    ensures result == 3u64
+{
+    let t: TaskPool = tp_new();
+    tp_submit_high(&mut t);
+    tp_submit_high(&mut t);
+    tp_submit_high(&mut t);
+    t.high_q
+}
+
+// Steal 2 from low: high_q grows
+fn steal_to_high() -> u64
+    ensures result == 4u64
+{
+    let t: TaskPool = tp_new();
+    tp_submit_high(&mut t);
+    tp_submit_high(&mut t);
+    tp_submit_low(&mut t);
+    tp_submit_low(&mut t);
+    tp_submit_low(&mut t);
+    tp_steal_low_to_high(&mut t, 2u64);
+    t.high_q
+}
+
+// Total conserved through steals
+fn total_conserved() -> u64
+    ensures result == 5u64
+{
+    let t: TaskPool = tp_new();
+    tp_submit_high(&mut t);
+    tp_submit_low(&mut t);
+    tp_submit_low(&mut t);
+    tp_submit_low(&mut t);
+    tp_submit_low(&mut t);
+    tp_steal_low_to_high(&mut t, 2u64);
+    t.total
+}
+
+// Steals tracked
+fn steal_count() -> u64
+    ensures result == 2u64
+{
+    let t: TaskPool = tp_new();
+    tp_submit_low(&mut t);
+    tp_submit_low(&mut t);
+    tp_submit_low(&mut t);
+    tp_submit_low(&mut t);
+    tp_steal_low_to_high(&mut t, 1u64);
+    tp_steal_low_to_high(&mut t, 1u64);
+    t.steals
+}
+
+fn main() -> u64 { 0u64 }

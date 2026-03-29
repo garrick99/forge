@@ -1,0 +1,109 @@
+// Demo 382: Dual stack — two stacks sharing a capacity
+//
+// Two stacks grow toward each other from opposite ends of a buffer.
+// Push to either stack; total elements never exceeds capacity.
+// Verified: size_a + size_b <= capacity at all times.
+
+struct DualStack {
+    size_a: u64,
+    size_b: u64,
+    cap:    u64,
+}
+
+fn ds_new(cap: u64) -> DualStack
+    requires cap > 0u64
+    ensures result.size_a == 0u64
+    ensures result.size_b == 0u64
+    ensures result.cap    == cap
+{
+    struct DualStack { size_a: 0u64, size_b: 0u64, cap: cap }
+}
+
+fn ds_push_a(d: refmut<DualStack>)
+    requires (*d).size_a + (*d).size_b < (*d).cap
+    ensures  (*d).size_a == old((*d).size_a) + 1u64
+    ensures  (*d).size_b == old((*d).size_b)
+    ensures  (*d).cap    == old((*d).cap)
+{
+    (*d).size_a = (*d).size_a + 1u64;
+}
+
+fn ds_push_b(d: refmut<DualStack>)
+    requires (*d).size_a + (*d).size_b < (*d).cap
+    ensures  (*d).size_b == old((*d).size_b) + 1u64
+    ensures  (*d).size_a == old((*d).size_a)
+    ensures  (*d).cap    == old((*d).cap)
+{
+    (*d).size_b = (*d).size_b + 1u64;
+}
+
+fn ds_pop_a(d: refmut<DualStack>)
+    requires (*d).size_a > 0u64
+    ensures  (*d).size_a == old((*d).size_a) - 1u64
+    ensures  (*d).size_b == old((*d).size_b)
+    ensures  (*d).cap    == old((*d).cap)
+{
+    (*d).size_a = (*d).size_a - 1u64;
+}
+
+fn ds_pop_b(d: refmut<DualStack>)
+    requires (*d).size_b > 0u64
+    ensures  (*d).size_b == old((*d).size_b) - 1u64
+    ensures  (*d).size_a == old((*d).size_a)
+    ensures  (*d).cap    == old((*d).cap)
+{
+    (*d).size_b = (*d).size_b - 1u64;
+}
+
+// Push 3 to A: size_a is 3
+fn push3_a(cap: u64) -> u64
+    requires cap > 3u64
+    ensures result == 3u64
+{
+    let d: DualStack = ds_new(cap);
+    ds_push_a(&mut d);
+    ds_push_a(&mut d);
+    ds_push_a(&mut d);
+    d.size_a
+}
+
+// Push 2 A, 2 B: total is 4
+fn push_both_total(cap: u64) -> u64
+    requires cap > 4u64
+    ensures result == 4u64
+{
+    let d: DualStack = ds_new(cap);
+    ds_push_a(&mut d);
+    ds_push_a(&mut d);
+    ds_push_b(&mut d);
+    ds_push_b(&mut d);
+    d.size_a + d.size_b
+}
+
+// Push 3 A, pop 1 A: size_a is 2
+fn push3_pop1_a(cap: u64) -> u64
+    requires cap > 3u64
+    ensures result == 2u64
+{
+    let d: DualStack = ds_new(cap);
+    ds_push_a(&mut d);
+    ds_push_a(&mut d);
+    ds_push_a(&mut d);
+    ds_pop_a(&mut d);
+    d.size_a
+}
+
+// Mixed ops: cap preserved
+fn cap_preserved(cap: u64) -> u64
+    requires cap > 4u64
+    ensures result == cap
+{
+    let d: DualStack = ds_new(cap);
+    ds_push_a(&mut d);
+    ds_push_a(&mut d);
+    ds_push_b(&mut d);
+    ds_pop_a(&mut d);
+    d.cap
+}
+
+fn main() -> u64 { 0u64 }

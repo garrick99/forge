@@ -1,0 +1,103 @@
+// Demo 390: Garbage collector statistics
+//
+// A GC tracker: alloc() increments live objects, collect() frees
+// a batch (reducing live by collected) and increments gc_cycles.
+// Verified: live and collected track the GC cycle correctly.
+
+struct GCStats {
+    live:       u64,
+    collected:  u64,
+    gc_cycles:  u64,
+    allocs:     u64,
+}
+
+fn gc_new() -> GCStats
+    ensures result.live      == 0u64
+    ensures result.collected == 0u64
+    ensures result.gc_cycles == 0u64
+    ensures result.allocs    == 0u64
+{
+    struct GCStats { live: 0u64, collected: 0u64, gc_cycles: 0u64, allocs: 0u64 }
+}
+
+fn gc_alloc(g: refmut<GCStats>)
+    ensures (*g).live      == old((*g).live) + 1u64
+    ensures (*g).allocs    == old((*g).allocs) + 1u64
+    ensures (*g).collected == old((*g).collected)
+    ensures (*g).gc_cycles == old((*g).gc_cycles)
+{
+    (*g).live   = (*g).live   + 1u64;
+    (*g).allocs = (*g).allocs + 1u64;
+}
+
+fn gc_collect(g: refmut<GCStats>, freed: u64)
+    requires (*g).live >= freed
+    ensures  (*g).live      == old((*g).live) - freed
+    ensures  (*g).collected == old((*g).collected) + freed
+    ensures  (*g).gc_cycles == old((*g).gc_cycles) + 1u64
+    ensures  (*g).allocs    == old((*g).allocs)
+{
+    (*g).live      = (*g).live      - freed;
+    (*g).collected = (*g).collected + freed;
+    (*g).gc_cycles = (*g).gc_cycles + 1u64;
+}
+
+// Alloc 5: live is 5
+fn alloc_five() -> u64
+    ensures result == 5u64
+{
+    let g: GCStats = gc_new();
+    gc_alloc(&mut g);
+    gc_alloc(&mut g);
+    gc_alloc(&mut g);
+    gc_alloc(&mut g);
+    gc_alloc(&mut g);
+    g.live
+}
+
+// Alloc 5, collect 3: live is 2
+fn collect_three() -> u64
+    ensures result == 2u64
+{
+    let g: GCStats = gc_new();
+    gc_alloc(&mut g);
+    gc_alloc(&mut g);
+    gc_alloc(&mut g);
+    gc_alloc(&mut g);
+    gc_alloc(&mut g);
+    gc_collect(&mut g, 3u64);
+    g.live
+}
+
+// Collected total accumulates
+fn collected_total() -> u64
+    ensures result == 7u64
+{
+    let g: GCStats = gc_new();
+    gc_alloc(&mut g);
+    gc_alloc(&mut g);
+    gc_alloc(&mut g);
+    gc_alloc(&mut g);
+    gc_alloc(&mut g);
+    gc_collect(&mut g, 3u64);
+    gc_alloc(&mut g);
+    gc_alloc(&mut g);
+    gc_collect(&mut g, 4u64);
+    g.collected
+}
+
+// GC cycle count
+fn gc_cycle_count() -> u64
+    ensures result == 2u64
+{
+    let g: GCStats = gc_new();
+    gc_alloc(&mut g);
+    gc_alloc(&mut g);
+    gc_alloc(&mut g);
+    gc_collect(&mut g, 2u64);
+    gc_alloc(&mut g);
+    gc_collect(&mut g, 2u64);
+    g.gc_cycles
+}
+
+fn main() -> u64 { 0u64 }

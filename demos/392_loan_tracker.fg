@@ -1,0 +1,93 @@
+// Demo 392: Loan tracker — principal, interest, payments
+//
+// A loan accrues interest each period and accepts payments.
+// Verified: balance = principal + accrued - paid tracks correctly.
+
+struct Loan {
+    principal: u64,
+    accrued:   u64,
+    paid:      u64,
+    periods:   u64,
+    payments:  u64,
+}
+
+fn loan_new(principal: u64) -> Loan
+    requires principal > 0u64
+    ensures result.principal == principal
+    ensures result.accrued   == 0u64
+    ensures result.paid      == 0u64
+    ensures result.periods   == 0u64
+    ensures result.payments  == 0u64
+{
+    struct Loan { principal: principal, accrued: 0u64, paid: 0u64, periods: 0u64, payments: 0u64 }
+}
+
+fn loan_accrue(l: refmut<Loan>, interest: u64)
+    ensures (*l).accrued   == old((*l).accrued) + interest
+    ensures (*l).periods   == old((*l).periods) + 1u64
+    ensures (*l).principal == old((*l).principal)
+    ensures (*l).paid      == old((*l).paid)
+    ensures (*l).payments  == old((*l).payments)
+{
+    (*l).accrued = (*l).accrued + interest;
+    (*l).periods = (*l).periods + 1u64;
+}
+
+fn loan_pay(l: refmut<Loan>, amount: u64)
+    requires (*l).principal + (*l).accrued >= (*l).paid + amount
+    ensures  (*l).paid     == old((*l).paid) + amount
+    ensures  (*l).payments == old((*l).payments) + 1u64
+    ensures  (*l).principal == old((*l).principal)
+    ensures  (*l).accrued   == old((*l).accrued)
+    ensures  (*l).periods   == old((*l).periods)
+{
+    (*l).paid     = (*l).paid     + amount;
+    (*l).payments = (*l).payments + 1u64;
+}
+
+// After 3 periods of interest 10: accrued is 30
+fn three_periods() -> u64
+    ensures result == 30u64
+{
+    let l: Loan = loan_new(100u64);
+    loan_accrue(&mut l, 10u64);
+    loan_accrue(&mut l, 10u64);
+    loan_accrue(&mut l, 10u64);
+    l.accrued
+}
+
+// Balance = principal + accrued - paid
+fn balance_after_payment() -> u64
+    ensures result == 90u64
+{
+    let l: Loan = loan_new(100u64);
+    loan_accrue(&mut l, 10u64);
+    loan_pay(&mut l, 20u64);
+    l.principal + l.accrued - l.paid
+}
+
+// Payment count
+fn payment_count() -> u64
+    ensures result == 3u64
+{
+    let l: Loan = loan_new(200u64);
+    loan_accrue(&mut l, 10u64);
+    loan_pay(&mut l, 20u64);
+    loan_pay(&mut l, 20u64);
+    loan_pay(&mut l, 20u64);
+    l.payments
+}
+
+// Periods counted
+fn period_count() -> u64
+    ensures result == 4u64
+{
+    let l: Loan = loan_new(100u64);
+    loan_accrue(&mut l, 5u64);
+    loan_accrue(&mut l, 5u64);
+    loan_accrue(&mut l, 5u64);
+    loan_accrue(&mut l, 5u64);
+    l.periods
+}
+
+fn main() -> u64 { 0u64 }

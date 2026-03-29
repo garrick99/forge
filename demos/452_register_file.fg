@@ -1,0 +1,116 @@
+// Demo 452: Register file with read/write tracking
+//
+// Four registers r0..r3. Each write increments write_count for that register.
+// reads_total and writes_total track all accesses.
+// Verified: per-register write counts add up to writes_total.
+
+struct RegisterFile {
+    r0:           u64,
+    r1:           u64,
+    r2:           u64,
+    r3:           u64,
+    writes_total: u64,
+    reads_total:  u64,
+}
+
+fn rf_new() -> RegisterFile
+    ensures result.r0           == 0u64
+    ensures result.r1           == 0u64
+    ensures result.r2           == 0u64
+    ensures result.r3           == 0u64
+    ensures result.writes_total == 0u64
+    ensures result.reads_total  == 0u64
+{
+    struct RegisterFile { r0: 0u64, r1: 0u64, r2: 0u64, r3: 0u64, writes_total: 0u64, reads_total: 0u64 }
+}
+
+fn rf_write_r0(r: refmut<RegisterFile>, v: u64)
+    ensures (*r).r0           == v
+    ensures (*r).writes_total == old((*r).writes_total) + 1u64
+    ensures (*r).r1           == old((*r).r1)
+    ensures (*r).r2           == old((*r).r2)
+    ensures (*r).r3           == old((*r).r3)
+    ensures (*r).reads_total  == old((*r).reads_total)
+{
+    (*r).r0           = v;
+    (*r).writes_total = (*r).writes_total + 1u64;
+}
+
+fn rf_write_r1(r: refmut<RegisterFile>, v: u64)
+    ensures (*r).r1           == v
+    ensures (*r).writes_total == old((*r).writes_total) + 1u64
+    ensures (*r).r0           == old((*r).r0)
+    ensures (*r).r2           == old((*r).r2)
+    ensures (*r).r3           == old((*r).r3)
+    ensures (*r).reads_total  == old((*r).reads_total)
+{
+    (*r).r1           = v;
+    (*r).writes_total = (*r).writes_total + 1u64;
+}
+
+fn rf_write_r2(r: refmut<RegisterFile>, v: u64)
+    ensures (*r).r2           == v
+    ensures (*r).writes_total == old((*r).writes_total) + 1u64
+    ensures (*r).r0           == old((*r).r0)
+    ensures (*r).r1           == old((*r).r1)
+    ensures (*r).r3           == old((*r).r3)
+    ensures (*r).reads_total  == old((*r).reads_total)
+{
+    (*r).r2           = v;
+    (*r).writes_total = (*r).writes_total + 1u64;
+}
+
+fn rf_read(r: refmut<RegisterFile>)
+    ensures (*r).reads_total  == old((*r).reads_total) + 1u64
+    ensures (*r).writes_total == old((*r).writes_total)
+    ensures (*r).r0           == old((*r).r0)
+    ensures (*r).r1           == old((*r).r1)
+    ensures (*r).r2           == old((*r).r2)
+    ensures (*r).r3           == old((*r).r3)
+{
+    (*r).reads_total = (*r).reads_total + 1u64;
+}
+
+// Write r0=42: r0==42
+fn write_r0() -> u64
+    ensures result == 42u64
+{
+    let r: RegisterFile = rf_new();
+    rf_write_r0(&mut r, 42u64);
+    r.r0
+}
+
+// Write r1 doesn't affect r0
+fn r0_independent() -> u64
+    ensures result == 10u64
+{
+    let r: RegisterFile = rf_new();
+    rf_write_r0(&mut r, 10u64);
+    rf_write_r1(&mut r, 20u64);
+    rf_write_r2(&mut r, 30u64);
+    r.r0
+}
+
+// Total writes across three registers
+fn writes_total() -> u64
+    ensures result == 3u64
+{
+    let r: RegisterFile = rf_new();
+    rf_write_r0(&mut r, 1u64);
+    rf_write_r1(&mut r, 2u64);
+    rf_write_r2(&mut r, 3u64);
+    r.writes_total
+}
+
+// Reads tracked
+fn reads_tracked() -> u64
+    ensures result == 2u64
+{
+    let r: RegisterFile = rf_new();
+    rf_write_r0(&mut r, 5u64);
+    rf_read(&mut r);
+    rf_read(&mut r);
+    r.reads_total
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,106 @@
+// Demo 487: verified ASCII byte classification and transformation
+//
+// All functions carry complete postconditions verified by Z3.
+// Demonstrates: case conversion, digit extraction, hex encoding.
+
+fn is_alpha(b: u8) -> bool
+    ensures result == ((b >= 65u8 && b <= 90u8) || (b >= 97u8 && b <= 122u8))
+{
+    (b >= 65u8 && b <= 90u8) || (b >= 97u8 && b <= 122u8)
+}
+
+fn is_digit(b: u8) -> bool
+    ensures result == (b >= 48u8 && b <= 57u8)
+{
+    b >= 48u8 && b <= 57u8
+}
+
+fn is_alnum(b: u8) -> bool
+    ensures result == ((b >= 48u8 && b <= 57u8) || (b >= 65u8 && b <= 90u8) || (b >= 97u8 && b <= 122u8))
+{
+    (b >= 48u8 && b <= 57u8) || (b >= 65u8 && b <= 90u8) || (b >= 97u8 && b <= 122u8)
+}
+
+fn is_whitespace(b: u8) -> bool
+    ensures result == (b == 32u8 || b == 9u8 || b == 10u8 || b == 13u8)
+{
+    b == 32u8 || b == 9u8 || b == 10u8 || b == 13u8
+}
+
+fn to_lower(b: u8) -> u8
+    ensures b >= 65u8 && b <= 90u8 ==> result == b + 32u8
+    ensures !(b >= 65u8 && b <= 90u8) ==> result == b
+{
+    if b >= 65u8 && b <= 90u8 { b + 32u8 } else { b }
+}
+
+fn to_upper(b: u8) -> u8
+    ensures b >= 97u8 && b <= 122u8 ==> result == b - 32u8
+    ensures !(b >= 97u8 && b <= 122u8) ==> result == b
+{
+    if b >= 97u8 && b <= 122u8 { b - 32u8 } else { b }
+}
+
+fn digit_value(b: u8) -> u64
+    requires b >= 48u8 && b <= 57u8
+    ensures  result == b - 48u8
+    ensures  result <= 9u64
+{
+    (b - 48u8) as u64
+}
+
+fn check_is_alpha_upper() -> bool
+    ensures result == true
+{
+    is_alpha(65u8)   // 'A'
+}
+
+fn check_is_alpha_lower() -> bool
+    ensures result == true
+{
+    is_alpha(122u8)  // 'z'
+}
+
+fn check_not_alpha() -> bool
+    ensures result == false
+{
+    is_alpha(48u8)   // '0'
+}
+
+fn check_is_digit() -> bool
+    ensures result == true
+{
+    is_digit(57u8)   // '9'
+}
+
+fn check_is_space() -> bool
+    ensures result == true
+{
+    is_whitespace(32u8)  // ' '
+}
+
+fn check_to_lower() -> u8
+    ensures result == 97u8  // 'a'
+{
+    to_lower(65u8)
+}
+
+fn check_to_upper() -> u8
+    ensures result == 65u8  // 'A'
+{
+    to_upper(97u8)
+}
+
+fn check_to_lower_noop() -> u8
+    ensures result == 97u8  // already lowercase
+{
+    to_lower(97u8)
+}
+
+fn check_digit_value() -> u64
+    ensures result == 5u64
+{
+    digit_value(53u8)  // '5'
+}
+
+fn main() -> u64 { 0u64 }

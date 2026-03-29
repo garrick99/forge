@@ -1,0 +1,115 @@
+// Demo 450: Circuit breaker state machine
+//
+// States: closed (normal), open (failing), half-open (testing).
+// Failures increment; after threshold, circuit opens.
+// Verified: state transitions and counts are coherent.
+
+struct CircuitBreaker {
+    failures:   u64,
+    successes:  u64,
+    threshold:  u64,
+    trips:      u64,
+    resets:     u64,
+}
+
+fn cb_new(threshold: u64) -> CircuitBreaker
+    requires threshold > 0u64
+    ensures result.failures  == 0u64
+    ensures result.successes == 0u64
+    ensures result.threshold == threshold
+    ensures result.trips     == 0u64
+    ensures result.resets    == 0u64
+{
+    struct CircuitBreaker { failures: 0u64, successes: 0u64, threshold: threshold, trips: 0u64, resets: 0u64 }
+}
+
+fn cb_fail(c: refmut<CircuitBreaker>)
+    requires (*c).failures + 1u64 < (*c).threshold
+    ensures  (*c).failures  == old((*c).failures) + 1u64
+    ensures  (*c).threshold == old((*c).threshold)
+    ensures  (*c).successes == old((*c).successes)
+    ensures  (*c).trips     == old((*c).trips)
+    ensures  (*c).resets    == old((*c).resets)
+{
+    (*c).failures = (*c).failures + 1u64;
+}
+
+fn cb_trip(c: refmut<CircuitBreaker>)
+    requires (*c).failures + 1u64 == (*c).threshold
+    ensures  (*c).failures  == old((*c).failures) + 1u64
+    ensures  (*c).trips     == old((*c).trips) + 1u64
+    ensures  (*c).threshold == old((*c).threshold)
+    ensures  (*c).successes == old((*c).successes)
+    ensures  (*c).resets    == old((*c).resets)
+{
+    (*c).failures = (*c).failures + 1u64;
+    (*c).trips    = (*c).trips    + 1u64;
+}
+
+fn cb_reset(c: refmut<CircuitBreaker>)
+    requires (*c).trips > (*c).resets
+    ensures  (*c).resets    == old((*c).resets) + 1u64
+    ensures  (*c).failures  == 0u64
+    ensures  (*c).successes == old((*c).successes)
+    ensures  (*c).threshold == old((*c).threshold)
+    ensures  (*c).trips     == old((*c).trips)
+{
+    (*c).resets   = (*c).resets   + 1u64;
+    (*c).failures = 0u64;
+}
+
+fn cb_success(c: refmut<CircuitBreaker>)
+    ensures (*c).successes == old((*c).successes) + 1u64
+    ensures (*c).failures  == old((*c).failures)
+    ensures (*c).threshold == old((*c).threshold)
+    ensures (*c).trips     == old((*c).trips)
+    ensures (*c).resets    == old((*c).resets)
+{
+    (*c).successes = (*c).successes + 1u64;
+}
+
+// 2 fails below threshold=3: failures==2
+fn two_fails() -> u64
+    ensures result == 2u64
+{
+    let c: CircuitBreaker = cb_new(3u64);
+    cb_fail(&mut c);
+    cb_fail(&mut c);
+    c.failures
+}
+
+// Trip on 3rd failure
+fn trip_fires() -> u64
+    ensures result == 1u64
+{
+    let c: CircuitBreaker = cb_new(3u64);
+    cb_fail(&mut c);
+    cb_fail(&mut c);
+    cb_trip(&mut c);
+    c.trips
+}
+
+// Reset clears failures
+fn reset_clears() -> u64
+    ensures result == 0u64
+{
+    let c: CircuitBreaker = cb_new(3u64);
+    cb_fail(&mut c);
+    cb_fail(&mut c);
+    cb_trip(&mut c);
+    cb_reset(&mut c);
+    c.failures
+}
+
+// Successes tracked independently
+fn successes_tracked() -> u64
+    ensures result == 3u64
+{
+    let c: CircuitBreaker = cb_new(5u64);
+    cb_success(&mut c);
+    cb_success(&mut c);
+    cb_success(&mut c);
+    c.successes
+}
+
+fn main() -> u64 { 0u64 }

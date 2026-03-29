@@ -1,0 +1,97 @@
+// Demo 372: Page allocator with order tracking
+//
+// A simple page allocator tracks pages by order (size class).
+// alloc_page consumes one free page and increments alloc count,
+// free_page returns it. Verified: free + used == total.
+
+struct PageAlloc {
+    free_pages:  u64,
+    used_pages:  u64,
+    total_pages: u64,
+    alloc_count: u64,
+}
+
+fn pgalloc_new(total: u64) -> PageAlloc
+    requires total > 0u64
+    ensures result.free_pages  == total
+    ensures result.used_pages  == 0u64
+    ensures result.total_pages == total
+    ensures result.alloc_count == 0u64
+{
+    struct PageAlloc { free_pages: total, used_pages: 0u64, total_pages: total, alloc_count: 0u64 }
+}
+
+fn pgalloc_alloc(p: refmut<PageAlloc>)
+    requires (*p).free_pages > 0u64
+    ensures  (*p).free_pages  == old((*p).free_pages)  - 1u64
+    ensures  (*p).used_pages  == old((*p).used_pages)  + 1u64
+    ensures  (*p).total_pages == old((*p).total_pages)
+    ensures  (*p).alloc_count == old((*p).alloc_count) + 1u64
+{
+    (*p).free_pages  = (*p).free_pages  - 1u64;
+    (*p).used_pages  = (*p).used_pages  + 1u64;
+    (*p).alloc_count = (*p).alloc_count + 1u64;
+}
+
+fn pgalloc_free(p: refmut<PageAlloc>)
+    requires (*p).used_pages > 0u64
+    ensures  (*p).used_pages  == old((*p).used_pages)  - 1u64
+    ensures  (*p).free_pages  == old((*p).free_pages)  + 1u64
+    ensures  (*p).total_pages == old((*p).total_pages)
+    ensures  (*p).alloc_count == old((*p).alloc_count)
+{
+    (*p).used_pages = (*p).used_pages - 1u64;
+    (*p).free_pages = (*p).free_pages + 1u64;
+}
+
+// Alloc 4 from 8: used is 4
+fn alloc_four_used() -> u64
+    ensures result == 4u64
+{
+    let p: PageAlloc = pgalloc_new(8u64);
+    pgalloc_alloc(&mut p);
+    pgalloc_alloc(&mut p);
+    pgalloc_alloc(&mut p);
+    pgalloc_alloc(&mut p);
+    p.used_pages
+}
+
+// Alloc 4: alloc_count is 4
+fn alloc_count() -> u64
+    ensures result == 4u64
+{
+    let p: PageAlloc = pgalloc_new(8u64);
+    pgalloc_alloc(&mut p);
+    pgalloc_alloc(&mut p);
+    pgalloc_alloc(&mut p);
+    pgalloc_alloc(&mut p);
+    p.alloc_count
+}
+
+// Alloc 3, free 2: free is 7
+fn alloc3_free2() -> u64
+    ensures result == 7u64
+{
+    let p: PageAlloc = pgalloc_new(8u64);
+    pgalloc_alloc(&mut p);
+    pgalloc_alloc(&mut p);
+    pgalloc_alloc(&mut p);
+    pgalloc_free(&mut p);
+    pgalloc_free(&mut p);
+    p.free_pages
+}
+
+// Invariant: free + used == total
+fn balance_check(total: u64) -> u64
+    requires total > 3u64
+    ensures result == total
+{
+    let p: PageAlloc = pgalloc_new(total);
+    pgalloc_alloc(&mut p);
+    pgalloc_alloc(&mut p);
+    pgalloc_free(&mut p);
+    pgalloc_alloc(&mut p);
+    p.free_pages + p.used_pages
+}
+
+fn main() -> u64 { 0u64 }

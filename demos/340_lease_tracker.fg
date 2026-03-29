@@ -1,0 +1,91 @@
+// Demo 340: Lease tracker — acquired/released state
+//
+// A resource lease tracks how many times it has been acquired
+// and released. The proof verifies that:
+//   - acquired count increments on acquire
+//   - released count increments on release
+//   - net outstanding = acquired - released
+
+struct Lease {
+    acquired: u64,
+    released: u64,
+}
+
+fn lease_new() -> Lease
+    ensures result.acquired == 0u64
+    ensures result.released == 0u64
+{
+    struct Lease { acquired: 0u64, released: 0u64 }
+}
+
+fn lease_acquire(l: refmut<Lease>)
+    ensures (*l).acquired == old((*l).acquired) + 1u64
+    ensures (*l).released == old((*l).released)
+{
+    (*l).acquired = (*l).acquired + 1u64;
+}
+
+fn lease_release(l: refmut<Lease>)
+    requires (*l).released < (*l).acquired
+    ensures  (*l).released == old((*l).released) + 1u64
+    ensures  (*l).acquired == old((*l).acquired)
+{
+    (*l).released = (*l).released + 1u64;
+}
+
+// After one acquire, acquired == 1
+fn one_acquire() -> u64
+    ensures result == 1u64
+{
+    let l: Lease = lease_new();
+    lease_acquire(&mut l);
+    l.acquired
+}
+
+// Acquire 3 times: acquired == 3
+fn three_acquires() -> u64
+    ensures result == 3u64
+{
+    let l: Lease = lease_new();
+    lease_acquire(&mut l);
+    lease_acquire(&mut l);
+    lease_acquire(&mut l);
+    l.acquired
+}
+
+// Acquire then release: released == 1
+fn acquire_release() -> u64
+    ensures result == 1u64
+{
+    let l: Lease = lease_new();
+    lease_acquire(&mut l);
+    lease_release(&mut l);
+    l.released
+}
+
+// Acquire 3, release 2: outstanding == 1
+fn outstanding() -> u64
+    ensures result == 1u64
+{
+    let l: Lease = lease_new();
+    lease_acquire(&mut l);
+    lease_acquire(&mut l);
+    lease_acquire(&mut l);
+    lease_release(&mut l);
+    lease_release(&mut l);
+    l.acquired - l.released
+}
+
+// Acquire 2, release 2: fully released
+fn fully_released() -> u64
+    ensures result == 0u64
+{
+    let l: Lease = lease_new();
+    lease_acquire(&mut l);
+    lease_acquire(&mut l);
+    lease_release(&mut l);
+    lease_release(&mut l);
+    l.acquired - l.released
+}
+
+fn main() -> u64 { 0u64 }

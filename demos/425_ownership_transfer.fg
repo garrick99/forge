@@ -1,0 +1,108 @@
+// Demo 425: Ownership transfer protocol
+//
+// A resource has exactly one owner at a time (owner_id).
+// transfer() changes ownership and increments transfer_count.
+// claim() is the first acquisition from the unowned state (owner=0).
+// Verified: owner_id and transfer_count track the protocol.
+
+struct Owned {
+    owner_id:       u64,
+    transfer_count: u64,
+    releases:       u64,
+}
+
+fn own_new() -> Owned
+    ensures result.owner_id       == 0u64
+    ensures result.transfer_count == 0u64
+    ensures result.releases       == 0u64
+{
+    struct Owned { owner_id: 0u64, transfer_count: 0u64, releases: 0u64 }
+}
+
+fn own_claim(o: refmut<Owned>, new_owner: u64)
+    requires (*o).owner_id == 0u64
+    requires new_owner > 0u64
+    ensures  (*o).owner_id       == new_owner
+    ensures  (*o).transfer_count == old((*o).transfer_count) + 1u64
+    ensures  (*o).releases       == old((*o).releases)
+{
+    (*o).owner_id       = new_owner;
+    (*o).transfer_count = (*o).transfer_count + 1u64;
+}
+
+fn own_transfer(o: refmut<Owned>, new_owner: u64)
+    requires (*o).owner_id > 0u64
+    requires new_owner > 0u64
+    ensures  (*o).owner_id       == new_owner
+    ensures  (*o).transfer_count == old((*o).transfer_count) + 1u64
+    ensures  (*o).releases       == old((*o).releases)
+{
+    (*o).owner_id       = new_owner;
+    (*o).transfer_count = (*o).transfer_count + 1u64;
+}
+
+fn own_release(o: refmut<Owned>)
+    requires (*o).owner_id > 0u64
+    ensures  (*o).owner_id       == 0u64
+    ensures  (*o).releases       == old((*o).releases) + 1u64
+    ensures  (*o).transfer_count == old((*o).transfer_count)
+{
+    (*o).owner_id = 0u64;
+    (*o).releases = (*o).releases + 1u64;
+}
+
+// Claim by owner 1
+fn claim_owner1() -> u64
+    ensures result == 1u64
+{
+    let o: Owned = own_new();
+    own_claim(&mut o, 1u64);
+    o.owner_id
+}
+
+// Transfer chain: 1 → 2 → 3
+fn transfer_chain() -> u64
+    ensures result == 3u64
+{
+    let o: Owned = own_new();
+    own_claim(&mut o, 1u64);
+    own_transfer(&mut o, 2u64);
+    own_transfer(&mut o, 3u64);
+    o.owner_id
+}
+
+// Transfer count after chain
+fn transfer_count() -> u64
+    ensures result == 3u64
+{
+    let o: Owned = own_new();
+    own_claim(&mut o, 1u64);
+    own_transfer(&mut o, 2u64);
+    own_transfer(&mut o, 3u64);
+    o.transfer_count
+}
+
+// Release returns to unowned
+fn release_unowned() -> u64
+    ensures result == 0u64
+{
+    let o: Owned = own_new();
+    own_claim(&mut o, 5u64);
+    own_transfer(&mut o, 7u64);
+    own_release(&mut o);
+    o.owner_id
+}
+
+// Release count
+fn release_count() -> u64
+    ensures result == 2u64
+{
+    let o: Owned = own_new();
+    own_claim(&mut o, 1u64);
+    own_release(&mut o);
+    own_claim(&mut o, 2u64);
+    own_release(&mut o);
+    o.releases
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,91 @@
+// Demo 414: Packet reassembly tracker
+//
+// Tracks fragments arriving for a packet reassembly buffer.
+// receive_fragment() records an arriving fragment and its bytes.
+// complete() fires when all expected fragments have arrived.
+// Verified: fragment and byte counts accumulate correctly.
+
+struct ReassemblyBuf {
+    fragments_received: u64,
+    fragments_expected: u64,
+    bytes_received:     u64,
+    complete:           u64,  // 0=incomplete, 1=complete
+}
+
+fn rb_new(expected: u64) -> ReassemblyBuf
+    requires expected > 0u64
+    ensures result.fragments_received == 0u64
+    ensures result.fragments_expected == expected
+    ensures result.bytes_received     == 0u64
+    ensures result.complete           == 0u64
+{
+    struct ReassemblyBuf { fragments_received: 0u64, fragments_expected: expected, bytes_received: 0u64, complete: 0u64 }
+}
+
+fn rb_receive(r: refmut<ReassemblyBuf>, bytes: u64)
+    requires (*r).fragments_received < (*r).fragments_expected
+    requires (*r).complete == 0u64
+    ensures  (*r).fragments_received == old((*r).fragments_received) + 1u64
+    ensures  (*r).bytes_received     == old((*r).bytes_received) + bytes
+    ensures  (*r).fragments_expected == old((*r).fragments_expected)
+    ensures  (*r).complete           == old((*r).complete)
+{
+    (*r).fragments_received = (*r).fragments_received + 1u64;
+    (*r).bytes_received     = (*r).bytes_received     + bytes;
+}
+
+fn rb_complete(r: refmut<ReassemblyBuf>)
+    requires (*r).fragments_received == (*r).fragments_expected
+    requires (*r).complete == 0u64
+    ensures  (*r).complete           == 1u64
+    ensures  (*r).fragments_received == old((*r).fragments_received)
+    ensures  (*r).bytes_received     == old((*r).bytes_received)
+{
+    (*r).complete = 1u64;
+}
+
+// Receive 3 of 5: fragments_received is 3
+fn receive_three() -> u64
+    ensures result == 3u64
+{
+    let r: ReassemblyBuf = rb_new(5u64);
+    rb_receive(&mut r, 100u64);
+    rb_receive(&mut r, 200u64);
+    rb_receive(&mut r, 150u64);
+    r.fragments_received
+}
+
+// Total bytes: 100+200+150 = 450
+fn total_bytes() -> u64
+    ensures result == 450u64
+{
+    let r: ReassemblyBuf = rb_new(5u64);
+    rb_receive(&mut r, 100u64);
+    rb_receive(&mut r, 200u64);
+    rb_receive(&mut r, 150u64);
+    r.bytes_received
+}
+
+// Receive all 3, complete: complete is 1
+fn all_received_complete() -> u64
+    ensures result == 1u64
+{
+    let r: ReassemblyBuf = rb_new(3u64);
+    rb_receive(&mut r, 100u64);
+    rb_receive(&mut r, 200u64);
+    rb_receive(&mut r, 300u64);
+    rb_complete(&mut r);
+    r.complete
+}
+
+// Expected count preserved
+fn expected_preserved() -> u64
+    ensures result == 4u64
+{
+    let r: ReassemblyBuf = rb_new(4u64);
+    rb_receive(&mut r, 128u64);
+    rb_receive(&mut r, 256u64);
+    r.fragments_expected
+}
+
+fn main() -> u64 { 0u64 }

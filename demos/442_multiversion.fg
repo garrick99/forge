@@ -1,0 +1,100 @@
+// Demo 442: Multi-version concurrency control (MVCC) snapshot tracking
+//
+// Each write creates a new version. Reads target a specific snapshot_version.
+// Verified: version advances monotonically, reads_at_snapshot tracks read count.
+
+struct MVCC {
+    current_version:   u64,
+    snapshot_version:  u64,
+    writes:            u64,
+    reads_at_snapshot: u64,
+}
+
+fn mvcc_new() -> MVCC
+    ensures result.current_version  == 1u64
+    ensures result.snapshot_version == 1u64
+    ensures result.writes            == 0u64
+    ensures result.reads_at_snapshot == 0u64
+{
+    struct MVCC { current_version: 1u64, snapshot_version: 1u64, writes: 0u64, reads_at_snapshot: 0u64 }
+}
+
+fn mvcc_write(m: refmut<MVCC>)
+    ensures (*m).current_version  == old((*m).current_version) + 1u64
+    ensures (*m).writes           == old((*m).writes) + 1u64
+    ensures (*m).snapshot_version == old((*m).snapshot_version)
+    ensures (*m).reads_at_snapshot == old((*m).reads_at_snapshot)
+{
+    (*m).current_version = (*m).current_version + 1u64;
+    (*m).writes          = (*m).writes          + 1u64;
+}
+
+fn mvcc_take_snapshot(m: refmut<MVCC>)
+    ensures (*m).snapshot_version  == (*m).current_version
+    ensures (*m).reads_at_snapshot == 0u64
+    ensures (*m).current_version   == old((*m).current_version)
+    ensures (*m).writes            == old((*m).writes)
+{
+    (*m).snapshot_version  = (*m).current_version;
+    (*m).reads_at_snapshot = 0u64;
+}
+
+fn mvcc_read(m: refmut<MVCC>)
+    ensures (*m).reads_at_snapshot == old((*m).reads_at_snapshot) + 1u64
+    ensures (*m).current_version   == old((*m).current_version)
+    ensures (*m).snapshot_version  == old((*m).snapshot_version)
+    ensures (*m).writes            == old((*m).writes)
+{
+    (*m).reads_at_snapshot = (*m).reads_at_snapshot + 1u64;
+}
+
+// 3 writes: current_version==4
+fn three_writes() -> u64
+    ensures result == 4u64
+{
+    let m: MVCC = mvcc_new();
+    mvcc_write(&mut m);
+    mvcc_write(&mut m);
+    mvcc_write(&mut m);
+    m.current_version
+}
+
+// Snapshot captures current version
+fn snapshot_captures() -> u64
+    ensures result == 3u64
+{
+    let m: MVCC = mvcc_new();
+    mvcc_write(&mut m);
+    mvcc_write(&mut m);
+    mvcc_take_snapshot(&mut m);
+    m.snapshot_version
+}
+
+// Reads after snapshot
+fn reads_after_snapshot() -> u64
+    ensures result == 3u64
+{
+    let m: MVCC = mvcc_new();
+    mvcc_write(&mut m);
+    mvcc_take_snapshot(&mut m);
+    mvcc_read(&mut m);
+    mvcc_read(&mut m);
+    mvcc_read(&mut m);
+    m.reads_at_snapshot
+}
+
+// New snapshot resets read count
+fn snapshot_resets_reads() -> u64
+    ensures result == 1u64
+{
+    let m: MVCC = mvcc_new();
+    mvcc_take_snapshot(&mut m);
+    mvcc_read(&mut m);
+    mvcc_read(&mut m);
+    mvcc_write(&mut m);
+    mvcc_take_snapshot(&mut m);
+    mvcc_read(&mut m);
+    m.reads_at_snapshot
+}
+
+fn main() -> u64 { 0u64 }

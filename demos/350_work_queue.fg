@@ -1,0 +1,92 @@
+// Demo 350: Work queue with enqueue/dequeue/drain
+//
+// A bounded FIFO work queue tracks pending, completed, and
+// total enqueued items. Verified: invariant pending == enqueued - completed.
+
+struct WorkQueue {
+    enqueued:  u64,
+    completed: u64,
+    cap:       u64,
+}
+
+fn wq_new(cap: u64) -> WorkQueue
+    requires cap > 0u64
+    ensures result.enqueued  == 0u64
+    ensures result.completed == 0u64
+    ensures result.cap       == cap
+{
+    struct WorkQueue { enqueued: 0u64, completed: 0u64, cap: cap }
+}
+
+fn wq_enqueue(w: refmut<WorkQueue>)
+    requires (*w).enqueued - (*w).completed < (*w).cap
+    ensures  (*w).enqueued  == old((*w).enqueued) + 1u64
+    ensures  (*w).completed == old((*w).completed)
+{
+    (*w).enqueued = (*w).enqueued + 1u64;
+}
+
+fn wq_complete(w: refmut<WorkQueue>)
+    requires (*w).completed < (*w).enqueued
+    ensures  (*w).completed == old((*w).completed) + 1u64
+    ensures  (*w).enqueued  == old((*w).enqueued)
+{
+    (*w).completed = (*w).completed + 1u64;
+}
+
+// Enqueue 4: pending is 4
+fn enqueue_four(cap: u64) -> u64
+    requires cap > 4u64
+    ensures result == 4u64
+{
+    let w: WorkQueue = wq_new(cap);
+    wq_enqueue(&mut w);
+    wq_enqueue(&mut w);
+    wq_enqueue(&mut w);
+    wq_enqueue(&mut w);
+    w.enqueued - w.completed
+}
+
+// Enqueue 3, complete 2: pending is 1
+fn enqueue3_complete2(cap: u64) -> u64
+    requires cap > 3u64
+    ensures result == 1u64
+{
+    let w: WorkQueue = wq_new(cap);
+    wq_enqueue(&mut w);
+    wq_enqueue(&mut w);
+    wq_enqueue(&mut w);
+    wq_complete(&mut w);
+    wq_complete(&mut w);
+    w.enqueued - w.completed
+}
+
+// Enqueue 2, complete 2: drained
+fn drain(cap: u64) -> u64
+    requires cap > 2u64
+    ensures result == 0u64
+{
+    let w: WorkQueue = wq_new(cap);
+    wq_enqueue(&mut w);
+    wq_enqueue(&mut w);
+    wq_complete(&mut w);
+    wq_complete(&mut w);
+    w.enqueued - w.completed
+}
+
+// Completed count is preserved accurately
+fn completed_count(cap: u64) -> u64
+    requires cap > 3u64
+    ensures result == 3u64
+{
+    let w: WorkQueue = wq_new(cap);
+    wq_enqueue(&mut w);
+    wq_enqueue(&mut w);
+    wq_enqueue(&mut w);
+    wq_complete(&mut w);
+    wq_complete(&mut w);
+    wq_complete(&mut w);
+    w.completed
+}
+
+fn main() -> u64 { 0u64 }

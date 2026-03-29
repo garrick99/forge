@@ -1,0 +1,105 @@
+// Demo 391: Object pool with generation tagging
+//
+// An object pool assigns generation numbers to detect use-after-free.
+// alloc() hands out a slot with the current generation, free() bumps
+// the generation on that slot. Verified: generation and live counts track.
+
+struct ObjPool {
+    live:       u64,
+    cap:        u64,
+    generation: u64,
+    allocs:     u64,
+    frees:      u64,
+}
+
+fn op_new(cap: u64) -> ObjPool
+    requires cap > 0u64
+    ensures result.live       == 0u64
+    ensures result.cap        == cap
+    ensures result.generation == 0u64
+    ensures result.allocs     == 0u64
+    ensures result.frees      == 0u64
+{
+    struct ObjPool { live: 0u64, cap: cap, generation: 0u64, allocs: 0u64, frees: 0u64 }
+}
+
+fn op_alloc(p: refmut<ObjPool>)
+    requires (*p).live < (*p).cap
+    ensures  (*p).live       == old((*p).live) + 1u64
+    ensures  (*p).allocs     == old((*p).allocs) + 1u64
+    ensures  (*p).cap        == old((*p).cap)
+    ensures  (*p).generation == old((*p).generation)
+    ensures  (*p).frees      == old((*p).frees)
+{
+    (*p).live   = (*p).live   + 1u64;
+    (*p).allocs = (*p).allocs + 1u64;
+}
+
+fn op_free(p: refmut<ObjPool>)
+    requires (*p).live > 0u64
+    ensures  (*p).live       == old((*p).live) - 1u64
+    ensures  (*p).generation == old((*p).generation) + 1u64
+    ensures  (*p).frees      == old((*p).frees) + 1u64
+    ensures  (*p).allocs     == old((*p).allocs)
+    ensures  (*p).cap        == old((*p).cap)
+{
+    (*p).live       = (*p).live       - 1u64;
+    (*p).generation = (*p).generation + 1u64;
+    (*p).frees      = (*p).frees      + 1u64;
+}
+
+// Alloc 3: live is 3
+fn alloc_three(cap: u64) -> u64
+    requires cap > 3u64
+    ensures result == 3u64
+{
+    let p: ObjPool = op_new(cap);
+    op_alloc(&mut p);
+    op_alloc(&mut p);
+    op_alloc(&mut p);
+    p.live
+}
+
+// Each free bumps generation
+fn generation_after_frees() -> u64
+    ensures result == 2u64
+{
+    let p: ObjPool = op_new(4u64);
+    op_alloc(&mut p);
+    op_alloc(&mut p);
+    op_free(&mut p);
+    op_free(&mut p);
+    p.generation
+}
+
+// Alloc then free cycle: allocs and frees tracked
+fn alloc_free_allocs() -> u64
+    ensures result == 4u64
+{
+    let p: ObjPool = op_new(4u64);
+    op_alloc(&mut p);
+    op_alloc(&mut p);
+    op_alloc(&mut p);
+    op_alloc(&mut p);
+    op_free(&mut p);
+    op_free(&mut p);
+    op_alloc(&mut p);
+    op_alloc(&mut p);
+    p.allocs
+}
+
+fn alloc_free_frees() -> u64
+    ensures result == 2u64
+{
+    let p: ObjPool = op_new(4u64);
+    op_alloc(&mut p);
+    op_alloc(&mut p);
+    op_alloc(&mut p);
+    op_alloc(&mut p);
+    op_free(&mut p);
+    op_free(&mut p);
+    op_alloc(&mut p);
+    p.frees
+}
+
+fn main() -> u64 { 0u64 }

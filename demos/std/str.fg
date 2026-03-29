@@ -1,0 +1,114 @@
+// std/str.fg — byte-string type and operations
+//
+// Include with:  use std::str;
+//
+// Str wraps a span<u8> with a tracked logical length.  The underlying span
+// carries proven bounds so every byte access is verified by Z3.
+//
+// Structural invariant: (*s).len <= (*s).data.len must be maintained by the
+// caller and is threaded through as a precondition where needed.
+
+// ---- Str type --------------------------------------------------------------
+
+struct Str {
+    data: span<u8>,   // underlying byte storage (capacity = data.len)
+    len:  u64,        // logical length (bytes written)
+}
+
+fn str_new(data: span<u8>) -> Str
+    ensures result.len  == 0u64
+    ensures result.data.len == data.len
+{
+    struct Str { data: data, len: 0u64 }
+}
+
+fn str_len(s: ref<Str>) -> u64
+    ensures result == (*s).len
+{
+    (*s).len
+}
+
+fn str_capacity(s: ref<Str>) -> u64
+    ensures result == (*s).data.len
+{
+    (*s).data.len
+}
+
+fn str_is_empty(s: ref<Str>) -> bool
+    ensures result == ((*s).len == 0u64)
+{
+    (*s).len == 0u64
+}
+
+// Read a byte at index i.
+fn str_at(s: ref<Str>, i: u64) -> u8
+    requires i < (*s).len
+    requires (*s).len <= (*s).data.len
+{
+    (*s).data[i]
+}
+
+// Append a byte to the string (requires room).
+fn str_push(s: refmut<Str>, b: u8)
+    requires (*s).len < (*s).data.len
+    ensures  (*s).len == old((*s).len) + 1u64
+{
+    (*s).data[(*s).len] = b;
+    (*s).len = (*s).len + 1u64;
+}
+
+// Clear the string (reset logical length to 0).
+fn str_clear(s: refmut<Str>)
+    ensures (*s).len == 0u64
+{
+    (*s).len = 0u64;
+}
+
+// ---- Byte equality ---------------------------------------------------------
+
+// Are two bytes equal?
+fn byte_eq(a: u8, b: u8) -> bool
+    ensures result == (a == b)
+{
+    a == b
+}
+
+// Does a string start with a given byte?
+fn str_starts_with_byte(s: ref<Str>, b: u8) -> bool
+    requires (*s).len <= (*s).data.len
+{
+    if (*s).len > 0u64 { (*s).data[0u64] == b } else { false }
+}
+
+// ---- ASCII utilities -------------------------------------------------------
+
+// Is a byte an ASCII decimal digit?
+fn is_ascii_digit(b: u8) -> bool
+    ensures result == (b >= 48u8 && b <= 57u8)
+{
+    b >= 48u8 && b <= 57u8
+}
+
+// Is a byte an ASCII lowercase letter?
+fn is_ascii_lower(b: u8) -> bool
+    ensures result == (b >= 97u8 && b <= 122u8)
+{
+    b >= 97u8 && b <= 122u8
+}
+
+// Is a byte an ASCII uppercase letter?
+fn is_ascii_upper(b: u8) -> bool
+    ensures result == (b >= 65u8 && b <= 90u8)
+{
+    b >= 65u8 && b <= 90u8
+}
+
+// Convert an ASCII uppercase byte to lowercase (no-op if not uppercase).
+fn to_ascii_lower(b: u8) -> u8 {
+    if b >= 65u8 && b <= 90u8 { b + 32u8 } else { b }
+}
+
+// Convert an ASCII lowercase byte to uppercase.
+fn to_ascii_upper(b: u8) -> u8 {
+    if b >= 97u8 && b <= 122u8 { b - 32u8 } else { b }
+}

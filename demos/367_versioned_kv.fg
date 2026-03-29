@@ -1,0 +1,89 @@
+// Demo 367: Versioned key-value store (single slot)
+//
+// A single versioned slot: write() stores a value and bumps the version,
+// read returns the stored value. Verified: after N writes, version is N
+// and the value reflects the last write.
+
+struct KVSlot {
+    value:   u64,
+    version: u64,
+    reads:   u64,
+}
+
+fn kv_new() -> KVSlot
+    ensures result.value   == 0u64
+    ensures result.version == 0u64
+    ensures result.reads   == 0u64
+{
+    struct KVSlot { value: 0u64, version: 0u64, reads: 0u64 }
+}
+
+fn kv_write(k: refmut<KVSlot>, v: u64)
+    ensures (*k).value   == v
+    ensures (*k).version == old((*k).version) + 1u64
+    ensures (*k).reads   == old((*k).reads)
+{
+    (*k).value   = v;
+    (*k).version = (*k).version + 1u64;
+}
+
+fn kv_read(k: refmut<KVSlot>) -> u64
+    ensures result      == (*k).value
+    ensures (*k).reads  == old((*k).reads) + 1u64
+    ensures (*k).version == old((*k).version)
+    ensures (*k).value   == old((*k).value)
+{
+    (*k).reads = (*k).reads + 1u64;
+    (*k).value
+}
+
+// Write 42: value is 42
+fn write_42() -> u64
+    ensures result == 42u64
+{
+    let k: KVSlot = kv_new();
+    kv_write(&mut k, 42u64);
+    k.value
+}
+
+// Write twice: value is last written, version is 2
+fn two_writes_value() -> u64
+    ensures result == 99u64
+{
+    let k: KVSlot = kv_new();
+    kv_write(&mut k, 42u64);
+    kv_write(&mut k, 99u64);
+    k.value
+}
+
+fn two_writes_version() -> u64
+    ensures result == 2u64
+{
+    let k: KVSlot = kv_new();
+    kv_write(&mut k, 42u64);
+    kv_write(&mut k, 99u64);
+    k.version
+}
+
+// Three reads: reads count is 3
+fn three_reads() -> u64
+    ensures result == 3u64
+{
+    let k: KVSlot = kv_new();
+    kv_write(&mut k, 10u64);
+    kv_read(&mut k);
+    kv_read(&mut k);
+    kv_read(&mut k);
+    k.reads
+}
+
+// Read returns current value
+fn read_returns_value() -> u64
+    ensures result == 77u64
+{
+    let k: KVSlot = kv_new();
+    kv_write(&mut k, 77u64);
+    kv_read(&mut k)
+}
+
+fn main() -> u64 { 0u64 }

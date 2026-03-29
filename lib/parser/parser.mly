@@ -552,9 +552,10 @@ pred:
   | l = pred SHL     r = pred { PBinop (Shl,    l, r) }
   | l = pred SHR     r = pred { PBinop (Shr,    l, r) }
 
-  (* Unary *)
-  | BANG p = pred  { PUnop (Not, p) }
-  | MINUS p = pred { PUnop (Neg, p) }
+  (* Unary — %prec ensures ! and unary - bind tighter than ==> so that
+     !(cond) ==> rhs  parses as  (!(cond)) ==> rhs, not !(cond ==> rhs). *)
+  | BANG p = pred  %prec UBANG { PUnop (Not, p) }
+  | MINUS p = pred %prec UMINUS { PUnop (Neg, p) }
 
   (* Quantifiers *)
   | FORALL name = ident COLON t = ty COMMA p = pred

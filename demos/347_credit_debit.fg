@@ -1,0 +1,77 @@
+// Demo 347: Credit/debit ledger
+//
+// A simple ledger tracks total credits, total debits, and
+// the net balance (credits - debits). Each operation updates
+// the running totals; the balance is always derivable.
+// Verified: balance == credits - debits after any sequence.
+
+struct Ledger {
+    credits: u64,
+    debits:  u64,
+}
+
+fn ledger_new() -> Ledger
+    ensures result.credits == 0u64
+    ensures result.debits  == 0u64
+{
+    struct Ledger { credits: 0u64, debits: 0u64 }
+}
+
+fn ledger_credit(l: refmut<Ledger>, amount: u64)
+    ensures (*l).credits == old((*l).credits) + amount
+    ensures (*l).debits  == old((*l).debits)
+{
+    (*l).credits = (*l).credits + amount;
+}
+
+fn ledger_debit(l: refmut<Ledger>, amount: u64)
+    requires (*l).credits >= (*l).debits + amount
+    ensures  (*l).debits  == old((*l).debits) + amount
+    ensures  (*l).credits == old((*l).credits)
+{
+    (*l).debits = (*l).debits + amount;
+}
+
+// Credit 100: credits is 100
+fn credit_100() -> u64
+    ensures result == 100u64
+{
+    let l: Ledger = ledger_new();
+    ledger_credit(&mut l, 100u64);
+    l.credits
+}
+
+// Credit 200, debit 50: balance is 150
+fn credit_debit_balance() -> u64
+    ensures result == 150u64
+{
+    let l: Ledger = ledger_new();
+    ledger_credit(&mut l, 200u64);
+    ledger_debit(&mut l, 50u64);
+    l.credits - l.debits
+}
+
+// Three credits, two debits
+fn multi_ops() -> u64
+    ensures result == 160u64
+{
+    let l: Ledger = ledger_new();
+    ledger_credit(&mut l, 100u64);
+    ledger_credit(&mut l, 100u64);
+    ledger_credit(&mut l, 100u64);
+    ledger_debit(&mut l, 80u64);
+    ledger_debit(&mut l, 60u64);
+    l.credits - l.debits
+}
+
+// Net-zero: credit 50, debit 50
+fn net_zero() -> u64
+    ensures result == 0u64
+{
+    let l: Ledger = ledger_new();
+    ledger_credit(&mut l, 50u64);
+    ledger_debit(&mut l, 50u64);
+    l.credits - l.debits
+}
+
+fn main() -> u64 { 0u64 }

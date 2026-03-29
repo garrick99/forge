@@ -1,0 +1,100 @@
+// Demo 352: Pipeline stage tracker
+//
+// A 3-stage pipeline: fetch → decode → execute.
+// Each stage counter increments independently; the pipeline
+// depth (fetch - execute) is bounded. Verified via old() chaining.
+
+struct Pipeline {
+    fetched:  u64,
+    decoded:  u64,
+    executed: u64,
+}
+
+fn pipe_new() -> Pipeline
+    ensures result.fetched  == 0u64
+    ensures result.decoded  == 0u64
+    ensures result.executed == 0u64
+{
+    struct Pipeline { fetched: 0u64, decoded: 0u64, executed: 0u64 }
+}
+
+fn pipe_fetch(p: refmut<Pipeline>)
+    ensures (*p).fetched  == old((*p).fetched) + 1u64
+    ensures (*p).decoded  == old((*p).decoded)
+    ensures (*p).executed == old((*p).executed)
+{
+    (*p).fetched = (*p).fetched + 1u64;
+}
+
+fn pipe_decode(p: refmut<Pipeline>)
+    requires (*p).decoded < (*p).fetched
+    ensures  (*p).decoded  == old((*p).decoded) + 1u64
+    ensures  (*p).fetched  == old((*p).fetched)
+    ensures  (*p).executed == old((*p).executed)
+{
+    (*p).decoded = (*p).decoded + 1u64;
+}
+
+fn pipe_execute(p: refmut<Pipeline>)
+    requires (*p).executed < (*p).decoded
+    ensures  (*p).executed == old((*p).executed) + 1u64
+    ensures  (*p).fetched  == old((*p).fetched)
+    ensures  (*p).decoded  == old((*p).decoded)
+{
+    (*p).executed = (*p).executed + 1u64;
+}
+
+// Fetch 3: fetched is 3
+fn fetch_three() -> u64
+    ensures result == 3u64
+{
+    let p: Pipeline = pipe_new();
+    pipe_fetch(&mut p);
+    pipe_fetch(&mut p);
+    pipe_fetch(&mut p);
+    p.fetched
+}
+
+// Full pipeline step: fetch, decode, execute
+fn one_full_step_executed() -> u64
+    ensures result == 1u64
+{
+    let p: Pipeline = pipe_new();
+    pipe_fetch(&mut p);
+    pipe_decode(&mut p);
+    pipe_execute(&mut p);
+    p.executed
+}
+
+// Fetch 3, decode 2, execute 1: in-flight is 1
+fn in_flight() -> u64
+    ensures result == 1u64
+{
+    let p: Pipeline = pipe_new();
+    pipe_fetch(&mut p);
+    pipe_fetch(&mut p);
+    pipe_fetch(&mut p);
+    pipe_decode(&mut p);
+    pipe_decode(&mut p);
+    pipe_execute(&mut p);
+    p.decoded - p.executed
+}
+
+// Three full cycles: executed is 3
+fn three_full_cycles() -> u64
+    ensures result == 3u64
+{
+    let p: Pipeline = pipe_new();
+    pipe_fetch(&mut p);
+    pipe_decode(&mut p);
+    pipe_execute(&mut p);
+    pipe_fetch(&mut p);
+    pipe_decode(&mut p);
+    pipe_execute(&mut p);
+    pipe_fetch(&mut p);
+    pipe_decode(&mut p);
+    pipe_execute(&mut p);
+    p.executed
+}
+
+fn main() -> u64 { 0u64 }

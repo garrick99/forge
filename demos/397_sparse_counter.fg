@@ -1,0 +1,111 @@
+// Demo 397: Sparse counter — two buckets with overflow tracking
+//
+// A sparse counter maintains two buckets (small and large values).
+// inc_small increments bucket_small, inc_large increments bucket_large.
+// When bucket_small overflows threshold, it spills into bucket_large.
+// Verified: totals track correctly across bucket operations.
+
+struct SparseCounter {
+    bucket_small: u64,
+    bucket_large: u64,
+    threshold:    u64,
+    spills:       u64,
+}
+
+fn sc_new(threshold: u64) -> SparseCounter
+    requires threshold > 0u64
+    ensures result.bucket_small == 0u64
+    ensures result.bucket_large == 0u64
+    ensures result.threshold    == threshold
+    ensures result.spills       == 0u64
+{
+    struct SparseCounter { bucket_small: 0u64, bucket_large: 0u64, threshold: threshold, spills: 0u64 }
+}
+
+fn sc_inc_small(s: refmut<SparseCounter>)
+    requires (*s).bucket_small + 1u64 < (*s).threshold
+    ensures  (*s).bucket_small == old((*s).bucket_small) + 1u64
+    ensures  (*s).bucket_large == old((*s).bucket_large)
+    ensures  (*s).spills       == old((*s).spills)
+    ensures  (*s).threshold    == old((*s).threshold)
+{
+    (*s).bucket_small = (*s).bucket_small + 1u64;
+}
+
+fn sc_spill(s: refmut<SparseCounter>)
+    requires (*s).bucket_small + 1u64 == (*s).threshold
+    ensures  (*s).bucket_large == old((*s).bucket_large) + (*s).threshold
+    ensures  (*s).bucket_small == 0u64
+    ensures  (*s).spills       == old((*s).spills) + 1u64
+    ensures  (*s).threshold    == old((*s).threshold)
+{
+    (*s).bucket_large = (*s).bucket_large + (*s).threshold;
+    (*s).bucket_small = 0u64;
+    (*s).spills       = (*s).spills + 1u64;
+}
+
+fn sc_inc_large(s: refmut<SparseCounter>, n: u64)
+    ensures (*s).bucket_large == old((*s).bucket_large) + n
+    ensures (*s).bucket_small == old((*s).bucket_small)
+    ensures (*s).spills       == old((*s).spills)
+    ensures (*s).threshold    == old((*s).threshold)
+{
+    (*s).bucket_large = (*s).bucket_large + n;
+}
+
+// Inc small 4 times (threshold=5): bucket_small is 4
+fn small_four() -> u64
+    ensures result == 4u64
+{
+    let s: SparseCounter = sc_new(5u64);
+    sc_inc_small(&mut s);
+    sc_inc_small(&mut s);
+    sc_inc_small(&mut s);
+    sc_inc_small(&mut s);
+    s.bucket_small
+}
+
+// Spill: bucket_large gains threshold, small resets
+fn spill_large() -> u64
+    ensures result == 5u64
+{
+    let s: SparseCounter = sc_new(5u64);
+    sc_inc_small(&mut s);
+    sc_inc_small(&mut s);
+    sc_inc_small(&mut s);
+    sc_inc_small(&mut s);
+    sc_spill(&mut s);
+    s.bucket_large
+}
+
+fn spill_resets_small() -> u64
+    ensures result == 0u64
+{
+    let s: SparseCounter = sc_new(5u64);
+    sc_inc_small(&mut s);
+    sc_inc_small(&mut s);
+    sc_inc_small(&mut s);
+    sc_inc_small(&mut s);
+    sc_spill(&mut s);
+    s.bucket_small
+}
+
+// Two spills: bucket_large is 10
+fn two_spills() -> u64
+    ensures result == 10u64
+{
+    let s: SparseCounter = sc_new(5u64);
+    sc_inc_small(&mut s);
+    sc_inc_small(&mut s);
+    sc_inc_small(&mut s);
+    sc_inc_small(&mut s);
+    sc_spill(&mut s);
+    sc_inc_small(&mut s);
+    sc_inc_small(&mut s);
+    sc_inc_small(&mut s);
+    sc_inc_small(&mut s);
+    sc_spill(&mut s);
+    s.bucket_large
+}
+
+fn main() -> u64 { 0u64 }

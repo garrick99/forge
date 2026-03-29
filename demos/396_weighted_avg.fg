@@ -1,0 +1,90 @@
+// Demo 396: Weighted average accumulator
+//
+// Accumulates weighted samples: add_sample adds value*weight to
+// the numerator and weight to the denominator. The weighted average
+// is num / denom. Verified: numerator and denominator accumulate correctly.
+
+struct WeightedAvg {
+    numerator:   u64,
+    denominator: u64,
+    samples:     u64,
+}
+
+fn wa_new() -> WeightedAvg
+    ensures result.numerator   == 0u64
+    ensures result.denominator == 0u64
+    ensures result.samples     == 0u64
+{
+    struct WeightedAvg { numerator: 0u64, denominator: 0u64, samples: 0u64 }
+}
+
+fn wa_add(w: refmut<WeightedAvg>, value: u64, weight: u64)
+    requires weight > 0u64
+    ensures  (*w).numerator   == old((*w).numerator) + value * weight
+    ensures  (*w).denominator == old((*w).denominator) + weight
+    ensures  (*w).samples     == old((*w).samples) + 1u64
+{
+    (*w).numerator   = (*w).numerator   + value * weight;
+    (*w).denominator = (*w).denominator + weight;
+    (*w).samples     = (*w).samples     + 1u64;
+}
+
+// One sample (value=10, weight=2): num=20, denom=2
+fn one_sample_num() -> u64
+    ensures result == 20u64
+{
+    let w: WeightedAvg = wa_new();
+    wa_add(&mut w, 10u64, 2u64);
+    w.numerator
+}
+
+fn one_sample_denom() -> u64
+    ensures result == 2u64
+{
+    let w: WeightedAvg = wa_new();
+    wa_add(&mut w, 10u64, 2u64);
+    w.denominator
+}
+
+// Two samples: (10*2 + 20*3) = 80, denom = 5
+fn two_samples_num() -> u64
+    ensures result == 80u64
+{
+    let w: WeightedAvg = wa_new();
+    wa_add(&mut w, 10u64, 2u64);
+    wa_add(&mut w, 20u64, 3u64);
+    w.numerator
+}
+
+fn two_samples_denom() -> u64
+    ensures result == 5u64
+{
+    let w: WeightedAvg = wa_new();
+    wa_add(&mut w, 10u64, 2u64);
+    wa_add(&mut w, 20u64, 3u64);
+    w.denominator
+}
+
+// Three samples: count is 3
+fn sample_count() -> u64
+    ensures result == 3u64
+{
+    let w: WeightedAvg = wa_new();
+    wa_add(&mut w, 5u64, 1u64);
+    wa_add(&mut w, 10u64, 2u64);
+    wa_add(&mut w, 15u64, 3u64);
+    w.samples
+}
+
+// Equal weights (1,1,1): num = sum of values
+fn equal_weights_num() -> u64
+    ensures result == 30u64
+{
+    let w: WeightedAvg = wa_new();
+    wa_add(&mut w, 5u64, 1u64);
+    wa_add(&mut w, 10u64, 1u64);
+    wa_add(&mut w, 15u64, 1u64);
+    w.numerator
+}
+
+fn main() -> u64 { 0u64 }

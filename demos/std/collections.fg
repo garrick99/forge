@@ -1,21 +1,220 @@
-// std/collections.fg — concrete Vec_u64 proven-bounds array wrapper
+// std/collections.fg — verified collections
 //
-// A fixed-capacity slice view with a tracked logical length.
-// Indexing is bounds-checked at compile time via preconditions.
+// Include with:  use std::collections;
+//
+// Vec_u64: a dynamic array of u64 backed by a span.
+// Structural invariant: (*v).len <= (*v).data.len must be maintained by the
+// caller and is threaded through as a precondition where needed.
+// All push/pop/get/set operations carry Z3-verified bounds proofs.
+
+// ---- Vec_u64 ---------------------------------------------------------------
 
 struct Vec_u64 {
     data: span<u64>,
-    len:  usize,
+    len:  u64,
 }
 
-fn vec_u64_new(data: span<u64>) -> Vec_u64 {
+fn vec_u64_new(data: span<u64>) -> Vec_u64
+    ensures result.len        == 0u64
+    ensures result.data.len   == data.len
+{
     struct Vec_u64 { data: data, len: 0u64 }
 }
 
-fn vec_u64_len(v: ref<Vec_u64>) -> usize {
+fn vec_u64_len(v: ref<Vec_u64>) -> u64
+    ensures result == (*v).len
+{
     (*v).len
 }
 
-fn vec_u64_capacity(v: ref<Vec_u64>) -> usize {
+fn vec_u64_capacity(v: ref<Vec_u64>) -> u64
+    ensures result == (*v).data.len
+{
     (*v).data.len
+}
+
+fn vec_u64_is_empty(v: ref<Vec_u64>) -> bool
+    ensures result == ((*v).len == 0u64)
+{
+    (*v).len == 0u64
+}
+
+fn vec_u64_is_full(v: ref<Vec_u64>) -> bool
+    ensures result == ((*v).len == (*v).data.len)
+{
+    (*v).len == (*v).data.len
+}
+
+// Get element at index i (bounds-checked by precondition).
+fn vec_u64_get(v: ref<Vec_u64>, i: u64) -> u64
+    requires i < (*v).len
+    requires (*v).len <= (*v).data.len
+{
+    (*v).data[i]
+}
+
+// Set element at index i.
+fn vec_u64_set(v: refmut<Vec_u64>, i: u64, val: u64)
+    requires i < (*v).len
+    requires (*v).len <= (*v).data.len
+    ensures  (*v).len      == old((*v).len)
+{
+    (*v).data[i] = val;
+}
+
+// Push a value onto the end.
+fn vec_u64_push(v: refmut<Vec_u64>, val: u64)
+    requires (*v).len < (*v).data.len
+    ensures  (*v).len == old((*v).len) + 1u64
+{
+    (*v).data[(*v).len] = val;
+    (*v).len = (*v).len + 1u64;
+}
+
+// Pop the last value (returns it, decrements length).
+fn vec_u64_pop(v: refmut<Vec_u64>) -> u64
+    requires (*v).len > 0u64
+    requires (*v).len <= (*v).data.len
+    ensures  (*v).len == old((*v).len) - 1u64
+{
+    (*v).len = (*v).len - 1u64;
+    (*v).data[(*v).len]
+}
+
+// Peek at the last element without removing it.
+fn vec_u64_peek(v: ref<Vec_u64>) -> u64
+    requires (*v).len > 0u64
+    requires (*v).len <= (*v).data.len
+{
+    (*v).data[(*v).len - 1u64]
+}
+
+// Fill entire logical length with a constant value.
+fn vec_u64_fill(v: refmut<Vec_u64>, val: u64)
+    requires (*v).len <= (*v).data.len
+    ensures (*v).len      == old((*v).len)
+{
+    let i: u64 = 0u64;
+    while i < (*v).len
+        invariant i <= (*v).len
+        invariant (*v).len      == old((*v).len)
+        invariant (*v).len      <= (*v).data.len
+        decreases (*v).len - i
+    {
+        (*v).data[i] = val;
+        i = i + 1u64;
+    }
+}
+
+// Linear search: return index of first element == val, or len if not found.
+fn vec_u64_find(v: ref<Vec_u64>, val: u64) -> u64
+    requires (*v).len <= (*v).data.len
+    ensures result <= (*v).len
+{
+    let i: u64 = 0u64;
+    let ans: u64 = (*v).len;
+    while i < (*v).len
+        invariant i <= (*v).len
+        invariant ans <= (*v).len
+        invariant (*v).len <= (*v).data.len
+        decreases (*v).len - i
+    {
+        let cur: u64 = (*v).data[i];
+        if cur == val && ans == (*v).len {
+            ans = i;
+        };
+        i = i + 1u64;
+    };
+    ans
+}
+
+// Sum of all elements.
+fn vec_u64_sum(v: ref<Vec_u64>) -> u64
+    requires (*v).len <= (*v).data.len
+{
+    let acc: u64 = 0u64;
+    let i: u64 = 0u64;
+    while i < (*v).len
+        invariant i <= (*v).len
+        invariant (*v).len <= (*v).data.len
+        decreases (*v).len - i
+    {
+        acc = acc + (*v).data[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+// Maximum element (requires non-empty).
+fn vec_u64_max(v: ref<Vec_u64>) -> u64
+    requires (*v).len > 0u64
+    requires (*v).len <= (*v).data.len
+{
+    let m: u64 = (*v).data[0u64];
+    let i: u64 = 1u64;
+    while i < (*v).len
+        invariant i <= (*v).len
+        invariant (*v).len <= (*v).data.len
+        decreases (*v).len - i
+    {
+        if (*v).data[i] > m { m = (*v).data[i]; };
+        i = i + 1u64;
+    };
+    m
+}
+
+// Minimum element (requires non-empty).
+fn vec_u64_min(v: ref<Vec_u64>) -> u64
+    requires (*v).len > 0u64
+    requires (*v).len <= (*v).data.len
+{
+    let m: u64 = (*v).data[0u64];
+    let i: u64 = 1u64;
+    while i < (*v).len
+        invariant i <= (*v).len
+        invariant (*v).len <= (*v).data.len
+        decreases (*v).len - i
+    {
+        if (*v).data[i] < m { m = (*v).data[i]; };
+        i = i + 1u64;
+    };
+    m
+}
+
+// ---- Stack (alias over Vec_u64) --------------------------------------------
+// Push = vec_u64_push, Pop = vec_u64_pop, Peek = vec_u64_peek.
+
+// ---- Simple u8 vector -------------------------------------------------------
+
+struct Vec_u8 {
+    data: span<u8>,
+    len:  u64,
+}
+
+fn vec_u8_new(data: span<u8>) -> Vec_u8
+    ensures result.len      == 0u64
+    ensures result.data.len == data.len
+{
+    struct Vec_u8 { data: data, len: 0u64 }
+}
+
+fn vec_u8_push(v: refmut<Vec_u8>, val: u8)
+    requires (*v).len < (*v).data.len
+    ensures  (*v).len == old((*v).len) + 1u64
+{
+    (*v).data[(*v).len] = val;
+    (*v).len = (*v).len + 1u64;
+}
+
+fn vec_u8_get(v: ref<Vec_u8>, i: u64) -> u8
+    requires i < (*v).len
+    requires (*v).len <= (*v).data.len
+{
+    (*v).data[i]
+}
+
+fn vec_u8_len(v: ref<Vec_u8>) -> u64
+    ensures result == (*v).len
+{
+    (*v).len
 }

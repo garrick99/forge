@@ -1,0 +1,80 @@
+// Demo 486: verified numeric casts with range preconditions
+//
+// Shows that narrowing casts are safe when guarded by preconditions,
+// and that postconditions survive cast operations.
+
+fn u64_to_u8(v: u64) -> u8
+    requires v < 256u64
+    ensures  result == v
+{
+    v as u8
+}
+
+fn u64_to_u16(v: u64) -> u16
+    requires v < 65536u64
+    ensures  result == v
+{
+    v as u16
+}
+
+fn u64_to_u32(v: u64) -> u32
+    requires v < 4294967296u64
+    ensures  result == v
+{
+    v as u32
+}
+
+// Widen u8 to u64 preserving value.
+fn u8_to_u64(v: u8) -> u64
+    ensures result == v
+{
+    v as u64
+}
+
+// Round-trip: widen then narrow.
+fn round_trip_u8(v: u8) -> u8
+    ensures result == v
+{
+    let w: u64 = u8_to_u64(v);
+    u64_to_u8(w)
+}
+
+// Scale a byte value, clamp to u8 range.
+fn scale_byte(v: u8, factor: u64) -> u64
+    requires factor <= 255u64
+    ensures  result == v * factor
+{
+    (v as u64) * factor
+}
+
+fn check_cast_48() -> u8
+    ensures result == 48u8
+{
+    u64_to_u8(48u64)
+}
+
+fn check_cast_255() -> u8
+    ensures result == 255u8
+{
+    u64_to_u8(255u64)
+}
+
+fn check_widen_97() -> u64
+    ensures result == 97u64
+{
+    u8_to_u64(97u8)
+}
+
+fn check_round_trip() -> u8
+    ensures result == 65u8
+{
+    round_trip_u8(65u8)
+}
+
+fn check_scale_zero() -> u64
+    ensures result == 0u64
+{
+    scale_byte(0u8, 100u64)
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,118 @@
+// Demo 419: TCP congestion window (cwnd) state machine
+//
+// Models TCP slow-start and congestion avoidance.
+// slow_start_inc() doubles cwnd (up to ssthresh),
+// cong_avoid_inc() adds 1, on_loss() halves cwnd and ssthresh.
+// Verified: cwnd and ssthresh track transitions.
+
+struct CWnd {
+    cwnd:     u64,
+    ssthresh: u64,
+    losses:   u64,
+}
+
+fn cwnd_new(initial: u64, ssthresh: u64) -> CWnd
+    requires initial > 0u64
+    requires ssthresh > initial
+    ensures result.cwnd     == initial
+    ensures result.ssthresh == ssthresh
+    ensures result.losses   == 0u64
+{
+    struct CWnd { cwnd: initial, ssthresh: ssthresh, losses: 0u64 }
+}
+
+fn cwnd_slow_start(c: refmut<CWnd>)
+    requires (*c).cwnd < (*c).ssthresh
+    requires (*c).cwnd * 2u64 <= (*c).ssthresh
+    ensures  (*c).cwnd     == old((*c).cwnd) * 2u64
+    ensures  (*c).ssthresh == old((*c).ssthresh)
+    ensures  (*c).losses   == old((*c).losses)
+{
+    (*c).cwnd = (*c).cwnd * 2u64;
+}
+
+fn cwnd_cong_avoid(c: refmut<CWnd>)
+    ensures  (*c).cwnd     == old((*c).cwnd) + 1u64
+    ensures  (*c).ssthresh == old((*c).ssthresh)
+    ensures  (*c).losses   == old((*c).losses)
+{
+    (*c).cwnd = (*c).cwnd + 1u64;
+}
+
+fn cwnd_loss(c: refmut<CWnd>)
+    requires (*c).cwnd > 1u64
+    ensures  (*c).ssthresh == old((*c).cwnd) / 2u64
+    ensures  (*c).cwnd     == 1u64
+    ensures  (*c).losses   == old((*c).losses) + 1u64
+{
+    (*c).ssthresh = (*c).cwnd / 2u64;
+    (*c).cwnd     = 1u64;
+    (*c).losses   = (*c).losses + 1u64;
+}
+
+// Slow start doubles: 1→2→4
+fn slow_start_doubles() -> u64
+    ensures result == 4u64
+{
+    let c: CWnd = cwnd_new(1u64, 16u64);
+    cwnd_slow_start(&mut c);
+    cwnd_slow_start(&mut c);
+    c.cwnd
+}
+
+// Congestion avoidance increments by 1
+fn cong_avoid_inc() -> u64
+    ensures result == 20u64
+{
+    let c: CWnd = cwnd_new(1u64, 16u64);
+    cwnd_slow_start(&mut c);
+    cwnd_slow_start(&mut c);
+    cwnd_slow_start(&mut c);
+    cwnd_slow_start(&mut c);
+    cwnd_cong_avoid(&mut c);
+    cwnd_cong_avoid(&mut c);
+    cwnd_cong_avoid(&mut c);
+    cwnd_cong_avoid(&mut c);
+    c.cwnd
+}
+
+// Loss resets cwnd to 1
+fn loss_resets_cwnd() -> u64
+    ensures result == 1u64
+{
+    let c: CWnd = cwnd_new(1u64, 32u64);
+    cwnd_slow_start(&mut c);
+    cwnd_slow_start(&mut c);
+    cwnd_slow_start(&mut c);
+    cwnd_loss(&mut c);
+    c.cwnd
+}
+
+// Loss sets ssthresh to cwnd/2
+fn loss_sets_ssthresh() -> u64
+    ensures result == 4u64
+{
+    let c: CWnd = cwnd_new(1u64, 32u64);
+    cwnd_slow_start(&mut c);
+    cwnd_slow_start(&mut c);
+    cwnd_slow_start(&mut c);
+    cwnd_loss(&mut c);
+    c.ssthresh
+}
+
+// Loss count tracked
+fn loss_count() -> u64
+    ensures result == 2u64
+{
+    let c: CWnd = cwnd_new(1u64, 32u64);
+    cwnd_slow_start(&mut c);
+    cwnd_slow_start(&mut c);
+    cwnd_loss(&mut c);
+    cwnd_cong_avoid(&mut c);
+    cwnd_cong_avoid(&mut c);
+    cwnd_cong_avoid(&mut c);
+    cwnd_loss(&mut c);
+    c.losses
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,94 @@
+// Demo 345: Event log with capacity and flush
+//
+// An event log buffers events up to a capacity limit.
+// Flush resets the count and increments the flush counter.
+// Verified: event count tracks appends, flush clears count.
+
+struct EventLog {
+    count:   u64,
+    cap:     u64,
+    flushes: u64,
+}
+
+fn log_new(cap: u64) -> EventLog
+    requires cap > 0u64
+    ensures result.count   == 0u64
+    ensures result.cap     == cap
+    ensures result.flushes == 0u64
+{
+    struct EventLog { count: 0u64, cap: cap, flushes: 0u64 }
+}
+
+fn log_append(l: refmut<EventLog>)
+    requires (*l).count < (*l).cap
+    ensures  (*l).count   == old((*l).count) + 1u64
+    ensures  (*l).cap     == old((*l).cap)
+    ensures  (*l).flushes == old((*l).flushes)
+{
+    (*l).count = (*l).count + 1u64;
+}
+
+fn log_flush(l: refmut<EventLog>)
+    requires (*l).count > 0u64
+    ensures  (*l).count   == 0u64
+    ensures  (*l).flushes == old((*l).flushes) + 1u64
+    ensures  (*l).cap     == old((*l).cap)
+{
+    (*l).count   = 0u64;
+    (*l).flushes = (*l).flushes + 1u64;
+}
+
+// Five appends: count is 5
+fn five_appends(cap: u64) -> u64
+    requires cap > 5u64
+    ensures result == 5u64
+{
+    let l: EventLog = log_new(cap);
+    log_append(&mut l);
+    log_append(&mut l);
+    log_append(&mut l);
+    log_append(&mut l);
+    log_append(&mut l);
+    l.count
+}
+
+// Append 3, flush: count is 0, flushes is 1
+fn append_flush_count(cap: u64) -> u64
+    requires cap > 3u64
+    ensures result == 0u64
+{
+    let l: EventLog = log_new(cap);
+    log_append(&mut l);
+    log_append(&mut l);
+    log_append(&mut l);
+    log_flush(&mut l);
+    l.count
+}
+
+fn append_flush_flushes(cap: u64) -> u64
+    requires cap > 3u64
+    ensures result == 1u64
+{
+    let l: EventLog = log_new(cap);
+    log_append(&mut l);
+    log_append(&mut l);
+    log_append(&mut l);
+    log_flush(&mut l);
+    l.flushes
+}
+
+// Two flush cycles: flushes is 2
+fn two_flush_cycles(cap: u64) -> u64
+    requires cap > 2u64
+    ensures result == 2u64
+{
+    let l: EventLog = log_new(cap);
+    log_append(&mut l);
+    log_append(&mut l);
+    log_flush(&mut l);
+    log_append(&mut l);
+    log_flush(&mut l);
+    l.flushes
+}
+
+fn main() -> u64 { 0u64 }

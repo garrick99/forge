@@ -1,0 +1,100 @@
+// Demo 364: Permission grant/revoke tracker
+//
+// A permissions register: grant() adds a permission slot (up to cap),
+// revoke() removes one. The count tracks active permissions.
+// Verified: grant/revoke maintain the count invariant.
+
+struct Permissions {
+    count: u64,
+    cap:   u64,
+    grants:  u64,  // total grants ever
+    revokes: u64,  // total revokes ever
+}
+
+fn perm_new(cap: u64) -> Permissions
+    requires cap > 0u64
+    ensures result.count   == 0u64
+    ensures result.cap     == cap
+    ensures result.grants  == 0u64
+    ensures result.revokes == 0u64
+{
+    struct Permissions { count: 0u64, cap: cap, grants: 0u64, revokes: 0u64 }
+}
+
+fn perm_grant(p: refmut<Permissions>)
+    requires (*p).count < (*p).cap
+    ensures  (*p).count   == old((*p).count) + 1u64
+    ensures  (*p).grants  == old((*p).grants) + 1u64
+    ensures  (*p).cap     == old((*p).cap)
+    ensures  (*p).revokes == old((*p).revokes)
+{
+    (*p).count  = (*p).count  + 1u64;
+    (*p).grants = (*p).grants + 1u64;
+}
+
+fn perm_revoke(p: refmut<Permissions>)
+    requires (*p).count > 0u64
+    ensures  (*p).count   == old((*p).count) - 1u64
+    ensures  (*p).revokes == old((*p).revokes) + 1u64
+    ensures  (*p).cap     == old((*p).cap)
+    ensures  (*p).grants  == old((*p).grants)
+{
+    (*p).count   = (*p).count   - 1u64;
+    (*p).revokes = (*p).revokes + 1u64;
+}
+
+// Grant 3: count is 3
+fn grant_three(cap: u64) -> u64
+    requires cap > 3u64
+    ensures result == 3u64
+{
+    let p: Permissions = perm_new(cap);
+    perm_grant(&mut p);
+    perm_grant(&mut p);
+    perm_grant(&mut p);
+    p.count
+}
+
+// Grant 3, revoke 1: count is 2
+fn grant3_revoke1(cap: u64) -> u64
+    requires cap > 3u64
+    ensures result == 2u64
+{
+    let p: Permissions = perm_new(cap);
+    perm_grant(&mut p);
+    perm_grant(&mut p);
+    perm_grant(&mut p);
+    perm_revoke(&mut p);
+    p.count
+}
+
+// Grant 3, revoke 3: count is 0
+fn grant_revoke_all(cap: u64) -> u64
+    requires cap > 3u64
+    ensures result == 0u64
+{
+    let p: Permissions = perm_new(cap);
+    perm_grant(&mut p);
+    perm_grant(&mut p);
+    perm_grant(&mut p);
+    perm_revoke(&mut p);
+    perm_revoke(&mut p);
+    perm_revoke(&mut p);
+    p.count
+}
+
+// Cumulative grant/revoke counts
+fn total_grants(cap: u64) -> u64
+    requires cap > 4u64
+    ensures result == 4u64
+{
+    let p: Permissions = perm_new(cap);
+    perm_grant(&mut p);
+    perm_grant(&mut p);
+    perm_revoke(&mut p);
+    perm_grant(&mut p);
+    perm_grant(&mut p);
+    p.grants
+}
+
+fn main() -> u64 { 0u64 }

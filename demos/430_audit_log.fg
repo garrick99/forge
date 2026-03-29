@@ -1,0 +1,103 @@
+// Demo 430: Audit log with sequence numbers
+//
+// Each entry gets a monotonically increasing sequence number.
+// Different event types are counted separately.
+// Verified: sequence numbers advance, per-type counts preserved.
+
+struct AuditLog {
+    seq:     u64,
+    reads:   u64,
+    writes:  u64,
+    deletes: u64,
+}
+
+fn al_new() -> AuditLog
+    ensures result.seq     == 0u64
+    ensures result.reads   == 0u64
+    ensures result.writes  == 0u64
+    ensures result.deletes == 0u64
+{
+    struct AuditLog { seq: 0u64, reads: 0u64, writes: 0u64, deletes: 0u64 }
+}
+
+fn al_log_read(a: refmut<AuditLog>)
+    ensures (*a).seq     == old((*a).seq) + 1u64
+    ensures (*a).reads   == old((*a).reads) + 1u64
+    ensures (*a).writes  == old((*a).writes)
+    ensures (*a).deletes == old((*a).deletes)
+{
+    (*a).seq   = (*a).seq   + 1u64;
+    (*a).reads = (*a).reads + 1u64;
+}
+
+fn al_log_write(a: refmut<AuditLog>)
+    ensures (*a).seq     == old((*a).seq) + 1u64
+    ensures (*a).writes  == old((*a).writes) + 1u64
+    ensures (*a).reads   == old((*a).reads)
+    ensures (*a).deletes == old((*a).deletes)
+{
+    (*a).seq    = (*a).seq    + 1u64;
+    (*a).writes = (*a).writes + 1u64;
+}
+
+fn al_log_delete(a: refmut<AuditLog>)
+    ensures (*a).seq     == old((*a).seq) + 1u64
+    ensures (*a).deletes == old((*a).deletes) + 1u64
+    ensures (*a).reads   == old((*a).reads)
+    ensures (*a).writes  == old((*a).writes)
+{
+    (*a).seq     = (*a).seq     + 1u64;
+    (*a).deletes = (*a).deletes + 1u64;
+}
+
+// 4 events: seq==4
+fn seq_advances() -> u64
+    ensures result == 4u64
+{
+    let a: AuditLog = al_new();
+    al_log_read(&mut a);
+    al_log_write(&mut a);
+    al_log_read(&mut a);
+    al_log_delete(&mut a);
+    a.seq
+}
+
+// Read count
+fn read_count() -> u64
+    ensures result == 3u64
+{
+    let a: AuditLog = al_new();
+    al_log_read(&mut a);
+    al_log_write(&mut a);
+    al_log_read(&mut a);
+    al_log_delete(&mut a);
+    al_log_read(&mut a);
+    a.reads
+}
+
+// Writes independent of reads
+fn writes_independent() -> u64
+    ensures result == 2u64
+{
+    let a: AuditLog = al_new();
+    al_log_read(&mut a);
+    al_log_write(&mut a);
+    al_log_read(&mut a);
+    al_log_write(&mut a);
+    al_log_read(&mut a);
+    a.writes
+}
+
+// Delete count
+fn delete_count() -> u64
+    ensures result == 2u64
+{
+    let a: AuditLog = al_new();
+    al_log_delete(&mut a);
+    al_log_read(&mut a);
+    al_log_write(&mut a);
+    al_log_delete(&mut a);
+    a.deletes
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,118 @@
+// Demo 420: CPU instruction type counter
+//
+// A simple profiler counts instructions by type: loads, stores,
+// arithmetic, branches. Verified: total == sum of all categories.
+
+struct InstrCounter {
+    loads:  u64,
+    stores: u64,
+    arith:  u64,
+    branches: u64,
+}
+
+fn ic_new() -> InstrCounter
+    ensures result.loads    == 0u64
+    ensures result.stores   == 0u64
+    ensures result.arith    == 0u64
+    ensures result.branches == 0u64
+{
+    struct InstrCounter { loads: 0u64, stores: 0u64, arith: 0u64, branches: 0u64 }
+}
+
+fn ic_load(c: refmut<InstrCounter>)
+    ensures (*c).loads    == old((*c).loads) + 1u64
+    ensures (*c).stores   == old((*c).stores)
+    ensures (*c).arith    == old((*c).arith)
+    ensures (*c).branches == old((*c).branches)
+{
+    (*c).loads = (*c).loads + 1u64;
+}
+
+fn ic_store(c: refmut<InstrCounter>)
+    ensures (*c).stores   == old((*c).stores) + 1u64
+    ensures (*c).loads    == old((*c).loads)
+    ensures (*c).arith    == old((*c).arith)
+    ensures (*c).branches == old((*c).branches)
+{
+    (*c).stores = (*c).stores + 1u64;
+}
+
+fn ic_arith(c: refmut<InstrCounter>)
+    ensures (*c).arith    == old((*c).arith) + 1u64
+    ensures (*c).loads    == old((*c).loads)
+    ensures (*c).stores   == old((*c).stores)
+    ensures (*c).branches == old((*c).branches)
+{
+    (*c).arith = (*c).arith + 1u64;
+}
+
+fn ic_branch(c: refmut<InstrCounter>)
+    ensures (*c).branches == old((*c).branches) + 1u64
+    ensures (*c).loads    == old((*c).loads)
+    ensures (*c).stores   == old((*c).stores)
+    ensures (*c).arith    == old((*c).arith)
+{
+    (*c).branches = (*c).branches + 1u64;
+}
+
+// Mixed workload totals
+fn mixed_total() -> u64
+    ensures result == 10u64
+{
+    let c: InstrCounter = ic_new();
+    ic_load(&mut c);
+    ic_load(&mut c);
+    ic_load(&mut c);
+    ic_store(&mut c);
+    ic_store(&mut c);
+    ic_arith(&mut c);
+    ic_arith(&mut c);
+    ic_arith(&mut c);
+    ic_branch(&mut c);
+    ic_branch(&mut c);
+    c.loads + c.stores + c.arith + c.branches
+}
+
+// Memory ops = loads + stores
+fn memory_ops() -> u64
+    ensures result == 5u64
+{
+    let c: InstrCounter = ic_new();
+    ic_load(&mut c);
+    ic_load(&mut c);
+    ic_load(&mut c);
+    ic_store(&mut c);
+    ic_store(&mut c);
+    ic_arith(&mut c);
+    ic_branch(&mut c);
+    c.loads + c.stores
+}
+
+// Branch count
+fn branch_count() -> u64
+    ensures result == 4u64
+{
+    let c: InstrCounter = ic_new();
+    ic_arith(&mut c);
+    ic_branch(&mut c);
+    ic_branch(&mut c);
+    ic_arith(&mut c);
+    ic_branch(&mut c);
+    ic_branch(&mut c);
+    c.branches
+}
+
+// Categories independent: arith doesn't affect loads
+fn arith_no_load_effect() -> u64
+    ensures result == 2u64
+{
+    let c: InstrCounter = ic_new();
+    ic_load(&mut c);
+    ic_load(&mut c);
+    ic_arith(&mut c);
+    ic_arith(&mut c);
+    ic_arith(&mut c);
+    c.loads
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,104 @@
+// Demo 423: Election vote tallier with three candidates
+//
+// Three candidates A, B, C. Each vote goes to exactly one.
+// The total votes == votes_a + votes_b + votes_c.
+// Verified: tallies track per-candidate votes and total is preserved.
+
+struct Tally {
+    votes_a: u64,
+    votes_b: u64,
+    votes_c: u64,
+    total:   u64,
+}
+
+fn tally_new() -> Tally
+    ensures result.votes_a == 0u64
+    ensures result.votes_b == 0u64
+    ensures result.votes_c == 0u64
+    ensures result.total   == 0u64
+{
+    struct Tally { votes_a: 0u64, votes_b: 0u64, votes_c: 0u64, total: 0u64 }
+}
+
+fn tally_vote_a(t: refmut<Tally>)
+    ensures (*t).votes_a == old((*t).votes_a) + 1u64
+    ensures (*t).total   == old((*t).total) + 1u64
+    ensures (*t).votes_b == old((*t).votes_b)
+    ensures (*t).votes_c == old((*t).votes_c)
+{
+    (*t).votes_a = (*t).votes_a + 1u64;
+    (*t).total   = (*t).total   + 1u64;
+}
+
+fn tally_vote_b(t: refmut<Tally>)
+    ensures (*t).votes_b == old((*t).votes_b) + 1u64
+    ensures (*t).total   == old((*t).total) + 1u64
+    ensures (*t).votes_a == old((*t).votes_a)
+    ensures (*t).votes_c == old((*t).votes_c)
+{
+    (*t).votes_b = (*t).votes_b + 1u64;
+    (*t).total   = (*t).total   + 1u64;
+}
+
+fn tally_vote_c(t: refmut<Tally>)
+    ensures (*t).votes_c == old((*t).votes_c) + 1u64
+    ensures (*t).total   == old((*t).total) + 1u64
+    ensures (*t).votes_a == old((*t).votes_a)
+    ensures (*t).votes_b == old((*t).votes_b)
+{
+    (*t).votes_c = (*t).votes_c + 1u64;
+    (*t).total   = (*t).total   + 1u64;
+}
+
+// A wins with 3: votes_a is 3
+fn a_wins() -> u64
+    ensures result == 3u64
+{
+    let t: Tally = tally_new();
+    tally_vote_a(&mut t);
+    tally_vote_a(&mut t);
+    tally_vote_a(&mut t);
+    t.votes_a
+}
+
+// Split vote: total is 6
+fn split_total() -> u64
+    ensures result == 6u64
+{
+    let t: Tally = tally_new();
+    tally_vote_a(&mut t);
+    tally_vote_a(&mut t);
+    tally_vote_b(&mut t);
+    tally_vote_b(&mut t);
+    tally_vote_c(&mut t);
+    tally_vote_c(&mut t);
+    t.total
+}
+
+// Total == sum of parts
+fn total_eq_sum() -> u64
+    ensures result == 0u64
+{
+    let t: Tally = tally_new();
+    tally_vote_a(&mut t);
+    tally_vote_a(&mut t);
+    tally_vote_b(&mut t);
+    tally_vote_c(&mut t);
+    tally_vote_c(&mut t);
+    t.total - t.votes_a - t.votes_b - t.votes_c
+}
+
+// Independent tallies: B doesn't affect A
+fn b_no_a_effect() -> u64
+    ensures result == 2u64
+{
+    let t: Tally = tally_new();
+    tally_vote_a(&mut t);
+    tally_vote_a(&mut t);
+    tally_vote_b(&mut t);
+    tally_vote_b(&mut t);
+    tally_vote_b(&mut t);
+    t.votes_a
+}
+
+fn main() -> u64 { 0u64 }

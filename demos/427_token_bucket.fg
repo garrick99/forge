@@ -1,0 +1,88 @@
+// Demo 427: Token bucket with burst tracking
+//
+// Classic token bucket: tokens refill up to capacity each period.
+// consume() drains tokens, refill() adds up to capacity.
+// Verified: tokens never exceed capacity, consume tracks total drained.
+
+struct TokenBucket {
+    tokens:    u64,
+    capacity:  u64,
+    consumed:  u64,
+    refills:   u64,
+}
+
+fn tb_new(cap: u64) -> TokenBucket
+    requires cap > 0u64
+    ensures result.tokens   == cap
+    ensures result.capacity == cap
+    ensures result.consumed == 0u64
+    ensures result.refills  == 0u64
+{
+    struct TokenBucket { tokens: cap, capacity: cap, consumed: 0u64, refills: 0u64 }
+}
+
+fn tb_consume(b: refmut<TokenBucket>, n: u64)
+    requires (*b).tokens >= n
+    ensures  (*b).tokens   == old((*b).tokens) - n
+    ensures  (*b).consumed == old((*b).consumed) + n
+    ensures  (*b).capacity == old((*b).capacity)
+    ensures  (*b).refills  == old((*b).refills)
+{
+    (*b).tokens   = (*b).tokens   - n;
+    (*b).consumed = (*b).consumed + n;
+}
+
+fn tb_refill(b: refmut<TokenBucket>, n: u64)
+    requires (*b).tokens + n <= (*b).capacity
+    ensures  (*b).tokens   == old((*b).tokens) + n
+    ensures  (*b).refills  == old((*b).refills) + 1u64
+    ensures  (*b).capacity == old((*b).capacity)
+    ensures  (*b).consumed == old((*b).consumed)
+{
+    (*b).tokens  = (*b).tokens  + n;
+    (*b).refills = (*b).refills + 1u64;
+}
+
+// Consume 3 from cap=10: tokens==7
+fn consume_3() -> u64
+    ensures result == 7u64
+{
+    let b: TokenBucket = tb_new(10u64);
+    tb_consume(&mut b, 3u64);
+    b.tokens
+}
+
+// Consume 5, refill 3: tokens==8
+fn consume_refill() -> u64
+    ensures result == 8u64
+{
+    let b: TokenBucket = tb_new(10u64);
+    tb_consume(&mut b, 5u64);
+    tb_refill(&mut b, 3u64);
+    b.tokens
+}
+
+// Total consumed across two drains
+fn total_consumed() -> u64
+    ensures result == 7u64
+{
+    let b: TokenBucket = tb_new(10u64);
+    tb_consume(&mut b, 4u64);
+    tb_refill(&mut b, 4u64);
+    tb_consume(&mut b, 3u64);
+    b.consumed
+}
+
+// Refill count
+fn refill_count() -> u64
+    ensures result == 2u64
+{
+    let b: TokenBucket = tb_new(8u64);
+    tb_consume(&mut b, 4u64);
+    tb_refill(&mut b, 2u64);
+    tb_consume(&mut b, 2u64);
+    tb_refill(&mut b, 4u64);
+    b.refills
+}
+
+fn main() -> u64 { 0u64 }

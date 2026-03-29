@@ -1,0 +1,105 @@
+// Demo 421: Button debounce state machine
+//
+// A hardware debouncer: a button press is only registered after
+// N consecutive stable reads. Tracks stable_count and registered presses.
+// Verified: stable_count and registered track the debounce protocol.
+
+struct Debounce {
+    stable_count:  u64,
+    threshold:     u64,
+    registered:    u64,
+    state:         u64,  // 0=released, 1=pressed
+}
+
+fn db_new(threshold: u64) -> Debounce
+    requires threshold > 0u64
+    ensures result.stable_count == 0u64
+    ensures result.threshold    == threshold
+    ensures result.registered   == 0u64
+    ensures result.state        == 0u64
+{
+    struct Debounce { stable_count: 0u64, threshold: threshold, registered: 0u64, state: 0u64 }
+}
+
+fn db_read_pressed(d: refmut<Debounce>)
+    requires (*d).stable_count + 1u64 < (*d).threshold
+    ensures  (*d).stable_count == old((*d).stable_count) + 1u64
+    ensures  (*d).state        == old((*d).state)
+    ensures  (*d).registered   == old((*d).registered)
+    ensures  (*d).threshold    == old((*d).threshold)
+{
+    (*d).stable_count = (*d).stable_count + 1u64;
+}
+
+fn db_register_press(d: refmut<Debounce>)
+    requires (*d).stable_count + 1u64 == (*d).threshold
+    requires (*d).state == 0u64
+    ensures  (*d).registered   == old((*d).registered) + 1u64
+    ensures  (*d).state        == 1u64
+    ensures  (*d).stable_count == old((*d).stable_count) + 1u64
+    ensures  (*d).threshold    == old((*d).threshold)
+{
+    (*d).registered   = (*d).registered   + 1u64;
+    (*d).state        = 1u64;
+    (*d).stable_count = (*d).stable_count + 1u64;
+}
+
+fn db_read_released(d: refmut<Debounce>)
+    ensures  (*d).stable_count == 0u64
+    ensures  (*d).state        == 0u64
+    ensures  (*d).registered   == old((*d).registered)
+    ensures  (*d).threshold    == old((*d).threshold)
+{
+    (*d).stable_count = 0u64;
+    (*d).state        = 0u64;
+}
+
+// 3 reads then register (threshold=4): stable is 4
+fn debounce_register() -> u64
+    ensures result == 1u64
+{
+    let d: Debounce = db_new(4u64);
+    db_read_pressed(&mut d);
+    db_read_pressed(&mut d);
+    db_read_pressed(&mut d);
+    db_register_press(&mut d);
+    d.registered
+}
+
+// State is pressed after register
+fn state_pressed() -> u64
+    ensures result == 1u64
+{
+    let d: Debounce = db_new(3u64);
+    db_read_pressed(&mut d);
+    db_read_pressed(&mut d);
+    db_register_press(&mut d);
+    d.state
+}
+
+// Release resets stable_count
+fn release_resets() -> u64
+    ensures result == 0u64
+{
+    let d: Debounce = db_new(3u64);
+    db_read_pressed(&mut d);
+    db_read_pressed(&mut d);
+    db_register_press(&mut d);
+    db_read_released(&mut d);
+    d.stable_count
+}
+
+// Two button presses
+fn two_presses() -> u64
+    ensures result == 2u64
+{
+    let d: Debounce = db_new(2u64);
+    db_read_pressed(&mut d);
+    db_register_press(&mut d);
+    db_read_released(&mut d);
+    db_read_pressed(&mut d);
+    db_register_press(&mut d);
+    d.registered
+}
+
+fn main() -> u64 { 0u64 }

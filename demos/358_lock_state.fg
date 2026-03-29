@@ -1,0 +1,104 @@
+// Demo 358: Reader-writer lock state
+//
+// A simplified reader-writer lock: multiple readers XOR one writer.
+// reader_lock increments readers (requires no writer),
+// writer_lock sets writer flag (requires no readers and no writer).
+// Verified: state transitions maintain exclusion invariants.
+
+struct RWLock {
+    readers: u64,
+    writer:  u64,  // 0=no writer, 1=writer held
+}
+
+fn rwl_new() -> RWLock
+    ensures result.readers == 0u64
+    ensures result.writer  == 0u64
+{
+    struct RWLock { readers: 0u64, writer: 0u64 }
+}
+
+fn rwl_read_lock(l: refmut<RWLock>)
+    requires (*l).writer == 0u64
+    ensures  (*l).readers == old((*l).readers) + 1u64
+    ensures  (*l).writer  == 0u64
+{
+    (*l).readers = (*l).readers + 1u64;
+}
+
+fn rwl_read_unlock(l: refmut<RWLock>)
+    requires (*l).readers > 0u64
+    ensures  (*l).readers == old((*l).readers) - 1u64
+    ensures  (*l).writer  == old((*l).writer)
+{
+    (*l).readers = (*l).readers - 1u64;
+}
+
+fn rwl_write_lock(l: refmut<RWLock>)
+    requires (*l).writer  == 0u64
+    requires (*l).readers == 0u64
+    ensures  (*l).writer  == 1u64
+    ensures  (*l).readers == 0u64
+{
+    (*l).writer = 1u64;
+}
+
+fn rwl_write_unlock(l: refmut<RWLock>)
+    requires (*l).writer == 1u64
+    ensures  (*l).writer  == 0u64
+    ensures  (*l).readers == old((*l).readers)
+{
+    (*l).writer = 0u64;
+}
+
+// Three readers: readers is 3
+fn three_readers() -> u64
+    ensures result == 3u64
+{
+    let l: RWLock = rwl_new();
+    rwl_read_lock(&mut l);
+    rwl_read_lock(&mut l);
+    rwl_read_lock(&mut l);
+    l.readers
+}
+
+// Lock then unlock reader: readers back to 0
+fn read_lock_unlock() -> u64
+    ensures result == 0u64
+{
+    let l: RWLock = rwl_new();
+    rwl_read_lock(&mut l);
+    rwl_read_unlock(&mut l);
+    l.readers
+}
+
+// Write lock: writer is 1
+fn write_lock() -> u64
+    ensures result == 1u64
+{
+    let l: RWLock = rwl_new();
+    rwl_write_lock(&mut l);
+    l.writer
+}
+
+// Write lock then unlock: writer is 0
+fn write_lock_unlock() -> u64
+    ensures result == 0u64
+{
+    let l: RWLock = rwl_new();
+    rwl_write_lock(&mut l);
+    rwl_write_unlock(&mut l);
+    l.writer
+}
+
+// Two readers, one unlocks: readers is 1
+fn two_readers_one_unlocks() -> u64
+    ensures result == 1u64
+{
+    let l: RWLock = rwl_new();
+    rwl_read_lock(&mut l);
+    rwl_read_lock(&mut l);
+    rwl_read_unlock(&mut l);
+    l.readers
+}
+
+fn main() -> u64 { 0u64 }

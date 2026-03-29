@@ -1,0 +1,84 @@
+// Demo 478: std::math showcase — all math functions
+//
+// Exercises min64, max64, clamp64, abs_diff, pow64, ceil_div, round_up,
+// gcd64, sat_add, sat_sub, sat_mul, is_pow2, popcount64, floor_log2.
+
+use std::math;
+
+fn check_min() -> u64
+    ensures result == 3u64
+{
+    min64(3u64, 7u64)
+}
+
+fn check_max() -> u64
+    ensures result == 7u64
+{
+    max64(3u64, 7u64)
+}
+
+fn check_clamp() -> u64
+    ensures result == 5u64
+{
+    clamp64(5u64, 1u64, 10u64)
+}
+
+fn check_clamp_lo() -> u64
+    ensures result == 1u64
+{
+    clamp64(0u64, 1u64, 10u64)
+}
+
+fn check_clamp_hi() -> u64
+    ensures result == 10u64
+{
+    clamp64(99u64, 1u64, 10u64)
+}
+
+fn check_abs_diff() -> u64
+    ensures result == 5u64
+{
+    abs_diff(10u64, 5u64)
+}
+
+fn check_pow64() -> u64 {
+    pow64(2u64, 3u64)
+}
+
+fn check_ceil_div() -> u64
+    ensures result == 4u64
+{
+    ceil_div(10u64, 3u64)
+}
+
+fn check_gcd() -> u64 {
+    gcd64(48u64, 18u64)
+}
+
+fn check_sat_overflow() -> u64
+    ensures result == 18446744073709551615u64
+{
+    sat_add(18446744073709551615u64, 1u64)
+}
+
+fn check_sat_sub() -> u64
+    ensures result == 0u64
+{
+    sat_sub(3u64, 10u64)
+}
+
+fn check_is_pow2() -> bool
+    ensures result == true
+{
+    is_pow2(64u64)
+}
+
+fn check_popcount() -> u64 {
+    popcount64(15u64)
+}
+
+fn check_floor_log2() -> u64 {
+    floor_log2(8u64)
+}
+
+fn main() -> u64 { 0u64 }

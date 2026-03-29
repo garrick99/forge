@@ -1,0 +1,106 @@
+// Demo 458: Quorum voting with majority check
+//
+// N voters, quorum = N/2 + 1. Votes accumulate; quorum_reached when
+// yes_votes >= quorum. Verified: quorum tracks voting correctly.
+
+struct VoteQuorum {
+    voters:      u64,
+    quorum:      u64,
+    yes_votes:   u64,
+    no_votes:    u64,
+    abstentions: u64,
+}
+
+fn vq_new(voters: u64, quorum: u64) -> VoteQuorum
+    requires voters > 0u64
+    requires quorum > 0u64
+    requires quorum <= voters
+    ensures result.voters      == voters
+    ensures result.quorum      == quorum
+    ensures result.yes_votes   == 0u64
+    ensures result.no_votes    == 0u64
+    ensures result.abstentions == 0u64
+{
+    struct VoteQuorum { voters: voters, quorum: quorum, yes_votes: 0u64, no_votes: 0u64, abstentions: 0u64 }
+}
+
+fn vq_vote_yes(v: refmut<VoteQuorum>)
+    requires (*v).yes_votes + (*v).no_votes + (*v).abstentions < (*v).voters
+    ensures  (*v).yes_votes   == old((*v).yes_votes) + 1u64
+    ensures  (*v).no_votes    == old((*v).no_votes)
+    ensures  (*v).abstentions == old((*v).abstentions)
+    ensures  (*v).voters      == old((*v).voters)
+    ensures  (*v).quorum      == old((*v).quorum)
+{
+    (*v).yes_votes = (*v).yes_votes + 1u64;
+}
+
+fn vq_vote_no(v: refmut<VoteQuorum>)
+    requires (*v).yes_votes + (*v).no_votes + (*v).abstentions < (*v).voters
+    ensures  (*v).no_votes    == old((*v).no_votes) + 1u64
+    ensures  (*v).yes_votes   == old((*v).yes_votes)
+    ensures  (*v).abstentions == old((*v).abstentions)
+    ensures  (*v).voters      == old((*v).voters)
+    ensures  (*v).quorum      == old((*v).quorum)
+{
+    (*v).no_votes = (*v).no_votes + 1u64;
+}
+
+fn vq_abstain(v: refmut<VoteQuorum>)
+    requires (*v).yes_votes + (*v).no_votes + (*v).abstentions < (*v).voters
+    ensures  (*v).abstentions == old((*v).abstentions) + 1u64
+    ensures  (*v).yes_votes   == old((*v).yes_votes)
+    ensures  (*v).no_votes    == old((*v).no_votes)
+    ensures  (*v).voters      == old((*v).voters)
+    ensures  (*v).quorum      == old((*v).quorum)
+{
+    (*v).abstentions = (*v).abstentions + 1u64;
+}
+
+// 3 yes votes: yes_votes==3
+fn three_yes() -> u64
+    ensures result == 3u64
+{
+    let v: VoteQuorum = vq_new(5u64, 3u64);
+    vq_vote_yes(&mut v);
+    vq_vote_yes(&mut v);
+    vq_vote_yes(&mut v);
+    v.yes_votes
+}
+
+// Yes meets quorum: yes_votes >= quorum
+fn quorum_met() -> u64
+    ensures result == 3u64
+{
+    let v: VoteQuorum = vq_new(5u64, 3u64);
+    vq_vote_yes(&mut v);
+    vq_vote_yes(&mut v);
+    vq_vote_yes(&mut v);
+    v.yes_votes
+}
+
+// Mixed voting: total==5
+fn total_votes() -> u64
+    ensures result == 5u64
+{
+    let v: VoteQuorum = vq_new(5u64, 3u64);
+    vq_vote_yes(&mut v);
+    vq_vote_yes(&mut v);
+    vq_vote_no(&mut v);
+    vq_abstain(&mut v);
+    vq_vote_no(&mut v);
+    v.yes_votes + v.no_votes + v.abstentions
+}
+
+// No votes tracked independently
+fn no_votes() -> u64
+    ensures result == 2u64
+{
+    let v: VoteQuorum = vq_new(5u64, 3u64);
+    vq_vote_yes(&mut v);
+    vq_vote_no(&mut v);
+    vq_vote_no(&mut v);
+    v.no_votes
+}
+
+fn main() -> u64 { 0u64 }

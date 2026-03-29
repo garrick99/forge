@@ -1,0 +1,53 @@
+// Demo 476: Standard library hello — first program using std::io, std::math
+//
+// The "hello world" for Forge: demonstrates actual output via std::io,
+// integer math via std::math, and that the stdlib loads end-to-end.
+//
+// Expected output (when run as C):
+//   Hello from Forge!
+//   42
+//   gcd(48, 18) = 6
+//   sat_add overflow = 18446744073709551615
+//   popcount(255) = 8
+
+use std::io;
+use std::math;
+
+fn main() -> u64 {
+    // "Hello from Forge!\n"
+    putchar(72u64);   // H
+    putchar(101u64);  // e
+    putchar(108u64);  // l
+    putchar(108u64);  // l
+    putchar(111u64);  // o
+    putchar(32u64);   //
+    putchar(102u64);  // f
+    putchar(114u64);  // r
+    putchar(111u64);  // o
+    putchar(109u64);  // m
+    putchar(32u64);   //
+    putchar(70u64);   // F
+    putchar(111u64);  // o
+    putchar(114u64);  // r
+    putchar(103u64);  // g
+    putchar(101u64);  // e
+    putchar(33u64);   // !
+    print_newline();
+
+    // Print 42
+    println_u64(42u64);
+
+    // gcd(48, 18) = 6
+    let g: u64 = gcd64(48u64, 18u64);
+    println_u64(g);
+
+    // sat_add: u64 max + 1 saturates at max
+    let big: u64 = sat_add(18446744073709551615u64, 1u64);
+    println_u64(big);
+
+    // popcount(255) = 8
+    let p: u64 = popcount64(255u64);
+    println_u64(p);
+
+    0u64
+}

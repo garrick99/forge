@@ -1,0 +1,101 @@
+// Demo 410: I/O statistics tracker
+//
+// Tracks read/write bytes and operation counts for a storage device.
+// read_op() and write_op() update both byte counts and op counts.
+// Verified: byte totals and op counts accumulate correctly.
+
+struct IOStats {
+    read_bytes:  u64,
+    write_bytes: u64,
+    read_ops:    u64,
+    write_ops:   u64,
+}
+
+fn io_new() -> IOStats
+    ensures result.read_bytes  == 0u64
+    ensures result.write_bytes == 0u64
+    ensures result.read_ops    == 0u64
+    ensures result.write_ops   == 0u64
+{
+    struct IOStats { read_bytes: 0u64, write_bytes: 0u64, read_ops: 0u64, write_ops: 0u64 }
+}
+
+fn io_read(s: refmut<IOStats>, bytes: u64)
+    requires bytes > 0u64
+    ensures  (*s).read_bytes  == old((*s).read_bytes) + bytes
+    ensures  (*s).read_ops    == old((*s).read_ops) + 1u64
+    ensures  (*s).write_bytes == old((*s).write_bytes)
+    ensures  (*s).write_ops   == old((*s).write_ops)
+{
+    (*s).read_bytes = (*s).read_bytes + bytes;
+    (*s).read_ops   = (*s).read_ops   + 1u64;
+}
+
+fn io_write(s: refmut<IOStats>, bytes: u64)
+    requires bytes > 0u64
+    ensures  (*s).write_bytes == old((*s).write_bytes) + bytes
+    ensures  (*s).write_ops   == old((*s).write_ops) + 1u64
+    ensures  (*s).read_bytes  == old((*s).read_bytes)
+    ensures  (*s).read_ops    == old((*s).read_ops)
+{
+    (*s).write_bytes = (*s).write_bytes + bytes;
+    (*s).write_ops   = (*s).write_ops   + 1u64;
+}
+
+// 3 reads of 512 bytes: read_bytes is 1536
+fn three_reads() -> u64
+    ensures result == 1536u64
+{
+    let s: IOStats = io_new();
+    io_read(&mut s, 512u64);
+    io_read(&mut s, 512u64);
+    io_read(&mut s, 512u64);
+    s.read_bytes
+}
+
+// Mixed IO: total bytes
+fn mixed_total_bytes() -> u64
+    ensures result == 2560u64
+{
+    let s: IOStats = io_new();
+    io_read(&mut s, 512u64);
+    io_read(&mut s, 1024u64);
+    io_write(&mut s, 512u64);
+    io_write(&mut s, 512u64);
+    s.read_bytes + s.write_bytes
+}
+
+// Op counts independent
+fn read_op_count() -> u64
+    ensures result == 2u64
+{
+    let s: IOStats = io_new();
+    io_read(&mut s, 512u64);
+    io_read(&mut s, 1024u64);
+    io_write(&mut s, 512u64);
+    s.read_ops
+}
+
+fn write_op_count() -> u64
+    ensures result == 3u64
+{
+    let s: IOStats = io_new();
+    io_read(&mut s, 512u64);
+    io_write(&mut s, 256u64);
+    io_write(&mut s, 256u64);
+    io_write(&mut s, 512u64);
+    s.write_ops
+}
+
+// Write bytes don't affect read bytes
+fn write_no_read_effect() -> u64
+    ensures result == 512u64
+{
+    let s: IOStats = io_new();
+    io_read(&mut s, 512u64);
+    io_write(&mut s, 1024u64);
+    io_write(&mut s, 2048u64);
+    s.read_bytes
+}
+
+fn main() -> u64 { 0u64 }

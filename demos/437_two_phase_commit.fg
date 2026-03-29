@@ -1,0 +1,123 @@
+// Demo 437: Two-phase commit coordinator state
+//
+// Tracks participant votes and coordinator decisions.
+// Phase 1: collect votes (yes/no). Phase 2: commit if all yes, else abort.
+// Verified: commits only happen when yes_votes == participants.
+
+struct TwoPhaseCommit {
+    participants: u64,
+    yes_votes:    u64,
+    no_votes:     u64,
+    commits:      u64,
+    aborts:       u64,
+}
+
+fn tpc_new(participants: u64) -> TwoPhaseCommit
+    requires participants > 0u64
+    ensures result.participants == participants
+    ensures result.yes_votes    == 0u64
+    ensures result.no_votes     == 0u64
+    ensures result.commits      == 0u64
+    ensures result.aborts       == 0u64
+{
+    struct TwoPhaseCommit { participants: participants, yes_votes: 0u64, no_votes: 0u64, commits: 0u64, aborts: 0u64 }
+}
+
+fn tpc_vote_yes(t: refmut<TwoPhaseCommit>)
+    requires (*t).yes_votes + (*t).no_votes < (*t).participants
+    ensures  (*t).yes_votes    == old((*t).yes_votes) + 1u64
+    ensures  (*t).no_votes     == old((*t).no_votes)
+    ensures  (*t).participants == old((*t).participants)
+    ensures  (*t).commits      == old((*t).commits)
+    ensures  (*t).aborts       == old((*t).aborts)
+{
+    (*t).yes_votes = (*t).yes_votes + 1u64;
+}
+
+fn tpc_vote_no(t: refmut<TwoPhaseCommit>)
+    requires (*t).yes_votes + (*t).no_votes < (*t).participants
+    ensures  (*t).no_votes     == old((*t).no_votes) + 1u64
+    ensures  (*t).yes_votes    == old((*t).yes_votes)
+    ensures  (*t).participants == old((*t).participants)
+    ensures  (*t).commits      == old((*t).commits)
+    ensures  (*t).aborts       == old((*t).aborts)
+{
+    (*t).no_votes = (*t).no_votes + 1u64;
+}
+
+fn tpc_commit(t: refmut<TwoPhaseCommit>)
+    requires (*t).yes_votes == (*t).participants
+    requires (*t).no_votes  == 0u64
+    ensures  (*t).commits      == old((*t).commits) + 1u64
+    ensures  (*t).yes_votes    == 0u64
+    ensures  (*t).no_votes     == 0u64
+    ensures  (*t).participants == old((*t).participants)
+    ensures  (*t).aborts       == old((*t).aborts)
+{
+    (*t).commits   = (*t).commits + 1u64;
+    (*t).yes_votes = 0u64;
+    (*t).no_votes  = 0u64;
+}
+
+fn tpc_abort(t: refmut<TwoPhaseCommit>)
+    requires (*t).no_votes > 0u64
+    ensures  (*t).aborts       == old((*t).aborts) + 1u64
+    ensures  (*t).yes_votes    == 0u64
+    ensures  (*t).no_votes     == 0u64
+    ensures  (*t).participants == old((*t).participants)
+    ensures  (*t).commits      == old((*t).commits)
+{
+    (*t).aborts    = (*t).aborts + 1u64;
+    (*t).yes_votes = 0u64;
+    (*t).no_votes  = 0u64;
+}
+
+// All 3 vote yes: commits==1
+fn all_yes_commits() -> u64
+    ensures result == 1u64
+{
+    let t: TwoPhaseCommit = tpc_new(3u64);
+    tpc_vote_yes(&mut t);
+    tpc_vote_yes(&mut t);
+    tpc_vote_yes(&mut t);
+    tpc_commit(&mut t);
+    t.commits
+}
+
+// One no vote: aborts
+fn one_no_aborts() -> u64
+    ensures result == 1u64
+{
+    let t: TwoPhaseCommit = tpc_new(3u64);
+    tpc_vote_yes(&mut t);
+    tpc_vote_no(&mut t);
+    tpc_abort(&mut t);
+    t.aborts
+}
+
+// Commit clears votes
+fn commit_clears_votes() -> u64
+    ensures result == 0u64
+{
+    let t: TwoPhaseCommit = tpc_new(2u64);
+    tpc_vote_yes(&mut t);
+    tpc_vote_yes(&mut t);
+    tpc_commit(&mut t);
+    t.yes_votes
+}
+
+// Two rounds: 1 commit + 1 abort
+fn two_rounds() -> u64
+    ensures result == 1u64
+{
+    let t: TwoPhaseCommit = tpc_new(2u64);
+    tpc_vote_yes(&mut t);
+    tpc_vote_yes(&mut t);
+    tpc_commit(&mut t);
+    tpc_vote_yes(&mut t);
+    tpc_vote_no(&mut t);
+    tpc_abort(&mut t);
+    t.commits
+}
+
+fn main() -> u64 { 0u64 }

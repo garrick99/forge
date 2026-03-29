@@ -1,0 +1,98 @@
+// Demo 443: Ring counter (Johnson counter / Gray-like)
+//
+// A modulo-N counter with lap tracking.
+// Each tick: value = (value + 1) % modulus. Lap increments on wrap.
+// Verified: value stays in [0, modulus), laps track wraps.
+
+struct RingCounter {
+    value:   u64,
+    modulus: u64,
+    laps:    u64,
+    ticks:   u64,
+}
+
+fn rc_new(modulus: u64) -> RingCounter
+    requires modulus > 1u64
+    ensures result.value   == 0u64
+    ensures result.modulus == modulus
+    ensures result.laps    == 0u64
+    ensures result.ticks   == 0u64
+{
+    struct RingCounter { value: 0u64, modulus: modulus, laps: 0u64, ticks: 0u64 }
+}
+
+fn rc_tick(r: refmut<RingCounter>)
+    requires (*r).value + 1u64 < (*r).modulus
+    ensures  (*r).value   == old((*r).value) + 1u64
+    ensures  (*r).ticks   == old((*r).ticks) + 1u64
+    ensures  (*r).laps    == old((*r).laps)
+    ensures  (*r).modulus == old((*r).modulus)
+{
+    (*r).value = (*r).value + 1u64;
+    (*r).ticks = (*r).ticks + 1u64;
+}
+
+fn rc_tick_wrap(r: refmut<RingCounter>)
+    requires (*r).value + 1u64 == (*r).modulus
+    ensures  (*r).value   == 0u64
+    ensures  (*r).laps    == old((*r).laps) + 1u64
+    ensures  (*r).ticks   == old((*r).ticks) + 1u64
+    ensures  (*r).modulus == old((*r).modulus)
+{
+    (*r).value = 0u64;
+    (*r).laps  = (*r).laps  + 1u64;
+    (*r).ticks = (*r).ticks + 1u64;
+}
+
+// 3 ticks on modulus=5: value==3
+fn three_ticks() -> u64
+    ensures result == 3u64
+{
+    let r: RingCounter = rc_new(5u64);
+    rc_tick(&mut r);
+    rc_tick(&mut r);
+    rc_tick(&mut r);
+    r.value
+}
+
+// Wrap resets value to 0
+fn wrap_resets() -> u64
+    ensures result == 0u64
+{
+    let r: RingCounter = rc_new(4u64);
+    rc_tick(&mut r);
+    rc_tick(&mut r);
+    rc_tick(&mut r);
+    rc_tick_wrap(&mut r);
+    r.value
+}
+
+// Two laps
+fn two_laps() -> u64
+    ensures result == 2u64
+{
+    let r: RingCounter = rc_new(3u64);
+    rc_tick(&mut r);
+    rc_tick(&mut r);
+    rc_tick_wrap(&mut r);
+    rc_tick(&mut r);
+    rc_tick(&mut r);
+    rc_tick_wrap(&mut r);
+    r.laps
+}
+
+// Total ticks across laps
+fn total_ticks() -> u64
+    ensures result == 6u64
+{
+    let r: RingCounter = rc_new(3u64);
+    rc_tick(&mut r);
+    rc_tick(&mut r);
+    rc_tick_wrap(&mut r);
+    rc_tick(&mut r);
+    rc_tick(&mut r);
+    rc_tick_wrap(&mut r);
+    r.ticks
+}
+
+fn main() -> u64 { 0u64 }

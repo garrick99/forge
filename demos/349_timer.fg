@@ -1,0 +1,106 @@
+// Demo 349: Timer with start/tick/reset
+//
+// A software timer: tick increments elapsed when running,
+// start/stop control the running state, reset zeroes elapsed.
+// Verified: elapsed tracks ticks precisely.
+
+struct Timer {
+    elapsed: u64,
+    running: u64,  // 0=stopped, 1=running
+    ticks:   u64,  // total ticks ever
+}
+
+fn timer_new() -> Timer
+    ensures result.elapsed == 0u64
+    ensures result.running == 0u64
+    ensures result.ticks   == 0u64
+{
+    struct Timer { elapsed: 0u64, running: 0u64, ticks: 0u64 }
+}
+
+fn timer_start(t: refmut<Timer>)
+    requires (*t).running == 0u64
+    ensures  (*t).running == 1u64
+    ensures  (*t).elapsed == old((*t).elapsed)
+    ensures  (*t).ticks   == old((*t).ticks)
+{
+    (*t).running = 1u64;
+}
+
+fn timer_stop(t: refmut<Timer>)
+    requires (*t).running == 1u64
+    ensures  (*t).running == 0u64
+    ensures  (*t).elapsed == old((*t).elapsed)
+    ensures  (*t).ticks   == old((*t).ticks)
+{
+    (*t).running = 0u64;
+}
+
+fn timer_tick(t: refmut<Timer>)
+    requires (*t).running == 1u64
+    ensures  (*t).elapsed == old((*t).elapsed) + 1u64
+    ensures  (*t).ticks   == old((*t).ticks)   + 1u64
+    ensures  (*t).running == 1u64
+{
+    (*t).elapsed = (*t).elapsed + 1u64;
+    (*t).ticks   = (*t).ticks   + 1u64;
+}
+
+fn timer_reset(t: refmut<Timer>)
+    ensures (*t).elapsed == 0u64
+    ensures (*t).running == old((*t).running)
+    ensures (*t).ticks   == old((*t).ticks)
+{
+    (*t).elapsed = 0u64;
+}
+
+// Start + 3 ticks: elapsed is 3
+fn three_ticks() -> u64
+    ensures result == 3u64
+{
+    let t: Timer = timer_new();
+    timer_start(&mut t);
+    timer_tick(&mut t);
+    timer_tick(&mut t);
+    timer_tick(&mut t);
+    t.elapsed
+}
+
+// Ticks also counted in ticks field
+fn ticks_field() -> u64
+    ensures result == 3u64
+{
+    let t: Timer = timer_new();
+    timer_start(&mut t);
+    timer_tick(&mut t);
+    timer_tick(&mut t);
+    timer_tick(&mut t);
+    t.ticks
+}
+
+// Start, tick 2, stop, reset: elapsed is 0, ticks preserved
+fn tick_stop_reset_elapsed() -> u64
+    ensures result == 0u64
+{
+    let t: Timer = timer_new();
+    timer_start(&mut t);
+    timer_tick(&mut t);
+    timer_tick(&mut t);
+    timer_stop(&mut t);
+    timer_reset(&mut t);
+    t.elapsed
+}
+
+fn tick_stop_reset_ticks() -> u64
+    ensures result == 2u64
+{
+    let t: Timer = timer_new();
+    timer_start(&mut t);
+    timer_tick(&mut t);
+    timer_tick(&mut t);
+    timer_stop(&mut t);
+    timer_reset(&mut t);
+    t.ticks
+}
+
+fn main() -> u64 { 0u64 }

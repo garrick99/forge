@@ -1,0 +1,105 @@
+// Demo 377: Windowed sum with fixed window size
+//
+// A sliding-window accumulator: add_sample() updates the sum and
+// sample count. When count reaches the window size, a flush resets
+// the window. Verified: sum and count track samples correctly.
+
+struct WindowSum {
+    sum:        u64,
+    count:      u64,
+    window_sz:  u64,
+    flushes:    u64,
+}
+
+fn ws_new(window_sz: u64) -> WindowSum
+    requires window_sz > 0u64
+    ensures result.sum       == 0u64
+    ensures result.count     == 0u64
+    ensures result.window_sz == window_sz
+    ensures result.flushes   == 0u64
+{
+    struct WindowSum { sum: 0u64, count: 0u64, window_sz: window_sz, flushes: 0u64 }
+}
+
+fn ws_add(w: refmut<WindowSum>, v: u64)
+    requires (*w).count < (*w).window_sz
+    ensures  (*w).sum       == old((*w).sum) + v
+    ensures  (*w).count     == old((*w).count) + 1u64
+    ensures  (*w).window_sz == old((*w).window_sz)
+    ensures  (*w).flushes   == old((*w).flushes)
+{
+    (*w).sum   = (*w).sum + v;
+    (*w).count = (*w).count + 1u64;
+}
+
+fn ws_flush(w: refmut<WindowSum>)
+    ensures (*w).sum     == 0u64
+    ensures (*w).count   == 0u64
+    ensures (*w).flushes == old((*w).flushes) + 1u64
+    ensures (*w).window_sz == old((*w).window_sz)
+{
+    (*w).sum     = 0u64;
+    (*w).count   = 0u64;
+    (*w).flushes = (*w).flushes + 1u64;
+}
+
+// Add 3 samples: sum is 10 + 20 + 30 = 60
+fn three_samples() -> u64
+    ensures result == 60u64
+{
+    let w: WindowSum = ws_new(5u64);
+    ws_add(&mut w, 10u64);
+    ws_add(&mut w, 20u64);
+    ws_add(&mut w, 30u64);
+    w.sum
+}
+
+// Count after 3 adds is 3
+fn sample_count() -> u64
+    ensures result == 3u64
+{
+    let w: WindowSum = ws_new(5u64);
+    ws_add(&mut w, 10u64);
+    ws_add(&mut w, 20u64);
+    ws_add(&mut w, 30u64);
+    w.count
+}
+
+// After flush: sum is 0, flushes is 1
+fn flush_resets_sum() -> u64
+    ensures result == 0u64
+{
+    let w: WindowSum = ws_new(5u64);
+    ws_add(&mut w, 10u64);
+    ws_add(&mut w, 20u64);
+    ws_flush(&mut w);
+    w.sum
+}
+
+fn flush_count() -> u64
+    ensures result == 1u64
+{
+    let w: WindowSum = ws_new(5u64);
+    ws_add(&mut w, 10u64);
+    ws_add(&mut w, 20u64);
+    ws_flush(&mut w);
+    w.flushes
+}
+
+// Two window cycles
+fn two_windows_flushes() -> u64
+    ensures result == 2u64
+{
+    let w: WindowSum = ws_new(3u64);
+    ws_add(&mut w, 1u64);
+    ws_add(&mut w, 2u64);
+    ws_add(&mut w, 3u64);
+    ws_flush(&mut w);
+    ws_add(&mut w, 4u64);
+    ws_add(&mut w, 5u64);
+    ws_add(&mut w, 6u64);
+    ws_flush(&mut w);
+    w.flushes
+}
+
+fn main() -> u64 { 0u64 }

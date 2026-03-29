@@ -1,0 +1,93 @@
+// Demo 375: Shift register state tracker
+//
+// A 3-stage shift register: shift_in loads a new value into stage 0,
+// shifting stage 0→1, stage 1→2. Each shift increments the shift count.
+// Verified: stages track the pipeline of values via old() chaining.
+
+struct ShiftReg {
+    s0:     u64,
+    s1:     u64,
+    s2:     u64,
+    shifts: u64,
+}
+
+fn sr_new() -> ShiftReg
+    ensures result.s0     == 0u64
+    ensures result.s1     == 0u64
+    ensures result.s2     == 0u64
+    ensures result.shifts == 0u64
+{
+    struct ShiftReg { s0: 0u64, s1: 0u64, s2: 0u64, shifts: 0u64 }
+}
+
+fn sr_shift(r: refmut<ShiftReg>, v: u64)
+    ensures (*r).s2     == old((*r).s1)
+    ensures (*r).s1     == old((*r).s0)
+    ensures (*r).s0     == v
+    ensures (*r).shifts == old((*r).shifts) + 1u64
+{
+    (*r).s2 = (*r).s1;
+    (*r).s1 = (*r).s0;
+    (*r).s0 = v;
+    (*r).shifts = (*r).shifts + 1u64;
+}
+
+// Shift in 7: s0 is 7, s1 and s2 are 0
+fn shift_in_7_s0() -> u64
+    ensures result == 7u64
+{
+    let r: ShiftReg = sr_new();
+    sr_shift(&mut r, 7u64);
+    r.s0
+}
+
+fn shift_in_7_s1() -> u64
+    ensures result == 0u64
+{
+    let r: ShiftReg = sr_new();
+    sr_shift(&mut r, 7u64);
+    r.s1
+}
+
+// Shift 5 then 9: s0=9, s1=5
+fn two_shifts_s0() -> u64
+    ensures result == 9u64
+{
+    let r: ShiftReg = sr_new();
+    sr_shift(&mut r, 5u64);
+    sr_shift(&mut r, 9u64);
+    r.s0
+}
+
+fn two_shifts_s1() -> u64
+    ensures result == 5u64
+{
+    let r: ShiftReg = sr_new();
+    sr_shift(&mut r, 5u64);
+    sr_shift(&mut r, 9u64);
+    r.s1
+}
+
+// Three shifts: s0=3, s1=2, s2=1
+fn three_shifts_s2() -> u64
+    ensures result == 1u64
+{
+    let r: ShiftReg = sr_new();
+    sr_shift(&mut r, 1u64);
+    sr_shift(&mut r, 2u64);
+    sr_shift(&mut r, 3u64);
+    r.s2
+}
+
+// Shift count tracks shifts
+fn shift_count() -> u64
+    ensures result == 3u64
+{
+    let r: ShiftReg = sr_new();
+    sr_shift(&mut r, 1u64);
+    sr_shift(&mut r, 2u64);
+    sr_shift(&mut r, 3u64);
+    r.shifts
+}
+
+fn main() -> u64 { 0u64 }

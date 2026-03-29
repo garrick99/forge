@@ -1,0 +1,118 @@
+// Demo 470: Memory hierarchy L1/L2/L3 cache hit tracking
+//
+// Request goes to L1 first. On L1 miss, goes to L2, then L3, then DRAM.
+// Verified: hits at each level plus misses sum to total_requests.
+
+struct MemoryHierarchy {
+    l1_hits:       u64,
+    l2_hits:       u64,
+    l3_hits:       u64,
+    dram_accesses: u64,
+    total_requests: u64,
+}
+
+fn mh_new() -> MemoryHierarchy
+    ensures result.l1_hits        == 0u64
+    ensures result.l2_hits        == 0u64
+    ensures result.l3_hits        == 0u64
+    ensures result.dram_accesses  == 0u64
+    ensures result.total_requests == 0u64
+{
+    struct MemoryHierarchy { l1_hits: 0u64, l2_hits: 0u64, l3_hits: 0u64, dram_accesses: 0u64, total_requests: 0u64 }
+}
+
+fn mh_l1_hit(m: refmut<MemoryHierarchy>)
+    ensures (*m).l1_hits        == old((*m).l1_hits) + 1u64
+    ensures (*m).total_requests == old((*m).total_requests) + 1u64
+    ensures (*m).l2_hits        == old((*m).l2_hits)
+    ensures (*m).l3_hits        == old((*m).l3_hits)
+    ensures (*m).dram_accesses  == old((*m).dram_accesses)
+{
+    (*m).l1_hits        = (*m).l1_hits        + 1u64;
+    (*m).total_requests = (*m).total_requests + 1u64;
+}
+
+fn mh_l2_hit(m: refmut<MemoryHierarchy>)
+    ensures (*m).l2_hits        == old((*m).l2_hits) + 1u64
+    ensures (*m).total_requests == old((*m).total_requests) + 1u64
+    ensures (*m).l1_hits        == old((*m).l1_hits)
+    ensures (*m).l3_hits        == old((*m).l3_hits)
+    ensures (*m).dram_accesses  == old((*m).dram_accesses)
+{
+    (*m).l2_hits        = (*m).l2_hits        + 1u64;
+    (*m).total_requests = (*m).total_requests + 1u64;
+}
+
+fn mh_l3_hit(m: refmut<MemoryHierarchy>)
+    ensures (*m).l3_hits        == old((*m).l3_hits) + 1u64
+    ensures (*m).total_requests == old((*m).total_requests) + 1u64
+    ensures (*m).l1_hits        == old((*m).l1_hits)
+    ensures (*m).l2_hits        == old((*m).l2_hits)
+    ensures (*m).dram_accesses  == old((*m).dram_accesses)
+{
+    (*m).l3_hits        = (*m).l3_hits        + 1u64;
+    (*m).total_requests = (*m).total_requests + 1u64;
+}
+
+fn mh_dram(m: refmut<MemoryHierarchy>)
+    ensures (*m).dram_accesses  == old((*m).dram_accesses) + 1u64
+    ensures (*m).total_requests == old((*m).total_requests) + 1u64
+    ensures (*m).l1_hits        == old((*m).l1_hits)
+    ensures (*m).l2_hits        == old((*m).l2_hits)
+    ensures (*m).l3_hits        == old((*m).l3_hits)
+{
+    (*m).dram_accesses  = (*m).dram_accesses  + 1u64;
+    (*m).total_requests = (*m).total_requests + 1u64;
+}
+
+// 5 L1 hits: l1_hits==5
+fn l1_hits() -> u64
+    ensures result == 5u64
+{
+    let m: MemoryHierarchy = mh_new();
+    mh_l1_hit(&mut m);
+    mh_l1_hit(&mut m);
+    mh_l1_hit(&mut m);
+    mh_l1_hit(&mut m);
+    mh_l1_hit(&mut m);
+    m.l1_hits
+}
+
+// Mixed hierarchy: total==4
+fn mixed_total() -> u64
+    ensures result == 4u64
+{
+    let m: MemoryHierarchy = mh_new();
+    mh_l1_hit(&mut m);
+    mh_l2_hit(&mut m);
+    mh_l3_hit(&mut m);
+    mh_dram(&mut m);
+    m.total_requests
+}
+
+// All levels sum to total
+fn level_sum() -> u64
+    ensures result == 0u64
+{
+    let m: MemoryHierarchy = mh_new();
+    mh_l1_hit(&mut m);
+    mh_l1_hit(&mut m);
+    mh_l2_hit(&mut m);
+    mh_l3_hit(&mut m);
+    mh_dram(&mut m);
+    m.total_requests - m.l1_hits - m.l2_hits - m.l3_hits - m.dram_accesses
+}
+
+// DRAM tracked independently
+fn dram_tracked() -> u64
+    ensures result == 2u64
+{
+    let m: MemoryHierarchy = mh_new();
+    mh_l1_hit(&mut m);
+    mh_l1_hit(&mut m);
+    mh_dram(&mut m);
+    mh_dram(&mut m);
+    m.dram_accesses
+}
+
+fn main() -> u64 { 0u64 }

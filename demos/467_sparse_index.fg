@@ -1,0 +1,116 @@
+// Demo 467: Sparse index with bucket tracking
+//
+// Keys hash into one of three buckets. Each insert increments bucket count.
+// Verified: bucket_a + bucket_b + bucket_c == total_inserts.
+
+struct SparseIndex {
+    bucket_a:      u64,
+    bucket_b:      u64,
+    bucket_c:      u64,
+    total_inserts: u64,
+    total_lookups: u64,
+}
+
+fn si_new() -> SparseIndex
+    ensures result.bucket_a      == 0u64
+    ensures result.bucket_b      == 0u64
+    ensures result.bucket_c      == 0u64
+    ensures result.total_inserts == 0u64
+    ensures result.total_lookups == 0u64
+{
+    struct SparseIndex { bucket_a: 0u64, bucket_b: 0u64, bucket_c: 0u64, total_inserts: 0u64, total_lookups: 0u64 }
+}
+
+fn si_insert_a(s: refmut<SparseIndex>)
+    ensures (*s).bucket_a      == old((*s).bucket_a) + 1u64
+    ensures (*s).total_inserts == old((*s).total_inserts) + 1u64
+    ensures (*s).bucket_b      == old((*s).bucket_b)
+    ensures (*s).bucket_c      == old((*s).bucket_c)
+    ensures (*s).total_lookups == old((*s).total_lookups)
+{
+    (*s).bucket_a      = (*s).bucket_a      + 1u64;
+    (*s).total_inserts = (*s).total_inserts + 1u64;
+}
+
+fn si_insert_b(s: refmut<SparseIndex>)
+    ensures (*s).bucket_b      == old((*s).bucket_b) + 1u64
+    ensures (*s).total_inserts == old((*s).total_inserts) + 1u64
+    ensures (*s).bucket_a      == old((*s).bucket_a)
+    ensures (*s).bucket_c      == old((*s).bucket_c)
+    ensures (*s).total_lookups == old((*s).total_lookups)
+{
+    (*s).bucket_b      = (*s).bucket_b      + 1u64;
+    (*s).total_inserts = (*s).total_inserts + 1u64;
+}
+
+fn si_insert_c(s: refmut<SparseIndex>)
+    ensures (*s).bucket_c      == old((*s).bucket_c) + 1u64
+    ensures (*s).total_inserts == old((*s).total_inserts) + 1u64
+    ensures (*s).bucket_a      == old((*s).bucket_a)
+    ensures (*s).bucket_b      == old((*s).bucket_b)
+    ensures (*s).total_lookups == old((*s).total_lookups)
+{
+    (*s).bucket_c      = (*s).bucket_c      + 1u64;
+    (*s).total_inserts = (*s).total_inserts + 1u64;
+}
+
+fn si_lookup(s: refmut<SparseIndex>)
+    ensures (*s).total_lookups == old((*s).total_lookups) + 1u64
+    ensures (*s).bucket_a      == old((*s).bucket_a)
+    ensures (*s).bucket_b      == old((*s).bucket_b)
+    ensures (*s).bucket_c      == old((*s).bucket_c)
+    ensures (*s).total_inserts == old((*s).total_inserts)
+{
+    (*s).total_lookups = (*s).total_lookups + 1u64;
+}
+
+// Insert 3 into bucket A: bucket_a==3
+fn bucket_a_3() -> u64
+    ensures result == 3u64
+{
+    let s: SparseIndex = si_new();
+    si_insert_a(&mut s);
+    si_insert_a(&mut s);
+    si_insert_a(&mut s);
+    s.bucket_a
+}
+
+// Total inserts across buckets
+fn total_inserts() -> u64
+    ensures result == 6u64
+{
+    let s: SparseIndex = si_new();
+    si_insert_a(&mut s);
+    si_insert_a(&mut s);
+    si_insert_b(&mut s);
+    si_insert_b(&mut s);
+    si_insert_c(&mut s);
+    si_insert_c(&mut s);
+    s.total_inserts
+}
+
+// Bucket sum invariant
+fn bucket_sum() -> u64
+    ensures result == 0u64
+{
+    let s: SparseIndex = si_new();
+    si_insert_a(&mut s);
+    si_insert_b(&mut s);
+    si_insert_b(&mut s);
+    si_insert_c(&mut s);
+    s.total_inserts - s.bucket_a - s.bucket_b - s.bucket_c
+}
+
+// Lookups independent
+fn lookups_independent() -> u64
+    ensures result == 3u64
+{
+    let s: SparseIndex = si_new();
+    si_insert_a(&mut s);
+    si_lookup(&mut s);
+    si_lookup(&mut s);
+    si_lookup(&mut s);
+    s.total_lookups
+}
+
+fn main() -> u64 { 0u64 }

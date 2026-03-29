@@ -1,0 +1,111 @@
+// Demo 428: Retry with exponential backoff state
+//
+// Tracks retry count and current delay (doubles each retry up to max_delay).
+// reset() clears after success. Verified: delay doubles correctly, retries track.
+
+struct RetryState {
+    retries:   u64,
+    delay:     u64,
+    max_delay: u64,
+    successes: u64,
+}
+
+fn retry_new(initial_delay: u64, max_delay: u64) -> RetryState
+    requires initial_delay > 0u64
+    requires max_delay >= initial_delay
+    ensures result.retries   == 0u64
+    ensures result.delay     == initial_delay
+    ensures result.max_delay == max_delay
+    ensures result.successes == 0u64
+{
+    struct RetryState { retries: 0u64, delay: initial_delay, max_delay: max_delay, successes: 0u64 }
+}
+
+fn retry_fail(r: refmut<RetryState>)
+    requires (*r).delay * 2u64 <= (*r).max_delay
+    ensures  (*r).retries   == old((*r).retries) + 1u64
+    ensures  (*r).delay     == old((*r).delay) * 2u64
+    ensures  (*r).max_delay == old((*r).max_delay)
+    ensures  (*r).successes == old((*r).successes)
+{
+    (*r).retries = (*r).retries + 1u64;
+    (*r).delay   = (*r).delay   * 2u64;
+}
+
+fn retry_fail_capped(r: refmut<RetryState>)
+    requires (*r).delay * 2u64 > (*r).max_delay
+    ensures  (*r).retries   == old((*r).retries) + 1u64
+    ensures  (*r).delay     == (*r).max_delay
+    ensures  (*r).max_delay == old((*r).max_delay)
+    ensures  (*r).successes == old((*r).successes)
+{
+    (*r).retries = (*r).retries + 1u64;
+    (*r).delay   = (*r).max_delay;
+}
+
+fn retry_success(r: refmut<RetryState>, initial_delay: u64)
+    requires initial_delay > 0u64
+    ensures  (*r).successes == old((*r).successes) + 1u64
+    ensures  (*r).retries   == 0u64
+    ensures  (*r).delay     == initial_delay
+    ensures  (*r).max_delay == old((*r).max_delay)
+{
+    (*r).successes = (*r).successes + 1u64;
+    (*r).retries   = 0u64;
+    (*r).delay     = initial_delay;
+}
+
+// After 1 fail with initial=1, max=16: delay==2
+fn one_fail_delay() -> u64
+    ensures result == 2u64
+{
+    let r: RetryState = retry_new(1u64, 16u64);
+    retry_fail(&mut r);
+    r.delay
+}
+
+// After 2 fails: delay==4
+fn two_fail_delay() -> u64
+    ensures result == 4u64
+{
+    let r: RetryState = retry_new(1u64, 16u64);
+    retry_fail(&mut r);
+    retry_fail(&mut r);
+    r.delay
+}
+
+// After 3 fails: delay==8
+fn three_fail_delay() -> u64
+    ensures result == 8u64
+{
+    let r: RetryState = retry_new(1u64, 16u64);
+    retry_fail(&mut r);
+    retry_fail(&mut r);
+    retry_fail(&mut r);
+    r.delay
+}
+
+// Success resets retries
+fn success_resets() -> u64
+    ensures result == 0u64
+{
+    let r: RetryState = retry_new(1u64, 16u64);
+    retry_fail(&mut r);
+    retry_fail(&mut r);
+    retry_success(&mut r, 1u64);
+    r.retries
+}
+
+// Success resets delay
+fn success_resets_delay() -> u64
+    ensures result == 1u64
+{
+    let r: RetryState = retry_new(1u64, 16u64);
+    retry_fail(&mut r);
+    retry_fail(&mut r);
+    retry_fail(&mut r);
+    retry_success(&mut r, 1u64);
+    r.delay
+}
+
+fn main() -> u64 { 0u64 }

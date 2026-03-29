@@ -1,0 +1,122 @@
+// Demo 417: VNode reference counting (filesystem inode model)
+//
+// A vnode has a reference count and dirty flag. get() increments refs,
+// put() decrements refs. dirty_set() marks it dirty; writeback() clears.
+// Verified: ref count and dirty state track all operations.
+
+struct VNode {
+    refcount: u64,
+    dirty:    u64,
+    writes:   u64,
+    writebacks: u64,
+}
+
+fn vnode_new() -> VNode
+    ensures result.refcount   == 0u64
+    ensures result.dirty      == 0u64
+    ensures result.writes     == 0u64
+    ensures result.writebacks == 0u64
+{
+    struct VNode { refcount: 0u64, dirty: 0u64, writes: 0u64, writebacks: 0u64 }
+}
+
+fn vnode_get(v: refmut<VNode>)
+    ensures (*v).refcount   == old((*v).refcount) + 1u64
+    ensures (*v).dirty      == old((*v).dirty)
+    ensures (*v).writes     == old((*v).writes)
+    ensures (*v).writebacks == old((*v).writebacks)
+{
+    (*v).refcount = (*v).refcount + 1u64;
+}
+
+fn vnode_put(v: refmut<VNode>)
+    requires (*v).refcount > 0u64
+    ensures  (*v).refcount   == old((*v).refcount) - 1u64
+    ensures  (*v).dirty      == old((*v).dirty)
+    ensures  (*v).writes     == old((*v).writes)
+    ensures  (*v).writebacks == old((*v).writebacks)
+{
+    (*v).refcount = (*v).refcount - 1u64;
+}
+
+fn vnode_write(v: refmut<VNode>)
+    requires (*v).refcount > 0u64
+    ensures  (*v).dirty  == 1u64
+    ensures  (*v).writes == old((*v).writes) + 1u64
+    ensures  (*v).refcount   == old((*v).refcount)
+    ensures  (*v).writebacks == old((*v).writebacks)
+{
+    (*v).dirty  = 1u64;
+    (*v).writes = (*v).writes + 1u64;
+}
+
+fn vnode_writeback(v: refmut<VNode>)
+    requires (*v).dirty == 1u64
+    ensures  (*v).dirty      == 0u64
+    ensures  (*v).writebacks == old((*v).writebacks) + 1u64
+    ensures  (*v).refcount   == old((*v).refcount)
+    ensures  (*v).writes     == old((*v).writes)
+{
+    (*v).dirty      = 0u64;
+    (*v).writebacks = (*v).writebacks + 1u64;
+}
+
+// Get 3 times: refcount is 3
+fn get_three() -> u64
+    ensures result == 3u64
+{
+    let v: VNode = vnode_new();
+    vnode_get(&mut v);
+    vnode_get(&mut v);
+    vnode_get(&mut v);
+    v.refcount
+}
+
+// Get 3, put 1: refcount is 2
+fn get3_put1() -> u64
+    ensures result == 2u64
+{
+    let v: VNode = vnode_new();
+    vnode_get(&mut v);
+    vnode_get(&mut v);
+    vnode_get(&mut v);
+    vnode_put(&mut v);
+    v.refcount
+}
+
+// Write makes dirty
+fn write_dirty() -> u64
+    ensures result == 1u64
+{
+    let v: VNode = vnode_new();
+    vnode_get(&mut v);
+    vnode_write(&mut v);
+    v.dirty
+}
+
+// Write then writeback: dirty is 0
+fn writeback_clears() -> u64
+    ensures result == 0u64
+{
+    let v: VNode = vnode_new();
+    vnode_get(&mut v);
+    vnode_write(&mut v);
+    vnode_writeback(&mut v);
+    v.dirty
+}
+
+// Write count and writeback count
+fn write_writeback_counts() -> u64
+    ensures result == 3u64
+{
+    let v: VNode = vnode_new();
+    vnode_get(&mut v);
+    vnode_write(&mut v);
+    vnode_writeback(&mut v);
+    vnode_write(&mut v);
+    vnode_writeback(&mut v);
+    vnode_write(&mut v);
+    v.writes
+}
+
+fn main() -> u64 { 0u64 }

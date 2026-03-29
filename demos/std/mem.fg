@@ -1,0 +1,177 @@
+// std/mem.fg — memory and span utilities
+//
+// Include with:  use std::mem;
+//
+// Provides span-level operations with Z3-verified bounds.
+// Spans are passed by value: elements are mutable (pointer semantics),
+// but the span's length field is fixed.
+// Raw allocation via malloc/free is in prelude.fg.
+
+use prelude;
+
+// ---- Span fill and copy ----------------------------------------------------
+
+// Fill the first n elements of dst with value v.
+fn span_fill_u8(dst: span<u8>, v: u8, n: u64)
+    requires n <= dst.len
+    ensures  forall k: u64, k < n ==> dst[k] == v
+{
+    let i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant n <= dst.len
+        invariant forall k: u64, k < i ==> dst[k] == v
+        decreases n - i
+    {
+        dst[i] = v;
+        i = i + 1u64;
+    }
+}
+
+// Zero the first n elements of dst.
+fn span_zero_u8(dst: span<u8>, n: u64)
+    requires n <= dst.len
+    ensures  forall k: u64, k < n ==> dst[k] == 0u8
+{
+    let i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant n <= dst.len
+        invariant forall k: u64, k < i ==> dst[k] == 0u8
+        decreases n - i
+    {
+        dst[i] = 0u8;
+        i = i + 1u64;
+    }
+}
+
+// Copy n bytes from src to dst (non-overlapping assumed by caller).
+fn span_copy_u8(dst: span<u8>, src: span<u8>, n: u64)
+    requires n <= dst.len
+    requires n <= src.len
+    ensures  forall k: u64, k < n ==> dst[k] == src[k]
+{
+    let i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant n <= dst.len
+        invariant n <= src.len
+        invariant forall k: u64, k < i ==> dst[k] == src[k]
+        decreases n - i
+    {
+        dst[i] = src[i];
+        i = i + 1u64;
+    }
+}
+
+// Compare n bytes of two spans.  Returns true if all equal.
+fn span_eq_u8(a: span<u8>, b: span<u8>, n: u64) -> bool
+    requires n <= a.len
+    requires n <= b.len
+{
+    let i: u64 = 0u64;
+    let equal: bool = true;
+    while i < n && equal
+        invariant i <= n
+        invariant n <= a.len
+        invariant n <= b.len
+        decreases n - i
+    {
+        if a[i] != b[i] {
+            equal = false;
+        };
+        i = i + 1u64;
+    };
+    equal
+}
+
+// ---- Span u64 utilities ----------------------------------------------------
+
+fn span_fill_u64(dst: span<u64>, v: u64, n: u64)
+    requires n <= dst.len
+    ensures  forall k: u64, k < n ==> dst[k] == v
+{
+    let i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant n <= dst.len
+        invariant forall k: u64, k < i ==> dst[k] == v
+        decreases n - i
+    {
+        dst[i] = v;
+        i = i + 1u64;
+    }
+}
+
+fn span_copy_u64(dst: span<u64>, src: span<u64>, n: u64)
+    requires n <= dst.len
+    requires n <= src.len
+    ensures  forall k: u64, k < n ==> dst[k] == src[k]
+{
+    let i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant n <= dst.len
+        invariant n <= src.len
+        invariant forall k: u64, k < i ==> dst[k] == src[k]
+        decreases n - i
+    {
+        dst[i] = src[i];
+        i = i + 1u64;
+    }
+}
+
+// Sum of first n elements of a u64 span.
+fn span_sum(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+    ensures  n == 0u64 ==> result == 0u64
+{
+    let acc: u64 = 0u64;
+    let i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant n <= s.len
+        invariant n == 0u64 ==> acc == 0u64
+        decreases n - i
+    {
+        acc = acc + s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+// Maximum of first n elements (requires n >= 1).
+fn span_max(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+{
+    let m: u64 = s[0u64];
+    let i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant n <= s.len
+        decreases n - i
+    {
+        if s[i] > m { m = s[i]; };
+        i = i + 1u64;
+    };
+    m
+}
+
+// Minimum of first n elements (requires n >= 1).
+fn span_min(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+{
+    let m: u64 = s[0u64];
+    let i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant n <= s.len
+        decreases n - i
+    {
+        if s[i] < m { m = s[i]; };
+        i = i + 1u64;
+    };
+    m
+}

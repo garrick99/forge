@@ -1,0 +1,87 @@
+// Demo 441: Fan-out dispatcher with subscriber tracking
+//
+// A message is dispatched to N subscribers.
+// dispatched tracks total messages sent; each subscriber gets a share.
+// Verified: sub_a + sub_b + sub_c == dispatched (for 3-subscriber fan-out).
+
+struct FanOut {
+    dispatched: u64,
+    sub_a:      u64,
+    sub_b:      u64,
+    sub_c:      u64,
+}
+
+fn fo_new() -> FanOut
+    ensures result.dispatched == 0u64
+    ensures result.sub_a      == 0u64
+    ensures result.sub_b      == 0u64
+    ensures result.sub_c      == 0u64
+{
+    struct FanOut { dispatched: 0u64, sub_a: 0u64, sub_b: 0u64, sub_c: 0u64 }
+}
+
+fn fo_dispatch(f: refmut<FanOut>)
+    ensures (*f).dispatched == old((*f).dispatched) + 3u64
+    ensures (*f).sub_a      == old((*f).sub_a) + 1u64
+    ensures (*f).sub_b      == old((*f).sub_b) + 1u64
+    ensures (*f).sub_c      == old((*f).sub_c) + 1u64
+{
+    (*f).dispatched = (*f).dispatched + 3u64;
+    (*f).sub_a      = (*f).sub_a      + 1u64;
+    (*f).sub_b      = (*f).sub_b      + 1u64;
+    (*f).sub_c      = (*f).sub_c      + 1u64;
+}
+
+fn fo_dispatch_ab(f: refmut<FanOut>)
+    ensures (*f).dispatched == old((*f).dispatched) + 2u64
+    ensures (*f).sub_a      == old((*f).sub_a) + 1u64
+    ensures (*f).sub_b      == old((*f).sub_b) + 1u64
+    ensures (*f).sub_c      == old((*f).sub_c)
+{
+    (*f).dispatched = (*f).dispatched + 2u64;
+    (*f).sub_a      = (*f).sub_a      + 1u64;
+    (*f).sub_b      = (*f).sub_b      + 1u64;
+}
+
+// 2 full dispatches: dispatched==6
+fn two_dispatches() -> u64
+    ensures result == 6u64
+{
+    let f: FanOut = fo_new();
+    fo_dispatch(&mut f);
+    fo_dispatch(&mut f);
+    f.dispatched
+}
+
+// Each sub gets 2 after 2 dispatches
+fn sub_a_count() -> u64
+    ensures result == 2u64
+{
+    let f: FanOut = fo_new();
+    fo_dispatch(&mut f);
+    fo_dispatch(&mut f);
+    f.sub_a
+}
+
+// Partial dispatch: sub_c not incremented
+fn partial_no_c() -> u64
+    ensures result == 0u64
+{
+    let f: FanOut = fo_new();
+    fo_dispatch_ab(&mut f);
+    fo_dispatch_ab(&mut f);
+    f.sub_c
+}
+
+// Sum invariant: sub_a + sub_b + sub_c == dispatched
+fn sum_invariant() -> u64
+    ensures result == 0u64
+{
+    let f: FanOut = fo_new();
+    fo_dispatch(&mut f);
+    fo_dispatch(&mut f);
+    fo_dispatch_ab(&mut f);
+    f.dispatched - f.sub_a - f.sub_b - f.sub_c
+}
+
+fn main() -> u64 { 0u64 }

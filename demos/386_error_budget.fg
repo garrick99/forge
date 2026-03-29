@@ -1,0 +1,93 @@
+// Demo 386: SLO error budget tracker
+//
+// Site Reliability Engineering: an error budget starts full and
+// burns down as errors occur. Toil is tracked separately.
+// Verified: budget remaining = total - burned, burns tracked.
+
+struct ErrorBudget {
+    total:     u64,
+    burned:    u64,
+    incidents: u64,
+}
+
+fn eb_new(total: u64) -> ErrorBudget
+    requires total > 0u64
+    ensures result.total     == total
+    ensures result.burned    == 0u64
+    ensures result.incidents == 0u64
+{
+    struct ErrorBudget { total: total, burned: 0u64, incidents: 0u64 }
+}
+
+fn eb_burn(e: refmut<ErrorBudget>, amount: u64)
+    requires (*e).burned + amount <= (*e).total
+    ensures  (*e).burned    == old((*e).burned) + amount
+    ensures  (*e).incidents == old((*e).incidents) + 1u64
+    ensures  (*e).total     == old((*e).total)
+{
+    (*e).burned    = (*e).burned + amount;
+    (*e).incidents = (*e).incidents + 1u64;
+}
+
+fn eb_restore(e: refmut<ErrorBudget>, amount: u64)
+    requires (*e).burned >= amount
+    ensures  (*e).burned    == old((*e).burned) - amount
+    ensures  (*e).total     == old((*e).total)
+    ensures  (*e).incidents == old((*e).incidents)
+{
+    (*e).burned = (*e).burned - amount;
+}
+
+// Burn 20 from 100: remaining is 80
+fn burn_20() -> u64
+    ensures result == 80u64
+{
+    let e: ErrorBudget = eb_new(100u64);
+    eb_burn(&mut e, 20u64);
+    e.total - e.burned
+}
+
+// Three incidents: incident count is 3
+fn three_incidents() -> u64
+    ensures result == 3u64
+{
+    let e: ErrorBudget = eb_new(100u64);
+    eb_burn(&mut e, 10u64);
+    eb_burn(&mut e, 5u64);
+    eb_burn(&mut e, 15u64);
+    e.incidents
+}
+
+// Burn 30, restore 10: burned is 20
+fn burn_restore() -> u64
+    ensures result == 20u64
+{
+    let e: ErrorBudget = eb_new(100u64);
+    eb_burn(&mut e, 30u64);
+    eb_restore(&mut e, 10u64);
+    e.burned
+}
+
+// Restore doesn't add incidents
+fn restore_no_incident() -> u64
+    ensures result == 1u64
+{
+    let e: ErrorBudget = eb_new(100u64);
+    eb_burn(&mut e, 30u64);
+    eb_restore(&mut e, 10u64);
+    e.incidents
+}
+
+// Total is invariant
+fn total_preserved(total: u64) -> u64
+    requires total > 20u64
+    ensures result == total
+{
+    let e: ErrorBudget = eb_new(total);
+    eb_burn(&mut e, 10u64);
+    eb_burn(&mut e, 5u64);
+    eb_restore(&mut e, 3u64);
+    e.total
+}
+
+fn main() -> u64 { 0u64 }

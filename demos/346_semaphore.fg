@@ -1,0 +1,76 @@
+// Demo 346: Semaphore with up/down operations
+//
+// A counting semaphore: down acquires (decrements), up releases (increments).
+// Verified: the count accurately tracks acquisitions and releases.
+
+struct Semaphore {
+    count: u64,
+    cap:   u64,
+}
+
+fn sem_new(cap: u64) -> Semaphore
+    requires cap > 0u64
+    ensures result.count == cap
+    ensures result.cap   == cap
+{
+    struct Semaphore { count: cap, cap: cap }
+}
+
+fn sem_down(s: refmut<Semaphore>)
+    requires (*s).count > 0u64
+    ensures  (*s).count == old((*s).count) - 1u64
+    ensures  (*s).cap   == old((*s).cap)
+{
+    (*s).count = (*s).count - 1u64;
+}
+
+fn sem_up(s: refmut<Semaphore>)
+    requires (*s).count < (*s).cap
+    ensures  (*s).count == old((*s).count) + 1u64
+    ensures  (*s).cap   == old((*s).cap)
+{
+    (*s).count = (*s).count + 1u64;
+}
+
+// New semaphore with cap=3: count is 3
+fn initial_count() -> u64
+    ensures result == 3u64
+{
+    let s: Semaphore = sem_new(3u64);
+    s.count
+}
+
+// Three downs: count is 0
+fn three_downs() -> u64
+    ensures result == 0u64
+{
+    let s: Semaphore = sem_new(3u64);
+    sem_down(&mut s);
+    sem_down(&mut s);
+    sem_down(&mut s);
+    s.count
+}
+
+// Down then up: count is back to cap
+fn down_up() -> u64
+    ensures result == 5u64
+{
+    let s: Semaphore = sem_new(5u64);
+    sem_down(&mut s);
+    sem_up(&mut s);
+    s.count
+}
+
+// Two downs, one up: count is cap - 1
+fn two_down_one_up(cap: u64) -> u64
+    requires cap > 2u64
+    ensures result == cap - 1u64
+{
+    let s: Semaphore = sem_new(cap);
+    sem_down(&mut s);
+    sem_down(&mut s);
+    sem_up(&mut s);
+    s.count
+}
+
+fn main() -> u64 { 0u64 }

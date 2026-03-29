@@ -1,0 +1,89 @@
+// Demo 384: Interval set tracker (lo, hi, count)
+//
+// An interval grows by extending lo downward or hi upward.
+// The span (hi - lo) and insert count are tracked.
+// Verified: span and count reflect all extension operations.
+
+struct Interval {
+    lo:      u64,
+    hi:      u64,
+    inserts: u64,
+}
+
+fn iv_new(lo: u64, hi: u64) -> Interval
+    requires hi >= lo
+    ensures result.lo      == lo
+    ensures result.hi      == hi
+    ensures result.inserts == 0u64
+{
+    struct Interval { lo: lo, hi: hi, inserts: 0u64 }
+}
+
+fn iv_extend_hi(iv: refmut<Interval>, new_hi: u64)
+    requires new_hi > (*iv).hi
+    ensures  (*iv).hi      == new_hi
+    ensures  (*iv).lo      == old((*iv).lo)
+    ensures  (*iv).inserts == old((*iv).inserts) + 1u64
+{
+    (*iv).hi      = new_hi;
+    (*iv).inserts = (*iv).inserts + 1u64;
+}
+
+fn iv_extend_lo(iv: refmut<Interval>, new_lo: u64)
+    requires new_lo < (*iv).lo
+    ensures  (*iv).lo      == new_lo
+    ensures  (*iv).hi      == old((*iv).hi)
+    ensures  (*iv).inserts == old((*iv).inserts) + 1u64
+{
+    (*iv).lo      = new_lo;
+    (*iv).inserts = (*iv).inserts + 1u64;
+}
+
+// Extend hi to 20: hi is 20
+fn extend_hi_to_20() -> u64
+    ensures result == 20u64
+{
+    let iv: Interval = iv_new(5u64, 10u64);
+    iv_extend_hi(&mut iv, 20u64);
+    iv.hi
+}
+
+// Extend lo to 2: lo is 2
+fn extend_lo_to_2() -> u64
+    ensures result == 2u64
+{
+    let iv: Interval = iv_new(5u64, 10u64);
+    iv_extend_lo(&mut iv, 2u64);
+    iv.lo
+}
+
+// Extend both: span is 25 - 1 = 24
+fn extend_both_span() -> u64
+    ensures result == 24u64
+{
+    let iv: Interval = iv_new(5u64, 10u64);
+    iv_extend_hi(&mut iv, 25u64);
+    iv_extend_lo(&mut iv, 1u64);
+    iv.hi - iv.lo
+}
+
+// Insert count after 3 extensions
+fn insert_count() -> u64
+    ensures result == 3u64
+{
+    let iv: Interval = iv_new(10u64, 20u64);
+    iv_extend_hi(&mut iv, 30u64);
+    iv_extend_hi(&mut iv, 40u64);
+    iv_extend_lo(&mut iv, 5u64);
+    iv.inserts
+}
+
+// Initial span
+fn initial_span() -> u64
+    ensures result == 10u64
+{
+    let iv: Interval = iv_new(5u64, 15u64);
+    iv.hi - iv.lo
+}
+
+fn main() -> u64 { 0u64 }

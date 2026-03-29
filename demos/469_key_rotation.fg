@@ -1,0 +1,95 @@
+// Demo 469: Cryptographic key rotation tracker
+//
+// Keys have a version number. Rotation increments version and resets use_count.
+// Verified: version monotone, use_count resets on rotation.
+
+struct KeyRotation {
+    version:        u64,
+    use_count:      u64,
+    total_uses:     u64,
+    rotations:      u64,
+    max_uses:       u64,
+}
+
+fn kr_new(max_uses: u64) -> KeyRotation
+    requires max_uses > 0u64
+    ensures result.version    == 1u64
+    ensures result.use_count  == 0u64
+    ensures result.total_uses == 0u64
+    ensures result.rotations  == 0u64
+    ensures result.max_uses   == max_uses
+{
+    struct KeyRotation { version: 1u64, use_count: 0u64, total_uses: 0u64, rotations: 0u64, max_uses: max_uses }
+}
+
+fn kr_use(k: refmut<KeyRotation>)
+    requires (*k).use_count < (*k).max_uses
+    ensures  (*k).use_count  == old((*k).use_count) + 1u64
+    ensures  (*k).total_uses == old((*k).total_uses) + 1u64
+    ensures  (*k).version    == old((*k).version)
+    ensures  (*k).rotations  == old((*k).rotations)
+    ensures  (*k).max_uses   == old((*k).max_uses)
+{
+    (*k).use_count  = (*k).use_count  + 1u64;
+    (*k).total_uses = (*k).total_uses + 1u64;
+}
+
+fn kr_rotate(k: refmut<KeyRotation>)
+    ensures  (*k).version    == old((*k).version) + 1u64
+    ensures  (*k).use_count  == 0u64
+    ensures  (*k).rotations  == old((*k).rotations) + 1u64
+    ensures  (*k).total_uses == old((*k).total_uses)
+    ensures  (*k).max_uses   == old((*k).max_uses)
+{
+    (*k).version   = (*k).version   + 1u64;
+    (*k).use_count = 0u64;
+    (*k).rotations = (*k).rotations + 1u64;
+}
+
+// 3 uses: use_count==3
+fn three_uses() -> u64
+    ensures result == 3u64
+{
+    let k: KeyRotation = kr_new(10u64);
+    kr_use(&mut k);
+    kr_use(&mut k);
+    kr_use(&mut k);
+    k.use_count
+}
+
+// Rotation resets use_count
+fn rotation_resets() -> u64
+    ensures result == 0u64
+{
+    let k: KeyRotation = kr_new(10u64);
+    kr_use(&mut k);
+    kr_use(&mut k);
+    kr_rotate(&mut k);
+    k.use_count
+}
+
+// Version advances on rotation
+fn version_advances() -> u64
+    ensures result == 3u64
+{
+    let k: KeyRotation = kr_new(10u64);
+    kr_rotate(&mut k);
+    kr_rotate(&mut k);
+    k.version
+}
+
+// Total uses preserved across rotation
+fn total_uses_preserved() -> u64
+    ensures result == 5u64
+{
+    let k: KeyRotation = kr_new(10u64);
+    kr_use(&mut k);
+    kr_use(&mut k);
+    kr_use(&mut k);
+    kr_rotate(&mut k);
+    kr_use(&mut k);
+    kr_use(&mut k);
+    k.total_uses
+}
+
+fn main() -> u64 { 0u64 }

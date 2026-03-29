@@ -1,0 +1,84 @@
+// Demo 402: Bloom filter bit counter
+//
+// A Bloom filter tracks how many bits are set and how many
+// insertions have been made. Each insert sets k bits; the
+// bit_count tracks the population count upper bound.
+// Verified: insertions and bit_count accumulate correctly.
+
+struct BloomFilter {
+    bit_count:  u64,
+    capacity:   u64,
+    insertions: u64,
+    k:          u64,  // hash functions per insert
+}
+
+fn bf_new(capacity: u64, k: u64) -> BloomFilter
+    requires capacity > 0u64
+    requires k > 0u64
+    ensures result.bit_count  == 0u64
+    ensures result.capacity   == capacity
+    ensures result.insertions == 0u64
+    ensures result.k          == k
+{
+    struct BloomFilter { bit_count: 0u64, capacity: capacity, insertions: 0u64, k: k }
+}
+
+fn bf_insert(b: refmut<BloomFilter>)
+    requires (*b).bit_count + (*b).k <= (*b).capacity
+    ensures  (*b).bit_count  == old((*b).bit_count) + (*b).k
+    ensures  (*b).insertions == old((*b).insertions) + 1u64
+    ensures  (*b).capacity   == old((*b).capacity)
+    ensures  (*b).k          == old((*b).k)
+{
+    (*b).bit_count  = (*b).bit_count  + (*b).k;
+    (*b).insertions = (*b).insertions + 1u64;
+}
+
+// Insert 3 with k=2: bit_count is 6
+fn insert_three_k2() -> u64
+    ensures result == 6u64
+{
+    let b: BloomFilter = bf_new(100u64, 2u64);
+    bf_insert(&mut b);
+    bf_insert(&mut b);
+    bf_insert(&mut b);
+    b.bit_count
+}
+
+// Insertion count
+fn insertion_count() -> u64
+    ensures result == 4u64
+{
+    let b: BloomFilter = bf_new(100u64, 3u64);
+    bf_insert(&mut b);
+    bf_insert(&mut b);
+    bf_insert(&mut b);
+    bf_insert(&mut b);
+    b.insertions
+}
+
+// k=1: bit_count == insertions
+fn k1_bitcount_eq_insertions() -> u64
+    ensures result == 5u64
+{
+    let b: BloomFilter = bf_new(100u64, 1u64);
+    bf_insert(&mut b);
+    bf_insert(&mut b);
+    bf_insert(&mut b);
+    bf_insert(&mut b);
+    bf_insert(&mut b);
+    b.bit_count
+}
+
+// Capacity preserved
+fn capacity_preserved(cap: u64) -> u64
+    requires cap > 20u64
+    ensures result == cap
+{
+    let b: BloomFilter = bf_new(cap, 3u64);
+    bf_insert(&mut b);
+    bf_insert(&mut b);
+    b.capacity
+}
+
+fn main() -> u64 { 0u64 }

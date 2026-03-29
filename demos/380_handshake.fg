@@ -1,0 +1,107 @@
+// Demo 380: Three-way handshake state machine
+//
+// Models TCP-style 3-way handshake: SYN sent → SYN-ACK received → ACK sent.
+// State: 0=idle, 1=syn_sent, 2=syn_ack_rcvd, 3=established.
+// Verified: state transitions follow the protocol.
+
+struct Handshake {
+    state:   u64,
+    retries: u64,
+}
+
+fn hs_new() -> Handshake
+    ensures result.state   == 0u64
+    ensures result.retries == 0u64
+{
+    struct Handshake { state: 0u64, retries: 0u64 }
+}
+
+fn hs_send_syn(h: refmut<Handshake>)
+    requires (*h).state == 0u64
+    ensures  (*h).state   == 1u64
+    ensures  (*h).retries == old((*h).retries)
+{
+    (*h).state = 1u64;
+}
+
+fn hs_recv_syn_ack(h: refmut<Handshake>)
+    requires (*h).state == 1u64
+    ensures  (*h).state   == 2u64
+    ensures  (*h).retries == old((*h).retries)
+{
+    (*h).state = 2u64;
+}
+
+fn hs_send_ack(h: refmut<Handshake>)
+    requires (*h).state == 2u64
+    ensures  (*h).state   == 3u64
+    ensures  (*h).retries == old((*h).retries)
+{
+    (*h).state = 3u64;
+}
+
+fn hs_retry(h: refmut<Handshake>)
+    requires (*h).state == 1u64
+    ensures  (*h).state   == 0u64
+    ensures  (*h).retries == old((*h).retries) + 1u64
+{
+    (*h).state   = 0u64;
+    (*h).retries = (*h).retries + 1u64;
+}
+
+// After SYN: state is 1
+fn after_syn() -> u64
+    ensures result == 1u64
+{
+    let h: Handshake = hs_new();
+    hs_send_syn(&mut h);
+    h.state
+}
+
+// After SYN + SYN-ACK: state is 2
+fn after_syn_ack() -> u64
+    ensures result == 2u64
+{
+    let h: Handshake = hs_new();
+    hs_send_syn(&mut h);
+    hs_recv_syn_ack(&mut h);
+    h.state
+}
+
+// Established: state is 3
+fn established() -> u64
+    ensures result == 3u64
+{
+    let h: Handshake = hs_new();
+    hs_send_syn(&mut h);
+    hs_recv_syn_ack(&mut h);
+    hs_send_ack(&mut h);
+    h.state
+}
+
+// Retry then re-handshake: retries is 1, state is 3
+fn retry_then_establish_retries() -> u64
+    ensures result == 1u64
+{
+    let h: Handshake = hs_new();
+    hs_send_syn(&mut h);
+    hs_retry(&mut h);
+    hs_send_syn(&mut h);
+    hs_recv_syn_ack(&mut h);
+    hs_send_ack(&mut h);
+    h.retries
+}
+
+fn retry_then_establish_state() -> u64
+    ensures result == 3u64
+{
+    let h: Handshake = hs_new();
+    hs_send_syn(&mut h);
+    hs_retry(&mut h);
+    hs_send_syn(&mut h);
+    hs_recv_syn_ack(&mut h);
+    hs_send_ack(&mut h);
+    h.state
+}
+
+fn main() -> u64 { 0u64 }

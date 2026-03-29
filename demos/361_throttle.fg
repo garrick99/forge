@@ -1,0 +1,90 @@
+// Demo 361: Token-bucket throttle with refill
+//
+// A throttle with tokens that drain on use and refill by a fixed amount.
+// Consume requires enough tokens; refill adds up to the cap.
+// Verified: token count tracks consume/refill accurately.
+
+struct Throttle {
+    tokens: u64,
+    cap:    u64,
+    used:   u64,  // cumulative tokens consumed
+}
+
+fn throttle_new(cap: u64) -> Throttle
+    requires cap > 0u64
+    ensures result.tokens == cap
+    ensures result.cap    == cap
+    ensures result.used   == 0u64
+{
+    struct Throttle { tokens: cap, cap: cap, used: 0u64 }
+}
+
+fn throttle_consume(t: refmut<Throttle>, n: u64)
+    requires (*t).tokens >= n
+    ensures  (*t).tokens == old((*t).tokens) - n
+    ensures  (*t).used   == old((*t).used) + n
+    ensures  (*t).cap    == old((*t).cap)
+{
+    (*t).tokens = (*t).tokens - n;
+    (*t).used   = (*t).used   + n;
+}
+
+fn throttle_refill(t: refmut<Throttle>, n: u64)
+    requires (*t).tokens + n <= (*t).cap
+    ensures  (*t).tokens == old((*t).tokens) + n
+    ensures  (*t).cap    == old((*t).cap)
+    ensures  (*t).used   == old((*t).used)
+{
+    (*t).tokens = (*t).tokens + n;
+}
+
+// Consume 30 from 100: tokens is 70
+fn consume_30() -> u64
+    ensures result == 70u64
+{
+    let t: Throttle = throttle_new(100u64);
+    throttle_consume(&mut t, 30u64);
+    t.tokens
+}
+
+// Consume 30: used is 30
+fn consumed_used() -> u64
+    ensures result == 30u64
+{
+    let t: Throttle = throttle_new(100u64);
+    throttle_consume(&mut t, 30u64);
+    t.used
+}
+
+// Consume 50, refill 20: tokens is 70
+fn consume_refill() -> u64
+    ensures result == 70u64
+{
+    let t: Throttle = throttle_new(100u64);
+    throttle_consume(&mut t, 50u64);
+    throttle_refill(&mut t, 20u64);
+    t.tokens
+}
+
+// Cumulative used not affected by refill
+fn refill_no_affect_used() -> u64
+    ensures result == 50u64
+{
+    let t: Throttle = throttle_new(100u64);
+    throttle_consume(&mut t, 50u64);
+    throttle_refill(&mut t, 20u64);
+    t.used
+}
+
+// Multiple consumes: 10 + 20 + 15 = 45 used
+fn multi_consume() -> u64
+    ensures result == 45u64
+{
+    let t: Throttle = throttle_new(100u64);
+    throttle_consume(&mut t, 10u64);
+    throttle_consume(&mut t, 20u64);
+    throttle_consume(&mut t, 15u64);
+    t.used
+}
+
+fn main() -> u64 { 0u64 }

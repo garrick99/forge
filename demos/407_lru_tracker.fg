@@ -1,0 +1,111 @@
+// Demo 407: LRU cache eviction tracker
+//
+// An LRU cache tracks hits, misses, evictions, and current occupancy.
+// access_hit() records a hit, access_miss_evict() records a miss
+// with eviction, access_miss_insert() inserts without eviction.
+// Verified: occupancy and counts track the LRU lifecycle.
+
+struct LRUCache {
+    occupancy: u64,
+    capacity:  u64,
+    hits:      u64,
+    misses:    u64,
+    evictions: u64,
+}
+
+fn lru_new(capacity: u64) -> LRUCache
+    requires capacity > 0u64
+    ensures result.occupancy == 0u64
+    ensures result.capacity  == capacity
+    ensures result.hits      == 0u64
+    ensures result.misses    == 0u64
+    ensures result.evictions == 0u64
+{
+    struct LRUCache { occupancy: 0u64, capacity: capacity, hits: 0u64, misses: 0u64, evictions: 0u64 }
+}
+
+fn lru_hit(c: refmut<LRUCache>)
+    requires (*c).occupancy > 0u64
+    ensures  (*c).hits      == old((*c).hits) + 1u64
+    ensures  (*c).occupancy == old((*c).occupancy)
+    ensures  (*c).misses    == old((*c).misses)
+    ensures  (*c).evictions == old((*c).evictions)
+{
+    (*c).hits = (*c).hits + 1u64;
+}
+
+fn lru_miss_insert(c: refmut<LRUCache>)
+    requires (*c).occupancy < (*c).capacity
+    ensures  (*c).misses    == old((*c).misses) + 1u64
+    ensures  (*c).occupancy == old((*c).occupancy) + 1u64
+    ensures  (*c).hits      == old((*c).hits)
+    ensures  (*c).evictions == old((*c).evictions)
+{
+    (*c).misses    = (*c).misses    + 1u64;
+    (*c).occupancy = (*c).occupancy + 1u64;
+}
+
+fn lru_miss_evict(c: refmut<LRUCache>)
+    requires (*c).occupancy == (*c).capacity
+    ensures  (*c).misses    == old((*c).misses) + 1u64
+    ensures  (*c).evictions == old((*c).evictions) + 1u64
+    ensures  (*c).occupancy == old((*c).occupancy)
+    ensures  (*c).hits      == old((*c).hits)
+{
+    (*c).misses    = (*c).misses    + 1u64;
+    (*c).evictions = (*c).evictions + 1u64;
+}
+
+// Fill cache then hit: occupancy stays at cap
+fn fill_and_hit() -> u64
+    ensures result == 4u64
+{
+    let c: LRUCache = lru_new(4u64);
+    lru_miss_insert(&mut c);
+    lru_miss_insert(&mut c);
+    lru_miss_insert(&mut c);
+    lru_miss_insert(&mut c);
+    lru_hit(&mut c);
+    c.occupancy
+}
+
+// Fill then evict: evictions is 2
+fn fill_evict() -> u64
+    ensures result == 2u64
+{
+    let c: LRUCache = lru_new(3u64);
+    lru_miss_insert(&mut c);
+    lru_miss_insert(&mut c);
+    lru_miss_insert(&mut c);
+    lru_miss_evict(&mut c);
+    lru_miss_evict(&mut c);
+    c.evictions
+}
+
+// Total misses: inserts + evicts
+fn total_misses() -> u64
+    ensures result == 5u64
+{
+    let c: LRUCache = lru_new(3u64);
+    lru_miss_insert(&mut c);
+    lru_miss_insert(&mut c);
+    lru_miss_insert(&mut c);
+    lru_miss_evict(&mut c);
+    lru_miss_evict(&mut c);
+    c.misses
+}
+
+// Hits tracked independently
+fn hits_tracked() -> u64
+    ensures result == 3u64
+{
+    let c: LRUCache = lru_new(4u64);
+    lru_miss_insert(&mut c);
+    lru_miss_insert(&mut c);
+    lru_hit(&mut c);
+    lru_hit(&mut c);
+    lru_hit(&mut c);
+    c.hits
+}
+
+fn main() -> u64 { 0u64 }

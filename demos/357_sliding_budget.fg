@@ -1,0 +1,107 @@
+// Demo 357: Sliding budget — spend/earn with period resets
+//
+// A budget resets each period. spend() reduces remaining budget,
+// earn() adds to it (capped at limit), next_period() resets to limit
+// and increments period. Verified via old() chaining.
+
+struct Budget {
+    remaining: u64,
+    limit:     u64,
+    period:    u64,
+    spent:     u64,  // cumulative across all periods
+}
+
+fn budget_new(limit: u64) -> Budget
+    requires limit > 0u64
+    ensures result.remaining == limit
+    ensures result.limit     == limit
+    ensures result.period    == 0u64
+    ensures result.spent     == 0u64
+{
+    struct Budget { remaining: limit, limit: limit, period: 0u64, spent: 0u64 }
+}
+
+fn budget_spend(b: refmut<Budget>, amount: u64)
+    requires (*b).remaining >= amount
+    ensures  (*b).remaining == old((*b).remaining) - amount
+    ensures  (*b).spent     == old((*b).spent) + amount
+    ensures  (*b).limit     == old((*b).limit)
+    ensures  (*b).period    == old((*b).period)
+{
+    (*b).remaining = (*b).remaining - amount;
+    (*b).spent     = (*b).spent + amount;
+}
+
+fn budget_earn(b: refmut<Budget>, amount: u64)
+    requires (*b).remaining + amount <= (*b).limit
+    ensures  (*b).remaining == old((*b).remaining) + amount
+    ensures  (*b).limit     == old((*b).limit)
+    ensures  (*b).period    == old((*b).period)
+    ensures  (*b).spent     == old((*b).spent)
+{
+    (*b).remaining = (*b).remaining + amount;
+}
+
+fn budget_next_period(b: refmut<Budget>)
+    ensures (*b).remaining == (*b).limit
+    ensures (*b).period    == old((*b).period) + 1u64
+    ensures (*b).limit     == old((*b).limit)
+    ensures (*b).spent     == old((*b).spent)
+{
+    (*b).remaining = (*b).limit;
+    (*b).period    = (*b).period + 1u64;
+}
+
+// Spend 30 from 100: remaining is 70
+fn spend_30() -> u64
+    ensures result == 70u64
+{
+    let b: Budget = budget_new(100u64);
+    budget_spend(&mut b, 30u64);
+    b.remaining
+}
+
+// Spend 30, next period: remaining is 100 again
+fn reset_after_period() -> u64
+    ensures result == 100u64
+{
+    let b: Budget = budget_new(100u64);
+    budget_spend(&mut b, 30u64);
+    budget_next_period(&mut b);
+    b.remaining
+}
+
+// Two periods: period count is 2
+fn two_periods() -> u64
+    ensures result == 2u64
+{
+    let b: Budget = budget_new(50u64);
+    budget_spend(&mut b, 10u64);
+    budget_next_period(&mut b);
+    budget_spend(&mut b, 20u64);
+    budget_next_period(&mut b);
+    b.period
+}
+
+// Cumulative spent tracked across periods
+fn cumulative_spent() -> u64
+    ensures result == 30u64
+{
+    let b: Budget = budget_new(50u64);
+    budget_spend(&mut b, 10u64);
+    budget_next_period(&mut b);
+    budget_spend(&mut b, 20u64);
+    b.spent
+}
+
+// Earn restores budget within limit
+fn spend_earn() -> u64
+    ensures result == 80u64
+{
+    let b: Budget = budget_new(100u64);
+    budget_spend(&mut b, 50u64);
+    budget_earn(&mut b, 30u64);
+    b.remaining
+}
+
+fn main() -> u64 { 0u64 }

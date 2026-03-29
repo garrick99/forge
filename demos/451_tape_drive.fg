@@ -1,0 +1,111 @@
+// Demo 451: Tape drive head position tracker
+//
+// Linear tape: head moves forward (seek_fwd) or backward (seek_bwd).
+// Verified: position stays within [0, length), reads/writes track ops.
+
+struct TapeDrive {
+    position: u64,
+    length:   u64,
+    reads:    u64,
+    writes:   u64,
+    seeks:    u64,
+}
+
+fn td_new(length: u64) -> TapeDrive
+    requires length > 0u64
+    ensures result.position == 0u64
+    ensures result.length   == length
+    ensures result.reads    == 0u64
+    ensures result.writes   == 0u64
+    ensures result.seeks    == 0u64
+{
+    struct TapeDrive { position: 0u64, length: length, reads: 0u64, writes: 0u64, seeks: 0u64 }
+}
+
+fn td_seek_fwd(t: refmut<TapeDrive>, n: u64)
+    requires (*t).position + n < (*t).length
+    ensures  (*t).position == old((*t).position) + n
+    ensures  (*t).seeks    == old((*t).seeks) + 1u64
+    ensures  (*t).length   == old((*t).length)
+    ensures  (*t).reads    == old((*t).reads)
+    ensures  (*t).writes   == old((*t).writes)
+{
+    (*t).position = (*t).position + n;
+    (*t).seeks    = (*t).seeks    + 1u64;
+}
+
+fn td_seek_bwd(t: refmut<TapeDrive>, n: u64)
+    requires (*t).position >= n
+    ensures  (*t).position == old((*t).position) - n
+    ensures  (*t).seeks    == old((*t).seeks) + 1u64
+    ensures  (*t).length   == old((*t).length)
+    ensures  (*t).reads    == old((*t).reads)
+    ensures  (*t).writes   == old((*t).writes)
+{
+    (*t).position = (*t).position - n;
+    (*t).seeks    = (*t).seeks    + 1u64;
+}
+
+fn td_read(t: refmut<TapeDrive>)
+    ensures (*t).reads    == old((*t).reads) + 1u64
+    ensures (*t).position == old((*t).position)
+    ensures (*t).length   == old((*t).length)
+    ensures (*t).writes   == old((*t).writes)
+    ensures (*t).seeks    == old((*t).seeks)
+{
+    (*t).reads = (*t).reads + 1u64;
+}
+
+fn td_write(t: refmut<TapeDrive>)
+    ensures (*t).writes   == old((*t).writes) + 1u64
+    ensures (*t).position == old((*t).position)
+    ensures (*t).length   == old((*t).length)
+    ensures (*t).reads    == old((*t).reads)
+    ensures (*t).seeks    == old((*t).seeks)
+{
+    (*t).writes = (*t).writes + 1u64;
+}
+
+// Seek forward 30: position==30
+fn seek_fwd() -> u64
+    ensures result == 30u64
+{
+    let t: TapeDrive = td_new(100u64);
+    td_seek_fwd(&mut t, 30u64);
+    t.position
+}
+
+// Seek forward then backward: position==10
+fn seek_back() -> u64
+    ensures result == 10u64
+{
+    let t: TapeDrive = td_new(100u64);
+    td_seek_fwd(&mut t, 30u64);
+    td_seek_bwd(&mut t, 20u64);
+    t.position
+}
+
+// Read at position
+fn reads_tracked() -> u64
+    ensures result == 3u64
+{
+    let t: TapeDrive = td_new(100u64);
+    td_seek_fwd(&mut t, 10u64);
+    td_read(&mut t);
+    td_read(&mut t);
+    td_read(&mut t);
+    t.reads
+}
+
+// Seek count
+fn seek_count() -> u64
+    ensures result == 3u64
+{
+    let t: TapeDrive = td_new(100u64);
+    td_seek_fwd(&mut t, 20u64);
+    td_seek_fwd(&mut t, 10u64);
+    td_seek_bwd(&mut t, 5u64);
+    t.seeks
+}
+
+fn main() -> u64 { 0u64 }

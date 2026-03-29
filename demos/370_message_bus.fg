@@ -1,0 +1,96 @@
+// Demo 370: Message bus with publish/subscribe counts
+//
+// A message bus tracks: published messages, delivered (received by
+// all subscribers), subscribers registered. Each publish increments
+// published; deliver increments delivered.
+// Verified: delivered <= published invariant via old() chaining.
+
+struct MsgBus {
+    published:   u64,
+    delivered:   u64,
+    subscribers: u64,
+}
+
+fn bus_new() -> MsgBus
+    ensures result.published   == 0u64
+    ensures result.delivered   == 0u64
+    ensures result.subscribers == 0u64
+{
+    struct MsgBus { published: 0u64, delivered: 0u64, subscribers: 0u64 }
+}
+
+fn bus_subscribe(b: refmut<MsgBus>)
+    ensures (*b).subscribers == old((*b).subscribers) + 1u64
+    ensures (*b).published   == old((*b).published)
+    ensures (*b).delivered   == old((*b).delivered)
+{
+    (*b).subscribers = (*b).subscribers + 1u64;
+}
+
+fn bus_publish(b: refmut<MsgBus>)
+    ensures (*b).published   == old((*b).published) + 1u64
+    ensures (*b).subscribers == old((*b).subscribers)
+    ensures (*b).delivered   == old((*b).delivered)
+{
+    (*b).published = (*b).published + 1u64;
+}
+
+fn bus_deliver(b: refmut<MsgBus>)
+    requires (*b).delivered < (*b).published
+    ensures  (*b).delivered   == old((*b).delivered) + 1u64
+    ensures  (*b).published   == old((*b).published)
+    ensures  (*b).subscribers == old((*b).subscribers)
+{
+    (*b).delivered = (*b).delivered + 1u64;
+}
+
+// Subscribe 3: subscribers is 3
+fn three_subscribers() -> u64
+    ensures result == 3u64
+{
+    let b: MsgBus = bus_new();
+    bus_subscribe(&mut b);
+    bus_subscribe(&mut b);
+    bus_subscribe(&mut b);
+    b.subscribers
+}
+
+// Publish 5: published is 5
+fn five_published() -> u64
+    ensures result == 5u64
+{
+    let b: MsgBus = bus_new();
+    bus_publish(&mut b);
+    bus_publish(&mut b);
+    bus_publish(&mut b);
+    bus_publish(&mut b);
+    bus_publish(&mut b);
+    b.published
+}
+
+// Publish 3, deliver 2: in-flight is 1
+fn in_flight() -> u64
+    ensures result == 1u64
+{
+    let b: MsgBus = bus_new();
+    bus_publish(&mut b);
+    bus_publish(&mut b);
+    bus_publish(&mut b);
+    bus_deliver(&mut b);
+    bus_deliver(&mut b);
+    b.published - b.delivered
+}
+
+// All delivered: published == delivered
+fn all_delivered() -> u64
+    ensures result == 0u64
+{
+    let b: MsgBus = bus_new();
+    bus_publish(&mut b);
+    bus_publish(&mut b);
+    bus_deliver(&mut b);
+    bus_deliver(&mut b);
+    b.published - b.delivered
+}
+
+fn main() -> u64 { 0u64 }

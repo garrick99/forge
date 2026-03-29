@@ -1,0 +1,87 @@
+// Demo 363: Bounded offset pointer arithmetic
+//
+// A pointer into a fixed-size buffer: advance moves forward,
+// rewind moves back, reset returns to base. The offset is always
+// within [0, size). Verified: offset arithmetic stays in bounds.
+
+struct OffsetPtr {
+    offset: u64,
+    size:   u64,
+}
+
+fn optr_new(size: u64) -> OffsetPtr
+    requires size > 0u64
+    ensures result.offset == 0u64
+    ensures result.size   == size
+{
+    struct OffsetPtr { offset: 0u64, size: size }
+}
+
+fn optr_advance(p: refmut<OffsetPtr>, n: u64)
+    requires (*p).offset + n < (*p).size
+    ensures  (*p).offset == old((*p).offset) + n
+    ensures  (*p).size   == old((*p).size)
+{
+    (*p).offset = (*p).offset + n;
+}
+
+fn optr_rewind(p: refmut<OffsetPtr>, n: u64)
+    requires (*p).offset >= n
+    ensures  (*p).offset == old((*p).offset) - n
+    ensures  (*p).size   == old((*p).size)
+{
+    (*p).offset = (*p).offset - n;
+}
+
+fn optr_reset(p: refmut<OffsetPtr>)
+    ensures (*p).offset == 0u64
+    ensures (*p).size   == old((*p).size)
+{
+    (*p).offset = 0u64;
+}
+
+// Advance 5: offset is 5
+fn advance_5(size: u64) -> u64
+    requires size > 5u64
+    ensures result == 5u64
+{
+    let p: OffsetPtr = optr_new(size);
+    optr_advance(&mut p, 5u64);
+    p.offset
+}
+
+// Advance 10, rewind 3: offset is 7
+fn advance_rewind(size: u64) -> u64
+    requires size > 10u64
+    ensures result == 7u64
+{
+    let p: OffsetPtr = optr_new(size);
+    optr_advance(&mut p, 10u64);
+    optr_rewind(&mut p, 3u64);
+    p.offset
+}
+
+// Advance 8, reset: offset is 0
+fn advance_reset(size: u64) -> u64
+    requires size > 8u64
+    ensures result == 0u64
+{
+    let p: OffsetPtr = optr_new(size);
+    optr_advance(&mut p, 8u64);
+    optr_reset(&mut p);
+    p.offset
+}
+
+// Size invariant preserved across all ops
+fn size_preserved(size: u64) -> u64
+    requires size > 6u64
+    ensures result == size
+{
+    let p: OffsetPtr = optr_new(size);
+    optr_advance(&mut p, 5u64);
+    optr_rewind(&mut p, 2u64);
+    optr_reset(&mut p);
+    p.size
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,74 @@
+// Demo 339: Round-robin scheduler state verification
+//
+// A minimal cooperative scheduler tracks which task is currently
+// running and how many tasks exist. Verified properties:
+//   - yield() advances the current task (mod num_tasks)
+//   - task_count is invariant across yields
+//   - After N yields, current_task cycles back
+
+struct Sched {
+    current: u64,
+    count:   u64,
+    yields:  u64,   // total yield count
+}
+
+fn sched_new(count: u64) -> Sched
+    requires count > 0u64
+    ensures result.current == 0u64
+    ensures result.count   == count
+    ensures result.yields  == 0u64
+{
+    struct Sched { current: 0u64, count: count, yields: 0u64 }
+}
+
+fn sched_yield(s: refmut<Sched>)
+    ensures (*s).current == (old((*s).current) + 1u64) % (*s).count
+    ensures (*s).yields  == old((*s).yields) + 1u64
+    ensures (*s).count   == old((*s).count)
+{
+    (*s).current = ((*s).current + 1u64) % (*s).count;
+    (*s).yields  = (*s).yields + 1u64;
+}
+
+// After 1 yield with 3 tasks: current is 1
+fn yield_once_3tasks() -> u64
+    ensures result == 1u64
+{
+    let s: Sched = sched_new(3u64);
+    sched_yield(&mut s);
+    s.current
+}
+
+// After 3 yields with 3 tasks: current wraps to 0
+fn yield_full_cycle() -> u64
+    ensures result == 0u64
+{
+    let s: Sched = sched_new(3u64);
+    sched_yield(&mut s);
+    sched_yield(&mut s);
+    sched_yield(&mut s);
+    s.current
+}
+
+// Total yields is 3 after 3 yields
+fn yield_count() -> u64
+    ensures result == 3u64
+{
+    let s: Sched = sched_new(5u64);
+    sched_yield(&mut s);
+    sched_yield(&mut s);
+    sched_yield(&mut s);
+    s.yields
+}
+
+// count is preserved across yields
+fn count_preserved() -> u64
+    ensures result == 4u64
+{
+    let s: Sched = sched_new(4u64);
+    sched_yield(&mut s);
+    sched_yield(&mut s);
+    s.count
+}
+
+fn main() -> u64 { 0u64 }

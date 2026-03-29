@@ -1,0 +1,91 @@
+// Demo 422: Supply chain inventory tracker
+//
+// Three stages: raw → in_process → finished.
+// advance_stage() moves units between stages.
+// Verified: total units conserved across all three stages.
+
+struct SupplyChain {
+    raw:        u64,
+    in_process: u64,
+    finished:   u64,
+    batches:    u64,
+}
+
+fn sc_new(raw: u64) -> SupplyChain
+    requires raw > 0u64
+    ensures result.raw        == raw
+    ensures result.in_process == 0u64
+    ensures result.finished   == 0u64
+    ensures result.batches    == 0u64
+{
+    struct SupplyChain { raw: raw, in_process: 0u64, finished: 0u64, batches: 0u64 }
+}
+
+fn sc_process(s: refmut<SupplyChain>, units: u64)
+    requires (*s).raw >= units
+    ensures  (*s).raw        == old((*s).raw) - units
+    ensures  (*s).in_process == old((*s).in_process) + units
+    ensures  (*s).finished   == old((*s).finished)
+    ensures  (*s).batches    == old((*s).batches) + 1u64
+{
+    (*s).raw        = (*s).raw        - units;
+    (*s).in_process = (*s).in_process + units;
+    (*s).batches    = (*s).batches    + 1u64;
+}
+
+fn sc_finish(s: refmut<SupplyChain>, units: u64)
+    requires (*s).in_process >= units
+    ensures  (*s).in_process == old((*s).in_process) - units
+    ensures  (*s).finished   == old((*s).finished) + units
+    ensures  (*s).raw        == old((*s).raw)
+    ensures  (*s).batches    == old((*s).batches) + 1u64
+{
+    (*s).in_process = (*s).in_process - units;
+    (*s).finished   = (*s).finished   + units;
+    (*s).batches    = (*s).batches    + 1u64;
+}
+
+// Process 30 from 100: raw is 70
+fn process_30() -> u64
+    ensures result == 70u64
+{
+    let s: SupplyChain = sc_new(100u64);
+    sc_process(&mut s, 30u64);
+    s.raw
+}
+
+// Process 30, finish 20: finished is 20
+fn finish_20() -> u64
+    ensures result == 20u64
+{
+    let s: SupplyChain = sc_new(100u64);
+    sc_process(&mut s, 30u64);
+    sc_finish(&mut s, 20u64);
+    s.finished
+}
+
+// Conservation: raw + in_process + finished == initial
+fn conservation() -> u64
+    ensures result == 100u64
+{
+    let s: SupplyChain = sc_new(100u64);
+    sc_process(&mut s, 40u64);
+    sc_process(&mut s, 20u64);
+    sc_finish(&mut s, 30u64);
+    sc_finish(&mut s, 10u64);
+    s.raw + s.in_process + s.finished
+}
+
+// Batch count tracks all movements
+fn batch_count() -> u64
+    ensures result == 4u64
+{
+    let s: SupplyChain = sc_new(100u64);
+    sc_process(&mut s, 40u64);
+    sc_process(&mut s, 20u64);
+    sc_finish(&mut s, 30u64);
+    sc_finish(&mut s, 10u64);
+    s.batches
+}
+
+fn main() -> u64 { 0u64 }

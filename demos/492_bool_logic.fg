@@ -1,0 +1,85 @@
+// Demo 492: verified boolean logic functions
+//
+// Boolean combinators with exact postconditions.
+// Exercises: and, or, xor, implication, equivalence, majority vote.
+
+fn bool_and(a: bool, b: bool) -> bool
+    ensures result == (a && b)
+    ensures !(a && b) ==> result == false
+    ensures a && b    ==> result == true
+{
+    a && b
+}
+
+fn bool_or(a: bool, b: bool) -> bool
+    ensures result == (a || b)
+    ensures !(a || b) ==> result == false
+    ensures a || b    ==> result == true
+{
+    a || b
+}
+
+fn bool_xor(a: bool, b: bool) -> bool
+    ensures result == (a && !b || !a && b)
+    ensures a == b  ==> result == false
+    ensures !(a == b) ==> result == true
+{
+    (a && !b) || (!a && b)
+}
+
+fn bool_implies(a: bool, b: bool) -> bool
+    ensures result == (!a || b)
+    ensures !a         ==> result == true
+    ensures a && b     ==> result == true
+    ensures a && !b    ==> result == false
+{
+    !a || b
+}
+
+fn majority(a: bool, b: bool, c: bool) -> bool
+    ensures result == ((a && b) || (b && c) || (a && c))
+{
+    (a && b) || (b && c) || (a && c)
+}
+
+fn check_and_tt() -> bool
+    ensures result == true
+{ bool_and(true, true) }
+
+fn check_and_tf() -> bool
+    ensures result == false
+{ bool_and(true, false) }
+
+fn check_or_ff() -> bool
+    ensures result == false
+{ bool_or(false, false) }
+
+fn check_or_tf() -> bool
+    ensures result == true
+{ bool_or(true, false) }
+
+fn check_xor_tt() -> bool
+    ensures result == false
+{ bool_xor(true, true) }
+
+fn check_xor_tf() -> bool
+    ensures result == true
+{ bool_xor(true, false) }
+
+fn check_implies_ff() -> bool
+    ensures result == true
+{ bool_implies(false, false) }
+
+fn check_implies_tf() -> bool
+    ensures result == false
+{ bool_implies(true, false) }
+
+fn check_majority_2true() -> bool
+    ensures result == true
+{ majority(true, true, false) }
+
+fn check_majority_1true() -> bool
+    ensures result == false
+{ majority(true, false, false) }
+
+fn main() -> u64 { 0u64 }

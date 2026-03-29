@@ -1,0 +1,106 @@
+// Demo 388: Transaction log with commit/abort tracking
+//
+// A transaction log tracks open, committed, and aborted transactions.
+// begin() opens a transaction, commit() closes it successfully,
+// abort() rolls it back. Verified: open + committed + aborted == total.
+
+struct TxLog {
+    open:      u64,
+    committed: u64,
+    aborted:   u64,
+    total:     u64,
+}
+
+fn txlog_new() -> TxLog
+    ensures result.open      == 0u64
+    ensures result.committed == 0u64
+    ensures result.aborted   == 0u64
+    ensures result.total     == 0u64
+{
+    struct TxLog { open: 0u64, committed: 0u64, aborted: 0u64, total: 0u64 }
+}
+
+fn txlog_begin(t: refmut<TxLog>)
+    ensures (*t).open      == old((*t).open) + 1u64
+    ensures (*t).total     == old((*t).total) + 1u64
+    ensures (*t).committed == old((*t).committed)
+    ensures (*t).aborted   == old((*t).aborted)
+{
+    (*t).open  = (*t).open  + 1u64;
+    (*t).total = (*t).total + 1u64;
+}
+
+fn txlog_commit(t: refmut<TxLog>)
+    requires (*t).open > 0u64
+    ensures  (*t).committed == old((*t).committed) + 1u64
+    ensures  (*t).open      == old((*t).open) - 1u64
+    ensures  (*t).total     == old((*t).total)
+    ensures  (*t).aborted   == old((*t).aborted)
+{
+    (*t).committed = (*t).committed + 1u64;
+    (*t).open      = (*t).open      - 1u64;
+}
+
+fn txlog_abort(t: refmut<TxLog>)
+    requires (*t).open > 0u64
+    ensures  (*t).aborted == old((*t).aborted) + 1u64
+    ensures  (*t).open    == old((*t).open) - 1u64
+    ensures  (*t).total   == old((*t).total)
+    ensures  (*t).committed == old((*t).committed)
+{
+    (*t).aborted = (*t).aborted + 1u64;
+    (*t).open    = (*t).open    - 1u64;
+}
+
+// Begin 3: open is 3, total is 3
+fn begin_three_open() -> u64
+    ensures result == 3u64
+{
+    let t: TxLog = txlog_new();
+    txlog_begin(&mut t);
+    txlog_begin(&mut t);
+    txlog_begin(&mut t);
+    t.open
+}
+
+// Begin 3, commit 2: committed is 2
+fn commit_two() -> u64
+    ensures result == 2u64
+{
+    let t: TxLog = txlog_new();
+    txlog_begin(&mut t);
+    txlog_begin(&mut t);
+    txlog_begin(&mut t);
+    txlog_commit(&mut t);
+    txlog_commit(&mut t);
+    t.committed
+}
+
+// Begin 3, commit 1, abort 1: open is 1
+fn mixed_ops_open() -> u64
+    ensures result == 1u64
+{
+    let t: TxLog = txlog_new();
+    txlog_begin(&mut t);
+    txlog_begin(&mut t);
+    txlog_begin(&mut t);
+    txlog_commit(&mut t);
+    txlog_abort(&mut t);
+    t.open
+}
+
+// Total never decreases
+fn total_grows() -> u64
+    ensures result == 4u64
+{
+    let t: TxLog = txlog_new();
+    txlog_begin(&mut t);
+    txlog_begin(&mut t);
+    txlog_commit(&mut t);
+    txlog_begin(&mut t);
+    txlog_abort(&mut t);
+    txlog_begin(&mut t);
+    t.total
+}
+
+fn main() -> u64 { 0u64 }

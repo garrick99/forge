@@ -1,0 +1,103 @@
+// Demo 454: PID controller with anti-windup integral clamp
+//
+// Integral accumulates error; anti-windup clamps at max_integral.
+// Resets on setpoint change. Verified: integral bounded, resets tracked.
+
+struct PIDIntegral {
+    integral:     u64,
+    max_integral: u64,
+    accumulates:  u64,
+    clamps:       u64,
+    resets:       u64,
+}
+
+fn pid_new(max: u64) -> PIDIntegral
+    requires max > 0u64
+    ensures result.integral     == 0u64
+    ensures result.max_integral == max
+    ensures result.accumulates  == 0u64
+    ensures result.clamps       == 0u64
+    ensures result.resets       == 0u64
+{
+    struct PIDIntegral { integral: 0u64, max_integral: max, accumulates: 0u64, clamps: 0u64, resets: 0u64 }
+}
+
+fn pid_accumulate(p: refmut<PIDIntegral>, err: u64)
+    requires (*p).integral + err <= (*p).max_integral
+    ensures  (*p).integral     == old((*p).integral) + err
+    ensures  (*p).accumulates  == old((*p).accumulates) + 1u64
+    ensures  (*p).max_integral == old((*p).max_integral)
+    ensures  (*p).clamps       == old((*p).clamps)
+    ensures  (*p).resets       == old((*p).resets)
+{
+    (*p).integral    = (*p).integral    + err;
+    (*p).accumulates = (*p).accumulates + 1u64;
+}
+
+fn pid_clamp(p: refmut<PIDIntegral>, err: u64)
+    requires (*p).integral + err > (*p).max_integral
+    ensures  (*p).integral     == (*p).max_integral
+    ensures  (*p).clamps       == old((*p).clamps) + 1u64
+    ensures  (*p).max_integral == old((*p).max_integral)
+    ensures  (*p).accumulates  == old((*p).accumulates)
+    ensures  (*p).resets       == old((*p).resets)
+{
+    (*p).integral = (*p).max_integral;
+    (*p).clamps   = (*p).clamps + 1u64;
+}
+
+fn pid_reset(p: refmut<PIDIntegral>)
+    ensures (*p).integral    == 0u64
+    ensures (*p).resets      == old((*p).resets) + 1u64
+    ensures (*p).max_integral == old((*p).max_integral)
+    ensures (*p).accumulates  == old((*p).accumulates)
+    ensures (*p).clamps       == old((*p).clamps)
+{
+    (*p).integral = 0u64;
+    (*p).resets   = (*p).resets + 1u64;
+}
+
+// Accumulate 30+20: integral==50
+fn accumulate() -> u64
+    ensures result == 50u64
+{
+    let p: PIDIntegral = pid_new(200u64);
+    pid_accumulate(&mut p, 30u64);
+    pid_accumulate(&mut p, 20u64);
+    p.integral
+}
+
+// Clamp at max
+fn clamp_at_max() -> u64
+    ensures result == 100u64
+{
+    let p: PIDIntegral = pid_new(100u64);
+    pid_accumulate(&mut p, 80u64);
+    pid_clamp(&mut p, 50u64);
+    p.integral
+}
+
+// Reset clears integral
+fn reset_clears() -> u64
+    ensures result == 0u64
+{
+    let p: PIDIntegral = pid_new(100u64);
+    pid_accumulate(&mut p, 50u64);
+    pid_reset(&mut p);
+    p.integral
+}
+
+// Clamp count
+fn clamp_count() -> u64
+    ensures result == 2u64
+{
+    let p: PIDIntegral = pid_new(100u64);
+    pid_accumulate(&mut p, 80u64);
+    pid_clamp(&mut p, 50u64);
+    pid_reset(&mut p);
+    pid_accumulate(&mut p, 70u64);
+    pid_clamp(&mut p, 60u64);
+    p.clamps
+}
+
+fn main() -> u64 { 0u64 }

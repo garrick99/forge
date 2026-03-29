@@ -1,0 +1,73 @@
+// Demo 360: Hash chain integrity counter
+//
+// A hash chain appends blocks; each block increments height and
+// carries a cumulative transaction count. Verified: height tracks
+// block appends and tx_count accumulates correctly.
+
+struct Chain {
+    height:   u64,
+    tx_count: u64,
+}
+
+fn chain_new() -> Chain
+    ensures result.height   == 0u64
+    ensures result.tx_count == 0u64
+{
+    struct Chain { height: 0u64, tx_count: 0u64 }
+}
+
+fn chain_append(c: refmut<Chain>, txs: u64)
+    requires txs > 0u64
+    ensures  (*c).height   == old((*c).height) + 1u64
+    ensures  (*c).tx_count == old((*c).tx_count) + txs
+{
+    (*c).height   = (*c).height + 1u64;
+    (*c).tx_count = (*c).tx_count + txs;
+}
+
+// Three blocks of 1 tx each: height is 3
+fn three_blocks_height() -> u64
+    ensures result == 3u64
+{
+    let c: Chain = chain_new();
+    chain_append(&mut c, 1u64);
+    chain_append(&mut c, 1u64);
+    chain_append(&mut c, 1u64);
+    c.height
+}
+
+// Three blocks of 1 tx each: tx_count is 3
+fn three_blocks_txs() -> u64
+    ensures result == 3u64
+{
+    let c: Chain = chain_new();
+    chain_append(&mut c, 1u64);
+    chain_append(&mut c, 1u64);
+    chain_append(&mut c, 1u64);
+    c.tx_count
+}
+
+// Varying tx counts: 5 + 10 + 3 = 18
+fn varying_txs() -> u64
+    ensures result == 18u64
+{
+    let c: Chain = chain_new();
+    chain_append(&mut c, 5u64);
+    chain_append(&mut c, 10u64);
+    chain_append(&mut c, 3u64);
+    c.tx_count
+}
+
+// Height is always number of appends
+fn height_is_appends() -> u64
+    ensures result == 4u64
+{
+    let c: Chain = chain_new();
+    chain_append(&mut c, 5u64);
+    chain_append(&mut c, 10u64);
+    chain_append(&mut c, 3u64);
+    chain_append(&mut c, 7u64);
+    c.height
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,90 @@
+// Demo 491: verified u8 arithmetic with range postconditions
+//
+// All operations carry postconditions verified by Z3 in Int mode.
+// Demonstrates: addition guards, subtraction guards, scaling, distance.
+
+fn safe_add_u8(a: u8, b: u8) -> u8
+    requires a <= 255u8 - b
+    ensures  result == a + b
+    ensures  result >= a
+    ensures  result >= b
+{
+    a + b
+}
+
+fn safe_sub_u8(a: u8, b: u8) -> u8
+    requires a >= b
+    ensures  result == a - b
+    ensures  result <= a
+{
+    a - b
+}
+
+fn half_u8(v: u8) -> u8
+    ensures result == v / 2u8
+    ensures result <= v
+    ensures result <= 127u8
+{
+    v / 2u8
+}
+
+fn triple_clamped(v: u8) -> u8
+    requires v <= 85u8
+    ensures  result == v + v + v
+    ensures  result <= 255u8
+{
+    v + v + v
+}
+
+fn distance_u8(a: u8, b: u8) -> u8
+    ensures a >= b ==> result == a - b
+    ensures !(a >= b) ==> result == b - a
+    ensures result <= 255u8
+{
+    if a >= b { a - b } else { b - a }
+}
+
+fn avg_u8(a: u8, b: u8) -> u8
+    ensures result <= 255u8
+    ensures result <= a || result <= b
+{
+    (a / 2u8) + (b / 2u8)
+}
+
+fn check_safe_add() -> u8
+    ensures result == 200u8
+{
+    safe_add_u8(150u8, 50u8)
+}
+
+fn check_safe_sub() -> u8
+    ensures result == 100u8
+{
+    safe_sub_u8(200u8, 100u8)
+}
+
+fn check_half_200() -> u8
+    ensures result == 100u8
+{
+    half_u8(200u8)
+}
+
+fn check_triple_50() -> u8
+    ensures result == 150u8
+{
+    triple_clamped(50u8)
+}
+
+fn check_distance_10_5() -> u8
+    ensures result == 5u8
+{
+    distance_u8(10u8, 5u8)
+}
+
+fn check_distance_5_10() -> u8
+    ensures result == 5u8
+{
+    distance_u8(5u8, 10u8)
+}
+
+fn main() -> u64 { 0u64 }

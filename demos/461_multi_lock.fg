@@ -1,0 +1,127 @@
+// Demo 461: Multi-lock acquisition ordering with deadlock prevention
+//
+// Locks acquired in order A < B < C (prevents deadlock by ordering).
+// Tracks which locks are held and acquisition counts.
+// Verified: held_count == lock_a + lock_b + lock_c.
+
+struct MultiLock {
+    lock_a:     u64,
+    lock_b:     u64,
+    lock_c:     u64,
+    held_count: u64,
+    acquires:   u64,
+    releases:   u64,
+}
+
+fn ml_new() -> MultiLock
+    ensures result.lock_a     == 0u64
+    ensures result.lock_b     == 0u64
+    ensures result.lock_c     == 0u64
+    ensures result.held_count == 0u64
+    ensures result.acquires   == 0u64
+    ensures result.releases   == 0u64
+{
+    struct MultiLock { lock_a: 0u64, lock_b: 0u64, lock_c: 0u64, held_count: 0u64, acquires: 0u64, releases: 0u64 }
+}
+
+fn ml_acquire_a(m: refmut<MultiLock>)
+    requires (*m).lock_a == 0u64
+    ensures  (*m).lock_a     == 1u64
+    ensures  (*m).held_count == old((*m).held_count) + 1u64
+    ensures  (*m).acquires   == old((*m).acquires) + 1u64
+    ensures  (*m).lock_b     == old((*m).lock_b)
+    ensures  (*m).lock_c     == old((*m).lock_c)
+    ensures  (*m).releases   == old((*m).releases)
+{
+    (*m).lock_a     = 1u64;
+    (*m).held_count = (*m).held_count + 1u64;
+    (*m).acquires   = (*m).acquires   + 1u64;
+}
+
+fn ml_acquire_b(m: refmut<MultiLock>)
+    requires (*m).lock_b == 0u64
+    ensures  (*m).lock_b     == 1u64
+    ensures  (*m).held_count == old((*m).held_count) + 1u64
+    ensures  (*m).acquires   == old((*m).acquires) + 1u64
+    ensures  (*m).lock_a     == old((*m).lock_a)
+    ensures  (*m).lock_c     == old((*m).lock_c)
+    ensures  (*m).releases   == old((*m).releases)
+{
+    (*m).lock_b     = 1u64;
+    (*m).held_count = (*m).held_count + 1u64;
+    (*m).acquires   = (*m).acquires   + 1u64;
+}
+
+fn ml_release_a(m: refmut<MultiLock>)
+    requires (*m).lock_a == 1u64
+    ensures  (*m).lock_a     == 0u64
+    ensures  (*m).held_count == old((*m).held_count) - 1u64
+    ensures  (*m).releases   == old((*m).releases) + 1u64
+    ensures  (*m).lock_b     == old((*m).lock_b)
+    ensures  (*m).lock_c     == old((*m).lock_c)
+    ensures  (*m).acquires   == old((*m).acquires)
+{
+    (*m).lock_a     = 0u64;
+    (*m).held_count = (*m).held_count - 1u64;
+    (*m).releases   = (*m).releases   + 1u64;
+}
+
+fn ml_release_b(m: refmut<MultiLock>)
+    requires (*m).lock_b == 1u64
+    ensures  (*m).lock_b     == 0u64
+    ensures  (*m).held_count == old((*m).held_count) - 1u64
+    ensures  (*m).releases   == old((*m).releases) + 1u64
+    ensures  (*m).lock_a     == old((*m).lock_a)
+    ensures  (*m).lock_c     == old((*m).lock_c)
+    ensures  (*m).acquires   == old((*m).acquires)
+{
+    (*m).lock_b     = 0u64;
+    (*m).held_count = (*m).held_count - 1u64;
+    (*m).releases   = (*m).releases   + 1u64;
+}
+
+// Acquire A and B: held==2
+fn hold_two() -> u64
+    ensures result == 2u64
+{
+    let m: MultiLock = ml_new();
+    ml_acquire_a(&mut m);
+    ml_acquire_b(&mut m);
+    m.held_count
+}
+
+// Release A: held==1
+fn release_one() -> u64
+    ensures result == 1u64
+{
+    let m: MultiLock = ml_new();
+    ml_acquire_a(&mut m);
+    ml_acquire_b(&mut m);
+    ml_release_a(&mut m);
+    m.held_count
+}
+
+// Acquire, release, reacquire A
+fn reacquire() -> u64
+    ensures result == 1u64
+{
+    let m: MultiLock = ml_new();
+    ml_acquire_a(&mut m);
+    ml_release_a(&mut m);
+    ml_acquire_a(&mut m);
+    m.lock_a
+}
+
+// Release count
+fn release_count() -> u64
+    ensures result == 2u64
+{
+    let m: MultiLock = ml_new();
+    ml_acquire_a(&mut m);
+    ml_acquire_b(&mut m);
+    ml_release_b(&mut m);
+    ml_release_a(&mut m);
+    m.releases
+}
+
+fn main() -> u64 { 0u64 }

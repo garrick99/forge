@@ -1,0 +1,102 @@
+// Demo 446: Flow meter with sampling and overflow detection
+//
+// Samples accumulate bytes; when count reaches sample_interval, a sample fires.
+// Overflow: if accumulated > threshold, overflow_count increments.
+// Verified: samples track interval crossings, bytes_accumulated tracks input.
+
+struct FlowMeter {
+    bytes_accumulated: u64,
+    sample_interval:   u64,
+    samples:           u64,
+    overflow_count:    u64,
+    threshold:         u64,
+}
+
+fn fm_new(interval: u64, threshold: u64) -> FlowMeter
+    requires interval > 0u64
+    requires threshold > 0u64
+    ensures result.bytes_accumulated == 0u64
+    ensures result.sample_interval   == interval
+    ensures result.samples           == 0u64
+    ensures result.overflow_count    == 0u64
+    ensures result.threshold         == threshold
+{
+    struct FlowMeter { bytes_accumulated: 0u64, sample_interval: interval, samples: 0u64, overflow_count: 0u64, threshold: threshold }
+}
+
+fn fm_add(f: refmut<FlowMeter>, n: u64)
+    requires (*f).bytes_accumulated + n < (*f).sample_interval
+    ensures  (*f).bytes_accumulated == old((*f).bytes_accumulated) + n
+    ensures  (*f).samples           == old((*f).samples)
+    ensures  (*f).sample_interval   == old((*f).sample_interval)
+    ensures  (*f).overflow_count    == old((*f).overflow_count)
+    ensures  (*f).threshold         == old((*f).threshold)
+{
+    (*f).bytes_accumulated = (*f).bytes_accumulated + n;
+}
+
+fn fm_sample(f: refmut<FlowMeter>, n: u64)
+    requires (*f).bytes_accumulated + n >= (*f).sample_interval
+    requires (*f).bytes_accumulated + n <= (*f).threshold
+    ensures  (*f).bytes_accumulated == 0u64
+    ensures  (*f).samples           == old((*f).samples) + 1u64
+    ensures  (*f).sample_interval   == old((*f).sample_interval)
+    ensures  (*f).overflow_count    == old((*f).overflow_count)
+    ensures  (*f).threshold         == old((*f).threshold)
+{
+    (*f).bytes_accumulated = 0u64;
+    (*f).samples           = (*f).samples + 1u64;
+}
+
+fn fm_overflow(f: refmut<FlowMeter>, n: u64)
+    requires (*f).bytes_accumulated + n > (*f).threshold
+    ensures  (*f).overflow_count    == old((*f).overflow_count) + 1u64
+    ensures  (*f).bytes_accumulated == 0u64
+    ensures  (*f).samples           == old((*f).samples)
+    ensures  (*f).sample_interval   == old((*f).sample_interval)
+    ensures  (*f).threshold         == old((*f).threshold)
+{
+    (*f).overflow_count    = (*f).overflow_count + 1u64;
+    (*f).bytes_accumulated = 0u64;
+}
+
+// Add bytes below interval: accumulated tracks
+fn add_bytes() -> u64
+    ensures result == 50u64
+{
+    let f: FlowMeter = fm_new(100u64, 1000u64);
+    fm_add(&mut f, 30u64);
+    fm_add(&mut f, 20u64);
+    f.bytes_accumulated
+}
+
+// Sample fires at interval
+fn sample_fires() -> u64
+    ensures result == 1u64
+{
+    let f: FlowMeter = fm_new(100u64, 1000u64);
+    fm_add(&mut f, 60u64);
+    fm_sample(&mut f, 50u64);
+    f.samples
+}
+
+// Sample resets accumulator
+fn sample_resets() -> u64
+    ensures result == 0u64
+{
+    let f: FlowMeter = fm_new(100u64, 1000u64);
+    fm_add(&mut f, 70u64);
+    fm_sample(&mut f, 40u64);
+    f.bytes_accumulated
+}
+
+// Overflow detected
+fn overflow_detected() -> u64
+    ensures result == 1u64
+{
+    let f: FlowMeter = fm_new(100u64, 200u64);
+    fm_overflow(&mut f, 201u64);
+    f.overflow_count
+}
+
+fn main() -> u64 { 0u64 }

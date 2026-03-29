@@ -1,0 +1,92 @@
+// Demo 500: milestone — showcase of Forge's verification capabilities
+//
+// 500 verified demos. Each function below is proven correct by Z3.
+
+fn add_commutative(a: u64, b: u64) -> bool
+    ensures result == true
+    ensures (a + b == b + a) ==> result == true
+{
+    a + b == b + a
+}
+
+fn mul_commutative(a: u64, b: u64) -> bool
+    ensures result == true
+    ensures (a * b == b * a) ==> result == true
+{
+    a * b == b * a
+}
+
+fn triangle_inequality(a: u64, b: u64, c: u64) -> bool
+    requires a <= b + c
+    requires b <= a + c
+    requires c <= a + b
+    ensures result == true
+{
+    a <= b + c
+}
+
+fn max_ge_both(a: u64, b: u64) -> bool
+    ensures result == true
+{
+    let m: u64 = if a >= b { a } else { b };
+    m >= a && m >= b
+}
+
+fn min_le_both(a: u64, b: u64) -> bool
+    ensures result == true
+{
+    let m: u64 = if a <= b { a } else { b };
+    m <= a && m <= b
+}
+
+fn clamp_in_range(v: u64, lo: u64, hi: u64) -> bool
+    requires lo <= hi
+    ensures result == true
+{
+    let c: u64 = if v < lo { lo } else if v > hi { hi } else { v };
+    c >= lo && c <= hi
+}
+
+fn sub_then_add(a: u64, b: u64) -> u64
+    requires a >= b
+    ensures  result == a
+{
+    (a - b) + b
+}
+
+fn div_then_mul_le(a: u64, b: u64) -> bool
+    requires b > 0u64
+    ensures result == true
+{
+    (a / b) * b <= a
+}
+
+fn zero_identity_add(a: u64) -> u64
+    ensures result == a
+{
+    a + 0u64
+}
+
+fn one_identity_mul(a: u64) -> u64
+    ensures result == a
+{
+    a * 1u64
+}
+
+fn double_half(a: u64) -> bool
+    ensures result == true
+{
+    (a / 2u64) * 2u64 <= a
+}
+
+fn check_add_comm() -> bool   ensures result == true { add_commutative(3u64, 7u64) }
+fn check_mul_comm() -> bool   ensures result == true { mul_commutative(6u64, 9u64) }
+fn check_max_ge()  -> bool   ensures result == true { max_ge_both(5u64, 3u64) }
+fn check_min_le()  -> bool   ensures result == true { min_le_both(5u64, 3u64) }
+fn check_clamp()   -> bool   ensures result == true { clamp_in_range(15u64, 1u64, 10u64) }
+fn check_sub_add() -> u64    ensures result == 10u64 { sub_then_add(10u64, 3u64) }
+fn check_div_mul() -> bool   ensures result == true { div_then_mul_le(10u64, 3u64) }
+fn check_zero()    -> u64    ensures result == 42u64 { zero_identity_add(42u64) }
+fn check_one()     -> u64    ensures result == 42u64 { one_identity_mul(42u64) }
+
+fn main() -> u64 { 0u64 }

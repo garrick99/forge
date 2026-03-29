@@ -1,0 +1,92 @@
+// Demo 368: Free list allocator state
+//
+// A free list tracks free slots and allocated slots.
+// alloc() takes from free, dealloc() returns to free.
+// Invariant: free + allocated == capacity.
+
+struct FreeList {
+    free:      u64,
+    allocated: u64,
+    capacity:  u64,
+}
+
+fn fl_new(cap: u64) -> FreeList
+    requires cap > 0u64
+    ensures result.free      == cap
+    ensures result.allocated == 0u64
+    ensures result.capacity  == cap
+{
+    struct FreeList { free: cap, allocated: 0u64, capacity: cap }
+}
+
+fn fl_alloc(f: refmut<FreeList>)
+    requires (*f).free > 0u64
+    ensures  (*f).free      == old((*f).free) - 1u64
+    ensures  (*f).allocated == old((*f).allocated) + 1u64
+    ensures  (*f).capacity  == old((*f).capacity)
+{
+    (*f).free      = (*f).free - 1u64;
+    (*f).allocated = (*f).allocated + 1u64;
+}
+
+fn fl_dealloc(f: refmut<FreeList>)
+    requires (*f).allocated > 0u64
+    ensures  (*f).allocated == old((*f).allocated) - 1u64
+    ensures  (*f).free      == old((*f).free) + 1u64
+    ensures  (*f).capacity  == old((*f).capacity)
+{
+    (*f).allocated = (*f).allocated - 1u64;
+    (*f).free      = (*f).free + 1u64;
+}
+
+// Alloc 4 from cap 8: allocated is 4
+fn alloc_four() -> u64
+    ensures result == 4u64
+{
+    let f: FreeList = fl_new(8u64);
+    fl_alloc(&mut f);
+    fl_alloc(&mut f);
+    fl_alloc(&mut f);
+    fl_alloc(&mut f);
+    f.allocated
+}
+
+// Alloc 4: free is 4
+fn alloc_four_free() -> u64
+    ensures result == 4u64
+{
+    let f: FreeList = fl_new(8u64);
+    fl_alloc(&mut f);
+    fl_alloc(&mut f);
+    fl_alloc(&mut f);
+    fl_alloc(&mut f);
+    f.free
+}
+
+// Alloc 3, dealloc 2: allocated is 1
+fn alloc3_dealloc2() -> u64
+    ensures result == 1u64
+{
+    let f: FreeList = fl_new(8u64);
+    fl_alloc(&mut f);
+    fl_alloc(&mut f);
+    fl_alloc(&mut f);
+    fl_dealloc(&mut f);
+    fl_dealloc(&mut f);
+    f.allocated
+}
+
+// Invariant: free + allocated == capacity
+fn invariant_holds(cap: u64) -> u64
+    requires cap > 3u64
+    ensures result == cap
+{
+    let f: FreeList = fl_new(cap);
+    fl_alloc(&mut f);
+    fl_alloc(&mut f);
+    fl_dealloc(&mut f);
+    fl_alloc(&mut f);
+    f.free + f.allocated
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,4 +1,4 @@
-// FORGE standard prelude — common C/CUDA extern declarations
+// FORGE standard prelude — C/CUDA extern declarations
 //
 // Include with:  use std::prelude;
 //
@@ -6,30 +6,53 @@
 // header — FORGE emits #include <header.h> and omits the redeclaration.
 
 // ---- Memory ----------------------------------------------------------------
-extern fn malloc(size: u64) -> u64 = "<stdlib.h>";
-extern fn free(ptr: u64) = "<stdlib.h>";
-extern fn memcpy(dst: u64, src: u64, n: u64) -> u64 = "<string.h>";
-extern fn memset(ptr: u64, val: i32, n: u64) -> u64 = "<string.h>";
+extern fn malloc(size: u64) -> u64   = "<stdlib.h>";
+extern fn free(ptr: u64)             = "<stdlib.h>";
+extern fn realloc(ptr: u64, size: u64) -> u64 = "<stdlib.h>";
+extern fn memcpy(dst: u64, src: u64, n: u64) -> u64  = "<string.h>";
+extern fn memmove(dst: u64, src: u64, n: u64) -> u64 = "<string.h>";
+extern fn memset(ptr: u64, val: i32, n: u64) -> u64  = "<string.h>";
+extern fn memcmp(a: u64, b: u64, n: u64) -> i32       = "<string.h>";
+
+// ---- C strings -------------------------------------------------------------
+extern fn strlen(s: u64) -> u64 = "<string.h>";
+extern fn strcmp(a: u64, b: u64) -> i32 = "<string.h>";
+extern fn strcpy(dst: u64, src: u64) -> u64 = "<string.h>";
 
 // ---- I/O -------------------------------------------------------------------
-extern fn puts(s: u64) -> i32 = "<stdio.h>";
-extern fn abort() = "<stdlib.h>";
+extern fn putchar(c: u64) -> i32   = "<stdio.h>";
+extern fn getchar() -> i32         = "<stdio.h>";
+extern fn puts(s: u64) -> i32      = "<stdio.h>";
+extern fn fputs(s: u64, f: u64) -> i32 = "<stdio.h>";
+extern fn fflush(f: u64) -> i32    = "<stdio.h>";
+extern fn fwrite(ptr: u64, size: u64, count: u64, f: u64) -> u64 = "<stdio.h>";
 
-// ---- Math (double precision) — use C standard names -----------------------
-extern fn sqrt(x: f64) -> f64 = "<math.h>";
-extern fn fabs(x: f64) -> f64 = "<math.h>";
-extern fn floor(x: f64) -> f64 = "<math.h>";
-extern fn ceil(x: f64) -> f64 = "<math.h>";
+// ---- Process ---------------------------------------------------------------
+extern fn abort()          = "<stdlib.h>";
+extern fn exit(code: i32)  = "<stdlib.h>";
+
+// ---- Math (double precision) -----------------------------------------------
+extern fn sqrt(x: f64) -> f64   = "<math.h>";
+extern fn fabs(x: f64) -> f64   = "<math.h>";
+extern fn floor(x: f64) -> f64  = "<math.h>";
+extern fn ceil(x: f64) -> f64   = "<math.h>";
 extern fn pow(x: f64, y: f64) -> f64 = "<math.h>";
-extern fn sin(x: f64) -> f64 = "<math.h>";
-extern fn cos(x: f64) -> f64 = "<math.h>";
-extern fn exp(x: f64) -> f64 = "<math.h>";
-extern fn log(x: f64) -> f64 = "<math.h>";
+extern fn sin(x: f64) -> f64    = "<math.h>";
+extern fn cos(x: f64) -> f64    = "<math.h>";
+extern fn tan(x: f64) -> f64    = "<math.h>";
+extern fn exp(x: f64) -> f64    = "<math.h>";
+extern fn log(x: f64) -> f64    = "<math.h>";
+extern fn log2(x: f64) -> f64   = "<math.h>";
+extern fn log10(x: f64) -> f64  = "<math.h>";
+extern fn atan2(y: f64, x: f64) -> f64 = "<math.h>";
 
 // ---- Math (single precision) -----------------------------------------------
-extern fn sqrtf(x: f32) -> f32 = "<math.h>";
-extern fn fabsf(x: f32) -> f32 = "<math.h>";
+extern fn sqrtf(x: f32) -> f32  = "<math.h>";
+extern fn fabsf(x: f32) -> f32  = "<math.h>";
 extern fn floorf(x: f32) -> f32 = "<math.h>";
+extern fn ceilf(x: f32) -> f32  = "<math.h>";
 extern fn powf(x: f32, y: f32) -> f32 = "<math.h>";
-extern fn sinf(x: f32) -> f32 = "<math.h>";
-extern fn cosf(x: f32) -> f32 = "<math.h>";
+extern fn sinf(x: f32) -> f32   = "<math.h>";
+extern fn cosf(x: f32) -> f32   = "<math.h>";
+extern fn expf(x: f32) -> f32   = "<math.h>";
+extern fn logf(x: f32) -> f32   = "<math.h>";

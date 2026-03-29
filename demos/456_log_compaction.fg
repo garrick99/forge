@@ -1,0 +1,85 @@
+// Demo 456: Log compaction with snapshot and truncation
+//
+// Log entries accumulate; compaction takes a snapshot and truncates old entries.
+// Verified: after compaction, entries == total_appended - compacted.
+
+struct LogCompaction {
+    total_appended: u64,
+    compacted:      u64,
+    live_entries:   u64,
+    snapshots:      u64,
+}
+
+fn lc_new() -> LogCompaction
+    ensures result.total_appended == 0u64
+    ensures result.compacted      == 0u64
+    ensures result.live_entries   == 0u64
+    ensures result.snapshots      == 0u64
+{
+    struct LogCompaction { total_appended: 0u64, compacted: 0u64, live_entries: 0u64, snapshots: 0u64 }
+}
+
+fn lc_append(l: refmut<LogCompaction>, n: u64)
+    ensures (*l).total_appended == old((*l).total_appended) + n
+    ensures (*l).live_entries   == old((*l).live_entries) + n
+    ensures (*l).compacted      == old((*l).compacted)
+    ensures (*l).snapshots      == old((*l).snapshots)
+{
+    (*l).total_appended = (*l).total_appended + n;
+    (*l).live_entries   = (*l).live_entries   + n;
+}
+
+fn lc_compact(l: refmut<LogCompaction>, n: u64)
+    requires (*l).live_entries >= n
+    ensures  (*l).compacted      == old((*l).compacted) + n
+    ensures  (*l).live_entries   == old((*l).live_entries) - n
+    ensures  (*l).snapshots      == old((*l).snapshots) + 1u64
+    ensures  (*l).total_appended == old((*l).total_appended)
+{
+    (*l).compacted    = (*l).compacted    + n;
+    (*l).live_entries = (*l).live_entries - n;
+    (*l).snapshots    = (*l).snapshots    + 1u64;
+}
+
+// Append 10: live==10
+fn append_10() -> u64
+    ensures result == 10u64
+{
+    let l: LogCompaction = lc_new();
+    lc_append(&mut l, 10u64);
+    l.live_entries
+}
+
+// Append 10, compact 4: live==6
+fn compact_4() -> u64
+    ensures result == 6u64
+{
+    let l: LogCompaction = lc_new();
+    lc_append(&mut l, 10u64);
+    lc_compact(&mut l, 4u64);
+    l.live_entries
+}
+
+// live == total_appended - compacted
+fn live_invariant() -> u64
+    ensures result == 0u64
+{
+    let l: LogCompaction = lc_new();
+    lc_append(&mut l, 20u64);
+    lc_compact(&mut l, 8u64);
+    lc_append(&mut l, 5u64);
+    l.live_entries - (l.total_appended - l.compacted)
+}
+
+// Snapshot count
+fn snapshot_count() -> u64
+    ensures result == 2u64
+{
+    let l: LogCompaction = lc_new();
+    lc_append(&mut l, 20u64);
+    lc_compact(&mut l, 10u64);
+    lc_compact(&mut l, 5u64);
+    l.snapshots
+}
+
+fn main() -> u64 { 0u64 }

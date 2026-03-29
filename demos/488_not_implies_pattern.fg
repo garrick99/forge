@@ -1,0 +1,99 @@
+// Demo 488: ! (not) in implies postconditions — parser fix regression test
+//
+// Exercises the !(cond) ==> rhs pattern that previously parsed incorrectly
+// as !(cond ==> rhs).  All postconditions now use the correct precedence.
+
+fn is_upper(b: u8) -> bool
+    ensures result == (b >= 65u8 && b <= 90u8)
+{
+    b >= 65u8 && b <= 90u8
+}
+
+fn is_lower(b: u8) -> bool
+    ensures result == (b >= 97u8 && b <= 122u8)
+{
+    b >= 97u8 && b <= 122u8
+}
+
+fn negate_bool(v: bool) -> bool
+    ensures result == !v
+    ensures !v ==> result == true
+    ensures v  ==> result == false
+{
+    !v
+}
+
+fn clamp_u8(v: u8, lo: u8, hi: u8) -> u8
+    requires lo <= hi
+    ensures result >= lo
+    ensures result <= hi
+    ensures !(v < lo)  ==> result >= v || result == hi
+    ensures !(v > hi)  ==> result <= v || result == lo
+{
+    if v < lo { lo } else if v > hi { hi } else { v }
+}
+
+fn abs_diff_u8(a: u8, b: u8) -> u8
+    ensures !(a >= b) ==> result == b - a
+    ensures !(a < b)  ==> result == a - b
+{
+    if a >= b { a - b } else { b - a }
+}
+
+fn sign_bit_clear(v: u8) -> bool
+    ensures result == !(v >= 128u8)
+    ensures !(v >= 128u8) ==> result == true
+    ensures v >= 128u8    ==> result == false
+{
+    !(v >= 128u8)
+}
+
+fn check_negate_false() -> bool
+    ensures result == true
+{
+    negate_bool(false)
+}
+
+fn check_negate_true() -> bool
+    ensures result == false
+{
+    negate_bool(true)
+}
+
+fn check_clamp_mid() -> u8
+    ensures result == 100u8
+{
+    clamp_u8(100u8, 0u8, 200u8)
+}
+
+fn check_clamp_lo() -> u8
+    ensures result == 10u8
+{
+    clamp_u8(5u8, 10u8, 20u8)
+}
+
+fn check_clamp_hi() -> u8
+    ensures result == 20u8
+{
+    clamp_u8(30u8, 10u8, 20u8)
+}
+
+fn check_abs_diff() -> u8
+    ensures result == 5u8
+{
+    abs_diff_u8(15u8, 10u8)
+}
+
+fn check_sign_clear() -> bool
+    ensures result == true
+{
+    sign_bit_clear(127u8)
+}
+
+fn check_sign_set() -> bool
+    ensures result == false
+{
+    sign_bit_clear(128u8)
+}
+
+fn main() -> u64 { 0u64 }

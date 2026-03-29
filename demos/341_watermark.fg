@@ -1,0 +1,84 @@
+// Demo 341: High-watermark tracker
+//
+// Tracks the maximum value seen so far. The watermark can only
+// increase; a reset brings it back to zero.
+// Verified: update only raises the mark, reset zeroes it.
+
+struct Watermark {
+    mark:    u64,
+    updates: u64,
+}
+
+fn wm_new() -> Watermark
+    ensures result.mark    == 0u64
+    ensures result.updates == 0u64
+{
+    struct Watermark { mark: 0u64, updates: 0u64 }
+}
+
+fn wm_update(w: refmut<Watermark>, v: u64)
+    requires v > (*w).mark
+    ensures  (*w).mark    == v
+    ensures  (*w).updates == old((*w).updates) + 1u64
+{
+    (*w).mark    = v;
+    (*w).updates = (*w).updates + 1u64;
+}
+
+fn wm_reset(w: refmut<Watermark>)
+    ensures (*w).mark    == 0u64
+    ensures (*w).updates == old((*w).updates)
+{
+    (*w).mark = 0u64;
+}
+
+// After one update to 5, mark is 5
+fn update_to_5() -> u64
+    ensures result == 5u64
+{
+    let w: Watermark = wm_new();
+    wm_update(&mut w, 5u64);
+    w.mark
+}
+
+// Three rising updates: mark is 30
+fn three_updates() -> u64
+    ensures result == 30u64
+{
+    let w: Watermark = wm_new();
+    wm_update(&mut w, 10u64);
+    wm_update(&mut w, 20u64);
+    wm_update(&mut w, 30u64);
+    w.mark
+}
+
+// Update count is 2 after two updates
+fn update_count() -> u64
+    ensures result == 2u64
+{
+    let w: Watermark = wm_new();
+    wm_update(&mut w, 7u64);
+    wm_update(&mut w, 15u64);
+    w.updates
+}
+
+// Update then reset: mark is 0, updates preserved
+fn update_reset_mark() -> u64
+    ensures result == 0u64
+{
+    let w: Watermark = wm_new();
+    wm_update(&mut w, 42u64);
+    wm_reset(&mut w);
+    w.mark
+}
+
+fn update_reset_updates() -> u64
+    ensures result == 1u64
+{
+    let w: Watermark = wm_new();
+    wm_update(&mut w, 42u64);
+    wm_reset(&mut w);
+    w.updates
+}
+
+fn main() -> u64 { 0u64 }

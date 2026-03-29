@@ -1,0 +1,124 @@
+// Demo 400: Verified bank — multi-account ledger
+//
+// Three accounts: checking, savings, reserve.
+// transfer() moves funds between any two accounts.
+// The total across all three is invariant (conservation of funds).
+// Verified: every transfer preserves total and never goes negative.
+
+struct Bank {
+    checking: u64,
+    savings:  u64,
+    reserve:  u64,
+    txns:     u64,
+}
+
+fn bank_new(checking: u64, savings: u64, reserve: u64) -> Bank
+    ensures result.checking == checking
+    ensures result.savings  == savings
+    ensures result.reserve  == reserve
+    ensures result.txns     == 0u64
+{
+    struct Bank { checking: checking, savings: savings, reserve: reserve, txns: 0u64 }
+}
+
+fn bank_checking_to_savings(b: refmut<Bank>, amount: u64)
+    requires (*b).checking >= amount
+    ensures  (*b).checking == old((*b).checking) - amount
+    ensures  (*b).savings  == old((*b).savings)  + amount
+    ensures  (*b).reserve  == old((*b).reserve)
+    ensures  (*b).txns     == old((*b).txns) + 1u64
+{
+    (*b).checking = (*b).checking - amount;
+    (*b).savings  = (*b).savings  + amount;
+    (*b).txns     = (*b).txns     + 1u64;
+}
+
+fn bank_savings_to_checking(b: refmut<Bank>, amount: u64)
+    requires (*b).savings >= amount
+    ensures  (*b).savings  == old((*b).savings)  - amount
+    ensures  (*b).checking == old((*b).checking) + amount
+    ensures  (*b).reserve  == old((*b).reserve)
+    ensures  (*b).txns     == old((*b).txns) + 1u64
+{
+    (*b).savings  = (*b).savings  - amount;
+    (*b).checking = (*b).checking + amount;
+    (*b).txns     = (*b).txns     + 1u64;
+}
+
+fn bank_checking_to_reserve(b: refmut<Bank>, amount: u64)
+    requires (*b).checking >= amount
+    ensures  (*b).checking == old((*b).checking) - amount
+    ensures  (*b).reserve  == old((*b).reserve)  + amount
+    ensures  (*b).savings  == old((*b).savings)
+    ensures  (*b).txns     == old((*b).txns) + 1u64
+{
+    (*b).checking = (*b).checking - amount;
+    (*b).reserve  = (*b).reserve  + amount;
+    (*b).txns     = (*b).txns     + 1u64;
+}
+
+fn bank_reserve_to_checking(b: refmut<Bank>, amount: u64)
+    requires (*b).reserve >= amount
+    ensures  (*b).reserve  == old((*b).reserve)  - amount
+    ensures  (*b).checking == old((*b).checking) + amount
+    ensures  (*b).savings  == old((*b).savings)
+    ensures  (*b).txns     == old((*b).txns) + 1u64
+{
+    (*b).reserve  = (*b).reserve  - amount;
+    (*b).checking = (*b).checking + amount;
+    (*b).txns     = (*b).txns     + 1u64;
+}
+
+// Move 200 checking→savings: savings is 700
+fn transfer_to_savings() -> u64
+    ensures result == 700u64
+{
+    let b: Bank = bank_new(500u64, 500u64, 500u64);
+    bank_checking_to_savings(&mut b, 200u64);
+    b.savings
+}
+
+// Conservation: total is always 1500
+fn conservation_after_transfers() -> u64
+    ensures result == 1500u64
+{
+    let b: Bank = bank_new(500u64, 500u64, 500u64);
+    bank_checking_to_savings(&mut b, 200u64);
+    bank_savings_to_checking(&mut b, 100u64);
+    bank_checking_to_reserve(&mut b, 300u64);
+    bank_reserve_to_checking(&mut b, 50u64);
+    b.checking + b.savings + b.reserve
+}
+
+// Transaction count tracks all transfers
+fn txn_count() -> u64
+    ensures result == 4u64
+{
+    let b: Bank = bank_new(500u64, 500u64, 500u64);
+    bank_checking_to_savings(&mut b, 200u64);
+    bank_savings_to_checking(&mut b, 100u64);
+    bank_checking_to_reserve(&mut b, 300u64);
+    bank_reserve_to_checking(&mut b, 50u64);
+    b.txns
+}
+
+// Round-trip: checking→savings→checking leaves checking unchanged
+fn round_trip() -> u64
+    ensures result == 500u64
+{
+    let b: Bank = bank_new(500u64, 500u64, 500u64);
+    bank_checking_to_savings(&mut b, 300u64);
+    bank_savings_to_checking(&mut b, 300u64);
+    b.checking
+}
+
+// Reserve drains correctly
+fn reserve_drain() -> u64
+    ensures result == 100u64
+{
+    let b: Bank = bank_new(500u64, 500u64, 500u64);
+    bank_reserve_to_checking(&mut b, 400u64);
+    b.reserve
+}
+
+fn main() -> u64 { 0u64 }

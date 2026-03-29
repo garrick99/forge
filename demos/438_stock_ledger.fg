@@ -1,0 +1,87 @@
+// Demo 438: Stock ledger with shares and cost basis
+//
+// Tracks shares held, total cost paid, and number of trades.
+// buy() increases shares and cost; sell() decreases shares and cost basis.
+// Verified: shares track buys and sells, cost tracks purchases.
+
+struct StockLedger {
+    shares: u64,
+    cost:   u64,
+    buys:   u64,
+    sells:  u64,
+}
+
+fn sl_new() -> StockLedger
+    ensures result.shares == 0u64
+    ensures result.cost   == 0u64
+    ensures result.buys   == 0u64
+    ensures result.sells  == 0u64
+{
+    struct StockLedger { shares: 0u64, cost: 0u64, buys: 0u64, sells: 0u64 }
+}
+
+fn sl_buy(s: refmut<StockLedger>, qty: u64, price: u64)
+    requires qty > 0u64
+    ensures  (*s).shares == old((*s).shares) + qty
+    ensures  (*s).cost   == old((*s).cost) + price
+    ensures  (*s).buys   == old((*s).buys) + 1u64
+    ensures  (*s).sells  == old((*s).sells)
+{
+    (*s).shares = (*s).shares + qty;
+    (*s).cost   = (*s).cost   + price;
+    (*s).buys   = (*s).buys   + 1u64;
+}
+
+fn sl_sell(s: refmut<StockLedger>, qty: u64, cost_basis: u64)
+    requires (*s).shares >= qty
+    requires (*s).cost   >= cost_basis
+    ensures  (*s).shares == old((*s).shares) - qty
+    ensures  (*s).cost   == old((*s).cost) - cost_basis
+    ensures  (*s).sells  == old((*s).sells) + 1u64
+    ensures  (*s).buys   == old((*s).buys)
+{
+    (*s).shares = (*s).shares - qty;
+    (*s).cost   = (*s).cost   - cost_basis;
+    (*s).sells  = (*s).sells  + 1u64;
+}
+
+// Buy 10 shares at 500: shares==10
+fn buy_10() -> u64
+    ensures result == 10u64
+{
+    let s: StockLedger = sl_new();
+    sl_buy(&mut s, 10u64, 500u64);
+    s.shares
+}
+
+// Buy 10, sell 3: shares==7
+fn sell_3() -> u64
+    ensures result == 7u64
+{
+    let s: StockLedger = sl_new();
+    sl_buy(&mut s, 10u64, 500u64);
+    sl_sell(&mut s, 3u64, 150u64);
+    s.shares
+}
+
+// Cost basis after partial sell
+fn cost_after_sell() -> u64
+    ensures result == 350u64
+{
+    let s: StockLedger = sl_new();
+    sl_buy(&mut s, 10u64, 500u64);
+    sl_sell(&mut s, 3u64, 150u64);
+    s.cost
+}
+
+// Buy count across two buys
+fn buy_count() -> u64
+    ensures result == 2u64
+{
+    let s: StockLedger = sl_new();
+    sl_buy(&mut s, 5u64, 200u64);
+    sl_buy(&mut s, 5u64, 250u64);
+    s.buys
+}
+
+fn main() -> u64 { 0u64 }

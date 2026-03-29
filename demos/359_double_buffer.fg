@@ -1,0 +1,88 @@
+// Demo 359: Double-buffer swap tracking
+//
+// A double-buffer has a front and back buffer, each with a version.
+// write() increments the back version, swap() exchanges front and back.
+// Verified: after swap, front version == old back version.
+
+struct DoubleBuffer {
+    front_ver: u64,
+    back_ver:  u64,
+    swaps:     u64,
+}
+
+fn db_new() -> DoubleBuffer
+    ensures result.front_ver == 0u64
+    ensures result.back_ver  == 0u64
+    ensures result.swaps     == 0u64
+{
+    struct DoubleBuffer { front_ver: 0u64, back_ver: 0u64, swaps: 0u64 }
+}
+
+fn db_write(d: refmut<DoubleBuffer>)
+    ensures (*d).back_ver  == old((*d).back_ver) + 1u64
+    ensures (*d).front_ver == old((*d).front_ver)
+    ensures (*d).swaps     == old((*d).swaps)
+{
+    (*d).back_ver = (*d).back_ver + 1u64;
+}
+
+fn db_swap(d: refmut<DoubleBuffer>)
+    ensures (*d).front_ver == old((*d).back_ver)
+    ensures (*d).back_ver  == old((*d).front_ver)
+    ensures (*d).swaps     == old((*d).swaps) + 1u64
+{
+    let tmp: u64 = (*d).front_ver;
+    (*d).front_ver = (*d).back_ver;
+    (*d).back_ver  = tmp;
+    (*d).swaps = (*d).swaps + 1u64;
+}
+
+// Write 3 to back, swap: front_ver is 3
+fn write3_swap_front() -> u64
+    ensures result == 3u64
+{
+    let d: DoubleBuffer = db_new();
+    db_write(&mut d);
+    db_write(&mut d);
+    db_write(&mut d);
+    db_swap(&mut d);
+    d.front_ver
+}
+
+// After swap, back_ver is old front_ver (0)
+fn write3_swap_back() -> u64
+    ensures result == 0u64
+{
+    let d: DoubleBuffer = db_new();
+    db_write(&mut d);
+    db_write(&mut d);
+    db_write(&mut d);
+    db_swap(&mut d);
+    d.back_ver
+}
+
+// Swap count tracks swaps
+fn swap_count() -> u64
+    ensures result == 2u64
+{
+    let d: DoubleBuffer = db_new();
+    db_write(&mut d);
+    db_swap(&mut d);
+    db_write(&mut d);
+    db_swap(&mut d);
+    d.swaps
+}
+
+// Write 1, swap, write 1, swap: front_ver is 1 (back after second write)
+fn two_write_swap_cycles() -> u64
+    ensures result == 1u64
+{
+    let d: DoubleBuffer = db_new();
+    db_write(&mut d);
+    db_swap(&mut d);
+    db_write(&mut d);
+    db_swap(&mut d);
+    d.front_ver
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,104 @@
+// Demo 416: PID controller state (proportional/integral)
+//
+// A simplified PID controller: the integral accumulates error over time,
+// the derivative tracks the change in error. Each tick updates both.
+// Verified: integral and step count track correctly via old() chaining.
+
+struct PIDState {
+    integral:   u64,
+    prev_error: u64,
+    steps:      u64,
+    kp:         u64,  // proportional gain (fixed-point *100)
+    ki:         u64,  // integral gain (fixed-point *100)
+}
+
+fn pid_new(kp: u64, ki: u64) -> PIDState
+    requires kp > 0u64
+    requires ki > 0u64
+    ensures result.integral   == 0u64
+    ensures result.prev_error == 0u64
+    ensures result.steps      == 0u64
+    ensures result.kp         == kp
+    ensures result.ki         == ki
+{
+    struct PIDState { integral: 0u64, prev_error: 0u64, steps: 0u64, kp: kp, ki: ki }
+}
+
+fn pid_step(p: refmut<PIDState>, error: u64)
+    ensures (*p).integral   == old((*p).integral) + error
+    ensures (*p).prev_error == error
+    ensures (*p).steps      == old((*p).steps) + 1u64
+    ensures (*p).kp         == old((*p).kp)
+    ensures (*p).ki         == old((*p).ki)
+{
+    (*p).integral   = (*p).integral + error;
+    (*p).prev_error = error;
+    (*p).steps      = (*p).steps + 1u64;
+}
+
+fn pid_reset_integral(p: refmut<PIDState>)
+    ensures (*p).integral   == 0u64
+    ensures (*p).prev_error == old((*p).prev_error)
+    ensures (*p).steps      == old((*p).steps)
+    ensures (*p).kp         == old((*p).kp)
+    ensures (*p).ki         == old((*p).ki)
+{
+    (*p).integral = 0u64;
+}
+
+// After 3 steps with errors 10, 5, 8: integral is 23
+fn integral_accumulates() -> u64
+    ensures result == 23u64
+{
+    let p: PIDState = pid_new(100u64, 10u64);
+    pid_step(&mut p, 10u64);
+    pid_step(&mut p, 5u64);
+    pid_step(&mut p, 8u64);
+    p.integral
+}
+
+// prev_error reflects last step
+fn prev_error_last() -> u64
+    ensures result == 8u64
+{
+    let p: PIDState = pid_new(100u64, 10u64);
+    pid_step(&mut p, 10u64);
+    pid_step(&mut p, 5u64);
+    pid_step(&mut p, 8u64);
+    p.prev_error
+}
+
+// Reset integral mid-run
+fn reset_mid_run() -> u64
+    ensures result == 0u64
+{
+    let p: PIDState = pid_new(100u64, 10u64);
+    pid_step(&mut p, 10u64);
+    pid_step(&mut p, 5u64);
+    pid_reset_integral(&mut p);
+    p.integral
+}
+
+// Steps counted
+fn step_count() -> u64
+    ensures result == 4u64
+{
+    let p: PIDState = pid_new(100u64, 10u64);
+    pid_step(&mut p, 3u64);
+    pid_step(&mut p, 6u64);
+    pid_step(&mut p, 2u64);
+    pid_step(&mut p, 9u64);
+    p.steps
+}
+
+// Gains preserved
+fn kp_preserved() -> u64
+    ensures result == 150u64
+{
+    let p: PIDState = pid_new(150u64, 20u64);
+    pid_step(&mut p, 5u64);
+    pid_step(&mut p, 3u64);
+    p.kp
+}
+
+fn main() -> u64 { 0u64 }

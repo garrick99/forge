@@ -1,0 +1,25 @@
+// Demo 477: std::io showcase — all output functions
+//
+// Exercises print_u64, print_i64, print_hex, print_bool, print_hex_u64_padded.
+
+use std::io;
+
+fn main() -> u64 {
+    println_u64(0u64);
+    println_u64(1u64);
+    println_u64(999u64);
+    println_u64(18446744073709551615u64);  // u64 max
+
+    print_i64(0i64);    print_newline();
+    print_i64(42i64);   print_newline();
+    print_i64(-1i64);   print_newline();
+
+    print_bool(true);  print_newline();
+    print_bool(false); print_newline();
+
+    print_hex(0u64);        print_newline();
+    print_hex(255u64);      print_newline();
+    print_hex(4096u64);     print_newline();
+
+    0u64
+}

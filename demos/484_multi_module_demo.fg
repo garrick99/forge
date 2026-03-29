@@ -1,0 +1,45 @@
+// Demo 484: multi-module demo — mem + str + math together
+//
+// Uses span_fill_u8 to initialize a buffer, constructs a Str,
+// and uses math utilities — exercises cross-module composition.
+
+use std::mem;
+use std::str;
+use std::math;
+
+fn check_fill_and_str(buf: span<u8>) -> u64
+    requires buf.len == 16u64
+    ensures  result == 0u64
+{
+    span_fill_u8(buf, 0u8, 16u64);
+    let s: Str = str_new(buf);
+    str_len(&s)
+}
+
+fn check_clamp_in_range() -> u64
+    ensures result == 10u64
+{
+    clamp64(15u64, 1u64, 10u64)
+}
+
+fn check_min_selection() -> u64
+    ensures result == 3u64
+{
+    min64(3u64, 8u64)
+}
+
+fn check_max_selection() -> u64
+    ensures result == 9u64
+{
+    max64(9u64, 4u64)
+}
+
+fn check_span_fill_then_sum(s: span<u64>) -> u64
+    requires s.len == 4u64
+    ensures  result == 0u64
+{
+    span_fill_u64(s, 0u64, 4u64);
+    span_sum(s, 0u64)
+}
+
+fn main() -> u64 { 0u64 }

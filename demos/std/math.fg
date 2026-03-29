@@ -1,17 +1,15 @@
 // std/math.fg — integer math utilities
 //
-// Pure functions with postconditions:
-//   abs_diff, min64, max64, clamp64, pow64
+// Include with:  use std::math;
+//
+// All functions carry postconditions verified by Z3.
 
-fn abs_diff(a: u64, b: u64) -> u64
-    ensures result <= a || result <= b
-{
-    if a >= b { a - b } else { b - a }
-}
+// ---- Min / Max / Clamp -----------------------------------------------------
 
 fn min64(a: u64, b: u64) -> u64
     ensures result <= a
     ensures result <= b
+    ensures result == a || result == b
 {
     if a <= b { a } else { b }
 }
@@ -19,19 +17,32 @@ fn min64(a: u64, b: u64) -> u64
 fn max64(a: u64, b: u64) -> u64
     ensures result >= a
     ensures result >= b
+    ensures result == a || result == b
 {
     if a >= b { a } else { b }
 }
 
 fn clamp64(v: u64, lo: u64, hi: u64) -> u64
     requires lo <= hi
-    ensures result >= lo
-    ensures result <= hi
+    ensures  result >= lo
+    ensures  result <= hi
+    ensures  v < lo ==> result == lo
+    ensures  v > hi ==> result == hi
+    ensures  lo <= v && v <= hi ==> result == v
 {
     if v < lo { lo } else if v > hi { hi } else { v }
 }
 
-// Integer power: base^exp
+fn abs_diff(a: u64, b: u64) -> u64
+    ensures result <= a || result <= b
+    ensures a >= b ==> result == a - b
+    ensures b > a ==> result == b - a
+{
+    if a >= b { a - b } else { b - a }
+}
+
+// ---- Integer power ---------------------------------------------------------
+
 fn pow64(base: u64, exp: u64) -> u64
     decreases exp
 {
@@ -39,5 +50,103 @@ fn pow64(base: u64, exp: u64) -> u64
         1u64
     } else {
         base * pow64(base, exp - 1u64)
+    }
+}
+
+// ---- Division helpers ------------------------------------------------------
+
+// Ceiling division: ceil(a / b)
+fn ceil_div(a: u64, b: u64) -> u64
+    requires b > 0u64
+    ensures  result * b >= a
+    ensures  result == (a + b - 1u64) / b
+{
+    (a + b - 1u64) / b
+}
+
+// Round a up to the next multiple of b.
+fn round_up(a: u64, b: u64) -> u64
+    requires b > 0u64
+{
+    ceil_div(a, b) * b
+}
+
+// ---- GCD -------------------------------------------------------------------
+
+// Euclidean GCD.  b may be 0 (base case returns a).
+// Requires a > 0 to guarantee result > 0.
+fn gcd64(a: u64, b: u64) -> u64
+    requires a > 0u64
+    decreases b
+{
+    if b == 0u64 {
+        a
+    } else {
+        gcd64(b, a % b)
+    }
+}
+
+// ---- Saturating arithmetic -------------------------------------------------
+
+fn sat_add(a: u64, b: u64) -> u64
+    ensures result >= a
+    ensures a > 18446744073709551615u64 - b ==> result == 18446744073709551615u64
+    ensures a <= 18446744073709551615u64 - b ==> result == a + b
+{
+    if a > 18446744073709551615u64 - b {
+        18446744073709551615u64
+    } else {
+        a + b
+    }
+}
+
+fn sat_sub(a: u64, b: u64) -> u64
+    ensures result <= a
+    ensures a < b ==> result == 0u64
+    ensures a >= b ==> result == a - b
+{
+    if a < b { 0u64 } else { a - b }
+}
+
+fn sat_mul(a: u64, b: u64) -> u64 {
+    if b == 0u64 {
+        0u64
+    } else if a > 18446744073709551615u64 / b {
+        18446744073709551615u64
+    } else {
+        a * b
+    }
+}
+
+// ---- Bit utilities ---------------------------------------------------------
+
+// Is n a power of two?
+fn is_pow2(n: u64) -> bool
+    requires n > 0u64
+    ensures  result == (n & (n - 1u64) == 0u64)
+{
+    n & (n - 1u64) == 0u64
+}
+
+// Popcount: number of set bits in a u64 (via Brian Kernighan's method).
+fn popcount64(n: u64) -> u64
+    decreases n
+{
+    if n == 0u64 {
+        0u64
+    } else {
+        1u64 + popcount64(n & (n - 1u64))
+    }
+}
+
+// Floor log2 (largest k s.t. 2^k <= n).
+fn floor_log2(n: u64) -> u64
+    requires n > 0u64
+    decreases n
+{
+    if n == 1u64 {
+        0u64
+    } else {
+        1u64 + floor_log2(n / 2u64)
     }
 }

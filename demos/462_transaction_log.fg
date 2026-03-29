@@ -1,0 +1,109 @@
+// Demo 462: Transaction log with WAL (write-ahead logging)
+//
+// WAL: entries written before commit. commit_lsn advances on commit.
+// Rollbacks revert to last committed state.
+// Verified: commit_lsn <= write_lsn, rollbacks track undo count.
+
+struct WAL {
+    write_lsn:  u64,
+    commit_lsn: u64,
+    commits:    u64,
+    rollbacks:  u64,
+    entries:    u64,
+}
+
+fn wal_new() -> WAL
+    ensures result.write_lsn  == 0u64
+    ensures result.commit_lsn == 0u64
+    ensures result.commits    == 0u64
+    ensures result.rollbacks  == 0u64
+    ensures result.entries    == 0u64
+{
+    struct WAL { write_lsn: 0u64, commit_lsn: 0u64, commits: 0u64, rollbacks: 0u64, entries: 0u64 }
+}
+
+fn wal_write(w: refmut<WAL>)
+    ensures (*w).write_lsn  == old((*w).write_lsn) + 1u64
+    ensures (*w).entries    == old((*w).entries) + 1u64
+    ensures (*w).commit_lsn == old((*w).commit_lsn)
+    ensures (*w).commits    == old((*w).commits)
+    ensures (*w).rollbacks  == old((*w).rollbacks)
+{
+    (*w).write_lsn = (*w).write_lsn + 1u64;
+    (*w).entries   = (*w).entries   + 1u64;
+}
+
+fn wal_commit(w: refmut<WAL>)
+    requires (*w).write_lsn > (*w).commit_lsn
+    ensures  (*w).commit_lsn == (*w).write_lsn
+    ensures  (*w).commits    == old((*w).commits) + 1u64
+    ensures  (*w).write_lsn  == old((*w).write_lsn)
+    ensures  (*w).entries    == old((*w).entries)
+    ensures  (*w).rollbacks  == old((*w).rollbacks)
+{
+    (*w).commit_lsn = (*w).write_lsn;
+    (*w).commits    = (*w).commits + 1u64;
+}
+
+fn wal_rollback(w: refmut<WAL>)
+    requires (*w).write_lsn > (*w).commit_lsn
+    ensures  (*w).write_lsn  == (*w).commit_lsn
+    ensures  (*w).rollbacks  == old((*w).rollbacks) + 1u64
+    ensures  (*w).commit_lsn == old((*w).commit_lsn)
+    ensures  (*w).commits    == old((*w).commits)
+    ensures  (*w).entries    == old((*w).entries)
+{
+    (*w).write_lsn = (*w).commit_lsn;
+    (*w).rollbacks = (*w).rollbacks + 1u64;
+}
+
+// Write 3: write_lsn==3
+fn write_3() -> u64
+    ensures result == 3u64
+{
+    let w: WAL = wal_new();
+    wal_write(&mut w);
+    wal_write(&mut w);
+    wal_write(&mut w);
+    w.write_lsn
+}
+
+// Commit: commit_lsn catches up
+fn commit_advances() -> u64
+    ensures result == 3u64
+{
+    let w: WAL = wal_new();
+    wal_write(&mut w);
+    wal_write(&mut w);
+    wal_write(&mut w);
+    wal_commit(&mut w);
+    w.commit_lsn
+}
+
+// Rollback: write_lsn reverts
+fn rollback_reverts() -> u64
+    ensures result == 2u64
+{
+    let w: WAL = wal_new();
+    wal_write(&mut w);
+    wal_write(&mut w);
+    wal_commit(&mut w);
+    wal_write(&mut w);
+    wal_write(&mut w);
+    wal_rollback(&mut w);
+    w.write_lsn
+}
+
+// Commit count
+fn commit_count() -> u64
+    ensures result == 2u64
+{
+    let w: WAL = wal_new();
+    wal_write(&mut w);
+    wal_commit(&mut w);
+    wal_write(&mut w);
+    wal_commit(&mut w);
+    w.commits
+}
+
+fn main() -> u64 { 0u64 }

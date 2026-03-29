@@ -1,0 +1,102 @@
+// Demo 389: Multicast group membership tracker
+//
+// A multicast group: join() adds a member (up to max),
+// leave() removes one, send() increments message count.
+// Verified: members track joins/leaves, messages accumulate.
+
+struct MulticastGroup {
+    members:   u64,
+    max_members: u64,
+    messages:  u64,
+}
+
+fn mg_new(max_members: u64) -> MulticastGroup
+    requires max_members > 0u64
+    ensures result.members     == 0u64
+    ensures result.max_members == max_members
+    ensures result.messages    == 0u64
+{
+    struct MulticastGroup { members: 0u64, max_members: max_members, messages: 0u64 }
+}
+
+fn mg_join(g: refmut<MulticastGroup>)
+    requires (*g).members < (*g).max_members
+    ensures  (*g).members     == old((*g).members) + 1u64
+    ensures  (*g).max_members == old((*g).max_members)
+    ensures  (*g).messages    == old((*g).messages)
+{
+    (*g).members = (*g).members + 1u64;
+}
+
+fn mg_leave(g: refmut<MulticastGroup>)
+    requires (*g).members > 0u64
+    ensures  (*g).members     == old((*g).members) - 1u64
+    ensures  (*g).max_members == old((*g).max_members)
+    ensures  (*g).messages    == old((*g).messages)
+{
+    (*g).members = (*g).members - 1u64;
+}
+
+fn mg_send(g: refmut<MulticastGroup>)
+    requires (*g).members > 0u64
+    ensures  (*g).messages == old((*g).messages) + 1u64
+    ensures  (*g).members  == old((*g).members)
+    ensures  (*g).max_members == old((*g).max_members)
+{
+    (*g).messages = (*g).messages + 1u64;
+}
+
+// Join 4: members is 4
+fn join_four(max: u64) -> u64
+    requires max > 4u64
+    ensures result == 4u64
+{
+    let g: MulticastGroup = mg_new(max);
+    mg_join(&mut g);
+    mg_join(&mut g);
+    mg_join(&mut g);
+    mg_join(&mut g);
+    g.members
+}
+
+// Join 3, leave 1: members is 2
+fn join3_leave1(max: u64) -> u64
+    requires max > 3u64
+    ensures result == 2u64
+{
+    let g: MulticastGroup = mg_new(max);
+    mg_join(&mut g);
+    mg_join(&mut g);
+    mg_join(&mut g);
+    mg_leave(&mut g);
+    g.members
+}
+
+// Send 5 messages: messages is 5
+fn send_five(max: u64) -> u64
+    requires max > 1u64
+    ensures result == 5u64
+{
+    let g: MulticastGroup = mg_new(max);
+    mg_join(&mut g);
+    mg_send(&mut g);
+    mg_send(&mut g);
+    mg_send(&mut g);
+    mg_send(&mut g);
+    mg_send(&mut g);
+    g.messages
+}
+
+// max_members preserved
+fn max_preserved(max: u64) -> u64
+    requires max > 3u64
+    ensures result == max
+{
+    let g: MulticastGroup = mg_new(max);
+    mg_join(&mut g);
+    mg_join(&mut g);
+    mg_leave(&mut g);
+    g.max_members
+}
+
+fn main() -> u64 { 0u64 }

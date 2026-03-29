@@ -1,0 +1,100 @@
+// Demo 378: Barrier synchronization counter
+//
+// N threads must all arrive before any can proceed.
+// arrived() increments arrivals, reset() clears for next barrier.
+// Verified: arrivals track increments, reset clears count.
+
+struct Barrier {
+    arrivals: u64,
+    target:   u64,
+    cycles:   u64,
+}
+
+fn barrier_new(target: u64) -> Barrier
+    requires target > 0u64
+    ensures result.arrivals == 0u64
+    ensures result.target   == target
+    ensures result.cycles   == 0u64
+{
+    struct Barrier { arrivals: 0u64, target: target, cycles: 0u64 }
+}
+
+fn barrier_arrive(b: refmut<Barrier>)
+    requires (*b).arrivals < (*b).target
+    ensures  (*b).arrivals == old((*b).arrivals) + 1u64
+    ensures  (*b).target   == old((*b).target)
+    ensures  (*b).cycles   == old((*b).cycles)
+{
+    (*b).arrivals = (*b).arrivals + 1u64;
+}
+
+fn barrier_reset(b: refmut<Barrier>)
+    requires (*b).arrivals == (*b).target
+    ensures  (*b).arrivals == 0u64
+    ensures  (*b).cycles   == old((*b).cycles) + 1u64
+    ensures  (*b).target   == old((*b).target)
+{
+    (*b).arrivals = 0u64;
+    (*b).cycles   = (*b).cycles + 1u64;
+}
+
+// 3 arrivals at target 4: arrivals is 3
+fn three_arrive() -> u64
+    ensures result == 3u64
+{
+    let b: Barrier = barrier_new(4u64);
+    barrier_arrive(&mut b);
+    barrier_arrive(&mut b);
+    barrier_arrive(&mut b);
+    b.arrivals
+}
+
+// All 3 arrive at barrier of 3: arrivals == target
+fn all_arrive() -> u64
+    ensures result == 3u64
+{
+    let b: Barrier = barrier_new(3u64);
+    barrier_arrive(&mut b);
+    barrier_arrive(&mut b);
+    barrier_arrive(&mut b);
+    b.arrivals
+}
+
+// All arrive, reset: arrivals is 0, cycles is 1
+fn arrive_reset_arrivals() -> u64
+    ensures result == 0u64
+{
+    let b: Barrier = barrier_new(3u64);
+    barrier_arrive(&mut b);
+    barrier_arrive(&mut b);
+    barrier_arrive(&mut b);
+    barrier_reset(&mut b);
+    b.arrivals
+}
+
+fn arrive_reset_cycles() -> u64
+    ensures result == 1u64
+{
+    let b: Barrier = barrier_new(3u64);
+    barrier_arrive(&mut b);
+    barrier_arrive(&mut b);
+    barrier_arrive(&mut b);
+    barrier_reset(&mut b);
+    b.cycles
+}
+
+// Two barrier cycles: cycles is 2
+fn two_cycles() -> u64
+    ensures result == 2u64
+{
+    let b: Barrier = barrier_new(2u64);
+    barrier_arrive(&mut b);
+    barrier_arrive(&mut b);
+    barrier_reset(&mut b);
+    barrier_arrive(&mut b);
+    barrier_arrive(&mut b);
+    barrier_reset(&mut b);
+    b.cycles
+}
+
+fn main() -> u64 { 0u64 }

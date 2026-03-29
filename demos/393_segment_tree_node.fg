@@ -1,0 +1,100 @@
+// Demo 393: Segment tree node update tracking
+//
+// A segment tree node tracks its value and the number of updates.
+// update() sets a new value and bumps update count.
+// push_up() propagates children sums to parent.
+// Verified: values and counts track mutations via old() chaining.
+
+struct SegNode {
+    value:   u64,
+    left:    u64,
+    right:   u64,
+    updates: u64,
+}
+
+fn sn_new(v: u64) -> SegNode
+    ensures result.value   == v
+    ensures result.left    == 0u64
+    ensures result.right   == 0u64
+    ensures result.updates == 0u64
+{
+    struct SegNode { value: v, left: 0u64, right: 0u64, updates: 0u64 }
+}
+
+fn sn_set_left(n: refmut<SegNode>, v: u64)
+    ensures (*n).left    == v
+    ensures (*n).right   == old((*n).right)
+    ensures (*n).value   == old((*n).value)
+    ensures (*n).updates == old((*n).updates) + 1u64
+{
+    (*n).left    = v;
+    (*n).updates = (*n).updates + 1u64;
+}
+
+fn sn_set_right(n: refmut<SegNode>, v: u64)
+    ensures (*n).right   == v
+    ensures (*n).left    == old((*n).left)
+    ensures (*n).value   == old((*n).value)
+    ensures (*n).updates == old((*n).updates) + 1u64
+{
+    (*n).right   = v;
+    (*n).updates = (*n).updates + 1u64;
+}
+
+fn sn_push_up(n: refmut<SegNode>)
+    ensures (*n).value   == (*n).left + (*n).right
+    ensures (*n).left    == old((*n).left)
+    ensures (*n).right   == old((*n).right)
+    ensures (*n).updates == old((*n).updates) + 1u64
+{
+    (*n).value   = (*n).left + (*n).right;
+    (*n).updates = (*n).updates + 1u64;
+}
+
+// Set left=10, right=20, push_up: value is 30
+fn push_up_sum() -> u64
+    ensures result == 30u64
+{
+    let n: SegNode = sn_new(0u64);
+    sn_set_left(&mut n, 10u64);
+    sn_set_right(&mut n, 20u64);
+    sn_push_up(&mut n);
+    n.value
+}
+
+// Updates counted: 3 ops
+fn update_count() -> u64
+    ensures result == 3u64
+{
+    let n: SegNode = sn_new(0u64);
+    sn_set_left(&mut n, 10u64);
+    sn_set_right(&mut n, 20u64);
+    sn_push_up(&mut n);
+    n.updates
+}
+
+// Update left then push_up again: value reflects new left
+fn update_left_repush() -> u64
+    ensures result == 50u64
+{
+    let n: SegNode = sn_new(0u64);
+    sn_set_left(&mut n, 10u64);
+    sn_set_right(&mut n, 20u64);
+    sn_push_up(&mut n);
+    sn_set_left(&mut n, 30u64);
+    sn_push_up(&mut n);
+    n.value
+}
+
+// Right preserved across left update
+fn right_preserved() -> u64
+    ensures result == 20u64
+{
+    let n: SegNode = sn_new(0u64);
+    sn_set_left(&mut n, 10u64);
+    sn_set_right(&mut n, 20u64);
+    sn_set_left(&mut n, 30u64);
+    n.right
+}
+
+fn main() -> u64 { 0u64 }

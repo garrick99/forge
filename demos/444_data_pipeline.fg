@@ -1,0 +1,100 @@
+// Demo 444: Data pipeline with filter and transform stages
+//
+// Items enter raw, pass filter (accepted/rejected), then transform (processed).
+// Verified: accepted + rejected == ingested, processed <= accepted.
+
+struct DataPipeline {
+    ingested:  u64,
+    accepted:  u64,
+    rejected:  u64,
+    processed: u64,
+}
+
+fn dp_new() -> DataPipeline
+    ensures result.ingested  == 0u64
+    ensures result.accepted  == 0u64
+    ensures result.rejected  == 0u64
+    ensures result.processed == 0u64
+{
+    struct DataPipeline { ingested: 0u64, accepted: 0u64, rejected: 0u64, processed: 0u64 }
+}
+
+fn dp_ingest_accept(d: refmut<DataPipeline>)
+    ensures (*d).ingested == old((*d).ingested) + 1u64
+    ensures (*d).accepted == old((*d).accepted) + 1u64
+    ensures (*d).rejected == old((*d).rejected)
+    ensures (*d).processed == old((*d).processed)
+{
+    (*d).ingested = (*d).ingested + 1u64;
+    (*d).accepted = (*d).accepted + 1u64;
+}
+
+fn dp_ingest_reject(d: refmut<DataPipeline>)
+    ensures (*d).ingested == old((*d).ingested) + 1u64
+    ensures (*d).rejected == old((*d).rejected) + 1u64
+    ensures (*d).accepted == old((*d).accepted)
+    ensures (*d).processed == old((*d).processed)
+{
+    (*d).ingested = (*d).ingested + 1u64;
+    (*d).rejected = (*d).rejected + 1u64;
+}
+
+fn dp_process(d: refmut<DataPipeline>)
+    requires (*d).accepted > (*d).processed
+    ensures  (*d).processed == old((*d).processed) + 1u64
+    ensures  (*d).ingested  == old((*d).ingested)
+    ensures  (*d).accepted  == old((*d).accepted)
+    ensures  (*d).rejected  == old((*d).rejected)
+{
+    (*d).processed = (*d).processed + 1u64;
+}
+
+// Ingest 4, accept 3, reject 1: ingested==4
+fn ingest_count() -> u64
+    ensures result == 4u64
+{
+    let d: DataPipeline = dp_new();
+    dp_ingest_accept(&mut d);
+    dp_ingest_accept(&mut d);
+    dp_ingest_accept(&mut d);
+    dp_ingest_reject(&mut d);
+    d.ingested
+}
+
+// accepted + rejected == ingested
+fn conservation() -> u64
+    ensures result == 0u64
+{
+    let d: DataPipeline = dp_new();
+    dp_ingest_accept(&mut d);
+    dp_ingest_reject(&mut d);
+    dp_ingest_accept(&mut d);
+    dp_ingest_reject(&mut d);
+    d.ingested - d.accepted - d.rejected
+}
+
+// Process accepted items
+fn process_count() -> u64
+    ensures result == 2u64
+{
+    let d: DataPipeline = dp_new();
+    dp_ingest_accept(&mut d);
+    dp_ingest_accept(&mut d);
+    dp_ingest_accept(&mut d);
+    dp_process(&mut d);
+    dp_process(&mut d);
+    d.processed
+}
+
+// Rejected not processed
+fn rejected_not_processed() -> u64
+    ensures result == 3u64
+{
+    let d: DataPipeline = dp_new();
+    dp_ingest_reject(&mut d);
+    dp_ingest_reject(&mut d);
+    dp_ingest_reject(&mut d);
+    d.rejected
+}
+
+fn main() -> u64 { 0u64 }

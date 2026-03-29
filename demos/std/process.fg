@@ -1,0 +1,26 @@
+// std/process.fg — process control
+//
+// Include with:  use std::process;
+
+use prelude;
+
+// Terminate the process with the given exit code.
+fn proc_exit(code: i32) {
+    exit(code);
+}
+
+// Terminate with exit code 0 (success).
+fn proc_success() {
+    exit(0i32);
+}
+
+// Terminate with exit code 1 (failure).
+fn proc_fail() {
+    exit(1i32);
+}
+
+// Abort: trigger an abnormal termination (SIGABRT).
+// Use for unreachable states or internal consistency failures.
+fn proc_abort() {
+    abort();
+}

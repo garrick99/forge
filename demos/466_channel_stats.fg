@@ -1,0 +1,106 @@
+// Demo 466: Communication channel statistics
+//
+// Tracks bytes sent, received, dropped, and retransmitted.
+// Verified: sent_bytes + dropped_bytes == total_attempted.
+
+struct ChannelStats {
+    sent_bytes:       u64,
+    received_bytes:   u64,
+    dropped_bytes:    u64,
+    retransmit_bytes: u64,
+    total_attempted:  u64,
+}
+
+fn cs_new() -> ChannelStats
+    ensures result.sent_bytes       == 0u64
+    ensures result.received_bytes   == 0u64
+    ensures result.dropped_bytes    == 0u64
+    ensures result.retransmit_bytes == 0u64
+    ensures result.total_attempted  == 0u64
+{
+    struct ChannelStats { sent_bytes: 0u64, received_bytes: 0u64, dropped_bytes: 0u64, retransmit_bytes: 0u64, total_attempted: 0u64 }
+}
+
+fn cs_send(c: refmut<ChannelStats>, n: u64)
+    ensures (*c).sent_bytes      == old((*c).sent_bytes) + n
+    ensures (*c).total_attempted == old((*c).total_attempted) + n
+    ensures (*c).received_bytes  == old((*c).received_bytes)
+    ensures (*c).dropped_bytes   == old((*c).dropped_bytes)
+    ensures (*c).retransmit_bytes == old((*c).retransmit_bytes)
+{
+    (*c).sent_bytes      = (*c).sent_bytes      + n;
+    (*c).total_attempted = (*c).total_attempted + n;
+}
+
+fn cs_drop(c: refmut<ChannelStats>, n: u64)
+    ensures (*c).dropped_bytes   == old((*c).dropped_bytes) + n
+    ensures (*c).total_attempted == old((*c).total_attempted) + n
+    ensures (*c).sent_bytes      == old((*c).sent_bytes)
+    ensures (*c).received_bytes  == old((*c).received_bytes)
+    ensures (*c).retransmit_bytes == old((*c).retransmit_bytes)
+{
+    (*c).dropped_bytes   = (*c).dropped_bytes   + n;
+    (*c).total_attempted = (*c).total_attempted + n;
+}
+
+fn cs_receive(c: refmut<ChannelStats>, n: u64)
+    ensures (*c).received_bytes  == old((*c).received_bytes) + n
+    ensures (*c).sent_bytes      == old((*c).sent_bytes)
+    ensures (*c).dropped_bytes   == old((*c).dropped_bytes)
+    ensures (*c).retransmit_bytes == old((*c).retransmit_bytes)
+    ensures (*c).total_attempted == old((*c).total_attempted)
+{
+    (*c).received_bytes = (*c).received_bytes + n;
+}
+
+fn cs_retransmit(c: refmut<ChannelStats>, n: u64)
+    ensures (*c).retransmit_bytes == old((*c).retransmit_bytes) + n
+    ensures (*c).total_attempted  == old((*c).total_attempted) + n
+    ensures (*c).sent_bytes       == old((*c).sent_bytes)
+    ensures (*c).dropped_bytes    == old((*c).dropped_bytes)
+    ensures (*c).received_bytes   == old((*c).received_bytes)
+{
+    (*c).retransmit_bytes = (*c).retransmit_bytes + n;
+    (*c).total_attempted  = (*c).total_attempted  + n;
+}
+
+// Send 100 bytes: sent==100
+fn send_100() -> u64
+    ensures result == 100u64
+{
+    let c: ChannelStats = cs_new();
+    cs_send(&mut c, 100u64);
+    c.sent_bytes
+}
+
+// Send + drop: total_attempted==150
+fn send_drop_total() -> u64
+    ensures result == 150u64
+{
+    let c: ChannelStats = cs_new();
+    cs_send(&mut c, 100u64);
+    cs_drop(&mut c, 50u64);
+    c.total_attempted
+}
+
+// Receive independent
+fn receive_independent() -> u64
+    ensures result == 80u64
+{
+    let c: ChannelStats = cs_new();
+    cs_send(&mut c, 100u64);
+    cs_receive(&mut c, 80u64);
+    c.received_bytes
+}
+
+// Retransmit tracked
+fn retransmit_tracked() -> u64
+    ensures result == 30u64
+{
+    let c: ChannelStats = cs_new();
+    cs_send(&mut c, 100u64);
+    cs_retransmit(&mut c, 30u64);
+    c.retransmit_bytes
+}
+
+fn main() -> u64 { 0u64 }

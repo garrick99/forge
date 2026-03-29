@@ -1,0 +1,99 @@
+// Demo 424: Interval timer with reload
+//
+// A countdown timer: tick() decrements the counter, reload() resets it
+// to the period value. expired() fires when count reaches 0.
+// Verified: count tracks ticks, reloads track reloads.
+
+struct IntervalTimer {
+    count:   u64,
+    period:  u64,
+    reloads: u64,
+    ticks:   u64,
+}
+
+fn itimer_new(period: u64) -> IntervalTimer
+    requires period > 0u64
+    ensures result.count   == period
+    ensures result.period  == period
+    ensures result.reloads == 0u64
+    ensures result.ticks   == 0u64
+{
+    struct IntervalTimer { count: period, period: period, reloads: 0u64, ticks: 0u64 }
+}
+
+fn itimer_tick(t: refmut<IntervalTimer>)
+    requires (*t).count > 1u64
+    ensures  (*t).count   == old((*t).count) - 1u64
+    ensures  (*t).ticks   == old((*t).ticks) + 1u64
+    ensures  (*t).period  == old((*t).period)
+    ensures  (*t).reloads == old((*t).reloads)
+{
+    (*t).count = (*t).count - 1u64;
+    (*t).ticks = (*t).ticks + 1u64;
+}
+
+fn itimer_expire_reload(t: refmut<IntervalTimer>)
+    requires (*t).count == 1u64
+    ensures  (*t).count   == (*t).period
+    ensures  (*t).reloads == old((*t).reloads) + 1u64
+    ensures  (*t).ticks   == old((*t).ticks) + 1u64
+    ensures  (*t).period  == old((*t).period)
+{
+    (*t).count   = (*t).period;
+    (*t).reloads = (*t).reloads + 1u64;
+    (*t).ticks   = (*t).ticks   + 1u64;
+}
+
+// 3 ticks from period=5: count is 2
+fn three_ticks() -> u64
+    ensures result == 2u64
+{
+    let t: IntervalTimer = itimer_new(5u64);
+    itimer_tick(&mut t);
+    itimer_tick(&mut t);
+    itimer_tick(&mut t);
+    t.count
+}
+
+// 4 ticks then expire: count reloads to 5
+fn expire_reload() -> u64
+    ensures result == 5u64
+{
+    let t: IntervalTimer = itimer_new(5u64);
+    itimer_tick(&mut t);
+    itimer_tick(&mut t);
+    itimer_tick(&mut t);
+    itimer_tick(&mut t);
+    itimer_expire_reload(&mut t);
+    t.count
+}
+
+// Reload count
+fn reload_count() -> u64
+    ensures result == 2u64
+{
+    let t: IntervalTimer = itimer_new(3u64);
+    itimer_tick(&mut t);
+    itimer_tick(&mut t);
+    itimer_expire_reload(&mut t);
+    itimer_tick(&mut t);
+    itimer_tick(&mut t);
+    itimer_expire_reload(&mut t);
+    t.reloads
+}
+
+// Total ticks across reloads
+fn total_ticks() -> u64
+    ensures result == 6u64
+{
+    let t: IntervalTimer = itimer_new(3u64);
+    itimer_tick(&mut t);
+    itimer_tick(&mut t);
+    itimer_expire_reload(&mut t);
+    itimer_tick(&mut t);
+    itimer_tick(&mut t);
+    itimer_expire_reload(&mut t);
+    t.ticks
+}
+
+fn main() -> u64 { 0u64 }

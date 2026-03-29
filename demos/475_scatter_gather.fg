@@ -1,0 +1,93 @@
+// Demo 475: Scatter-gather I/O operation tracker
+//
+// Scatter writes: one source → multiple destinations.
+// Gather reads: multiple sources → one destination.
+// Verified: scatter_ops + gather_ops == total_ops.
+
+struct ScatterGather {
+    scatter_ops:   u64,
+    gather_ops:    u64,
+    total_ops:     u64,
+    bytes_written: u64,
+    bytes_read:    u64,
+}
+
+fn sg_new() -> ScatterGather
+    ensures result.scatter_ops   == 0u64
+    ensures result.gather_ops    == 0u64
+    ensures result.total_ops     == 0u64
+    ensures result.bytes_written == 0u64
+    ensures result.bytes_read    == 0u64
+{
+    struct ScatterGather { scatter_ops: 0u64, gather_ops: 0u64, total_ops: 0u64, bytes_written: 0u64, bytes_read: 0u64 }
+}
+
+fn sg_scatter(s: refmut<ScatterGather>, bytes: u64)
+    ensures (*s).scatter_ops   == old((*s).scatter_ops) + 1u64
+    ensures (*s).total_ops     == old((*s).total_ops) + 1u64
+    ensures (*s).bytes_written == old((*s).bytes_written) + bytes
+    ensures (*s).gather_ops    == old((*s).gather_ops)
+    ensures (*s).bytes_read    == old((*s).bytes_read)
+{
+    (*s).scatter_ops   = (*s).scatter_ops   + 1u64;
+    (*s).total_ops     = (*s).total_ops     + 1u64;
+    (*s).bytes_written = (*s).bytes_written + bytes;
+}
+
+fn sg_gather(s: refmut<ScatterGather>, bytes: u64)
+    ensures (*s).gather_ops  == old((*s).gather_ops) + 1u64
+    ensures (*s).total_ops   == old((*s).total_ops) + 1u64
+    ensures (*s).bytes_read  == old((*s).bytes_read) + bytes
+    ensures (*s).scatter_ops == old((*s).scatter_ops)
+    ensures (*s).bytes_written == old((*s).bytes_written)
+{
+    (*s).gather_ops  = (*s).gather_ops  + 1u64;
+    (*s).total_ops   = (*s).total_ops   + 1u64;
+    (*s).bytes_read  = (*s).bytes_read  + bytes;
+}
+
+// 3 scatters: scatter_ops==3
+fn three_scatters() -> u64
+    ensures result == 3u64
+{
+    let s: ScatterGather = sg_new();
+    sg_scatter(&mut s, 64u64);
+    sg_scatter(&mut s, 64u64);
+    sg_scatter(&mut s, 64u64);
+    s.scatter_ops
+}
+
+// scatter + gather: total_ops==4
+fn mixed_ops() -> u64
+    ensures result == 4u64
+{
+    let s: ScatterGather = sg_new();
+    sg_scatter(&mut s, 100u64);
+    sg_scatter(&mut s, 100u64);
+    sg_gather(&mut s, 80u64);
+    sg_gather(&mut s, 80u64);
+    s.total_ops
+}
+
+// ops sum invariant
+fn ops_sum() -> u64
+    ensures result == 0u64
+{
+    let s: ScatterGather = sg_new();
+    sg_scatter(&mut s, 50u64);
+    sg_gather(&mut s, 30u64);
+    sg_scatter(&mut s, 50u64);
+    s.total_ops - s.scatter_ops - s.gather_ops
+}
+
+// Bytes written tracked
+fn bytes_written() -> u64
+    ensures result == 192u64
+{
+    let s: ScatterGather = sg_new();
+    sg_scatter(&mut s, 64u64);
+    sg_scatter(&mut s, 128u64);
+    s.bytes_written
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,108 @@
+// Demo 369: Min/max tracker with running bounds
+//
+// Tracks the minimum and maximum values seen so far.
+// observe() updates both bounds. Verified: min <= max invariant
+// and that bounds tighten/expand correctly via old() chaining.
+
+struct MinMax {
+    min:      u64,
+    max:      u64,
+    count:    u64,
+    has_data: u64,  // 0 = empty, 1 = has data
+}
+
+fn mm_new() -> MinMax
+    ensures result.min      == 0u64
+    ensures result.max      == 0u64
+    ensures result.count    == 0u64
+    ensures result.has_data == 0u64
+{
+    struct MinMax { min: 0u64, max: 0u64, count: 0u64, has_data: 0u64 }
+}
+
+fn mm_first(m: refmut<MinMax>, v: u64)
+    requires (*m).has_data == 0u64
+    ensures  (*m).min      == v
+    ensures  (*m).max      == v
+    ensures  (*m).has_data == 1u64
+    ensures  (*m).count    == 1u64
+{
+    (*m).min      = v;
+    (*m).max      = v;
+    (*m).has_data = 1u64;
+    (*m).count    = 1u64;
+}
+
+fn mm_update_max(m: refmut<MinMax>, v: u64)
+    requires (*m).has_data == 1u64
+    requires v > (*m).max
+    ensures  (*m).max   == v
+    ensures  (*m).min   == old((*m).min)
+    ensures  (*m).count == old((*m).count) + 1u64
+    ensures  (*m).has_data == 1u64
+{
+    (*m).max   = v;
+    (*m).count = (*m).count + 1u64;
+}
+
+fn mm_update_min(m: refmut<MinMax>, v: u64)
+    requires (*m).has_data == 1u64
+    requires v < (*m).min
+    ensures  (*m).min   == v
+    ensures  (*m).max   == old((*m).max)
+    ensures  (*m).count == old((*m).count) + 1u64
+    ensures  (*m).has_data == 1u64
+{
+    (*m).min   = v;
+    (*m).count = (*m).count + 1u64;
+}
+
+// First value: min == max == 10
+fn first_val_min() -> u64
+    ensures result == 10u64
+{
+    let m: MinMax = mm_new();
+    mm_first(&mut m, 10u64);
+    m.min
+}
+
+fn first_val_max() -> u64
+    ensures result == 10u64
+{
+    let m: MinMax = mm_new();
+    mm_first(&mut m, 10u64);
+    m.max
+}
+
+// First 10, update max to 30: max is 30
+fn expand_max() -> u64
+    ensures result == 30u64
+{
+    let m: MinMax = mm_new();
+    mm_first(&mut m, 10u64);
+    mm_update_max(&mut m, 30u64);
+    m.max
+}
+
+// First 10, update min to 3: min is 3
+fn shrink_min() -> u64
+    ensures result == 3u64
+{
+    let m: MinMax = mm_new();
+    mm_first(&mut m, 10u64);
+    mm_update_min(&mut m, 3u64);
+    m.min
+}
+
+// Count tracks observations
+fn count_tracks() -> u64
+    ensures result == 3u64
+{
+    let m: MinMax = mm_new();
+    mm_first(&mut m, 10u64);
+    mm_update_max(&mut m, 20u64);
+    mm_update_min(&mut m, 5u64);
+    m.count
+}
+
+fn main() -> u64 { 0u64 }

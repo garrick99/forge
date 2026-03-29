@@ -1,0 +1,81 @@
+// Demo 355: Two interdependent counters
+//
+// Two counters A and B where transfers move value between them.
+// The sum A + B is invariant across transfers.
+// Verified: transfer maintains the invariant sum == initial_a + initial_b.
+
+struct TwoCounters {
+    a: u64,
+    b: u64,
+}
+
+fn tc_new(a: u64, b: u64) -> TwoCounters
+    ensures result.a == a
+    ensures result.b == b
+{
+    struct TwoCounters { a: a, b: b }
+}
+
+fn tc_transfer_a_to_b(t: refmut<TwoCounters>, amount: u64)
+    requires (*t).a >= amount
+    ensures  (*t).a == old((*t).a) - amount
+    ensures  (*t).b == old((*t).b) + amount
+{
+    (*t).a = (*t).a - amount;
+    (*t).b = (*t).b + amount;
+}
+
+fn tc_transfer_b_to_a(t: refmut<TwoCounters>, amount: u64)
+    requires (*t).b >= amount
+    ensures  (*t).b == old((*t).b) - amount
+    ensures  (*t).a == old((*t).a) + amount
+{
+    (*t).b = (*t).b - amount;
+    (*t).a = (*t).a + amount;
+}
+
+// Transfer 3 from A to B: a is 7, b is 13
+fn transfer_atob_a() -> u64
+    ensures result == 7u64
+{
+    let t: TwoCounters = tc_new(10u64, 10u64);
+    tc_transfer_a_to_b(&mut t, 3u64);
+    t.a
+}
+
+fn transfer_atob_b() -> u64
+    ensures result == 13u64
+{
+    let t: TwoCounters = tc_new(10u64, 10u64);
+    tc_transfer_a_to_b(&mut t, 3u64);
+    t.b
+}
+
+// Sum is preserved after transfer
+fn sum_preserved() -> u64
+    ensures result == 20u64
+{
+    let t: TwoCounters = tc_new(10u64, 10u64);
+    tc_transfer_a_to_b(&mut t, 3u64);
+    tc_transfer_b_to_a(&mut t, 5u64);
+    t.a + t.b
+}
+
+// Transfer all of A to B: a is 0
+fn drain_a() -> u64
+    ensures result == 0u64
+{
+    let t: TwoCounters = tc_new(8u64, 2u64);
+    tc_transfer_a_to_b(&mut t, 8u64);
+    t.a
+}
+
+fn drain_a_b() -> u64
+    ensures result == 10u64
+{
+    let t: TwoCounters = tc_new(8u64, 2u64);
+    tc_transfer_a_to_b(&mut t, 8u64);
+    t.b
+}
+
+fn main() -> u64 { 0u64 }

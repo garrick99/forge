@@ -1,0 +1,55 @@
+// Demo 481: std::collections showcase — Vec_u64 operations
+//
+// push, pop, get, set, fill, find, sum, max, min.
+
+use std::collections;
+
+fn check_push_pop(data: span<u64>) -> u64
+    requires data.len == 8u64
+    ensures  result == 99u64
+{
+    let v: Vec_u64 = vec_u64_new(data);
+    vec_u64_push(&mut v, 99u64);
+    vec_u64_pop(&mut v)
+}
+
+fn check_len_after_pushes(data: span<u64>) -> u64
+    requires data.len == 8u64
+    ensures  result == 3u64
+{
+    let v: Vec_u64 = vec_u64_new(data);
+    vec_u64_push(&mut v, 10u64);
+    vec_u64_push(&mut v, 20u64);
+    vec_u64_push(&mut v, 30u64);
+    vec_u64_len(&v)
+}
+
+fn check_is_empty(data: span<u64>) -> bool
+    requires data.len == 4u64
+    ensures  result == true
+{
+    let v: Vec_u64 = vec_u64_new(data);
+    vec_u64_is_empty(&v)
+}
+
+fn check_is_full(data: span<u64>) -> bool
+    requires data.len == 1u64
+    ensures  result == true
+{
+    let v: Vec_u64 = vec_u64_new(data);
+    vec_u64_push(&mut v, 1u64);
+    vec_u64_is_full(&v)
+}
+
+fn check_find_not_present(data: span<u64>) -> u64
+    requires data.len == 4u64
+    ensures  result == 3u64
+{
+    let v: Vec_u64 = vec_u64_new(data);
+    vec_u64_push(&mut v, 1u64);
+    vec_u64_push(&mut v, 2u64);
+    vec_u64_push(&mut v, 3u64);
+    vec_u64_find(&v, 99u64)
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,98 @@
+// Demo 464: Monotone clock with tick and skew correction
+//
+// Clock ticks monotonically forward. Skew correction adds offset but
+// only forward (never backward). Verified: time never decreases.
+
+struct MonotoneClock {
+    time:        u64,
+    ticks:       u64,
+    corrections: u64,
+    total_skew:  u64,
+}
+
+fn mc_new() -> MonotoneClock
+    ensures result.time        == 0u64
+    ensures result.ticks       == 0u64
+    ensures result.corrections == 0u64
+    ensures result.total_skew  == 0u64
+{
+    struct MonotoneClock { time: 0u64, ticks: 0u64, corrections: 0u64, total_skew: 0u64 }
+}
+
+fn mc_tick(c: refmut<MonotoneClock>)
+    ensures (*c).time        == old((*c).time) + 1u64
+    ensures (*c).ticks       == old((*c).ticks) + 1u64
+    ensures (*c).corrections == old((*c).corrections)
+    ensures (*c).total_skew  == old((*c).total_skew)
+{
+    (*c).time  = (*c).time  + 1u64;
+    (*c).ticks = (*c).ticks + 1u64;
+}
+
+fn mc_advance(c: refmut<MonotoneClock>, n: u64)
+    requires n > 0u64
+    ensures  (*c).time        == old((*c).time) + n
+    ensures  (*c).ticks       == old((*c).ticks) + n
+    ensures  (*c).corrections == old((*c).corrections)
+    ensures  (*c).total_skew  == old((*c).total_skew)
+{
+    (*c).time  = (*c).time  + n;
+    (*c).ticks = (*c).ticks + n;
+}
+
+fn mc_correct_skew(c: refmut<MonotoneClock>, skew: u64)
+    requires skew > 0u64
+    ensures  (*c).time        == old((*c).time) + skew
+    ensures  (*c).corrections == old((*c).corrections) + 1u64
+    ensures  (*c).total_skew  == old((*c).total_skew) + skew
+    ensures  (*c).ticks       == old((*c).ticks)
+{
+    (*c).time        = (*c).time        + skew;
+    (*c).corrections = (*c).corrections + 1u64;
+    (*c).total_skew  = (*c).total_skew  + skew;
+}
+
+// 5 ticks: time==5
+fn five_ticks() -> u64
+    ensures result == 5u64
+{
+    let c: MonotoneClock = mc_new();
+    mc_tick(&mut c);
+    mc_tick(&mut c);
+    mc_tick(&mut c);
+    mc_tick(&mut c);
+    mc_tick(&mut c);
+    c.time
+}
+
+// Advance by 10: time==10
+fn advance_10() -> u64
+    ensures result == 10u64
+{
+    let c: MonotoneClock = mc_new();
+    mc_advance(&mut c, 10u64);
+    c.time
+}
+
+// Skew correction advances time
+fn skew_advances() -> u64
+    ensures result == 15u64
+{
+    let c: MonotoneClock = mc_new();
+    mc_advance(&mut c, 10u64);
+    mc_correct_skew(&mut c, 5u64);
+    c.time
+}
+
+// Total skew accumulated
+fn total_skew() -> u64
+    ensures result == 7u64
+{
+    let c: MonotoneClock = mc_new();
+    mc_advance(&mut c, 10u64);
+    mc_correct_skew(&mut c, 3u64);
+    mc_correct_skew(&mut c, 4u64);
+    c.total_skew
+}
+
+fn main() -> u64 { 0u64 }

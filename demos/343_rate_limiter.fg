@@ -1,0 +1,101 @@
+// Demo 343: Rate limiter with window tracking
+//
+// A fixed-window rate limiter: counts requests in the current window.
+// When the window is reset, the count clears and the window advances.
+// Verified: count increments on each request, resets correctly.
+
+struct RateLimit {
+    count:   u64,
+    window:  u64,
+    max_rps: u64,
+}
+
+fn rl_new(max_rps: u64) -> RateLimit
+    requires max_rps > 0u64
+    ensures result.count   == 0u64
+    ensures result.window  == 0u64
+    ensures result.max_rps == max_rps
+{
+    struct RateLimit { count: 0u64, window: 0u64, max_rps: max_rps }
+}
+
+fn rl_request(r: refmut<RateLimit>)
+    requires (*r).count < (*r).max_rps
+    ensures  (*r).count   == old((*r).count) + 1u64
+    ensures  (*r).window  == old((*r).window)
+    ensures  (*r).max_rps == old((*r).max_rps)
+{
+    (*r).count = (*r).count + 1u64;
+}
+
+fn rl_reset(r: refmut<RateLimit>)
+    ensures (*r).count  == 0u64
+    ensures (*r).window == old((*r).window) + 1u64
+{
+    (*r).count  = 0u64;
+    (*r).window = (*r).window + 1u64;
+}
+
+// Three requests: count is 3
+fn three_requests(max: u64) -> u64
+    requires max > 3u64
+    ensures result == 3u64
+{
+    let r: RateLimit = rl_new(max);
+    rl_request(&mut r);
+    rl_request(&mut r);
+    rl_request(&mut r);
+    r.count
+}
+
+// Three requests, reset: count is 0, window is 1
+fn reset_count(max: u64) -> u64
+    requires max > 3u64
+    ensures result == 0u64
+{
+    let r: RateLimit = rl_new(max);
+    rl_request(&mut r);
+    rl_request(&mut r);
+    rl_request(&mut r);
+    rl_reset(&mut r);
+    r.count
+}
+
+fn reset_window(max: u64) -> u64
+    requires max > 3u64
+    ensures result == 1u64
+{
+    let r: RateLimit = rl_new(max);
+    rl_request(&mut r);
+    rl_request(&mut r);
+    rl_request(&mut r);
+    rl_reset(&mut r);
+    r.window
+}
+
+// Two windows: request, reset, request, reset → window is 2
+fn two_windows(max: u64) -> u64
+    requires max > 1u64
+    ensures result == 2u64
+{
+    let r: RateLimit = rl_new(max);
+    rl_request(&mut r);
+    rl_reset(&mut r);
+    rl_request(&mut r);
+    rl_reset(&mut r);
+    r.window
+}
+
+// max_rps preserved across requests and resets
+fn max_preserved(max: u64) -> u64
+    requires max > 2u64
+    ensures result == max
+{
+    let r: RateLimit = rl_new(max);
+    rl_request(&mut r);
+    rl_request(&mut r);
+    rl_reset(&mut r);
+    r.max_rps
+}
+
+fn main() -> u64 { 0u64 }

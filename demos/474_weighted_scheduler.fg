@@ -1,0 +1,79 @@
+// Demo 474: Weighted round-robin scheduler
+//
+// Two classes: high weight=3, low weight=1. Each round dispatches weight items.
+// Verified: high_dispatched / low_dispatched tracks the 3:1 ratio over rounds.
+
+struct WeightedScheduler {
+    high_dispatched: u64,
+    low_dispatched:  u64,
+    rounds:          u64,
+    high_weight:     u64,
+    low_weight:      u64,
+}
+
+fn ws_new(high_w: u64, low_w: u64) -> WeightedScheduler
+    requires high_w > 0u64
+    requires low_w  > 0u64
+    ensures result.high_dispatched == 0u64
+    ensures result.low_dispatched  == 0u64
+    ensures result.rounds          == 0u64
+    ensures result.high_weight     == high_w
+    ensures result.low_weight      == low_w
+{
+    struct WeightedScheduler { high_dispatched: 0u64, low_dispatched: 0u64, rounds: 0u64, high_weight: high_w, low_weight: low_w }
+}
+
+fn ws_round(w: refmut<WeightedScheduler>)
+    ensures (*w).high_dispatched == old((*w).high_dispatched) + (*w).high_weight
+    ensures (*w).low_dispatched  == old((*w).low_dispatched) + (*w).low_weight
+    ensures (*w).rounds          == old((*w).rounds) + 1u64
+    ensures (*w).high_weight     == old((*w).high_weight)
+    ensures (*w).low_weight      == old((*w).low_weight)
+{
+    (*w).high_dispatched = (*w).high_dispatched + (*w).high_weight;
+    (*w).low_dispatched  = (*w).low_dispatched  + (*w).low_weight;
+    (*w).rounds          = (*w).rounds          + 1u64;
+}
+
+// After 2 rounds (3:1): high==6
+fn two_rounds_high() -> u64
+    ensures result == 6u64
+{
+    let w: WeightedScheduler = ws_new(3u64, 1u64);
+    ws_round(&mut w);
+    ws_round(&mut w);
+    w.high_dispatched
+}
+
+// After 2 rounds: low==2
+fn two_rounds_low() -> u64
+    ensures result == 2u64
+{
+    let w: WeightedScheduler = ws_new(3u64, 1u64);
+    ws_round(&mut w);
+    ws_round(&mut w);
+    w.low_dispatched
+}
+
+// Round count
+fn round_count() -> u64
+    ensures result == 3u64
+{
+    let w: WeightedScheduler = ws_new(3u64, 1u64);
+    ws_round(&mut w);
+    ws_round(&mut w);
+    ws_round(&mut w);
+    w.rounds
+}
+
+// Equal weights: both dispatched equally
+fn equal_weights() -> u64
+    ensures result == 0u64
+{
+    let w: WeightedScheduler = ws_new(2u64, 2u64);
+    ws_round(&mut w);
+    ws_round(&mut w);
+    w.high_dispatched - w.low_dispatched
+}
+
+fn main() -> u64 { 0u64 }

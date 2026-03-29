@@ -561,6 +561,8 @@ let rec expr_to_pred_simple e =
       PStruct (name.name,
         List.map (fun (fid, fe) -> (fid.name, expr_to_pred_simple fe)) inits)
   | EIndex (arr, idx)   -> PIndex (expr_to_pred_simple arr, expr_to_pred_simple idx)
+  (* Cast: in Int mode the value is unchanged (no truncation assumed); use inner pred *)
+  | ECast (inner, _)    -> expr_to_pred_simple inner
   | ESync               -> PTrue   (* syncthreads is a side effect, no pred value *)
   | EMatch (scrut, arms) ->
       (* Build a PIte chain so postconditions on match-returning functions
@@ -3094,7 +3096,10 @@ let check_fn env fn =
           caller's postcondition check can see them (mirrors the SLet injection). *)
        let inject_trailing_call base_env fn_name_str call_args call_loc =
          let call_pred = PVar { name = "__ret_call"; loc = call_loc } in
-         let enrich_with ensures params all_args env_in =
+         (* Register __ret_call in pc_vars with the correct return type so Z3
+            declares it with the right sort (Bool, not Int) in Int-mode queries. *)
+         let enrich_with ensures params all_args ret_ty env_in =
+           let env_in = env_add_var env_in "__ret_call" ret_ty Unr call_loc in
            if ensures = [] then env_in
            else if List.length params <> List.length all_args then env_in
            else begin
@@ -3110,12 +3115,12 @@ let check_fn env fn =
          let enriched =
            match env_lookup_fn base_env fn_name_str with
            | Some sig_ ->
-               enrich_with sig_.fs_ensures sig_.fs_params call_args base_env
+               enrich_with sig_.fs_ensures sig_.fs_params call_args sig_.fs_ret base_env
            | None ->
                (* fn_name_str may be a variable of fn-pointer type with ensures *)
                (match env_lookup_var base_env fn_name_str with
                 | Some { vi_ty = TFn fty; _ } ->
-                    enrich_with fty.ensures fty.params call_args base_env
+                    enrich_with fty.ensures fty.params call_args fty.ret base_env
                 | _ -> base_env)
          in
          (call_pred, enriched)

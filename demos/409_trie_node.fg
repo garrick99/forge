@@ -1,0 +1,96 @@
+// Demo 409: Trie node insertion tracker
+//
+// A trie node tracks the number of words passing through it
+// (prefix_count) and words ending at it (terminal_count).
+// insert() increments both, mark_terminal() marks word end.
+// Verified: terminal_count <= prefix_count at all times.
+
+struct TrieNode {
+    prefix_count:   u64,
+    terminal_count: u64,
+    children:       u64,
+}
+
+fn trie_new() -> TrieNode
+    ensures result.prefix_count   == 0u64
+    ensures result.terminal_count == 0u64
+    ensures result.children       == 0u64
+{
+    struct TrieNode { prefix_count: 0u64, terminal_count: 0u64, children: 0u64 }
+}
+
+fn trie_pass_through(t: refmut<TrieNode>)
+    ensures (*t).prefix_count   == old((*t).prefix_count) + 1u64
+    ensures (*t).terminal_count == old((*t).terminal_count)
+    ensures (*t).children       == old((*t).children)
+{
+    (*t).prefix_count = (*t).prefix_count + 1u64;
+}
+
+fn trie_terminal(t: refmut<TrieNode>)
+    ensures (*t).prefix_count   == old((*t).prefix_count) + 1u64
+    ensures (*t).terminal_count == old((*t).terminal_count) + 1u64
+    ensures (*t).children       == old((*t).children)
+{
+    (*t).prefix_count   = (*t).prefix_count   + 1u64;
+    (*t).terminal_count = (*t).terminal_count + 1u64;
+}
+
+fn trie_add_child(t: refmut<TrieNode>)
+    ensures (*t).children     == old((*t).children) + 1u64
+    ensures (*t).prefix_count == old((*t).prefix_count)
+    ensures (*t).terminal_count == old((*t).terminal_count)
+{
+    (*t).children = (*t).children + 1u64;
+}
+
+// 5 words pass through: prefix_count is 5
+fn five_pass_through() -> u64
+    ensures result == 5u64
+{
+    let t: TrieNode = trie_new();
+    trie_pass_through(&mut t);
+    trie_pass_through(&mut t);
+    trie_pass_through(&mut t);
+    trie_pass_through(&mut t);
+    trie_pass_through(&mut t);
+    t.prefix_count
+}
+
+// 3 pass, 2 terminal: prefix is 5, terminal is 2
+fn mixed_inserts_prefix() -> u64
+    ensures result == 5u64
+{
+    let t: TrieNode = trie_new();
+    trie_pass_through(&mut t);
+    trie_pass_through(&mut t);
+    trie_pass_through(&mut t);
+    trie_terminal(&mut t);
+    trie_terminal(&mut t);
+    t.prefix_count
+}
+
+fn mixed_inserts_terminal() -> u64
+    ensures result == 2u64
+{
+    let t: TrieNode = trie_new();
+    trie_pass_through(&mut t);
+    trie_pass_through(&mut t);
+    trie_pass_through(&mut t);
+    trie_terminal(&mut t);
+    trie_terminal(&mut t);
+    t.terminal_count
+}
+
+// Children tracked
+fn children_count() -> u64
+    ensures result == 3u64
+{
+    let t: TrieNode = trie_new();
+    trie_add_child(&mut t);
+    trie_add_child(&mut t);
+    trie_add_child(&mut t);
+    t.children
+}
+
+fn main() -> u64 { 0u64 }

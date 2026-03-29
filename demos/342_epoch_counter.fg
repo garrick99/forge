@@ -1,0 +1,85 @@
+// Demo 342: Epoch counter with generation tracking
+//
+// A versioned state: each "commit" increments the epoch,
+// each "rollback" increments a rollback counter (epoch unchanged).
+// Proves that the epoch tracks commits precisely.
+
+struct Epoch {
+    epoch:     u64,
+    rollbacks: u64,
+}
+
+fn epoch_new() -> Epoch
+    ensures result.epoch     == 0u64
+    ensures result.rollbacks == 0u64
+{
+    struct Epoch { epoch: 0u64, rollbacks: 0u64 }
+}
+
+fn epoch_commit(e: refmut<Epoch>)
+    ensures (*e).epoch     == old((*e).epoch) + 1u64
+    ensures (*e).rollbacks == old((*e).rollbacks)
+{
+    (*e).epoch = (*e).epoch + 1u64;
+}
+
+fn epoch_rollback(e: refmut<Epoch>)
+    ensures (*e).rollbacks == old((*e).rollbacks) + 1u64
+    ensures (*e).epoch     == old((*e).epoch)
+{
+    (*e).rollbacks = (*e).rollbacks + 1u64;
+}
+
+// One commit: epoch is 1
+fn one_commit() -> u64
+    ensures result == 1u64
+{
+    let e: Epoch = epoch_new();
+    epoch_commit(&mut e);
+    e.epoch
+}
+
+// Three commits: epoch is 3
+fn three_commits() -> u64
+    ensures result == 3u64
+{
+    let e: Epoch = epoch_new();
+    epoch_commit(&mut e);
+    epoch_commit(&mut e);
+    epoch_commit(&mut e);
+    e.epoch
+}
+
+// Commit, rollback, commit: epoch is 2, rollbacks is 1
+fn commit_rollback_commit_epoch() -> u64
+    ensures result == 2u64
+{
+    let e: Epoch = epoch_new();
+    epoch_commit(&mut e);
+    epoch_rollback(&mut e);
+    epoch_commit(&mut e);
+    e.epoch
+}
+
+fn commit_rollback_commit_rollbacks() -> u64
+    ensures result == 1u64
+{
+    let e: Epoch = epoch_new();
+    epoch_commit(&mut e);
+    epoch_rollback(&mut e);
+    epoch_commit(&mut e);
+    e.rollbacks
+}
+
+// Rollback doesn't change epoch
+fn rollback_preserves_epoch() -> u64
+    ensures result == 1u64
+{
+    let e: Epoch = epoch_new();
+    epoch_commit(&mut e);
+    epoch_rollback(&mut e);
+    epoch_rollback(&mut e);
+    e.epoch
+}
+
+fn main() -> u64 { 0u64 }

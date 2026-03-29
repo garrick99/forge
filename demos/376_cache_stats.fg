@@ -1,0 +1,96 @@
+// Demo 376: Cache hit/miss statistics
+//
+// A cache stats tracker: hit() and miss() increment respective counters.
+// The hit rate is hits / (hits + misses). Verified: totals accumulate
+// correctly and total == hits + misses.
+
+struct CacheStats {
+    hits:   u64,
+    misses: u64,
+}
+
+fn cs_new() -> CacheStats
+    ensures result.hits   == 0u64
+    ensures result.misses == 0u64
+{
+    struct CacheStats { hits: 0u64, misses: 0u64 }
+}
+
+fn cs_hit(c: refmut<CacheStats>)
+    ensures (*c).hits   == old((*c).hits) + 1u64
+    ensures (*c).misses == old((*c).misses)
+{
+    (*c).hits = (*c).hits + 1u64;
+}
+
+fn cs_miss(c: refmut<CacheStats>)
+    ensures (*c).misses == old((*c).misses) + 1u64
+    ensures (*c).hits   == old((*c).hits)
+{
+    (*c).misses = (*c).misses + 1u64;
+}
+
+// 5 hits: hits is 5
+fn five_hits() -> u64
+    ensures result == 5u64
+{
+    let c: CacheStats = cs_new();
+    cs_hit(&mut c);
+    cs_hit(&mut c);
+    cs_hit(&mut c);
+    cs_hit(&mut c);
+    cs_hit(&mut c);
+    c.hits
+}
+
+// 3 hits, 2 misses: total is 5
+fn total_accesses() -> u64
+    ensures result == 5u64
+{
+    let c: CacheStats = cs_new();
+    cs_hit(&mut c);
+    cs_hit(&mut c);
+    cs_hit(&mut c);
+    cs_miss(&mut c);
+    cs_miss(&mut c);
+    c.hits + c.misses
+}
+
+// Misses don't affect hits
+fn misses_independent() -> u64
+    ensures result == 3u64
+{
+    let c: CacheStats = cs_new();
+    cs_hit(&mut c);
+    cs_hit(&mut c);
+    cs_hit(&mut c);
+    cs_miss(&mut c);
+    cs_miss(&mut c);
+    c.hits
+}
+
+// Hits don't affect misses
+fn hits_independent() -> u64
+    ensures result == 2u64
+{
+    let c: CacheStats = cs_new();
+    cs_hit(&mut c);
+    cs_hit(&mut c);
+    cs_hit(&mut c);
+    cs_miss(&mut c);
+    cs_miss(&mut c);
+    c.misses
+}
+
+// All misses: hits stays 0
+fn all_misses() -> u64
+    ensures result == 0u64
+{
+    let c: CacheStats = cs_new();
+    cs_miss(&mut c);
+    cs_miss(&mut c);
+    cs_miss(&mut c);
+    c.hits
+}
+
+fn main() -> u64 { 0u64 }

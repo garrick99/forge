@@ -1,0 +1,110 @@
+// Demo 490: conditional postconditions — exhaustive case analysis
+//
+// Each function carries complete if/else postconditions covering all cases.
+// Exercises the !(cond) ==> rhs pattern with multiple branches.
+
+fn max3(a: u64, b: u64, c: u64) -> u64
+    ensures result >= a
+    ensures result >= b
+    ensures result >= c
+    ensures result == a || result == b || result == c
+{
+    if a >= b && a >= c { a } else if b >= c { b } else { c }
+}
+
+fn min3(a: u64, b: u64, c: u64) -> u64
+    ensures result <= a
+    ensures result <= b
+    ensures result <= c
+    ensures result == a || result == b || result == c
+{
+    if a <= b && a <= c { a } else if b <= c { b } else { c }
+}
+
+fn clamp3(v: u64, lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures result >= lo
+    ensures result <= hi
+    ensures v < lo  ==> result == lo
+    ensures v > hi  ==> result == hi
+    ensures !(v < lo) && !(v > hi) ==> result == v
+{
+    if v < lo { lo } else if v > hi { hi } else { v }
+}
+
+fn bounded_sub(a: u64, b: u64) -> u64
+    ensures a >= b ==> result == a - b
+    ensures !(a >= b) ==> result == 0u64
+{
+    if a >= b { a - b } else { 0u64 }
+}
+
+fn select_range(v: u64) -> u64
+    ensures v < 10u64   ==> result == 0u64
+    ensures v < 100u64 && !(v < 10u64)  ==> result == 1u64
+    ensures !(v < 100u64) ==> result == 2u64
+{
+    if v < 10u64 { 0u64 } else if v < 100u64 { 1u64 } else { 2u64 }
+}
+
+fn check_max3_first() -> u64
+    ensures result == 10u64
+{
+    max3(10u64, 5u64, 3u64)
+}
+
+fn check_max3_middle() -> u64
+    ensures result == 10u64
+{
+    max3(3u64, 10u64, 5u64)
+}
+
+fn check_max3_last() -> u64
+    ensures result == 10u64
+{
+    max3(3u64, 5u64, 10u64)
+}
+
+fn check_min3() -> u64
+    ensures result == 1u64
+{
+    min3(5u64, 1u64, 3u64)
+}
+
+fn check_clamp_in() -> u64
+    ensures result == 50u64
+{
+    clamp3(50u64, 10u64, 100u64)
+}
+
+fn check_bounded_sub_ok() -> u64
+    ensures result == 5u64
+{
+    bounded_sub(10u64, 5u64)
+}
+
+fn check_bounded_sub_zero() -> u64
+    ensures result == 0u64
+{
+    bounded_sub(3u64, 7u64)
+}
+
+fn check_select_low() -> u64
+    ensures result == 0u64
+{
+    select_range(5u64)
+}
+
+fn check_select_mid() -> u64
+    ensures result == 1u64
+{
+    select_range(50u64)
+}
+
+fn check_select_high() -> u64
+    ensures result == 2u64
+{
+    select_range(200u64)
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,90 @@
+// Demo 449: Session tracker with login/logout and duration
+//
+// active_sessions increments on login, decrements on logout.
+// total_sessions tracks all logins ever; duration tracks cumulative time.
+// Verified: active <= total_sessions, duration accumulates.
+
+struct SessionTracker {
+    active:         u64,
+    total_sessions: u64,
+    total_duration: u64,
+    logouts:        u64,
+}
+
+fn st_new() -> SessionTracker
+    ensures result.active         == 0u64
+    ensures result.total_sessions == 0u64
+    ensures result.total_duration == 0u64
+    ensures result.logouts        == 0u64
+{
+    struct SessionTracker { active: 0u64, total_sessions: 0u64, total_duration: 0u64, logouts: 0u64 }
+}
+
+fn st_login(s: refmut<SessionTracker>)
+    ensures (*s).active         == old((*s).active) + 1u64
+    ensures (*s).total_sessions == old((*s).total_sessions) + 1u64
+    ensures (*s).total_duration == old((*s).total_duration)
+    ensures (*s).logouts        == old((*s).logouts)
+{
+    (*s).active         = (*s).active         + 1u64;
+    (*s).total_sessions = (*s).total_sessions + 1u64;
+}
+
+fn st_logout(s: refmut<SessionTracker>, duration: u64)
+    requires (*s).active > 0u64
+    ensures  (*s).active         == old((*s).active) - 1u64
+    ensures  (*s).total_duration == old((*s).total_duration) + duration
+    ensures  (*s).logouts        == old((*s).logouts) + 1u64
+    ensures  (*s).total_sessions == old((*s).total_sessions)
+{
+    (*s).active         = (*s).active         - 1u64;
+    (*s).total_duration = (*s).total_duration + duration;
+    (*s).logouts        = (*s).logouts        + 1u64;
+}
+
+// 3 logins: active==3
+fn three_logins() -> u64
+    ensures result == 3u64
+{
+    let s: SessionTracker = st_new();
+    st_login(&mut s);
+    st_login(&mut s);
+    st_login(&mut s);
+    s.active
+}
+
+// Login/logout: active==0
+fn login_logout() -> u64
+    ensures result == 0u64
+{
+    let s: SessionTracker = st_new();
+    st_login(&mut s);
+    st_logout(&mut s, 100u64);
+    s.active
+}
+
+// Duration accumulates
+fn duration_sum() -> u64
+    ensures result == 250u64
+{
+    let s: SessionTracker = st_new();
+    st_login(&mut s);
+    st_login(&mut s);
+    st_logout(&mut s, 100u64);
+    st_logout(&mut s, 150u64);
+    s.total_duration
+}
+
+// Total sessions preserved after logout
+fn total_sessions() -> u64
+    ensures result == 3u64
+{
+    let s: SessionTracker = st_new();
+    st_login(&mut s);
+    st_login(&mut s);
+    st_login(&mut s);
+    st_logout(&mut s, 60u64);
+    s.total_sessions
+}
+
+fn main() -> u64 { 0u64 }

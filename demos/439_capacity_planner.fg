@@ -1,0 +1,88 @@
+// Demo 439: Capacity planner with reserved and used slots
+//
+// total = reserved + available. reserve() moves slots from available to reserved.
+// release() returns them. Verified: conservation holds throughout.
+
+struct CapacityPlanner {
+    total:     u64,
+    reserved:  u64,
+    available: u64,
+    ops:       u64,
+}
+
+fn cp_new(total: u64) -> CapacityPlanner
+    requires total > 0u64
+    ensures result.total     == total
+    ensures result.reserved  == 0u64
+    ensures result.available == total
+    ensures result.ops       == 0u64
+{
+    struct CapacityPlanner { total: total, reserved: 0u64, available: total, ops: 0u64 }
+}
+
+fn cp_reserve(c: refmut<CapacityPlanner>, n: u64)
+    requires (*c).available >= n
+    ensures  (*c).reserved  == old((*c).reserved) + n
+    ensures  (*c).available == old((*c).available) - n
+    ensures  (*c).total     == old((*c).total)
+    ensures  (*c).ops       == old((*c).ops) + 1u64
+{
+    (*c).reserved  = (*c).reserved  + n;
+    (*c).available = (*c).available - n;
+    (*c).ops       = (*c).ops       + 1u64;
+}
+
+fn cp_release(c: refmut<CapacityPlanner>, n: u64)
+    requires (*c).reserved >= n
+    ensures  (*c).reserved  == old((*c).reserved) - n
+    ensures  (*c).available == old((*c).available) + n
+    ensures  (*c).total     == old((*c).total)
+    ensures  (*c).ops       == old((*c).ops) + 1u64
+{
+    (*c).reserved  = (*c).reserved  - n;
+    (*c).available = (*c).available + n;
+    (*c).ops       = (*c).ops       + 1u64;
+}
+
+// Reserve 30 from 100: available==70
+fn reserve_30() -> u64
+    ensures result == 70u64
+{
+    let c: CapacityPlanner = cp_new(100u64);
+    cp_reserve(&mut c, 30u64);
+    c.available
+}
+
+// Reserve 40, release 10: reserved==30
+fn partial_release() -> u64
+    ensures result == 30u64
+{
+    let c: CapacityPlanner = cp_new(100u64);
+    cp_reserve(&mut c, 40u64);
+    cp_release(&mut c, 10u64);
+    c.reserved
+}
+
+// Conservation: reserved + available == total
+fn conservation() -> u64
+    ensures result == 100u64
+{
+    let c: CapacityPlanner = cp_new(100u64);
+    cp_reserve(&mut c, 50u64);
+    cp_reserve(&mut c, 20u64);
+    cp_release(&mut c, 15u64);
+    c.reserved + c.available
+}
+
+// Op count
+fn op_count() -> u64
+    ensures result == 3u64
+{
+    let c: CapacityPlanner = cp_new(100u64);
+    cp_reserve(&mut c, 30u64);
+    cp_reserve(&mut c, 20u64);
+    cp_release(&mut c, 10u64);
+    c.ops
+}
+
+fn main() -> u64 { 0u64 }

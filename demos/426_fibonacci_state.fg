@@ -1,0 +1,103 @@
+// Demo 426: Fibonacci iterator state
+//
+// Iterates Fibonacci by keeping the last two values.
+// next() advances: a,b → b, a+b. Verified: after N steps,
+// the state holds the correct Fibonacci pair.
+
+struct FibState {
+    a:     u64,
+    b:     u64,
+    steps: u64,
+}
+
+fn fib_new() -> FibState
+    ensures result.a     == 0u64
+    ensures result.b     == 1u64
+    ensures result.steps == 0u64
+{
+    struct FibState { a: 0u64, b: 1u64, steps: 0u64 }
+}
+
+fn fib_next(f: refmut<FibState>)
+    ensures (*f).a     == old((*f).b)
+    ensures (*f).b     == old((*f).a) + old((*f).b)
+    ensures (*f).steps == old((*f).steps) + 1u64
+{
+    let new_b: u64 = (*f).a + (*f).b;
+    (*f).a     = (*f).b;
+    (*f).b     = new_b;
+    (*f).steps = (*f).steps + 1u64;
+}
+
+// F(0)=0, F(1)=1: initial state
+fn fib_initial_a() -> u64
+    ensures result == 0u64
+{
+    let f: FibState = fib_new();
+    f.a
+}
+
+fn fib_initial_b() -> u64
+    ensures result == 1u64
+{
+    let f: FibState = fib_new();
+    f.b
+}
+
+// After 1 step: a=1, b=1
+fn fib_step1_a() -> u64
+    ensures result == 1u64
+{
+    let f: FibState = fib_new();
+    fib_next(&mut f);
+    f.a
+}
+
+// After 2 steps: a=1, b=2
+fn fib_step2_b() -> u64
+    ensures result == 2u64
+{
+    let f: FibState = fib_new();
+    fib_next(&mut f);
+    fib_next(&mut f);
+    f.b
+}
+
+// After 3 steps: a=2, b=3
+fn fib_step3_b() -> u64
+    ensures result == 3u64
+{
+    let f: FibState = fib_new();
+    fib_next(&mut f);
+    fib_next(&mut f);
+    fib_next(&mut f);
+    f.b
+}
+
+// After 5 steps: b=8 (F(7)=13... wait: 0,1,1,2,3,5,8)
+// Steps: (0,1)→(1,1)→(1,2)→(2,3)→(3,5)→(5,8)
+fn fib_step5_b() -> u64
+    ensures result == 8u64
+{
+    let f: FibState = fib_new();
+    fib_next(&mut f);
+    fib_next(&mut f);
+    fib_next(&mut f);
+    fib_next(&mut f);
+    fib_next(&mut f);
+    f.b
+}
+
+// Step count tracks
+fn fib_step_count() -> u64
+    ensures result == 4u64
+{
+    let f: FibState = fib_new();
+    fib_next(&mut f);
+    fib_next(&mut f);
+    fib_next(&mut f);
+    fib_next(&mut f);
+    f.steps
+}
+
+fn main() -> u64 { 0u64 }

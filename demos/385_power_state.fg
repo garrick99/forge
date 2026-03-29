@@ -1,0 +1,109 @@
+// Demo 385: Power state manager (S0-S3 sleep states)
+//
+// A device power manager cycles through states:
+// S0 (running), S1 (idle), S2 (standby), S3 (suspend).
+// Each transition is verified to follow the state machine.
+
+struct PowerState {
+    state:       u64,  // 0=S0, 1=S1, 2=S2, 3=S3
+    transitions: u64,
+}
+
+fn ps_new() -> PowerState
+    ensures result.state       == 0u64
+    ensures result.transitions == 0u64
+{
+    struct PowerState { state: 0u64, transitions: 0u64 }
+}
+
+fn ps_to_s1(p: refmut<PowerState>)
+    requires (*p).state == 0u64
+    ensures  (*p).state       == 1u64
+    ensures  (*p).transitions == old((*p).transitions) + 1u64
+{
+    (*p).state       = 1u64;
+    (*p).transitions = (*p).transitions + 1u64;
+}
+
+fn ps_to_s2(p: refmut<PowerState>)
+    requires (*p).state == 1u64
+    ensures  (*p).state       == 2u64
+    ensures  (*p).transitions == old((*p).transitions) + 1u64
+{
+    (*p).state       = 2u64;
+    (*p).transitions = (*p).transitions + 1u64;
+}
+
+fn ps_to_s3(p: refmut<PowerState>)
+    requires (*p).state == 2u64
+    ensures  (*p).state       == 3u64
+    ensures  (*p).transitions == old((*p).transitions) + 1u64
+{
+    (*p).state       = 3u64;
+    (*p).transitions = (*p).transitions + 1u64;
+}
+
+fn ps_resume(p: refmut<PowerState>)
+    requires (*p).state > 0u64
+    ensures  (*p).state       == 0u64
+    ensures  (*p).transitions == old((*p).transitions) + 1u64
+{
+    (*p).state       = 0u64;
+    (*p).transitions = (*p).transitions + 1u64;
+}
+
+// Enter S1: state is 1
+fn enter_s1() -> u64
+    ensures result == 1u64
+{
+    let p: PowerState = ps_new();
+    ps_to_s1(&mut p);
+    p.state
+}
+
+// Deep sleep (S3): state is 3
+fn deep_sleep() -> u64
+    ensures result == 3u64
+{
+    let p: PowerState = ps_new();
+    ps_to_s1(&mut p);
+    ps_to_s2(&mut p);
+    ps_to_s3(&mut p);
+    p.state
+}
+
+// Resume from S3: state is 0
+fn resume_from_s3() -> u64
+    ensures result == 0u64
+{
+    let p: PowerState = ps_new();
+    ps_to_s1(&mut p);
+    ps_to_s2(&mut p);
+    ps_to_s3(&mut p);
+    ps_resume(&mut p);
+    p.state
+}
+
+// Transitions counted: sleep cycle = 4 transitions
+fn sleep_cycle_transitions() -> u64
+    ensures result == 4u64
+{
+    let p: PowerState = ps_new();
+    ps_to_s1(&mut p);
+    ps_to_s2(&mut p);
+    ps_to_s3(&mut p);
+    ps_resume(&mut p);
+    p.transitions
+}
+
+// Resume from S1 directly
+fn resume_from_s1() -> u64
+    ensures result == 0u64
+{
+    let p: PowerState = ps_new();
+    ps_to_s1(&mut p);
+    ps_resume(&mut p);
+    p.state
+}
+
+fn main() -> u64 { 0u64 }
