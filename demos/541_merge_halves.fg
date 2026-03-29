@@ -1,0 +1,61 @@
+// Demo 541: merge two halves of an array in-place (merge step)
+
+fn copy_span(src: span<u64>, dst: span<u64>, n: u64)
+    requires n <= src.len
+    requires n <= dst.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        dst[i] = src[i];
+        i = i + 1u64;
+    };
+}
+
+fn merge_step(a: span<u64>, na: u64, b: span<u64>, nb: u64, out: span<u64>)
+    requires na <= a.len
+    requires nb <= b.len
+    requires na + nb <= out.len
+{
+    let mut i: u64 = 0u64;
+    let mut j: u64 = 0u64;
+    let mut k: u64 = 0u64;
+    while i < na && j < nb
+        invariant i <= na
+        invariant j <= nb
+        invariant k == i + j
+        decreases (na - i) + (nb - j)
+    {
+        let take_a: bool = a[i] <= b[j];
+        if take_a {
+            out[k] = a[i];
+            i = i + 1u64;
+        } else {
+            out[k] = b[j];
+            j = j + 1u64;
+        };
+        k = k + 1u64;
+    };
+    while i < na
+        invariant i <= na
+        invariant k == i + j
+        decreases na - i
+    {
+        out[k] = a[i];
+        i = i + 1u64;
+        k = k + 1u64;
+    };
+    while j < nb
+        invariant j <= nb
+        invariant k == i + j
+        decreases nb - j
+    {
+        out[k] = b[j];
+        j = j + 1u64;
+        k = k + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

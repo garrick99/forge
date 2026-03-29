@@ -1,0 +1,65 @@
+// Demo 545: block cipher round operations (AES-like S-box and permutation)
+
+fn sbox_lookup(input: u64, sbox: span<u64>) -> u64
+    requires input < sbox.len
+    requires sbox.len >= 256u64
+{
+    sbox[input]
+}
+
+fn sub_bytes(block: span<u64>, sbox: span<u64>, n: u64)
+    requires n <= block.len
+    requires sbox.len >= 256u64
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let b: u64 = block[i] & 0xFFu64;
+        block[i] = sbox[b];
+        i = i + 1u64;
+    };
+}
+
+fn xor_roundkey(block: span<u64>, key: span<u64>, n: u64)
+    requires n <= block.len
+    requires n <= key.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        block[i] = block[i] ^ key[i];
+        i = i + 1u64;
+    };
+}
+
+fn shift_row(block: span<u64>, n: u64, shift: u64) -> u64
+    requires n > 0u64
+    requires n <= block.len
+    requires shift < n
+    ensures  result < n
+{
+    (shift + 1u64) % n
+}
+
+fn block_sum(block: span<u64>, n: u64) -> u64
+    requires n <= block.len
+    ensures  n == 0u64 ==> result == 0u64
+{
+    let mut s: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant n == 0u64 ==> s == 0u64
+        decreases n - i
+    {
+        s = s + block[i];
+        i = i + 1u64;
+    };
+    s
+}
+
+fn main() -> u64 { 0u64 }

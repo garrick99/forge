@@ -1,0 +1,86 @@
+// Demo 548: ordered search operations on sorted spans
+
+fn find_first_ge(s: span<u64>, n: u64, target: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] >= target { return i; };
+        i = i + 1u64;
+    };
+    n
+}
+
+fn find_first_gt(s: span<u64>, n: u64, target: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] > target { return i; };
+        i = i + 1u64;
+    };
+    n
+}
+
+fn count_in_range(s: span<u64>, n: u64, lo: u64, hi: u64) -> u64
+    requires n <= s.len
+    requires lo <= hi
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if s[i] >= lo && s[i] <= hi { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn span_is_sorted(s: span<u64>, n: u64) -> bool
+    requires n <= s.len
+    requires n >= 1u64
+    ensures  result == true || result == false
+{
+    let mut i: u64 = 0u64;
+    let mut ok: bool = true;
+    while i + 1u64 < n
+        invariant i + 1u64 <= n
+        invariant ok == true || ok == false
+        decreases n - i
+    {
+        if s[i] > s[i + 1u64] { ok = (i != i); };
+        i = i + 1u64;
+    };
+    ok
+}
+
+fn span_all_eq(s: span<u64>, n: u64, v: u64) -> bool
+    requires n <= s.len
+    ensures  result == true || result == false
+{
+    let mut i: u64 = 0u64;
+    let mut ok: bool = true;
+    while i < n
+        invariant i <= n
+        invariant ok == true || ok == false
+        decreases n - i
+    {
+        if s[i] != v { ok = (i != i); };
+        i = i + 1u64;
+    };
+    ok
+}
+
+fn main() -> u64 { 0u64 }

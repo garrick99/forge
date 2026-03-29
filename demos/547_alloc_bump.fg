@@ -1,0 +1,55 @@
+// Demo 547: bump allocator — linear arena allocation
+
+struct BumpAlloc {
+    pool: span<u64>,
+    top: u64,
+    cap: u64,
+}
+
+fn bump_new(pool: span<u64>, cap: u64) -> BumpAlloc
+    requires cap <= pool.len
+    ensures  result.top == 0u64
+    ensures  result.cap == cap
+{
+    struct BumpAlloc { pool: pool, top: 0u64, cap: cap }
+}
+
+fn bump_alloc(a: refmut<BumpAlloc>, size: u64) -> u64
+    requires size > 0u64
+    requires (*a).top + size <= (*a).cap
+    requires (*a).cap <= (*a).pool.len
+    ensures  result == old((*a).top)
+    ensures  (*a).top == old((*a).top) + size
+{
+    let base: u64 = (*a).top;
+    (*a).top = (*a).top + size;
+    base
+}
+
+fn bump_free_all(a: refmut<BumpAlloc>)
+    ensures (*a).top == 0u64
+{
+    (*a).top = 0u64;
+}
+
+fn bump_remaining(a: ref<BumpAlloc>) -> u64
+    requires (*a).top <= (*a).cap
+    ensures  result == (*a).cap - (*a).top
+{
+    (*a).cap - (*a).top
+}
+
+fn bump_is_empty(a: ref<BumpAlloc>) -> bool
+    ensures result == true || result == false
+{
+    (*a).top == 0u64
+}
+
+fn bump_is_full(a: ref<BumpAlloc>) -> bool
+    requires (*a).top <= (*a).cap
+    ensures result == true || result == false
+{
+    (*a).top == (*a).cap
+}
+
+fn main() -> u64 { 0u64 }

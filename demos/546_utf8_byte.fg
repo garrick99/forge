@@ -1,0 +1,85 @@
+// Demo 546: UTF-8 byte classification and sequence length
+
+fn utf8_seq_len(first_byte: u64) -> u64
+    requires first_byte < 256u64
+    ensures  result >= 1u64
+    ensures  result <= 4u64
+    ensures  first_byte < 128u64 ==> result == 1u64
+    ensures  first_byte >= 128u64 && first_byte < 224u64 ==> result == 2u64
+    ensures  first_byte >= 224u64 && first_byte < 240u64 ==> result == 3u64
+    ensures  first_byte >= 240u64 ==> result == 4u64
+{
+    if first_byte < 128u64 {
+        1u64
+    } else if first_byte < 224u64 {
+        2u64
+    } else if first_byte < 240u64 {
+        3u64
+    } else {
+        4u64
+    }
+}
+
+fn utf8_is_ascii(b: u64) -> bool
+    requires b < 256u64
+    ensures  result == true || result == false
+{
+    b < 128u64
+}
+
+fn utf8_is_continuation(b: u64) -> bool
+    requires b < 256u64
+    ensures  result == true || result == false
+{
+    b >= 128u64 && b < 192u64
+}
+
+fn utf8_is_start_2(b: u64) -> bool
+    requires b < 256u64
+    ensures  result == true || result == false
+{
+    b >= 192u64 && b < 224u64
+}
+
+fn utf8_count_ascii(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if s[i] < 128u64 { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn check_ascii_len() -> u64
+    ensures result == 1u64
+{
+    utf8_seq_len(65u64)
+}
+
+fn check_2byte_len() -> u64
+    ensures result == 2u64
+{
+    utf8_seq_len(200u64)
+}
+
+fn check_3byte_len() -> u64
+    ensures result == 3u64
+{
+    utf8_seq_len(230u64)
+}
+
+fn check_4byte_len() -> u64
+    ensures result == 4u64
+{
+    utf8_seq_len(245u64)
+}
+
+fn main() -> u64 { 0u64 }

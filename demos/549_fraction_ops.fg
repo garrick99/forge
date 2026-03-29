@@ -1,0 +1,81 @@
+// Demo 549: unsigned fraction operations with verified bounds
+
+struct Frac {
+    num: u64,
+    den: u64,
+}
+
+fn frac_new(num: u64, den: u64) -> Frac
+    requires den > 0u64
+    ensures  result.num == num
+    ensures  result.den == den
+    ensures  result.den > 0u64
+{
+    struct Frac { num: num, den: den }
+}
+
+fn frac_add_same_den(a: Frac, b: Frac) -> Frac
+    requires a.den > 0u64
+    requires a.den == b.den
+    ensures  result.den == a.den
+    ensures  result.num == a.num + b.num
+    ensures  result.den > 0u64
+{
+    struct Frac { num: a.num + b.num, den: a.den }
+}
+
+fn frac_scale(f: Frac, k: u64) -> Frac
+    requires f.den > 0u64
+    ensures  result.den == f.den
+    ensures  result.num == f.num * k
+    ensures  result.den > 0u64
+{
+    struct Frac { num: f.num * k, den: f.den }
+}
+
+fn frac_is_proper(f: Frac) -> bool
+    requires f.den > 0u64
+    ensures  result == true || result == false
+{
+    f.num < f.den
+}
+
+fn frac_to_floor(f: Frac) -> u64
+    requires f.den > 0u64
+    ensures  result == f.num / f.den
+{
+    f.num / f.den
+}
+
+fn frac_le(a: Frac, b: Frac) -> bool
+    requires a.den > 0u64
+    requires b.den > 0u64
+    requires a.den == b.den
+    ensures  result == true || result == false
+{
+    a.num <= b.num
+}
+
+fn check_frac_num() -> u64
+    ensures result == 3u64
+{
+    let f: Frac = frac_new(3u64, 5u64);
+    f.num
+}
+
+fn check_frac_floor() -> u64
+    ensures result == 2u64
+{
+    let f: Frac = frac_new(10u64, 4u64);
+    frac_to_floor(f)
+}
+
+fn check_frac_scale() -> u64
+    ensures result == 6u64
+{
+    let f: Frac = frac_new(3u64, 5u64);
+    let g: Frac = frac_scale(f, 2u64);
+    g.num
+}
+
+fn main() -> u64 { 0u64 }

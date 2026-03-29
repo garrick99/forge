@@ -1,0 +1,64 @@
+// Demo 543: sieve of Eratosthenes — mark composite flags
+
+fn sieve_mark(flags: span<u64>, n: u64, p: u64)
+    requires n <= flags.len
+    requires p > 1u64
+    requires p * 2u64 <= n
+{
+    let mut i: u64 = p * 2u64;
+    while i < n
+        decreases n - i
+    {
+        flags[i] = 0u64;
+        i = i + p;
+    };
+}
+
+fn sieve_init(flags: span<u64>, n: u64)
+    requires n <= flags.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        flags[i] = 1u64;
+        i = i + 1u64;
+    };
+}
+
+fn count_primes(flags: span<u64>, n: u64) -> u64
+    requires n <= flags.len
+    requires n >= 2u64
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 2u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if flags[i] == 1u64 { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn find_next_prime(flags: span<u64>, n: u64, start: u64) -> u64
+    requires n <= flags.len
+    requires start < n
+    ensures  result <= n
+{
+    let mut i: u64 = start;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if flags[i] == 1u64 { return i; };
+        i = i + 1u64;
+    };
+    n
+}
+
+fn main() -> u64 { 0u64 }

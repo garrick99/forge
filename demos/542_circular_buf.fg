@@ -1,0 +1,57 @@
+// Demo 542: verified circular buffer with wrap-around indexing
+
+fn circ_next(idx: u64, cap: u64) -> u64
+    requires cap > 0u64
+    requires idx < cap
+    ensures  result < cap
+{
+    if idx + 1u64 < cap { idx + 1u64 } else { 0u64 }
+}
+
+fn circ_prev(idx: u64, cap: u64) -> u64
+    requires cap > 0u64
+    requires idx < cap
+    ensures  result < cap
+{
+    if idx > 0u64 { idx - 1u64 } else { cap - 1u64 }
+}
+
+fn circ_distance(from: u64, to: u64, cap: u64) -> u64
+    requires cap > 0u64
+    requires from < cap
+    requires to < cap
+    ensures  result < cap
+{
+    if to >= from { to - from } else { cap - from + to }
+}
+
+fn circ_is_full(head: u64, tail: u64, size: u64, cap: u64) -> bool
+    requires cap > 0u64
+    ensures  result == true || result == false
+{
+    size == cap
+}
+
+fn circ_is_empty(size: u64) -> bool
+    ensures result == true || result == false
+{
+    size == 0u64
+}
+
+fn circ_read(buf: span<u64>, head: u64, cap: u64) -> u64
+    requires cap > 0u64
+    requires head < cap
+    requires cap <= buf.len
+{
+    buf[head]
+}
+
+fn circ_write(buf: span<u64>, tail: u64, cap: u64, v: u64)
+    requires cap > 0u64
+    requires tail < cap
+    requires cap <= buf.len
+{
+    buf[tail] = v;
+}
+
+fn main() -> u64 { 0u64 }

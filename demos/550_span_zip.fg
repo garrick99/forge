@@ -1,0 +1,98 @@
+// Demo 550: span zip, unzip, and elementwise operations
+
+fn span_zip_add(a: span<u64>, b: span<u64>, out: span<u64>, n: u64)
+    requires n <= a.len
+    requires n <= b.len
+    requires n <= out.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        out[i] = a[i] + b[i];
+        i = i + 1u64;
+    };
+}
+
+fn span_zip_mul(a: span<u64>, b: span<u64>, out: span<u64>, n: u64)
+    requires n <= a.len
+    requires n <= b.len
+    requires n <= out.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        out[i] = a[i] * b[i];
+        i = i + 1u64;
+    };
+}
+
+fn span_zip_max(a: span<u64>, b: span<u64>, out: span<u64>, n: u64)
+    requires n <= a.len
+    requires n <= b.len
+    requires n <= out.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        out[i] = if a[i] >= b[i] { a[i] } else { b[i] };
+        i = i + 1u64;
+    };
+}
+
+fn span_zip_min(a: span<u64>, b: span<u64>, out: span<u64>, n: u64)
+    requires n <= a.len
+    requires n <= b.len
+    requires n <= out.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        out[i] = if a[i] <= b[i] { a[i] } else { b[i] };
+        i = i + 1u64;
+    };
+}
+
+fn span_inner_product(a: span<u64>, b: span<u64>, n: u64) -> u64
+    requires n <= a.len
+    requires n <= b.len
+    ensures  n == 0u64 ==> result == 0u64
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant n == 0u64 ==> acc == 0u64
+        decreases n - i
+    {
+        acc = acc + a[i] * b[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn span_lex_compare(a: span<u64>, b: span<u64>, n: u64) -> u64
+    requires n <= a.len
+    requires n <= b.len
+    ensures  result <= 2u64
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if a[i] < b[i] { return 0u64; };
+        if a[i] > b[i] { return 2u64; };
+        i = i + 1u64;
+    };
+    1u64
+}
+
+fn main() -> u64 { 0u64 }
