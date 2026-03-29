@@ -1,0 +1,76 @@
+// Demo 677: table operations — lookup, scan, aggregate over 2D arrays
+
+fn tbl_get(t: span<u64>, rows: u64, cols: u64, r: u64, c: u64) -> u64
+    requires cols >= 1u64
+    requires r < rows
+    requires c < cols
+    requires rows * cols <= t.len
+{
+    t[r * cols + c]
+}
+
+fn tbl_row_max(t: span<u64>, cols: u64, row: u64) -> u64
+    requires cols >= 1u64
+    requires row * cols + cols <= t.len
+{
+    let mut mx: u64 = t[row * cols];
+    let mut j: u64 = 1u64;
+    while j < cols
+        invariant j <= cols
+        decreases cols - j
+    {
+        if t[row * cols + j] > mx { mx = t[row * cols + j]; };
+        j = j + 1u64;
+    };
+    mx
+}
+
+fn tbl_row_min(t: span<u64>, cols: u64, row: u64) -> u64
+    requires cols >= 1u64
+    requires row * cols + cols <= t.len
+{
+    let mut mn: u64 = t[row * cols];
+    let mut j: u64 = 1u64;
+    while j < cols
+        invariant j <= cols
+        decreases cols - j
+    {
+        if t[row * cols + j] < mn { mn = t[row * cols + j]; };
+        j = j + 1u64;
+    };
+    mn
+}
+
+fn tbl_global_max(t: span<u64>, rows: u64, cols: u64) -> u64
+    requires rows >= 1u64
+    requires cols >= 1u64
+    requires rows * cols <= t.len
+{
+    let mut mx: u64 = t[0u64];
+    let total: u64 = rows * cols;
+    let mut i: u64 = 1u64;
+    while i < total
+        invariant i <= total
+        decreases total - i
+    {
+        if t[i] > mx { mx = t[i]; };
+        i = i + 1u64;
+    };
+    mx
+}
+
+fn tbl_fill(t: span<u64>, rows: u64, cols: u64, val: u64)
+    requires rows * cols <= t.len
+{
+    let total: u64 = rows * cols;
+    let mut i: u64 = 0u64;
+    while i < total
+        invariant i <= total
+        decreases total - i
+    {
+        t[i] = val;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

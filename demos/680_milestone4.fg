@@ -1,0 +1,96 @@
+// Demo 680: milestone 4 — combined verified algorithms
+
+fn gcd(a: u64, b: u64) -> u64
+    requires a >= 1u64
+    requires b >= 1u64
+    ensures  result >= 1u64
+{
+    let mut x: u64 = a;
+    let mut y: u64 = b;
+    while y > 0u64
+        invariant x >= 1u64
+        decreases y
+    {
+        let t: u64 = y;
+        y = x % y;
+        x = t;
+    };
+    x
+}
+
+fn lcm(a: u64, b: u64) -> u64
+    requires a >= 1u64
+    requires b >= 1u64
+{
+    let g: u64 = gcd(a, b);
+    (a / g) * b
+}
+
+fn abs_diff(a: u64, b: u64) -> u64 {
+    if a >= b { a - b } else { b - a }
+}
+
+fn array_max_elem(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+{
+    let mut mx: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] > mx { mx = s[i]; };
+        i = i + 1u64;
+    };
+    mx
+}
+
+fn array_abs_diff_sum(a: span<u64>, b: span<u64>, n: u64) -> u64
+    requires n <= a.len
+    requires n <= b.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let d: u64 = abs_diff(a[i], b[i]);
+        acc = acc + d;
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn clamp_array_range(s: span<u64>, n: u64, lo: u64, hi: u64)
+    requires lo <= hi
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] < lo { s[i] = lo; }
+        else if s[i] > hi { s[i] = hi; };
+        i = i + 1u64;
+    };
+}
+
+fn array_contains(s: span<u64>, n: u64, val: u64) -> bool
+    requires n <= s.len
+{
+    let mut found: bool = false;
+    let mut i: u64 = 0u64;
+    while i < n && !found
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] == val { found = true; };
+        i = i + 1u64;
+    };
+    found
+}
+
+fn main() -> u64 { 0u64 }

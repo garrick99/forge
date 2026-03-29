@@ -1,0 +1,82 @@
+// Demo 675: histogram — frequency counting, cumulative distribution
+
+fn hist_build(src: span<u64>, n: u64, hist: span<u64>, bins: u64)
+    requires n <= src.len
+    requires bins >= 1u64
+    requires bins <= hist.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let bin: u64 = src[i] % bins;
+        hist[bin] = hist[bin] + 1u64;
+        i = i + 1u64;
+    };
+}
+
+fn hist_total(hist: span<u64>, bins: u64) -> u64
+    requires bins <= hist.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < bins
+        invariant i <= bins
+        decreases bins - i
+    {
+        acc = acc + hist[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn hist_max_bin(hist: span<u64>, bins: u64) -> u64
+    requires bins >= 1u64
+    requires bins <= hist.len
+    ensures  result < bins
+{
+    let mut mx: u64 = hist[0u64];
+    let mut idx: u64 = 0u64;
+    let mut i: u64 = 1u64;
+    while i < bins
+        invariant i <= bins
+        invariant idx < bins
+        decreases bins - i
+    {
+        if hist[i] > mx { mx = hist[i]; idx = i; };
+        i = i + 1u64;
+    };
+    idx
+}
+
+fn hist_cumulative(hist: span<u64>, cum: span<u64>, bins: u64)
+    requires bins >= 1u64
+    requires bins <= hist.len
+    requires bins <= cum.len
+{
+    cum[0u64] = hist[0u64];
+    let mut i: u64 = 1u64;
+    while i < bins
+        invariant i <= bins
+        decreases bins - i
+    {
+        cum[i] = cum[i - 1u64] + hist[i];
+        i = i + 1u64;
+    };
+}
+
+fn hist_clear(hist: span<u64>, bins: u64)
+    requires bins <= hist.len
+{
+    let mut i: u64 = 0u64;
+    while i < bins
+        invariant i <= bins
+        decreases bins - i
+    {
+        hist[i] = 0u64;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

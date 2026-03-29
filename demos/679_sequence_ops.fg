@@ -1,0 +1,83 @@
+// Demo 679: sequence operations — zip, interleave, dedup
+
+fn seq_zip_add(a: span<u64>, b: span<u64>, out: span<u64>, n: u64)
+    requires n <= a.len
+    requires n <= b.len
+    requires n <= out.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        out[i] = a[i] + b[i];
+        i = i + 1u64;
+    };
+}
+
+fn seq_zip_max(a: span<u64>, b: span<u64>, out: span<u64>, n: u64)
+    requires n <= a.len
+    requires n <= b.len
+    requires n <= out.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if a[i] >= b[i] { out[i] = a[i]; } else { out[i] = b[i]; };
+        i = i + 1u64;
+    };
+}
+
+fn seq_interleave(a: span<u64>, b: span<u64>, out: span<u64>, n: u64)
+    requires n <= a.len
+    requires n <= b.len
+    requires 2u64 * n <= out.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        out[2u64 * i] = a[i];
+        out[2u64 * i + 1u64] = b[i];
+        i = i + 1u64;
+    };
+}
+
+fn seq_dedup_count(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures  result >= 1u64
+    ensures  result <= n
+{
+    let mut cnt: u64 = 1u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant cnt >= 1u64
+        invariant cnt <= i
+        decreases n - i
+    {
+        if s[i] != s[i - 1u64] { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn seq_prefix_copy(src: span<u64>, dst: span<u64>, n: u64)
+    requires n <= src.len
+    requires n <= dst.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        dst[i] = src[i];
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

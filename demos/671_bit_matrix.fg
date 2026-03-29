@@ -1,0 +1,82 @@
+// Demo 671: bit matrix operations — row/column ops on flat u64 arrays
+
+fn bmat_get(m: span<u64>, cols: u64, row: u64, col: u64) -> u64
+    requires cols >= 1u64
+    requires col < cols
+    requires row * cols + col < m.len
+{
+    m[row * cols + col]
+}
+
+fn bmat_set(m: span<u64>, cols: u64, row: u64, col: u64, val: u64)
+    requires cols >= 1u64
+    requires col < cols
+    requires row * cols + col < m.len
+{
+    m[row * cols + col] = val;
+}
+
+fn bmat_row_sum(m: span<u64>, cols: u64, row: u64) -> u64
+    requires cols >= 1u64
+    requires row * cols + cols <= m.len
+{
+    let mut acc: u64 = 0u64;
+    let mut j: u64 = 0u64;
+    while j < cols
+        invariant j <= cols
+        decreases cols - j
+    {
+        acc = acc + m[row * cols + j];
+        j = j + 1u64;
+    };
+    acc
+}
+
+fn bmat_col_sum(m: span<u64>, rows: u64, cols: u64, col: u64) -> u64
+    requires cols >= 1u64
+    requires col < cols
+    requires rows * cols <= m.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < rows
+        invariant i <= rows
+        decreases rows - i
+    {
+        acc = acc + m[i * cols + col];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn bmat_fill_row(m: span<u64>, cols: u64, row: u64, val: u64)
+    requires cols >= 1u64
+    requires row * cols + cols <= m.len
+{
+    let mut j: u64 = 0u64;
+    while j < cols
+        invariant j <= cols
+        decreases cols - j
+    {
+        m[row * cols + j] = val;
+        j = j + 1u64;
+    };
+}
+
+fn bmat_trace(m: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n * n <= m.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + m[i * n + i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

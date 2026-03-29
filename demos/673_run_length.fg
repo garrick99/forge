@@ -1,0 +1,84 @@
+// Demo 673: run-length encoding helpers
+
+fn rle_count_run(s: span<u64>, n: u64, start: u64) -> u64
+    requires start < n
+    requires n <= s.len
+    ensures  result >= 1u64
+    ensures  result <= n - start
+{
+    let val: u64 = s[start];
+    let mut len: u64 = 1u64;
+    let mut i: u64 = start + 1u64;
+    let mut done: bool = false;
+    while !done
+        invariant i <= n
+        invariant len == i - start
+        decreases n - i
+    {
+        if i >= n { done = true; }
+        else if s[i] != val { done = true; }
+        else { len = len + 1u64; i = i + 1u64; };
+    };
+    len
+}
+
+fn rle_count_runs(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures  result >= 1u64
+    ensures  result <= n
+{
+    let mut runs: u64 = 1u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant runs >= 1u64
+        invariant runs <= i
+        decreases n - i
+    {
+        if s[i] != s[i - 1u64] { runs = runs + 1u64; };
+        i = i + 1u64;
+    };
+    runs
+}
+
+fn rle_run_length(s: span<u64>, n: u64, start: u64) -> u64
+    requires start < n
+    requires n <= s.len
+    ensures  result >= 1u64
+{
+    let val: u64 = s[start];
+    let mut len: u64 = 1u64;
+    let mut i: u64 = start + 1u64;
+    let mut done: bool = false;
+    while !done
+        invariant i <= n
+        invariant len >= 1u64
+        decreases n - i
+    {
+        if i >= n { done = true; }
+        else if s[i] != val { done = true; }
+        else { len = len + 1u64; i = i + 1u64; };
+    };
+    len
+}
+
+fn rle_total_runs(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut runs: u64 = 1u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant runs <= i
+        decreases n - i
+    {
+        if s[i] != s[i - 1u64] { runs = runs + 1u64; };
+        i = i + 1u64;
+    };
+    runs
+}
+
+fn main() -> u64 { 0u64 }

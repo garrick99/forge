@@ -1,0 +1,81 @@
+// Demo 676: string search — naive pattern matching, count occurrences
+
+fn str_match_at(text: span<u64>, tlen: u64, pat: span<u64>, plen: u64, pos: u64) -> bool
+    requires pos + plen <= tlen
+    requires tlen <= text.len
+    requires plen <= pat.len
+{
+    let mut ok: bool = true;
+    let mut i: u64 = 0u64;
+    while i < plen && ok
+        invariant i <= plen
+        decreases plen - i
+    {
+        if text[pos + i] != pat[i] { ok = false; };
+        i = i + 1u64;
+    };
+    ok
+}
+
+fn str_find_first(text: span<u64>, tlen: u64, pat: span<u64>, plen: u64) -> u64
+    requires plen >= 1u64
+    requires plen <= tlen
+    requires tlen <= text.len
+    requires plen <= pat.len
+    ensures  result <= tlen
+{
+    let limit: u64 = tlen - plen + 1u64;
+    let mut found: u64 = tlen;
+    let mut i: u64 = 0u64;
+    let mut done: bool = false;
+    while i < limit && !done
+        invariant i <= limit
+        invariant found <= tlen
+        decreases limit - i
+    {
+        let ok: bool = str_match_at(text, tlen, pat, plen, i);
+        if ok { found = i; done = true; };
+        i = i + 1u64;
+    };
+    found
+}
+
+fn str_count(text: span<u64>, tlen: u64, pat: span<u64>, plen: u64) -> u64
+    requires plen >= 1u64
+    requires plen <= tlen
+    requires tlen <= text.len
+    requires plen <= pat.len
+    ensures  result <= tlen
+{
+    let limit: u64 = tlen - plen + 1u64;
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < limit
+        invariant i <= limit
+        invariant cnt <= i
+        decreases limit - i
+    {
+        let ok: bool = str_match_at(text, tlen, pat, plen, i);
+        if ok { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn str_eq(a: span<u64>, b: span<u64>, n: u64) -> bool
+    requires n <= a.len
+    requires n <= b.len
+{
+    let mut ok: bool = true;
+    let mut i: u64 = 0u64;
+    while i < n && ok
+        invariant i <= n
+        decreases n - i
+    {
+        if a[i] != b[i] { ok = false; };
+        i = i + 1u64;
+    };
+    ok
+}
+
+fn main() -> u64 { 0u64 }

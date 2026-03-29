@@ -1,0 +1,79 @@
+// Demo 678: bit counting and manipulation
+
+fn popcount(x: u64) -> u64
+    ensures result <= 64u64
+{
+    let mut n: u64 = x;
+    let mut cnt: u64 = 0u64;
+    while n > 0u64
+        invariant cnt <= 64u64
+        decreases n
+    {
+        cnt = cnt + n % 2u64;
+        n = n / 2u64;
+    };
+    cnt
+}
+
+fn count_leading_zeros(x: u64) -> u64
+    requires x >= 1u64
+    ensures result < 64u64
+{
+    let mut n: u64 = x;
+    let mut cnt: u64 = 0u64;
+    while n < 9223372036854775808u64 && cnt < 63u64
+        invariant cnt < 64u64
+        decreases 63u64 - cnt
+    {
+        n = n * 2u64;
+        cnt = cnt + 1u64;
+    };
+    cnt
+}
+
+fn lowest_set_bit(x: u64) -> u64
+    requires x >= 1u64
+    ensures result >= 1u64
+{
+    x - (x - 1u64) / 2u64 * 2u64 - (x - 1u64) % 2u64
+}
+
+fn is_power_of_two(x: u64) -> bool
+    requires x >= 1u64
+{
+    x % 2u64 == 0u64 || x == 1u64
+}
+
+fn next_power_of_two(x: u64) -> u64
+    requires x >= 1u64
+{
+    let mut p: u64 = 1u64;
+    let mut steps: u64 = 0u64;
+    while p < x && steps < 63u64
+        invariant p >= 1u64
+        invariant steps <= 63u64
+        decreases 63u64 - steps
+    {
+        p = p * 2u64;
+        steps = steps + 1u64;
+    };
+    p
+}
+
+fn array_popcount_sum(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let pc: u64 = popcount(s[i]);
+        acc = acc + pc;
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }
