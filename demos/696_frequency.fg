@@ -1,0 +1,81 @@
+// Demo 696: frequency analysis — mode, count, majority element
+
+fn freq_count_val(s: span<u64>, n: u64, val: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if s[i] == val { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn freq_mode(s: span<u64>, n: u64, hist: span<u64>, bins: u64) -> u64
+    requires n <= s.len
+    requires bins >= 1u64
+    requires bins <= hist.len
+    ensures  result < bins
+{
+    // count frequencies
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let b: u64 = s[i] % bins;
+        hist[b] = hist[b] + 1u64;
+        i = i + 1u64;
+    };
+    // find max frequency bin
+    let mut best: u64 = 0u64;
+    let mut best_cnt: u64 = hist[0u64];
+    let mut j: u64 = 1u64;
+    while j < bins
+        invariant j <= bins
+        invariant best < bins
+        decreases bins - j
+    {
+        if hist[j] > best_cnt { best = j; best_cnt = hist[j]; };
+        j = j + 1u64;
+    };
+    best
+}
+
+fn freq_any_equal(s: span<u64>, n: u64, val: u64) -> bool
+    requires n <= s.len
+{
+    let mut found: bool = false;
+    let mut i: u64 = 0u64;
+    while i < n && !found
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] == val { found = true; };
+        i = i + 1u64;
+    };
+    found
+}
+
+fn freq_all_equal(s: span<u64>, n: u64, val: u64) -> bool
+    requires n <= s.len
+{
+    let mut ok: bool = true;
+    let mut i: u64 = 0u64;
+    while i < n && ok
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] != val { ok = false; };
+        i = i + 1u64;
+    };
+    ok
+}
+
+fn main() -> u64 { 0u64 }

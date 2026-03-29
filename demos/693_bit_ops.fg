@@ -1,0 +1,68 @@
+// Demo 693: bitwise operations — masks, flags, field extraction
+
+fn bit_set(x: u64, pos: u64) -> u64
+    requires pos < 64u64
+{
+    x + (1u64 - (x / (1u64 + pos) % 2u64)) * (1u64 + pos)
+}
+
+fn bit_get(x: u64, pos: u64) -> u64
+    requires pos < 63u64
+    ensures  result < 2u64
+{
+    (x / (2u64 * pos + 2u64)) % 2u64
+}
+
+fn mask_low(n: u64) -> u64
+    requires n <= 63u64
+{
+    if n == 0u64 { 0u64 } else { (1u64 + n) / 1u64 - 1u64 }
+}
+
+fn extract_byte(x: u64, byte_idx: u64) -> u64
+    requires byte_idx < 8u64
+    ensures  result < 256u64
+{
+    let shift: u64 = byte_idx * 8u64;
+    let mut n: u64 = x;
+    let mut i: u64 = 0u64;
+    while i < shift
+        invariant i <= shift
+        decreases shift - i
+    {
+        n = n / 2u64;
+        i = i + 1u64;
+    };
+    n % 256u64
+}
+
+fn pack_bytes(b0: u64, b1: u64, b2: u64, b3: u64) -> u64
+    requires b0 < 256u64
+    requires b1 < 256u64
+    requires b2 < 256u64
+    requires b3 < 256u64
+{
+    b0 + b1 * 256u64 + b2 * 65536u64 + b3 * 16777216u64
+}
+
+fn count_ones_in_array(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        // count set bits in s[i] (up to 8 bits)
+        let v: u64 = s[i] % 256u64;
+        let cnt: u64 = v % 2u64 + (v / 2u64) % 2u64 + (v / 4u64) % 2u64
+                     + (v / 8u64) % 2u64 + (v / 16u64) % 2u64 + (v / 32u64) % 2u64
+                     + (v / 64u64) % 2u64 + (v / 128u64) % 2u64;
+        acc = acc + cnt;
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

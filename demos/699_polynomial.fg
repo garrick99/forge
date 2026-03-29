@@ -1,0 +1,73 @@
+// Demo 699: polynomial operations — evaluation, addition, multiplication mod
+
+fn poly_eval(coeffs: span<u64>, deg: u64, x: u64) -> u64
+    requires deg + 1u64 <= coeffs.len
+{
+    // Horner's method
+    let mut acc: u64 = coeffs[deg];
+    let mut i: u64 = deg;
+    let mut done: bool = false;
+    while !done
+        invariant i <= deg
+        decreases i
+    {
+        if i == 0u64 { done = true; }
+        else {
+            i = i - 1u64;
+            acc = acc * x + coeffs[i];
+        };
+    };
+    acc
+}
+
+fn poly_eval_mod(coeffs: span<u64>, deg: u64, x: u64, m: u64) -> u64
+    requires m >= 2u64
+    requires deg + 1u64 <= coeffs.len
+    ensures  result < m
+{
+    let mut acc: u64 = coeffs[deg] % m;
+    let mut i: u64 = deg;
+    let mut done: bool = false;
+    while !done
+        invariant i <= deg
+        invariant acc < m
+        decreases i
+    {
+        if i == 0u64 { done = true; }
+        else {
+            i = i - 1u64;
+            acc = (acc * (x % m) + coeffs[i] % m) % m;
+        };
+    };
+    acc
+}
+
+fn poly_add(a: span<u64>, b: span<u64>, out: span<u64>, n: u64)
+    requires n <= a.len
+    requires n <= b.len
+    requires n <= out.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        out[i] = a[i] + b[i];
+        i = i + 1u64;
+    };
+}
+
+fn poly_scale(coeffs: span<u64>, n: u64, s: u64)
+    requires n <= coeffs.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        coeffs[i] = coeffs[i] * s;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,65 @@
+// Demo 698: queue operations — circular buffer queue
+
+fn queue_enqueue(buf: span<u64>, cap: u64, tail: u64, val: u64) -> u64
+    requires cap >= 1u64
+    requires tail < cap
+    requires cap <= buf.len
+    ensures  result < cap
+{
+    buf[tail] = val;
+    (tail + 1u64) % cap
+}
+
+fn queue_dequeue(head: u64, cap: u64) -> u64
+    requires cap >= 1u64
+    requires head < cap
+    ensures  result < cap
+{
+    (head + 1u64) % cap
+}
+
+fn queue_size(head: u64, tail: u64, cap: u64) -> u64
+    requires cap >= 1u64
+    requires head < cap
+    requires tail < cap
+{
+    if tail >= head { tail - head }
+    else { cap - head + tail }
+}
+
+fn queue_is_empty(head: u64, tail: u64) -> bool
+    ensures result == (head == tail)
+{
+    head == tail
+}
+
+fn queue_peek(buf: span<u64>, cap: u64, head: u64) -> u64
+    requires cap >= 1u64
+    requires head < cap
+    requires cap <= buf.len
+{
+    buf[head]
+}
+
+fn queue_fill(buf: span<u64>, cap: u64, vals: span<u64>, n: u64) -> u64
+    requires cap >= 1u64
+    requires cap <= buf.len
+    requires n <= vals.len
+    requires n < cap
+    ensures  result < cap
+{
+    let mut tail: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant tail < cap
+        decreases n - i
+    {
+        buf[tail] = vals[i];
+        tail = (tail + 1u64) % cap;
+        i = i + 1u64;
+    };
+    tail
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,71 @@
+// Demo 697: transform operations — normalize, scale, map with offset
+
+fn transform_scale(s: span<u64>, n: u64, num: u64, den: u64)
+    requires n <= s.len
+    requires den >= 1u64
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = s[i] * num / den;
+        i = i + 1u64;
+    };
+}
+
+fn transform_offset(s: span<u64>, n: u64, off: u64)
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = s[i] + off;
+        i = i + 1u64;
+    };
+}
+
+fn transform_normalize(s: span<u64>, n: u64, new_max: u64, old_max: u64)
+    requires n <= s.len
+    requires old_max >= 1u64
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = s[i] * new_max / old_max;
+        i = i + 1u64;
+    };
+}
+
+fn transform_threshold(s: span<u64>, n: u64, thresh: u64, hi_val: u64, lo_val: u64)
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] >= thresh { s[i] = hi_val; } else { s[i] = lo_val; };
+        i = i + 1u64;
+    };
+}
+
+fn transform_abs_diff_from(s: span<u64>, n: u64, ref_val: u64)
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] >= ref_val { s[i] = s[i] - ref_val; }
+        else { s[i] = ref_val - s[i]; };
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

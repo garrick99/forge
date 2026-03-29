@@ -1,0 +1,95 @@
+// Demo 700: milestone 6 — verified 700-demo milestone
+
+fn sum_array(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn max_array(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+{
+    let mut mx: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] > mx { mx = s[i]; };
+        i = i + 1u64;
+    };
+    mx
+}
+
+fn min_array(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+{
+    let mut mn: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] < mn { mn = s[i]; };
+        i = i + 1u64;
+    };
+    mn
+}
+
+fn fill_array(s: span<u64>, n: u64, val: u64)
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = val;
+        i = i + 1u64;
+    };
+}
+
+fn copy_array(src: span<u64>, dst: span<u64>, n: u64)
+    requires n <= src.len
+    requires n <= dst.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        dst[i] = src[i];
+        i = i + 1u64;
+    };
+}
+
+fn reverse_array(s: span<u64>, n: u64)
+    requires n <= s.len
+{
+    let mut lo: u64 = 0u64;
+    let mut hi: u64 = n;
+    while lo + 1u64 < hi
+        invariant lo <= hi
+        invariant hi <= n
+        decreases hi - lo
+    {
+        hi = hi - 1u64;
+        let tmp: u64 = s[lo];
+        s[lo] = s[hi];
+        s[hi] = tmp;
+        lo = lo + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

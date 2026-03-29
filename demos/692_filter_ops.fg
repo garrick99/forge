@@ -1,0 +1,78 @@
+// Demo 692: filter operations — filter by predicate, compact, gather
+
+fn filter_lt(src: span<u64>, n: u64, dst: span<u64>, threshold: u64) -> u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures  result <= n
+{
+    let mut wi: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant wi <= i
+        decreases n - i
+    {
+        if src[i] < threshold { dst[wi] = src[i]; wi = wi + 1u64; };
+        i = i + 1u64;
+    };
+    wi
+}
+
+fn filter_nonzero(src: span<u64>, n: u64, dst: span<u64>) -> u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures  result <= n
+{
+    let mut wi: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant wi <= i
+        decreases n - i
+    {
+        if src[i] != 0u64 { dst[wi] = src[i]; wi = wi + 1u64; };
+        i = i + 1u64;
+    };
+    wi
+}
+
+fn filter_unique(src: span<u64>, n: u64, dst: span<u64>) -> u64
+    requires n >= 1u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures  result >= 1u64
+    ensures  result <= n
+{
+    dst[0u64] = src[0u64];
+    let mut wi: u64 = 1u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant wi >= 1u64
+        invariant wi <= i
+        decreases n - i
+    {
+        if src[i] != src[i - 1u64] { dst[wi] = src[i]; wi = wi + 1u64; };
+        i = i + 1u64;
+    };
+    wi
+}
+
+fn gather(src: span<u64>, idx: span<u64>, dst: span<u64>, n: u64, src_len: u64)
+    requires n <= idx.len
+    requires n <= dst.len
+    requires src_len >= 1u64
+    requires src_len <= src.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let j: u64 = idx[i] % src_len;
+        dst[i] = src[j];
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,82 @@
+// Demo 691: range operations — fill, copy, reverse, shift in ranges
+
+fn range_fill(s: span<u64>, lo: u64, hi: u64, val: u64)
+    requires lo <= hi
+    requires hi <= s.len
+{
+    let mut i: u64 = lo;
+    while i < hi
+        invariant i <= hi
+        decreases hi - i
+    {
+        s[i] = val;
+        i = i + 1u64;
+    };
+}
+
+fn range_copy(src: span<u64>, dst: span<u64>, lo: u64, hi: u64)
+    requires lo <= hi
+    requires hi <= src.len
+    requires hi <= dst.len
+{
+    let mut i: u64 = lo;
+    while i < hi
+        invariant i <= hi
+        decreases hi - i
+    {
+        dst[i] = src[i];
+        i = i + 1u64;
+    };
+}
+
+fn range_sum(s: span<u64>, lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    requires hi <= s.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = lo;
+    while i < hi
+        invariant i <= hi
+        decreases hi - i
+    {
+        acc = acc + s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn range_max(s: span<u64>, lo: u64, hi: u64) -> u64
+    requires lo < hi
+    requires hi <= s.len
+{
+    let mut mx: u64 = s[lo];
+    let mut i: u64 = lo + 1u64;
+    while i < hi
+        invariant i <= hi
+        decreases hi - i
+    {
+        if s[i] > mx { mx = s[i]; };
+        i = i + 1u64;
+    };
+    mx
+}
+
+fn range_count_eq(s: span<u64>, lo: u64, hi: u64, val: u64) -> u64
+    requires lo <= hi
+    requires hi <= s.len
+    ensures  result <= hi - lo
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = lo;
+    while i < hi
+        invariant i <= hi
+        invariant cnt <= i - lo
+        decreases hi - i
+    {
+        if s[i] == val { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }

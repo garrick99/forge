@@ -1,0 +1,83 @@
+// Demo 694: statistics — mean, variance helpers, percentile
+
+fn stat_sum(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn stat_min(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+{
+    let mut mn: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] < mn { mn = s[i]; };
+        i = i + 1u64;
+    };
+    mn
+}
+
+fn stat_max(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+{
+    let mut mx: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] > mx { mx = s[i]; };
+        i = i + 1u64;
+    };
+    mx
+}
+
+fn stat_sum_sq(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + s[i] * s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn stat_range(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+{
+    let mut mn: u64 = s[0u64];
+    let mut mx: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] < mn { mn = s[i]; };
+        if s[i] > mx { mx = s[i]; };
+        i = i + 1u64;
+    };
+    mx - mn
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,76 @@
+// Demo 695: memory operations — memset, memcpy, memmove, memcmp
+
+fn memset(buf: span<u64>, n: u64, val: u64)
+    requires n <= buf.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        buf[i] = val;
+        i = i + 1u64;
+    };
+}
+
+fn memcpy(dst: span<u64>, src: span<u64>, n: u64)
+    requires n <= dst.len
+    requires n <= src.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        dst[i] = src[i];
+        i = i + 1u64;
+    };
+}
+
+fn memcmp(a: span<u64>, b: span<u64>, n: u64) -> bool
+    requires n <= a.len
+    requires n <= b.len
+{
+    let mut eq: bool = true;
+    let mut i: u64 = 0u64;
+    while i < n && eq
+        invariant i <= n
+        decreases n - i
+    {
+        if a[i] != b[i] { eq = false; };
+        i = i + 1u64;
+    };
+    eq
+}
+
+fn memzero(buf: span<u64>, n: u64)
+    requires n <= buf.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        buf[i] = 0u64;
+        i = i + 1u64;
+    };
+}
+
+fn mem_count_nonzero(buf: span<u64>, n: u64) -> u64
+    requires n <= buf.len
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if buf[i] != 0u64 { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }
