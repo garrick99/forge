@@ -1,0 +1,58 @@
+// Demo 607: scan operations — inclusive and exclusive scan
+
+fn inclusive_scan_add(src: span<u64>, dst: span<u64>, n: u64)
+    requires n >= 1u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures  dst[0u64] == src[0u64]
+{
+    dst[0u64] = src[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i >= 1u64
+        invariant i <= n
+        decreases n - i
+    {
+        dst[i] = dst[i - 1u64] + src[i];
+        i = i + 1u64;
+    };
+}
+
+fn exclusive_scan_add(src: span<u64>, dst: span<u64>, n: u64)
+    requires n >= 1u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures  dst[0u64] == 0u64
+{
+    dst[0u64] = 0u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant 1u64 <= i
+        invariant i <= n
+        decreases n - i
+    {
+        dst[i] = dst[i - 1u64] + src[i - 1u64];
+        i = i + 1u64;
+    };
+}
+
+fn inclusive_scan_max(src: span<u64>, dst: span<u64>, n: u64)
+    requires n >= 1u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures  dst[0u64] == src[0u64]
+{
+    dst[0u64] = src[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i >= 1u64
+        invariant i <= n
+        decreases n - i
+    {
+        if src[i] > dst[i - 1u64] { dst[i] = src[i]; }
+        else { dst[i] = dst[i - 1u64]; };
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

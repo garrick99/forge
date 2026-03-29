@@ -1,0 +1,72 @@
+// Demo 608: array comparison utilities
+
+fn array_lt(a: span<u64>, b: span<u64>, n: u64) -> bool
+    requires n <= a.len
+    requires n <= b.len
+{
+    // lexicographic: a < b
+    let mut i: u64 = 0u64;
+    let mut res: bool = false;
+    let mut done: bool = false;
+    while i < n && !done
+        invariant i <= n
+        decreases n - i
+    {
+        if a[i] < b[i] { res = true; done = true; }
+        else if a[i] > b[i] { done = true; }
+        else { i = i + 1u64; };
+    };
+    res
+}
+
+fn array_eq(a: span<u64>, b: span<u64>, n: u64) -> bool
+    requires n <= a.len
+    requires n <= b.len
+{
+    let mut eq: bool = true;
+    let mut i: u64 = 0u64;
+    while i < n && eq
+        invariant i <= n
+        decreases n - i
+    {
+        if a[i] != b[i] { eq = false; };
+        i = i + 1u64;
+    };
+    eq
+}
+
+fn array_sum_lt(a: span<u64>, b: span<u64>, n: u64) -> bool
+    requires n <= a.len
+    requires n <= b.len
+{
+    let mut sa: u64 = 0u64;
+    let mut sb: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        sa = sa + a[i];
+        sb = sb + b[i];
+        i = i + 1u64;
+    };
+    sa < sb
+}
+
+fn pointwise_le(a: span<u64>, b: span<u64>, n: u64) -> bool
+    requires n <= a.len
+    requires n <= b.len
+{
+    let mut ok: bool = true;
+    let mut i: u64 = 0u64;
+    while i < n && ok
+        invariant i <= n
+        decreases n - i
+    {
+        if a[i] > b[i] { ok = false; };
+        i = i + 1u64;
+    };
+    ok
+}
+
+fn main() -> u64 { 0u64 }

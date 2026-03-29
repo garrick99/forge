@@ -1,0 +1,79 @@
+// Demo 605: open-addressing hash table (linear probing, integer keys)
+
+fn hash_slot(key: u64, cap: u64) -> u64
+    requires cap > 0u64
+    ensures  result < cap
+{
+    key % cap
+}
+
+fn ht_probe_insert(keys: span<u64>, cap: u64, key: u64, sentinel: u64) -> u64
+    requires cap > 0u64
+    requires cap <= keys.len
+    ensures  result <= cap
+{
+    // returns index where key was inserted, or cap if table full
+    let start: u64 = hash_slot(key, cap);
+    let mut i: u64 = 0u64;
+    let mut slot: u64 = cap; // not found yet
+    let mut done: bool = false;
+    while i < cap && !done
+        invariant i <= cap
+        invariant slot <= cap
+        decreases cap - i
+    {
+        let idx: u64 = (start + i) % cap;
+        if keys[idx] == sentinel {
+            keys[idx] = key;
+            slot = idx;
+            done = true;
+        };
+        i = i + 1u64;
+    };
+    slot
+}
+
+fn ht_probe_find(keys: span<u64>, cap: u64, key: u64, sentinel: u64) -> u64
+    requires cap > 0u64
+    requires cap <= keys.len
+    ensures  result <= cap
+{
+    let start: u64 = hash_slot(key, cap);
+    let mut i: u64 = 0u64;
+    let mut slot: u64 = cap; // not found
+    let mut done: bool = false;
+    while i < cap && !done
+        invariant i <= cap
+        invariant slot <= cap
+        decreases cap - i
+    {
+        let idx: u64 = (start + i) % cap;
+        if keys[idx] == key {
+            slot = idx;
+            done = true;
+        } else if keys[idx] == sentinel {
+            done = true; // empty slot — key absent
+        };
+        i = i + 1u64;
+    };
+    slot
+}
+
+fn ht_count(keys: span<u64>, cap: u64, sentinel: u64) -> u64
+    requires cap <= keys.len
+    ensures  result <= cap
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < cap
+        invariant i <= cap
+        invariant cnt <= i
+        decreases cap - i
+    {
+        if keys[i] != sentinel { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }

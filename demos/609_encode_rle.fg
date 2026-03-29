@@ -1,0 +1,60 @@
+// Demo 609: run-length encoding — encode and decode
+
+fn rle_encode(src: span<u64>, n: u64, out_vals: span<u64>, out_lens: span<u64>) -> u64
+    requires n >= 1u64
+    requires n <= src.len
+    requires n <= out_vals.len
+    requires n <= out_lens.len
+    ensures  result >= 1u64
+    ensures  result <= n
+{
+    out_vals[0u64] = src[0u64];
+    out_lens[0u64] = 1u64;
+    let mut runs: u64 = 1u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant runs >= 1u64
+        invariant runs <= i
+        decreases n - i
+    {
+        if src[i] == src[i - 1u64] {
+            out_lens[runs - 1u64] = out_lens[runs - 1u64] + 1u64;
+        } else {
+            out_vals[runs] = src[i];
+            out_lens[runs] = 1u64;
+            runs = runs + 1u64;
+        };
+        i = i + 1u64;
+    };
+    runs
+}
+
+fn rle_decode(vals: span<u64>, lens: span<u64>, runs: u64, out: span<u64>) -> u64
+    requires runs <= vals.len
+    requires runs <= lens.len
+    ensures  result <= out.len
+{
+    let mut pos: u64 = 0u64;
+    let mut r: u64 = 0u64;
+    while r < runs && pos < out.len
+        invariant r <= runs
+        invariant pos <= out.len
+        decreases runs - r
+    {
+        let mut j: u64 = 0u64;
+        while j < lens[r] && pos < out.len
+            invariant j <= lens[r]
+            invariant pos <= out.len
+            decreases lens[r] - j
+        {
+            out[pos] = vals[r];
+            pos = pos + 1u64;
+            j = j + 1u64;
+        };
+        r = r + 1u64;
+    };
+    pos
+}
+
+fn main() -> u64 { 0u64 }

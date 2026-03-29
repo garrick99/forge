@@ -1,0 +1,47 @@
+// Demo 604: integer linear interpolation
+
+fn lerp_floor(a: u64, b: u64, t_num: u64, t_den: u64) -> u64
+    requires t_den > 0u64
+    requires t_num <= t_den
+    requires b >= a
+{
+    a + (b - a) * t_num / t_den
+}
+
+fn lerp_range(lo: u64, hi: u64, i: u64, n: u64) -> u64
+    requires n > 0u64
+    requires i <= n
+    requires hi >= lo
+    ensures  result >= lo
+    ensures  result <= hi
+{
+    lo + (hi - lo) * i / n
+}
+
+fn remap(x: u64, from_lo: u64, from_hi: u64, to_lo: u64, to_hi: u64) -> u64
+    requires from_hi > from_lo
+    requires to_hi >= to_lo
+    requires x >= from_lo
+    requires x <= from_hi
+    ensures  result >= to_lo
+    ensures  result <= to_hi
+{
+    to_lo + (to_hi - to_lo) * (x - from_lo) / (from_hi - from_lo)
+}
+
+fn fill_gradient(s: span<u64>, n: u64, lo: u64, hi: u64)
+    requires n > 0u64
+    requires n <= s.len
+    requires hi >= lo
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = lerp_range(lo, hi, i, n);
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

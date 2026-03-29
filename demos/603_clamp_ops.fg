@@ -1,0 +1,65 @@
+// Demo 603: clamping and saturating arithmetic
+
+fn clamp(x: u64, lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures  result >= lo
+    ensures  result <= hi
+{
+    if x < lo { lo } else if x > hi { hi } else { x }
+}
+
+fn sat_add(a: u64, b: u64, max: u64) -> u64
+    requires max > 0u64
+    ensures  result <= max
+{
+    if a > max - b { max } else { a + b }
+}
+
+fn sat_sub(a: u64, b: u64) -> u64
+    ensures  result <= a
+{
+    if a < b { 0u64 } else { a - b }
+}
+
+fn clamp_array(s: span<u64>, n: u64, lo: u64, hi: u64)
+    requires lo <= hi
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = clamp(s[i], lo, hi);
+        i = i + 1u64;
+    };
+}
+
+fn sat_add_array(s: span<u64>, n: u64, val: u64, max: u64)
+    requires max > 0u64
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = sat_add(s[i], val, max);
+        i = i + 1u64;
+    };
+}
+
+fn sat_sub_array(s: span<u64>, n: u64, val: u64)
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = sat_sub(s[i], val);
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

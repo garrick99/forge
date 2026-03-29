@@ -1,0 +1,83 @@
+// Demo 610: min-heap sift operations (array-backed)
+
+fn heap_parent(i: u64) -> u64
+    requires i >= 1u64
+    ensures  result < i
+{
+    (i - 1u64) / 2u64
+}
+
+fn heap_left(i: u64) -> u64
+    ensures result >= i + 1u64
+{
+    2u64 * i + 1u64
+}
+
+fn heap_right(i: u64) -> u64
+    ensures result >= i + 2u64
+{
+    2u64 * i + 2u64
+}
+
+fn heap_sift_down(h: span<u64>, n: u64, i: u64)
+    requires n <= h.len
+    requires i < n
+{
+    let mut cur: u64 = i;
+    let mut done: bool = false;
+    while !done
+        invariant cur < n
+        decreases n - cur
+    {
+        let l: u64 = heap_left(cur);
+        let r: u64 = heap_right(cur);
+        // track min index and value to avoid h[smallest] bounds issue
+        let mut smallest: u64 = cur;
+        let mut min_val: u64 = h[cur];
+        if l < n {
+            if h[l] < min_val { smallest = l; min_val = h[l]; };
+        };
+        if r < n {
+            if h[r] < min_val { smallest = r; };
+        };
+        if smallest != cur {
+            let tmp: u64 = h[cur];
+            h[cur] = h[smallest];
+            h[smallest] = tmp;
+            cur = smallest;
+        } else {
+            done = true;
+        };
+    };
+}
+
+fn heap_sift_up(h: span<u64>, n: u64, i: u64)
+    requires n <= h.len
+    requires i < n
+{
+    let mut cur: u64 = i;
+    let mut done: bool = false;
+    while cur >= 1u64 && !done
+        invariant cur < n
+        decreases cur
+    {
+        let p: u64 = heap_parent(cur);
+        if h[cur] < h[p] {
+            let tmp: u64 = h[cur];
+            h[cur] = h[p];
+            h[p] = tmp;
+            cur = p;
+        } else {
+            done = true;
+        };
+    };
+}
+
+fn heap_min(h: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= h.len
+{
+    h[0u64]
+}
+
+fn main() -> u64 { 0u64 }
