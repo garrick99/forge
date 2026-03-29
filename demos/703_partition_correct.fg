@@ -1,0 +1,59 @@
+// Demo 703: Partition with functional correctness
+//
+// partition_inplace — Hoare-style two-pointer, proves bounds + termination
+// check_partition   — post-hoc verification of the functional property
+//
+// Key: the forall checker loops run unconditionally so their exit invariants
+// survive into the postcondition environment.  Both loops carry
+//   ok == true ==> forall k in range ==> s[k] satisfies pred
+// conditioned on the boolean flag, so Z3 can prove the postconditions.
+
+fn partition_inplace(s: span<u64>, n: u64, pivot: u64) -> u64
+    requires s.len == n
+    ensures result <= n
+{
+    let mut lo: u64 = 0u64;
+    let mut hi: u64 = n;
+    while lo < hi
+        invariant lo <= hi
+        invariant hi <= n
+        decreases hi - lo
+    {
+        if s[lo] < pivot {
+            lo = lo + 1u64;
+        } else {
+            hi = hi - 1u64;
+            let tmp: u64 = s[lo];
+            s[lo] = s[hi];
+            s[hi] = tmp;
+        };
+    };
+    lo
+}
+
+// Check that s[0..split) are all < pivot AND s[split..n) are all >= pivot.
+fn check_partition(s: span<u64>, n: u64, split: u64, pivot: u64) -> bool
+    requires s.len == n
+    requires split <= n
+    ensures result == true ==> forall k: u64, k < split ==> s[k] < pivot
+    ensures result == true ==> forall k: u64, split <= k && k < n ==> s[k] >= pivot
+{
+    let mut ok: bool = true;
+    // First pass: check s[0..split) are all < pivot
+    for i in split
+        invariant i <= split
+        invariant ok == true ==> forall k: u64, k < i ==> s[k] < pivot
+    {
+        if s[i] >= pivot { ok = false; };
+    };
+    // Second pass: check s[split..n) are all >= pivot
+    for i in split..n
+        invariant split <= i && i <= n
+        invariant ok == true ==> forall k: u64, split <= k && k < i ==> s[k] >= pivot
+    {
+        if s[i] < pivot { ok = false; };
+    };
+    ok
+}
+
+fn main() -> u64 { 0u64 }

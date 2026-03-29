@@ -1,0 +1,42 @@
+// Demo 706: Quicksort partition — full functional correctness
+//
+// Hoare-style two-pointer partition proves:
+//   1. result <= n (bound)
+//   2. All elements in s[0..result) are < pivot
+//   3. All elements in s[result..n) are >= pivot
+//
+// Two frontier invariants carry the bound across the loop:
+//   forall k < lo, s[k] < pivot    [left region done]
+//   forall k >= hi, k < n, s[k] >= pivot  [right region done]
+//
+// Uses per-branch while_preserved (single elif body) so frontier
+// invariants are provable despite ITE-encoded index updates.
+
+fn quicksort_partition(s: span<u64>, n: u64, pivot: u64) -> u64
+    requires s.len == n
+    ensures result <= n
+    ensures forall k: u64, k < result ==> s[k] < pivot
+    ensures forall k: u64, result <= k ==> k < n ==> s[k] >= pivot
+{
+    let mut lo: u64 = 0u64;
+    let mut hi: u64 = n;
+    while lo < hi
+        invariant lo <= hi
+        invariant hi <= n
+        invariant forall k: u64, k < lo ==> s[k] < pivot
+        invariant forall k: u64, k >= hi ==> k < n ==> s[k] >= pivot
+        decreases hi - lo
+    {
+        if s[lo] < pivot {
+            lo = lo + 1u64;
+        } else {
+            hi = hi - 1u64;
+            let tmp: u64 = s[lo];
+            s[lo] = s[hi];
+            s[hi] = tmp;
+        };
+    };
+    lo
+}
+
+fn main() -> u64 { 0u64 }

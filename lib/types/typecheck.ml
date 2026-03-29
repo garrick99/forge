@@ -927,6 +927,51 @@ let rec collect_chain_arr_assigns expr =
       ) else_arr
   | _ -> extract_block_arr_assigns expr
 
+(* Collect the branches of an if-else/elif chain as (guard_pred, stmt list) pairs.
+   The guard_pred for branch k is: !cond_0 && !cond_1 && ... && cond_k
+   (or PBool true for the final else).
+
+   Used to generate per-branch while_preserved obligations that avoid the
+   ITE-in-array-index problem: when a while body is an elif chain, each
+   conditional update produces  new_i = ite(c, i+1, i),  which appears as
+   a[ite(...)] in any frontier invariant, making Z3's quantifier instantiation
+   fail.  By verifying each branch in isolation (branch condition in hypothesis,
+   concrete non-ITE index updates), Z3 can prove frontier invariants that the
+   ITE-encoded unified approach cannot. *)
+let rec collect_elif_branches acc_neg (expr : expr) : (pred * stmt list) list =
+  let mk_and a b = PBinop (And, a, b) in
+  let mk_not p   = PUnop  (Not, p)   in
+  match expr.expr_desc with
+  | EIf (cond, then_, else_opt) ->
+      let cp = expr_to_pred_simple cond in
+      (* guard = !acc_neg[0] && !acc_neg[1] && ... && cp *)
+      let guard =
+        List.fold_right (fun neg acc -> mk_and (mk_not neg) acc) acc_neg cp
+      in
+      let stmts = match then_.expr_desc with
+        | EBlock (ss, _) -> ss
+        | _              -> []
+      in
+      let rest = match else_opt with
+        | None   -> []
+        | Some e -> collect_elif_branches (cp :: acc_neg) e
+      in
+      (guard, stmts) :: rest
+  | EBlock (ss, _) ->
+      (* Final else block *)
+      let guard =
+        List.fold_right (fun neg acc -> mk_and (mk_not neg) acc)
+          acc_neg (PBool true)
+      in
+      [(guard, ss)]
+  | _ ->
+      (* Final else is a single expression — treat as no statements *)
+      let guard =
+        List.fold_right (fun neg acc -> mk_and (mk_not neg) acc)
+          acc_neg (PBool true)
+      in
+      [(guard, [])]
+
 (* Apply a (var_id, ite_pred) list produced by collect_chain_var_assigns.
    Mirrors the cond-vars-last ordering of apply_if_assigns so that SSA
    renaming of condition variables propagates correctly. *)
@@ -1439,7 +1484,15 @@ and infer_expr env expr : ty =
 
   | EBinop (op, lhs, rhs) ->
       let lt = check_expr env lhs in
-      let rt = check_expr env rhs in
+      (* Short-circuit semantics for && and ==>: when evaluating the RHS, the LHS
+         is known to be true (otherwise the operator short-circuits to false/vacuous).
+         This lets bounds checks in the RHS use facts established by the LHS.
+         Example: `i < na && a[i] <= x` — bounds check on a[i] can use `i < na`. *)
+      let env_rhs = match op with
+        | And | Implies -> env_add_fact env (expr_to_pred_simple lhs)
+        | _             -> env
+      in
+      let rt = check_expr env_rhs rhs in
       let q = combine_qual (qual_of_ty lt) (qual_of_ty rt) in
       let result_ty = match op with
         | Eq | Ne | Lt | Le | Gt | Ge -> TPrim TBool
@@ -2521,10 +2574,25 @@ and check_stmt env stmt : env =
       let env_body = env_add_fact env cond_pred in
       let env_body = List.fold_left env_add_fact env_body invs in
       let env_after = check_stmts env_body body in
-      (* 4. Each invariant is preserved: prove it holds after body *)
-      List.iter (fun p ->
-        add_obligation p (OInvariant "while_preserved") stmt.stmt_loc env_after
-      ) invs;
+      (* 4. Each invariant is preserved: prove it holds after body.
+            When the body is a single elif chain, generate per-branch obligations
+            instead of the ITE-encoded unified obligation.  This avoids the
+            ITE-in-array-index problem where  a[ite(c, i+1, i)]  is opaque to
+            Z3's E-matching, causing frontier-style invariants to fail. *)
+      (match body with
+       | [{ stmt_desc = SExpr ({ expr_desc = EIf _; _ } as if_expr); _ }] ->
+           let branches = collect_elif_branches [] if_expr in
+           List.iter (fun (guard, branch_stmts) ->
+             let env_br = env_add_fact env_body guard in
+             let env_after_br = stmts_final_env env_br branch_stmts in
+             List.iter (fun p ->
+               add_obligation p (OInvariant "while_preserved") stmt.stmt_loc env_after_br
+             ) invs
+           ) branches
+       | _ ->
+           List.iter (fun p ->
+             add_obligation p (OInvariant "while_preserved") stmt.stmt_loc env_after
+           ) invs);
       (* 5. After the loop: strip stale initial-value facts for loop-modified
             vars (same as stmt_final_env does), then add ¬cond AND all invariants.
             This ensures nested-loop exit facts use the invariant, not the

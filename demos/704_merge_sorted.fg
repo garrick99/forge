@@ -1,0 +1,57 @@
+// Demo 704: Merge of two sorted arrays — output is sorted
+//
+// Single loop over the output, writing to out[i+j] directly (no separate k).
+// This eliminates the k == i+j invariant that confused Z3 with 4-way ITE arithmetic.
+//
+// Four-way if-else decides a[i] vs b[j] with no && in conditions:
+//   i >= na       → b[j] (a exhausted; j < nb follows from i+j < na+nb + i >= na)
+//   j >= nb       → a[i] (b exhausted)
+//   a[i] <= b[j]  → a[i] (a is smaller or equal)
+//   else          → b[j] (b is strictly smaller)
+//
+// decreases na+nb-i-j injects i+j < na+nb into while_preserved.
+//
+// Frontier invariants (stronger than "last element" boundaries):
+//   forall p < i+j, i < na ==> out[p] <= a[i]   [frontier_a]
+//   forall p < i+j, j < nb ==> out[p] <= b[j]   [frontier_b]
+//
+// These give out[p] <= written_value directly for all p < i+j in each branch,
+// avoiding the two-step chain through out[i+j-1] that Z3 can't find.
+//
+// Proves: forall p < q < na+nb, out[p] <= out[q]
+
+fn merge(a: span<u64>, na: u64, b: span<u64>, nb: u64, out: span<u64>)
+    requires na + nb <= out.len
+    requires na <= a.len
+    requires nb <= b.len
+    requires forall p: u64, forall q: u64, p < q ==> q < na ==> a[p] <= a[q]
+    requires forall p: u64, forall q: u64, p < q ==> q < nb ==> b[p] <= b[q]
+    ensures forall p: u64, forall q: u64, p < q ==> q < na + nb ==> out[p] <= out[q]
+{
+    let mut i: u64 = 0u64;
+    let mut j: u64 = 0u64;
+    while i + j < na + nb
+        invariant i <= na
+        invariant j <= nb
+        invariant forall p: u64, forall q: u64, p < q ==> q < i + j ==> out[p] <= out[q]
+        invariant forall p: u64, p < i + j ==> i < na ==> out[p] <= a[i]
+        invariant forall p: u64, p < i + j ==> j < nb ==> out[p] <= b[j]
+        decreases na + nb - i - j
+    {
+        if i >= na {
+            out[i + j] = b[j];
+            j = j + 1u64;
+        } else if j >= nb {
+            out[i + j] = a[i];
+            i = i + 1u64;
+        } else if a[i] <= b[j] {
+            out[i + j] = a[i];
+            i = i + 1u64;
+        } else {
+            out[i + j] = b[j];
+            j = j + 1u64;
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }

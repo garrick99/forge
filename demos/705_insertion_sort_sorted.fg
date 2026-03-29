@@ -1,0 +1,37 @@
+// Demo 705: Insertion sort with sorted output proof
+//
+// After each outer iteration i, s[0..i+1) is sorted.
+// Inner loop shifts elements right to make room for key.
+//
+// Key insight: after inserting s[i] into sorted s[0..i),
+// the result s[0..i+1) is sorted.
+
+fn insertion_sort_sorted(s: span<u64>, n: u64)
+    requires s.len == n
+    requires n >= 1u64
+    ensures forall a: u64, forall b: u64, a < b ==> b < n ==> s[a] <= s[b]
+{
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant i >= 1u64
+        invariant forall a: u64, forall b: u64, a < b ==> b < i ==> s[a] <= s[b]
+        decreases n - i
+    {
+        let key: u64 = s[i];
+        let mut j: u64 = i;
+        while j >= 1u64 && s[j - 1u64] > key
+            invariant j <= i
+            invariant forall a: u64, forall b: u64, a < b ==> b < i + 1u64 ==> b != j ==> s[a] <= s[b]
+            invariant j == 0u64 || s[j - 1u64] <= key ==> forall a: u64, a < j ==> s[a] <= key
+            decreases j
+        {
+            s[j] = s[j - 1u64];
+            j = j - 1u64;
+        };
+        s[j] = key;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

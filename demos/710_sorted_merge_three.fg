@@ -1,0 +1,76 @@
+// Demo 710: Three-way merge of sorted arrays — flat 12-branch elif
+//
+// Merges a[0..na), b[0..nb), c[0..nc) into out[0..na+nb+nc).
+// Single while loop with flat 12-branch elif (no nested ifs) so that
+// per-branch while_preserved fires on all branches.
+//
+// Branch ordering: exhausted-2 cases first, then exhausted-1, then all-present.
+// Each branch writes exactly one element and advances exactly one index.
+//
+// Three frontier invariants:
+//   forall p < i+j+k, i < na ==> out[p] <= a[i]
+//   forall p < i+j+k, j < nb ==> out[p] <= b[j]
+//   forall p < i+j+k, k < nc ==> out[p] <= c[k]
+//
+// Proves: forall p < q < na+nb+nc, out[p] <= out[q]
+
+fn merge3(a: span<u64>, na: u64,
+          b: span<u64>, nb: u64,
+          c: span<u64>, nc: u64,
+          out: span<u64>)
+    requires na + nb + nc <= out.len
+    requires na <= a.len
+    requires nb <= b.len
+    requires nc <= c.len
+    requires forall p: u64, forall q: u64, p < q ==> q < na ==> a[p] <= a[q]
+    requires forall p: u64, forall q: u64, p < q ==> q < nb ==> b[p] <= b[q]
+    requires forall p: u64, forall q: u64, p < q ==> q < nc ==> c[p] <= c[q]
+    ensures forall p: u64, forall q: u64, p < q ==> q < na + nb + nc ==> out[p] <= out[q]
+{
+    let mut i: u64 = 0u64;
+    let mut j: u64 = 0u64;
+    let mut k: u64 = 0u64;
+    while i + j + k < na + nb + nc
+        invariant i <= na
+        invariant j <= nb
+        invariant k <= nc
+        invariant forall p: u64, forall q: u64, p < q ==> q < i+j+k ==> out[p] <= out[q]
+        invariant forall p: u64, p < i+j+k ==> i < na ==> out[p] <= a[i]
+        invariant forall p: u64, p < i+j+k ==> j < nb ==> out[p] <= b[j]
+        invariant forall p: u64, p < i+j+k ==> k < nc ==> out[p] <= c[k]
+        decreases na + nb + nc - i - j - k
+    {
+        // Two-exhausted cases (only one array remains)
+        if i >= na && j >= nb {
+            out[i+j+k] = c[k]; k = k + 1u64;
+        } else if i >= na && k >= nc {
+            out[i+j+k] = b[j]; j = j + 1u64;
+        } else if j >= nb && k >= nc {
+            out[i+j+k] = a[i]; i = i + 1u64;
+        // One-exhausted cases: a exhausted, pick min(b[j], c[k])
+        } else if i >= na && b[j] <= c[k] {
+            out[i+j+k] = b[j]; j = j + 1u64;
+        } else if i >= na {
+            out[i+j+k] = c[k]; k = k + 1u64;
+        // One-exhausted cases: b exhausted, pick min(a[i], c[k])
+        } else if j >= nb && a[i] <= c[k] {
+            out[i+j+k] = a[i]; i = i + 1u64;
+        } else if j >= nb {
+            out[i+j+k] = c[k]; k = k + 1u64;
+        // One-exhausted cases: c exhausted, pick min(a[i], b[j])
+        } else if k >= nc && a[i] <= b[j] {
+            out[i+j+k] = a[i]; i = i + 1u64;
+        } else if k >= nc {
+            out[i+j+k] = b[j]; j = j + 1u64;
+        // All present: pick minimum of three heads
+        } else if a[i] <= b[j] && a[i] <= c[k] {
+            out[i+j+k] = a[i]; i = i + 1u64;
+        } else if b[j] <= c[k] {
+            out[i+j+k] = b[j]; j = j + 1u64;
+        } else {
+            out[i+j+k] = c[k]; k = k + 1u64;
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }
