@@ -1,0 +1,35 @@
+// Demo 568: modular exponentiation (square-and-multiply)
+
+fn modpow(base: u64, exp: u64, m: u64) -> u64
+    requires m > 0u64
+{
+    let mut acc: u64 = 1u64 % m;
+    let mut b: u64 = base % m;
+    let mut e: u64 = exp;
+    while e > 0u64
+        invariant e <= exp
+        decreases e
+    {
+        if e % 2u64 == 1u64 {
+            acc = (acc * b) % m;
+        };
+        b = (b * b) % m;
+        e = e / 2u64;
+    };
+    acc
+}
+
+fn modpow_terminates(base: u64, m: u64) -> u64
+    requires m > 0u64
+{
+    modpow(base, 0u64, m)
+}
+
+fn modpow_small(base: u64, exp: u64) -> u64
+    requires base < 100u64
+    requires exp < 100u64
+{
+    modpow(base, exp, 1000u64)
+}
+
+fn main() -> u64 { 0u64 }

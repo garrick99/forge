@@ -1,0 +1,68 @@
+// Demo 566: sparse vector — indices and values in parallel spans
+
+fn sparse_dot(idx: span<u64>, vals: span<u64>, n: u64, dense: span<u64>, d_len: u64) -> u64
+    requires n <= idx.len
+    requires n <= vals.len
+{
+    let mut sum: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let j: u64 = idx[i];
+        if j < d_len && j < dense.len {
+            sum = sum + vals[i] * dense[j];
+        };
+        i = i + 1u64;
+    };
+    sum
+}
+
+fn sparse_count_valid(idx: span<u64>, n: u64, d_len: u64) -> u64
+    requires n <= idx.len
+    ensures  result <= n
+{
+    let mut count: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant count <= i
+        decreases n - i
+    {
+        if idx[i] < d_len { count = count + 1u64; };
+        i = i + 1u64;
+    };
+    count
+}
+
+fn sparse_max_index(idx: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= idx.len
+{
+    let mut m: u64 = idx[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if idx[i] > m { m = idx[i]; };
+        i = i + 1u64;
+    };
+    m
+}
+
+fn sparse_scale(vals: span<u64>, n: u64, k: u64)
+    requires n <= vals.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        vals[i] = vals[i] * k;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

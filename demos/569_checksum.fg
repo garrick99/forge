@@ -1,0 +1,57 @@
+// Demo 569: Internet checksum (one's complement sum)
+
+fn ones_complement_add(a: u64, b: u64) -> u64
+    requires a < 65536u64
+    requires b < 65536u64
+    ensures  result < 65536u64
+{
+    let s: u64 = a + b;
+    if s >= 65536u64 {
+        (s + 1u64) % 65536u64
+    } else {
+        s
+    }
+}
+
+fn inet_checksum(data: span<u64>, n: u64) -> u64
+    requires n <= data.len
+    ensures  result < 65536u64
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant acc < 65536u64
+        invariant i <= n
+        decreases n - i
+    {
+        let word: u64 = data[i] % 65536u64;
+        let s: u64 = acc + word;
+        acc = if s >= 65536u64 { (s + 1u64) % 65536u64 } else { s };
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn checksum_finalize(acc: u64) -> u64
+    requires acc < 65536u64
+    ensures  result < 65536u64
+{
+    65535u64 - acc
+}
+
+fn checksum_is_valid(data: span<u64>, n: u64) -> bool
+    requires n <= data.len
+    ensures  result == true || result == false
+{
+    let cs: u64 = inet_checksum(data, n);
+    checksum_finalize(cs) == 65535u64
+}
+
+fn checksum_single(word: u64) -> u64
+    requires word < 65536u64
+    ensures  result < 65536u64
+{
+    ones_complement_add(0u64, word)
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,80 @@
+// Demo 564: decimal digit operations
+
+fn digit_sum(n: u64) -> u64
+    ensures n == 0u64 ==> result == 0u64
+{
+    if n == 0u64 {
+        0u64
+    } else {
+        let mut v: u64 = n;
+        let mut s: u64 = 0u64;
+        while v > 0u64
+            decreases v
+        {
+            s = s + (v % 10u64);
+            v = v / 10u64;
+        };
+        s
+    }
+}
+
+fn count_digits(n: u64) -> u64
+    ensures result >= 1u64
+{
+    let mut v: u64 = n / 10u64;
+    let mut d: u64 = 1u64;
+    while v > 0u64
+        invariant d >= 1u64
+        decreases v
+    {
+        d = d + 1u64;
+        v = v / 10u64;
+    };
+    d
+}
+
+fn reverse_digits(n: u64) -> u64
+{
+    let mut v: u64 = n;
+    let mut r: u64 = 0u64;
+    while v > 0u64
+        decreases v
+    {
+        r = r * 10u64 + (v % 10u64);
+        v = v / 10u64;
+    };
+    r
+}
+
+fn last_digit(n: u64) -> u64
+    ensures result < 10u64
+    ensures result == n % 10u64
+{
+    n % 10u64
+}
+
+fn remove_last_digit(n: u64) -> u64
+    ensures result <= n
+{
+    n / 10u64
+}
+
+fn check_digit_sum_0() -> u64
+    ensures result == 0u64
+{
+    digit_sum(0u64)
+}
+
+fn check_last_digit() -> u64
+    ensures result == 7u64
+{
+    last_digit(12347u64)
+}
+
+fn check_count_digits_single() -> u64
+    ensures result >= 1u64
+{
+    count_digits(0u64)
+}
+
+fn main() -> u64 { 0u64 }

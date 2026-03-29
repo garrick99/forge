@@ -1,0 +1,56 @@
+// Demo 570: ring counter — modular counter with wraparound
+
+struct RingCounter {
+    val: u64,
+    modulus: u64,
+}
+
+fn ring_new(m: u64) -> RingCounter
+    requires m > 0u64
+    ensures  result.modulus == m
+    ensures  result.val == 0u64
+{
+    struct RingCounter { val: 0u64, modulus: m }
+}
+
+fn ring_inc(c: refmut<RingCounter>)
+    requires (*c).modulus > 0u64
+    requires (*c).val < (*c).modulus
+    ensures  (*c).val < (*c).modulus
+{
+    if (*c).val + 1u64 == (*c).modulus {
+        (*c).val = 0u64;
+    } else {
+        (*c).val = (*c).val + 1u64;
+    };
+}
+
+fn ring_get(c: ref<RingCounter>) -> u64
+    requires (*c).val < (*c).modulus
+    ensures  result == (*c).val
+    ensures  result < (*c).modulus
+{
+    (*c).val
+}
+
+fn ring_reset(c: refmut<RingCounter>)
+    ensures  (*c).val == 0u64
+{
+    (*c).val = 0u64;
+}
+
+fn ring_is_zero(c: ref<RingCounter>) -> bool
+    ensures result == ((*c).val == 0u64)
+{
+    (*c).val == 0u64
+}
+
+fn ring_add(c: refmut<RingCounter>, n: u64)
+    requires (*c).modulus > 0u64
+    requires (*c).val < (*c).modulus
+    ensures  (*c).val < (*c).modulus
+{
+    (*c).val = ((*c).val + n) % (*c).modulus;
+}
+
+fn main() -> u64 { 0u64 }

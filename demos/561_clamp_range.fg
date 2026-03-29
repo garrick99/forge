@@ -1,0 +1,76 @@
+// Demo 561: range clamping and bounds enforcement
+
+fn clamp(v: u64, lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures  result >= lo
+    ensures  result <= hi
+    ensures  v < lo ==> result == lo
+    ensures  v > hi ==> result == hi
+    ensures  v >= lo && v <= hi ==> result == v
+{
+    if v < lo { lo } else if v > hi { hi } else { v }
+}
+
+fn clamp_sum(a: u64, b: u64, lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures  result >= lo
+    ensures  result <= hi
+{
+    clamp(a + b, lo, hi)
+}
+
+fn clamp_span(s: span<u64>, n: u64, lo: u64, hi: u64)
+    requires n <= s.len
+    requires lo <= hi
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = clamp(s[i], lo, hi);
+        i = i + 1u64;
+    };
+}
+
+fn range_contains(lo: u64, hi: u64, v: u64) -> bool
+    requires lo <= hi
+    ensures  result == (v >= lo && v <= hi)
+{
+    v >= lo && v <= hi
+}
+
+fn range_width(lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures  result == hi - lo
+{
+    hi - lo
+}
+
+fn range_midpoint(lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures  result >= lo
+    ensures  result <= hi
+{
+    lo + (hi - lo) / 2u64
+}
+
+fn check_clamp_mid() -> u64
+    ensures result == 5u64
+{
+    clamp(5u64, 1u64, 10u64)
+}
+
+fn check_clamp_low() -> u64
+    ensures result == 1u64
+{
+    clamp(0u64, 1u64, 10u64)
+}
+
+fn check_clamp_high() -> u64
+    ensures result == 10u64
+{
+    clamp(99u64, 1u64, 10u64)
+}
+
+fn main() -> u64 { 0u64 }

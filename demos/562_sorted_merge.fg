@@ -1,0 +1,60 @@
+// Demo 562: merge two sorted spans into an output span
+
+fn merge_sorted(a: span<u64>, na: u64, b: span<u64>, nb: u64, out: span<u64>)
+    requires na <= a.len
+    requires nb <= b.len
+    requires na + nb <= out.len
+{
+    let mut ia: u64 = 0u64;
+    let mut ib: u64 = 0u64;
+    let mut k: u64 = 0u64;
+    while ia < na || ib < nb
+        invariant ia <= na
+        invariant ib <= nb
+        invariant ia + ib <= na + nb
+        decreases (na - ia) + (nb - ib)
+    {
+        if ia >= na {
+            out[ia + ib] = b[ib];
+            ib = ib + 1u64;
+        } else if ib >= nb {
+            out[ia + ib] = a[ia];
+            ia = ia + 1u64;
+        } else if a[ia] <= b[ib] {
+            out[ia + ib] = a[ia];
+            ia = ia + 1u64;
+        } else {
+            out[ia + ib] = b[ib];
+            ib = ib + 1u64;
+        };
+    };
+}
+
+fn merge_count(na: u64, nb: u64) -> u64
+    ensures result == na + nb
+{
+    na + nb
+}
+
+fn copy_if_less(s: span<u64>, n: u64, out: span<u64>, thresh: u64) -> u64
+    requires n <= s.len
+    requires n <= out.len
+    ensures  result <= n
+{
+    let mut k: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant k <= i
+        decreases n - i
+    {
+        if s[i] < thresh {
+            out[k] = s[i];
+            k = k + 1u64;
+        };
+        i = i + 1u64;
+    };
+    k
+}
+
+fn main() -> u64 { 0u64 }

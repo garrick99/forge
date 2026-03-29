@@ -1,0 +1,83 @@
+// Demo 567: prefix minimum and maximum scans
+
+fn prefix_min(src: span<u64>, dst: span<u64>, n: u64)
+    requires n >= 1u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures  dst[0u64] == src[0u64]
+{
+    dst[0u64] = src[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant 1u64 <= i
+        invariant i <= n
+        decreases n - i
+    {
+        if src[i] < dst[i - 1u64] {
+            dst[i] = src[i];
+        } else {
+            dst[i] = dst[i - 1u64];
+        };
+        i = i + 1u64;
+    };
+}
+
+fn prefix_max(src: span<u64>, dst: span<u64>, n: u64)
+    requires n >= 1u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures  dst[0u64] == src[0u64]
+{
+    dst[0u64] = src[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant 1u64 <= i
+        invariant i <= n
+        decreases n - i
+    {
+        if src[i] > dst[i - 1u64] {
+            dst[i] = src[i];
+        } else {
+            dst[i] = dst[i - 1u64];
+        };
+        i = i + 1u64;
+    };
+}
+
+fn running_min(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures  result <= s[0u64]
+{
+    let mut m: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant m <= s[0u64]
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] < m { m = s[i]; };
+        i = i + 1u64;
+    };
+    m
+}
+
+fn running_max(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures  result >= s[0u64]
+{
+    let mut m: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant m >= s[0u64]
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] > m { m = s[i]; };
+        i = i + 1u64;
+    };
+    m
+}
+
+fn main() -> u64 { 0u64 }

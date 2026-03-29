@@ -1,0 +1,80 @@
+// Demo 563: absolute difference and signed-magnitude operations on u64
+
+fn abs_diff(a: u64, b: u64) -> u64
+    ensures result == (if a >= b { a - b } else { b - a })
+{
+    if a >= b { a - b } else { b - a }
+}
+
+fn max_u64(a: u64, b: u64) -> u64
+    ensures result >= a
+    ensures result >= b
+    ensures result == a || result == b
+{
+    if a >= b { a } else { b }
+}
+
+fn min_u64(a: u64, b: u64) -> u64
+    ensures result <= a
+    ensures result <= b
+    ensures result == a || result == b
+{
+    if a <= b { a } else { b }
+}
+
+fn abs_diff_bounded(a: u64, b: u64, bound: u64) -> bool
+    ensures result == true || result == false
+{
+    abs_diff(a, b) <= bound
+}
+
+fn max3(a: u64, b: u64, c: u64) -> u64
+    ensures result >= a
+    ensures result >= b
+    ensures result >= c
+{
+    let ab: u64 = max_u64(a, b);
+    max_u64(ab, c)
+}
+
+fn min3(a: u64, b: u64, c: u64) -> u64
+    ensures result <= a
+    ensures result <= b
+    ensures result <= c
+{
+    let ab: u64 = min_u64(a, b);
+    min_u64(ab, c)
+}
+
+fn span_range(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+{
+    let mut lo: u64 = s[0u64];
+    let mut hi: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant lo <= hi
+        decreases n - i
+    {
+        if s[i] < lo { lo = s[i]; };
+        if s[i] > hi { hi = s[i]; };
+        i = i + 1u64;
+    };
+    hi - lo
+}
+
+fn check_abs_diff_sym() -> u64
+    ensures result == 3u64
+{
+    abs_diff(7u64, 4u64)
+}
+
+fn check_abs_diff_sym2() -> u64
+    ensures result == 3u64
+{
+    abs_diff(4u64, 7u64)
+}
+
+fn main() -> u64 { 0u64 }
