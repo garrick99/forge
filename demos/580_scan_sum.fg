@@ -1,0 +1,72 @@
+// Demo 580: inclusive and exclusive prefix scan (sum)
+
+fn exclusive_scan(src: span<u64>, dst: span<u64>, n: u64)
+    requires n >= 1u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures  dst[0u64] == 0u64
+{
+    dst[0u64] = 0u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant 1u64 <= i
+        invariant i <= n
+        decreases n - i
+    {
+        dst[i] = dst[i - 1u64] + src[i - 1u64];
+        i = i + 1u64;
+    };
+}
+
+fn inclusive_scan(src: span<u64>, dst: span<u64>, n: u64)
+    requires n >= 1u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures  dst[0u64] == src[0u64]
+{
+    dst[0u64] = src[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant 1u64 <= i
+        invariant i <= n
+        decreases n - i
+    {
+        dst[i] = dst[i - 1u64] + src[i];
+        i = i + 1u64;
+    };
+}
+
+fn scan_total(src: span<u64>, n: u64) -> u64
+    requires n <= src.len
+{
+    let mut sum: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        sum = sum + src[i];
+        i = i + 1u64;
+    };
+    sum
+}
+
+fn scan_max(src: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= src.len
+    ensures  result >= src[0u64]
+{
+    let mut m: u64 = src[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant m >= src[0u64]
+        decreases n - i
+    {
+        if src[i] > m { m = src[i]; };
+        i = i + 1u64;
+    };
+    m
+}
+
+fn main() -> u64 { 0u64 }

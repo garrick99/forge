@@ -1,0 +1,69 @@
+// Demo 576: weighted sum and weighted average (integer arithmetic)
+
+fn weighted_sum(vals: span<u64>, weights: span<u64>, n: u64) -> u64
+    requires n <= vals.len
+    requires n <= weights.len
+{
+    let mut s: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s = s + vals[i] * weights[i];
+        i = i + 1u64;
+    };
+    s
+}
+
+fn weight_sum(weights: span<u64>, n: u64) -> u64
+    requires n <= weights.len
+{
+    let mut s: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s = s + weights[i];
+        i = i + 1u64;
+    };
+    s
+}
+
+fn max_weight_index(weights: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= weights.len
+    ensures  result < n
+{
+    let mut best: u64 = 0u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant best < n
+        decreases n - i
+    {
+        if weights[i] > weights[best] { best = i; };
+        i = i + 1u64;
+    };
+    best
+}
+
+fn threshold_count(weights: span<u64>, n: u64, thresh: u64) -> u64
+    requires n <= weights.len
+    ensures  result <= n
+{
+    let mut count: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant count <= i
+        decreases n - i
+    {
+        if weights[i] >= thresh { count = count + 1u64; };
+        i = i + 1u64;
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

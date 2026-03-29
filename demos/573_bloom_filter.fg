@@ -1,0 +1,66 @@
+// Demo 573: simplified Bloom filter bit array ops
+
+fn bf_set(bits: span<u64>, hash: u64, nbits: u64)
+    requires nbits > 0u64
+    requires nbits <= bits.len * 64u64
+    requires nbits <= bits.len
+{
+    let idx: u64 = hash % nbits;
+    if idx < bits.len {
+        let word_idx: u64 = idx / 64u64;
+        let bit_pos: u64 = idx % 64u64;
+        if word_idx < bits.len {
+            bits[word_idx] = bits[word_idx] | (1u64 << bit_pos);
+        };
+    };
+}
+
+fn bf_test(bits: span<u64>, hash: u64, nbits: u64) -> bool
+    requires nbits > 0u64
+    requires nbits <= bits.len
+{
+    let idx: u64 = hash % nbits;
+    if idx < bits.len {
+        let word_idx: u64 = idx / 64u64;
+        let bit_pos: u64 = idx % 64u64;
+        if word_idx < bits.len {
+            (bits[word_idx] >> bit_pos) & 1u64 == 1u64
+        } else {
+            false
+        }
+    } else {
+        false
+    }
+}
+
+fn bf_clear_all(bits: span<u64>, n: u64)
+    requires n <= bits.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        bits[i] = 0u64;
+        i = i + 1u64;
+    };
+}
+
+fn bf_count_set(bits: span<u64>, n: u64) -> u64
+    requires n <= bits.len
+    ensures  result <= n
+{
+    let mut count: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant count <= i
+        decreases n - i
+    {
+        if bits[i] != 0u64 { count = count + 1u64; };
+        i = i + 1u64;
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

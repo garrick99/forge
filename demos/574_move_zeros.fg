@@ -1,0 +1,65 @@
+// Demo 574: move zeros to end of span, preserving relative order of non-zeros
+
+fn count_nonzero(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut c: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant c <= i
+        decreases n - i
+    {
+        if s[i] != 0u64 { c = c + 1u64; };
+        i = i + 1u64;
+    };
+    c
+}
+
+fn move_zeros(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut write: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant write <= i
+        decreases n - i
+    {
+        if s[i] != 0u64 {
+            s[write] = s[i];
+            write = write + 1u64;
+        };
+        i = i + 1u64;
+    };
+    let mut j: u64 = write;
+    while j < n
+        invariant j <= n
+        invariant write <= j
+        decreases n - j
+    {
+        s[j] = 0u64;
+        j = j + 1u64;
+    };
+    write
+}
+
+fn all_zeros_from(s: span<u64>, start: u64, n: u64) -> bool
+    requires n <= s.len
+    requires start <= n
+{
+    let mut i: u64 = start;
+    let mut ok: bool = true;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] != 0u64 { ok = false; };
+        i = i + 1u64;
+    };
+    ok
+}
+
+fn main() -> u64 { 0u64 }

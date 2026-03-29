@@ -1,0 +1,73 @@
+// Demo 572: variable-length encoding size calculations
+
+fn varint_size(v: u64) -> u64
+    ensures  result >= 1u64
+    ensures  result <= 10u64
+{
+    let mut n: u64 = v;
+    let mut bytes: u64 = 1u64;
+    while n >= 128u64
+        invariant bytes >= 1u64
+        invariant bytes <= 10u64
+        decreases n
+    {
+        bytes = bytes + 1u64;
+        n = n / 128u64;
+    };
+    bytes
+}
+
+fn utf8_encode_size(codepoint: u64) -> u64
+    requires codepoint <= 0x10FFFFu64
+    ensures  result >= 1u64
+    ensures  result <= 4u64
+{
+    if codepoint < 0x80u64 { 1u64 }
+    else if codepoint < 0x800u64 { 2u64 }
+    else if codepoint < 0x10000u64 { 3u64 }
+    else { 4u64 }
+}
+
+fn leb128_size(v: u64) -> u64
+    ensures result >= 1u64
+{
+    let mut n: u64 = v;
+    let mut bytes: u64 = 1u64;
+    while n > 127u64
+        invariant bytes >= 1u64
+        decreases n
+    {
+        bytes = bytes + 1u64;
+        n = n >> 7u64;
+    };
+    bytes
+}
+
+fn total_varint_size(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+{
+    let mut total: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        total = total + varint_size(s[i]);
+        i = i + 1u64;
+    };
+    total
+}
+
+fn check_varint_size_0() -> u64
+    ensures result >= 1u64
+{
+    varint_size(0u64)
+}
+
+fn check_varint_size_127() -> u64
+    ensures result >= 1u64
+{
+    varint_size(127u64)
+}
+
+fn main() -> u64 { 0u64 }

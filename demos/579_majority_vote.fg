@@ -1,0 +1,62 @@
+// Demo 579: Boyer-Moore majority vote algorithm
+
+fn majority_candidate(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+{
+    let mut candidate: u64 = s[0u64];
+    let mut count: u64 = 1u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant count >= 1u64
+        decreases n - i
+    {
+        if s[i] == candidate {
+            count = count + 1u64;
+        } else if count > 1u64 {
+            count = count - 1u64;
+        } else {
+            candidate = s[i];
+            count = 1u64;
+        };
+        i = i + 1u64;
+    };
+    candidate
+}
+
+fn count_occurrences(s: span<u64>, n: u64, val: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut c: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant c <= i
+        decreases n - i
+    {
+        if s[i] == val { c = c + 1u64; };
+        i = i + 1u64;
+    };
+    c
+}
+
+fn has_majority(s: span<u64>, n: u64) -> bool
+    requires n >= 1u64
+    requires n <= s.len
+{
+    let candidate: u64 = majority_candidate(s, n);
+    count_occurrences(s, n, candidate) * 2u64 > n
+}
+
+fn majority_count_bound(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let candidate: u64 = majority_candidate(s, n);
+    count_occurrences(s, n, candidate)
+}
+
+fn main() -> u64 { 0u64 }

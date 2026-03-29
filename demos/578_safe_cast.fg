@@ -1,0 +1,70 @@
+// Demo 578: safe narrowing casts with range checks
+
+fn saturate_to_u8(v: u64) -> u64
+    ensures result <= 255u64
+    ensures v <= 255u64 ==> result == v
+    ensures v > 255u64 ==> result == 255u64
+{
+    if v > 255u64 { 255u64 } else { v }
+}
+
+fn saturate_to_u16(v: u64) -> u64
+    ensures result <= 65535u64
+    ensures v <= 65535u64 ==> result == v
+    ensures v > 65535u64 ==> result == 65535u64
+{
+    if v > 65535u64 { 65535u64 } else { v }
+}
+
+fn saturate_to_u32(v: u64) -> u64
+    ensures result <= 4294967295u64
+    ensures v <= 4294967295u64 ==> result == v
+    ensures v > 4294967295u64 ==> result == 4294967295u64
+{
+    if v > 4294967295u64 { 4294967295u64 } else { v }
+}
+
+fn fits_u8(v: u64) -> bool
+    ensures result == (v <= 255u64)
+{
+    v <= 255u64
+}
+
+fn fits_u16(v: u64) -> bool
+    ensures result == (v <= 65535u64)
+{
+    v <= 65535u64
+}
+
+fn fits_u32(v: u64) -> bool
+    ensures result == (v <= 4294967295u64)
+{
+    v <= 4294967295u64
+}
+
+fn clamp_span_u8(s: span<u64>, n: u64)
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = saturate_to_u8(s[i]);
+        i = i + 1u64;
+    };
+}
+
+fn check_sat_u8_in_range() -> u64
+    ensures result == 100u64
+{
+    saturate_to_u8(100u64)
+}
+
+fn check_sat_u8_overflow() -> u64
+    ensures result == 255u64
+{
+    saturate_to_u8(1000u64)
+}
+
+fn main() -> u64 { 0u64 }

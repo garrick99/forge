@@ -1,0 +1,75 @@
+// Demo 575: interval operations — overlap, containment, merging
+
+struct Interval {
+    lo: u64,
+    hi: u64,
+}
+
+fn interval_new(lo: u64, hi: u64) -> Interval
+    requires lo <= hi
+    ensures  result.lo == lo
+    ensures  result.hi == hi
+{
+    struct Interval { lo: lo, hi: hi }
+}
+
+fn interval_len(iv: Interval) -> u64
+    requires iv.lo <= iv.hi
+    ensures  result == iv.hi - iv.lo
+{
+    iv.hi - iv.lo
+}
+
+fn intervals_overlap(a: Interval, b: Interval) -> bool
+    ensures result == true || result == false
+{
+    a.lo < b.hi && b.lo < a.hi
+}
+
+fn interval_contains(outer: Interval, inner: Interval) -> bool
+    ensures result == true || result == false
+{
+    outer.lo <= inner.lo && inner.hi <= outer.hi
+}
+
+fn interval_contains_point(iv: Interval, p: u64) -> bool
+    ensures result == true || result == false
+{
+    iv.lo <= p && p < iv.hi
+}
+
+fn interval_union_lo(a: Interval, b: Interval) -> u64
+    ensures result <= a.lo
+    ensures result <= b.lo
+{
+    if a.lo <= b.lo { a.lo } else { b.lo }
+}
+
+fn interval_union_hi(a: Interval, b: Interval) -> u64
+    ensures result >= a.hi
+    ensures result >= b.hi
+{
+    if a.hi >= b.hi { a.hi } else { b.hi }
+}
+
+fn count_overlapping(ivs_lo: span<u64>, ivs_hi: span<u64>, n: u64, q_lo: u64, q_hi: u64) -> u64
+    requires n <= ivs_lo.len
+    requires n <= ivs_hi.len
+    ensures  result <= n
+{
+    let mut count: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant count <= i
+        decreases n - i
+    {
+        if ivs_lo[i] < q_hi && q_lo < ivs_hi[i] {
+            count = count + 1u64;
+        };
+        i = i + 1u64;
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }
