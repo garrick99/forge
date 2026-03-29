@@ -1,0 +1,90 @@
+// Demo 539: scan/reduce patterns: sum, product, max, min
+
+fn span_sum(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+    ensures  n == 0u64 ==> result == 0u64
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant n == 0u64 ==> acc == 0u64
+        decreases n - i
+    {
+        acc = acc + s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn span_max(s: span<u64>, n: u64) -> u64
+    requires n > 0u64
+    requires n <= s.len
+    ensures  result >= s[0u64]
+{
+    let mut m: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant m >= s[0u64]
+        decreases n - i
+    {
+        if s[i] > m { m = s[i]; };
+        i = i + 1u64;
+    };
+    m
+}
+
+fn span_min(s: span<u64>, n: u64) -> u64
+    requires n > 0u64
+    requires n <= s.len
+    ensures  result <= s[0u64]
+{
+    let mut m: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant m <= s[0u64]
+        decreases n - i
+    {
+        if s[i] < m { m = s[i]; };
+        i = i + 1u64;
+    };
+    m
+}
+
+fn span_count_eq(s: span<u64>, n: u64, target: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if s[i] == target { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn span_all_le(s: span<u64>, n: u64, bound: u64) -> bool
+    requires n <= s.len
+    ensures  result == true || result == false
+{
+    let mut ok: bool = true;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant ok == true || ok == false
+        decreases n - i
+    {
+        if s[i] > bound { ok = (i != i); };
+        i = i + 1u64;
+    };
+    ok
+}
+
+fn main() -> u64 { 0u64 }

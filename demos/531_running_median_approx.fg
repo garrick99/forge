@@ -1,0 +1,64 @@
+// Demo 531: running min/max tracking with verified bounds
+
+struct MinMax {
+    min: u64,
+    max: u64,
+    count: u64,
+}
+
+fn minmax_new(first: u64) -> MinMax
+    ensures result.min == first
+    ensures result.max == first
+    ensures result.count == 1u64
+{
+    struct MinMax { min: first, max: first, count: 1u64 }
+}
+
+fn minmax_update(mm: refmut<MinMax>, v: u64)
+    ensures (*mm).count == old((*mm).count) + 1u64
+    ensures (*mm).min <= v || (*mm).min <= old((*mm).min)
+    ensures (*mm).max >= v || (*mm).max >= old((*mm).max)
+{
+    if v < (*mm).min { (*mm).min = v; };
+    if v > (*mm).max { (*mm).max = v; };
+    (*mm).count = (*mm).count + 1u64;
+}
+
+fn minmax_range(mm: ref<MinMax>) -> u64
+    requires (*mm).max >= (*mm).min
+    ensures  result == (*mm).max - (*mm).min
+{
+    (*mm).max - (*mm).min
+}
+
+fn minmax_min(mm: ref<MinMax>) -> u64
+    ensures result == (*mm).min
+{
+    (*mm).min
+}
+
+fn minmax_max(mm: ref<MinMax>) -> u64
+    ensures result == (*mm).max
+{
+    (*mm).max
+}
+
+fn span_minmax(s: span<u64>, n: u64) -> MinMax
+    requires n > 0u64
+    requires n <= s.len
+    ensures  result.count == n
+{
+    let mut mm: MinMax = minmax_new(s[0u64]);
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant mm.count == i
+        decreases n - i
+    {
+        minmax_update(&mut mm, s[i]);
+        i = i + 1u64;
+    };
+    mm
+}
+
+fn main() -> u64 { 0u64 }

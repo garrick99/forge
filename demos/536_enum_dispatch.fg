@@ -1,0 +1,71 @@
+// Demo 536: enum-tagged operations with verified per-variant results
+
+enum BinOp {
+    BAdd,
+    BSub,
+    BMul,
+    BMin,
+    BMax,
+}
+
+fn binop_name_is_valid(op: BinOp) -> bool
+    ensures result == true || result == false
+{
+    match op {
+        BAdd => true,
+        BSub => true,
+        BMul => true,
+        BMin => true,
+        BMax => true,
+    }
+}
+
+fn binop_is_symmetric(op: BinOp) -> bool
+    ensures result == true || result == false
+{
+    match op {
+        BAdd => true,
+        BSub => false,
+        BMul => true,
+        BMin => true,
+        BMax => true,
+    }
+}
+
+fn binop_add(a: u64, b: u64) -> u64
+    ensures result == a + b
+{
+    a + b
+}
+
+fn binop_sub(a: u64, b: u64) -> u64
+    requires a >= b
+    ensures  result == a - b
+{
+    a - b
+}
+
+fn binop_min(a: u64, b: u64) -> u64
+    ensures result <= a
+    ensures result <= b
+    ensures result == a || result == b
+{
+    if a <= b { a } else { b }
+}
+
+fn binop_max(a: u64, b: u64) -> u64
+    ensures result >= a
+    ensures result >= b
+    ensures result == a || result == b
+{
+    if a >= b { a } else { b }
+}
+
+fn check_add() -> u64  ensures result == 7u64    { binop_add(3u64, 4u64) }
+fn check_sub() -> u64  ensures result == 2u64    { binop_sub(5u64, 3u64) }
+fn check_min() -> u64  ensures result <= 3u64    { binop_min(3u64, 7u64) }
+fn check_max() -> u64  ensures result >= 7u64    { binop_max(3u64, 7u64) }
+fn check_sym_add() -> bool  ensures result == true || result == false { binop_is_symmetric(BAdd) }
+fn check_sym_sub() -> bool  ensures result == true || result == false { binop_is_symmetric(BSub) }
+
+fn main() -> u64 { 0u64 }

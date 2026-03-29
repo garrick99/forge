@@ -1,0 +1,57 @@
+// Demo 535: LRU-style eviction counter tracking
+
+struct LRU {
+    timestamps: span<u64>,
+    cap: u64,
+    clock: u64,
+}
+
+fn lru_new(buf: span<u64>, cap: u64) -> LRU
+    requires cap > 0u64
+    requires cap <= buf.len
+    ensures  result.cap == cap
+    ensures  result.clock == 0u64
+{
+    struct LRU { timestamps: buf, cap: cap, clock: 0u64 }
+}
+
+fn lru_touch(lru: refmut<LRU>, slot: u64)
+    requires slot < (*lru).cap
+    requires (*lru).cap <= (*lru).timestamps.len
+    ensures  (*lru).clock == old((*lru).clock) + 1u64
+{
+    (*lru).timestamps[slot] = (*lru).clock;
+    (*lru).clock = (*lru).clock + 1u64;
+}
+
+fn lru_find_oldest(lru: ref<LRU>) -> u64
+    requires (*lru).cap > 0u64
+    requires (*lru).cap <= (*lru).timestamps.len
+    ensures  result < (*lru).cap
+{
+    let mut oldest: u64 = 0u64;
+    let mut min_ts: u64 = (*lru).timestamps[0u64];
+    let mut i: u64 = 1u64;
+    while i < (*lru).cap
+        invariant i <= (*lru).cap
+        invariant oldest < (*lru).cap
+        decreases (*lru).cap - i
+    {
+        let ts_i: u64 = (*lru).timestamps[i];
+        let go: bool = ts_i < min_ts;
+        if go {
+            min_ts = ts_i;
+            oldest = i;
+        };
+        i = i + 1u64;
+    };
+    oldest
+}
+
+fn lru_clock(lru: ref<LRU>) -> u64
+    ensures result == (*lru).clock
+{
+    (*lru).clock
+}
+
+fn main() -> u64 { 0u64 }

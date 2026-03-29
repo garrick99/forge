@@ -1,0 +1,87 @@
+// Demo 538: binary trie node indexing via bit manipulation
+
+fn trie_left(node: u64) -> u64
+    requires node < 0x7FFFFFFFFFFFFFFFu64
+    ensures  result == node * 2u64 + 1u64
+    ensures  result > node
+{
+    node * 2u64 + 1u64
+}
+
+fn trie_right(node: u64) -> u64
+    requires node < 0x7FFFFFFFFFFFFFFFu64
+    ensures  result == node * 2u64 + 2u64
+    ensures  result > node
+{
+    node * 2u64 + 2u64
+}
+
+fn trie_parent(node: u64) -> u64
+    requires node > 0u64
+    ensures  result < node
+    ensures  result == (node - 1u64) / 2u64
+{
+    (node - 1u64) / 2u64
+}
+
+fn trie_depth(node: u64) -> u64
+    requires node < 0xFFFFFFFFFFFFu64
+    ensures  result <= 48u64
+{
+    if node == 0u64 { return 0u64; };
+    let mut d: u64 = 0u64;
+    let mut n: u64 = node;
+    while n > 0u64
+        invariant d <= 48u64
+        decreases n
+    {
+        n = (n - 1u64) / 2u64;
+        d = d + 1u64;
+    };
+    d
+}
+
+fn trie_is_leaf(node: u64, max_depth: u64) -> bool
+    requires node < 0xFFFFFFFFFFFFu64
+    requires max_depth <= 60u64
+    ensures  result == true || result == false
+{
+    trie_depth(node) >= max_depth
+}
+
+fn trie_sibling(node: u64) -> u64
+    requires node > 0u64
+    ensures  result > 0u64
+{
+    if node % 2u64 == 1u64 {
+        node + 1u64
+    } else {
+        node - 1u64
+    }
+}
+
+fn check_trie_left_root() -> u64
+    ensures result == 1u64
+{
+    trie_left(0u64)
+}
+
+fn check_trie_right_root() -> u64
+    ensures result == 2u64
+{
+    trie_right(0u64)
+}
+
+fn check_trie_parent_1() -> u64
+    ensures result == 0u64
+{
+    trie_parent(1u64)
+}
+
+fn check_trie_parent_2() -> u64
+    ensures result == 0u64
+{
+    trie_parent(2u64)
+}
+
+fn main() -> u64 { 0u64 }

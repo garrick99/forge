@@ -1,0 +1,75 @@
+// Demo 537: prefix XOR, AND, OR arrays
+
+fn prefix_xor(src: span<u64>, dst: span<u64>, n: u64)
+    requires n > 0u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures  dst[0u64] == src[0u64]
+{
+    dst[0u64] = src[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant i >= 1u64
+        decreases n - i
+    {
+        dst[i] = dst[i - 1u64] ^ src[i];
+        i = i + 1u64;
+    };
+}
+
+fn prefix_and(src: span<u64>, dst: span<u64>, n: u64)
+    requires n > 0u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures  dst[0u64] == src[0u64]
+{
+    dst[0u64] = src[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant i >= 1u64
+        decreases n - i
+    {
+        dst[i] = dst[i - 1u64] & src[i];
+        i = i + 1u64;
+    };
+}
+
+fn prefix_or(src: span<u64>, dst: span<u64>, n: u64)
+    requires n > 0u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures  dst[0u64] == src[0u64]
+{
+    dst[0u64] = src[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant i >= 1u64
+        decreases n - i
+    {
+        dst[i] = dst[i - 1u64] | src[i];
+        i = i + 1u64;
+    };
+}
+
+fn range_xor(s: span<u64>, lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    requires hi <= s.len
+    ensures  lo == hi ==> result == 0u64
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = lo;
+    while i < hi
+        invariant i <= hi
+        invariant lo == hi ==> acc == 0u64
+        decreases hi - i
+    {
+        acc = acc ^ s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

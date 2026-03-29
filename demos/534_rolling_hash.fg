@@ -1,0 +1,51 @@
+// Demo 534: polynomial rolling hash over a span
+
+fn span_hash(s: span<u64>, n: u64, base: u64, mod: u64) -> u64
+    requires n <= s.len
+    requires mod > 0u64
+    ensures  result < mod
+{
+    let mut h: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant h < mod
+        decreases n - i
+    {
+        h = (h * base + s[i]) % mod;
+        i = i + 1u64;
+    };
+    h
+}
+
+fn span_hash_len(s: span<u64>, base: u64, mod: u64) -> u64
+    requires s.len > 0u64
+    requires mod > 0u64
+    ensures  result < mod
+{
+    span_hash(s, s.len, base, mod)
+}
+
+fn hash_append(h: u64, v: u64, base: u64, mod: u64) -> u64
+    requires mod > 0u64
+    requires h < mod
+    ensures  result < mod
+{
+    (h * base + v) % mod
+}
+
+fn check_hash_mod(s: span<u64>) -> u64
+    requires 3u64 <= s.len
+    ensures result < 1000u64
+{
+    span_hash(s, 3u64, 31u64, 1000u64)
+}
+
+fn check_hash_empty(s: span<u64>) -> u64
+    requires s.len >= 0u64
+    ensures result < 1000u64
+{
+    span_hash(s, 0u64, 31u64, 1000u64)
+}
+
+fn main() -> u64 { 0u64 }

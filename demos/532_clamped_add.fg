@@ -1,0 +1,88 @@
+// Demo 532: saturating and clamped arithmetic operations
+
+fn sat_add_u64(a: u64, b: u64) -> u64
+    ensures result >= a
+    ensures b == 0u64 ==> result == a
+    ensures a > 0xFFFFFFFFFFFFFFFFu64 - b ==> result == 0xFFFFFFFFFFFFFFFFu64
+    ensures a <= 0xFFFFFFFFFFFFFFFFu64 - b ==> result == a + b
+{
+    if a > 0xFFFFFFFFFFFFFFFFu64 - b {
+        0xFFFFFFFFFFFFFFFFu64
+    } else {
+        a + b
+    }
+}
+
+fn sat_sub_u64(a: u64, b: u64) -> u64
+    ensures result <= a
+    ensures b == 0u64 ==> result == a
+    ensures b > a ==> result == 0u64
+    ensures b <= a ==> result == a - b
+{
+    if b > a { 0u64 } else { a - b }
+}
+
+fn clamp_u64(v: u64, lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures  result >= lo
+    ensures  result <= hi
+    ensures  v < lo ==> result == lo
+    ensures  v > hi ==> result == hi
+    ensures  v >= lo && v <= hi ==> result == v
+{
+    if v < lo { lo } else if v > hi { hi } else { v }
+}
+
+fn abs_diff_u64(a: u64, b: u64) -> u64
+    ensures result == a - b || result == b - a
+{
+    if a >= b { a - b } else { b - a }
+}
+
+fn min_u64(a: u64, b: u64) -> u64
+    ensures result <= a
+    ensures result <= b
+    ensures result == a || result == b
+{
+    if a <= b { a } else { b }
+}
+
+fn max_u64(a: u64, b: u64) -> u64
+    ensures result >= a
+    ensures result >= b
+    ensures result == a || result == b
+{
+    if a >= b { a } else { b }
+}
+
+fn check_sat_add_overflow() -> u64
+    ensures result == 0xFFFFFFFFFFFFFFFFu64
+{
+    sat_add_u64(0xFFFFFFFFFFFFFFFFu64, 1u64)
+}
+
+fn check_sat_sub_underflow() -> u64
+    ensures result == 0u64
+{
+    sat_sub_u64(3u64, 5u64)
+}
+
+fn check_clamp_mid() -> u64
+    ensures result == 5u64
+{
+    clamp_u64(5u64, 1u64, 10u64)
+}
+
+fn check_clamp_lo() -> u64
+    ensures result == 1u64
+{
+    clamp_u64(0u64, 1u64, 10u64)
+}
+
+fn check_clamp_hi() -> u64
+    ensures result == 10u64
+{
+    clamp_u64(20u64, 1u64, 10u64)
+}
+
+fn main() -> u64 { 0u64 }

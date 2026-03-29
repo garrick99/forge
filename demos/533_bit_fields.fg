@@ -1,0 +1,81 @@
+// Demo 533: bit field extraction and packing
+
+fn extract_bits(v: u64, lo: u64, width: u64) -> u64
+    requires lo < 64u64
+    requires width > 0u64
+    requires lo + width <= 64u64
+    ensures  result == (v >> lo) & ((1u64 << width) - 1u64)
+{
+    (v >> lo) & ((1u64 << width) - 1u64)
+}
+
+fn insert_bits(v: u64, field: u64, lo: u64, width: u64) -> u64
+    requires lo < 64u64
+    requires width > 0u64
+    requires lo + width <= 64u64
+{
+    let mask: u64 = ((1u64 << width) - 1u64) << lo;
+    (v & ~mask) | ((field << lo) & mask)
+}
+
+fn get_byte(v: u64, byte_idx: u64) -> u64
+    requires byte_idx < 8u64
+    ensures  result < 256u64
+    ensures  result == (v >> (byte_idx * 8u64)) & 0xFFu64
+{
+    (v >> (byte_idx * 8u64)) & 0xFFu64
+}
+
+fn set_byte(v: u64, byte_idx: u64, val: u64) -> u64
+    requires byte_idx < 8u64
+    requires val < 256u64
+{
+    let shift: u64 = byte_idx * 8u64;
+    let mask: u64 = 0xFFu64 << shift;
+    (v & ~mask) | (val << shift)
+}
+
+fn get_nibble(v: u64, nibble_idx: u64) -> u64
+    requires nibble_idx < 16u64
+    ensures  result < 16u64
+    ensures  result == (v >> (nibble_idx * 4u64)) & 0xFu64
+{
+    (v >> (nibble_idx * 4u64)) & 0xFu64
+}
+
+fn bit_reverse_byte(b: u64) -> u64
+    requires b < 256u64
+    ensures  result < 256u64
+    ensures  b == 0u64 ==> result == 0u64
+{
+    let b0: u64 = (b >> 7u64) & 1u64;
+    let b1: u64 = (b >> 6u64) & 1u64;
+    let b2: u64 = (b >> 5u64) & 1u64;
+    let b3: u64 = (b >> 4u64) & 1u64;
+    let b4: u64 = (b >> 3u64) & 1u64;
+    let b5: u64 = (b >> 2u64) & 1u64;
+    let b6: u64 = (b >> 1u64) & 1u64;
+    let b7: u64 = b & 1u64;
+    (b7 << 7u64) | (b6 << 6u64) | (b5 << 5u64) | (b4 << 4u64) |
+    (b3 << 3u64) | (b2 << 2u64) | (b1 << 1u64) | b0
+}
+
+fn check_get_byte0() -> u64
+    ensures result == 0xABu64
+{
+    get_byte(0x12345678ABu64, 0u64)
+}
+
+fn check_get_nibble() -> u64
+    ensures result < 16u64
+{
+    get_nibble(0xABCDu64, 0u64)
+}
+
+fn check_bit_reverse_0() -> u64
+    ensures result == 0u64
+{
+    bit_reverse_byte(0u64)
+}
+
+fn main() -> u64 { 0u64 }

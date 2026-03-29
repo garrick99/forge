@@ -1,0 +1,74 @@
+// Demo 540: byte-swap and endian conversion
+
+fn bswap16(v: u64) -> u64
+    requires v < 65536u64
+    ensures  result < 65536u64
+    ensures  v == 0u64 ==> result == 0u64
+{
+    ((v & 0xFFu64) << 8u64) | ((v >> 8u64) & 0xFFu64)
+}
+
+fn bswap32(v: u64) -> u64
+    requires v < 0x100000000u64
+    ensures  result < 0x100000000u64
+    ensures  v == 0u64 ==> result == 0u64
+{
+    let b0: u64 = v & 0xFFu64;
+    let b1: u64 = (v >> 8u64) & 0xFFu64;
+    let b2: u64 = (v >> 16u64) & 0xFFu64;
+    let b3: u64 = (v >> 24u64) & 0xFFu64;
+    (b0 << 24u64) | (b1 << 16u64) | (b2 << 8u64) | b3
+}
+
+fn bswap64(v: u64) -> u64
+{
+    let b0: u64 = v & 0xFFu64;
+    let b1: u64 = (v >> 8u64) & 0xFFu64;
+    let b2: u64 = (v >> 16u64) & 0xFFu64;
+    let b3: u64 = (v >> 24u64) & 0xFFu64;
+    let b4: u64 = (v >> 32u64) & 0xFFu64;
+    let b5: u64 = (v >> 40u64) & 0xFFu64;
+    let b6: u64 = (v >> 48u64) & 0xFFu64;
+    let b7: u64 = (v >> 56u64) & 0xFFu64;
+    (b0 << 56u64) | (b1 << 48u64) | (b2 << 40u64) | (b3 << 32u64) |
+    (b4 << 24u64) | (b5 << 16u64) | (b6 << 8u64) | b7
+}
+
+fn bswap_span(s: span<u64>, n: u64)
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = bswap64(s[i]);
+        i = i + 1u64;
+    };
+}
+
+fn check_bswap16_zero() -> u64
+    ensures result == 0u64
+{
+    bswap16(0u64)
+}
+
+fn check_bswap32_zero() -> u64
+    ensures result == 0u64
+{
+    bswap32(0u64)
+}
+
+fn check_bswap16_bounds() -> u64
+    ensures result < 65536u64
+{
+    bswap16(0x1234u64)
+}
+
+fn check_bswap32_bounds() -> u64
+    ensures result < 0x100000000u64
+{
+    bswap32(0x12345678u64)
+}
+
+fn main() -> u64 { 0u64 }
