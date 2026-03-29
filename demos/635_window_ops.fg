@@ -1,0 +1,81 @@
+// Demo 635: windowed operations — moving average, min, max
+
+fn window_min(s: span<u64>, n: u64, k: u64, out: span<u64>)
+    requires k >= 1u64
+    requires k <= n
+    requires n <= s.len
+    requires n - k + 1u64 <= out.len
+{
+    let nout: u64 = n - k + 1u64;
+    let mut i: u64 = 0u64;
+    while i < nout
+        invariant i <= nout
+        decreases nout - i
+    {
+        let mut m: u64 = s[i];
+        let mut j: u64 = 1u64;
+        while j < k
+            invariant j <= k
+            decreases k - j
+        {
+            if s[i + j] < m { m = s[i + j]; };
+            j = j + 1u64;
+        };
+        out[i] = m;
+        i = i + 1u64;
+    };
+}
+
+fn window_max(s: span<u64>, n: u64, k: u64, out: span<u64>)
+    requires k >= 1u64
+    requires k <= n
+    requires n <= s.len
+    requires n - k + 1u64 <= out.len
+{
+    let nout: u64 = n - k + 1u64;
+    let mut i: u64 = 0u64;
+    while i < nout
+        invariant i <= nout
+        decreases nout - i
+    {
+        let mut m: u64 = s[i];
+        let mut j: u64 = 1u64;
+        while j < k
+            invariant j <= k
+            decreases k - j
+        {
+            if s[i + j] > m { m = s[i + j]; };
+            j = j + 1u64;
+        };
+        out[i] = m;
+        i = i + 1u64;
+    };
+}
+
+fn window_sum(s: span<u64>, n: u64, k: u64, out: span<u64>)
+    requires k >= 1u64
+    requires k <= n
+    requires n <= s.len
+    requires n - k + 1u64 <= out.len
+{
+    let nout: u64 = n - k + 1u64;
+    let mut i: u64 = 0u64;
+    while i < nout
+        invariant i <= nout
+        decreases nout - i
+    {
+        let mut acc: u64 = 0u64;
+        let mut j: u64 = 0u64;
+        while j < k
+            invariant j <= k
+            decreases k - j
+        {
+            acc = acc + s[i + j];
+            j = j + 1u64;
+        };
+        out[i] = acc;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

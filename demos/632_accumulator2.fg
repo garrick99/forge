@@ -1,0 +1,82 @@
+// Demo 632: accumulator patterns — fold left/right, scan
+
+fn fold_add(s: span<u64>, n: u64, init: u64) -> u64
+    requires n <= s.len
+{
+    let mut acc: u64 = init;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn fold_mul(s: span<u64>, n: u64, init: u64) -> u64
+    requires n <= s.len
+{
+    let mut acc: u64 = init;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc * s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn fold_max(s: span<u64>, n: u64, init: u64) -> u64
+    requires n <= s.len
+    ensures  result >= init
+{
+    let mut acc: u64 = init;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant acc >= init
+        decreases n - i
+    {
+        if s[i] > acc { acc = s[i]; };
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn fold_min(s: span<u64>, n: u64, init: u64) -> u64
+    requires n <= s.len
+    ensures  result <= init
+{
+    let mut acc: u64 = init;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant acc <= init
+        decreases n - i
+    {
+        if s[i] < acc { acc = s[i]; };
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn fold_xor(s: span<u64>, n: u64, init: u64) -> u64
+    requires n <= s.len
+{
+    let mut acc: u64 = init;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc ^ s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

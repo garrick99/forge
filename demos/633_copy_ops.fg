@@ -1,0 +1,75 @@
+// Demo 633: copy operations — copy, copy_n, copy_stride, copy_overlap
+
+fn copy_n(src: span<u64>, dst: span<u64>, n: u64)
+    requires n <= src.len
+    requires n <= dst.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        dst[i] = src[i];
+        i = i + 1u64;
+    };
+}
+
+fn copy_stride(src: span<u64>, dst: span<u64>, n: u64, stride: u64)
+    requires stride >= 1u64
+    requires n * stride <= src.len
+    requires n <= dst.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        dst[i] = src[i * stride];
+        i = i + 1u64;
+    };
+}
+
+fn copy_reverse(src: span<u64>, dst: span<u64>, n: u64)
+    requires n <= src.len
+    requires n <= dst.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        dst[i] = src[n - 1u64 - i];
+        i = i + 1u64;
+    };
+}
+
+fn copy_offset(src: span<u64>, dst: span<u64>, n: u64, src_off: u64, dst_off: u64)
+    requires src_off + n <= src.len
+    requires dst_off + n <= dst.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        dst[dst_off + i] = src[src_off + i];
+        i = i + 1u64;
+    };
+}
+
+fn fill_pattern(dst: span<u64>, n: u64, pat: span<u64>, pat_len: u64)
+    requires pat_len >= 1u64
+    requires pat_len <= pat.len
+    requires n <= dst.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        dst[i] = pat[i % pat_len];
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

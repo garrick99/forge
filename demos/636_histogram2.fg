@@ -1,0 +1,84 @@
+// Demo 636: histogram operations — build, query, normalize
+
+fn histogram_build(data: span<u64>, n: u64, bins: span<u64>, nbins: u64)
+    requires n <= data.len
+    requires nbins >= 1u64
+    requires nbins <= bins.len
+{
+    // zero bins first
+    let mut i: u64 = 0u64;
+    while i < nbins
+        invariant i <= nbins
+        decreases nbins - i
+    {
+        bins[i] = 0u64;
+        i = i + 1u64;
+    };
+    // accumulate
+    let mut j: u64 = 0u64;
+    while j < n
+        invariant j <= n
+        decreases n - j
+    {
+        let idx: u64 = data[j] % nbins;
+        bins[idx] = bins[idx] + 1u64;
+        j = j + 1u64;
+    };
+}
+
+fn histogram_total(bins: span<u64>, nbins: u64) -> u64
+    requires nbins <= bins.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < nbins
+        invariant i <= nbins
+        decreases nbins - i
+    {
+        acc = acc + bins[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn histogram_max_bin(bins: span<u64>, nbins: u64) -> u64
+    requires nbins >= 1u64
+    requires nbins <= bins.len
+    ensures  result < nbins
+{
+    let mut best: u64 = 0u64;
+    let mut best_idx: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < nbins
+        invariant i <= nbins
+        invariant best_idx < nbins
+        decreases nbins - i
+    {
+        if bins[i] > best {
+            best = bins[i];
+            best_idx = i;
+        };
+        i = i + 1u64;
+    };
+    best_idx
+}
+
+fn histogram_cumulative(bins: span<u64>, nbins: u64, cum: span<u64>)
+    requires nbins >= 1u64
+    requires nbins <= bins.len
+    requires nbins <= cum.len
+    ensures  cum[0u64] == bins[0u64]
+{
+    cum[0u64] = bins[0u64];
+    let mut i: u64 = 1u64;
+    while i < nbins
+        invariant i >= 1u64
+        invariant i <= nbins
+        decreases nbins - i
+    {
+        cum[i] = cum[i - 1u64] + bins[i];
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

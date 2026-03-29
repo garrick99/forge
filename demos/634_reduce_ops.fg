@@ -1,0 +1,86 @@
+// Demo 634: parallel-style reduce operations
+
+fn reduce_add(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn reduce_max(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures  result >= s[0u64]
+{
+    let mut acc: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant acc >= s[0u64]
+        decreases n - i
+    {
+        if s[i] > acc { acc = s[i]; };
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn reduce_min(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures  result <= s[0u64]
+{
+    let mut acc: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant acc <= s[0u64]
+        decreases n - i
+    {
+        if s[i] < acc { acc = s[i]; };
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn reduce_and(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+{
+    let mut acc: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc & s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn reduce_or(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+{
+    let mut acc: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc | s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

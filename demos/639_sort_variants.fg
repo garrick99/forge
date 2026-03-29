@@ -1,0 +1,94 @@
+// Demo 639: sorting algorithm variants — shell sort step, counting sort
+
+fn shell_sort_gap(s: span<u64>, n: u64, gap: u64)
+    requires gap >= 1u64
+    requires gap <= n
+    requires n <= s.len
+{
+    let mut i: u64 = gap;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let tmp: u64 = s[i];
+        let mut j: u64 = i;
+        let mut done: bool = false;
+        while j >= gap && !done
+            invariant j <= i
+            decreases j
+        {
+            if s[j - gap] > tmp {
+                s[j] = s[j - gap];
+                j = j - gap;
+            } else {
+                done = true;
+            };
+        };
+        s[j] = tmp;
+        i = i + 1u64;
+    };
+}
+
+fn counting_sort_small(s: span<u64>, n: u64, max_val: u64, counts: span<u64>)
+    requires n <= s.len
+    requires max_val >= 1u64
+    requires max_val <= counts.len
+{
+    // zero counts
+    let mut i: u64 = 0u64;
+    while i < max_val
+        invariant i <= max_val
+        decreases max_val - i
+    {
+        counts[i] = 0u64;
+        i = i + 1u64;
+    };
+    // count occurrences
+    let mut j: u64 = 0u64;
+    while j < n
+        invariant j <= n
+        decreases n - j
+    {
+        let v: u64 = s[j] % max_val;
+        counts[v] = counts[v] + 1u64;
+        j = j + 1u64;
+    };
+}
+
+fn find_min_index(s: span<u64>, n: u64, start: u64) -> u64
+    requires start < n
+    requires n <= s.len
+    ensures  result >= start
+    ensures  result < n
+{
+    let mut min_idx: u64 = start;
+    let mut i: u64 = start + 1u64;
+    while i < n
+        invariant i <= n
+        invariant min_idx >= start
+        invariant min_idx < n
+        decreases n - i
+    {
+        if s[i] < s[min_idx] { min_idx = i; };
+        i = i + 1u64;
+    };
+    min_idx
+}
+
+fn selection_sort(s: span<u64>, n: u64)
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let m: u64 = find_min_index(s, n, i);
+        let tmp: u64 = s[i];
+        s[i] = s[m];
+        s[m] = tmp;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

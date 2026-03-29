@@ -1,0 +1,88 @@
+// Demo 638: string/array operations — find, replace, split count
+
+fn find_value(s: span<u64>, n: u64, val: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut i: u64 = 0u64;
+    let mut found: u64 = n;
+    let mut done: bool = false;
+    while i < n && !done
+        invariant i <= n
+        invariant found <= n
+        decreases n - i
+    {
+        if s[i] == val { found = i; done = true; };
+        i = i + 1u64;
+    };
+    found
+}
+
+fn replace_value(s: span<u64>, n: u64, old_val: u64, new_val: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if s[i] == old_val { s[i] = new_val; cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn count_delim(s: span<u64>, n: u64, delim: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if s[i] == delim { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn trim_left(s: span<u64>, n: u64, val: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut i: u64 = 0u64;
+    let mut done: bool = false;
+    while i < n && !done
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] == val { i = i + 1u64; }
+        else { done = true; };
+    };
+    i
+}
+
+fn trim_right(s: span<u64>, n: u64, val: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut end: u64 = n;
+    let mut done: bool = false;
+    while end >= 1u64 && !done
+        invariant end <= n
+        decreases end
+    {
+        if s[end - 1u64] == val { end = end - 1u64; }
+        else { done = true; };
+    };
+    end
+}
+
+fn main() -> u64 { 0u64 }

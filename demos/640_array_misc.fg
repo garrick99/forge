@@ -1,0 +1,89 @@
+// Demo 640: miscellaneous array utilities
+
+fn array_iota(s: span<u64>, n: u64, start: u64)
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = start + i;
+        i = i + 1u64;
+    };
+}
+
+fn array_swap(s: span<u64>, i: u64, j: u64)
+    requires i < s.len
+    requires j < s.len
+{
+    let tmp: u64 = s[i];
+    s[i] = s[j];
+    s[j] = tmp;
+}
+
+fn array_fill_range(s: span<u64>, lo: u64, hi: u64, val: u64)
+    requires lo <= hi
+    requires hi <= s.len
+{
+    let mut i: u64 = lo;
+    while i < hi
+        invariant i >= lo
+        invariant i <= hi
+        decreases hi - i
+    {
+        s[i] = val;
+        i = i + 1u64;
+    };
+}
+
+fn array_count_zero(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if s[i] == 0u64 { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn array_any_eq(a: span<u64>, b: span<u64>, n: u64) -> bool
+    requires n <= a.len
+    requires n <= b.len
+{
+    let mut found: bool = false;
+    let mut i: u64 = 0u64;
+    while i < n && !found
+        invariant i <= n
+        decreases n - i
+    {
+        if a[i] == b[i] { found = true; };
+        i = i + 1u64;
+    };
+    found
+}
+
+fn array_all_eq(a: span<u64>, b: span<u64>, n: u64) -> bool
+    requires n <= a.len
+    requires n <= b.len
+{
+    let mut ok: bool = true;
+    let mut i: u64 = 0u64;
+    while i < n && ok
+        invariant i <= n
+        decreases n - i
+    {
+        if a[i] != b[i] { ok = false; };
+        i = i + 1u64;
+    };
+    ok
+}
+
+fn main() -> u64 { 0u64 }

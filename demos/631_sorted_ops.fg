@@ -1,0 +1,72 @@
+// Demo 631: operations on sorted arrays — is_sorted check, sorted insert
+
+fn is_sorted(s: span<u64>, n: u64) -> bool
+    requires n <= s.len
+{
+    let mut ok: bool = true;
+    let mut i: u64 = 0u64;
+    while i + 1u64 < n && ok
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i + 1u64] < s[i] { ok = false; };
+        i = i + 1u64;
+    };
+    ok
+}
+
+fn is_sorted_strict(s: span<u64>, n: u64) -> bool
+    requires n <= s.len
+{
+    let mut ok: bool = true;
+    let mut i: u64 = 0u64;
+    while i + 1u64 < n && ok
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i + 1u64] <= s[i] { ok = false; };
+        i = i + 1u64;
+    };
+    ok
+}
+
+fn sorted_insert(s: span<u64>, n: u64, val: u64)
+    requires n >= 1u64
+    requires n < s.len
+{
+    s[n] = val;
+    let mut i: u64 = n;
+    while i >= 1u64
+        invariant i <= n
+        decreases i
+    {
+        if s[i] < s[i - 1u64] {
+            let tmp: u64 = s[i];
+            s[i] = s[i - 1u64];
+            s[i - 1u64] = tmp;
+            i = i - 1u64;
+        } else {
+            i = 0u64; // exit
+        };
+    };
+}
+
+fn count_sorted_run(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures  result >= 1u64
+    ensures  result <= n
+{
+    let mut i: u64 = 0u64;
+    let mut done: bool = false;
+    while i + 1u64 < n && !done
+        invariant i <= n - 1u64
+        decreases n - i
+    {
+        if s[i + 1u64] >= s[i] { i = i + 1u64; }
+        else { done = true; };
+    };
+    i + 1u64
+}
+
+fn main() -> u64 { 0u64 }
