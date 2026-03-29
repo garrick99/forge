@@ -1,0 +1,77 @@
+// Demo 555: 3x3 matrix operations stored as 9-element span
+
+fn mat3_get(m: span<u64>, r: u64, c: u64) -> u64
+    requires r < 3u64
+    requires c < 3u64
+    requires 9u64 <= m.len
+    ensures  r * 3u64 + c < 9u64
+{
+    m[r * 3u64 + c]
+}
+
+fn mat3_set(m: span<u64>, r: u64, c: u64, v: u64)
+    requires r < 3u64
+    requires c < 3u64
+    requires 9u64 <= m.len
+{
+    m[r * 3u64 + c] = v;
+}
+
+fn mat3_zero(m: span<u64>)
+    requires 9u64 <= m.len
+{
+    let mut i: u64 = 0u64;
+    while i < 9u64
+        invariant i <= 9u64
+        decreases 9u64 - i
+    {
+        m[i] = 0u64;
+        i = i + 1u64;
+    };
+}
+
+fn mat3_identity(m: span<u64>)
+    requires 9u64 <= m.len
+{
+    mat3_zero(m);
+    m[0u64] = 1u64;
+    m[4u64] = 1u64;
+    m[8u64] = 1u64;
+}
+
+fn mat3_trace(m: span<u64>) -> u64
+    requires 9u64 <= m.len
+    ensures  result == m[0u64] + m[4u64] + m[8u64]
+{
+    m[0u64] + m[4u64] + m[8u64]
+}
+
+fn mat3_scale(m: span<u64>, k: u64)
+    requires 9u64 <= m.len
+{
+    let mut i: u64 = 0u64;
+    while i < 9u64
+        invariant i <= 9u64
+        decreases 9u64 - i
+    {
+        m[i] = m[i] * k;
+        i = i + 1u64;
+    };
+}
+
+fn mat3_add(a: span<u64>, b: span<u64>, out: span<u64>)
+    requires 9u64 <= a.len
+    requires 9u64 <= b.len
+    requires 9u64 <= out.len
+{
+    let mut i: u64 = 0u64;
+    while i < 9u64
+        invariant i <= 9u64
+        decreases 9u64 - i
+    {
+        out[i] = a[i] + b[i];
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

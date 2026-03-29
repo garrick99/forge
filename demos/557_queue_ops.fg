@@ -1,0 +1,58 @@
+// Demo 557: circular queue operations on a span
+
+fn queue_enqueue(s: span<u64>, head: u64, tail: u64, cap: u64, val: u64) -> u64
+    requires cap > 0u64
+    requires cap <= s.len
+    requires tail < cap
+    ensures  result == (tail + 1u64) % cap
+{
+    s[tail] = val;
+    (tail + 1u64) % cap
+}
+
+fn queue_dequeue(head: u64, cap: u64) -> u64
+    requires cap > 0u64
+    requires head < cap
+    ensures  result == (head + 1u64) % cap
+{
+    (head + 1u64) % cap
+}
+
+fn queue_is_empty(head: u64, tail: u64) -> bool
+    ensures result == (head == tail)
+{
+    head == tail
+}
+
+fn queue_is_full(head: u64, tail: u64, cap: u64) -> bool
+    requires cap > 0u64
+    requires head < cap
+    requires tail < cap
+    ensures  result == ((tail + 1u64) % cap == head)
+{
+    (tail + 1u64) % cap == head
+}
+
+fn queue_size(head: u64, tail: u64, cap: u64) -> u64
+    requires cap > 0u64
+    requires head < cap
+    requires tail < cap
+    ensures  result < cap
+{
+    if tail >= head {
+        tail - head
+    } else {
+        cap - head + tail
+    }
+}
+
+fn queue_peek(s: span<u64>, head: u64, cap: u64) -> u64
+    requires cap > 0u64
+    requires cap <= s.len
+    requires head < cap
+    ensures  result == s[head]
+{
+    s[head]
+}
+
+fn main() -> u64 { 0u64 }

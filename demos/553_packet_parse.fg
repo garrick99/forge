@@ -1,0 +1,58 @@
+// Demo 553: packet header parsing and field extraction
+
+fn read_u8(buf: span<u64>, offset: u64) -> u64
+    requires offset < buf.len
+{
+    buf[offset] & 0xFFu64
+}
+
+fn read_u16_be(buf: span<u64>, offset: u64) -> u64
+    requires offset + 1u64 < buf.len
+    ensures  result < 65536u64
+{
+    let hi: u64 = buf[offset] & 0xFFu64;
+    let lo: u64 = buf[offset + 1u64] & 0xFFu64;
+    (hi << 8u64) | lo
+}
+
+fn read_u32_be(buf: span<u64>, offset: u64) -> u64
+    requires offset < buf.len
+    requires offset + 1u64 < buf.len
+    requires offset + 2u64 < buf.len
+    requires offset + 3u64 < buf.len
+{
+    let b0: u64 = buf[offset] & 0xFFu64;
+    let b1: u64 = buf[offset + 1u64] & 0xFFu64;
+    let b2: u64 = buf[offset + 2u64] & 0xFFu64;
+    let b3: u64 = buf[offset + 3u64] & 0xFFu64;
+    (b0 << 24u64) | (b1 << 16u64) | (b2 << 8u64) | b3
+}
+
+fn packet_version(buf: span<u64>) -> u64
+    requires buf.len >= 1u64
+{
+    buf[0u64] >> 4u64
+}
+
+fn packet_ihl(buf: span<u64>) -> u64
+    requires buf.len >= 1u64
+{
+    buf[0u64] & 0xFu64
+}
+
+fn packet_total_len(buf: span<u64>) -> u64
+    requires buf.len >= 4u64
+    ensures  result < 65536u64
+{
+    read_u16_be(buf, 2u64)
+}
+
+fn packet_is_valid_len(buf: span<u64>, pkt_len: u64) -> bool
+    requires buf.len >= 4u64
+    ensures  result == true || result == false
+{
+    let total: u64 = packet_total_len(buf);
+    total <= pkt_len
+}
+
+fn main() -> u64 { 0u64 }

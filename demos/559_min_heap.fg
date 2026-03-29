@@ -1,0 +1,69 @@
+// Demo 559: min-heap property checks on a span
+
+fn heap_parent(i: u64) -> u64
+    requires i > 0u64
+    ensures  result == (i - 1u64) / 2u64
+    ensures  result < i
+{
+    (i - 1u64) / 2u64
+}
+
+fn heap_left(i: u64) -> u64
+    ensures result == 2u64 * i + 1u64
+    ensures result > i
+{
+    2u64 * i + 1u64
+}
+
+fn heap_right(i: u64) -> u64
+    ensures result == 2u64 * i + 2u64
+    ensures result > i
+{
+    2u64 * i + 2u64
+}
+
+fn heap_is_valid_node(h: span<u64>, n: u64, i: u64) -> bool
+    requires n <= h.len
+    requires i < n
+    ensures  result == true || result == false
+{
+    let left: u64  = heap_left(i);
+    let right: u64 = heap_right(i);
+    let ok_l: bool = left  >= n || h[i] <= h[left];
+    let ok_r: bool = right >= n || h[i] <= h[right];
+    ok_l && ok_r
+}
+
+fn heap_swap(h: span<u64>, i: u64, j: u64)
+    requires i < h.len
+    requires j < h.len
+{
+    let tmp: u64 = h[i];
+    h[i] = h[j];
+    h[j] = tmp;
+}
+
+fn heap_sift_down_step(h: span<u64>, n: u64, i: u64) -> u64
+    requires n <= h.len
+    requires i < n
+    ensures  result <= i || result < n
+{
+    let left: u64  = heap_left(i);
+    let right: u64 = heap_right(i);
+    let mut smallest: u64 = i;
+    if left < n && h[left] < h[smallest] {
+        smallest = left;
+    };
+    if right < n && h[right] < h[smallest] {
+        smallest = right;
+    };
+    smallest
+}
+
+fn heap_size_valid(n: u64, cap: u64) -> bool
+    ensures result == (n <= cap)
+{
+    n <= cap
+}
+
+fn main() -> u64 { 0u64 }

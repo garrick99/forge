@@ -1,0 +1,74 @@
+// Demo 552: 2D vector operations with integer coordinates
+
+struct Vec2 {
+    x: u64,
+    y: u64,
+}
+
+fn vec2_new(x: u64, y: u64) -> Vec2
+    ensures result.x == x
+    ensures result.y == y
+{
+    struct Vec2 { x: x, y: y }
+}
+
+fn vec2_add(a: Vec2, b: Vec2) -> Vec2
+    ensures result.x == a.x + b.x
+    ensures result.y == a.y + b.y
+{
+    struct Vec2 { x: a.x + b.x, y: a.y + b.y }
+}
+
+fn vec2_scale(v: Vec2, k: u64) -> Vec2
+    ensures result.x == v.x * k
+    ensures result.y == v.y * k
+{
+    struct Vec2 { x: v.x * k, y: v.y * k }
+}
+
+fn vec2_dot(a: Vec2, b: Vec2) -> u64
+    ensures result == a.x * b.x + a.y * b.y
+{
+    a.x * b.x + a.y * b.y
+}
+
+fn vec2_manhattan(a: Vec2, b: Vec2) -> u64
+    ensures result == (if a.x >= b.x { a.x - b.x } else { b.x - a.x }) +
+                      (if a.y >= b.y { a.y - b.y } else { b.y - a.y })
+{
+    let dx: u64 = if a.x >= b.x { a.x - b.x } else { b.x - a.x };
+    let dy: u64 = if a.y >= b.y { a.y - b.y } else { b.y - a.y };
+    dx + dy
+}
+
+fn vec2_eq(a: Vec2, b: Vec2) -> bool
+    ensures result == true || result == false
+{
+    a.x == b.x && a.y == b.y
+}
+
+fn vec2_zero() -> Vec2
+    ensures result.x == 0u64
+    ensures result.y == 0u64
+{
+    struct Vec2 { x: 0u64, y: 0u64 }
+}
+
+fn check_vec2_add() -> u64
+    ensures result == 5u64
+{
+    let a: Vec2 = vec2_new(2u64, 3u64);
+    let b: Vec2 = vec2_new(3u64, 4u64);
+    let c: Vec2 = vec2_add(a, b);
+    c.x
+}
+
+fn check_vec2_dot() -> u64
+    ensures result == 11u64
+{
+    let a: Vec2 = vec2_new(1u64, 2u64);
+    let b: Vec2 = vec2_new(3u64, 4u64);
+    vec2_dot(a, b)
+}
+
+fn main() -> u64 { 0u64 }

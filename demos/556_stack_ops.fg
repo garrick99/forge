@@ -1,0 +1,55 @@
+// Demo 556: stack operations on a span with a length counter
+
+fn stack_push(s: span<u64>, len: u64, val: u64) -> u64
+    requires len < s.len
+    ensures  result == len + 1u64
+{
+    s[len] = val;
+    len + 1u64
+}
+
+fn stack_pop(s: span<u64>, len: u64) -> u64
+    requires len > 0u64
+    requires len <= s.len
+    ensures  result == len - 1u64
+{
+    len - 1u64
+}
+
+fn stack_top(s: span<u64>, len: u64) -> u64
+    requires len > 0u64
+    requires len <= s.len
+    ensures  result == s[len - 1u64]
+{
+    s[len - 1u64]
+}
+
+fn stack_is_empty(len: u64) -> bool
+    ensures result == (len == 0u64)
+{
+    len == 0u64
+}
+
+fn stack_is_full(len: u64, cap: u64) -> bool
+    ensures result == (len == cap)
+{
+    len == cap
+}
+
+fn stack_size(len: u64) -> u64
+    ensures result == len
+{
+    len
+}
+
+fn check_push_pop(s: span<u64>) -> u64
+    requires s.len >= 2u64
+    ensures result == 0u64
+{
+    let len0: u64 = 0u64;
+    let len1: u64 = stack_push(s, len0, 42u64);
+    let len2: u64 = stack_push(s, len1, 99u64);
+    stack_pop(s, len2)
+}
+
+fn main() -> u64 { 0u64 }

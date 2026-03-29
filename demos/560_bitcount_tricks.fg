@@ -1,0 +1,78 @@
+// Demo 560: bit manipulation tricks with verified properties
+
+fn is_power_of_two(x: u64) -> bool
+    requires x > 0u64
+    ensures  result == true || result == false
+{
+    (x & (x - 1u64)) == 0u64
+}
+
+fn round_up_pow2(x: u64) -> u64
+    requires x > 0u64
+    requires x <= 0x8000000000000000u64
+    ensures  result >= x
+{
+    let mut v: u64 = x - 1u64;
+    v = v | (v >> 1u64);
+    v = v | (v >> 2u64);
+    v = v | (v >> 4u64);
+    v = v | (v >> 8u64);
+    v = v | (v >> 16u64);
+    v = v | (v >> 32u64);
+    v + 1u64
+}
+
+fn lowest_set_bit(x: u64) -> u64
+    requires x > 0u64
+    ensures  result > 0u64
+{
+    x & (0u64 - x)
+}
+
+fn clear_lowest_bit(x: u64) -> u64
+    ensures  result <= x
+{
+    x & (x - 1u64)
+}
+
+fn bit_at(x: u64, pos: u64) -> u64
+    requires pos < 64u64
+    ensures  result <= 1u64
+{
+    (x >> pos) & 1u64
+}
+
+fn set_bit(x: u64, pos: u64) -> u64
+    requires pos < 64u64
+    ensures  result >= x
+{
+    x | (1u64 << pos)
+}
+
+fn clear_bit(x: u64, pos: u64) -> u64
+    requires pos < 64u64
+    ensures  result <= x
+{
+    x & ~(1u64 << pos)
+}
+
+fn toggle_bit(x: u64, pos: u64) -> u64
+    requires pos < 64u64
+    ensures  result == x ^ (1u64 << pos)
+{
+    x ^ (1u64 << pos)
+}
+
+fn check_lowest_set_bit_power() -> u64
+    ensures result > 0u64
+{
+    lowest_set_bit(12u64)
+}
+
+fn check_clear_lowest() -> u64
+    ensures result <= 12u64
+{
+    clear_lowest_bit(12u64)
+}
+
+fn main() -> u64 { 0u64 }

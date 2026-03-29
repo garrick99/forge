@@ -1,0 +1,58 @@
+// Demo 551: token bucket rate limiter
+
+struct TokenBucket {
+    tokens: u64,
+    capacity: u64,
+    refill_rate: u64,
+}
+
+fn bucket_new(capacity: u64, initial: u64, rate: u64) -> TokenBucket
+    requires capacity > 0u64
+    requires initial <= capacity
+    ensures  result.capacity == capacity
+    ensures  result.tokens == initial
+    ensures  result.refill_rate == rate
+{
+    struct TokenBucket { tokens: initial, capacity: capacity, refill_rate: rate }
+}
+
+fn bucket_try_consume(b: refmut<TokenBucket>, n: u64) -> bool
+    requires (*b).tokens <= (*b).capacity
+    ensures  result == false ==> (*b).tokens <= (*b).capacity
+    ensures  (*b).tokens <= (*b).capacity
+{
+    if (*b).tokens >= n {
+        (*b).tokens = (*b).tokens - n;
+        true
+    } else {
+        false
+    }
+}
+
+fn bucket_refill(b: refmut<TokenBucket>, ticks: u64)
+    requires (*b).tokens <= (*b).capacity
+    ensures  (*b).tokens <= (*b).capacity
+{
+    let added: u64 = (*b).refill_rate * ticks;
+    let new_tokens: u64 = (*b).tokens + added;
+    if new_tokens > (*b).capacity {
+        (*b).tokens = (*b).capacity;
+    } else {
+        (*b).tokens = new_tokens;
+    };
+}
+
+fn bucket_available(b: ref<TokenBucket>) -> u64
+    ensures result == (*b).tokens
+{
+    (*b).tokens
+}
+
+fn bucket_is_full(b: ref<TokenBucket>) -> bool
+    requires (*b).tokens <= (*b).capacity
+    ensures  result == true || result == false
+{
+    (*b).tokens == (*b).capacity
+}
+
+fn main() -> u64 { 0u64 }

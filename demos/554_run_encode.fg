@@ -1,0 +1,50 @@
+// Demo 554: run-length encoding — count and emit runs
+
+fn count_run(s: span<u64>, n: u64, start: u64) -> u64
+    requires n <= s.len
+    requires start < n
+    ensures  result >= 1u64
+    ensures  result <= n - start
+{
+    let val: u64 = s[start];
+    let mut len: u64 = 1u64;
+    while start + len < n
+        invariant len >= 1u64
+        invariant len <= n - start
+        decreases n - start - len
+    {
+        if s[start + len] != val { return len; };
+        len = len + 1u64;
+    };
+    len
+}
+
+fn rle_encode_count(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+    ensures  result <= n
+{
+    if n == 0u64 { return 0u64; };
+    let mut pos: u64 = 0u64;
+    let mut runs: u64 = 0u64;
+    while pos < n
+        invariant pos <= n
+        invariant runs <= pos
+        decreases n - pos
+    {
+        let run_len: u64 = count_run(s, n, pos);
+        runs = runs + 1u64;
+        pos = pos + run_len;
+    };
+    runs
+}
+
+fn rle_first_run_len(s: span<u64>, n: u64) -> u64
+    requires n > 0u64
+    requires n <= s.len
+    ensures  result >= 1u64
+    ensures  result <= n
+{
+    count_run(s, n, 0u64)
+}
+
+fn main() -> u64 { 0u64 }
