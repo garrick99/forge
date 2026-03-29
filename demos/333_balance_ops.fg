@@ -1,0 +1,77 @@
+// Demo 333: Balance operations — deposit/withdraw with verified accounting
+//
+// A simple account balance with verified deposit and withdrawal.
+// Demonstrates that chained financial operations maintain exact
+// balances, proven via old() injection across call boundaries.
+
+struct Account {
+    balance: u64,
+    txns:    u64,   // transaction count
+}
+
+fn acct_new(initial: u64) -> Account
+    ensures result.balance == initial
+    ensures result.txns    == 0u64
+{
+    struct Account { balance: initial, txns: 0u64 }
+}
+
+fn acct_deposit(a: refmut<Account>, amount: u64)
+    ensures (*a).balance == old((*a).balance) + amount
+    ensures (*a).txns    == old((*a).txns) + 1u64
+{
+    (*a).balance = (*a).balance + amount;
+    (*a).txns    = (*a).txns + 1u64;
+}
+
+fn acct_withdraw(a: refmut<Account>, amount: u64)
+    requires (*a).balance >= amount
+    ensures  (*a).balance == old((*a).balance) - amount
+    ensures  (*a).txns    == old((*a).txns) + 1u64
+{
+    (*a).balance = (*a).balance - amount;
+    (*a).txns    = (*a).txns + 1u64;
+}
+
+// Deposit 100: balance is 100
+fn deposit_100() -> u64
+    ensures result == 100u64
+{
+    let a: Account = acct_new(0u64);
+    acct_deposit(&mut a, 100u64);
+    a.balance
+}
+
+// Deposit 100, withdraw 30: balance is 70
+fn deposit_withdraw() -> u64
+    ensures result == 70u64
+{
+    let a: Account = acct_new(0u64);
+    acct_deposit(&mut a, 100u64);
+    acct_withdraw(&mut a, 30u64);
+    a.balance
+}
+
+// Two deposits, one withdrawal: count is 3
+fn three_txns() -> u64
+    ensures result == 3u64
+{
+    let a: Account = acct_new(50u64);
+    acct_deposit(&mut a, 10u64);
+    acct_deposit(&mut a, 20u64);
+    acct_withdraw(&mut a, 5u64);
+    a.txns
+}
+
+// Net zero: deposit X, withdraw X → original balance
+fn net_zero(initial: u64, x: u64) -> u64
+    requires initial >= x
+    ensures result == initial
+{
+    let a: Account = acct_new(initial);
+    acct_deposit(&mut a, x);
+    acct_withdraw(&mut a, x);
+    a.balance
+}
+
+fn main() -> u64 { 0u64 }
