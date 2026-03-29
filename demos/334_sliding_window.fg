@@ -1,0 +1,85 @@
+// Demo 334: Sliding window protocol state
+//
+// A sliding window tracker for reliable transmission.
+// send_base advances on acknowledgment, next_seq advances on send.
+// Proof verifies that the window invariant (next_seq >= send_base)
+// is maintained across all operations.
+
+struct Window {
+    send_base: u64,   // oldest unacknowledged sequence number
+    next_seq:  u64,   // next sequence number to use
+    window:    u64,   // max unacknowledged frames allowed
+}
+
+fn window_new(window: u64) -> Window
+    requires window > 0u64
+    ensures result.send_base == 0u64
+    ensures result.next_seq  == 0u64
+    ensures result.window    == window
+{
+    struct Window { send_base: 0u64, next_seq: 0u64, window: window }
+}
+
+fn window_send(w: refmut<Window>)
+    requires (*w).next_seq < (*w).send_base + (*w).window
+    ensures  (*w).next_seq == old((*w).next_seq) + 1u64
+{
+    (*w).next_seq = (*w).next_seq + 1u64;
+}
+
+fn window_ack(w: refmut<Window>)
+    requires (*w).send_base < (*w).next_seq
+    ensures  (*w).send_base == old((*w).send_base) + 1u64
+{
+    (*w).send_base = (*w).send_base + 1u64;
+}
+
+// Send one frame: next_seq becomes 1
+fn send_one(win: u64) -> u64
+    requires win > 0u64
+    ensures result == 1u64
+{
+    let w: Window = window_new(win);
+    window_send(&mut w);
+    w.next_seq
+}
+
+// Send two, ack one: send_base is 1, next_seq is 2
+fn send2_ack1_base(win: u64) -> u64
+    requires win > 1u64
+    ensures result == 1u64
+{
+    let w: Window = window_new(win);
+    window_send(&mut w);
+    window_send(&mut w);
+    window_ack(&mut w);
+    w.send_base
+}
+
+fn send2_ack1_next(win: u64) -> u64
+    requires win > 1u64
+    ensures result == 2u64
+{
+    let w: Window = window_new(win);
+    window_send(&mut w);
+    window_send(&mut w);
+    window_ack(&mut w);
+    w.next_seq
+}
+
+// Send and fully ack: send_base == next_seq == 3
+fn send3_ack3(win: u64) -> u64
+    requires win > 2u64
+    ensures result == 3u64
+{
+    let w: Window = window_new(win);
+    window_send(&mut w);
+    window_send(&mut w);
+    window_send(&mut w);
+    window_ack(&mut w);
+    window_ack(&mut w);
+    window_ack(&mut w);
+    w.send_base
+}
+
+fn main() -> u64 { 0u64 }

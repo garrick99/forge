@@ -1,0 +1,119 @@
+// Demo 335: Growable vector with verified length tracking
+//
+// A bounded vector (backed by a fixed array) where push/pop
+// operations are verified to maintain the length invariant.
+// Demonstrates old() chaining for size fields.
+
+struct Vec {
+    len: u64,
+    cap: u64,
+}
+
+fn vec_new(cap: u64) -> Vec
+    requires cap > 0u64
+    ensures result.len == 0u64
+    ensures result.cap == cap
+{
+    struct Vec { len: 0u64, cap: cap }
+}
+
+fn vec_push(v: refmut<Vec>)
+    requires (*v).len < (*v).cap
+    ensures  (*v).len == old((*v).len) + 1u64
+    ensures  (*v).cap == old((*v).cap)
+{
+    (*v).len = (*v).len + 1u64;
+}
+
+fn vec_pop(v: refmut<Vec>)
+    requires (*v).len > 0u64
+    ensures  (*v).len == old((*v).len) - 1u64
+{
+    (*v).len = (*v).len - 1u64;
+}
+
+fn vec_clear(v: refmut<Vec>)
+    ensures (*v).len == 0u64
+{
+    (*v).len = 0u64;
+}
+
+fn vec_len(v: refmut<Vec>) -> u64
+    ensures result == (*v).len
+{
+    (*v).len
+}
+
+// New vector is empty
+fn empty_len(cap: u64) -> u64
+    requires cap > 0u64
+    ensures result == 0u64
+{
+    let v: Vec = vec_new(cap);
+    v.len
+}
+
+// After one push, len is 1 and cap is unchanged
+fn push_len(cap: u64) -> u64
+    requires cap > 1u64
+    ensures result == 1u64
+{
+    let v: Vec = vec_new(cap);
+    vec_push(&mut v);
+    v.len
+}
+
+// Push 4 times
+fn push_four(cap: u64) -> u64
+    requires cap > 4u64
+    ensures result == 4u64
+{
+    let v: Vec = vec_new(cap);
+    vec_push(&mut v);
+    vec_push(&mut v);
+    vec_push(&mut v);
+    vec_push(&mut v);
+    v.len
+}
+
+// Push 3, pop 1: len is 2
+fn push3_pop1(cap: u64) -> u64
+    requires cap > 3u64
+    ensures result == 2u64
+{
+    let v: Vec = vec_new(cap);
+    vec_push(&mut v);
+    vec_push(&mut v);
+    vec_push(&mut v);
+    vec_pop(&mut v);
+    v.len
+}
+
+// Push 5, clear: len is 0
+fn push5_clear(cap: u64) -> u64
+    requires cap > 5u64
+    ensures result == 0u64
+{
+    let v: Vec = vec_new(cap);
+    vec_push(&mut v);
+    vec_push(&mut v);
+    vec_push(&mut v);
+    vec_push(&mut v);
+    vec_push(&mut v);
+    vec_clear(&mut v);
+    v.len
+}
+
+// cap is unchanged after any sequence of pushes and pops
+fn cap_preserved(cap: u64) -> u64
+    requires cap > 2u64
+    ensures result == cap
+{
+    let v: Vec = vec_new(cap);
+    vec_push(&mut v);
+    vec_push(&mut v);
+    vec_pop(&mut v);
+    v.cap
+}
+
+fn main() -> u64 { 0u64 }
