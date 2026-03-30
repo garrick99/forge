@@ -19,7 +19,7 @@ open Lexing
 %token <string> IDENT
 
 (* Declaration keywords *)
-%token FN TYPE STRUCT ENUM IMPL TRAIT USE EXTERN TASK CHAN
+%token FN TYPE STRUCT ENUM IMPL TRAIT USE EXTERN TASK CHAN UNION
 %token SPAN SHARED UNIFORM VARYING KERNEL COALESCED SYNCTHREADS STR_TY
 
 (* Control flow *)
@@ -151,6 +151,10 @@ item:
     { mk_item (IType t) $startpos }
   | s = struct_def
     { mk_item (IStruct s) $startpos }
+  | s = packed_struct_def
+    { mk_item (IStruct s) $startpos }
+  | u = union_def
+    { mk_item (IStruct u) $startpos }
   | e = enum_def
     { mk_item (IEnum e) $startpos }
   | tr = trait_def
@@ -275,6 +279,40 @@ struct_def:
         sd_params = params;
         sd_fields = fields;
         sd_invars = invars;
+        sd_is_union = false;
+        sd_is_packed = false;
+      }
+    }
+
+union_def:
+  | UNION name = ident params = kind_params
+    LBRACE
+      fields = list(struct_field)
+    RBRACE
+    {
+      {
+        sd_name   = name;
+        sd_params = params;
+        sd_fields = fields;
+        sd_invars = [];
+        sd_is_union = true;
+        sd_is_packed = false;
+      }
+    }
+
+packed_struct_def:
+  | HASH LBRACKET IDENT RBRACKET STRUCT name = ident params = kind_params
+    LBRACE
+      fields = list(struct_field)
+    RBRACE
+    {
+      {
+        sd_name   = name;
+        sd_params = params;
+        sd_fields = fields;
+        sd_invars = [];
+        sd_is_union = false;
+        sd_is_packed = true;
       }
     }
 

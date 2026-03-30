@@ -285,6 +285,8 @@ and struct_def = {
   sd_params: (ident * kind) list;
   sd_fields: (ident * ty) list;
   sd_invars: pred list;             (* struct invariants — always hold *)
+  sd_is_union: bool;                (* true = C union, false = C struct *)
+  sd_is_packed: bool;               (* true = __attribute__((packed)) *)
 }
 
 and enum_def = {

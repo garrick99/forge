@@ -11,7 +11,7 @@ type token =
   | IDENT  of string
 
   (* Keywords — declarations *)
-  | FN | TYPE | STRUCT | ENUM | IMPL | USE | EXTERN | TASK | CHAN
+  | FN | TYPE | STRUCT | ENUM | IMPL | USE | EXTERN | TASK | CHAN | UNION
 
   (* Keywords — types *)
   | SPAN | SHARED | UNIFORM | VARYING | KERNEL | COALESCED | SYNCTHREADS | STR_TY

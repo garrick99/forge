@@ -9,6 +9,7 @@ type token =
   | VARYING
   | USIZE
   | USE
+  | UNION
   | UNIFORM
   | UNDERSCORE
   | U8

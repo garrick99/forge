@@ -1,0 +1,37 @@
+// expected: 0
+// Demo 1012: Union types for protocol parsing and type punning
+//
+// Forge now supports C unions via `union Name { fields }`.
+// Generated as `typedef union Name { ... } Name;` in C.
+
+union PacketHeader {
+    raw_bytes: u64,
+    tcp_flags: u64,
+    udp_len: u64,
+}
+
+// Access a union field — same syntax as struct field access.
+fn get_raw(pkt: PacketHeader) -> u64 {
+    pkt.raw_bytes
+}
+
+fn make_tcp(flags: u64) -> PacketHeader {
+    struct PacketHeader { raw_bytes: flags, tcp_flags: flags, udp_len: 0u64 }
+}
+
+// Packed struct for wire protocol parsing.
+struct EthernetFrame {
+    dst_mac_hi: u64,
+    dst_mac_lo: u64,
+    src_mac_hi: u64,
+    src_mac_lo: u64,
+    ethertype: u64,
+}
+
+fn parse_ethertype(frame: EthernetFrame) -> u64
+    ensures result == frame.ethertype
+{
+    frame.ethertype
+}
+
+fn main() -> u64 { 0u64 }

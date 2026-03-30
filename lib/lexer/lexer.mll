@@ -14,6 +14,7 @@ let kw_table = Hashtbl.of_seq @@ List.to_seq [
   "impl",       IMPL;
   "use",        USE;
   "extern",     EXTERN;
+  "union",      UNION;
   "task",       TASK;
   "chan",        CHAN;
   "const",      CONST;

@@ -603,6 +603,13 @@ let rec emit_expr depth e =
       Printf.sprintf "(*(volatile uint64_t*)((uintptr_t)%s) = %s)"
         (emit_expr depth ptr) (emit_expr depth value)
   (* ---- Inline assembly ---- *)
+  | ECall ({ expr_desc = EVar id; _ }, [{ expr_desc = ELit (LStr s); _ }])
+      when id.name = "asm_volatile" ->
+      Printf.sprintf "__asm__ volatile(\"%s\")" (String.escaped s)
+  | ECall ({ expr_desc = EVar id; _ }, []) when id.name = "cpu_relax" ->
+      "__asm__ volatile(\"pause\" ::: \"memory\")"
+  | ECall ({ expr_desc = EVar id; _ }, []) when id.name = "dmb" ->
+      "__asm__ volatile(\"dmb sy\" ::: \"memory\")"
   | ECall ({ expr_desc = EVar id; _ }, []) when id.name = "compiler_fence" ->
       "__asm__ volatile(\"\" ::: \"memory\")"
   | ECall ({ expr_desc = EVar id; _ }, []) when id.name = "memory_barrier" ->
@@ -1648,13 +1655,14 @@ let emit_struct sd =
   ) sd.sd_params in
   if has_type_params then "" else begin
     let buf = Buffer.create 256 in
-    Buffer.add_string buf (Printf.sprintf "typedef struct %s {\n" sd.sd_name.name);
+    let keyword = if sd.sd_is_union then "union" else "struct" in
+    Buffer.add_string buf (Printf.sprintf "typedef %s %s {\n" keyword sd.sd_name.name);
     List.iter (fun (id, ty) ->
       Buffer.add_string buf
         (Printf.sprintf "  %s %s;\n" (emit_ty ty) id.name)
     ) sd.sd_fields;
-    (* struct invariants erased — proven at construction sites *)
-    Buffer.add_string buf (Printf.sprintf "} %s;\n" sd.sd_name.name);
+    let packed_attr = if sd.sd_is_packed then " __attribute__((packed))" else "" in
+    Buffer.add_string buf (Printf.sprintf "} %s%s;\n" sd.sd_name.name packed_attr);
     Buffer.contents buf
   end
 

@@ -1,0 +1,41 @@
+// expected: 0
+// Demo 1013: Packed structs for wire protocols
+//
+// #[packed] struct emits __attribute__((packed)) in C, ensuring no padding.
+// Essential for parsing network packets and binary file formats.
+
+#[packed] struct IpHeader {
+    version_ihl: u64,
+    tos: u64,
+    total_length: u64,
+    identification: u64,
+    flags_fragment: u64,
+    ttl: u64,
+    protocol: u64,
+    checksum: u64,
+    src_ip: u64,
+    dst_ip: u64,
+}
+
+fn make_ip_header(src: u64, dst: u64, proto: u64, length: u64) -> IpHeader {
+    struct IpHeader {
+        version_ihl: 69u64,
+        tos: 0u64,
+        total_length: length,
+        identification: 0u64,
+        flags_fragment: 0u64,
+        ttl: 64u64,
+        protocol: proto,
+        checksum: 0u64,
+        src_ip: src,
+        dst_ip: dst,
+    }
+}
+
+fn get_protocol(hdr: IpHeader) -> u64
+    ensures result == hdr.protocol
+{
+    hdr.protocol
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,55 @@
+// expected: 0
+// Demo 1014: Inline assembly and CPU intrinsics
+//
+// Demonstrates asm_volatile(), cpu_relax(), dmb(), compiler_fence(),
+// and memory_barrier() — all the primitives needed for kernel synchronization.
+
+use std::raw;
+
+// Spinlock acquire pattern.
+fn spin_lock(lock: u64, max_spins: u64) -> bool
+    requires max_spins >= 1u64
+{
+    let mut acquired: bool = false;
+    let mut spins: u64 = 0u64;
+    while spins < max_spins && !acquired
+        invariant spins <= max_spins
+        decreases max_spins - spins
+    {
+        let val: u64 = volatile_read(lock);
+        if val == 0u64 {
+            volatile_write(lock, 1u64);
+            compiler_fence();
+            acquired = true;
+        } else {
+            cpu_relax();
+        };
+        spins = spins + 1u64;
+    };
+    acquired
+}
+
+// Spinlock release.
+fn spin_unlock(lock: u64)
+{
+    compiler_fence();
+    volatile_write(lock, 0u64);
+}
+
+// Custom inline assembly: NOP sled for timing calibration.
+fn nop_sled()
+{
+    asm_volatile("nop");
+    asm_volatile("nop");
+    asm_volatile("nop");
+    asm_volatile("nop");
+}
+
+// Memory-mapped I/O write with full barrier.
+fn mmio_write_barrier(addr: u64, val: u64)
+{
+    volatile_write(addr, val);
+    memory_barrier();
+}
+
+fn main() -> u64 { 0u64 }

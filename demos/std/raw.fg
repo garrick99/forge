@@ -29,3 +29,9 @@ extern fn volatile_write(ptr: u64, v: u64) = "forge_raw";
 // ---- Memory barriers -------------------------------------------------------
 extern fn compiler_fence()                 = "forge_raw";
 extern fn memory_barrier()                 = "forge_raw";
+
+// ---- Inline assembly -------------------------------------------------------
+// asm_volatile("instruction") → __asm__ volatile("instruction")
+extern fn asm_volatile(code: str)          = "forge_raw";
+extern fn cpu_relax()                      = "forge_raw";
+extern fn dmb()                            = "forge_raw";
