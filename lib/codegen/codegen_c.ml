@@ -581,6 +581,33 @@ let rec emit_expr depth e =
         action
         payload
   (* own<T> heap intrinsics *)
+  (* ---- Raw pointer intrinsics ---- *)
+  | ECall ({ expr_desc = EVar id; _ }, []) when id.name = "ptr_null" ->
+      "((uint64_t)(uintptr_t)(void*)0)"
+  | ECall ({ expr_desc = EVar id; _ }, [ptr; offset]) when id.name = "ptr_offset" ->
+      Printf.sprintf "((uint64_t)((uint64_t*)((uintptr_t)%s) + %s))"
+        (emit_expr depth ptr) (emit_expr depth offset)
+  | ECall ({ expr_desc = EVar id; _ }, [ptr]) when id.name = "ptr_read" ->
+      Printf.sprintf "(*(uint64_t*)((uintptr_t)%s))" (emit_expr depth ptr)
+  | ECall ({ expr_desc = EVar id; _ }, [ptr; value]) when id.name = "ptr_write" ->
+      Printf.sprintf "(*(uint64_t*)((uintptr_t)%s) = %s)"
+        (emit_expr depth ptr) (emit_expr depth value)
+  | ECall ({ expr_desc = EVar id; _ }, [ptr]) when id.name = "ptr_to_u64" ->
+      Printf.sprintf "((uint64_t)(uintptr_t)%s)" (emit_expr depth ptr)
+  | ECall ({ expr_desc = EVar id; _ }, [v]) when id.name = "u64_to_ptr" ->
+      Printf.sprintf "((uint64_t)(uintptr_t)(void*)%s)" (emit_expr depth v)
+  (* ---- Volatile read/write ---- *)
+  | ECall ({ expr_desc = EVar id; _ }, [ptr]) when id.name = "volatile_read" ->
+      Printf.sprintf "(*(volatile uint64_t*)((uintptr_t)%s))" (emit_expr depth ptr)
+  | ECall ({ expr_desc = EVar id; _ }, [ptr; value]) when id.name = "volatile_write" ->
+      Printf.sprintf "(*(volatile uint64_t*)((uintptr_t)%s) = %s)"
+        (emit_expr depth ptr) (emit_expr depth value)
+  (* ---- Inline assembly ---- *)
+  | ECall ({ expr_desc = EVar id; _ }, []) when id.name = "compiler_fence" ->
+      "__asm__ volatile(\"\" ::: \"memory\")"
+  | ECall ({ expr_desc = EVar id; _ }, []) when id.name = "memory_barrier" ->
+      "__sync_synchronize()"
+  (* ---- Own<T> intrinsics ---- *)
   | ECall ({ expr_desc = EVar id; _ }, [arg]) when id.name = "own_alloc" ->
       let elem_ty = match arg.expr_ty with Some t -> t | None -> TPrim (TUint U64) in
       let mname = mangle_ty_id elem_ty in

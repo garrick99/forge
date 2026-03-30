@@ -1,0 +1,42 @@
+// expected: 0
+// Demo 1011: Using std::raw for kernel-style pointer operations
+//
+// Demonstrates the raw pointer standard library:
+// ptr_null, ptr_offset, ptr_read, ptr_write, volatile_read/write,
+// compiler_fence, memory_barrier.
+
+use std::raw;
+
+// Simulated MMIO register block initialization.
+fn init_device_regs(base: u64, n_regs: u64)
+    requires n_regs >= 1u64
+{
+    let mut i: u64 = 0u64;
+    while i < n_regs
+        invariant i <= n_regs
+        decreases n_regs - i
+    {
+        let reg_addr: u64 = ptr_offset(base, i);
+        volatile_write(reg_addr, 0u64);
+        i = i + 1u64;
+    };
+    compiler_fence();
+}
+
+// Write a value and read it back for verification.
+fn write_verify(addr: u64, value: u64) -> bool
+{
+    volatile_write(addr, value);
+    compiler_fence();
+    let readback: u64 = volatile_read(addr);
+    readback == value
+}
+
+// Null check pattern.
+fn safe_read(ptr: u64) -> u64
+{
+    let null: u64 = ptr_null();
+    if ptr != null { ptr_read(ptr) } else { 0u64 }
+}
+
+fn main() -> u64 { 0u64 }

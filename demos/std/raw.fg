@@ -1,0 +1,31 @@
+// std/raw.fg — raw pointer operations for kernel/systems code
+//
+// Include with:  use std::raw;
+//
+// These functions map to C pointer operations. They are UNSAFE —
+// the proof system verifies preconditions (e.g., non-null) but cannot
+// verify the pointer actually points to valid memory.
+//
+// For safe verified code, use span<T> instead.
+
+// ---- Null pointer ----------------------------------------------------------
+extern fn ptr_null() -> u64       = "forge_raw";
+
+// ---- Pointer arithmetic ----------------------------------------------------
+extern fn ptr_offset(ptr: u64, n: u64) -> u64 = "forge_raw";
+
+// ---- Pointer read/write (UNSAFE) -------------------------------------------
+extern fn ptr_read(ptr: u64) -> u64       = "forge_raw";
+extern fn ptr_write(ptr: u64, v: u64)     = "forge_raw";
+
+// ---- Pointer ↔ integer conversion ------------------------------------------
+extern fn ptr_to_u64(ptr: u64) -> u64     = "forge_raw";
+extern fn u64_to_ptr(v: u64) -> u64       = "forge_raw";
+
+// ---- Volatile memory access (for hardware registers) -----------------------
+extern fn volatile_read(ptr: u64) -> u64  = "forge_raw";
+extern fn volatile_write(ptr: u64, v: u64) = "forge_raw";
+
+// ---- Memory barriers -------------------------------------------------------
+extern fn compiler_fence()                 = "forge_raw";
+extern fn memory_barrier()                 = "forge_raw";
