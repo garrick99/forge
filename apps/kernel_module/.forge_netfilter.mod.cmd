@@ -1,0 +1,1 @@
+savedcmd_/mnt/c/users/kraken/forge/apps/kernel_module/forge_netfilter.mod := printf '%s\n'   forge_netfilter.o | awk '!x[$$0]++ { print("/mnt/c/users/kraken/forge/apps/kernel_module/"$$0) }' > /mnt/c/users/kraken/forge/apps/kernel_module/forge_netfilter.mod

@@ -1,0 +1,1 @@
+savedcmd_/mnt/c/users/kraken/forge/apps/kernel_module/forge_netfilter.ko := ld -r -m elf_x86_64 -z noexecstack --no-warn-rwx-segments --build-id=sha1  -T scripts/module.lds -o /mnt/c/users/kraken/forge/apps/kernel_module/forge_netfilter.ko /mnt/c/users/kraken/forge/apps/kernel_module/forge_netfilter.o /mnt/c/users/kraken/forge/apps/kernel_module/forge_netfilter.mod.o

@@ -1,0 +1,1 @@
+savedcmd_/mnt/c/users/kraken/forge/apps/kernel_module/Module.symvers :=  scripts/mod/modpost -M -m -a      -o /mnt/c/users/kraken/forge/apps/kernel_module/Module.symvers -T /mnt/c/users/kraken/forge/apps/kernel_module/modules.order -i Module.symvers -e 

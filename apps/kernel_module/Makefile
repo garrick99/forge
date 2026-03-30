@@ -11,6 +11,9 @@
 ##   - Forge compiler (for regenerating filter_core.c from filter_core.fg)
 
 obj-m += forge_netfilter.o
+# Local stubs for stdint.h/stdbool.h/stdlib.h override userspace headers
+# Suppress strict-prototype warnings from Forge-generated code (main() decl)
+ccflags-y := -I$(M) -Wno-strict-prototypes
 
 # Kernel build directory
 KDIR ?= /lib/modules/$(shell uname -r)/build
