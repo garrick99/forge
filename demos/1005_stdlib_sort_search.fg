@@ -1,0 +1,52 @@
+// expected: 0
+// Demo 1005: Standard library composition — sort then search
+//
+// The proof that sells Forge: sort an array, then binary search it.
+// The sort's postcondition (sorted output) satisfies the search's
+// precondition (sorted input).  The search proves it finds the target.
+//
+// Pipeline:
+//   insertion_sort: ensures forall i j, i<j && j<n ==> s[i] <= s[j]
+//   binary_search:  requires sorted; ensures result<n ==> s[result]==target
+//
+// Both functions from std::sort and std::search.  Zero assumptions.
+
+use std::sort;
+use std::search;
+
+fn sort_then_find(s: span<u64>, n: u64, target: u64) -> u64
+    requires n <= s.len
+    ensures result <= n
+    ensures result < n ==> s[result] == target
+{
+    insertion_sort(s, n);
+    // At this point, the proof context has:
+    //   forall i j, i < j && j < n ==> s[i] <= s[j]
+    // which satisfies binary_search's requires.
+    binary_search(s, n, target)
+}
+
+fn sort_then_bounds(s: span<u64>, n: u64, lo: u64, hi: u64) -> (u64, u64)
+    requires n <= s.len
+    requires lo <= hi
+    ensures result.0 <= n
+    ensures result.1 <= n
+{
+    insertion_sort(s, n);
+    let lb: u64 = lower_bound(s, n, lo);
+    let ub: u64 = upper_bound(s, n, hi);
+    (lb, ub)
+}
+
+fn find_extremes(s: span<u64>, n: u64) -> (u64, u64)
+    requires n >= 1u64
+    requires n <= s.len
+    ensures result.0 < n
+    ensures result.1 < n
+{
+    let mi: u64 = min_index(s, n);
+    let mx: u64 = max_index(s, n);
+    (mi, mx)
+}
+
+fn main() -> u64 { 0u64 }

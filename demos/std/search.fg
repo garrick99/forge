@@ -1,0 +1,157 @@
+// std/search.fg — verified search algorithms
+//
+// Include with:  use std::search;
+//
+// Binary search proves: result < n ==> s[result] == target
+// Linear search proves: result <= n
+
+// ---- Binary search (full soundness) ----------------------------------------
+
+fn binary_search(s: span<u64>, n: u64, target: u64) -> u64
+    requires n <= s.len
+    requires forall i: u64, forall j: u64, i < j && j < n ==> s[i] <= s[j]
+    ensures result <= n
+    ensures result < n ==> s[result] == target
+{
+    let mut lo: u64 = 0u64;
+    let mut hi: u64 = n;
+    let mut ans: u64 = n;
+    while lo < hi
+        invariant lo <= hi
+        invariant hi <= n
+        invariant ans <= n
+        invariant ans < n ==> s[ans] == target
+        invariant ans == n ==> forall k: u64, k < lo ==> s[k] < target
+        invariant ans == n ==> forall k: u64, k >= hi && k < n ==> s[k] > target
+        decreases hi - lo
+    {
+        let mid: u64 = lo + (hi - lo) / 2u64;
+        if s[mid] == target {
+            ans = mid;
+            lo = hi;
+        } else if s[mid] < target {
+            lo = mid + 1u64;
+        } else {
+            hi = mid;
+        };
+    };
+    ans
+}
+
+// ---- Lower bound (first element >= target) ----------------------------------
+
+fn lower_bound(s: span<u64>, n: u64, target: u64) -> u64
+    requires n <= s.len
+    ensures result <= n
+{
+    let mut lo: u64 = 0u64;
+    let mut hi: u64 = n;
+    while lo < hi
+        invariant lo <= hi
+        invariant hi <= n
+        decreases hi - lo
+    {
+        let mid: u64 = lo + (hi - lo) / 2u64;
+        if s[mid] < target {
+            lo = mid + 1u64;
+        } else {
+            hi = mid;
+        };
+    };
+    lo
+}
+
+// ---- Upper bound (first element > target) -----------------------------------
+
+fn upper_bound(s: span<u64>, n: u64, target: u64) -> u64
+    requires n <= s.len
+    ensures result <= n
+{
+    let mut lo: u64 = 0u64;
+    let mut hi: u64 = n;
+    while lo < hi
+        invariant lo <= hi
+        invariant hi <= n
+        decreases hi - lo
+    {
+        let mid: u64 = lo + (hi - lo) / 2u64;
+        if s[mid] <= target {
+            lo = mid + 1u64;
+        } else {
+            hi = mid;
+        };
+    };
+    lo
+}
+
+// ---- Linear search ----------------------------------------------------------
+
+fn linear_search(s: span<u64>, n: u64, target: u64) -> u64
+    requires n <= s.len
+    ensures result <= n
+{
+    let mut i: u64 = 0u64;
+    let mut found: u64 = n;
+    while i < n
+        invariant i <= n
+        invariant found <= n
+        decreases n - i
+    {
+        if s[i] == target && found == n {
+            found = i;
+        };
+        i = i + 1u64;
+    };
+    found
+}
+
+// ---- Contains ---------------------------------------------------------------
+
+fn contains(s: span<u64>, n: u64, target: u64) -> bool
+    requires n <= s.len
+{
+    let idx: u64 = linear_search(s, n, target);
+    idx < n
+}
+
+// ---- Min / Max element index ------------------------------------------------
+
+fn min_index(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures result < n
+    ensures forall k: u64, k < n ==> s[result] <= s[k]
+{
+    let mut best: u64 = 0u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant best < n
+        invariant forall k: u64, k < i ==> s[best] <= s[k]
+        decreases n - i
+    {
+        if s[i] < s[best] { best = i; };
+        i = i + 1u64;
+    };
+    best
+}
+
+fn max_index(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures result < n
+    ensures forall k: u64, k < n ==> s[result] >= s[k]
+{
+    let mut best: u64 = 0u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant best < n
+        invariant forall k: u64, k < i ==> s[best] >= s[k]
+        decreases n - i
+    {
+        if s[i] > s[best] { best = i; };
+        i = i + 1u64;
+    };
+    best
+}

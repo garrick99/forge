@@ -1,0 +1,129 @@
+// std/sort.fg — verified sorting algorithms
+//
+// Include with:  use std::sort;
+//
+// Every sort function guarantees:
+//   ensures forall i: u64, forall j: u64, i < j && j < n ==> s[i] <= s[j]
+//
+// This is the crown jewel of Forge's standard library: sorting algorithms
+// that PROVE their output is sorted.  No trust — just math.
+
+// ---- Insertion sort (proven sorted) -----------------------------------------
+
+fn insertion_sort(s: span<u64>, n: u64)
+    requires n <= s.len
+    ensures forall i: u64, forall j: u64, i < j && j < n ==> s[i] <= s[j]
+{
+    let mut k: u64 = 0u64;
+    while k < n
+        invariant k <= n
+        invariant forall p: u64, forall q: u64, p < q && q < k ==> s[p] <= s[q]
+        decreases n - k
+    {
+        let mut j: u64 = k;
+        while j > 0u64
+            invariant j <= k
+            invariant forall p: u64, forall q: u64, p < q && q < k + 1u64 && p >= j && q >= j ==> s[p] <= s[q]
+            invariant forall p: u64, forall q: u64, p < q && q < j ==> s[p] <= s[q]
+            invariant forall p: u64, forall q: u64, p < j && q > j && q < k + 1u64 ==> s[p] <= s[q]
+            decreases j
+        {
+            if s[j - 1u64] > s[j] {
+                let tmp: u64 = s[j - 1u64];
+                s[j - 1u64] = s[j];
+                s[j] = tmp;
+                j = j - 1u64;
+            } else {
+                j = 0u64;
+            };
+        };
+        k = k + 1u64;
+    };
+}
+
+// ---- Selection sort (proven sorted) -----------------------------------------
+
+fn selection_sort(s: span<u64>, n: u64)
+    requires n <= s.len
+    ensures forall i: u64, forall j: u64, i < j && j < n ==> s[i] <= s[j]
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall p: u64, forall q: u64, p < q && q < i ==> s[p] <= s[q]
+        invariant forall p: u64, forall q: u64, p < i && q >= i && q < n ==> s[p] <= s[q]
+        decreases n - i
+    {
+        // Find minimum in s[i..n).
+        let mut min_idx: u64 = i;
+        let mut j: u64 = i + 1u64;
+        while j < n
+            invariant j <= n
+            invariant min_idx >= i
+            invariant min_idx < n
+            invariant forall k: u64, k >= i && k < j ==> s[min_idx] <= s[k]
+            decreases n - j
+        {
+            if s[j] < s[min_idx] {
+                min_idx = j;
+            };
+            j = j + 1u64;
+        };
+        // Swap s[i] and s[min_idx].
+        if min_idx != i {
+            let tmp: u64 = s[i];
+            s[i] = s[min_idx];
+            s[min_idx] = tmp;
+        };
+        i = i + 1u64;
+    };
+}
+
+// ---- Sort utilities ---------------------------------------------------------
+
+// Check if span is sorted.
+fn is_sorted(s: span<u64>, n: u64) -> bool
+    requires n <= s.len
+    requires n >= 1u64
+{
+    let mut ok: bool = true;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant i >= 1u64
+        decreases n - i
+    {
+        if s[i - 1u64] > s[i] { ok = false; };
+        i = i + 1u64;
+    };
+    ok
+}
+
+// Sort 2 elements.
+fn sort2(s: span<u64>)
+    requires 2u64 <= s.len
+    ensures s[0u64] <= s[1u64]
+{
+    if s[0u64] > s[1u64] {
+        let tmp: u64 = s[0u64];
+        s[0u64] = s[1u64];
+        s[1u64] = tmp;
+    };
+}
+
+// Sort 3 elements.
+fn sort3(s: span<u64>)
+    requires 3u64 <= s.len
+    ensures s[0u64] <= s[1u64]
+    ensures s[1u64] <= s[2u64]
+{
+    if s[0u64] > s[1u64] {
+        let t: u64 = s[0u64]; s[0u64] = s[1u64]; s[1u64] = t;
+    };
+    if s[1u64] > s[2u64] {
+        let t: u64 = s[1u64]; s[1u64] = s[2u64]; s[2u64] = t;
+    };
+    if s[0u64] > s[1u64] {
+        let t: u64 = s[0u64]; s[0u64] = s[1u64]; s[1u64] = t;
+    };
+}
