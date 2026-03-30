@@ -1,0 +1,193 @@
+// Verified LZ77 Compression Engine
+//
+// Implements LZ77 sliding-window compression with verified bounds safety.
+// Every array access is proven safe by Z3 — no buffer overflow possible
+// regardless of input content or size.
+//
+// Format: stream of tokens, each is either:
+//   [0, byte]           — literal byte (2 words)
+//   [1, offset, length] — back-reference (3 words)
+
+// --- Match finding (sliding window) ----------------------------------------
+
+// Find longest match in window. Returns (offset, length).
+// offset = distance back from current position.
+// length = number of matching bytes (0 if no match found).
+fn find_match(data: span<u64>, data_len: u64, pos: u64,
+              window_size: u64, max_match: u64) -> (u64, u64)
+    requires data_len <= data.len
+    requires pos < data_len
+    requires window_size >= 1u64
+    requires max_match >= 1u64
+    ensures result.0 <= window_size
+    ensures result.1 <= max_match
+{
+    let start: u64 = if pos >= window_size { pos - window_size } else { 0u64 };
+    let mut best_off: u64 = 0u64;
+    let mut best_len: u64 = 0u64;
+
+    let mut s: u64 = start;
+    while s < pos
+        invariant s <= pos
+        invariant best_off <= window_size
+        invariant best_len <= max_match
+        decreases pos - s
+    {
+        // Count matching bytes.
+        let mut len: u64 = 0u64;
+        let mut matching: bool = true;
+        while len < max_match && pos + len < data_len && s + len < data_len && matching
+            invariant len <= max_match
+            decreases max_match - len
+        {
+            if data[s + len] == data[pos + len] {
+                len = len + 1u64;
+            } else {
+                matching = false;
+            };
+        };
+        let actual: u64 = len;
+        if actual > best_len {
+            best_off = pos - s;
+            best_len = actual;
+        };
+        s = s + 1u64;
+    };
+    (best_off, best_len)
+}
+
+// --- Compression -----------------------------------------------------------
+
+// Compress data into output buffer.
+// Returns number of words written to output.
+fn compress(data: span<u64>, data_len: u64,
+            output: span<u64>, out_cap: u64,
+            window_size: u64, min_match: u64, max_match: u64) -> u64
+    requires data_len <= data.len
+    requires out_cap <= output.len
+    requires window_size >= 1u64
+    requires min_match >= 2u64
+    requires max_match >= min_match
+{
+    let mut pos: u64 = 0u64;
+    let mut out_idx: u64 = 0u64;
+
+    while pos < data_len
+        invariant pos <= data_len
+        decreases data_len - pos
+    {
+        if out_idx + 3u64 > out_cap {
+            pos = data_len;
+        } else {
+            let match_result: (u64, u64) = find_match(data, data_len, pos,
+                                                        window_size, max_match);
+            let m_off: u64 = match_result.0;
+            let m_len: u64 = match_result.1;
+
+            if m_len >= min_match && pos + m_len <= data_len {
+                output[out_idx] = 1u64;
+                output[out_idx + 1u64] = m_off;
+                output[out_idx + 2u64] = m_len;
+                out_idx = out_idx + 3u64;
+                pos = pos + m_len;
+            } else {
+                output[out_idx] = 0u64;
+                output[out_idx + 1u64] = data[pos];
+                out_idx = out_idx + 2u64;
+                pos = pos + 1u64;
+            };
+        };
+    };
+    out_idx
+}
+
+// --- Decompression ---------------------------------------------------------
+
+// Decompress token stream back to original data.
+// Returns number of bytes written to output.
+fn decompress(tokens: span<u64>, token_len: u64,
+              output: span<u64>, out_cap: u64) -> u64
+    requires token_len <= tokens.len
+    requires out_cap <= output.len
+    ensures result <= out_cap
+{
+    let mut ti: u64 = 0u64;
+    let mut out_idx: u64 = 0u64;
+
+    while ti < token_len
+        invariant ti <= token_len
+        invariant out_idx <= out_cap
+        decreases token_len - ti
+    {
+        let tag: u64 = tokens[ti];
+        if tag == 0u64 && ti + 1u64 < token_len && out_idx < out_cap {
+            // Literal.
+            output[out_idx] = tokens[ti + 1u64];
+            out_idx = out_idx + 1u64;
+            ti = ti + 2u64;
+        } else if tag == 1u64 && ti + 2u64 < token_len {
+            // Back-reference.
+            let offset: u64 = tokens[ti + 1u64];
+            let length: u64 = tokens[ti + 2u64];
+            let mut k: u64 = 0u64;
+            while k < length && out_idx < out_cap
+                invariant k <= length
+                invariant out_idx <= out_cap
+                decreases length - k
+            {
+                if out_idx >= offset {
+                    let src_idx: u64 = out_idx - offset;
+                    output[out_idx] = output[src_idx];
+                };
+                out_idx = out_idx + 1u64;
+                k = k + 1u64;
+            };
+            ti = ti + 3u64;
+        } else {
+            // Invalid or end — stop.
+            ti = token_len;
+        };
+    };
+    out_idx
+}
+
+// --- Statistics ------------------------------------------------------------
+
+// Count literals and references in a compressed stream.
+fn count_tokens(tokens: span<u64>, token_len: u64) -> (u64, u64)
+    requires token_len <= tokens.len
+{
+    let mut literals: u64 = 0u64;
+    let mut refs: u64 = 0u64;
+    let mut ti: u64 = 0u64;
+    while ti < token_len
+        invariant ti <= token_len
+        decreases token_len - ti
+    {
+        let tag: u64 = tokens[ti];
+        let mut step: u64 = token_len - ti;
+        if tag == 0u64 {
+            literals = literals + 1u64;
+            step = 2u64;
+        } else if tag == 1u64 {
+            refs = refs + 1u64;
+            step = 3u64;
+        };
+        if ti + step <= token_len {
+            ti = ti + step;
+        } else {
+            ti = token_len;
+        };
+    };
+    (literals, refs)
+}
+
+// Compute compressed size in "bytes" (literals=1, refs=2 for offset+length).
+fn compressed_size(tokens: span<u64>, token_len: u64) -> u64
+    requires token_len <= tokens.len
+{
+    let stats: (u64, u64) = count_tokens(tokens, token_len);
+    stats.0 + stats.1 * 2u64
+}
+
+fn main() -> u64 { 0u64 }
