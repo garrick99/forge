@@ -1,0 +1,98 @@
+// expected: 0
+// Demo 1009: Bitfield manipulation for protocol headers and hardware registers
+//
+// Demonstrates verified bitfield packing/unpacking — the pattern used in
+// every network protocol header and device register in the kernel.
+
+// --- Generic bitfield extract/insert (proven bounds) -----------------------
+
+// Extract `width` bits starting at `shift` from a value.
+fn field_extract(val: u64, shift: u64, width: u64) -> u64
+    requires shift < 64u64
+    requires width >= 1u64
+    requires width <= 64u64
+{
+    let mask: u64 = (1u64 << width) - 1u64;
+    (val >> shift) & mask
+}
+
+// Insert `field_val` into `val` at position `shift` with given `width`.
+fn field_insert(val: u64, field_val: u64, shift: u64, width: u64) -> u64
+    requires shift < 64u64
+    requires width >= 1u64
+    requires width <= 64u64
+{
+    let mask: u64 = (1u64 << width) - 1u64;
+    let cleared: u64 = val & ((mask << shift) ^ 18446744073709551615u64);
+    cleared | ((field_val & mask) << shift)
+}
+
+// --- Ethernet frame header (14 bytes packed into 2 u64s) -------------------
+
+// Pack Ethernet header: dst_mac(48) + src_mac(48) + ethertype(16) = 112 bits
+// We store as: word0 = dst_mac[47:0], word1 = src_mac[47:0] << 16 | ethertype
+fn eth_get_ethertype(header_lo: u64, header_hi: u64) -> u64
+    ensures result < 65536u64
+{
+    header_hi % 65536u64
+}
+
+fn eth_set_ethertype(header_hi: u64, ethertype: u64) -> u64
+    requires ethertype < 65536u64
+{
+    (header_hi / 65536u64) * 65536u64 + ethertype
+}
+
+// --- IPv4 flags + fragment offset (16 bits) --------------------------------
+
+fn ip_get_flags(flags_frag: u64) -> u64
+    ensures result < 8u64
+{
+    (flags_frag / 8192u64) % 8u64
+}
+
+fn ip_get_fragment_offset(flags_frag: u64) -> u64
+    ensures result < 8192u64
+{
+    flags_frag % 8192u64
+}
+
+fn ip_pack_flags_frag(flags: u64, frag_offset: u64) -> u64
+    requires flags < 8u64
+    requires frag_offset < 8192u64
+    ensures result < 65536u64
+{
+    flags * 8192u64 + frag_offset
+}
+
+// --- TCP flags (6 bits in a u64 word) --------------------------------------
+
+fn tcp_get_syn(flags: u64) -> bool { (flags >> 1u64) & 1u64 == 1u64 }
+fn tcp_get_ack(flags: u64) -> bool { (flags >> 4u64) & 1u64 == 1u64 }
+fn tcp_get_fin(flags: u64) -> bool { flags & 1u64 == 1u64 }
+fn tcp_get_rst(flags: u64) -> bool { (flags >> 2u64) & 1u64 == 1u64 }
+fn tcp_get_psh(flags: u64) -> bool { (flags >> 3u64) & 1u64 == 1u64 }
+
+fn tcp_set_syn(flags: u64) -> u64 { flags | (1u64 << 1u64) }
+fn tcp_set_ack(flags: u64) -> u64 { flags | (1u64 << 4u64) }
+fn tcp_set_fin(flags: u64) -> u64 { flags | 1u64 }
+
+// --- PCI configuration space register (32-bit packed) ----------------------
+
+fn pci_get_vendor_id(config0: u64) -> u64
+    ensures result < 65536u64
+{ config0 % 65536u64 }
+
+fn pci_get_device_id(config0: u64) -> u64
+    ensures result < 65536u64
+{ (config0 / 65536u64) % 65536u64 }
+
+fn pci_get_command(config1: u64) -> u64
+    ensures result < 65536u64
+{ config1 % 65536u64 }
+
+fn pci_get_status(config1: u64) -> u64
+    ensures result < 65536u64
+{ (config1 / 65536u64) % 65536u64 }
+
+fn main() -> u64 { 0u64 }

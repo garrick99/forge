@@ -1,0 +1,162 @@
+// expected: 0
+// Demo 1010: Verified kernel module pattern
+//
+// Demonstrates the pattern for writing a verified Linux kernel module:
+// - init/cleanup functions with resource tracking
+// - ioctl dispatch with bounds-checked command handling
+// - Interrupt handler with register polling
+// - Verified state machine for device lifecycle
+//
+// This is the template for real kernel work in Forge.
+
+// --- Device state machine ---------------------------------------------------
+// States: 0=UNINIT, 1=INIT, 2=OPEN, 3=ACTIVE, 4=ERROR, 5=SHUTDOWN
+
+fn device_transition(state: u64, event: u64) -> u64
+    requires state < 6u64
+    requires event < 8u64
+    ensures result < 6u64
+{
+    // Events: 0=PROBE, 1=OPEN, 2=START, 3=STOP, 4=CLOSE, 5=ERROR, 6=RESET, 7=REMOVE
+    let mut next: u64 = state;
+    if state == 0u64 {
+        if event == 0u64 { next = 1u64; };
+    } else if state == 1u64 {
+        if event == 1u64 { next = 2u64; }
+        else if event == 7u64 { next = 5u64; };
+    } else if state == 2u64 {
+        if event == 2u64 { next = 3u64; }
+        else if event == 4u64 { next = 1u64; }
+        else if event == 5u64 { next = 4u64; };
+    } else if state == 3u64 {
+        if event == 3u64 { next = 2u64; }
+        else if event == 5u64 { next = 4u64; };
+    } else if state == 4u64 {
+        if event == 6u64 { next = 1u64; }
+        else if event == 7u64 { next = 5u64; };
+    } else {
+        next = 5u64;
+    };
+    next
+}
+
+// --- IOCTL dispatch (proven command bounds) ---------------------------------
+
+fn handle_ioctl(cmd: u64, arg: u64, device_regs: span<u64>, n_regs: u64) -> u64
+    requires n_regs <= device_regs.len
+    requires n_regs >= 1u64
+{
+    // Commands: 0=READ_REG, 1=WRITE_REG, 2=GET_STATUS
+    let mut ret: u64 = 2u64;
+    if cmd == 0u64 {
+        // Read register: arg = register index
+        if arg < n_regs {
+            ret = device_regs[arg];
+        };
+    } else if cmd == 1u64 {
+        // Write register: arg = (reg_idx << 32) | value
+        let reg_idx: u64 = arg / 4294967296u64;
+        let value: u64 = arg % 4294967296u64;
+        if reg_idx < n_regs {
+            device_regs[reg_idx] = value;
+            ret = 0u64;
+        };
+    } else if cmd == 2u64 {
+        ret = device_regs[0u64];
+    };
+    ret
+}
+
+// --- Interrupt handler (bounded polling) -----------------------------------
+
+fn handle_interrupt(status_regs: span<u64>, n_regs: u64,
+                    pending: span<u64>, n_pending: u64) -> u64
+    requires n_regs >= 1u64
+    requires n_regs <= status_regs.len
+    requires n_pending <= pending.len
+    ensures result <= n_pending
+{
+    let mut handled: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n_regs
+        invariant i <= n_regs
+        invariant handled <= n_pending
+        decreases n_regs - i
+    {
+        let status: u64 = status_regs[i];
+        if status != 0u64 && handled < n_pending {
+            pending[handled] = i;
+            handled = handled + 1u64;
+            // Acknowledge interrupt by writing 0.
+            status_regs[i] = 0u64;
+        };
+        i = i + 1u64;
+    };
+    handled
+}
+
+// --- Ring buffer for kernel logging ----------------------------------------
+
+fn klog_write(log_buf: span<u64>, log_cap: u64,
+              tail: u64, count: u64,
+              msg: span<u64>, msg_len: u64) -> (u64, u64)
+    requires log_cap >= 1u64
+    requires log_cap <= log_buf.len
+    requires tail < log_cap
+    requires count <= log_cap
+    requires msg_len <= msg.len
+    ensures result.0 < log_cap
+    ensures result.1 <= log_cap
+{
+    let mut t: u64 = tail;
+    let mut c: u64 = count;
+    let mut i: u64 = 0u64;
+    while i < msg_len && c < log_cap
+        invariant i <= msg_len
+        invariant t < log_cap
+        invariant c <= log_cap
+        decreases msg_len - i
+    {
+        log_buf[t] = msg[i];
+        t = if t + 1u64 == log_cap { 0u64 } else { t + 1u64 };
+        c = c + 1u64;
+        i = i + 1u64;
+    };
+    (t, c)
+}
+
+// --- Module init/cleanup simulation ----------------------------------------
+
+fn module_init(device_regs: span<u64>, n_regs: u64) -> u64
+    requires n_regs >= 4u64
+    requires n_regs <= device_regs.len
+    ensures result < 6u64
+{
+    // Initialize device registers.
+    let mut i: u64 = 0u64;
+    while i < n_regs
+        invariant i <= n_regs
+        decreases n_regs - i
+    { device_regs[i] = 0u64; i = i + 1u64; };
+
+    // Set magic number in reg 0.
+    device_regs[0u64] = 3735928559u64;
+
+    // Transition: UNINIT → INIT.
+    let state: u64 = device_transition(0u64, 0u64);
+    state
+}
+
+fn module_cleanup(device_regs: span<u64>, n_regs: u64, state: u64) -> u64
+    requires n_regs >= 1u64
+    requires n_regs <= device_regs.len
+    requires state < 6u64
+    ensures result < 6u64
+{
+    // Clear magic number.
+    device_regs[0u64] = 0u64;
+    // Transition to SHUTDOWN.
+    device_transition(state, 7u64)
+}
+
+fn main() -> u64 { 0u64 }

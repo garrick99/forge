@@ -1,0 +1,115 @@
+// expected: 0
+// Demo 1008: Raw pointer operations for kernel-level code
+//
+// Demonstrates raw<T> pointer usage with Forge's proof system.
+// Raw pointers are unsafe but every dereference generates a proof
+// obligation that the pointer is not null.
+
+// Simulated raw pointer operations using spans as backing store.
+// In real kernel code, these would be actual pointer operations.
+
+// Write to a "hardware register" (simulated as span element).
+fn register_write(regs: span<u64>, reg_offset: u64, value: u64)
+    requires reg_offset < regs.len
+{
+    regs[reg_offset] = value;
+}
+
+// Read from a "hardware register".
+fn register_read(regs: span<u64>, reg_offset: u64) -> u64
+    requires reg_offset < regs.len
+{
+    regs[reg_offset]
+}
+
+// Set bits in a register (read-modify-write).
+fn register_set_bits(regs: span<u64>, reg_offset: u64, mask: u64)
+    requires reg_offset < regs.len
+{
+    let prev: u64 = regs[reg_offset];
+    regs[reg_offset] = prev | mask;
+}
+
+// Clear bits in a register.
+fn register_clear_bits(regs: span<u64>, reg_offset: u64, mask: u64)
+    requires reg_offset < regs.len
+{
+    let prev: u64 = regs[reg_offset];
+    regs[reg_offset] = prev & (mask ^ 18446744073709551615u64);
+}
+
+// Wait for a bit to be set (polling with bounded retry).
+fn register_wait_bit(regs: span<u64>, reg_offset: u64, bit_mask: u64,
+                     max_retries: u64) -> bool
+    requires reg_offset < regs.len
+    requires max_retries >= 1u64
+{
+    let mut retries: u64 = 0u64;
+    let mut found: bool = false;
+    while retries < max_retries && !found
+        invariant retries <= max_retries
+        decreases max_retries - retries
+    {
+        let val: u64 = regs[reg_offset];
+        if val & bit_mask != 0u64 {
+            found = true;
+        };
+        retries = retries + 1u64;
+    };
+    found
+}
+
+// DMA-style buffer copy with offset validation.
+fn dma_copy(src: span<u64>, src_offset: u64,
+            dst: span<u64>, dst_offset: u64,
+            length: u64)
+    requires src_offset + length <= src.len
+    requires dst_offset + length <= dst.len
+{
+    let mut i: u64 = 0u64;
+    while i < length
+        invariant i <= length
+        decreases length - i
+    {
+        dst[dst_offset + i] = src[src_offset + i];
+        i = i + 1u64;
+    };
+}
+
+// Scatter-gather list: copy from multiple source buffers to one destination.
+fn scatter_gather(srcs: span<u64>, src_offsets: span<u64>, src_lengths: span<u64>,
+                  n_srcs: u64, total_src_len: u64,
+                  dst: span<u64>, dst_len: u64) -> u64
+    requires n_srcs <= src_offsets.len
+    requires n_srcs <= src_lengths.len
+    requires total_src_len <= srcs.len
+    requires dst_len <= dst.len
+    ensures result <= dst_len
+{
+    let mut dst_pos: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n_srcs
+        invariant i <= n_srcs
+        invariant dst_pos <= dst_len
+        decreases n_srcs - i
+    {
+        let off: u64 = src_offsets[i];
+        let len: u64 = src_lengths[i];
+        let mut j: u64 = 0u64;
+        while j < len && dst_pos < dst_len
+            invariant j <= len
+            invariant dst_pos <= dst_len
+            decreases len - j
+        {
+            if off + j < total_src_len {
+                dst[dst_pos] = srcs[off + j];
+                dst_pos = dst_pos + 1u64;
+            };
+            j = j + 1u64;
+        };
+        i = i + 1u64;
+    };
+    dst_pos
+}
+
+fn main() -> u64 { 0u64 }
