@@ -1,0 +1,100 @@
+// Forge GPU Benchmark Kernels
+//
+// Verified kernels for performance testing on RTX 5090.
+// Each kernel is proven bounds-safe before compilation to CUDA C.
+
+use std::gpu;
+
+// ---- Vector Add: C[i] = A[i] + B[i] ----------------------------------------
+#[kernel]
+#[coalesced]
+fn bench_vec_add(a: span<u64>, b: span<u64>, c: span<u64>, n: u64)
+    requires n <= a.len
+    requires n <= b.len
+    requires n <= c.len
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        c[tid] = a[tid] + b[tid];
+    };
+}
+
+// ---- SAXPY: Y[i] = alpha * X[i] + Y[i] ------------------------------------
+#[kernel]
+#[coalesced]
+fn bench_saxpy(x: span<u64>, y: span<u64>, alpha: u64, n: u64)
+    requires n <= x.len
+    requires n <= y.len
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        y[tid] = alpha * x[tid] + y[tid];
+    };
+}
+
+// ---- Reduction Sum (warp shuffle) -------------------------------------------
+#[kernel]
+fn bench_reduce_sum(data: span<u64>, n: u64, result_ptr: u64)
+    requires n <= data.len
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+
+    let mut val: u64 = 0u64;
+    if tid < n { val = data[tid]; };
+
+    // Warp-level butterfly reduction.
+    val = val + shfl_xor_sync(val, 16u64, 32u64);
+    val = val + shfl_xor_sync(val, 8u64, 32u64);
+    val = val + shfl_xor_sync(val, 4u64, 32u64);
+    val = val + shfl_xor_sync(val, 2u64, 32u64);
+    val = val + shfl_xor_sync(val, 1u64, 32u64);
+
+    let lid: u64 = lane_id();
+    if lid == 0u64 {
+        let _old: u64 = atom_add(result_ptr, val);
+    };
+}
+
+// ---- Element-wise Multiply: C[i] = A[i] * B[i] -----------------------------
+#[kernel]
+#[coalesced]
+fn bench_vec_mul(a: span<u64>, b: span<u64>, c: span<u64>, n: u64)
+    requires n <= a.len
+    requires n <= b.len
+    requires n <= c.len
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        c[tid] = a[tid] * b[tid];
+    };
+}
+
+// ---- Memory copy: dst[i] = src[i] -------------------------------------------
+#[kernel]
+#[coalesced]
+fn bench_memcpy(src: span<u64>, dst: span<u64>, n: u64)
+    requires n <= src.len
+    requires n <= dst.len
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        dst[tid] = src[tid];
+    };
+}
+
+// ---- Modular arithmetic (NTT-style): c[i] = (a[i] * b[i]) % p --------------
+#[kernel]
+#[coalesced]
+fn bench_mod_mul(a: span<u64>, b: span<u64>, c: span<u64>, p: u64, n: u64)
+    requires n <= a.len
+    requires n <= b.len
+    requires n <= c.len
+    requires p >= 2u64
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        c[tid] = (a[tid] * b[tid]) % p;
+    };
+}
+
+fn main() -> u64 { 0u64 }

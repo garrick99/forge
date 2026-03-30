@@ -1,0 +1,345 @@
+// FORGE-generated PTX — SM_89
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.5
+.target sm_89
+.address_size 64
+
+.visible .entry bench_vec_add(
+    .param .u64 bench_vec_add_param_a_data,
+    .param .u64 bench_vec_add_param_a_len,
+    .param .u64 bench_vec_add_param_b_data,
+    .param .u64 bench_vec_add_param_b_len,
+    .param .u64 bench_vec_add_param_c_data,
+    .param .u64 bench_vec_add_param_c_len,
+    .param .u64 bench_vec_add_param_n
+)
+{
+    .reg .pred %p12;
+    .reg .u64 %rd0, %rd1, %rd13, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd3, %rd4, %rd5, %rd6;
+    .reg .u32 %r10, %r11, %r27, %r28, %r29, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [bench_vec_add_param_a_data];
+  ld.param.u64 %rd1, [bench_vec_add_param_a_len];
+  ld.param.u64 %rd2, [bench_vec_add_param_b_data];
+  ld.param.u64 %rd3, [bench_vec_add_param_b_len];
+  ld.param.u64 %rd4, [bench_vec_add_param_c_data];
+  ld.param.u64 %rd5, [bench_vec_add_param_c_len];
+  ld.param.u64 %rd6, [bench_vec_add_param_n];
+
+  mov.u32 %r7, %ctaid.x;
+  mov.u32 %r8, %ntid.x;
+  mul.lo.u32 %r9, %r7, %r8;
+  mov.u32 %r10, %tid.x;
+  add.u32 %r11, %r9, %r10;
+  cvt.u64.u32 %rd13, %r11;
+  setp.lt.u64 %p12, %rd13, %rd6;
+  @%p12 bra bench_vec_add_then_14;
+  bra bench_vec_add_else_14;
+  bench_vec_add_then_14:
+  cvt.u64.u32 %rd15, %r11;
+  mul.lo.u64 %rd16, %rd15, 8;
+  add.u64 %rd17, %rd0, %rd16;
+  ld.global.u64 %rd18, [%rd17];
+  cvt.u64.u32 %rd19, %r11;
+  mul.lo.u64 %rd20, %rd19, 8;
+  add.u64 %rd21, %rd2, %rd20;
+  ld.global.u64 %rd22, [%rd21];
+  add.u64 %rd23, %rd18, %rd22;
+  cvt.u64.u32 %rd24, %r11;
+  mul.lo.u64 %rd25, %rd24, 8;
+  add.u64 %rd26, %rd4, %rd25;
+  st.global.u64 [%rd26], %rd23;
+  mov.u32 %r27, 0; // unit
+  mov.u32 %r28, %r27;
+  bra bench_vec_add_end_14;
+  bench_vec_add_else_14:
+  mov.u32 %r28, 0; // no else branch
+  bench_vec_add_end_14:
+  mov.u32 %r29, 0; // unit
+  ret;
+}
+
+.visible .entry bench_saxpy(
+    .param .u64 bench_saxpy_param_x_data,
+    .param .u64 bench_saxpy_param_x_len,
+    .param .u64 bench_saxpy_param_y_data,
+    .param .u64 bench_saxpy_param_y_len,
+    .param .u64 bench_saxpy_param_alpha,
+    .param .u64 bench_saxpy_param_n
+)
+{
+    .reg .pred %p11;
+    .reg .u64 %rd0, %rd1, %rd12, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd3, %rd4, %rd5;
+    .reg .u32 %r10, %r27, %r28, %r29, %r6, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [bench_saxpy_param_x_data];
+  ld.param.u64 %rd1, [bench_saxpy_param_x_len];
+  ld.param.u64 %rd2, [bench_saxpy_param_y_data];
+  ld.param.u64 %rd3, [bench_saxpy_param_y_len];
+  ld.param.u64 %rd4, [bench_saxpy_param_alpha];
+  ld.param.u64 %rd5, [bench_saxpy_param_n];
+
+  mov.u32 %r6, %ctaid.x;
+  mov.u32 %r7, %ntid.x;
+  mul.lo.u32 %r8, %r6, %r7;
+  mov.u32 %r9, %tid.x;
+  add.u32 %r10, %r8, %r9;
+  cvt.u64.u32 %rd12, %r10;
+  setp.lt.u64 %p11, %rd12, %rd5;
+  @%p11 bra bench_saxpy_then_13;
+  bra bench_saxpy_else_13;
+  bench_saxpy_then_13:
+  cvt.u64.u32 %rd14, %r10;
+  mul.lo.u64 %rd15, %rd14, 8;
+  add.u64 %rd16, %rd0, %rd15;
+  ld.global.u64 %rd17, [%rd16];
+  mul.lo.u64 %rd18, %rd4, %rd17;
+  cvt.u64.u32 %rd19, %r10;
+  mul.lo.u64 %rd20, %rd19, 8;
+  add.u64 %rd21, %rd2, %rd20;
+  ld.global.u64 %rd22, [%rd21];
+  add.u64 %rd23, %rd18, %rd22;
+  cvt.u64.u32 %rd24, %r10;
+  mul.lo.u64 %rd25, %rd24, 8;
+  add.u64 %rd26, %rd2, %rd25;
+  st.global.u64 [%rd26], %rd23;
+  mov.u32 %r27, 0; // unit
+  mov.u32 %r28, %r27;
+  bra bench_saxpy_end_13;
+  bench_saxpy_else_13:
+  mov.u32 %r28, 0; // no else branch
+  bench_saxpy_end_13:
+  mov.u32 %r29, 0; // unit
+  ret;
+}
+
+.visible .entry bench_reduce_sum(
+    .param .u64 bench_reduce_sum_param_data_data,
+    .param .u64 bench_reduce_sum_param_data_len,
+    .param .u64 bench_reduce_sum_param_n,
+    .param .u64 bench_reduce_sum_param_result_ptr
+)
+{
+    .reg .pred %p10, %p36;
+    .reg .u64 %rd0, %rd1, %rd11, %rd13, %rd14, %rd15, %rd16, %rd19, %rd2, %rd21, %rd22, %rd24, %rd25, %rd27, %rd28, %rd3, %rd30, %rd31, %rd33, %rd35, %rd37, %rd39, %rd9;
+    .reg .u32 %r17, %r18, %r20, %r23, %r26, %r29, %r32, %r34, %r4, %r40, %r41, %r42, %r5, %r6, %r7, %r8;
+
+  ld.param.u64 %rd0, [bench_reduce_sum_param_data_data];
+  ld.param.u64 %rd1, [bench_reduce_sum_param_data_len];
+  ld.param.u64 %rd2, [bench_reduce_sum_param_n];
+  ld.param.u64 %rd3, [bench_reduce_sum_param_result_ptr];
+
+  mov.u32 %r4, %ctaid.x;
+  mov.u32 %r5, %ntid.x;
+  mul.lo.u32 %r6, %r4, %r5;
+  mov.u32 %r7, %tid.x;
+  add.u32 %r8, %r6, %r7;
+  mov.u64 %rd9, 0;
+  cvt.u64.u32 %rd11, %r8;
+  setp.lt.u64 %p10, %rd11, %rd2;
+  @%p10 bra bench_reduce_sum_then_12;
+  bra bench_reduce_sum_else_12;
+  bench_reduce_sum_then_12:
+  cvt.u64.u32 %rd13, %r8;
+  mul.lo.u64 %rd14, %rd13, 8;
+  add.u64 %rd15, %rd0, %rd14;
+  ld.global.u64 %rd16, [%rd15];
+  mov.u32 %r17, 0; // unit
+  mov.u32 %r18, %r17;
+  bra bench_reduce_sum_end_12;
+  bench_reduce_sum_else_12:
+  mov.u32 %r18, 0; // no else branch
+  bench_reduce_sum_end_12:
+  mov.u64 %rd19, 16;
+  shfl.sync.bfly.b32 %r20, %rd16, %rd19, 31, 0xffffffff;
+  add.u64 %rd21, %rd16, %r20;
+  mov.u64 %rd22, 8;
+  shfl.sync.bfly.b32 %r23, %rd21, %rd22, 31, 0xffffffff;
+  add.u64 %rd24, %rd21, %r23;
+  mov.u64 %rd25, 4;
+  shfl.sync.bfly.b32 %r26, %rd24, %rd25, 31, 0xffffffff;
+  add.u64 %rd27, %rd24, %r26;
+  mov.u64 %rd28, 2;
+  shfl.sync.bfly.b32 %r29, %rd27, %rd28, 31, 0xffffffff;
+  add.u64 %rd30, %rd27, %r29;
+  mov.u64 %rd31, 1;
+  shfl.sync.bfly.b32 %r32, %rd30, %rd31, 31, 0xffffffff;
+  add.u64 %rd33, %rd30, %r32;
+  mov.u32 %r34, %laneid;
+  mov.u64 %rd35, 0;
+  cvt.u64.u32 %rd37, %r34;
+  setp.eq.u64 %p36, %rd37, %rd35;
+  @%p36 bra bench_reduce_sum_then_38;
+  bra bench_reduce_sum_else_38;
+  bench_reduce_sum_then_38:
+  atom.global.add.u64 %rd39, [%rd3], %rd33;
+  mov.u32 %r40, 0; // unit
+  mov.u32 %r41, %r40;
+  bra bench_reduce_sum_end_38;
+  bench_reduce_sum_else_38:
+  mov.u32 %r41, 0; // no else branch
+  bench_reduce_sum_end_38:
+  mov.u32 %r42, 0; // unit
+  ret;
+}
+
+.visible .entry bench_vec_mul(
+    .param .u64 bench_vec_mul_param_a_data,
+    .param .u64 bench_vec_mul_param_a_len,
+    .param .u64 bench_vec_mul_param_b_data,
+    .param .u64 bench_vec_mul_param_b_len,
+    .param .u64 bench_vec_mul_param_c_data,
+    .param .u64 bench_vec_mul_param_c_len,
+    .param .u64 bench_vec_mul_param_n
+)
+{
+    .reg .pred %p12;
+    .reg .u64 %rd0, %rd1, %rd13, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd3, %rd4, %rd5, %rd6;
+    .reg .u32 %r10, %r11, %r27, %r28, %r29, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [bench_vec_mul_param_a_data];
+  ld.param.u64 %rd1, [bench_vec_mul_param_a_len];
+  ld.param.u64 %rd2, [bench_vec_mul_param_b_data];
+  ld.param.u64 %rd3, [bench_vec_mul_param_b_len];
+  ld.param.u64 %rd4, [bench_vec_mul_param_c_data];
+  ld.param.u64 %rd5, [bench_vec_mul_param_c_len];
+  ld.param.u64 %rd6, [bench_vec_mul_param_n];
+
+  mov.u32 %r7, %ctaid.x;
+  mov.u32 %r8, %ntid.x;
+  mul.lo.u32 %r9, %r7, %r8;
+  mov.u32 %r10, %tid.x;
+  add.u32 %r11, %r9, %r10;
+  cvt.u64.u32 %rd13, %r11;
+  setp.lt.u64 %p12, %rd13, %rd6;
+  @%p12 bra bench_vec_mul_then_14;
+  bra bench_vec_mul_else_14;
+  bench_vec_mul_then_14:
+  cvt.u64.u32 %rd15, %r11;
+  mul.lo.u64 %rd16, %rd15, 8;
+  add.u64 %rd17, %rd0, %rd16;
+  ld.global.u64 %rd18, [%rd17];
+  cvt.u64.u32 %rd19, %r11;
+  mul.lo.u64 %rd20, %rd19, 8;
+  add.u64 %rd21, %rd2, %rd20;
+  ld.global.u64 %rd22, [%rd21];
+  mul.lo.u64 %rd23, %rd18, %rd22;
+  cvt.u64.u32 %rd24, %r11;
+  mul.lo.u64 %rd25, %rd24, 8;
+  add.u64 %rd26, %rd4, %rd25;
+  st.global.u64 [%rd26], %rd23;
+  mov.u32 %r27, 0; // unit
+  mov.u32 %r28, %r27;
+  bra bench_vec_mul_end_14;
+  bench_vec_mul_else_14:
+  mov.u32 %r28, 0; // no else branch
+  bench_vec_mul_end_14:
+  mov.u32 %r29, 0; // unit
+  ret;
+}
+
+.visible .entry bench_memcpy(
+    .param .u64 bench_memcpy_param_src_data,
+    .param .u64 bench_memcpy_param_src_len,
+    .param .u64 bench_memcpy_param_dst_data,
+    .param .u64 bench_memcpy_param_dst_len,
+    .param .u64 bench_memcpy_param_n
+)
+{
+    .reg .pred %p10;
+    .reg .u64 %rd0, %rd1, %rd11, %rd13, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd3, %rd4;
+    .reg .u32 %r20, %r21, %r22, %r5, %r6, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [bench_memcpy_param_src_data];
+  ld.param.u64 %rd1, [bench_memcpy_param_src_len];
+  ld.param.u64 %rd2, [bench_memcpy_param_dst_data];
+  ld.param.u64 %rd3, [bench_memcpy_param_dst_len];
+  ld.param.u64 %rd4, [bench_memcpy_param_n];
+
+  mov.u32 %r5, %ctaid.x;
+  mov.u32 %r6, %ntid.x;
+  mul.lo.u32 %r7, %r5, %r6;
+  mov.u32 %r8, %tid.x;
+  add.u32 %r9, %r7, %r8;
+  cvt.u64.u32 %rd11, %r9;
+  setp.lt.u64 %p10, %rd11, %rd4;
+  @%p10 bra bench_memcpy_then_12;
+  bra bench_memcpy_else_12;
+  bench_memcpy_then_12:
+  cvt.u64.u32 %rd13, %r9;
+  mul.lo.u64 %rd14, %rd13, 8;
+  add.u64 %rd15, %rd0, %rd14;
+  ld.global.u64 %rd16, [%rd15];
+  cvt.u64.u32 %rd17, %r9;
+  mul.lo.u64 %rd18, %rd17, 8;
+  add.u64 %rd19, %rd2, %rd18;
+  st.global.u64 [%rd19], %rd16;
+  mov.u32 %r20, 0; // unit
+  mov.u32 %r21, %r20;
+  bra bench_memcpy_end_12;
+  bench_memcpy_else_12:
+  mov.u32 %r21, 0; // no else branch
+  bench_memcpy_end_12:
+  mov.u32 %r22, 0; // unit
+  ret;
+}
+
+.visible .entry bench_mod_mul(
+    .param .u64 bench_mod_mul_param_a_data,
+    .param .u64 bench_mod_mul_param_a_len,
+    .param .u64 bench_mod_mul_param_b_data,
+    .param .u64 bench_mod_mul_param_b_len,
+    .param .u64 bench_mod_mul_param_c_data,
+    .param .u64 bench_mod_mul_param_c_len,
+    .param .u64 bench_mod_mul_param_p,
+    .param .u64 bench_mod_mul_param_n
+)
+{
+    .reg .pred %p13;
+    .reg .u64 %rd0, %rd1, %rd14, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd3, %rd4, %rd5, %rd6, %rd7;
+    .reg .u32 %r10, %r11, %r12, %r29, %r30, %r31, %r8, %r9;
+
+  ld.param.u64 %rd0, [bench_mod_mul_param_a_data];
+  ld.param.u64 %rd1, [bench_mod_mul_param_a_len];
+  ld.param.u64 %rd2, [bench_mod_mul_param_b_data];
+  ld.param.u64 %rd3, [bench_mod_mul_param_b_len];
+  ld.param.u64 %rd4, [bench_mod_mul_param_c_data];
+  ld.param.u64 %rd5, [bench_mod_mul_param_c_len];
+  ld.param.u64 %rd6, [bench_mod_mul_param_p];
+  ld.param.u64 %rd7, [bench_mod_mul_param_n];
+
+  mov.u32 %r8, %ctaid.x;
+  mov.u32 %r9, %ntid.x;
+  mul.lo.u32 %r10, %r8, %r9;
+  mov.u32 %r11, %tid.x;
+  add.u32 %r12, %r10, %r11;
+  cvt.u64.u32 %rd14, %r12;
+  setp.lt.u64 %p13, %rd14, %rd7;
+  @%p13 bra bench_mod_mul_then_15;
+  bra bench_mod_mul_else_15;
+  bench_mod_mul_then_15:
+  cvt.u64.u32 %rd16, %r12;
+  mul.lo.u64 %rd17, %rd16, 8;
+  add.u64 %rd18, %rd0, %rd17;
+  ld.global.u64 %rd19, [%rd18];
+  cvt.u64.u32 %rd20, %r12;
+  mul.lo.u64 %rd21, %rd20, 8;
+  add.u64 %rd22, %rd2, %rd21;
+  ld.global.u64 %rd23, [%rd22];
+  mul.lo.u64 %rd24, %rd19, %rd23;
+  rem.u64 %rd25, %rd24, %rd6;
+  cvt.u64.u32 %rd26, %r12;
+  mul.lo.u64 %rd27, %rd26, 8;
+  add.u64 %rd28, %rd4, %rd27;
+  st.global.u64 [%rd28], %rd25;
+  mov.u32 %r29, 0; // unit
+  mov.u32 %r30, %r29;
+  bra bench_mod_mul_end_15;
+  bench_mod_mul_else_15:
+  mov.u32 %r30, 0; // no else branch
+  bench_mod_mul_end_15:
+  mov.u32 %r31, 0; // unit
+  ret;
+}
+
