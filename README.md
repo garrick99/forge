@@ -54,11 +54,14 @@ fn divide(n: u64, d: u64) -> u64
 
 ## Building
 
-Requires OCaml 5.0+, Menhir 20231231+, Z3 4.12+, and Dune 3.0+.
+**Build dependencies:** OCaml 5.0+ and Dune 3.0+. No third-party OCaml libraries.
+
+**Runtime dependency:** Z3 4.12+ (called as a subprocess — not linked, not an opam dep).
 
 ```bash
-# Install dependencies (Ubuntu/WSL2)
-opam install dune menhir z3
+# Install (Ubuntu/WSL2)
+opam install dune    # build system only
+apt install z3       # or: brew install z3, or download from github.com/Z3Prover/z3
 
 # Build
 dune build
@@ -69,7 +72,7 @@ dune build
 
 The compiler binary is `./_build/default/bin/main.exe`.
 
-**Note:** `lib/parser/parser.ml` is pre-generated and committed. Do not add a `(menhir ...)` stanza to the dune file — there is a known Dune 3.22 + Menhir cycle bug. To regenerate after grammar changes, use the manual `--infer-write-query` / `--infer-read-reply` protocol.
+**Note:** The parser (`lib/parser/parser.ml`) is pre-generated and committed — Menhir is NOT required to build. To regenerate after grammar changes, install Menhir and use `regen_parser.sh`.
 
 ---
 

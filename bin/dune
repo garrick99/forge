@@ -1,4 +1,4 @@
 (executable
  (name main)
  (public_name forge)
- (libraries ast lexer parser proof types codegen fmt))
+ (libraries ast lexer parser proof types codegen))

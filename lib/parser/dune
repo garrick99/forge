@@ -1,5 +1,5 @@
 (library
  (name parser)
  (wrapped false)
- (libraries ast fmt)
+ (libraries ast)
  (modules parse_util parser token))

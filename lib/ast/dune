@@ -1,5 +1,3 @@
 (library
  (name ast)
- (wrapped false)
- (libraries fmt)
- (preprocess (pps ppx_deriving.show ppx_deriving.eq)))
+ (wrapped false))

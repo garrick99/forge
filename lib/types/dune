@@ -1,4 +1,4 @@
 (library
  (name types)
  (wrapped false)
- (libraries ast proof fmt))
+ (libraries ast proof))

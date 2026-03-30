@@ -2,6 +2,9 @@
 
 ## Build
 
+**Dependencies:** OCaml 5.0+ and Dune 3.0+ (build). Z3 4.12+ (runtime, called as subprocess).
+No third-party OCaml libraries — no fmt, no ppx_deriving, no Menhir at build time.
+
 ```bash
 # In WSL (build requires opam environment)
 cd /mnt/c/users/kraken/forge
@@ -11,7 +14,7 @@ opam exec -- dune build
 ./_build/default/bin/main.exe
 ```
 
-The parser (`lib/parser/parser.ml`) is **pre-generated and committed**. Do NOT add a `(menhir ...)` stanza — Dune 3.22 + Menhir has a cycle bug. To regenerate after grammar changes, use the manual `--infer-write-query` / `--infer-read-reply` protocol (see `regen_parser.sh`).
+The parser (`lib/parser/parser.ml`) is **pre-generated and committed**. Menhir is NOT needed to build. To regenerate after grammar changes, install Menhir and use `regen_parser.sh`.
 
 ## Test
 
