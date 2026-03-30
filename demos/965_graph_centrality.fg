@@ -1,0 +1,51 @@
+// expected: 0
+// Demo 965: Verified graph centrality (degree-based)
+// Compute degree of each node from edge list. Max-degree node is most central.
+//
+fn degree_centrality(edges_u: span<u64>, edges_v: span<u64>, deg: span<u64>, n_nodes: u64, n_edges: u64) -> u64
+    requires edges_u.len == n_edges
+    requires edges_v.len == n_edges
+    requires deg.len == n_nodes
+    requires n_nodes > 0u64
+    ensures result < n_nodes
+{
+    // Zero degrees
+    let mut i: u64 = 0u64;
+    while i < n_nodes
+        invariant i <= n_nodes
+        decreases n_nodes - i
+    {
+        deg[i] = 0u64;
+        i = i + 1u64;
+    };
+    // Count degrees
+    let mut e: u64 = 0u64;
+    while e < n_edges
+        invariant e <= n_edges
+        decreases n_edges - e
+    {
+        let u: u64 = edges_u[e];
+        let v: u64 = edges_v[e];
+        if u < n_nodes { deg[u] = deg[u] + 1u64; };
+        if v < n_nodes { deg[v] = deg[v] + 1u64; };
+        e = e + 1u64;
+    };
+    // Find max
+    let mut best: u64 = 0u64;
+    let mut best_d: u64 = deg[0u64];
+    let mut j: u64 = 1u64;
+    while j < n_nodes
+        invariant j <= n_nodes
+        invariant best < n_nodes
+        decreases n_nodes - j
+    {
+        if deg[j] > best_d {
+            best = j;
+            best_d = deg[j];
+        };
+        j = j + 1u64;
+    };
+    best
+}
+
+fn main() -> u64 { 0u64 }

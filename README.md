@@ -96,7 +96,7 @@ standard library (math/mem/str/collections/crypto/prelude), error handling, and 
 
 ## Demos
 
-780 demos, all verified by Z3 and compiled clean under `gcc -Wall -Wextra -Werror`.
+**1000 demos**, all verified by Z3 and compiled clean under `gcc -Wall -Wextra -Werror`.
 
 | # | File | What it demonstrates |
 |---|------|----------------------|
@@ -233,8 +233,26 @@ top-k selection, open-addressing hash table, trie traversal, sieve of Eratosthen
 state machine, array differencing, round-robin scheduler, matrix multiply, base conversion,
 packed bit arrays, interleave/deinterleave, ternary search, Huffman code lengths, reservoir
 sampling, leaky-bucket rate limiter, monotonic stack, Horner polynomial evaluation,
-GCD/LCM (recursive + iterative), pancake sort, bitmap allocator, and multi-stage
-verified pipeline (filter → transform → aggregate → validate).
+GCD/LCM (recursive + iterative), pancake sort, bitmap allocator, and multi-stage verified pipeline (filter → transform → aggregate → validate).
+
+Demos 901–1000 cover: counting inversions, CORDIC rotation, DAG longest path,
+block cipher ECB, sparse set intersection, affine cipher, graph transitive
+closure, cache line simulation, polynomial calculus, image downsampling,
+circular linked lists, heap extract-min, byte stuffing (SLIP), graph
+bipartiteness, Kronecker product, LFSR, range tree queries, array majority,
+packet reassembly, Toeplitz matrix-vector multiply, string alignment,
+integer square root, sliding window entropy, Luhn checksum, Bloom filter
+union, suffix automaton, integer FFT butterfly, hash map rehash, B-tree
+node split, Smith-Waterman alignment, Zobrist hashing, interpolation search,
+arithmetic coding, AES MixColumns, network flow augmentation, HMAC step,
+skip list insert/delete, convex polygon area, succinct bit vector rank,
+push-relabel maxflow, Galois field polynomial GCD, error syndrome computation,
+Patricia trie, DAG topological numbering, CRC-64, Hamming distance, matrix
+eigenvalue bounds, wavelet tree rank, PBKDF2, Merkle tree verification,
+suffix array LCP, graph minimum cut, consistent hash rebalance, optimal BST
+cost DP, modular polynomial evaluation, weighted fair queue scheduler, array
+rotation by GCD cycles, formal power series, streaming median, and the
+**grand finale milestone 1000**.
 
 | # | File | What it demonstrates |
 |---|------|----------------------|
@@ -242,6 +260,11 @@ verified pipeline (filter → transform → aggregate → validate).
 | 700 | `700_milestone6.fg` | Milestone 700 — verified algorithms showcase |
 | 750 | `750_milestone7.fg` | Milestone 750 — four proof patterns (quantified, cross-function, ghost, recursive) |
 | 780 | `780_verified_pipeline.fg` | Multi-stage verified pipeline: filter → transform → aggregate → validate |
+| 800 | `800_milestone8.fg` | Milestone 800 — five proof patterns (quantified, cross-function, recursive, graph, DP) |
+| 850 | `850_milestone9.fg` | Milestone 850 — six categories (+ crypto, modular exponentiation) |
+| 900 | `900_milestone.fg` | Milestone 900 — seven categories (+ verified data structures) |
+| 950 | `950_milestone_showcase.fg` | Milestone 950 — eight proof categories |
+| 1000 | `1000_grand_finale.fg` | **MILESTONE 1000** — grand finale showcasing all Forge verification capabilities |
 
 ### Intentional failures (in `demos/bad/`)
 
@@ -323,7 +346,7 @@ lib/
   codegen/      C99 emitter (codegen_c.ml ~2150 lines) + PTX backend (codegen_ptx.ml ~620 lines)
 bin/
   main.ml       CLI driver + compiler pipeline (~290 lines)
-demos/          780 passing demos (01–780, excluding intentional failures)
+demos/          1000 passing demos (01–1000, excluding intentional failures)
   bad/          10 intentional failures
   std/          Standard library modules (prelude, option, result, math, iter,
                 collections, crypto, mem, str, fmt, io, process)

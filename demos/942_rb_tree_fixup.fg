@@ -1,0 +1,48 @@
+// expected: 0
+// Demo 942: Verified red-black tree insert fixup check
+//
+// Flat array RB tree: color[i] = 0 (black) or 1 (red), parent[i], left[i], right[i].
+// check_rb(color, parent, n) verifies no red-red parent-child pairs.
+// Returns number of violations.
+//
+fn check_rb_violations(color: span<u64>, parent: span<u64>, n: u64) -> u64
+    requires color.len == n
+    requires parent.len == n
+    ensures result <= n
+{
+    let mut violations: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant violations <= i
+        decreases n - i
+    {
+        if color[i] == 1u64 {
+            let p: u64 = parent[i];
+            if p < n && color[p] == 1u64 {
+                violations = violations + 1u64;
+            };
+        };
+        i = i + 1u64;
+    };
+    violations
+}
+
+fn count_black_nodes(color: span<u64>, n: u64) -> u64
+    requires color.len == n
+    ensures result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if color[i] == 0u64 { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }

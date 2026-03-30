@@ -1,0 +1,25 @@
+// expected: 0
+// Demo 993: Verified modular polynomial evaluation (Horner's method)
+// Evaluate poly(x) = sum(coeffs[i] * x^i) mod p using Horner. Result < p.
+//
+fn horner_eval(coeffs: span<u64>, n: u64, x: u64, p: u64) -> u64
+    requires coeffs.len == n
+    requires n > 0u64
+    requires p > 1u64
+    ensures result < p
+{
+    let mut acc: u64 = coeffs[n - 1u64] % p;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant acc < p
+        decreases n - i
+    {
+        let idx: u64 = n - 1u64 - i;
+        acc = (acc * (x % p) + coeffs[idx]) % p;
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

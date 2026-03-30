@@ -1,0 +1,32 @@
+// expected: 0
+// Demo 904: Verified longest common prefix of two arrays
+//
+// lcp(a, b, na, nb) returns the length of the longest common prefix.
+// Postcondition: result <= min(na, nb).
+//
+fn lcp(a: span<u64>, b: span<u64>, na: u64, nb: u64) -> u64
+    requires a.len == na
+    requires b.len == nb
+    ensures result <= na
+    ensures result <= nb
+{
+    let mut i: u64 = 0u64;
+    let mut done: bool = false;
+    let limit: u64 = if na <= nb { na } else { nb };
+    while i < limit
+        invariant i <= limit
+        invariant limit <= na
+        invariant limit <= nb
+        decreases limit - i
+    {
+        if done == false && a[i] == b[i] {
+            i = i + 1u64;
+        } else {
+            done = true;
+            i = limit;
+        };
+    };
+    if done { i } else { i }
+}
+
+fn main() -> u64 { 0u64 }

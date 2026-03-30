@@ -1,0 +1,39 @@
+// expected: 0
+// Demo 910: Verified graph degree histogram
+//
+// degree_hist(edges, m, hist, max_deg) builds a histogram of edge endpoints.
+// Each edge (u,v) encoded as edges[2*i]=u, edges[2*i+1]=v.
+// Postcondition: sum of histogram entries == 2*m.
+//
+fn degree_hist(edges: span<u64>, m: u64, hist: span<u64>, n: u64)
+    requires edges.len == 2u64 * m
+    requires hist.len == n
+    requires m <= 512u64
+    requires n > 0u64
+{
+    let mut j: u64 = 0u64;
+    while j < n
+        invariant j <= n
+        decreases n - j
+    {
+        hist[j] = 0u64;
+        j = j + 1u64;
+    };
+    let mut i: u64 = 0u64;
+    while i < m
+        invariant i <= m
+        decreases m - i
+    {
+        let u: u64 = edges[2u64 * i];
+        let v: u64 = edges[2u64 * i + 1u64];
+        if u < n {
+            hist[u] = hist[u] + 1u64;
+        };
+        if v < n {
+            hist[v] = hist[v] + 1u64;
+        };
+        i = i + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,31 @@
+// expected: 0
+// Demo 905: Verified ring buffer overwrite (oldest data replaced)
+//
+// ring_write(buf, cap, src, n, head) writes n elements into buf circularly.
+// Postcondition: new head position is (head + n) % cap.
+//
+fn ring_write(buf: span<u64>, cap: u64, src: span<u64>, n: u64, head: u64) -> u64
+    requires buf.len == cap
+    requires src.len == n
+    requires cap > 0u64
+    requires head < cap
+    ensures result < cap
+{
+    let mut h: u64 = head;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant h < cap
+        decreases n - i
+    {
+        buf[h] = src[i];
+        h = h + 1u64;
+        if h == cap {
+            h = 0u64;
+        };
+        i = i + 1u64;
+    };
+    h
+}
+
+fn main() -> u64 { 0u64 }

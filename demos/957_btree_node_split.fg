@@ -1,0 +1,29 @@
+// expected: 0
+// Demo 957: Verified B-tree node split
+// Split a full node: copy upper half of keys to new node, return median.
+//
+fn btree_split(keys: span<u64>, new_node: span<u64>, n: u64) -> u64
+    requires n > 2u64
+    requires keys.len == n
+    requires new_node.len == n
+    ensures result <= n / 2u64
+{
+    let mid: u64 = n / 2u64;
+    let mut j: u64 = 0u64;
+    let mut src: u64 = mid + 1u64;
+    while src < n
+        invariant src <= n
+        invariant j <= src
+        invariant j <= n
+        decreases n - src
+    {
+        if j < n {
+            new_node[j] = keys[src];
+        };
+        j = j + 1u64;
+        src = src + 1u64;
+    };
+    mid
+}
+
+fn main() -> u64 { 0u64 }

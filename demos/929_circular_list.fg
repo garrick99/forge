@@ -1,0 +1,36 @@
+// expected: 0
+// Demo 929: Verified circular linked list (flat array)
+//
+// Flat circular list: next[i] = index of next node.
+// traverse(next, n, start) counts nodes visited before returning to start.
+// Postcondition: count <= n.
+//
+fn traverse(next: span<u64>, n: u64, start: u64) -> u64
+    requires next.len == n
+    requires start < n
+    requires n > 0u64
+    requires forall k: u64, k < n ==> next[k] < n
+    ensures result <= n
+{
+    let mut cur: u64 = next[start];
+    let mut cnt: u64 = 1u64;
+    let mut steps: u64 = 0u64;
+    while cur != start
+        invariant cnt <= n
+        invariant steps <= n
+        invariant cur < n
+        decreases n - steps
+    {
+        if steps >= n {
+            cur = start;
+        } else {
+            cur = next[cur];
+            cnt = cnt + 1u64;
+            if cnt > n { cnt = n; };
+            steps = steps + 1u64;
+        };
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }

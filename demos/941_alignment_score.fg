@@ -1,0 +1,46 @@
+// expected: 0
+// Demo 941: Verified string alignment score
+//
+// align_score(a, b, n) computes a simple alignment score:
+// +2 for match, +0 for mismatch. Postcondition: score <= 2*n.
+//
+fn align_score(a: span<u64>, b: span<u64>, n: u64) -> u64
+    requires a.len == n
+    requires b.len == n
+    requires n <= 4096u64
+    ensures result <= 2u64 * n
+{
+    let mut score: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant score <= 2u64 * i
+        decreases n - i
+    {
+        if a[i] == b[i] {
+            score = score + 2u64;
+        };
+        i = i + 1u64;
+    };
+    score
+}
+
+fn hamming_dist(a: span<u64>, b: span<u64>, n: u64) -> u64
+    requires a.len == n
+    requires b.len == n
+    ensures result <= n
+{
+    let mut d: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant d <= i
+        decreases n - i
+    {
+        if a[i] != b[i] { d = d + 1u64; };
+        i = i + 1u64;
+    };
+    d
+}
+
+fn main() -> u64 { 0u64 }

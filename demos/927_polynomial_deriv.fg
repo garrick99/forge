@@ -1,0 +1,40 @@
+// expected: 0
+// Demo 927: Verified polynomial derivative and integral
+//
+// poly_deriv(coeffs, out, n) computes derivative: out[i] = (i+1)*coeffs[i+1].
+// Postcondition: out has n-1 coefficients.
+//
+fn poly_deriv(coeffs: span<u64>, out: span<u64>, n: u64)
+    requires coeffs.len == n
+    requires out.len == n
+    requires n > 0u64
+{
+    let mut i: u64 = 0u64;
+    let deg: u64 = n - 1u64;
+    while i < deg
+        invariant i <= deg
+        invariant deg < n
+        decreases deg - i
+    {
+        out[i] = (i + 1u64) * coeffs[i + 1u64];
+        i = i + 1u64;
+    }
+}
+
+fn poly_integral(coeffs: span<u64>, out: span<u64>, n: u64)
+    requires coeffs.len == n
+    requires out.len == n + 1u64
+    requires n > 0u64
+{
+    out[0u64] = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        out[i + 1u64] = coeffs[i] / (i + 1u64);
+        i = i + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

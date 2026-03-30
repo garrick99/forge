@@ -1,0 +1,35 @@
+// expected: 0
+// Demo 953: Verified suffix automaton transition step
+// Follow transitions in a flat automaton table. State stays in bounds.
+//
+fn sa_follow(table: span<u64>, n_states: u64, alpha: u64, state: u64, input: span<u64>, len: u64) -> u64
+    requires n_states > 0u64
+    requires alpha > 0u64
+    requires table.len == n_states * alpha
+    requires state < n_states
+    requires input.len == len
+    ensures result < n_states
+{
+    let mut st: u64 = state;
+    let mut i: u64 = 0u64;
+    while i < len
+        invariant i <= len
+        invariant st < n_states
+        decreases len - i
+    {
+        let ch: u64 = input[i];
+        if ch < alpha {
+            let idx: u64 = st * alpha + ch;
+            if idx < n_states * alpha {
+                let nxt: u64 = table[idx];
+                if nxt < n_states {
+                    st = nxt;
+                };
+            };
+        };
+        i = i + 1u64;
+    };
+    st
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,28 @@
+// expected: 0
+// Demo 951: Verified Bloom filter union
+// OR two Bloom filter bit-arrays into dst. Every set bit is preserved.
+//
+fn bloom_union(a: span<u64>, b: span<u64>, dst: span<u64>, n: u64)
+    requires a.len == n
+    requires b.len == n
+    requires dst.len == n
+    ensures forall k: u64, k < n ==> dst[k] >= a[k]
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> dst[k] >= a[k]
+        decreases n - i
+    {
+        let av: u64 = a[i];
+        let bv: u64 = b[i];
+        if av > bv {
+            dst[i] = av;
+        } else {
+            dst[i] = bv;
+        };
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

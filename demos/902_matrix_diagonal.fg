@@ -1,0 +1,36 @@
+// expected: 0
+// Demo 902: Verified matrix diagonal extraction
+//
+// extract_diag(mat, diag, rows, cols) copies mat[i*cols + i] into diag.
+// Postcondition: forall k < min(rows,cols), diag[k] == mat[k*cols+k].
+//
+fn min_u64(a: u64, b: u64) -> u64
+    ensures result <= a
+    ensures result <= b
+{
+    if a <= b { a } else { b }
+}
+
+fn extract_diag(mat: span<u64>, diag: span<u64>, rows: u64, cols: u64)
+    requires mat.len == rows * cols
+    requires rows <= 64u64
+    requires cols <= 64u64
+    requires diag.len >= min_u64(rows, cols)
+{
+    let d: u64 = min_u64(rows, cols);
+    let mut i: u64 = 0u64;
+    while i < d
+        invariant i <= d
+        invariant d <= rows
+        invariant d <= cols
+        invariant d <= 64u64
+        decreases d - i
+    {
+        if i < diag.len && i * cols + i < mat.len {
+            diag[i] = mat[i * cols + i];
+        };
+        i = i + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

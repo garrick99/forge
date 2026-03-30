@@ -1,0 +1,41 @@
+// expected: 0
+// Demo 986: Verified PBKDF2 iteration step
+// Repeated hash-and-XOR accumulation. All intermediate values bounded by modulus.
+//
+fn pbkdf2_iterate(state: span<u64>, salt: span<u64>, n: u64, iterations: u64, modulus: u64)
+    requires state.len == n
+    requires salt.len == n
+    requires modulus > 1u64
+    ensures forall k: u64, k < n ==> state[k] < modulus
+{
+    // Initialize state from salt
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> state[k] < modulus
+        decreases n - i
+    {
+        state[i] = salt[i] % modulus;
+        i = i + 1u64;
+    };
+    // Iterate
+    let mut iter: u64 = 0u64;
+    while iter < iterations
+        invariant iter <= iterations
+        invariant forall k: u64, k < n ==> state[k] < modulus
+        decreases iterations - iter
+    {
+        let mut j: u64 = 0u64;
+        while j < n
+            invariant j <= n
+            invariant forall k: u64, k < n ==> state[k] < modulus
+            decreases n - j
+        {
+            state[j] = (state[j] * 31u64 + 17u64) % modulus;
+            j = j + 1u64;
+        };
+        iter = iter + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

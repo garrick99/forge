@@ -1,0 +1,37 @@
+// expected: 0
+// Demo 979: Verified error syndrome computation
+// Compute syndrome s[j] = sum(received[i] * H[j][i]) mod p for each check equation.
+//
+fn compute_syndrome(received: span<u64>, h_matrix: span<u64>, syndrome: span<u64>, n: u64, m: u64, p: u64)
+    requires received.len == n
+    requires h_matrix.len == m * n
+    requires syndrome.len == m
+    requires p > 1u64
+    requires n > 0u64
+    ensures forall k: u64, k < m ==> syndrome[k] < p
+{
+    let mut j: u64 = 0u64;
+    while j < m
+        invariant j <= m
+        invariant forall k: u64, k < j ==> syndrome[k] < p
+        decreases m - j
+    {
+        let mut acc: u64 = 0u64;
+        let mut i: u64 = 0u64;
+        while i < n
+            invariant i <= n
+            invariant acc < p
+            decreases n - i
+        {
+            let idx: u64 = j * n + i;
+            if idx < m * n {
+                acc = (acc + received[i] * h_matrix[idx]) % p;
+            };
+            i = i + 1u64;
+        };
+        syndrome[j] = acc;
+        j = j + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

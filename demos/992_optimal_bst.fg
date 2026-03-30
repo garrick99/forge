@@ -1,0 +1,55 @@
+// expected: 0
+// Demo 992: Verified optimal BST cost (dynamic programming)
+// Compute cost[i][j] = min cost of BST for keys i..j. Flat array encoding.
+//
+fn optimal_bst_cost(freq: span<u64>, cost: span<u64>, n: u64) -> u64
+    requires freq.len == n
+    requires cost.len == n * n
+    requires n > 0u64
+{
+    // Initialize diagonal: cost[i][i] = freq[i]
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let idx: u64 = i * n + i;
+        if idx < n * n {
+            cost[idx] = freq[i];
+        };
+        i = i + 1u64;
+    };
+    // Fill diagonals of increasing length
+    let mut gap: u64 = 1u64;
+    while gap < n
+        invariant gap <= n
+        decreases n - gap
+    {
+        let mut row: u64 = 0u64;
+        while row + gap < n
+            invariant row <= n
+            decreases n - row
+        {
+            let col: u64 = row + gap;
+            let idx: u64 = row * n + col;
+            // Sum frequencies
+            let mut fsum: u64 = 0u64;
+            let mut k: u64 = row;
+            while k <= col
+                invariant k <= col + 1u64
+                decreases col + 1u64 - k
+            {
+                if k < n { fsum = fsum + freq[k]; };
+                k = k + 1u64;
+            };
+            if idx < n * n {
+                cost[idx] = fsum;
+            };
+            row = row + 1u64;
+        };
+        gap = gap + 1u64;
+    };
+    cost[0u64 * n + (n - 1u64)]
+}
+
+fn main() -> u64 { 0u64 }

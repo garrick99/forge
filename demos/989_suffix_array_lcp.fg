@@ -1,0 +1,33 @@
+// expected: 0
+// Demo 989: Verified suffix array LCP query
+// Compute longest common prefix between two suffixes using Kasai's approach.
+//
+fn lcp_query(text: span<u64>, n: u64, start_a: u64, start_b: u64) -> u64
+    requires text.len == n
+    requires start_a < n
+    requires start_b < n
+    ensures result <= n
+{
+    let mut len: u64 = 0u64;
+    let mut a: u64 = start_a;
+    let mut b: u64 = start_b;
+    while a < n
+        invariant a <= n
+        invariant b <= n
+        invariant len <= n
+        decreases n - a
+    {
+        if b >= n {
+            a = n;  // exit
+        } else if text[a] == text[b] {
+            len = len + 1u64;
+            a = a + 1u64;
+            b = b + 1u64;
+        } else {
+            a = n;  // exit
+        };
+    };
+    len
+}
+
+fn main() -> u64 { 0u64 }

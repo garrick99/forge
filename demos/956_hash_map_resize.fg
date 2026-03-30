@@ -1,0 +1,34 @@
+// expected: 0
+// Demo 956: Verified hash map resize/rehash
+// Rehash entries from old bucket array to new (double-size) bucket array.
+//
+fn rehash(old_keys: span<u64>, old_vals: span<u64>, new_keys: span<u64>, new_vals: span<u64>, old_cap: u64, new_cap: u64) -> u64
+    requires old_keys.len == old_cap
+    requires old_vals.len == old_cap
+    requires new_keys.len == new_cap
+    requires new_vals.len == new_cap
+    requires new_cap > 0u64
+    ensures result <= old_cap
+{
+    let mut moved: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < old_cap
+        invariant i <= old_cap
+        invariant moved <= i
+        decreases old_cap - i
+    {
+        let key: u64 = old_keys[i];
+        if key > 0u64 {
+            let slot: u64 = key % new_cap;
+            if slot < new_cap {
+                new_keys[slot] = key;
+                new_vals[slot] = old_vals[i];
+                moved = moved + 1u64;
+            };
+        };
+        i = i + 1u64;
+    };
+    moved
+}
+
+fn main() -> u64 { 0u64 }

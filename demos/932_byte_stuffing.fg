@@ -1,0 +1,43 @@
+// expected: 0
+// Demo 932: Verified byte stuffing (SLIP protocol)
+//
+// slip_encode(src, dst, n, cap) escapes END (192) and ESC (219) bytes.
+// Returns encoded length. Postcondition: out_len <= 2*n.
+//
+fn slip_encode(src: span<u64>, dst: span<u64>, n: u64, cap: u64) -> u64
+    requires src.len == n
+    requires dst.len == cap
+    requires cap >= 2u64 * n
+    requires n <= 2048u64
+    ensures result <= 2u64 * n
+{
+    let end_byte: u64 = 192u64;
+    let esc_byte: u64 = 219u64;
+    let mut out: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant out <= 2u64 * i
+        decreases n - i
+    {
+        let b: u64 = src[i] & 255u64;
+        if b == end_byte {
+            dst[out] = esc_byte;
+            out = out + 1u64;
+            dst[out] = 220u64;
+            out = out + 1u64;
+        } else if b == esc_byte {
+            dst[out] = esc_byte;
+            out = out + 1u64;
+            dst[out] = 221u64;
+            out = out + 1u64;
+        } else {
+            dst[out] = b;
+            out = out + 1u64;
+        };
+        i = i + 1u64;
+    };
+    out
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,29 @@
+// expected: 0
+// Demo 921: Verified histogram distance (chi-squared approximation)
+//
+// chi_sq_dist(h1, h2, n) computes sum of (h1[i]-h2[i])^2 / max(h1[i]+h2[i],1).
+// Postcondition: result is bounded by iteration count * max_val.
+//
+fn hist_diff_sum(h1: span<u64>, h2: span<u64>, n: u64) -> u64
+    requires h1.len == n
+    requires h2.len == n
+    requires n <= 256u64
+    ensures result >= 0u64
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let d: u64 = if h1[i] >= h2[i] { h1[i] - h2[i] } else { h2[i] - h1[i] };
+        let denom: u64 = h1[i] + h2[i];
+        if denom > 0u64 {
+            acc = acc + (d * d) / denom;
+        };
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

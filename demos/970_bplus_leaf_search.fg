@@ -1,0 +1,26 @@
+// expected: 0
+// Demo 970: Verified B+ tree leaf search
+// Linear scan of a sorted leaf node for key. Returns slot index or n (not found).
+//
+fn bplus_leaf_search(keys: span<u64>, n: u64, target: u64) -> u64
+    requires keys.len == n
+    ensures result <= n
+{
+    let mut i: u64 = 0u64;
+    let mut found: u64 = n;
+    while i < n
+        invariant i <= n
+        invariant found <= n
+        decreases n - i
+    {
+        if keys[i] == target {
+            if found == n {
+                found = i;
+            };
+        };
+        i = i + 1u64;
+    };
+    found
+}
+
+fn main() -> u64 { 0u64 }

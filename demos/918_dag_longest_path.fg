@@ -1,0 +1,35 @@
+// expected: 0
+// Demo 918: Verified DAG longest path
+//
+// longest_path(dist, adj, n) relaxes edges in topological order.
+// adj[i*n+j] = weight or 0. Postcondition: dist[k] bounded.
+//
+fn dag_relax(dist: span<u64>, adj: span<u64>, n: u64, cap: u64)
+    requires dist.len == n
+    requires adj.len == n * n
+    requires n <= 64u64
+    requires cap > 0u64
+{
+    let mut u: u64 = 0u64;
+    while u < n
+        invariant u <= n
+        decreases n - u
+    {
+        let mut v: u64 = 0u64;
+        while v < n
+            invariant v <= n
+            decreases n - v
+        {
+            if u * n + v < n * n {
+                let w: u64 = adj[u * n + v];
+                if w > 0u64 && v < n && u < n && dist[u] + w > dist[v] && dist[u] + w <= cap {
+                    dist[v] = dist[u] + w;
+                };
+            };
+            v = v + 1u64;
+        };
+        u = u + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

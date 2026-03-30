@@ -1,0 +1,29 @@
+// expected: 0
+// Demo 960: Verified concurrent queue (lock-free simulation)
+// Model a circular buffer with head/tail. Enqueue n items, verify no overflow.
+//
+fn enqueue_batch(buf: span<u64>, cap: u64, items: span<u64>, n: u64, head: u64) -> u64
+    requires buf.len == cap
+    requires items.len == n
+    requires cap > 0u64
+    requires head < cap
+    ensures result < cap
+{
+    let mut tail: u64 = head;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant tail < cap
+        decreases n - i
+    {
+        let next: u64 = (tail + 1u64) % cap;
+        if next != head {
+            buf[tail] = items[i];
+            tail = next;
+        };
+        i = i + 1u64;
+    };
+    tail
+}
+
+fn main() -> u64 { 0u64 }

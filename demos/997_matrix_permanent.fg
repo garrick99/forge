@@ -1,0 +1,41 @@
+// expected: 0
+// Demo 997: Verified matrix permanent (Ryser formula step)
+// Compute row sums for a subset of columns, multiply. Bounded by column sum.
+//
+fn ryser_row_sums(mat: span<u64>, n: u64, subset: span<u64>, k: u64, row_sums: span<u64>)
+    requires mat.len == n * n
+    requires subset.len == k
+    requires row_sums.len == n
+    requires k <= n
+    ensures forall r: u64, r < n ==> row_sums[r] <= k * n
+{
+    let mut r: u64 = 0u64;
+    while r < n
+        invariant r <= n
+        invariant forall m: u64, m < r ==> row_sums[m] <= k * n
+        decreases n - r
+    {
+        let mut s: u64 = 0u64;
+        let mut j: u64 = 0u64;
+        while j < k
+            invariant j <= k
+            invariant s <= j * n
+            decreases k - j
+        {
+            let col: u64 = subset[j];
+            if col < n {
+                let idx: u64 = r * n + col;
+                if idx < n * n {
+                    let v: u64 = mat[idx];
+                    if v <= n { s = s + v; }
+                    else { s = s + n; };
+                };
+            };
+            j = j + 1u64;
+        };
+        row_sums[r] = s;
+        r = r + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

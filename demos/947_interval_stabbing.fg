@@ -1,0 +1,48 @@
+// expected: 0
+// Demo 947: Verified interval tree stabbing query
+//
+// Flat interval set: lo[i], hi[i] for interval i.
+// stab_count(lo, hi, n, point) counts intervals containing point.
+// Postcondition: result <= n.
+//
+fn stab_count(lo: span<u64>, hi: span<u64>, n: u64, point: u64) -> u64
+    requires lo.len == n
+    requires hi.len == n
+    ensures result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if lo[i] <= point && point <= hi[i] {
+            cnt = cnt + 1u64;
+        };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn stab_first(lo: span<u64>, hi: span<u64>, n: u64, point: u64) -> u64
+    requires lo.len == n
+    requires hi.len == n
+    ensures result <= n
+{
+    let mut idx: u64 = n;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant idx <= n
+        decreases n - i
+    {
+        if idx == n && lo[i] <= point && point <= hi[i] {
+            idx = i;
+        };
+        i = i + 1u64;
+    };
+    idx
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,43 @@
+// expected: 0
+// Demo 923: Verified affine cipher encode/decode
+//
+// affine_enc(plain, cipher, n, a, b, m) computes cipher[i] = (a*plain[i]+b) % m.
+// Postcondition: all cipher values < m.
+//
+fn affine_enc(plain: span<u64>, cipher: span<u64>, n: u64, a: u64, b: u64, m: u64)
+    requires plain.len == n
+    requires cipher.len == n
+    requires m > 0u64
+    ensures forall k: u64, k < n ==> cipher[k] < m
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> cipher[k] < m
+        decreases n - i
+    {
+        cipher[i] = (a * plain[i] + b) % m;
+        i = i + 1u64;
+    }
+}
+
+fn mod_inv_naive(a: u64, m: u64) -> u64
+    requires m > 0u64
+    ensures result < m
+{
+    let mut x: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < m
+        invariant i <= m
+        invariant x < m
+        decreases m - i
+    {
+        if (a * i) % m == 1u64 {
+            x = i;
+        };
+        i = i + 1u64;
+    };
+    x
+}
+
+fn main() -> u64 { 0u64 }

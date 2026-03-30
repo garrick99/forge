@@ -1,0 +1,54 @@
+// expected: 0
+// Demo 967: Verified persistent array (path copying)
+// Copy-on-write update: copy src to dst, then modify dst[idx]. src unchanged.
+// Also provides a multi-update variant that applies several patches.
+//
+fn persistent_set(src: span<u64>, dst: span<u64>, n: u64, idx: u64, val: u64)
+    requires src.len == n
+    requires dst.len == n
+    requires idx < n
+    ensures dst[idx] == val
+    ensures forall k: u64, (k < n && k != idx) ==> dst[k] == old(src[k])
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> dst[k] == old(src[k])
+        decreases n - i
+    {
+        dst[i] = src[i];
+        i = i + 1u64;
+    };
+    dst[idx] = val;
+}
+
+fn persistent_multi_set(src: span<u64>, dst: span<u64>, n: u64, indices: span<u64>, vals: span<u64>, m: u64)
+    requires src.len == n
+    requires dst.len == n
+    requires indices.len == m
+    requires vals.len == m
+{
+    // Copy first
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        dst[i] = src[i];
+        i = i + 1u64;
+    };
+    // Apply patches
+    let mut j: u64 = 0u64;
+    while j < m
+        invariant j <= m
+        decreases m - j
+    {
+        let idx: u64 = indices[j];
+        if idx < n {
+            dst[idx] = vals[j];
+        };
+        j = j + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

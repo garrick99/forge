@@ -1,0 +1,44 @@
+// expected: 0
+// Demo 920: Verified sparse set intersection
+//
+// intersect(a, na, b, nb, out) finds common elements of sorted arrays.
+// Postcondition: output count <= min(na, nb).
+//
+fn intersect(a: span<u64>, na: u64, b: span<u64>, nb: u64, out: span<u64>, cap: u64) -> u64
+    requires a.len == na
+    requires b.len == nb
+    requires out.len == cap
+    requires cap >= na
+    requires cap >= nb
+    ensures result <= na
+    ensures result <= nb
+{
+    let mut ia: u64 = 0u64;
+    let mut ib: u64 = 0u64;
+    let mut cnt: u64 = 0u64;
+    while ia < na
+        invariant ia <= na
+        invariant ib <= nb
+        invariant cnt <= ia
+        invariant cnt <= ib
+        decreases na - ia
+    {
+        if ib >= nb {
+            ia = na;
+        } else if a[ia] == b[ib] {
+            if cnt < cap {
+                out[cnt] = a[ia];
+            };
+            cnt = cnt + 1u64;
+            ia = ia + 1u64;
+            ib = ib + 1u64;
+        } else if a[ia] < b[ib] {
+            ia = ia + 1u64;
+        } else {
+            ib = ib + 1u64;
+        };
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }

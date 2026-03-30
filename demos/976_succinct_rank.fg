@@ -1,0 +1,33 @@
+// expected: 0
+// Demo 976: Verified succinct bit vector rank query
+// rank(i) = number of 1-bits in positions [0, i). Monotonic and bounded.
+//
+fn build_rank(bits: span<u64>, rank_table: span<u64>, n: u64)
+    requires bits.len == n
+    requires rank_table.len == n + 1u64
+    ensures forall k: u64, k <= n ==> rank_table[k] <= k
+{
+    rank_table[0u64] = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k <= i ==> rank_table[k] <= k
+        decreases n - i
+    {
+        if bits[i] > 0u64 {
+            rank_table[i + 1u64] = rank_table[i] + 1u64;
+        } else {
+            rank_table[i + 1u64] = rank_table[i];
+        };
+        i = i + 1u64;
+    };
+}
+
+fn query_rank(rank_table: span<u64>, n: u64, pos: u64) -> u64
+    requires rank_table.len == n + 1u64
+    requires pos <= n
+{
+    rank_table[pos]
+}
+
+fn main() -> u64 { 0u64 }

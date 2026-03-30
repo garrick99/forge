@@ -1,0 +1,32 @@
+// expected: 0
+// Demo 974: Verified convex polygon area (shoelace formula)
+// Compute 2*area of polygon from vertices (x[], y[]). Result is non-negative.
+//
+fn shoelace_2x(x: span<u64>, y: span<u64>, n: u64) -> u64
+    requires x.len == n
+    requires y.len == n
+    requires n >= 3u64
+    ensures result >= 0u64
+{
+    let mut pos_sum: u64 = 0u64;
+    let mut neg_sum: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let j: u64 = if i + 1u64 < n { i + 1u64 } else { 0u64 };
+        let cross_pos: u64 = x[i] * y[j];
+        let cross_neg: u64 = x[j] * y[i];
+        pos_sum = pos_sum + cross_pos;
+        neg_sum = neg_sum + cross_neg;
+        i = i + 1u64;
+    };
+    if pos_sum >= neg_sum {
+        pos_sum - neg_sum
+    } else {
+        neg_sum - pos_sum
+    }
+}
+
+fn main() -> u64 { 0u64 }

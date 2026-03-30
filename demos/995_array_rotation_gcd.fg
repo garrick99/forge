@@ -1,0 +1,58 @@
+// expected: 0
+// Demo 995: Verified array rotation by GCD cycles
+// Rotate array left by d positions using cycle-leader algorithm.
+//
+fn gcd(a: u64, b: u64) -> u64
+    requires a > 0u64
+    requires b > 0u64
+    ensures result >= 1u64
+{
+    let mut x: u64 = a;
+    let mut y: u64 = b;
+    while y > 0u64
+        invariant x >= 1u64
+        decreases y
+    {
+        let t: u64 = y;
+        y = x % y;
+        x = t;
+    };
+    x
+}
+
+fn rotate_left(arr: span<u64>, n: u64, d: u64)
+    requires arr.len == n
+    requires n > 0u64
+    requires d > 0u64
+    requires d < n
+{
+    let g: u64 = gcd(n, d);
+    let mut i: u64 = 0u64;
+    while i < g
+        invariant i <= g
+        invariant g >= 1u64
+        decreases g - i
+    {
+        let tmp: u64 = arr[i];
+        let mut j: u64 = i;
+        let mut steps: u64 = 0u64;
+        while steps < n
+            invariant j < n
+            invariant steps <= n
+            decreases n - steps
+        {
+            let k: u64 = (j + d) % n;
+            if k == i {
+                arr[j] = tmp;
+                steps = n;  // exit
+            } else {
+                arr[j] = arr[k];
+                j = k;
+                steps = steps + 1u64;
+            };
+        };
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

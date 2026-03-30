@@ -1,0 +1,34 @@
+// expected: 0
+// Demo 958: Verified packet deduplication by sequence numbers
+// Scan packets, mark duplicates using a seen-bitmap. Output count <= input count.
+//
+fn dedup_packets(seqs: span<u64>, seen: span<u64>, out: span<u64>, n: u64, max_seq: u64) -> u64
+    requires seqs.len == n
+    requires seen.len == max_seq
+    requires out.len == n
+    requires max_seq > 0u64
+    ensures result <= n
+{
+    let mut count: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant count <= i
+        decreases n - i
+    {
+        let seq: u64 = seqs[i];
+        if seq < max_seq {
+            if seen[seq] == 0u64 {
+                seen[seq] = 1u64;
+                if count < n {
+                    out[count] = seq;
+                };
+                count = count + 1u64;
+            };
+        };
+        i = i + 1u64;
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

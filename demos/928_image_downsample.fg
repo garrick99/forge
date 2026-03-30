@@ -1,0 +1,42 @@
+// expected: 0
+// Demo 928: Verified image downsample 2x
+//
+// downsample(src, dst, w, h) averages 2x2 blocks into dst.
+// dst has (w/2)*(h/2) elements. Postcondition: all dst values bounded.
+//
+fn downsample(src: span<u64>, dst: span<u64>, w: u64, h: u64)
+    requires src.len == w * h
+    requires dst.len == (w / 2u64) * (h / 2u64)
+    requires w >= 2u64
+    requires h >= 2u64
+    requires w <= 128u64
+    requires h <= 128u64
+{
+    let hw: u64 = w / 2u64;
+    let hh: u64 = h / 2u64;
+    let mut r: u64 = 0u64;
+    while r < hh
+        invariant r <= hh
+        decreases hh - r
+    {
+        let mut c: u64 = 0u64;
+        while c < hw
+            invariant c <= hw
+            decreases hw - c
+        {
+            let r2: u64 = r * 2u64;
+            let c2: u64 = c * 2u64;
+            if r2 * w + c2 + w + 1u64 < w * h {
+                let avg: u64 = (src[r2 * w + c2] + src[r2 * w + c2 + 1u64]
+                    + src[(r2 + 1u64) * w + c2] + src[(r2 + 1u64) * w + c2 + 1u64]) / 4u64;
+                if r * hw + c < hw * hh {
+                    dst[r * hw + c] = avg;
+                };
+            };
+            c = c + 1u64;
+        };
+        r = r + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

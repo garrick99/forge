@@ -1,0 +1,169 @@
+// expected: 0
+// Demo 950: Milestone 950 — Showcase of 8 proof categories
+//
+// 1. Quantified postconditions  2. Cross-function composition
+// 3. Recursive induction        4. Graph algorithms
+// 5. Dynamic programming        6. Cryptographic primitives
+// 7. Verified data structures   8. Modular arithmetic
+
+// --- 1. Quantified postconditions: fill array with constant ---
+fn fill(s: span<u64>, n: u64, val: u64)
+    requires s.len == n
+    ensures forall k: u64, k < n ==> s[k] == val
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> s[k] == val
+        decreases n - i
+    {
+        s[i] = val;
+        i = i + 1u64;
+    }
+}
+
+// --- 2. Cross-function composition: fill then verify sum ---
+fn sum_array(s: span<u64>, n: u64) -> u64
+    requires s.len == n
+    requires n <= 1024u64
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+// --- 3. Recursive induction: factorial bounded ---
+fn factorial(n: u64) -> u64
+    requires n <= 20u64
+    ensures result >= 1u64
+    decreases n
+{
+    if n == 0u64 { 1u64 }
+    else {
+        let prev: u64 = factorial(n - 1u64);
+        n * prev
+    }
+}
+
+// --- 4. Graph algorithms: BFS-like level count ---
+fn bfs_levels(adj: span<u64>, n: u64, visited: span<u64>) -> u64
+    requires adj.len == n * n
+    requires visited.len == n
+    requires n <= 32u64
+    ensures result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if visited[i] > 0u64 { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+// --- 5. Dynamic programming: LIS length (patience sorting count) ---
+fn lis_length(s: span<u64>, n: u64, dp: span<u64>) -> u64
+    requires s.len == n
+    requires dp.len == n
+    requires n > 0u64
+    ensures result >= 1u64
+    ensures result <= n
+{
+    let mut best: u64 = 1u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant best >= 1u64
+        invariant best <= n
+        decreases n - i
+    {
+        dp[i] = 1u64;
+        let mut j: u64 = 0u64;
+        while j < i
+            invariant j <= i
+            decreases i - j
+        {
+            if s[j] < s[i] && dp[j] + 1u64 > dp[i] {
+                dp[i] = dp[j] + 1u64;
+            };
+            j = j + 1u64;
+        };
+        if dp[i] > best { best = dp[i]; };
+        if best > n { best = n; };
+        i = i + 1u64;
+    };
+    best
+}
+
+// --- 6. Cryptographic primitives: XOR stream cipher ---
+fn xor_cipher(data: span<u64>, key: span<u64>, out: span<u64>, n: u64, klen: u64)
+    requires data.len == n
+    requires key.len == klen
+    requires out.len == n
+    requires klen > 0u64
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        out[i] = data[i] ^ key[i % klen];
+        i = i + 1u64;
+    }
+}
+
+// --- 7. Verified data structures: bounded stack ---
+fn stack_push(stk: span<u64>, top: u64, cap: u64, val: u64) -> u64
+    requires stk.len == cap
+    requires top < cap
+    ensures result == top + 1u64
+    ensures stk[top] == val
+{
+    stk[top] = val;
+    top + 1u64
+}
+
+fn stack_pop(stk: span<u64>, top: u64) -> (u64, u64)
+    requires stk.len >= top
+    requires top > 0u64
+    ensures result.1 == top - 1u64
+{
+    let val: u64 = stk[top - 1u64];
+    (val, top - 1u64)
+}
+
+// --- 8. Modular arithmetic: modular exponentiation ---
+fn mod_pow(base: u64, exp: u64, m: u64) -> u64
+    requires m > 1u64
+    requires base < m
+    ensures result < m
+{
+    let mut b: u64 = base;
+    let mut e: u64 = exp;
+    let mut acc: u64 = 1u64;
+    while e > 0u64
+        invariant acc < m
+        invariant b < m || e == 0u64
+        decreases e
+    {
+        if e % 2u64 == 1u64 {
+            acc = (acc * b) % m;
+        };
+        b = (b * b) % m;
+        e = e / 2u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

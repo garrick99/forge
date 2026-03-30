@@ -1,0 +1,33 @@
+// expected: 0
+// Demo 954: Verified Hopcroft-Karp augment step
+// Walk an augmenting path and flip matched/free edges. Match count increases.
+//
+fn augment_path(path: span<u64>, match_u: span<u64>, match_v: span<u64>, plen: u64, nu: u64, nv: u64) -> u64
+    requires match_u.len == nu
+    requires match_v.len == nv
+    requires path.len == plen
+    requires plen > 0u64
+    ensures result <= plen
+{
+    let mut flipped: u64 = 0u64;
+    let mut k: u64 = 0u64;
+    while k + 1u64 < plen
+        invariant k <= plen
+        invariant flipped <= k
+        decreases plen - k
+    {
+        let u: u64 = path[k];
+        let v: u64 = path[k + 1u64];
+        if u < nu {
+            match_u[u] = v;
+        };
+        if v < nv {
+            match_v[v] = u;
+        };
+        flipped = flipped + 1u64;
+        k = k + 2u64;
+    };
+    flipped
+}
+
+fn main() -> u64 { 0u64 }

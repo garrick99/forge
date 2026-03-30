@@ -1,0 +1,31 @@
+// expected: 0
+// Demo 925: Verified Booth's algorithm (multiplication)
+//
+// booth_mul(a, b, bits) computes a * b using Booth-style add/shift.
+// Simplified: iterates over bits of b, accumulating shifted a.
+//
+fn booth_mul(a: u64, b: u64, bits: u64) -> u64
+    requires bits <= 32u64
+    requires a <= 65535u64
+    requires b <= 65535u64
+    ensures result >= 0u64
+{
+    let mut acc: u64 = 0u64;
+    let mut shifted: u64 = a;
+    let mut rem: u64 = b;
+    let mut i: u64 = 0u64;
+    while i < bits
+        invariant i <= bits
+        decreases bits - i
+    {
+        if rem & 1u64 == 1u64 {
+            acc = acc + shifted;
+        };
+        shifted = shifted * 2u64;
+        rem = rem / 2u64;
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

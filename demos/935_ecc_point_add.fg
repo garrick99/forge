@@ -1,0 +1,38 @@
+// expected: 0
+// Demo 935: Verified ECC point addition (simplified)
+//
+// Simplified affine addition on curve y^2 = x^3 + ax + b (mod p).
+// Returns (x3, y3). All arithmetic mod p.
+//
+fn mod_sub(a: u64, b: u64, p: u64) -> u64
+    requires p > 0u64
+    ensures result < p
+{
+    if a >= b { (a - b) % p } else { (p - (b - a) % p) % p }
+}
+
+fn mod_add(a: u64, b: u64, p: u64) -> u64
+    requires p > 0u64
+    ensures result < p
+{
+    (a + b) % p
+}
+
+fn mod_mul(a: u64, b: u64, p: u64) -> u64
+    requires p > 0u64
+    ensures result < p
+{
+    (a * b) % p
+}
+
+fn ecc_add_x(x1: u64, y1: u64, x2: u64, y2: u64, slope: u64, p: u64) -> u64
+    requires p > 1u64
+    ensures result < p
+{
+    let s2: u64 = mod_mul(slope, slope, p);
+    let tmp: u64 = mod_sub(s2, x1, p);
+    let x3: u64 = mod_sub(tmp, x2, p);
+    x3
+}
+
+fn main() -> u64 { 0u64 }

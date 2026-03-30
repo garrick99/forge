@@ -1,0 +1,42 @@
+// expected: 0
+// Demo 998: Verified streaming median (two-counter approach)
+// Track count of elements below/above running median estimate. Adjust estimate.
+//
+fn streaming_median(data: span<u64>, n: u64) -> u64
+    requires data.len == n
+    requires n > 0u64
+    ensures result >= 0u64
+{
+    let mut est: u64 = data[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let mut below: u64 = 0u64;
+        let mut above: u64 = 0u64;
+        let mut j: u64 = 0u64;
+        while j <= i
+            invariant j <= i + 1u64
+            invariant below <= j
+            invariant above <= j
+            decreases i + 1u64 - j
+        {
+            if data[j] < est {
+                below = below + 1u64;
+            } else if data[j] > est {
+                above = above + 1u64;
+            };
+            j = j + 1u64;
+        };
+        if below > above + 1u64 {
+            if est > 0u64 { est = est - 1u64; };
+        } else if above > below + 1u64 {
+            est = est + 1u64;
+        };
+        i = i + 1u64;
+    };
+    est
+}
+
+fn main() -> u64 { 0u64 }

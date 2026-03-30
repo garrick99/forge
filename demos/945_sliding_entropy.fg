@@ -1,0 +1,45 @@
+// expected: 0
+// Demo 945: Verified sliding window entropy approximation
+//
+// Approximates entropy via frequency counts in a sliding window.
+// entropy_approx(data, n, w, hist, nbins) returns diversity count.
+//
+fn entropy_approx(data: span<u64>, n: u64, w: u64, hist: span<u64>, nbins: u64) -> u64
+    requires data.len == n
+    requires hist.len == nbins
+    requires nbins > 0u64
+    requires w > 0u64
+    requires w <= n
+    ensures result <= nbins
+{
+    let mut j: u64 = 0u64;
+    while j < nbins
+        invariant j <= nbins
+        decreases nbins - j
+    {
+        hist[j] = 0u64;
+        j = j + 1u64;
+    };
+    let mut i: u64 = 0u64;
+    while i < w
+        invariant i <= w
+        decreases w - i
+    {
+        let b: u64 = data[i] % nbins;
+        hist[b] = hist[b] + 1u64;
+        i = i + 1u64;
+    };
+    let mut distinct: u64 = 0u64;
+    let mut k: u64 = 0u64;
+    while k < nbins
+        invariant k <= nbins
+        invariant distinct <= k
+        decreases nbins - k
+    {
+        if hist[k] > 0u64 { distinct = distinct + 1u64; };
+        k = k + 1u64;
+    };
+    distinct
+}
+
+fn main() -> u64 { 0u64 }

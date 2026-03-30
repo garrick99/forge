@@ -1,0 +1,40 @@
+// expected: 0
+// Demo 944: Verified sparse matrix diagonal extraction
+//
+// CSR-like: row_ptr[i]..row_ptr[i+1] are column indices in col_idx, values in vals.
+// extract_sparse_diag(row_ptr, col_idx, vals, diag, n) extracts diagonal.
+//
+fn extract_sparse_diag(row_ptr: span<u64>, col_idx: span<u64>, vals: span<u64>,
+                       diag: span<u64>, n: u64, nnz: u64)
+    requires row_ptr.len == n + 1u64
+    requires col_idx.len == nnz
+    requires vals.len == nnz
+    requires diag.len == n
+    ensures forall k: u64, k < n ==> diag[k] >= 0u64
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> diag[k] >= 0u64
+        decreases n - i
+    {
+        diag[i] = 0u64;
+        let start: u64 = row_ptr[i];
+        let stop: u64 = row_ptr[i + 1u64];
+        let mut j: u64 = start;
+        let mut steps: u64 = 0u64;
+        while j < stop && steps < nnz
+            invariant steps <= nnz
+            decreases nnz - steps
+        {
+            if j < nnz && col_idx[j] == i {
+                diag[i] = vals[j];
+            };
+            j = j + 1u64;
+            steps = steps + 1u64;
+        };
+        i = i + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

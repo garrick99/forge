@@ -1,0 +1,40 @@
+// expected: 0
+// Demo 996: Verified Karger minimum cut step
+// Contract a random edge: merge two vertices, update adjacency counts.
+//
+fn karger_contract(adj: span<u64>, component: span<u64>, n: u64, edge_u: u64, edge_v: u64) -> u64
+    requires adj.len == n * n
+    requires component.len == n
+    requires n > 0u64
+    requires edge_u < n
+    requires edge_v < n
+    ensures result <= n
+{
+    // Merge edge_v into edge_u: redirect all edges
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if component[i] == edge_v {
+            component[i] = edge_u;
+        };
+        i = i + 1u64;
+    };
+    // Count remaining distinct components
+    let mut count: u64 = 0u64;
+    let mut j: u64 = 0u64;
+    while j < n
+        invariant j <= n
+        invariant count <= j
+        decreases n - j
+    {
+        if component[j] == j {
+            count = count + 1u64;
+        };
+        j = j + 1u64;
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

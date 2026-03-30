@@ -1,0 +1,34 @@
+// expected: 0
+// Demo 987: Verified Merkle tree verification
+// Walk proof path from leaf to root, combining hashes. Final hash is deterministic.
+//
+fn merkle_combine(a: u64, b: u64, modulus: u64) -> u64
+    requires modulus > 1u64
+    ensures result < modulus
+{
+    (a * 37u64 + b * 53u64 + 7u64) % modulus
+}
+
+fn merkle_verify(leaf: u64, prf: span<u64>, sides: span<u64>, plen: u64, modulus: u64) -> u64
+    requires prf.len == plen
+    requires sides.len == plen
+    requires modulus > 1u64
+    ensures result < modulus
+{
+    let mut h: u64 = leaf % modulus;
+    let mut i: u64 = 0u64;
+    while i < plen
+        invariant i <= plen
+        invariant h < modulus
+        decreases plen - i
+    {
+        let sibling: u64 = prf[i] % modulus;
+        let left: u64 = if sides[i] == 0u64 { h } else { sibling };
+        let right: u64 = if sides[i] == 0u64 { sibling } else { h };
+        h = merkle_combine(left, right, modulus);
+        i = i + 1u64;
+    };
+    h
+}
+
+fn main() -> u64 { 0u64 }

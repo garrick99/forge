@@ -1,0 +1,42 @@
+// expected: 0
+// Demo 984: Verified Gershgorin eigenvalue bounds
+// For each row i, compute radius = sum of |off-diagonal| entries.
+// Eigenvalue bound: max(diag[i] + radius[i]). Returns max bound.
+//
+fn gershgorin_max(mat: span<u64>, diag: span<u64>, n: u64) -> u64
+    requires mat.len == n * n
+    requires diag.len == n
+    requires n > 0u64
+    ensures result >= diag[0u64]
+{
+    let mut max_bound: u64 = diag[0u64];
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant max_bound >= diag[0u64]
+        decreases n - i
+    {
+        let mut radius: u64 = 0u64;
+        let mut j: u64 = 0u64;
+        while j < n
+            invariant j <= n
+            decreases n - j
+        {
+            if j != i {
+                let idx: u64 = i * n + j;
+                if idx < n * n {
+                    radius = radius + mat[idx];
+                };
+            };
+            j = j + 1u64;
+        };
+        let bound: u64 = diag[i] + radius;
+        if bound > max_bound {
+            max_bound = bound;
+        };
+        i = i + 1u64;
+    };
+    max_bound
+}
+
+fn main() -> u64 { 0u64 }

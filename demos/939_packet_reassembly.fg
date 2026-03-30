@@ -1,0 +1,30 @@
+// expected: 0
+// Demo 939: Verified packet reassembly
+//
+// reassemble(offsets, payloads, n, buf, cap) places fragments at their offsets.
+// Each fragment is one u64. Postcondition: all writes within bounds.
+//
+fn reassemble(offsets: span<u64>, payloads: span<u64>, n: u64, buf: span<u64>, cap: u64) -> u64
+    requires offsets.len == n
+    requires payloads.len == n
+    requires buf.len == cap
+    ensures result <= n
+{
+    let mut placed: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant placed <= i
+        decreases n - i
+    {
+        let off: u64 = offsets[i];
+        if off < cap {
+            buf[off] = payloads[i];
+            placed = placed + 1u64;
+        };
+        i = i + 1u64;
+    };
+    placed
+}
+
+fn main() -> u64 { 0u64 }

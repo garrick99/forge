@@ -1,0 +1,47 @@
+// expected: 0
+// Demo 948: Verified matrix Householder reflection step
+//
+// householder_apply(col, n, v, scale) applies H = I - scale*v*v^T to column.
+// col[i] -= scale * v[i] * dot(v, col). Simplified integer version.
+//
+fn dot_product(a: span<u64>, b: span<u64>, n: u64) -> u64
+    requires a.len == n
+    requires b.len == n
+    requires n <= 256u64
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + a[i] * b[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn householder_apply(col: span<u64>, n: u64, v: span<u64>, scale: u64)
+    requires col.len == n
+    requires v.len == n
+    requires n <= 256u64
+    requires scale <= 100u64
+{
+    let d: u64 = dot_product(v, col, n);
+    let factor: u64 = scale * d;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let sub: u64 = v[i] * factor;
+        if col[i] >= sub {
+            col[i] = col[i] - sub;
+        } else {
+            col[i] = 0u64;
+        };
+        i = i + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

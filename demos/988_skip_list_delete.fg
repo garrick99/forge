@@ -1,0 +1,41 @@
+// expected: 0
+// Demo 988: Verified skip list delete
+// Delete element from sorted array by shifting left. Length decreases by at most 1.
+//
+fn skip_delete(data: span<u64>, n: u64, val: u64) -> u64
+    requires data.len == n
+    requires n > 0u64
+    ensures result <= n
+    ensures result >= n - 1u64
+{
+    // Find element
+    let mut pos: u64 = n;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant pos <= n
+        decreases n - i
+    {
+        if data[i] == val {
+            if pos == n { pos = i; };
+        };
+        i = i + 1u64;
+    };
+    if pos < n {
+        // Shift left
+        let mut j: u64 = pos;
+        while j + 1u64 < n
+            invariant j < n
+            invariant j >= pos
+            decreases n - j
+        {
+            data[j] = data[j + 1u64];
+            j = j + 1u64;
+        };
+        n - 1u64
+    } else {
+        n
+    }
+}
+
+fn main() -> u64 { 0u64 }

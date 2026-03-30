@@ -1,0 +1,39 @@
+// expected: 0
+// Demo 930: Verified CRC-CCITT (16-bit)
+//
+// crc16(data, n) computes a 16-bit CRC with polynomial 0x1021.
+// Postcondition: result < 65536.
+//
+fn crc16(data: span<u64>, n: u64) -> u64
+    requires data.len == n
+    ensures result < 65536u64
+{
+    let poly: u64 = 4129u64;
+    let mut crc: u64 = 65535u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant crc < 65536u64
+        decreases n - i
+    {
+        crc = crc ^ ((data[i] & 255u64) * 256u64);
+        crc = crc & 65535u64;
+        let mut bit: u64 = 0u64;
+        while bit < 8u64
+            invariant bit <= 8u64
+            invariant crc < 65536u64
+            decreases 8u64 - bit
+        {
+            if crc / 32768u64 > 0u64 {
+                crc = ((crc * 2u64) ^ poly) & 65535u64;
+            } else {
+                crc = (crc * 2u64) & 65535u64;
+            };
+            bit = bit + 1u64;
+        };
+        i = i + 1u64;
+    };
+    crc
+}
+
+fn main() -> u64 { 0u64 }

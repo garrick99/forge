@@ -1,0 +1,33 @@
+// expected: 0
+// Demo 926: Verified cache line simulation
+//
+// cache_sim(accesses, n, cache, nlines) simulates direct-mapped cache.
+// Returns hit count. Postcondition: hits <= n.
+//
+fn cache_sim(accesses: span<u64>, n: u64, cache: span<u64>, nlines: u64) -> u64
+    requires accesses.len == n
+    requires cache.len == nlines
+    requires nlines > 0u64
+    ensures result <= n
+{
+    let mut hits: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant hits <= i
+        decreases n - i
+    {
+        let addr: u64 = accesses[i];
+        let line: u64 = addr % nlines;
+        let tag: u64 = addr / nlines;
+        if cache[line] == tag + 1u64 {
+            hits = hits + 1u64;
+        } else {
+            cache[line] = tag + 1u64;
+        };
+        i = i + 1u64;
+    };
+    hits
+}
+
+fn main() -> u64 { 0u64 }

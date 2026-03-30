@@ -1,0 +1,25 @@
+// expected: 0
+// Demo 983: Verified Hamming distance between two strings
+// Count positions where a[i] != b[i]. Distance <= n.
+//
+fn hamming_distance(a: span<u64>, b: span<u64>, n: u64) -> u64
+    requires a.len == n
+    requires b.len == n
+    ensures result <= n
+{
+    let mut dist: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant dist <= i
+        decreases n - i
+    {
+        if a[i] != b[i] {
+            dist = dist + 1u64;
+        };
+        i = i + 1u64;
+    };
+    dist
+}
+
+fn main() -> u64 { 0u64 }

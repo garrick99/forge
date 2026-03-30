@@ -1,0 +1,36 @@
+// expected: 0
+// Demo 903: Verified CORDIC rotation step (integer trig approximation)
+//
+// cordic_step performs one iteration of CORDIC rotation using shifts.
+// Returns (x', y') as a tuple. Invariant: iteration count bounded.
+//
+fn cordic(x0: u64, y0: u64, steps: u64) -> (u64, u64)
+    requires steps <= 16u64
+    requires x0 <= 1000000u64
+    requires y0 <= 1000000u64
+    ensures result.0 <= 2000000u64
+    ensures result.1 <= 2000000u64
+{
+    let mut x: u64 = x0;
+    let mut y: u64 = y0;
+    let mut i: u64 = 0u64;
+    while i < steps
+        invariant i <= steps
+        invariant x <= 2000000u64
+        invariant y <= 2000000u64
+        decreases steps - i
+    {
+        let dx: u64 = y / (1u64 + i);
+        let dy: u64 = x / (1u64 + i);
+        if dx <= x {
+            x = x - dx;
+        };
+        if dy <= 2000000u64 - y {
+            y = y + dy;
+        };
+        i = i + 1u64;
+    };
+    (x, y)
+}
+
+fn main() -> u64 { 0u64 }

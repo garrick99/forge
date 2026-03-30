@@ -1,0 +1,30 @@
+// expected: 0
+// Demo 980: Verified Patricia trie lookup
+// Traverse trie following bit-path of key. Node table: left[i], right[i].
+//
+fn patricia_lookup(left: span<u64>, right: span<u64>, n_nodes: u64, key: u64, depth: u64) -> u64
+    requires left.len == n_nodes
+    requires right.len == n_nodes
+    requires n_nodes > 0u64
+    ensures result < n_nodes
+{
+    let mut node: u64 = 0u64;
+    let mut d: u64 = 0u64;
+    let mut k: u64 = key;
+    while d < depth
+        invariant d <= depth
+        invariant node < n_nodes
+        decreases depth - d
+    {
+        let bit: u64 = k % 2u64;
+        k = k / 2u64;
+        let next: u64 = if bit == 0u64 { left[node] } else { right[node] };
+        if next < n_nodes {
+            node = next;
+        };
+        d = d + 1u64;
+    };
+    node
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,35 @@
+// expected: 0
+// Demo 916: Verified trie delete (mark-based)
+//
+// Flat trie: nodes[i] = value, marks[i] = 1 if active, 0 if deleted.
+// trie_delete(marks, n, key) sets marks[key] = 0.
+// Postcondition: marks[key] == 0 after delete.
+//
+fn trie_delete(marks: span<u64>, n: u64, key: u64)
+    requires marks.len == n
+    requires key < n
+    ensures marks[key] == 0u64
+{
+    marks[key] = 0u64;
+}
+
+fn trie_count_active(marks: span<u64>, n: u64) -> u64
+    requires marks.len == n
+    ensures result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if marks[i] > 0u64 {
+            cnt = cnt + 1u64;
+        };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }

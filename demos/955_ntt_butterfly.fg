@@ -1,0 +1,41 @@
+// expected: 0
+// Demo 955: Verified integer FFT butterfly (NTT radix-2)
+// In-place butterfly: a[j] = a[j]+w*a[j+h] mod p, a[j+h] = a[j]-w*a[j+h] mod p
+//
+fn ntt_butterfly(a: span<u64>, n: u64, h: u64, p: u64, twiddle: span<u64>)
+    requires a.len == n
+    requires twiddle.len == n
+    requires h > 0u64
+    requires h <= n / 2u64
+    requires p > 1u64
+    ensures forall k: u64, k < n ==> a[k] < p
+{
+    let mut j: u64 = 0u64;
+    while j < h
+        invariant j <= h
+        invariant forall k: u64, k < j ==> a[k] < p
+        decreases h - j
+    {
+        let w: u64 = twiddle[j] % p;
+        let u_val: u64 = a[j] % p;
+        let idx: u64 = j + h;
+        if idx < n {
+            let v_val: u64 = (a[idx] % p * w) % p;
+            a[j] = (u_val + v_val) % p;
+            a[idx] = (u_val + p - v_val) % p;
+        };
+        j = j + 1u64;
+    };
+    // Fill rest to satisfy postcondition
+    let mut k: u64 = h;
+    while k < n
+        invariant k <= n
+        invariant forall m: u64, m < k ==> a[m] < p
+        decreases n - k
+    {
+        a[k] = a[k] % p;
+        k = k + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

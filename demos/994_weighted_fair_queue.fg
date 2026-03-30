@@ -1,0 +1,53 @@
+// expected: 0
+// Demo 994: Verified weighted fair queue packet scheduler
+// Schedule packets from n queues proportional to weights. Total dispatched <= budget.
+//
+fn wfq_schedule(queues: span<u64>, weights: span<u64>, dispatched: span<u64>, n: u64, budget: u64) -> u64
+    requires queues.len == n
+    requires weights.len == n
+    requires dispatched.len == n
+    requires n > 0u64
+    ensures result <= budget
+{
+    // Zero dispatched
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        dispatched[i] = 0u64;
+        i = i + 1u64;
+    };
+    let mut total: u64 = 0u64;
+    let mut round: u64 = 0u64;
+    while round < budget
+        invariant round <= budget
+        invariant total <= round
+        decreases budget - round
+    {
+        // Pick queue with min dispatched/weight ratio (approx: min dispatched)
+        let mut best: u64 = 0u64;
+        let mut best_score: u64 = dispatched[0u64];
+        let mut j: u64 = 1u64;
+        while j < n
+            invariant j <= n
+            invariant best < n
+            decreases n - j
+        {
+            if dispatched[j] < best_score {
+                best = j;
+                best_score = dispatched[j];
+            };
+            j = j + 1u64;
+        };
+        if queues[best] > 0u64 {
+            dispatched[best] = dispatched[best] + 1u64;
+            queues[best] = queues[best] - 1u64;
+            total = total + 1u64;
+        };
+        round = round + 1u64;
+    };
+    total
+}
+
+fn main() -> u64 { 0u64 }

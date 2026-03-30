@@ -1,0 +1,58 @@
+// expected: 0
+// Demo 990: Verified Stoer-Wagner minimum cut step
+// Maximum adjacency search: repeatedly pick most tightly connected vertex.
+//
+fn max_adj_search(weights: span<u64>, n: u64, visited: span<u64>) -> (u64, u64)
+    requires weights.len == n * n
+    requires visited.len == n
+    requires n >= 2u64
+    ensures result.0 < n
+    ensures result.1 < n
+{
+    // Clear visited
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        visited[i] = 0u64;
+        i = i + 1u64;
+    };
+    let mut last: u64 = 0u64;
+    let mut second_last: u64 = 0u64;
+    let mut step: u64 = 0u64;
+    while step < n
+        invariant step <= n
+        invariant last < n
+        invariant second_last < n
+        decreases n - step
+    {
+        // Find max-weight unvisited
+        let mut best: u64 = 0u64;
+        let mut best_w: u64 = 0u64;
+        let mut j: u64 = 0u64;
+        while j < n
+            invariant j <= n
+            invariant best < n
+            decreases n - j
+        {
+            if visited[j] == 0u64 {
+                let idx: u64 = last * n + j;
+                if idx < n * n {
+                    if weights[idx] >= best_w {
+                        best = j;
+                        best_w = weights[idx];
+                    };
+                };
+            };
+            j = j + 1u64;
+        };
+        visited[best] = 1u64;
+        second_last = last;
+        last = best;
+        step = step + 1u64;
+    };
+    (second_last, last)
+}
+
+fn main() -> u64 { 0u64 }

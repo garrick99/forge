@@ -1,0 +1,56 @@
+// expected: 0
+// Demo 964: Verified arithmetic coding step
+// Narrow interval [lo, hi) by symbol frequency. Interval stays valid.
+// Encode a sequence of symbols, each narrowing the interval.
+//
+fn arith_encode_step(lo: u64, hi: u64, sym_lo: u64, sym_hi: u64, total: u64) -> (u64, u64)
+    requires lo < hi
+    requires sym_lo < sym_hi
+    requires sym_hi <= total
+    requires total > 0u64
+    ensures result.0 >= lo
+    ensures result.1 <= hi
+{
+    let range: u64 = hi - lo;
+    let new_lo: u64 = lo + (range * sym_lo) / total;
+    let new_hi: u64 = lo + (range * sym_hi) / total;
+    if new_lo < new_hi {
+        (new_lo, new_hi)
+    } else {
+        (lo, hi)
+    }
+}
+
+fn arith_encode_seq(symbols: span<u64>, cum_freq: span<u64>, n: u64, alpha: u64, total: u64) -> (u64, u64)
+    requires symbols.len == n
+    requires cum_freq.len == alpha + 1u64
+    requires total > 0u64
+    requires alpha > 0u64
+    ensures result.0 <= result.1
+{
+    let mut lo: u64 = 0u64;
+    let mut hi: u64 = 1000000000u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant lo <= hi
+        decreases n - i
+    {
+        let s: u64 = symbols[i];
+        if s < alpha {
+            let sl: u64 = cum_freq[s];
+            let sh: u64 = cum_freq[s + 1u64];
+            if sl < sh {
+                if sh <= total {
+                    let p: (u64, u64) = arith_encode_step(lo, hi, sl, sh, total);
+                    lo = p.0;
+                    hi = p.1;
+                };
+            };
+        };
+        i = i + 1u64;
+    };
+    (lo, hi)
+}
+
+fn main() -> u64 { 0u64 }

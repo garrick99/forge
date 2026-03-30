@@ -1,0 +1,29 @@
+// expected: 0
+// Demo 969: Verified suffix tree child lookup
+// Flat child table: children[node * alpha + ch] = child node. Returns sentinel if none.
+//
+fn suffix_child(children: span<u64>, n_nodes: u64, alpha: u64, node: u64, ch: u64, sentinel: u64) -> u64
+    requires children.len == n_nodes * alpha
+    requires node < n_nodes
+    requires alpha > 0u64
+    requires sentinel >= n_nodes
+    ensures result < n_nodes || result == sentinel
+{
+    if ch >= alpha {
+        sentinel
+    } else {
+        let idx: u64 = node * alpha + ch;
+        if idx < n_nodes * alpha {
+            let child: u64 = children[idx];
+            if child < n_nodes {
+                child
+            } else {
+                sentinel
+            }
+        } else {
+            sentinel
+        }
+    }
+}
+
+fn main() -> u64 { 0u64 }

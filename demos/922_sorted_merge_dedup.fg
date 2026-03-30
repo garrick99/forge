@@ -1,0 +1,42 @@
+// expected: 0
+// Demo 922: Verified sorted merge with dedup
+//
+// merge_dedup(a, na, b, nb, out, cap) merges two sorted arrays, skipping dups.
+// Postcondition: output count <= na + nb.
+//
+fn merge_dedup(a: span<u64>, na: u64, b: span<u64>, nb: u64, out: span<u64>, cap: u64) -> u64
+    requires a.len == na
+    requires b.len == nb
+    requires out.len == cap
+    requires cap >= na + nb
+    ensures result <= na + nb
+{
+    let mut ia: u64 = 0u64;
+    let mut ib: u64 = 0u64;
+    let mut oc: u64 = 0u64;
+    let mut last: u64 = 0u64;
+    let mut has_last: bool = false;
+    while ia < na || ib < nb
+        invariant ia <= na
+        invariant ib <= nb
+        invariant oc <= ia + ib
+        decreases (na - ia) + (nb - ib)
+    {
+        let pick_a: bool = if ia < na && ib < nb { a[ia] <= b[ib] }
+                           else if ia < na { true }
+                           else { false };
+        let val: u64 = if pick_a { a[ia] } else { b[ib] };
+        if has_last == false || val > last {
+            if oc < cap {
+                out[oc] = val;
+            };
+            oc = oc + 1u64;
+            last = val;
+            has_last = true;
+        };
+        if pick_a { ia = ia + 1u64; } else { ib = ib + 1u64; };
+    };
+    oc
+}
+
+fn main() -> u64 { 0u64 }

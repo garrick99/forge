@@ -1,0 +1,36 @@
+// expected: 0
+// Demo 914: Verified token bucket with burst
+//
+// token_bucket(arrivals, n, rate, burst) simulates a token bucket.
+// Returns number of accepted packets. Postcondition: accepted <= n.
+//
+fn token_bucket(arrivals: span<u64>, n: u64, rate: u64, burst: u64) -> u64
+    requires arrivals.len == n
+    requires rate > 0u64
+    requires burst >= rate
+    ensures result <= n
+{
+    let mut tokens: u64 = burst;
+    let mut accepted: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant accepted <= i
+        invariant tokens <= burst
+        decreases n - i
+    {
+        if tokens + rate <= burst {
+            tokens = tokens + rate;
+        } else {
+            tokens = burst;
+        };
+        if arrivals[i] > 0u64 && tokens > 0u64 {
+            tokens = tokens - 1u64;
+            accepted = accepted + 1u64;
+        };
+        i = i + 1u64;
+    };
+    accepted
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,36 @@
+// expected: 0
+// Demo 999: Verified formal power series multiplication step
+// Convolve two coefficient arrays: c[k] = sum(a[i]*b[k-i]) mod p for i=0..k.
+//
+fn fps_multiply(a: span<u64>, b: span<u64>, c: span<u64>, n: u64, p: u64)
+    requires a.len == n
+    requires b.len == n
+    requires c.len == n
+    requires p > 1u64
+    ensures forall k: u64, k < n ==> c[k] < p
+{
+    let mut k: u64 = 0u64;
+    while k < n
+        invariant k <= n
+        invariant forall m: u64, m < k ==> c[m] < p
+        decreases n - k
+    {
+        let mut acc: u64 = 0u64;
+        let mut i: u64 = 0u64;
+        while i <= k
+            invariant i <= k + 1u64
+            invariant acc < p
+            decreases k + 1u64 - i
+        {
+            let j: u64 = k - i;
+            if j < n {
+                acc = (acc + a[i] * b[j]) % p;
+            };
+            i = i + 1u64;
+        };
+        c[k] = acc;
+        k = k + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

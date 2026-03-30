@@ -1,0 +1,36 @@
+// expected: 0
+// Demo 963: Verified van Emde Boas predecessor step
+// Flat bit-array predecessor: scan backwards from query to find last set bit.
+//
+fn veb_predecessor(bits: span<u64>, n: u64, query: u64) -> u64
+    requires bits.len == n
+    requires n > 0u64
+    requires query < n
+    ensures result <= query
+{
+    let mut pos: u64 = query;
+    let mut found: bool = false;
+    let mut steps: u64 = 0u64;
+    let max_steps: u64 = query + 1u64;
+    while found == false
+        invariant pos <= query
+        invariant steps <= max_steps
+        decreases max_steps - steps
+    {
+        if steps == max_steps {
+            found = true;
+        } else if bits[pos] > 0u64 {
+            found = true;
+        } else {
+            if pos == 0u64 {
+                found = true;
+            } else {
+                pos = pos - 1u64;
+            };
+        };
+        steps = steps + 1u64;
+    };
+    pos
+}
+
+fn main() -> u64 { 0u64 }

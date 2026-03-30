@@ -1,0 +1,39 @@
+// expected: 0
+// Demo 959: Verified Smith-Waterman local alignment step
+// Fill one row of the scoring matrix. Each cell is max(0, diag+match, up+gap, left+gap).
+//
+fn sw_row(prev: span<u64>, curr: span<u64>, seq_a: u64, seq_b: span<u64>, m: u64, match_sc: u64, gap: u64) -> u64
+    requires prev.len == m
+    requires curr.len == m
+    requires seq_b.len == m
+    requires m > 0u64
+    ensures result <= m
+{
+    let mut best_j: u64 = 0u64;
+    let mut best_v: u64 = 0u64;
+    let mut j: u64 = 0u64;
+    while j < m
+        invariant j <= m
+        invariant best_j <= m
+        decreases m - j
+    {
+        let diag: u64 = if j > 0u64 { prev[j - 1u64] } else { 0u64 };
+        let bonus: u64 = if seq_a == seq_b[j] { match_sc } else { 0u64 };
+        let from_diag: u64 = diag + bonus;
+        let from_up: u64 = prev[j];
+        let from_left: u64 = if j > 0u64 { curr[j - 1u64] } else { 0u64 };
+        let mut v: u64 = 0u64;
+        if from_diag > v { v = from_diag; };
+        if from_up > v { v = from_up; };
+        if from_left > v { v = from_left; };
+        curr[j] = v;
+        if v > best_v {
+            best_v = v;
+            best_j = j;
+        };
+        j = j + 1u64;
+    };
+    best_j
+}
+
+fn main() -> u64 { 0u64 }

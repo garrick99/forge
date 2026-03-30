@@ -1,0 +1,38 @@
+// expected: 0
+// Demo 972: Verified HMAC-SHA step
+// XOR key with ipad/opad constants, then combine. All outputs bounded by modulus.
+//
+fn xor_pad(key: span<u64>, out: span<u64>, n: u64, pad: u64, modulus: u64)
+    requires key.len == n
+    requires out.len == n
+    requires modulus > 0u64
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        out[i] = (key[i] ^ pad) % modulus;
+        i = i + 1u64;
+    };
+}
+
+fn hmac_combine(inner: span<u64>, outer: span<u64>, n: u64, modulus: u64) -> u64
+    requires inner.len == n
+    requires outer.len == n
+    requires n > 0u64
+    requires modulus > 0u64
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = (acc ^ inner[i] ^ outer[i]) % modulus;
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

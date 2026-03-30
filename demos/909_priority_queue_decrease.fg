@@ -1,0 +1,42 @@
+// expected: 0
+// Demo 909: Verified priority queue decrease-key
+//
+// decrease_key(heap, n, pos, new_val) decreases the key at pos and sifts up.
+// Postcondition: heap[pos] == new_val after operation.
+//
+fn sift_up(heap: span<u64>, pos: u64) -> u64
+    requires heap.len > pos
+    requires pos < 1024u64
+    ensures result <= pos
+{
+    let mut i: u64 = pos;
+    while i > 0u64
+        invariant i <= pos
+        decreases i
+    {
+        let parent: u64 = (i - 1u64) / 2u64;
+        if heap[i] < heap[parent] {
+            let tmp: u64 = heap[i];
+            heap[i] = heap[parent];
+            heap[parent] = tmp;
+            i = parent;
+        } else {
+            i = 0u64;
+        };
+    };
+    i
+}
+
+fn decrease_key(heap: span<u64>, n: u64, pos: u64, new_val: u64) -> u64
+    requires heap.len == n
+    requires pos < n
+    requires n <= 1024u64
+    requires new_val <= heap[pos]
+    ensures result <= pos
+{
+    heap[pos] = new_val;
+    let v: u64 = sift_up(heap, pos);
+    v
+}
+
+fn main() -> u64 { 0u64 }

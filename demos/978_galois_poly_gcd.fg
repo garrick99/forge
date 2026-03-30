@@ -1,0 +1,45 @@
+// expected: 0
+// Demo 978: Verified Galois field polynomial GCD
+// GCD of two polynomials over GF(p) via Euclidean algorithm on coefficient arrays.
+//
+fn poly_degree(coeffs: span<u64>, n: u64) -> u64
+    requires coeffs.len == n
+    requires n > 0u64
+    ensures result < n
+{
+    let mut deg: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant deg < n
+        decreases n - i
+    {
+        if coeffs[i] > 0u64 { deg = i; };
+        i = i + 1u64;
+    };
+    deg
+}
+
+fn poly_reduce(a: span<u64>, b: span<u64>, n: u64, p: u64)
+    requires a.len == n
+    requires b.len == n
+    requires p > 1u64
+    ensures forall k: u64, k < n ==> a[k] < p
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> a[k] < p
+        decreases n - i
+    {
+        let bv: u64 = b[i] % p;
+        if a[i] >= bv {
+            a[i] = (a[i] - bv) % p;
+        } else {
+            a[i] = (a[i] + p - bv) % p;
+        };
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

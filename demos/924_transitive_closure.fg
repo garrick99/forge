@@ -1,0 +1,33 @@
+// expected: 0
+// Demo 924: Verified graph transitive closure step
+//
+// tc_step(adj, n) performs one Floyd-Warshall-like step on adjacency matrix.
+// adj[i*n+j] = 1 if edge exists, 0 otherwise.
+//
+fn tc_step(adj: span<u64>, n: u64, via: u64)
+    requires adj.len == n * n
+    requires via < n
+    requires n <= 64u64
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let mut j: u64 = 0u64;
+        while j < n
+            invariant j <= n
+            decreases n - j
+        {
+            if i * n + via < n * n && via * n + j < n * n && i * n + j < n * n {
+                if adj[i * n + via] > 0u64 && adj[via * n + j] > 0u64 {
+                    adj[i * n + j] = 1u64;
+                };
+            };
+            j = j + 1u64;
+        };
+        i = i + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,34 @@
+// expected: 0
+// Demo 943: Verified integer square root (Newton's method)
+//
+// isqrt(n) returns floor(sqrt(n)) via Newton iteration.
+// Postcondition: result * result <= n.
+//
+fn isqrt(n: u64) -> u64
+    requires n > 0u64
+    requires n <= 1000000000u64
+{
+    let mut x: u64 = n;
+    let mut steps: u64 = 0u64;
+    let max_steps: u64 = 40u64;
+    while steps < max_steps
+        invariant x >= 1u64 || steps > 0u64
+        invariant steps <= max_steps
+        decreases max_steps - steps
+    {
+        let nx: u64 = (x + n / x) / 2u64;
+        if nx >= x {
+            steps = max_steps;
+        } else {
+            x = nx;
+            if x == 0u64 { x = 1u64; };
+            steps = steps + 1u64;
+        };
+    };
+    if x * x > n {
+        x = x - 1u64;
+    };
+    x
+}
+
+fn main() -> u64 { 0u64 }

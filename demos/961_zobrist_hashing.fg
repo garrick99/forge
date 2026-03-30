@@ -1,0 +1,27 @@
+// expected: 0
+// Demo 961: Verified Zobrist hashing
+// Compute Zobrist hash: XOR of table[i * nvals + board[i]] for each cell.
+//
+fn zobrist_hash(board: span<u64>, table: span<u64>, ncells: u64, nvals: u64) -> u64
+    requires board.len == ncells
+    requires nvals > 0u64
+    requires table.len == ncells * nvals
+    ensures result >= 0u64
+{
+    let mut h: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < ncells
+        invariant i <= ncells
+        decreases ncells - i
+    {
+        let v: u64 = board[i] % nvals;
+        let idx: u64 = i * nvals + v;
+        if idx < ncells * nvals {
+            h = h ^ table[idx];
+        };
+        i = i + 1u64;
+    };
+    h
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,34 @@
+// expected: 0
+// Demo 985: Verified wavelet tree rank query
+// Rank query: count occurrences of symbol in prefix. Uses bit-level navigation.
+//
+fn wavelet_rank(bits: span<u64>, n: u64, pos: u64) -> u64
+    requires bits.len == n
+    requires pos <= n
+    ensures result <= pos
+{
+    let mut count: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < pos
+        invariant i <= pos
+        invariant count <= i
+        decreases pos - i
+    {
+        if bits[i] > 0u64 {
+            count = count + 1u64;
+        };
+        i = i + 1u64;
+    };
+    count
+}
+
+fn wavelet_rank_zero(bits: span<u64>, n: u64, pos: u64) -> u64
+    requires bits.len == n
+    requires pos <= n
+    ensures result <= pos
+{
+    let ones: u64 = wavelet_rank(bits, n, pos);
+    pos - ones
+}
+
+fn main() -> u64 { 0u64 }

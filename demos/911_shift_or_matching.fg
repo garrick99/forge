@@ -1,0 +1,33 @@
+// expected: 0
+// Demo 911: Verified bit-parallel string matching (shift-OR)
+//
+// shift_or(text, n, pat_mask, pat_len) finds pattern via bit masks.
+// Returns index of first match or n if not found.
+//
+fn shift_or(text: span<u64>, n: u64, pat_mask: span<u64>, pat_len: u64) -> u64
+    requires text.len == n
+    requires pat_mask.len == 256u64
+    requires pat_len <= 64u64
+    requires pat_len > 0u64
+    ensures result <= n
+{
+    let mut state: u64 = 0u64;
+    let accept: u64 = 1u64;
+    let mut i: u64 = 0u64;
+    let mut found: u64 = n;
+    while i < n
+        invariant i <= n
+        invariant found <= n
+        decreases n - i
+    {
+        let ch: u64 = text[i] & 255u64;
+        state = (state * 2u64 + 1u64) & pat_mask[ch];
+        if state >= accept && found == n {
+            found = i;
+        };
+        i = i + 1u64;
+    };
+    found
+}
+
+fn main() -> u64 { 0u64 }

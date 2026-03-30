@@ -1,0 +1,42 @@
+// expected: 0
+// Demo 949: Verified graph shortest path tree extraction
+//
+// Given dist[] and adj matrix, extract the SPT parent array.
+// spt_extract(adj, dist, parent, n) sets parent[v] to the neighbor u
+// minimizing dist[u] + adj[u*n+v]. Postcondition: parent[v] < n or == n.
+//
+fn spt_extract(adj: span<u64>, dist: span<u64>, parent: span<u64>, n: u64)
+    requires adj.len == n * n
+    requires dist.len == n
+    requires parent.len == n
+    requires n <= 64u64
+    ensures forall k: u64, k < n ==> parent[k] <= n
+{
+    let mut v: u64 = 0u64;
+    while v < n
+        invariant v <= n
+        invariant forall k: u64, k < v ==> parent[k] <= n
+        decreases n - v
+    {
+        parent[v] = n;
+        let mut best: u64 = dist[v];
+        let mut u: u64 = 0u64;
+        while u < n
+            invariant u <= n
+            invariant parent[v] <= n
+            decreases n - u
+        {
+            if u * n + v < n * n && adj[u * n + v] > 0u64 {
+                let cost: u64 = dist[u] + adj[u * n + v];
+                if cost < best {
+                    best = cost;
+                    parent[v] = u;
+                };
+            };
+            u = u + 1u64;
+        };
+        v = v + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

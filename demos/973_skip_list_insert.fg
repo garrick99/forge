@@ -1,0 +1,41 @@
+// expected: 0
+// Demo 973: Verified skip list insert
+// Insert into sorted level-0 array by shifting elements right. Length increases by 1.
+//
+fn skip_insert(data: span<u64>, n: u64, cap: u64, val: u64) -> u64
+    requires data.len == cap
+    requires n < cap
+    ensures result == n + 1u64
+{
+    // Find insertion point
+    let mut pos: u64 = 0u64;
+    while pos < n
+        invariant pos <= n
+        decreases n - pos
+    {
+        if data[pos] >= val {
+            pos = n;  // break via steps = max pattern
+        } else {
+            pos = pos + 1u64;
+        };
+    };
+    let insert_at: u64 = if pos > n { n } else { pos };
+    // Shift right from end
+    let mut j: u64 = n;
+    while j > insert_at
+        invariant j <= n
+        invariant j >= insert_at
+        decreases j - insert_at
+    {
+        if j < cap {
+            data[j] = data[j - 1u64];
+        };
+        j = j - 1u64;
+    };
+    if insert_at < cap {
+        data[insert_at] = val;
+    };
+    n + 1u64
+}
+
+fn main() -> u64 { 0u64 }

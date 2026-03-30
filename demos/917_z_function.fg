@@ -1,0 +1,39 @@
+// expected: 0
+// Demo 917: Verified Z-function (string matching preprocessing)
+//
+// z_naive(s, n, z) fills z[i] with the length of the longest prefix match
+// starting at position i. Postcondition: z[i] <= n - i.
+//
+fn z_naive(s: span<u64>, n: u64, z: span<u64>)
+    requires s.len == n
+    requires z.len == n
+    requires n > 0u64
+    ensures forall k: u64, k < n ==> z[k] <= n
+{
+    z[0u64] = n;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i >= 1u64
+        invariant i <= n
+        invariant forall k: u64, k < i ==> z[k] <= n
+        decreases n - i
+    {
+        let mut j: u64 = 0u64;
+        let mut done: bool = false;
+        while done == false
+            invariant j <= n
+            invariant i + j <= n || done == true
+            decreases n - j
+        {
+            if i + j < n && s[j] == s[i + j] {
+                j = j + 1u64;
+            } else {
+                done = true;
+            };
+        };
+        z[i] = j;
+        i = i + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

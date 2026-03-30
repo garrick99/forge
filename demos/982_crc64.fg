@@ -1,0 +1,33 @@
+// expected: 0
+// Demo 982: Verified CRC-64 computation
+// Process each byte: crc = (crc ^ data[i]) then 8 rounds of shift-and-xor-poly.
+//
+fn crc64(data: span<u64>, n: u64, poly: u64) -> u64
+    requires data.len == n
+    ensures result >= 0u64
+{
+    let mut crc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        crc = crc ^ (data[i] % 256u64);
+        let mut bit: u64 = 0u64;
+        while bit < 8u64
+            invariant bit <= 8u64
+            decreases 8u64 - bit
+        {
+            if crc % 2u64 == 1u64 {
+                crc = (crc / 2u64) ^ poly;
+            } else {
+                crc = crc / 2u64;
+            };
+            bit = bit + 1u64;
+        };
+        i = i + 1u64;
+    };
+    crc
+}
+
+fn main() -> u64 { 0u64 }

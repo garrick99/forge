@@ -1,0 +1,50 @@
+// expected: 0
+// Demo 938: Verified array majority element (deterministic)
+//
+// majority(s, n) finds the candidate via Boyer-Moore voting, then
+// verify(s, n, cand) counts occurrences to confirm.
+// Postcondition of verify: count <= n.
+//
+fn majority_vote(s: span<u64>, n: u64) -> u64
+    requires s.len == n
+    requires n > 0u64
+{
+    let mut cand: u64 = s[0u64];
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if cnt == 0u64 {
+            cand = s[i];
+            cnt = 1u64;
+        } else if s[i] == cand {
+            cnt = cnt + 1u64;
+        } else {
+            cnt = cnt - 1u64;
+        };
+        i = i + 1u64;
+    };
+    cand
+}
+
+fn verify_majority(s: span<u64>, n: u64, cand: u64) -> u64
+    requires s.len == n
+    ensures result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if s[i] == cand { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }

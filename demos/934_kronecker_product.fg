@@ -1,0 +1,58 @@
+// expected: 0
+// Demo 934: Verified matrix Kronecker product
+//
+// kronecker(a, ra, ca, b, rb, cb, out) computes A (x) B.
+// Output is (ra*rb) x (ca*cb). Bounds-checked indexing.
+//
+fn kronecker(a: span<u64>, ra: u64, ca: u64,
+             b: span<u64>, rb: u64, cb: u64,
+             out: span<u64>, orows: u64, ocols: u64)
+    requires a.len == ra * ca
+    requires b.len == rb * cb
+    requires orows == ra * rb
+    requires ocols == ca * cb
+    requires out.len == orows * ocols
+    requires ra <= 8u64
+    requires ca <= 8u64
+    requires rb <= 8u64
+    requires cb <= 8u64
+{
+    let mut i: u64 = 0u64;
+    while i < ra
+        invariant i <= ra
+        decreases ra - i
+    {
+        let mut j: u64 = 0u64;
+        while j < ca
+            invariant j <= ca
+            decreases ca - j
+        {
+            let aij: u64 = a[i * ca + j];
+            let mut p: u64 = 0u64;
+            while p < rb
+                invariant p <= rb
+                decreases rb - p
+            {
+                let mut q: u64 = 0u64;
+                while q < cb
+                    invariant q <= cb
+                    decreases cb - q
+                {
+                    let row: u64 = i * rb + p;
+                    let col: u64 = j * cb + q;
+                    if row < orows && col < ocols {
+                        if row * ocols + col < orows * ocols {
+                            out[row * ocols + col] = aij * b[p * cb + q];
+                        };
+                    };
+                    q = q + 1u64;
+                };
+                p = p + 1u64;
+            };
+            j = j + 1u64;
+        };
+        i = i + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

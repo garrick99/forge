@@ -1,0 +1,45 @@
+// expected: 0
+// Demo 908: Verified sparse vector norm (L1 and L2 squared)
+//
+// Computes L1 norm (sum of values) and L2^2 (sum of squares) of sparse vec.
+// Sparse format: indices in idx, values in val, count nnz.
+//
+fn sparse_l1(val: span<u64>, nnz: u64) -> u64
+    requires val.len == nnz
+    requires nnz <= 1024u64
+    ensures result >= 0u64
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < nnz
+        invariant i <= nnz
+        decreases nnz - i
+    {
+        acc = acc + val[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn sparse_l2sq(val: span<u64>, nnz: u64, cap: u64) -> u64
+    requires val.len == nnz
+    requires nnz <= 64u64
+    ensures result <= cap || result == 0u64
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < nnz
+        invariant i <= nnz
+        invariant acc <= cap || acc == 0u64
+        decreases nnz - i
+    {
+        let sq: u64 = val[i] * val[i];
+        if acc + sq <= cap {
+            acc = acc + sq;
+        };
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

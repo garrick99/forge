@@ -1,0 +1,41 @@
+// expected: 0
+// Demo 952: Verified matrix cofactor extraction
+// Copy a 3x3 matrix minor (skip row r, col c) into a 2x2 flat array.
+//
+fn cofactor_2x2(mat: span<u64>, minor: span<u64>, r: u64, c: u64)
+    requires mat.len == 9u64
+    requires minor.len == 4u64
+    requires r < 3u64
+    requires c < 3u64
+{
+    let mut out: u64 = 0u64;
+    let mut row: u64 = 0u64;
+    while row < 3u64
+        invariant row <= 3u64
+        invariant out <= 4u64
+        decreases 3u64 - row
+    {
+        if row != r {
+            let mut col: u64 = 0u64;
+            while col < 3u64
+                invariant col <= 3u64
+                invariant out <= 4u64
+                decreases 3u64 - col
+            {
+                if col != c {
+                    if out < 4u64 {
+                        let idx: u64 = row * 3u64 + col;
+                        if idx < 9u64 {
+                            minor[out] = mat[idx];
+                        };
+                        out = out + 1u64;
+                    };
+                };
+                col = col + 1u64;
+            };
+        };
+        row = row + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

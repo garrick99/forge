@@ -1,0 +1,35 @@
+// expected: 0
+// Demo 940: Verified Toeplitz matrix-vector multiply
+//
+// Toeplitz matrix defined by first row and first column.
+// toeplitz_matvec(row, col, x, y, n) computes y = T*x.
+// T[i][j] = row[j-i] if j>=i, col[i-j] if i>j.
+//
+fn toeplitz_matvec(row: span<u64>, col: span<u64>, x: span<u64>, y: span<u64>, n: u64)
+    requires row.len == n
+    requires col.len == n
+    requires x.len == n
+    requires y.len == n
+    requires n <= 64u64
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let mut acc: u64 = 0u64;
+        let mut j: u64 = 0u64;
+        while j < n
+            invariant j <= n
+            decreases n - j
+        {
+            let coeff: u64 = if j >= i { row[j - i] } else { col[i - j] };
+            acc = acc + coeff * x[j];
+            j = j + 1u64;
+        };
+        y[i] = acc;
+        i = i + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,41 @@
+// expected: 0
+// Demo 968: Verified Fibonacci heap decrease-key step
+// Decrease key[node] to new_val, cascade cuts up to root. Cut count bounded.
+//
+fn decrease_key(keys: span<u64>, parent: span<u64>, marked: span<u64>, n: u64, node: u64, new_val: u64) -> u64
+    requires keys.len == n
+    requires parent.len == n
+    requires marked.len == n
+    requires node < n
+    requires new_val <= keys[node]
+    ensures result <= n
+{
+    keys[node] = new_val;
+    let mut cur: u64 = node;
+    let mut cuts: u64 = 0u64;
+    let mut done: bool = false;
+    while done == false
+        invariant cur < n
+        invariant cuts <= n
+        decreases n - cuts
+    {
+        if cuts == n {
+            done = true;
+        } else {
+            let p: u64 = parent[cur];
+            if p >= n {
+                done = true;
+            } else if marked[p] == 0u64 {
+                marked[p] = 1u64;
+                done = true;
+            } else {
+                marked[p] = 0u64;
+                cur = p;
+                cuts = cuts + 1u64;
+            };
+        };
+    };
+    cuts
+}
+
+fn main() -> u64 { 0u64 }

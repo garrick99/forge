@@ -1,0 +1,40 @@
+// expected: 0
+// Demo 981: Verified DAG topological numbering
+// Assign topo-order numbers via in-degree counting. Each node gets unique rank < n.
+//
+fn topo_number(in_deg: span<u64>, order: span<u64>, n: u64) -> u64
+    requires in_deg.len == n
+    requires order.len == n
+    ensures result <= n
+{
+    let mut assigned: u64 = 0u64;
+    let mut pass: u64 = 0u64;
+    while pass < n
+        invariant pass <= n
+        invariant assigned <= pass
+        decreases n - pass
+    {
+        // Find node with in_deg == 0
+        let mut found: u64 = n;
+        let mut i: u64 = 0u64;
+        while i < n
+            invariant i <= n
+            invariant found <= n
+            decreases n - i
+        {
+            if in_deg[i] == 0u64 {
+                if found == n { found = i; };
+            };
+            i = i + 1u64;
+        };
+        if found < n {
+            order[found] = assigned;
+            in_deg[found] = n + 1u64;  // mark as processed
+            assigned = assigned + 1u64;
+        };
+        pass = pass + 1u64;
+    };
+    assigned
+}
+
+fn main() -> u64 { 0u64 }

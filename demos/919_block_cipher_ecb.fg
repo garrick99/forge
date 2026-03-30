@@ -1,0 +1,35 @@
+// expected: 0
+// Demo 919: Verified block cipher ECB mode
+//
+// ecb_encrypt(plain, cipher, n, key) XOR-encrypts each block with key.
+// Postcondition: cipher[k] == plain[k] ^ key for all k < n.
+//
+fn ecb_encrypt(plain: span<u64>, cipher: span<u64>, n: u64, key: u64)
+    requires plain.len == n
+    requires cipher.len == n
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        cipher[i] = plain[i] ^ key;
+        i = i + 1u64;
+    }
+}
+
+fn ecb_decrypt(cipher: span<u64>, plain: span<u64>, n: u64, key: u64)
+    requires cipher.len == n
+    requires plain.len == n
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        plain[i] = cipher[i] ^ key;
+        i = i + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

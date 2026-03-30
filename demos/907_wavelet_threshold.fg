@@ -1,0 +1,41 @@
+// expected: 0
+// Demo 907: Verified wavelet coefficient thresholding
+//
+// threshold(coeffs, n, thresh) zeroes coefficients below threshold.
+// Postcondition: all values are either 0 or >= thresh.
+//
+fn threshold(coeffs: span<u64>, n: u64, thresh: u64)
+    requires coeffs.len == n
+    ensures forall k: u64, k < n ==> (coeffs[k] == 0u64 || coeffs[k] >= thresh)
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> (coeffs[k] == 0u64 || coeffs[k] >= thresh)
+        decreases n - i
+    {
+        if coeffs[i] < thresh {
+            coeffs[i] = 0u64;
+        };
+        i = i + 1u64;
+    }
+}
+
+fn count_nonzero(coeffs: span<u64>, n: u64) -> u64
+    requires coeffs.len == n
+    ensures result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if coeffs[i] > 0u64 { cnt = cnt + 1u64; };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }

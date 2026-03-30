@@ -1,0 +1,42 @@
+// expected: 0
+// Demo 975: Verified reservoir sampling (weighted)
+// Maintain k-sample reservoir. Each item replaces with probability weight/total.
+// Simulated via deterministic threshold comparison.
+//
+fn reservoir_sample(stream: span<u64>, weights: span<u64>, reservoir: span<u64>, n: u64, k: u64, seed: u64) -> u64
+    requires stream.len == n
+    requires weights.len == n
+    requires reservoir.len == k
+    requires k > 0u64
+    requires k <= n
+    ensures result <= n
+{
+    // Fill initial reservoir
+    let mut i: u64 = 0u64;
+    while i < k
+        invariant i <= k
+        decreases k - i
+    {
+        if i < n {
+            reservoir[i] = stream[i];
+        };
+        i = i + 1u64;
+    };
+    // Replace phase
+    let mut j: u64 = k;
+    let mut rng: u64 = seed;
+    while j < n
+        invariant j <= n
+        decreases n - j
+    {
+        rng = (rng * 6364136223846793005u64 + 1u64) % 1000000007u64;
+        let slot: u64 = rng % k;
+        if weights[j] > rng % 100u64 {
+            reservoir[slot] = stream[j];
+        };
+        j = j + 1u64;
+    };
+    n
+}
+
+fn main() -> u64 { 0u64 }

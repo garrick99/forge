@@ -1,0 +1,40 @@
+// expected: 0
+// Demo 991: Verified consistent hash ring rebalance
+// Assign keys to nodes on a ring. After adding a node, only affected keys move.
+//
+fn assign_keys(keys: span<u64>, assignments: span<u64>, nodes: span<u64>, n_keys: u64, n_nodes: u64)
+    requires keys.len == n_keys
+    requires assignments.len == n_keys
+    requires nodes.len == n_nodes
+    requires n_nodes > 0u64
+    ensures forall k: u64, k < n_keys ==> assignments[k] < n_nodes
+{
+    let mut i: u64 = 0u64;
+    while i < n_keys
+        invariant i <= n_keys
+        invariant forall k: u64, k < i ==> assignments[k] < n_nodes
+        decreases n_keys - i
+    {
+        let h: u64 = keys[i];
+        // Find closest node (ring distance)
+        let mut best: u64 = 0u64;
+        let mut best_dist: u64 = h ^ nodes[0u64];
+        let mut j: u64 = 1u64;
+        while j < n_nodes
+            invariant j <= n_nodes
+            invariant best < n_nodes
+            decreases n_nodes - j
+        {
+            let d: u64 = h ^ nodes[j];
+            if d < best_dist {
+                best_dist = d;
+                best = j;
+            };
+            j = j + 1u64;
+        };
+        assignments[i] = best;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

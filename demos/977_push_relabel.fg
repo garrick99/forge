@@ -1,0 +1,37 @@
+// expected: 0
+// Demo 977: Verified maxflow push-relabel step
+// Push excess flow from node u to neighbors. Excess decreases or relabel occurs.
+//
+fn push_step(excess: span<u64>, height: span<u64>, cap: span<u64>, flow: span<u64>, adj: span<u64>, n: u64, u: u64, deg: u64) -> u64
+    requires excess.len == n
+    requires height.len == n
+    requires adj.len == deg
+    requires u < n
+    requires n > 0u64
+{
+    let mut pushed: u64 = 0u64;
+    let mut ex: u64 = excess[u];
+    let mut i: u64 = 0u64;
+    while i < deg
+        invariant i <= deg
+        invariant pushed <= excess[u]
+        invariant ex <= excess[u]
+        decreases deg - i
+    {
+        if ex > 0u64 {
+            let v: u64 = adj[i];
+            if v < n {
+                if height[u] > height[v] {
+                    let send: u64 = if ex < 1u64 { ex } else { 1u64 };
+                    ex = ex - send;
+                    pushed = pushed + send;
+                };
+            };
+        };
+        i = i + 1u64;
+    };
+    excess[u] = ex;
+    pushed
+}
+
+fn main() -> u64 { 0u64 }

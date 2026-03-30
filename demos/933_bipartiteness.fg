@@ -1,0 +1,50 @@
+// expected: 0
+// Demo 933: Verified graph bipartiteness check
+//
+// bipartite_check(adj, n, color) attempts 2-coloring via BFS-like scan.
+// Returns 1 if valid 2-coloring found, 0 otherwise.
+//
+fn bipartite_check(adj: span<u64>, n: u64, color: span<u64>) -> u64
+    requires adj.len == n * n
+    requires color.len == n
+    requires n <= 64u64
+    ensures result <= 1u64
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        color[i] = 0u64;
+        i = i + 1u64;
+    };
+    let mut ok: u64 = 1u64;
+    let mut u: u64 = 0u64;
+    while u < n
+        invariant u <= n
+        invariant ok <= 1u64
+        decreases n - u
+    {
+        let mut v: u64 = 0u64;
+        while v < n
+            invariant v <= n
+            invariant ok <= 1u64
+            decreases n - v
+        {
+            if u * n + v < n * n && adj[u * n + v] > 0u64 {
+                if color[u] == color[v] && color[u] > 0u64 {
+                    ok = 0u64;
+                };
+                if color[v] == 0u64 && color[u] > 0u64 {
+                    color[v] = 3u64 - color[u];
+                };
+            };
+            v = v + 1u64;
+        };
+        if color[u] == 0u64 { color[u] = 1u64; };
+        u = u + 1u64;
+    };
+    ok
+}
+
+fn main() -> u64 { 0u64 }
