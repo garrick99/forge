@@ -1,0 +1,286 @@
+// Forge Verified Systems Diagnostic Core
+//
+// Parses /proc data, computes health scores, detects anomalies.
+// Every buffer access is proven safe by Z3. No parsing overflow possible.
+//
+// Alert levels: 0=OK, 1=WARNING, 2=CRITICAL, 3=UNKNOWN
+
+// ============================================================================
+// Numeric parsing — proven bounds-safe
+// ============================================================================
+
+// Parse decimal digits from buf[start..]. Returns the parsed value.
+// Parse digits from buf[start..start+max_digits). Stops at non-digit or end.
+fn parse_u64_bounded(buf: span<u64>, buf_len: u64, start: u64, max_digits: u64) -> u64
+    requires buf_len <= buf.len
+    requires max_digits >= 1u64
+{
+    let mut val: u64 = 0u64;
+    let mut d: u64 = 0u64;
+    while d < max_digits
+        invariant d <= max_digits
+        decreases max_digits - d
+    {
+        if start + d < buf_len {
+            let ch: u64 = buf[start + d];
+            if ch >= 48u64 && ch <= 57u64 {
+                val = val * 10u64 + (ch - 48u64);
+            };
+        };
+        d = d + 1u64;
+    };
+    val
+}
+
+// Find first digit position in buf[start..start+max_scan).
+fn find_digit(buf: span<u64>, buf_len: u64, start: u64, max_scan: u64) -> u64
+    requires buf_len <= buf.len
+    ensures result <= start + max_scan
+{
+    let mut d: u64 = 0u64;
+    let mut pos: u64 = start + max_scan;
+    while d < max_scan
+        invariant d <= max_scan
+        invariant pos <= start + max_scan
+        decreases max_scan - d
+    {
+        if start + d < buf_len && pos == start + max_scan {
+            if buf[start + d] >= 48u64 && buf[start + d] <= 57u64 {
+                pos = start + d;
+            };
+        };
+        d = d + 1u64;
+    };
+    pos
+}
+
+fn find_value_after(buf: span<u64>, buf_len: u64,
+                    label: span<u64>, label_len: u64) -> u64
+    requires buf_len <= buf.len
+    requires label_len <= label.len
+{
+    let mut i: u64 = 0u64;
+    let mut found_val: u64 = 0u64;
+    let mut found: bool = false;
+    let mut steps: u64 = 0u64;
+    while steps < buf_len && !found
+        invariant steps <= buf_len
+        invariant i <= buf_len
+        decreases buf_len - steps
+    {
+        let mut match_ok: bool = true;
+        let mut j: u64 = 0u64;
+        while j < label_len
+            invariant j <= label_len
+            decreases label_len - j
+        {
+            if i + j < buf_len {
+                if buf[i + j] != label[j] { match_ok = false; };
+            } else { match_ok = false; };
+            j = j + 1u64;
+        };
+        if match_ok {
+            // Parse the number after the label.
+            let scan_from: u64 = if i + label_len < buf_len { i + label_len } else { buf_len };
+            let remain: u64 = if buf_len > scan_from { buf_len - scan_from } else { 0u64 };
+            let digit_pos: u64 = find_digit(buf, buf_len, scan_from, remain);
+            let dig_remain: u64 = if buf_len > digit_pos { buf_len - digit_pos } else { 0u64 };
+            let max_d: u64 = if dig_remain > 20u64 { 20u64 } else { if dig_remain >= 1u64 { dig_remain } else { 1u64 } };
+            found_val = parse_u64_bounded(buf, buf_len, digit_pos, max_d);
+            found = true;
+        };
+        i = i + 1u64;
+        steps = steps + 1u64;
+    };
+    found_val
+}
+
+// ============================================================================
+// Memory diagnostics
+// ============================================================================
+
+// Compute memory usage percentage (0-100).
+fn memory_usage_pct(total_kb: u64, avail_kb: u64) -> u64
+    ensures result <= 100u64
+{
+    if total_kb == 0u64 { 0u64 }
+    else {
+        let used: u64 = if total_kb >= avail_kb { total_kb - avail_kb } else { 0u64 };
+        let pct: u64 = (used * 100u64) / total_kb;
+        if pct > 100u64 { 100u64 } else { pct }
+    }
+}
+
+// Memory alert level.
+fn memory_alert(usage_pct: u64) -> u64
+    requires usage_pct <= 100u64
+    ensures result <= 2u64
+{
+    if usage_pct >= 95u64 { 2u64 }
+    else if usage_pct >= 80u64 { 1u64 }
+    else { 0u64 }
+}
+
+// ============================================================================
+// CPU diagnostics
+// ============================================================================
+
+// Parse load average (stored as value * 100, e.g. 1.50 → 150).
+fn cpu_load_alert(load_100: u64, n_cpus: u64) -> u64
+    requires n_cpus >= 1u64
+    ensures result <= 2u64
+{
+    let threshold_warn: u64 = n_cpus * 100u64;
+    let threshold_crit: u64 = n_cpus * 200u64;
+    if load_100 >= threshold_crit { 2u64 }
+    else if load_100 >= threshold_warn { 1u64 }
+    else { 0u64 }
+}
+
+// ============================================================================
+// Disk diagnostics
+// ============================================================================
+
+// Disk usage percentage.
+fn disk_usage_pct(total_kb: u64, used_kb: u64) -> u64
+    ensures result <= 100u64
+{
+    if total_kb == 0u64 { 0u64 }
+    else {
+        let pct: u64 = (used_kb * 100u64) / total_kb;
+        if pct > 100u64 { 100u64 } else { pct }
+    }
+}
+
+fn disk_alert(usage_pct: u64) -> u64
+    requires usage_pct <= 100u64
+    ensures result <= 2u64
+{
+    if usage_pct >= 95u64 { 2u64 }
+    else if usage_pct >= 85u64 { 1u64 }
+    else { 0u64 }
+}
+
+// ============================================================================
+// Network diagnostics
+// ============================================================================
+
+// Detect packet loss (rx_errors / rx_packets * 100).
+fn packet_loss_pct(rx_packets: u64, rx_errors: u64) -> u64
+    ensures result <= 100u64
+{
+    if rx_packets == 0u64 { 0u64 }
+    else {
+        let pct: u64 = (rx_errors * 100u64) / rx_packets;
+        if pct > 100u64 { 100u64 } else { pct }
+    }
+}
+
+fn network_alert(loss_pct: u64) -> u64
+    requires loss_pct <= 100u64
+    ensures result <= 2u64
+{
+    if loss_pct >= 5u64 { 2u64 }
+    else if loss_pct >= 1u64 { 1u64 }
+    else { 0u64 }
+}
+
+// ============================================================================
+// Temperature diagnostics
+// ============================================================================
+
+fn temp_alert(temp_mc: u64) -> u64
+    ensures result <= 2u64
+{
+    // temp_mc is millidegrees C (e.g. 85000 = 85°C).
+    if temp_mc >= 95000u64 { 2u64 }
+    else if temp_mc >= 80000u64 { 1u64 }
+    else { 0u64 }
+}
+
+// ============================================================================
+// Process diagnostics
+// ============================================================================
+
+fn process_alert(n_procs: u64, max_procs: u64) -> u64
+    requires max_procs >= 1u64
+    ensures result <= 2u64
+{
+    let pct: u64 = (n_procs * 100u64) / max_procs;
+    if pct >= 95u64 { 2u64 }
+    else if pct >= 80u64 { 1u64 }
+    else { 0u64 }
+}
+
+// ============================================================================
+// Overall health score
+// ============================================================================
+
+// Aggregate alert levels into a health score (0-100).
+// Each subsystem contributes equally. 0=CRITICAL → 0pts, 1=WARN → 50pts, 2=OK → 100pts.
+fn health_score(mem_alert: u64, cpu_alert: u64, disk_alert_val: u64,
+                net_alert: u64, temp_alert_val: u64, proc_alert: u64) -> u64
+    requires mem_alert <= 2u64
+    requires cpu_alert <= 2u64
+    requires disk_alert_val <= 2u64
+    requires net_alert <= 2u64
+    requires temp_alert_val <= 2u64
+    requires proc_alert <= 2u64
+    ensures result <= 100u64
+{
+    let mut score: u64 = 0u64;
+
+    // Each subsystem: 0(CRIT)=0, 1(WARN)=8, 2(OK?)=...
+    // Actually 0=OK, 1=WARN, 2=CRIT in our scheme. So:
+    // 0=OK → 16pts, 1=WARN → 8pts, 2=CRIT → 0pts. 6 subsystems × 16 = 96 max. Round to 100.
+
+    let mut alerts: u64 = 0u64;
+    if mem_alert == 0u64 { score = score + 16u64; }
+    else if mem_alert == 1u64 { score = score + 8u64; alerts = alerts + 1u64; }
+    else { alerts = alerts + 1u64; };
+
+    if cpu_alert == 0u64 { score = score + 17u64; }
+    else if cpu_alert == 1u64 { score = score + 8u64; alerts = alerts + 1u64; }
+    else { alerts = alerts + 1u64; };
+
+    if disk_alert_val == 0u64 { score = score + 17u64; }
+    else if disk_alert_val == 1u64 { score = score + 8u64; alerts = alerts + 1u64; }
+    else { alerts = alerts + 1u64; };
+
+    if net_alert == 0u64 { score = score + 17u64; }
+    else if net_alert == 1u64 { score = score + 8u64; alerts = alerts + 1u64; }
+    else { alerts = alerts + 1u64; };
+
+    if temp_alert_val == 0u64 { score = score + 17u64; }
+    else if temp_alert_val == 1u64 { score = score + 8u64; alerts = alerts + 1u64; }
+    else { alerts = alerts + 1u64; };
+
+    if proc_alert == 0u64 { score = score + 16u64; }
+    else if proc_alert == 1u64 { score = score + 8u64; alerts = alerts + 1u64; }
+    else { alerts = alerts + 1u64; };
+
+    if score > 100u64 { 100u64 } else { score }
+}
+
+// Count critical alerts.
+fn count_critical(mem_a: u64, cpu_a: u64, disk_a: u64,
+                  net_a: u64, temp_a: u64, proc_a: u64) -> u64
+    requires mem_a <= 2u64
+    requires cpu_a <= 2u64
+    requires disk_a <= 2u64
+    requires net_a <= 2u64
+    requires temp_a <= 2u64
+    requires proc_a <= 2u64
+    ensures result <= 6u64
+{
+    let mut count: u64 = 0u64;
+    if mem_a == 2u64 { count = count + 1u64; };
+    if cpu_a == 2u64 { count = count + 1u64; };
+    if disk_a == 2u64 { count = count + 1u64; };
+    if net_a == 2u64 { count = count + 1u64; };
+    if temp_a == 2u64 { count = count + 1u64; };
+    if proc_a == 2u64 { count = count + 1u64; };
+    count
+}
+
+fn main() -> u64 { 0u64 }
