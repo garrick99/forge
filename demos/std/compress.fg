@@ -1,0 +1,178 @@
+// std/compress.fg — verified compression and decompression
+//
+// Include with:  use std::compress;
+//
+// LZ77 sliding-window compression with proven memory safety.
+// Every array access is verified by Z3 — no buffer overflow possible
+// regardless of input content, size, or malformation.
+//
+// Token format:
+//   [0, byte]           — literal (2 words)
+//   [1, offset, length] — back-reference (3 words)
+//
+// Usage:
+//   let n = lz_compress(input, input_len, output, out_cap);
+//   let m = lz_decompress(tokens, token_len, output, out_cap);
+
+// ---- Match finder ----------------------------------------------------------
+
+fn lz_find_match(data: span<u64>, data_len: u64, pos: u64,
+                 window: u64, max_len: u64) -> (u64, u64)
+    requires data_len <= data.len
+    requires pos < data_len
+    requires window >= 1u64
+    requires max_len >= 1u64
+    ensures result.0 <= window
+    ensures result.1 <= max_len
+{
+    let start: u64 = if pos >= window { pos - window } else { 0u64 };
+    let mut best_off: u64 = 0u64;
+    let mut best_len: u64 = 0u64;
+    let mut s: u64 = start;
+    while s < pos
+        invariant s <= pos
+        invariant best_off <= window
+        invariant best_len <= max_len
+        decreases pos - s
+    {
+        let mut len: u64 = 0u64;
+        let mut ok: bool = true;
+        while len < max_len && pos + len < data_len && s + len < data_len && ok
+            invariant len <= max_len
+            decreases max_len - len
+        {
+            if data[s + len] == data[pos + len] {
+                len = len + 1u64;
+            } else {
+                ok = false;
+            };
+        };
+        if len > best_len {
+            best_off = pos - s;
+            best_len = len;
+        };
+        s = s + 1u64;
+    };
+    (best_off, best_len)
+}
+
+// ---- Compress --------------------------------------------------------------
+
+fn lz_compress(data: span<u64>, data_len: u64,
+               output: span<u64>, out_cap: u64) -> u64
+    requires data_len <= data.len
+    requires out_cap <= output.len
+{
+    let window: u64 = 4096u64;
+    let min_match: u64 = 3u64;
+    let max_match: u64 = 258u64;
+    let mut pos: u64 = 0u64;
+    let mut oi: u64 = 0u64;
+    while pos < data_len
+        invariant pos <= data_len
+        decreases data_len - pos
+    {
+        if oi + 3u64 > out_cap {
+            pos = data_len;
+        } else {
+            let m: (u64, u64) = lz_find_match(data, data_len, pos,
+                                                window, max_match);
+            if m.1 >= min_match && pos + m.1 <= data_len {
+                output[oi] = 1u64;
+                output[oi + 1u64] = m.0;
+                output[oi + 2u64] = m.1;
+                oi = oi + 3u64;
+                pos = pos + m.1;
+            } else {
+                output[oi] = 0u64;
+                output[oi + 1u64] = data[pos];
+                oi = oi + 2u64;
+                pos = pos + 1u64;
+            };
+        };
+    };
+    oi
+}
+
+// ---- Decompress ------------------------------------------------------------
+
+fn lz_decompress(tokens: span<u64>, token_len: u64,
+                 output: span<u64>, out_cap: u64) -> u64
+    requires token_len <= tokens.len
+    requires out_cap <= output.len
+    ensures result <= out_cap
+{
+    let mut ti: u64 = 0u64;
+    let mut oi: u64 = 0u64;
+    while ti < token_len
+        invariant ti <= token_len
+        invariant oi <= out_cap
+        decreases token_len - ti
+    {
+        let tag: u64 = tokens[ti];
+        if tag == 0u64 && ti + 1u64 < token_len && oi < out_cap {
+            output[oi] = tokens[ti + 1u64];
+            oi = oi + 1u64;
+            ti = ti + 2u64;
+        } else if tag == 1u64 && ti + 2u64 < token_len {
+            let offset: u64 = tokens[ti + 1u64];
+            let length: u64 = tokens[ti + 2u64];
+            let mut k: u64 = 0u64;
+            while k < length && oi < out_cap
+                invariant k <= length
+                invariant oi <= out_cap
+                decreases length - k
+            {
+                if oi >= offset {
+                    output[oi] = output[oi - offset];
+                };
+                oi = oi + 1u64;
+                k = k + 1u64;
+            };
+            ti = ti + 3u64;
+        } else {
+            ti = token_len;
+        };
+    };
+    oi
+}
+
+// ---- Statistics ------------------------------------------------------------
+
+fn lz_count_literals(tokens: span<u64>, token_len: u64) -> u64
+    requires token_len <= tokens.len
+{
+    let mut count: u64 = 0u64;
+    let mut ti: u64 = 0u64;
+    while ti < token_len
+        invariant ti <= token_len
+        decreases token_len - ti
+    {
+        let tag: u64 = tokens[ti];
+        let mut step: u64 = token_len - ti;
+        if tag == 0u64 { count = count + 1u64; step = 2u64; }
+        else if tag == 1u64 { step = 3u64; };
+        if ti + step <= token_len { ti = ti + step; }
+        else { ti = token_len; };
+    };
+    count
+}
+
+fn lz_count_refs(tokens: span<u64>, token_len: u64) -> u64
+    requires token_len <= tokens.len
+{
+    let mut count: u64 = 0u64;
+    let mut ti: u64 = 0u64;
+    while ti < token_len
+        invariant ti <= token_len
+        decreases token_len - ti
+    {
+        let tag: u64 = tokens[ti];
+        let mut step: u64 = token_len - ti;
+        if tag == 0u64 { step = 2u64; }
+        else if tag == 1u64 { count = count + 1u64; step = 3u64; };
+        if ti + step <= token_len { ti = ti + step; }
+        else { ti = token_len; };
+    };
+    count
+}

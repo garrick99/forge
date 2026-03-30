@@ -1,0 +1,26 @@
+// expected: 0
+// Demo 1007: Standard library compression — use std::compress
+//
+// Demonstrates the built-in compression library:
+//   lz_compress: proven-safe LZ77 encoding
+//   lz_decompress: proven-safe decoding (result <= out_cap)
+//   lz_count_literals / lz_count_refs: token statistics
+
+use std::compress;
+
+// Compress then decompress — the decompressor's postcondition
+// (result <= out_cap) is automatically available to the caller.
+fn roundtrip(data: span<u64>, n: u64,
+             comp_buf: span<u64>, comp_cap: u64,
+             decomp_buf: span<u64>, decomp_cap: u64) -> u64
+    requires n <= data.len
+    requires comp_cap <= comp_buf.len
+    requires decomp_cap <= decomp_buf.len
+    ensures result <= decomp_cap
+{
+    let raw_len: u64 = lz_compress(data, n, comp_buf, comp_cap);
+    let comp_len: u64 = if raw_len <= comp_cap { raw_len } else { comp_cap };
+    lz_decompress(comp_buf, comp_len, decomp_buf, decomp_cap)
+}
+
+fn main() -> u64 { 0u64 }
