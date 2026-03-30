@@ -103,6 +103,7 @@ module Z3Bridge = struct
     | TRefined (TInt  I64, _, _) -> SBV (64, true)
     | TPrim TBool -> SBool
     | TSecret t   -> ty_to_sort t   (* secret<T> has same SMT sort as T *)
+    | TQual (_, t) -> ty_to_sort t  (* varying/uniform qualifier: same SMT sort as T *)
     | _           -> SInt
 
   (* Detect auto-generated array-init frame axioms — forall (__oi_k_N ...) body.
