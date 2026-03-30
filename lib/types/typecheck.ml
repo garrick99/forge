@@ -1213,7 +1213,25 @@ and stmt_final_env env stmt =
       (match e.expr_desc with
        | EAssign (lhs, rhs) ->
            (match lhs.expr_desc with
-            | EVar v -> env_assign_var env v (expr_to_pred_simple rhs)
+            | EVar v ->
+                let env' = env_assign_var env v (expr_to_pred_simple rhs) in
+                (* Inject callee postconditions for x = f(args) assignments.
+                   After SSA rename, v refers to the new value, so substitute
+                   "result" with PVar v in the callee's ensures clauses. *)
+                (match rhs.expr_desc with
+                 | ECall ({ expr_desc = EVar fn_id; _ }, call_args) ->
+                     (match env_lookup_fn env fn_id.name with
+                      | Some sig_ when sig_.fs_ensures <> [] &&
+                          List.length sig_.fs_params = List.length call_args ->
+                          let arg_subst = List.map2 (fun (pid, _) arg ->
+                            (pid.name, expr_to_pred_simple arg)
+                          ) sig_.fs_params call_args in
+                          let result_subst = ("result", PVar v) :: arg_subst in
+                          List.fold_left (fun e ens ->
+                            env_add_fact e (subst_pred result_subst ens)
+                          ) env' sig_.fs_ensures
+                      | _ -> env')
+                 | _ -> env')
             (* Scalar dereference assignment: *v = rhs  →  SSA-update v *)
             | EDeref deref_inner ->
                 (match deref_inner.expr_desc with
@@ -2429,7 +2447,24 @@ and check_stmt env stmt : env =
       (match e.expr_desc with
        | EAssign (lhs, rhs) ->
            (match lhs.expr_desc with
-            | EVar v -> env_assign_var env v (expr_to_pred_simple rhs)
+            | EVar v ->
+                let env' = env_assign_var env v (expr_to_pred_simple rhs) in
+                (* Inject callee postconditions for x = f(args) assignments
+                   so downstream precondition checks see the callee's ensures. *)
+                (match rhs.expr_desc with
+                 | ECall ({ expr_desc = EVar fn_id; _ }, call_args) ->
+                     (match env_lookup_fn env fn_id.name with
+                      | Some sig_ when sig_.fs_ensures <> [] &&
+                          List.length sig_.fs_params = List.length call_args ->
+                          let arg_subst = List.map2 (fun (pid, _) arg ->
+                            (pid.name, expr_to_pred_simple arg)
+                          ) sig_.fs_params call_args in
+                          let result_subst = ("result", PVar v) :: arg_subst in
+                          List.fold_left (fun e ens ->
+                            env_add_fact e (subst_pred result_subst ens)
+                          ) env' sig_.fs_ensures
+                      | _ -> env')
+                 | _ -> env')
             (* Scalar dereference assignment: *v = rhs *)
             | EDeref deref_inner ->
                 (match deref_inner.expr_desc with

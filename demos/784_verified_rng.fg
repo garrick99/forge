@@ -29,8 +29,7 @@ fn fill_random(seed: u64, bound: u64, output: span<u64>, n: u64) -> u64
         invariant state != 0u64
         decreases n - i
     {
-        let ns: u64 = xorshift64(state);
-        state = ns;
+        state = xorshift64(state);
         output[i] = state % bound;
         i = i + 1u64;
     };

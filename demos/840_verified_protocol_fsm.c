@@ -65,8 +65,7 @@ uint64_t protocol_run(forge_span_u64_t events __attribute__((unused)), uint64_t 
   uint64_t i __attribute__((unused)) = 0;
   {
     while ((i < n)) {
-      uint64_t ns __attribute__((unused)) = protocol_step(state, events.data[i]);
-      state = ns;
+      state = protocol_step(state, events.data[i]);
       i = (i + 1);
     }
 

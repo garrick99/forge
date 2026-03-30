@@ -33,8 +33,7 @@ uint64_t fill_random(uint64_t seed __attribute__((unused)), uint64_t bound __att
   uint64_t i __attribute__((unused)) = 0;
   {
     while ((i < n)) {
-      uint64_t ns __attribute__((unused)) = xorshift64(state);
-      state = ns;
+      state = xorshift64(state);
       output.data[i] = (state % bound);
       i = (i + 1);
     }
