@@ -1,0 +1,72 @@
+// expected: 0
+// Demo 716: Verified stack operations
+//
+// Stack backed by a span<u64> with an explicit length counter.
+// All operations proved correct via postconditions.
+//
+// Demonstrates cross-module usage of std::collections Vec_u64 with
+// verified multi-operation sequences (push then pop roundtrip,
+// batch push, batch drain).
+
+use std::collections;
+
+// Push n values from src[0..n) onto the stack, proving length grows.
+fn stack_push_n(s: refmut<Vec_u64>, src: span<u64>, n: u64)
+    requires n <= src.len
+    requires (*s).len + n <= (*s).data.len
+    requires (*s).len <= (*s).data.len
+    ensures  (*s).len == old((*s).len) + n
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant (*s).len == old((*s).len) + i
+        invariant (*s).len <= (*s).data.len
+        decreases n - i
+    {
+        vec_u64_push(s, src[i]);
+        i = i + 1u64;
+    };
+}
+
+// Drain n elements from the stack into dst[0..n), proving length shrinks.
+fn stack_drain(s: refmut<Vec_u64>, dst: span<u64>, n: u64)
+    requires n == (*s).len
+    requires n <= dst.len
+    requires (*s).len <= (*s).data.len
+    ensures  (*s).len == 0u64
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant (*s).len == n - i
+        invariant (*s).len <= (*s).data.len
+        decreases n - i
+    {
+        dst[i] = vec_u64_pop(s);
+        i = i + 1u64;
+    };
+}
+
+// Fill all existing elements with a constant.
+fn stack_fill_all(s: refmut<Vec_u64>, val: u64)
+    requires (*s).len <= (*s).data.len
+    ensures  (*s).len == old((*s).len)
+{
+    vec_u64_fill(s, val);
+}
+
+// Verify that pushing then popping gives back the original length.
+fn stack_push_pop_len(s: refmut<Vec_u64>, val: u64)
+    requires (*s).len < (*s).data.len
+    requires (*s).len <= (*s).data.len
+    ensures  (*s).len == old((*s).len)
+{
+    let old_len: u64 = (*s).len;
+    vec_u64_push(s, val);
+    let _ = vec_u64_pop(s);
+    // After push + pop, length is restored.
+    // old_len + 1 - 1 = old_len
+}
+
+fn main() -> u64 { 0u64 }

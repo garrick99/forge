@@ -1,0 +1,97 @@
+// expected: 0
+// Demo 711: Standard library composition
+//
+// Demonstrates calling verified std::math functions and composing their
+// postconditions into larger proofs.  The caller's ensures clauses are
+// discharged entirely by chaining callee postconditions — no re-proof needed.
+//
+// Shows: `use std::math` import, cross-function postcondition composition.
+
+use std::math;
+
+// Clamp every element of s[0..n) into [lo, hi].
+fn clamp_all(s: span<u64>, n: u64, lo: u64, hi: u64)
+    requires s.len == n
+    requires lo <= hi
+    ensures forall k: u64, k < n ==> s[k] >= lo
+    ensures forall k: u64, k < n ==> s[k] <= hi
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> s[k] >= lo
+        invariant forall k: u64, k < i ==> s[k] <= hi
+        decreases n - i
+    {
+        s[i] = clamp64(s[i], lo, hi);
+        i = i + 1u64;
+    };
+}
+
+// Compute element-wise minimum of two equal-length spans into out[0..n).
+fn pairwise_min(a: span<u64>, b: span<u64>, out: span<u64>, n: u64)
+    requires a.len == n
+    requires b.len == n
+    requires out.len == n
+    ensures forall k: u64, k < n ==> out[k] <= a[k]
+    ensures forall k: u64, k < n ==> out[k] <= b[k]
+    ensures forall k: u64, k < n ==> out[k] == a[k] || out[k] == b[k]
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> out[k] <= a[k]
+        invariant forall k: u64, k < i ==> out[k] <= b[k]
+        invariant forall k: u64, k < i ==> out[k] == a[k] || out[k] == b[k]
+        decreases n - i
+    {
+        out[i] = min64(a[i], b[i]);
+        i = i + 1u64;
+    };
+}
+
+// Compute element-wise maximum of two equal-length spans into out[0..n).
+fn pairwise_max(a: span<u64>, b: span<u64>, out: span<u64>, n: u64)
+    requires a.len == n
+    requires b.len == n
+    requires out.len == n
+    ensures forall k: u64, k < n ==> out[k] >= a[k]
+    ensures forall k: u64, k < n ==> out[k] >= b[k]
+    ensures forall k: u64, k < n ==> out[k] == a[k] || out[k] == b[k]
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> out[k] >= a[k]
+        invariant forall k: u64, k < i ==> out[k] >= b[k]
+        invariant forall k: u64, k < i ==> out[k] == a[k] || out[k] == b[k]
+        decreases n - i
+    {
+        out[i] = max64(a[i], b[i]);
+        i = i + 1u64;
+    };
+}
+
+// Saturating prefix sum: accumulate with sat_add to prevent overflow.
+fn sat_prefix_sum(s: span<u64>, out: span<u64>, n: u64)
+    requires s.len == n
+    requires out.len == n
+    ensures forall k: u64, k < n ==> out[k] >= s[k]
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> out[k] >= s[k]
+        decreases n - i
+    {
+        // Pass s[i] as the first argument so that `ensures result >= a`
+        // directly gives new_acc >= s[i] — avoiding the need for result >= b.
+        let new_acc: u64 = sat_add(s[i], acc);
+        acc = new_acc;
+        out[i] = acc;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

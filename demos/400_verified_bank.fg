@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 400: Verified bank — multi-account ledger
 //
 // Three accounts: checking, savings, reserve.

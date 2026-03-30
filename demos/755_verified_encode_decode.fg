@@ -1,0 +1,57 @@
+// expected: 0
+// Demo 755: Verified encode / decode roundtrip
+//
+// Simple delta encoding: encode stores differences, decode recovers originals.
+// Proves: decode(encode(x)) preserves length and first element.
+
+fn delta_encode(input: span<u64>, n: u64, output: span<u64>)
+    requires n >= 1u64
+    requires n <= input.len
+    requires n <= output.len
+    ensures output[0u64] == input[0u64]
+{
+    output[0u64] = input[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        output[i] = input[i] - input[i - 1u64];
+        i = i + 1u64;
+    };
+}
+
+fn delta_decode(encoded: span<u64>, n: u64, output: span<u64>)
+    requires n >= 1u64
+    requires n <= encoded.len
+    requires n <= output.len
+    ensures output[0u64] == encoded[0u64]
+{
+    output[0u64] = encoded[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        output[i] = output[i - 1u64] + encoded[i];
+        i = i + 1u64;
+    };
+}
+
+// XOR-based encode/decode (self-inverse).
+fn xor_encode(data: span<u64>, n: u64, key: span<u64>, key_len: u64)
+    requires n <= data.len
+    requires key_len >= 1u64
+    requires key_len <= key.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        data[i] = data[i] ^ key[i % key_len];
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

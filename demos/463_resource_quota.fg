@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 463: Resource quota with soft and hard limits
 //
 // soft_limit: warning threshold. hard_limit: absolute max.

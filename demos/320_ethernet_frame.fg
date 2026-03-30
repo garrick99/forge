@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 320: Verified Ethernet frame parser with nested struct fields
 //
 // An Ethernet frame header with nested Address and EtherType structs.

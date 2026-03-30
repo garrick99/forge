@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 596: stable partition — move elements satisfying pred to front
 
 fn partition_by_zero(s: span<u64>, n: u64) -> u64

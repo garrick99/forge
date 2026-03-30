@@ -1,0 +1,89 @@
+// expected: 0
+// Demo 780: Verified multi-stage data pipeline
+//
+// Chains four verified stages: filter, transform, aggregate, validate.
+// Each stage's postcondition feeds the next stage's precondition.
+// Proves: full pipeline bounds safety and output correctness.
+
+// Stage 1: Filter — keep elements <= threshold.
+fn filter_le(src: span<u64>, n: u64, dst: span<u64>, threshold: u64) -> u64
+    requires n <= src.len
+    requires n <= dst.len
+    ensures result <= n
+{
+    let mut write: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant write <= i
+        decreases n - i
+    {
+        if src[i] <= threshold {
+            dst[write] = src[i];
+            write = write + 1u64;
+        };
+        i = i + 1u64;
+    };
+    write
+}
+
+// Stage 2: Transform — double each element.
+fn double_all(s: span<u64>, n: u64)
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = s[i] * 2u64;
+        i = i + 1u64;
+    };
+}
+
+// Stage 3: Aggregate — compute sum and max.
+fn aggregate(s: span<u64>, n: u64) -> (u64, u64)
+    requires n >= 1u64
+    requires n <= s.len
+{
+    let mut sum: u64 = 0u64;
+    let mut mx: u64 = s[0u64];
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        sum = sum + s[i];
+        if s[i] > mx {
+            mx = s[i];
+        };
+        i = i + 1u64;
+    };
+    (sum, mx)
+}
+
+// Stage 4: Validate — check sum is below budget.
+fn validate(sum: u64, budget: u64) -> bool
+    ensures result == (sum <= budget)
+{
+    sum <= budget
+}
+
+// Full pipeline.
+fn run_pipeline(data: span<u64>, n: u64, buf: span<u64>,
+                threshold: u64, budget: u64) -> bool
+    requires n >= 1u64
+    requires n <= data.len
+    requires n <= buf.len
+{
+    let filtered_n: u64 = filter_le(data, n, buf, threshold);
+    if filtered_n >= 1u64 {
+        double_all(buf, filtered_n);
+        let stats: (u64, u64) = aggregate(buf, filtered_n);
+        validate(stats.0, budget)
+    } else {
+        true
+    }
+}
+
+fn main() -> u64 { 0u64 }

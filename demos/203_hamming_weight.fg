@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 203: Hamming weight (popcount) with invariant
 //
 // Counts the number of set bits in a u64 value.

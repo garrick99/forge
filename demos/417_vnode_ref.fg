@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 417: VNode reference counting (filesystem inode model)
 //
 // A vnode has a reference count and dirty flag. get() increments refs,

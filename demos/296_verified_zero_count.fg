@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 296: Verified zero count — count zeroes and non-zeroes sum to n
 //
 // zero_count(s, n) returns number of zero elements. Postcondition: result <= n.

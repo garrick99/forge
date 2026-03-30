@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 394: Task scheduler with priority queues
 //
 // A scheduler has high-priority and low-priority queues.

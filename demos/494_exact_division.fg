@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 494: exact division and modular arithmetic postconditions
 //
 // Verified division/modulo properties: quotient bounds, remainder bounds,

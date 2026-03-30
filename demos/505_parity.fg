@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 505: parity — XOR reduction and bit-level boolean functions
 
 fn xor_reduce(s: span<u64>, n: u64) -> u64

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 565: parity, odd/even, and alignment checks
 
 fn is_even(n: u64) -> bool

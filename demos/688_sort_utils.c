@@ -21,29 +21,17 @@ void merge_sorted(forge_span_u64_t a __attribute__((unused)), uint64_t na __attr
   uint64_t i __attribute__((unused)) = 0;
   uint64_t j __attribute__((unused)) = 0;
   uint64_t k __attribute__((unused)) = 0;
-  _Bool done __attribute__((unused)) = 0;
   {
-    while ((!done)) {
-      if ((i < na)) {
-        if ((j < nb)) {
-          if ((a.data[i] <= b.data[j])) {
-            out.data[k] = a.data[i];
-            i = (i + 1);
-
-          } else {
-            out.data[k] = b.data[j];
-            j = (j + 1);
-
-          }
-          k = (k + 1);
-
-        } else {
-          done = 1;
-
-        }
+    while (((i < na) && (j < nb))) {
+      if ((a.data[i] <= b.data[j])) {
+        out.data[k] = a.data[i];
+        i = (i + 1);
+        k = (k + 1);
 
       } else {
-        done = 1;
+        out.data[k] = b.data[j];
+        j = (j + 1);
+        k = (k + 1);
 
       }
     }

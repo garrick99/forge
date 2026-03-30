@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 377: Windowed sum with fixed window size
 //
 // A sliding-window accumulator: add_sample() updates the sum and

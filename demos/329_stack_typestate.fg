@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 329: Stack typestate — size tracking with old() across calls
 //
 // A bounded stack with verified size invariants:

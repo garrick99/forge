@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 283: Verified stride copy — copy every other element
 //
 // stride_copy(src, dst, n) copies src[2*i] to dst[i] for i < n.

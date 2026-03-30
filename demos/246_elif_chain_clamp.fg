@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 246: else-if chain — clamp with else-if (not sequential ifs)
 //
 // clamp_elif(s, n, lo, hi) clamps each element using a proper else-if chain.

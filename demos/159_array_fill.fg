@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 159: Verified array fill (memset)
 //
 // Sets every element of s to `val`.

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 526: selection sort — find minimum, swap into place
 
 fn find_min_index(s: span<u64>, lo: u64, n: u64) -> u64

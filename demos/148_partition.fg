@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 148: Verified array partition (fill below/above pivot)
 //
 // Demonstrates conditional array writes in a practical algorithm context.

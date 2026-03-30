@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 151: Mutable ghost variable — verified running maximum
 //
 // Finds the maximum element in a non-empty span.

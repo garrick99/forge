@@ -1,0 +1,60 @@
+// expected: 0
+// Demo 775: Verified monotonic stack operations
+//
+// Simulates a monotonic (non-decreasing) stack: push elements maintaining
+// order by discarding smaller top elements.
+// Proves: stack pointer stays in bounds.
+
+// Push onto a max-stack: replace top if new value is larger.
+fn max_stack_push(stack: span<u64>, sp: u64, cap: u64, val: u64) -> u64
+    requires cap >= 1u64
+    requires cap <= stack.len
+    requires sp <= cap
+    ensures result <= cap
+    ensures result >= 1u64
+{
+    // Pop elements less than val.
+    let mut top: u64 = sp;
+    while top > 0u64
+        invariant top <= sp
+        decreases top
+    {
+        if stack[top - 1u64] < val {
+            top = top - 1u64;
+        } else {
+            top = top;
+            // Can't break — set to 0 to exit.
+            top = 0u64;
+        };
+    };
+    // Push val.
+    if top < cap {
+        stack[top] = val;
+        top + 1u64
+    } else {
+        top
+    }
+}
+
+// Build prefix minimum stack: for each position, the minimum so far.
+fn prefix_min_stack(s: span<u64>, n: u64, mins: span<u64>)
+    requires n >= 1u64
+    requires n <= s.len
+    requires n <= mins.len
+    ensures forall k: u64, k < n ==> mins[k] <= s[k]
+{
+    mins[0u64] = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> mins[k] <= s[k]
+        decreases n - i
+    {
+        let prev: u64 = mins[i - 1u64];
+        let cur: u64 = s[i];
+        mins[i] = if prev <= cur { prev } else { cur };
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

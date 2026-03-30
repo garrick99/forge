@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 167: Verified tiled (block) copy from 2D matrix
 //
 // Copies a tile starting at (row_off, col_off) of size (tile_rows × tile_cols)

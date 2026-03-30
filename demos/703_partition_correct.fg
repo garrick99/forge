@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 703: Partition with functional correctness
 //
 // partition_inplace — Hoare-style two-pointer, proves bounds + termination

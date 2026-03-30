@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 336: Producer-consumer queue state verification
 //
 // A bounded queue with separate producer and consumer positions.

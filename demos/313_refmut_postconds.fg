@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 313: refmut<T> postconditions via field assignment tracking
 //
 // When a function mutates a struct through a refmut<T> parameter,

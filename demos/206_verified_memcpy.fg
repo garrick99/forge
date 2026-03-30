@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 206: Verified memcpy — full functional correctness
 //
 // Copies n bytes from src to dst.

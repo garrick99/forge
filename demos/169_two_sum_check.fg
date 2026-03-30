@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 169: Verified two-sum existence check
 //
 // Returns true iff there exist distinct indices i != j such that s[i] + s[j] == target.

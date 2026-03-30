@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 393: Segment tree node update tracking
 //
 // A segment tree node tracks its value and the number of updates.

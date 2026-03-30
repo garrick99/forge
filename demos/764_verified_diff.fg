@@ -1,0 +1,56 @@
+// expected: 0
+// Demo 764: Verified array differencing
+//
+// Computes forward differences and cumulative sums (inverse operations).
+// Proves: output indices stay in bounds and length relationships hold.
+
+// Forward difference: out[i] = s[i+1] - s[i].
+fn forward_diff(s: span<u64>, n: u64, out: span<u64>)
+    requires n >= 2u64
+    requires n <= s.len
+    requires n - 1u64 <= out.len
+{
+    let mut i: u64 = 0u64;
+    while i + 1u64 < n
+        invariant i < n
+        decreases n - i - 1u64
+    {
+        out[i] = s[i + 1u64] - s[i];
+        i = i + 1u64;
+    };
+}
+
+// Cumulative sum (prefix sum): out[i] = sum(s[0..i+1]).
+fn cumsum(s: span<u64>, n: u64, out: span<u64>)
+    requires n >= 1u64
+    requires n <= s.len
+    requires n <= out.len
+{
+    out[0u64] = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        out[i] = out[i - 1u64] + s[i];
+        i = i + 1u64;
+    };
+}
+
+// Second-order difference: out[i] = s[i+2] - 2*s[i+1] + s[i].
+fn second_diff(s: span<u64>, n: u64, out: span<u64>)
+    requires n >= 3u64
+    requires n <= s.len
+    requires n - 2u64 <= out.len
+{
+    let mut i: u64 = 0u64;
+    while i + 2u64 < n
+        invariant i + 2u64 <= n
+        decreases n - i - 2u64
+    {
+        out[i] = s[i + 2u64] - 2u64 * s[i + 1u64] + s[i];
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

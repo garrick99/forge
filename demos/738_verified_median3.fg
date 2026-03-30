@@ -1,0 +1,78 @@
+// expected: 0
+// Demo 738: Verified median-of-three and nth-element selection
+//
+// Median-of-three is the standard pivot selection for quicksort.
+// Proves: result is one of the three inputs and is between the other two.
+
+fn median_of_three(a: u64, b: u64, c: u64) -> u64
+    ensures result == a || result == b || result == c
+    ensures result >= a || result >= b
+    ensures result >= b || result >= c
+    ensures result >= a || result >= c
+{
+    if a <= b {
+        if b <= c {
+            b
+        } else if a <= c {
+            c
+        } else {
+            a
+        }
+    } else {
+        if a <= c {
+            a
+        } else if b <= c {
+            c
+        } else {
+            b
+        }
+    }
+}
+
+// Sort exactly 3 elements in a span (indices lo, mid, hi).
+fn sort3(s: span<u64>, lo: u64, mid: u64, hi: u64)
+    requires lo < mid
+    requires mid < hi
+    requires hi < s.len
+    ensures s[lo] <= s[mid]
+    ensures s[mid] <= s[hi]
+{
+    // Bubble sort on 3 elements.
+    if s[lo] > s[mid] {
+        let t: u64 = s[lo]; s[lo] = s[mid]; s[mid] = t;
+    };
+    if s[mid] > s[hi] {
+        let t: u64 = s[mid]; s[mid] = s[hi]; s[hi] = t;
+    };
+    if s[lo] > s[mid] {
+        let t: u64 = s[lo]; s[lo] = s[mid]; s[mid] = t;
+    };
+}
+
+// Minimum of three values.
+fn min3(a: u64, b: u64, c: u64) -> u64
+    ensures result <= a
+    ensures result <= b
+    ensures result <= c
+{
+    if a <= b {
+        if a <= c { a } else { c }
+    } else {
+        if b <= c { b } else { c }
+    }
+}
+
+// Maximum of three values.
+fn max3(a: u64, b: u64, c: u64) -> u64
+    ensures result >= a
+    ensures result >= b
+    ensures result >= c
+{
+    if a >= b {
+        if a >= c { a } else { c }
+    } else {
+        if b >= c { b } else { c }
+    }
+}
+
+fn main() -> u64 { 0u64 }

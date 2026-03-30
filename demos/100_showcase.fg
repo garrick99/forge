@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 100: Showcase — combining all major FORGE features
 //
 // This demo exercises: generics, traits, trait bounds, default methods,

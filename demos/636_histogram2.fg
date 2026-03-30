@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 636: histogram operations — build, query, normalize
 
 fn histogram_build(data: span<u64>, n: u64, bins: span<u64>, nbins: u64)

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 589: conditional copy — copy elements satisfying a predicate
 
 fn copy_lt(src: span<u64>, n: u64, dst: span<u64>, thresh: u64) -> u64

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 75: Multi-bound generics — T: Trait1 + Trait2
 //
 // A type parameter can require multiple traits simultaneously.

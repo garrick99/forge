@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 374: Credit limit enforcement
 //
 // A credit account with a limit: spend reduces available credit,

@@ -1,0 +1,82 @@
+// expected: 0
+// Demo 759: Verified top-k selection
+//
+// Finds the k largest elements from a span using partial selection.
+// Uses a simple approach: maintain a sorted buffer of size k.
+// Proves: output count equals min(k, n) and all indices are in bounds.
+
+fn top_k(s: span<u64>, n: u64, out: span<u64>, k: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    requires k >= 1u64
+    requires k <= out.len
+    ensures result <= k
+    ensures result <= n
+{
+    let limit: u64 = if k <= n { k } else { n };
+
+    // Fill first `limit` slots directly.
+    let mut i: u64 = 0u64;
+    while i < limit
+        invariant i <= limit
+        decreases limit - i
+    {
+        out[i] = s[i];
+        i = i + 1u64;
+    };
+
+    // Sort the initial buffer (insertion sort on small k).
+    let mut a: u64 = 1u64;
+    while a < limit
+        invariant a <= limit
+        decreases limit - a
+    {
+        let mut b: u64 = a;
+        while b > 0u64
+            invariant b <= limit
+            decreases b
+        {
+            if out[b] > out[b - 1u64] {
+                let tmp: u64 = out[b];
+                out[b] = out[b - 1u64];
+                out[b - 1u64] = tmp;
+                b = b - 1u64;
+            } else {
+                b = 0u64;
+            };
+        };
+        a = a + 1u64;
+    };
+
+    // Scan remaining elements.
+    let mut j: u64 = limit;
+    while j < n
+        invariant j <= n
+        decreases n - j
+    {
+        // If s[j] > out[limit-1] (the smallest of top-k), replace and re-sort.
+        if s[j] > out[limit - 1u64] {
+            out[limit - 1u64] = s[j];
+            // Bubble up.
+            let mut p: u64 = limit - 1u64;
+            while p > 0u64
+                invariant p < limit
+                decreases p
+            {
+                if out[p] > out[p - 1u64] {
+                    let tmp: u64 = out[p];
+                    out[p] = out[p - 1u64];
+                    out[p - 1u64] = tmp;
+                    p = p - 1u64;
+                } else {
+                    p = 0u64;
+                };
+            };
+        };
+        j = j + 1u64;
+    };
+
+    limit
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 112: Verified bit manipulation tricks
 //
 // Classic bit tricks with SMT-verified postconditions.

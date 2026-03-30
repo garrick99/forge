@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 576: weighted sum and weighted average (integer arithmetic)
 
 fn weighted_sum(vals: span<u64>, weights: span<u64>, n: u64) -> u64

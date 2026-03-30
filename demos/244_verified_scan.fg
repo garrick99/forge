@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 244: Verified inclusive scan (prefix sum, in-place)
 //
 // scan_inplace(s, n) computes the inclusive prefix sum in place:

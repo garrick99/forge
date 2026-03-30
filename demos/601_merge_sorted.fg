@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 601: merge two sorted arrays into a third
 
 fn merge2(a: span<u64>, na: u64, b: span<u64>, nb: u64, out: span<u64>)

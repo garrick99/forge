@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 115: Verified run-length encoding helpers
 //
 // RLE encodes runs of repeated bytes as (count, value) pairs.

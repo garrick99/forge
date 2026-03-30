@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 477: std::io showcase — all output functions
 //
 // Exercises print_u64, print_i64, print_hex, print_bool, print_hex_u64_padded.

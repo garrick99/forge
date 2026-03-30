@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 555: 3x3 matrix operations stored as 9-element span
 
 fn mat3_get(m: span<u64>, r: u64, c: u64) -> u64

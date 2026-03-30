@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 539: scan/reduce patterns: sum, product, max, min
 
 fn span_sum(s: span<u64>, n: u64) -> u64

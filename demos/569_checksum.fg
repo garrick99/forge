@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 569: Internet checksum (one's complement sum)
 
 fn ones_complement_add(a: u64, b: u64) -> u64

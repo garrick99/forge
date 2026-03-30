@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 304: Verified packet header parser
 //
 // Parse a binary network packet with guaranteed bounds safety.

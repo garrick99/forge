@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 123: Verified simple tokenizer (number/identifier/operator scanner)
 //
 // Scan a 4-character window and classify it as:

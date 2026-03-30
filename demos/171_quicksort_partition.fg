@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 171: Verified quicksort partition step
 //
 // Lomuto partition: uses s[hi] as pivot, returns partition index p such that:

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 308: Arithmetic range injection
 //
 // The proof engine automatically injects range facts for:

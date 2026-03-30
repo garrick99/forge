@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 170: Verified 3-way partition (Dutch National Flag)
 //
 // Partitions s into three regions around pivot:

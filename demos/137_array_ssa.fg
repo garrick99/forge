@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 137: Array write SSA — verified multi-write reasoning
 //
 // Each span write s[i] = v creates a new SSA "generation" of the array:

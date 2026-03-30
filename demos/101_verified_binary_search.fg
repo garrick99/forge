@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 101: Verified binary search + integer sqrt
 //
 // Binary search on a sorted 4-element sequence.

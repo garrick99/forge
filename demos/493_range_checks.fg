@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 493: verified range checks and guards
 //
 // Functions that gate computation on range preconditions,

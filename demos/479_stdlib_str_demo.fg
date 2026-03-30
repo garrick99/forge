@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 479: std::str showcase — Str type operations
 //
 // Demonstrates str_new, str_push, str_at, str_len, str_clear,

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 324: Verified variable-length integer codec
 //
 // Variable-length encoding used in Protocol Buffers, LEB128, etc.

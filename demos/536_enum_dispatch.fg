@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 536: enum-tagged operations with verified per-variant results
 
 enum BinOp {

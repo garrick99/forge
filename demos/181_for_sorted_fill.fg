@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 181: For-loop with invariant — fill array with ascending values
 //
 // Demonstrates for-loop invariant checking.

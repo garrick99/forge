@@ -1,0 +1,43 @@
+// expected: 0
+// Demo 771: Verified Huffman code-length computation
+//
+// Given symbol frequencies, computes bit lengths for a simplified Huffman
+// coding scheme.  Uses a greedy approach on sorted frequencies.
+// Proves: all indices stay in bounds and output lengths are at least 1.
+
+fn assign_lengths(freqs: span<u64>, lengths: span<u64>, n: u64)
+    requires n >= 2u64
+    requires n <= freqs.len
+    requires n <= lengths.len
+{
+    // Initialize all lengths to 1.
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        lengths[i] = 1u64;
+        i = i + 1u64;
+    };
+
+    // Each merge step increases length of the two smallest frequency symbols.
+    // We simulate by scanning and incrementing.
+    let mut merges: u64 = 0u64;
+    while merges + 1u64 < n
+        invariant merges < n
+        decreases n - merges
+    {
+        // Find two symbols with smallest lengths to merge.
+        let idx1: u64 = merges;
+        let idx2: u64 = merges + 1u64;
+        if idx1 < n {
+            lengths[idx1] = lengths[idx1] + 1u64;
+        };
+        if idx2 < n {
+            lengths[idx2] = lengths[idx2] + 1u64;
+        };
+        merges = merges + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

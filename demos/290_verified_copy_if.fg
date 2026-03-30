@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 290: Verified copy-if — copy elements above threshold into output
 //
 // copy_if_gt(src, dst, n, thresh) copies src[i] to dst[out_count] when src[i] > thresh.

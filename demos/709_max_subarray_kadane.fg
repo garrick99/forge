@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 709: Maximum of array elements (running max with frontier proof)
 //
 // Computes the maximum element in s[0..n).

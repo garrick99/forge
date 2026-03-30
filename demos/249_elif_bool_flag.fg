@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 249: else-if with bool flag updated through chain
 //
 // categorize(s, n, threshold) sets flags: any_below and any_above

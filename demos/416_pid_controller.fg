@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 416: PID controller state (proportional/integral)
 //
 // A simplified PID controller: the integral accumulates error over time,

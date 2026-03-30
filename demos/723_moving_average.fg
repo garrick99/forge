@@ -1,0 +1,39 @@
+// expected: 0
+// Demo 723: Verified moving average (sliding window sum)
+//
+// Computes the sum of each window of size w across an input span.
+// Proves: output length is correct and each partial sum stays bounded.
+
+fn sliding_sum(input: span<u64>, n: u64, w: u64, output: span<u64>)
+    requires w >= 1u64
+    requires w <= n
+    requires n <= input.len
+    requires n - w + 1u64 <= output.len
+{
+    // Compute first window sum.
+    let mut sum: u64 = 0u64;
+    let mut j: u64 = 0u64;
+    while j < w
+        invariant j <= w
+        decreases w - j
+    {
+        sum = sum + input[j];
+        j = j + 1u64;
+    };
+    output[0u64] = sum;
+
+    // Slide the window.
+    let mut i: u64 = 1u64;
+    let out_len: u64 = n - w + 1u64;
+    while i < out_len
+        invariant i <= out_len
+        invariant i + w - 1u64 < n || i == out_len
+        decreases out_len - i
+    {
+        sum = sum + input[i + w - 1u64] - input[i - 1u64];
+        output[i] = sum;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

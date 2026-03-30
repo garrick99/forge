@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 624: 3D integer vector operations
 
 fn vec3_add(ax: u64, ay: u64, az: u64, bx: u64, by: u64, bz: u64,

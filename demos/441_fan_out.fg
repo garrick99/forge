@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 441: Fan-out dispatcher with subscriber tracking
 //
 // A message is dispatched to N subscribers.

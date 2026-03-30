@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 481: std::collections showcase — Vec_u64 operations
 //
 // push, pop, get, set, fill, find, sum, max, min.

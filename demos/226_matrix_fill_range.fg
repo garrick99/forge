@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 226: Matrix fill via nested for loops with lo..hi range
 //
 // fill_row(s, row_start, row_end, val) fills s[row_start..row_end) with val.

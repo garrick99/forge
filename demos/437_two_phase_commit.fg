@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 437: Two-phase commit coordinator state
 //
 // Tracks participant votes and coordinator decisions.

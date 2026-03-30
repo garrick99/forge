@@ -1,0 +1,38 @@
+// expected: 0
+// Demo 772: Verified reservoir sampling (deterministic variant)
+//
+// Selects k elements from a stream of n items using a deterministic
+// modular selection rule.  Proves: output count <= k.
+
+fn reservoir_select(stream: span<u64>, n: u64, out: span<u64>, k: u64) -> u64
+    requires n <= stream.len
+    requires k >= 1u64
+    requires k <= out.len
+    ensures result <= k
+{
+    // Fill reservoir with first k elements.
+    let fill: u64 = if k <= n { k } else { n };
+    let mut i: u64 = 0u64;
+    while i < fill
+        invariant i <= fill
+        invariant fill <= k
+        decreases fill - i
+    {
+        out[i] = stream[i];
+        i = i + 1u64;
+    };
+
+    // For remaining elements: replace modularly.
+    let mut j: u64 = fill;
+    while j < n
+        invariant j <= n
+        decreases n - j
+    {
+        let slot: u64 = j % k;
+        out[slot] = stream[j];
+        j = j + 1u64;
+    };
+    fill
+}
+
+fn main() -> u64 { 0u64 }

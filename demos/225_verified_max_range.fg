@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 225: Verified maximum over a range
 //
 // max_range(s, lo, hi) returns the maximum of s[lo..hi).

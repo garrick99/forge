@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 305: Verified UTF-8 single-byte decoder
 //
 // Decode a single UTF-8 codepoint from a span<u8>.

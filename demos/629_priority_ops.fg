@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 629: priority queue operations on sorted array
 
 fn pq_insert_sorted(s: span<u64>, n: u64, val: u64) -> u64

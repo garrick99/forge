@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 222: Verified prefix maximum
 //
 // prefix_max(s, n) computes the running maximum in-place:

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 547: bump allocator — linear arena allocation
 
 struct BumpAlloc {

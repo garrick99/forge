@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 609: run-length encoding — encode and decode
 
 fn rle_encode(src: span<u64>, n: u64, out_vals: span<u64>, out_lens: span<u64>) -> u64

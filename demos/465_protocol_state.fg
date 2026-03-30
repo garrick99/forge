@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 465: Protocol state machine (init → negotiating → established → closed)
 //
 // Each transition increments its counter. Only valid forward transitions.

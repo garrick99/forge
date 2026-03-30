@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 350: Work queue with enqueue/dequeue/drain
 //
 // A bounded FIFO work queue tracks pending, completed, and

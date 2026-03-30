@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 529: bit-matrix — 64-bit word as a packed 8x8 boolean matrix
 
 fn bmat_get(mat: u64, row: u64, col: u64) -> bool

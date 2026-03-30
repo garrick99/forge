@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 606: prefix operations — prefix min, max, product
 
 fn prefix_min(src: span<u64>, dst: span<u64>, n: u64)

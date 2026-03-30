@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 616: more array operations — zip, unzip, interleave
 
 fn zip_add(a: span<u64>, b: span<u64>, out: span<u64>, n: u64)

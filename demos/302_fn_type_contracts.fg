@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 302: Full fn-type contracts — requires + ensures on function pointer types
 //
 // fn(T) -> U requires pre ensures post

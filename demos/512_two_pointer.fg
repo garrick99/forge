@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 512: two-pointer techniques — unique count, adjacent diff, sum pair
 
 fn count_unique_sorted(s: span<u64>, n: u64) -> u64

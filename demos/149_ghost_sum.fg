@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 149: Ghost variables — verified running sum
 //
 // ghost let introduces a proof-only binding: it participates in invariants

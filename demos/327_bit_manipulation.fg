@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 327: Verified bit manipulation primitives
 //
 // Common bit tricks used in systems programming, proven correct:

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 643: frequency analysis — character/symbol frequency counting
 
 fn freq_count(data: span<u64>, n: u64, freq: span<u64>, nbuckets: u64)

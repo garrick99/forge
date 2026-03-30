@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 486: verified numeric casts with range preconditions
 //
 // Shows that narrowing casts are safe when guarded by preconditions,

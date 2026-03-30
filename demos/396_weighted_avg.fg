@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 396: Weighted average accumulator
 //
 // Accumulates weighted samples: add_sample adds value*weight to

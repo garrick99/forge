@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 118: Verified packet header parsing
 //
 // A minimal network packet header (simplified IPv4-like):

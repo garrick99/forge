@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 388: Transaction log with commit/abort tracking
 //
 // A transaction log tracks open, committed, and aborted transactions.

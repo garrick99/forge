@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 678: bit counting and manipulation
 
 fn popcount(x: u64) -> u64

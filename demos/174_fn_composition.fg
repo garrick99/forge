@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 174: Verified function composition
 //
 // `clamp_val` clamps a single u64 to [lo, hi].

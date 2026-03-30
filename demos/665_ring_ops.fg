@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 665: ring arithmetic — modular operations over Z_n
 
 fn ring_add(a: u64, b: u64, n: u64) -> u64

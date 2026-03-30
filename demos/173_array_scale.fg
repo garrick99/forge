@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 173: Verified array scale (multiply each element by a constant)
 //
 // Scales every element of s by `factor` in-place.

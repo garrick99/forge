@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 180: Verified fast exponentiation (square-and-multiply)
 //
 // Computes base^exp via repeated squaring.

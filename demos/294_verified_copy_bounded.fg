@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 294: Verified bounded copy — copy min(src.len, dst.len, limit) elements
 //
 // copy_bounded(src, dst, n, limit) copies min(n, limit) elements.

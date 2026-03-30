@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 83: str type — length, indexing, and comparison
 //
 // str is a borrowed UTF-8 byte span with .len (usize) and s[i] (u8).

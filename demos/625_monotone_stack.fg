@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 625: monotone stack — next greater element indices
 
 fn next_greater(s: span<u64>, n: u64, out: span<u64>)

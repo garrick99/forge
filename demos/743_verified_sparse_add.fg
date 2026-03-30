@@ -1,0 +1,74 @@
+// expected: 0
+// Demo 743: Verified sparse vector addition
+//
+// Sparse vectors stored as parallel (index, value) arrays.
+// Adds two sparse vectors into a dense output.
+// Proves all index accesses are in bounds.
+
+// Scatter a sparse vector into a dense output.
+fn sparse_to_dense(indices: span<u64>, values: span<u64>, nnz: u64,
+                   dense: span<u64>, dense_len: u64)
+    requires nnz <= indices.len
+    requires nnz <= values.len
+    requires dense_len <= dense.len
+    requires forall k: u64, k < nnz ==> indices[k] < dense_len
+{
+    // Zero the output.
+    let mut i: u64 = 0u64;
+    while i < dense_len
+        invariant i <= dense_len
+        decreases dense_len - i
+    {
+        dense[i] = 0u64;
+        i = i + 1u64;
+    };
+
+    // Scatter non-zeros.
+    let mut j: u64 = 0u64;
+    while j < nnz
+        invariant j <= nnz
+        decreases nnz - j
+    {
+        let idx: u64 = indices[j];
+        dense[idx] = dense[idx] + values[j];
+        j = j + 1u64;
+    };
+}
+
+// Dot product of two dense vectors.
+fn dense_dot(a: span<u64>, b: span<u64>, n: u64) -> u64
+    requires n <= a.len
+    requires n <= b.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + a[i] * b[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+// Sparse dot product: both vectors share the same index set.
+fn sparse_dot(indices: span<u64>, a_vals: span<u64>, b_vals: span<u64>,
+              nnz: u64) -> u64
+    requires nnz <= indices.len
+    requires nnz <= a_vals.len
+    requires nnz <= b_vals.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < nnz
+        invariant i <= nnz
+        decreases nnz - i
+    {
+        acc = acc + a_vals[i] * b_vals[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

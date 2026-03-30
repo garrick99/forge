@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 318: Ring buffer typestate verification
 //
 // A fixed-capacity ring buffer whose state tracks occupancy:

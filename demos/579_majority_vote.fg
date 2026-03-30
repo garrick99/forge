@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 579: Boyer-Moore majority vote algorithm
 
 fn majority_candidate(s: span<u64>, n: u64) -> u64

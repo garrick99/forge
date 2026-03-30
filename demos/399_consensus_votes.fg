@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 399: Consensus vote tracker
 //
 // A consensus round: nodes cast votes (yes/no/abstain).

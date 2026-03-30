@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 256: Verified argmax — returns index of maximum element
 //
 // argmax(s, n) returns i such that s[i] >= s[j] for all j < n.

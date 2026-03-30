@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 155: Verified sorted-order check
 //
 // Returns true iff the span is non-decreasing (sorted ascending).

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 153: Mutable ghost variables — verified single-pass min/max
 //
 // Computes both minimum and maximum of a non-empty span in one pass.

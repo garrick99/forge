@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 231: old() for scalar — function that modifies a span, relates sum to old
 //
 // increment_all(s, n) adds 1 to every element.

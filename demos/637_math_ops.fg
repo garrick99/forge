@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 637: mathematical operations — integer sqrt, power, factorial
 
 fn isqrt(n: u64) -> u64

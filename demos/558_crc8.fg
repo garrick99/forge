@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 558: CRC-8 checksum computation
 
 fn crc8_update(crc: u64, byte: u64) -> u64

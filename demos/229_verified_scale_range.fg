@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 229: Verified scale with old() postcondition
 //
 // scale(s, n, factor) multiplies every element by factor.

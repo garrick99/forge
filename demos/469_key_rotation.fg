@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 469: Cryptographic key rotation tracker
 //
 // Keys have a version number. Rotation increments version and resets use_count.

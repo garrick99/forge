@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 598: integer ceil-division and rounding utilities
 
 fn ceil_div(a: u64, b: u64) -> u64

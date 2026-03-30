@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 488: ! (not) in implies postconditions — parser fix regression test
 //
 // Exercises the !(cond) ==> rhs pattern that previously parsed incorrectly

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 265: Verified sliding window sum
 //
 // window_sum(s, n, out, w) computes out[i] = s[i] + s[i+1] + ... + s[i+w-1]

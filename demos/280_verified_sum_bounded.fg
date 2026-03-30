@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 280: Verified bounded sum — sum with overflow guard
 //
 // sum_bounded(s, n, cap) sums s[i] while acc <= cap; stops if adding would exceed cap.

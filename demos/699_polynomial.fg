@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 699: polynomial operations — evaluation, addition, multiplication mod
 
 fn poly_eval(coeffs: span<u64>, deg: u64, x: u64) -> u64

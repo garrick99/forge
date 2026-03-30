@@ -1,0 +1,52 @@
+// expected: 0
+// Demo 735: Two-pointer element removal
+//
+// Remove all occurrences of a target value from a span in-place.
+// Proves: write index <= read index (no overwrite of unprocessed elements)
+// and result <= n.
+
+fn remove_element(s: span<u64>, n: u64, target: u64) -> u64
+    requires n <= s.len
+    ensures result <= n
+{
+    let mut write: u64 = 0u64;
+    let mut read: u64 = 0u64;
+    while read < n
+        invariant read <= n
+        invariant write <= read
+        decreases n - read
+    {
+        if s[read] != target {
+            s[write] = s[read];
+            write = write + 1u64;
+        };
+        read = read + 1u64;
+    };
+    write
+}
+
+// Remove duplicates from sorted span (keep first of each).
+fn remove_sorted_dups(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures result >= 1u64
+    ensures result <= n
+{
+    let mut write: u64 = 1u64;
+    let mut read: u64 = 1u64;
+    while read < n
+        invariant read <= n
+        invariant write >= 1u64
+        invariant write <= read
+        decreases n - read
+    {
+        if s[read] != s[write - 1u64] {
+            s[write] = s[read];
+            write = write + 1u64;
+        };
+        read = read + 1u64;
+    };
+    write
+}
+
+fn main() -> u64 { 0u64 }

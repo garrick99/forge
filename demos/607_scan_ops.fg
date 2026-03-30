@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 607: scan operations — inclusive and exclusive scan
 
 fn inclusive_scan_add(src: span<u64>, dst: span<u64>, n: u64)

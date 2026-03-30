@@ -1,0 +1,52 @@
+// expected: 0
+// Demo 776: Verified polynomial evaluation (Horner's method)
+//
+// Evaluates polynomial c[0] + c[1]*x + c[2]*x^2 + ... + c[n-1]*x^(n-1)
+// using Horner's method: ((c[n-1]*x + c[n-2])*x + ...)*x + c[0].
+// Proves: all coefficient accesses are in bounds.
+
+fn horner_eval(coeffs: span<u64>, n: u64, x: u64) -> u64
+    requires n >= 1u64
+    requires n <= coeffs.len
+{
+    let mut acc: u64 = coeffs[n - 1u64];
+    let mut i: u64 = n - 1u64;
+    while i > 0u64
+        invariant i < n
+        decreases i
+    {
+        i = i - 1u64;
+        acc = acc * x + coeffs[i];
+    };
+    acc
+}
+
+// Evaluate two polynomials and sum them.
+fn poly_add_eval(a: span<u64>, na: u64, b: span<u64>, nb: u64, x: u64) -> u64
+    requires na >= 1u64
+    requires na <= a.len
+    requires nb >= 1u64
+    requires nb <= b.len
+{
+    let va: u64 = horner_eval(a, na, x);
+    let vb: u64 = horner_eval(b, nb, x);
+    va + vb
+}
+
+// Polynomial derivative coefficients: d[i] = (i+1) * c[i+1].
+fn poly_derivative(coeffs: span<u64>, n: u64, deriv: span<u64>)
+    requires n >= 2u64
+    requires n <= coeffs.len
+    requires n - 1u64 <= deriv.len
+{
+    let mut i: u64 = 0u64;
+    while i + 1u64 < n
+        invariant i + 1u64 <= n
+        decreases n - i - 1u64
+    {
+        deriv[i] = (i + 1u64) * coeffs[i + 1u64];
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

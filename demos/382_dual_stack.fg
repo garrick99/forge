@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 382: Dual stack — two stacks sharing a capacity
 //
 // Two stacks grow toward each other from opposite ends of a buffer.

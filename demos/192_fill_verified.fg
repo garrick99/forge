@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 192: Verified fill — prove every element equals the fill value
 //
 // fill(s, n, val) sets all elements to val.

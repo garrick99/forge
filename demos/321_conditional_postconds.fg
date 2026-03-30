@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 321: Conditional postconditions with if/else in ensures clauses
 //
 // The proof engine now supports PIte in spec position:

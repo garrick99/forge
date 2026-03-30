@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 681: prefix operations — prefix sum, max, product (mod)
 
 fn prefix_sum(src: span<u64>, dst: span<u64>, n: u64)

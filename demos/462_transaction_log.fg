@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 462: Transaction log with WAL (write-ahead logging)
 //
 // WAL: entries written before commit. commit_lsn advances on commit.

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 383: Run-length encoding state tracker
 //
 // Tracks the current run: symbol and consecutive count.

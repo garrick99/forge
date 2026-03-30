@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 521: GCD — subtraction-based with if-else-if-else (no early returns)
 
 fn gcd(a: u64, b: u64) -> u64

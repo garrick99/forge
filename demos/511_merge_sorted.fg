@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 511: merge two sorted spans — three-phase verified merge
 
 fn merge_sorted(a: span<u64>, na: u64,

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 587: rolling statistics — online min, max, and count
 
 struct RollingStats {

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 604: integer linear interpolation
 
 fn lerp_floor(a: u64, b: u64, t_num: u64, t_den: u64) -> u64

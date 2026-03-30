@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 262: Verified normalize — shift each element down by min_val, cap at 255
 //
 // normalize_inplace(s, n, min_val) computes s[i] = min(s[i] - min_val, 255u64).

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 436: Admission control with concurrency limit
 //
 // active requests must not exceed max_concurrent.

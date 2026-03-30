@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 197: Verified normalize — clamp to [0, 255] and prove result in range
 //
 // normalize(s, n) clamps each element to [0, 255] (for image processing).

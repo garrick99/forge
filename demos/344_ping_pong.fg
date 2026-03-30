@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 344: Ping-pong alternating ownership
 //
 // Two roles (A and B) alternate turns. A "ping" increments pings

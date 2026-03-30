@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 559: min-heap property checks on a span
 
 fn heap_parent(i: u64) -> u64

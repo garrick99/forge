@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 143: Verified binary search — lower_bound
 //
 // Finds the first index where s[i] >= target in a sorted span.

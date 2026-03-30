@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 275: Verified count equal — count occurrences of a value
 //
 // count_equal(s, n, val) returns the number of indices i where s[i] == val.

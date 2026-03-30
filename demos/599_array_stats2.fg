@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 599: extended array statistics — variance helpers and range checks
 
 fn array_sum(s: span<u64>, n: u64) -> u64

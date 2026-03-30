@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 603: clamping and saturating arithmetic
 
 fn clamp(x: u64, lo: u64, hi: u64) -> u64

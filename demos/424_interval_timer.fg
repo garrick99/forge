@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 424: Interval timer with reload
 //
 // A countdown timer: tick() decrements the counter, reload() resets it

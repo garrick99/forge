@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 431: Sliding window send/receive protocol
 //
 // Sender window: next_send advances on send, ack_base advances on ack.

@@ -1,0 +1,45 @@
+// expected: 0
+// Demo 770: Verified ternary search on unimodal function (table lookup)
+//
+// Finds the maximum of a unimodal function given as a table.
+// Ternary search narrows the interval by thirds.
+// Proves: lo and hi stay in bounds and result < n.
+
+fn ternary_search_max(table: span<u64>, n: u64) -> u64
+    requires n >= 3u64
+    requires n <= table.len
+    ensures result < n
+{
+    let mut lo: u64 = 0u64;
+    let mut hi: u64 = n - 1u64;
+    while lo + 2u64 < hi
+        invariant lo < hi
+        invariant hi < n
+        decreases hi - lo
+    {
+        let third: u64 = (hi - lo) / 3u64;
+        let m1: u64 = lo + third;
+        let m2: u64 = hi - third;
+        if table[m1] < table[m2] {
+            lo = m1 + 1u64;
+        } else {
+            hi = m2 - 1u64;
+        };
+    };
+    // Find max among lo..hi (at most 3 elements).
+    let mut best: u64 = lo;
+    let mut i: u64 = lo + 1u64;
+    while i <= hi
+        invariant i <= hi + 1u64
+        invariant best < n
+        decreases hi + 1u64 - i
+    {
+        if table[i] > table[best] {
+            best = i;
+        };
+        i = i + 1u64;
+    };
+    best
+}
+
+fn main() -> u64 { 0u64 }

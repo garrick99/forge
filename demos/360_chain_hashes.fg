@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 360: Hash chain integrity counter
 //
 // A hash chain appends blocks; each block increments height and

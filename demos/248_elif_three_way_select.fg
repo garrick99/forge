@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 248: Three-way select with else-if chain
 //
 // select3(a, b, c) returns the median of three values.

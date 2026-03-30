@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 649: codec operations — variable-length encoding, delta encoding
 
 fn delta_encode(src: span<u64>, dst: span<u64>, n: u64)

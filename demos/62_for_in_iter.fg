@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 62: for-in over Iterator trait types
 //
 // Demonstrates:

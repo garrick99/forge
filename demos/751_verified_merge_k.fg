@@ -1,0 +1,76 @@
+// expected: 0
+// Demo 751: Verified merge step for merge sort
+//
+// Merges two sorted halves of a buffer using an auxiliary span.
+// Proves: all accesses in bounds.
+
+fn merge_halves(src: span<u64>, lo: u64, mid: u64, hi: u64,
+                tmp: span<u64>)
+    requires lo <= mid
+    requires mid <= hi
+    requires hi <= src.len
+    requires hi <= tmp.len
+{
+    let mut i: u64 = lo;
+    let mut j: u64 = mid;
+    let mut k: u64 = lo;
+
+    // Main merge: both halves have elements.
+    while i < mid && j < hi
+        invariant i >= lo
+        invariant i <= mid
+        invariant j >= mid
+        invariant j <= hi
+        invariant k == i + j - mid
+        invariant k <= hi
+        decreases (mid - i) + (hi - j)
+    {
+        if src[i] <= src[j] {
+            tmp[k] = src[i];
+            i = i + 1u64;
+            k = k + 1u64;
+        } else {
+            tmp[k] = src[j];
+            j = j + 1u64;
+            k = k + 1u64;
+        };
+    };
+
+    // Drain left half.
+    while i < mid
+        invariant i <= mid
+        invariant k == i + j - mid
+        invariant j <= hi
+        invariant k <= hi
+        decreases mid - i
+    {
+        tmp[k] = src[i];
+        i = i + 1u64;
+        k = k + 1u64;
+    };
+
+    // Drain right half.
+    while j < hi
+        invariant j <= hi
+        invariant k == i + j - mid
+        invariant i <= mid
+        invariant k <= hi
+        decreases hi - j
+    {
+        tmp[k] = src[j];
+        j = j + 1u64;
+        k = k + 1u64;
+    };
+
+    // Copy back.
+    let mut c: u64 = lo;
+    while c < hi
+        invariant c <= hi
+        decreases hi - c
+    {
+        src[c] = tmp[c];
+        c = c + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

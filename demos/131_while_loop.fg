@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 131: While loops with invariants
 //
 // Tests loop invariant checking end-to-end.

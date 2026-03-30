@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 179: Verified GPU scan upsweep (reduce phase)
 //
 // The "upsweep" (reduce) phase of a work-efficient prefix scan.

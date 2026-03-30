@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 208: old() in postconditions — prove preservation
 //
 // reverse_first_n reverses the first n elements.

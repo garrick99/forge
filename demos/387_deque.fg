@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 387: Double-ended queue length tracking
 //
 // A deque tracks length and capacity. push_front and push_back

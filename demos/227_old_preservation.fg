@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 227: old() in postconditions — verified preservation
 //
 // fill_last(s, n, val) writes val into s[n-1], leaving the rest unchanged.

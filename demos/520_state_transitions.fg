@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 520: typestate protocol — a verified state machine with transition proofs
 
 // States encoded as u64 constants

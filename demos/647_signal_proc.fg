@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 647: simple signal processing — threshold, peak detection, normalization
 
 fn threshold_signal(s: span<u64>, n: u64, thresh: u64)

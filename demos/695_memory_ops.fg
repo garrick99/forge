@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 695: memory operations — memset, memcpy, memmove, memcmp
 
 fn memset(buf: span<u64>, n: u64, val: u64)

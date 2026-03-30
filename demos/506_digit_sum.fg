@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 506: digit_sum and decimal decomposition
 //
 // All arithmetic is u64. We bound inputs to avoid overflow.

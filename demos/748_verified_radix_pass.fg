@@ -1,0 +1,68 @@
+// expected: 0
+// Demo 748: Verified single radix-sort pass (one digit)
+//
+// Performs one pass of radix sort on the lowest `digit` (0-255 range).
+// Uses a count array to compute prefix sums, then scatters elements.
+// Proves: all index accesses are within bounds.
+
+fn radix_pass(input: span<u64>, n: u64,
+              output: span<u64>,
+              counts: span<u64>)
+    requires n <= input.len
+    requires n <= output.len
+    requires 256u64 <= counts.len
+{
+    // Clear counts.
+    let mut c: u64 = 0u64;
+    while c < 256u64
+        invariant c <= 256u64
+        decreases 256u64 - c
+    {
+        counts[c] = 0u64;
+        c = c + 1u64;
+    };
+
+    // Count occurrences of each digit.
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let digit: u64 = input[i] % 256u64;
+        counts[digit] = counts[digit] + 1u64;
+        i = i + 1u64;
+    };
+
+    // Prefix sum (exclusive) — gives start position of each digit bucket.
+    let mut sum: u64 = 0u64;
+    let mut d: u64 = 0u64;
+    while d < 256u64
+        invariant d <= 256u64
+        invariant sum <= n
+        decreases 256u64 - d
+    {
+        let old_count: u64 = counts[d];
+        counts[d] = sum;
+        if sum + old_count <= n {
+            sum = sum + old_count;
+        };
+        d = d + 1u64;
+    };
+
+    // Scatter to output using prefix sums as cursors.
+    let mut j: u64 = 0u64;
+    while j < n
+        invariant j <= n
+        decreases n - j
+    {
+        let digit2: u64 = input[j] % 256u64;
+        let pos: u64 = counts[digit2];
+        if pos < n {
+            output[pos] = input[j];
+            counts[digit2] = pos + 1u64;
+        };
+        j = j + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

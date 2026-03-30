@@ -1,0 +1,59 @@
+// expected: 0
+// Demo 769: Verified array interleaving and deinterleaving
+//
+// Interleave: merge two arrays by alternating elements.
+// Deinterleave: split one array into even/odd indexed parts.
+// Proves: all indices in bounds and output length is correct.
+
+fn interleave(a: span<u64>, b: span<u64>, n: u64, out: span<u64>)
+    requires n <= a.len
+    requires n <= b.len
+    requires n + n <= out.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        out[i + i] = a[i];
+        out[i + i + 1u64] = b[i];
+        i = i + 1u64;
+    };
+}
+
+fn deinterleave(input: span<u64>, n: u64, even: span<u64>, odd: span<u64>)
+    requires n >= 2u64
+    requires n <= input.len
+    requires n / 2u64 <= even.len
+    requires n / 2u64 <= odd.len
+{
+    let half: u64 = n / 2u64;
+    let mut i: u64 = 0u64;
+    while i < half
+        invariant i <= half
+        decreases half - i
+    {
+        even[i] = input[i + i];
+        odd[i] = input[i + i + 1u64];
+        i = i + 1u64;
+    };
+}
+
+// Transpose a 2×n matrix (stored as two rows) into n×2 (interleaved pairs).
+fn transpose_2xn(row0: span<u64>, row1: span<u64>, n: u64, out: span<u64>)
+    requires n <= row0.len
+    requires n <= row1.len
+    requires n + n <= out.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        out[i + i] = row0[i];
+        out[i + i + 1u64] = row1[i];
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

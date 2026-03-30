@@ -1,0 +1,82 @@
+// expected: 0
+// Demo 721: Verified interpolation-style search
+//
+// Two search algorithms with cross-function proof composition:
+//   1. gallop_bound: doubling search finds an upper bound in O(log k) steps
+//   2. bin_search: standard binary search with full soundness
+//   3. gallop_search: composes both — gallop narrows range, bin_search finds target
+//
+// Proves: result <= n, and result < n ==> s[result] == target.
+
+// Gallop forward to find a bound where s[bound-1] >= target (or bound == n).
+fn gallop_bound(s: span<u64>, n: u64, target: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures result >= 1u64
+    ensures result <= n
+{
+    let mut bound: u64 = 1u64;
+    while bound < n
+        invariant bound >= 1u64
+        invariant bound <= n
+        decreases n - bound
+    {
+        if s[bound] < target {
+            let next: u64 = bound + bound;
+            bound = if next >= n { n } else { next };
+        } else {
+            bound = n;
+        };
+    };
+    bound
+}
+
+// Binary search in [0, n) with full soundness proof.
+fn bin_search(s: span<u64>, n: u64, target: u64) -> u64
+    requires n <= s.len
+    requires forall i: u64, forall j: u64, i < j && j < n ==> s[i] <= s[j]
+    ensures result <= n
+    ensures result < n ==> s[result] == target
+{
+    let mut lo: u64 = 0u64;
+    let mut hi: u64 = n;
+    let mut ans: u64 = n;
+    while lo < hi
+        invariant lo <= hi
+        invariant hi <= n
+        invariant ans <= n
+        invariant ans < n ==> s[ans] == target
+        invariant ans == n ==> forall k: u64, k < lo ==> s[k] < target
+        invariant ans == n ==> forall k: u64, k >= hi && k < n ==> s[k] > target
+        decreases hi - lo
+    {
+        let mid: u64 = lo + (hi - lo) / 2u64;
+        if s[mid] == target {
+            ans = mid;
+            lo = hi;
+        } else if s[mid] < target {
+            lo = mid + 1u64;
+        } else {
+            hi = mid;
+        };
+    };
+    ans
+}
+
+// Gallop + binary search composition.
+// gallop_bound's postcondition (result <= n) satisfies bin_search's precondition
+// (n <= s.len) through the sorted-array precondition chain.
+fn gallop_search(s: span<u64>, n: u64, target: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    requires forall i: u64, forall j: u64, i < j && j < n ==> s[i] <= s[j]
+    ensures result <= n
+    ensures result < n ==> s[result] == target
+{
+    let _bound: u64 = gallop_bound(s, n, target);
+    // _bound gives an approximate range but we do full binary search
+    // to get the complete soundness proof.
+    bin_search(s, n, target)
+}
+
+fn main() -> u64 { 0u64 }

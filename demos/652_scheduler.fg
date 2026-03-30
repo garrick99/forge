@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 652: simple round-robin scheduler
 
 fn sched_next(current: u64, n: u64) -> u64

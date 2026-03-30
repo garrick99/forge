@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 346: Semaphore with up/down operations
 //
 // A counting semaphore: down acquires (decrements), up releases (increments).

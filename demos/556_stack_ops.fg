@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 556: stack operations on a span with a length counter
 
 fn stack_push(s: span<u64>, len: u64, val: u64) -> u64

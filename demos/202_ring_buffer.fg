@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 202: Verified ring buffer index arithmetic
 //
 // Ring buffer with head/tail pointers.

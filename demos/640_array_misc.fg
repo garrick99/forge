@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 640: miscellaneous array utilities
 
 fn array_iota(s: span<u64>, n: u64, start: u64)

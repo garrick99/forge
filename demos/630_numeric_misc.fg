@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 630: miscellaneous numeric utilities
 
 fn min3(a: u64, b: u64, c: u64) -> u64

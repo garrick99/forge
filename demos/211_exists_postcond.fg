@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 211: Existential postcondition — find returns a witness
 //
 // find_nonzero returns an index k where s[k] > 0, or n if none exists.

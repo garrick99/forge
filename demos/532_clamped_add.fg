@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 532: saturating and clamped arithmetic operations
 
 fn sat_add_u64(a: u64, b: u64) -> u64

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 513: absolute value and sign operations for signed integers
 
 fn abs_i64(x: i64) -> i64

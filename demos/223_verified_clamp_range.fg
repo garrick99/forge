@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 223: Verified clamp over a range [lo, hi)
 //
 // clamp_range(s, lo, hi, min_val, max_val) clamps each s[i] to [min_val, max_val].

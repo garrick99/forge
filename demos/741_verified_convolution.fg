@@ -1,0 +1,66 @@
+// expected: 0
+// Demo 741: Verified 1D discrete convolution
+//
+// Computes output[i] = sum_{j=0}^{k-1} input[i+j] * kernel[j].
+// Proves all array accesses are in bounds.
+
+fn convolve_1d(input: span<u64>, n: u64,
+               kernel: span<u64>, k: u64,
+               output: span<u64>)
+    requires k >= 1u64
+    requires k <= n
+    requires n <= input.len
+    requires k <= kernel.len
+    requires n - k + 1u64 <= output.len
+{
+    let out_len: u64 = n - k + 1u64;
+    let mut i: u64 = 0u64;
+    while i < out_len
+        invariant i <= out_len
+        decreases out_len - i
+    {
+        let mut acc: u64 = 0u64;
+        let mut j: u64 = 0u64;
+        while j < k
+            invariant j <= k
+            decreases k - j
+        {
+            acc = acc + input[i + j] * kernel[j];
+            j = j + 1u64;
+        };
+        output[i] = acc;
+        i = i + 1u64;
+    };
+}
+
+// Cross-correlation (same as convolution but kernel not reversed).
+fn correlate_1d(input: span<u64>, n: u64,
+                pattern: span<u64>, k: u64,
+                output: span<u64>)
+    requires k >= 1u64
+    requires k <= n
+    requires n <= input.len
+    requires k <= pattern.len
+    requires n - k + 1u64 <= output.len
+{
+    let out_len: u64 = n - k + 1u64;
+    let mut i: u64 = 0u64;
+    while i < out_len
+        invariant i <= out_len
+        decreases out_len - i
+    {
+        let mut acc: u64 = 0u64;
+        let mut j: u64 = 0u64;
+        while j < k
+            invariant j <= k
+            decreases k - j
+        {
+            acc = acc + input[i + j] * pattern[j];
+            j = j + 1u64;
+        };
+        output[i] = acc;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 710: Three-way merge of sorted arrays — flat 12-branch elif
 //
 // Merges a[0..na), b[0..nb), c[0..nc) into out[0..na+nb+nc).

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 341: High-watermark tracker
 //
 // Tracks the maximum value seen so far. The watermark can only

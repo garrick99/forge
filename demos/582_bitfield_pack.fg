@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 582: packing and unpacking multiple fields into a u64
 
 fn pack2(a: u64, b: u64, a_bits: u64) -> u64

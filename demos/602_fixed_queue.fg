@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 602: fixed-size circular queue (array-backed)
 
 fn queue_enqueue(buf: span<u64>, cap: u64, tail: u64, val: u64) -> u64

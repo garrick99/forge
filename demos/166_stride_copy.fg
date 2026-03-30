@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 166: Verified stride copy
 //
 // Copies every `stride`-th element from src into dst.

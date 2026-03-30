@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 702: Selection sort with sorted output proof
 //
 // After sorting, proves: forall a < b < n, s[a] <= s[b]

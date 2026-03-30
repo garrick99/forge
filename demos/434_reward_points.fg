@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 434: Reward points with tiers and expiry tracking
 //
 // Points earned accumulate; redemptions reduce balance.

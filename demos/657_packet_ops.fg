@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 657: packet header operations — fields, checksum, validation
 
 fn field_get(pkt: span<u64>, offset: u64, width: u64) -> u64

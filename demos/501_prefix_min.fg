@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 501: prefix_min — running minimum with quantified postcondition
 
 fn prefix_min(s: span<u64>, n: u64, out: span<u64>)

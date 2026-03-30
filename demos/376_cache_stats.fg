@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 376: Cache hit/miss statistics
 //
 // A cache stats tracker: hit() and miss() increment respective counters.

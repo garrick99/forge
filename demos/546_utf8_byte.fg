@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 546: UTF-8 byte classification and sequence length
 
 fn utf8_seq_len(first_byte: u64) -> u64

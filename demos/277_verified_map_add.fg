@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 277: Verified map-add — add scalar to each element
 //
 // map_add(s, n, delta) sets s[i] += delta for all i.

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 182: For-loop with running sum invariant
 //
 // Computes the sum of elements in a span.

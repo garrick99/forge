@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 245: Copy-back with range — copy from [mid, n) to [0, n-mid)
 //
 // copy_back(s, mid, n) copies s[mid..n) into s[0..n-mid).

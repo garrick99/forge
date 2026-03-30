@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 299: Lambda expressions — \(x: T) -> body
 //
 // Anonymous functions (lambdas) are lifted to top-level static functions.

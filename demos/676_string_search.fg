@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 676: string search — naive pattern matching, count occurrences
 
 fn str_match_at(text: span<u64>, tlen: u64, pat: span<u64>, plen: u64, pos: u64) -> bool

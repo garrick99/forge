@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 128: Verified ring buffer (circular FIFO queue)
 //
 // Fixed 8-slot ring buffer. head/tail in [0,8), size in [0,8].

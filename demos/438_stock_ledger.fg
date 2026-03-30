@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 438: Stock ledger with shares and cost basis
 //
 // Tracks shares held, total cost paid, and number of trades.

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 600: milestone — diverse verified utilities
 
 fn abs_diff(a: u64, b: u64) -> u64 {

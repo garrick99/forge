@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 433: Pipeline buffer with backpressure
 //
 // A bounded buffer: items are pushed in, popped out.

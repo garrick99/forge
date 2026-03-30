@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 446: Flow meter with sampling and overflow detection
 //
 // Samples accumulate bytes; when count reaches sample_interval, a sample fires.

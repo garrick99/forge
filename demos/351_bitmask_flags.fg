@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 351: Bitmask flag register with set/toggle
 //
 // A flags register where individual bits represent boolean flags.

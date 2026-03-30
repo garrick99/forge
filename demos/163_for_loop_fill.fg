@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 163: Verified for-loop array fill
 //
 // Fills every slot of a span with `val` using a for loop.

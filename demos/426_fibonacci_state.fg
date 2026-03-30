@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 426: Fibonacci iterator state
 //
 // Iterates Fibonacci by keeping the last two values.

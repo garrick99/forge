@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 459: Cache eviction policy tracker
 //
 // Cache has capacity slots. On miss, evict oldest if full.

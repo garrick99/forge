@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 704: Merge of two sorted arrays — output is sorted
 //
 // Single loop over the output, writing to out[i+j] directly (no separate k).

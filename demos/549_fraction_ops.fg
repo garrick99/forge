@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 549: unsigned fraction operations with verified bounds
 
 struct Frac {

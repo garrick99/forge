@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 639: sorting algorithm variants — shell sort step, counting sort
 
 fn shell_sort_gap(s: span<u64>, n: u64, gap: u64)

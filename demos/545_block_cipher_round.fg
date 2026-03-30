@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 545: block cipher round operations (AES-like S-box and permutation)
 
 fn sbox_lookup(input: u64, sbox: span<u64>) -> u64

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 583: Tower of Hanoi — move count = 2^n - 1
 
 fn hanoi_moves(n: u64) -> u64

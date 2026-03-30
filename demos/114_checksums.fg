@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 114: Verified checksum algorithms
 //
 // Internet checksum (ones-complement sum), simple CRC-8, Fletcher-16 checksum,

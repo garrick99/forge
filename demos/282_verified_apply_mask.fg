@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 282: Verified apply mask — zero out elements where mask[i] == 0
 //
 // apply_mask(s, mask, n) sets s[i] = 0 where mask[i] == 0, else keeps s[i].

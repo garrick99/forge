@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 110: Verified fixed-point arithmetic (Q16.16 format)
 //
 // 32-bit fixed-point numbers: upper 16 bits = integer part,

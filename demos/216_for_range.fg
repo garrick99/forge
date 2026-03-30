@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 216: for i in lo..hi — bounded range loop, verified
 //
 // fill_range sets s[i] = i for i in [lo, hi).

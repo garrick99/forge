@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 698: queue operations — circular buffer queue
 
 fn queue_enqueue(buf: span<u64>, cap: u64, tail: u64, val: u64) -> u64

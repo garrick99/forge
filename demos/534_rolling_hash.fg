@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 534: polynomial rolling hash over a span
 
 fn span_hash(s: span<u64>, n: u64, base: u64, mod: u64) -> u64

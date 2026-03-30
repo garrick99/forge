@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 455: Packet send window with retransmit tracking
 //
 // Packets are sent; unacked ones can be retransmitted.

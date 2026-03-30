@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 287: Verified scale array — multiply each element by factor
 //
 // scale(s, n, factor) sets s[i] *= factor.

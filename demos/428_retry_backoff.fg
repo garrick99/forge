@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 428: Retry with exponential backoff state
 //
 // Tracks retry count and current delay (doubles each retry up to max_delay).

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 342: Epoch counter with generation tracking
 //
 // A versioned state: each "commit" increments the epoch,

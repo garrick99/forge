@@ -1,0 +1,43 @@
+// expected: 0
+// Demo 773: Verified sparse matrix-vector multiply (CSR format)
+//
+// CSR (Compressed Sparse Row): row_ptr[i] = start of row i in col_idx/values.
+// y[i] = sum_j A[i,j] * x[j] for non-zero entries.
+// Proves: all array accesses are within bounds.
+
+fn spmv_csr(row_ptr: span<u64>, col_idx: span<u64>, values: span<u64>,
+            nrows: u64, nnz: u64,
+            x: span<u64>, x_len: u64,
+            y: span<u64>)
+    requires nrows >= 1u64
+    requires nrows + 1u64 <= row_ptr.len
+    requires nnz <= col_idx.len
+    requires nnz <= values.len
+    requires nrows <= y.len
+    requires x_len <= x.len
+    requires forall k: u64, k < nnz ==> col_idx[k] < x_len
+    requires forall k: u64, k <= nrows ==> row_ptr[k] <= nnz
+{
+    let mut i: u64 = 0u64;
+    while i < nrows
+        invariant i <= nrows
+        decreases nrows - i
+    {
+        let row_start: u64 = row_ptr[i];
+        let row_end: u64 = row_ptr[i + 1u64];
+        let mut acc: u64 = 0u64;
+        let mut j: u64 = row_start;
+        while j < row_end
+            invariant j <= nnz
+            decreases nnz - j
+        {
+            let col: u64 = col_idx[j];
+            acc = acc + values[j] * x[col];
+            j = j + 1u64;
+        };
+        y[i] = acc;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

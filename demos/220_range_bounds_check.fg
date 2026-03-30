@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 220: Bounds check injection for lo..hi range
 //
 // Demonstrates that for i in lo..hi automatically injects lo <= i < hi,

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 317: Transaction typestate — verified begin/commit/rollback
 //
 // A database transaction with three states:

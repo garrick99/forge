@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 694: statistics — mean, variance helpers, percentile
 
 fn stat_sum(s: span<u64>, n: u64) -> u64

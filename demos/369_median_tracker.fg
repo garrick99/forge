@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 369: Min/max tracker with running bounds
 //
 // Tracks the minimum and maximum values seen so far.

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 337: Retry state machine with attempt tracking
 //
 // An operation retry controller: the state tracks the number

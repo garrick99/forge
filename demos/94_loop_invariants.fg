@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 94: Loop invariants — prove correctness of iterative algorithms
 //
 // 'invariant' in a while loop provides facts the SMT can use at each iteration.

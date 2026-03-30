@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 490: conditional postconditions — exhaustive case analysis
 //
 // Each function carries complete if/else postconditions covering all cases.

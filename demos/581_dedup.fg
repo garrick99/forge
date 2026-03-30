@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 581: deduplicate consecutive equal elements (sorted span)
 
 fn dedup_sorted(s: span<u64>, n: u64) -> u64

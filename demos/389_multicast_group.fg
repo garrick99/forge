@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 389: Multicast group membership tracker
 //
 // A multicast group: join() adds a member (up to max),

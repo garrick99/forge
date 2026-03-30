@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 228: Verified reverse — postcondition with old()
 //
 // reverse_copy(dst, src, n) writes dst[i] = src[n-1-i] for all i.

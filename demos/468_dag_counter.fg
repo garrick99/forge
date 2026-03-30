@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 468: DAG node reference counter for topological processing
 //
 // Nodes have in-degree. When in-degree reaches 0, node is "ready".

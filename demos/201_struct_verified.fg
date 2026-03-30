@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 201: Verified struct with invariant
 //
 // BoundedCounter struct invariant: count <= max.

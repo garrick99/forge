@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 403: Raft consensus log state
 //
 // A Raft node tracks: current_term, commit_index, last_applied.

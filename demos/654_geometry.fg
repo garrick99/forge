@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 654: 2D integer geometry — bounding box, area, containment
 
 fn bbox_width(x_lo: u64, x_hi: u64) -> u64

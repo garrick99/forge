@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 705: Insertion sort with sorted output proof
 //
 // After each outer iteration i, s[0..i+1) is sorted.

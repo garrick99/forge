@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 333: Balance operations — deposit/withdraw with verified accounting
 //
 // A simple account balance with verified deposit and withdrawal.

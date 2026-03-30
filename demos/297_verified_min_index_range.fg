@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 297: Verified min index in subrange — find index of minimum in s[lo..hi)
 //
 // min_index_range(s, n, lo, hi) returns idx in [lo,hi) such that s[idx] <= s[k] for k in [lo,hi).

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 412: Memory fragmentation tracker
 //
 // Tracks allocated blocks and free fragments. split() divides a free

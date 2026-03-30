@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 217: Partial fill using lo..hi range
 //
 // zero_range sets s[i] = 0 for i in [lo, hi).

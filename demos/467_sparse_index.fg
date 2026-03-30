@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 467: Sparse index with bucket tracking
 //
 // Keys hash into one of three buckets. Each insert increments bucket count.

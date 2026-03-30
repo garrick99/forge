@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 497: span predicates — verified element classification over arrays
 
 fn count_nonzero(s: span<u64>, n: u64) -> u64

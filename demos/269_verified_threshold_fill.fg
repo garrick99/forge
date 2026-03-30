@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 269: Verified threshold fill — set elements above threshold to threshold
 //
 // threshold_fill(s, n, cap) sets s[i] = min(s[i], cap) for all i.

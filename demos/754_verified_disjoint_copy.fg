@@ -1,0 +1,79 @@
+// expected: 0
+// Demo 754: Verified disjoint memory operations
+//
+// Copy, swap, and compare operations on non-overlapping span regions.
+// Proves: indices stay in bounds and output counts are correct.
+
+// Copy n elements from src to dst (non-overlapping).
+fn memcopy(src: span<u64>, dst: span<u64>, n: u64)
+    requires n <= src.len
+    requires n <= dst.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        dst[i] = src[i];
+        i = i + 1u64;
+    };
+}
+
+// Swap n elements between two spans.
+fn memswap(a: span<u64>, b: span<u64>, n: u64)
+    requires n <= a.len
+    requires n <= b.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let tmp: u64 = a[i];
+        a[i] = b[i];
+        b[i] = tmp;
+        i = i + 1u64;
+    };
+}
+
+// Compare two spans lexicographically.
+// Returns: 0 if equal, 1 if a > b at first difference, 2 if a < b.
+fn memcompare(a: span<u64>, b: span<u64>, n: u64) -> u64
+    requires n <= a.len
+    requires n <= b.len
+    ensures result <= 2u64
+{
+    let mut i: u64 = 0u64;
+    let mut res: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant res <= 2u64
+        decreases n - i
+    {
+        if res == 0u64 {
+            if a[i] > b[i] {
+                res = 1u64;
+            } else if a[i] < b[i] {
+                res = 2u64;
+            };
+        };
+        i = i + 1u64;
+    };
+    res
+}
+
+// Fill a span with incrementing values: 0, 1, 2, ...
+fn iota(s: span<u64>, n: u64)
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        s[i] = i;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

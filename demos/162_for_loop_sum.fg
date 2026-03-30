@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 162: Verified for-loop array sum
 //
 // Uses `for i in n` range syntax to sum array elements.

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 650: milestone 2 — diverse verified algorithms
 
 fn binary_search2(s: span<u64>, n: u64, target: u64) -> u64

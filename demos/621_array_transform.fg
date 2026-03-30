@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 621: array transformations — negate, square, abs-diff from mean
 
 fn array_negate_sat(s: span<u64>, n: u64, max_val: u64)

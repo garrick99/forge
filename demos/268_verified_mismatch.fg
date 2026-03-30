@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 268: Verified mismatch — first index where a[i] != b[i]
 //
 // mismatch(a, b, n) returns the first index i where a[i] != b[i],

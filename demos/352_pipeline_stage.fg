@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 352: Pipeline stage tracker
 //
 // A 3-stage pipeline: fetch → decode → execute.

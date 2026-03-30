@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 199: For-loop over span elements with invariant
 //
 // Iterate over elements directly (for x in s).

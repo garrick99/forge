@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 635: windowed operations — moving average, min, max
 
 fn window_min(s: span<u64>, n: u64, k: u64, out: span<u64>)

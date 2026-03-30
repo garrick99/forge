@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 260: Verified running maximum — track max so far using elif update
 //
 // running_max(s, n) computes the running maximum and returns the global max.

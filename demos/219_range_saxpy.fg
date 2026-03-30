@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 219: SAXPY over a bounded range [lo, hi)
 //
 // saxpy_range computes y[i] += alpha * x[i] for i in [lo, hi).

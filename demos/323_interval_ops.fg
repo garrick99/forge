@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 323: Verified interval arithmetic with conditional postconditions
 //
 // An interval [lo, hi] with verified set operations.

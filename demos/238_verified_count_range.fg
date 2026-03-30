@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 238: Verified counting with range syntax
 //
 // count_in_bounds(s, n, lo_val, hi_val) counts elements in [lo_val, hi_val].

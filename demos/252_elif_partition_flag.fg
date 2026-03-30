@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 252: Verified 3-way partition using else-if with array writes
 //
 // partition3(dst_lo, dst_hi, s, n, pivot) partitions s into lo (< pivot)

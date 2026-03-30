@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 285: Verified upper bound — first index where s[i] > val (binary-free linear scan)
 //
 // upper_bound(s, n, val) returns the first index i where s[i] > val, or n if none.

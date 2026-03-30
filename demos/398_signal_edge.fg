@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 398: Signal edge detector
 //
 // Detects rising and falling edges on a digital signal.

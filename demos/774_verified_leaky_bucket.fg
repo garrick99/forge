@@ -1,0 +1,44 @@
+// expected: 0
+// Demo 774: Verified leaky-bucket rate limiter
+//
+// Models a token-bucket rate limiter: tokens accumulate up to a max,
+// and each request consumes one token.
+// Proves: bucket level stays in [0, capacity].
+
+fn process_requests(arrivals: span<u64>, n: u64,
+                    capacity: u64, refill_rate: u64,
+                    results: span<u64>) -> u64
+    requires n <= arrivals.len
+    requires n <= results.len
+    requires capacity >= 1u64
+    requires refill_rate >= 1u64
+    ensures result <= n
+{
+    let mut tokens: u64 = capacity;
+    let mut accepted: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant tokens <= capacity
+        invariant accepted <= i
+        decreases n - i
+    {
+        // Refill tokens (capped at capacity).
+        let refill: u64 = arrivals[i];
+        let new_tokens: u64 = tokens + refill * refill_rate;
+        tokens = if new_tokens > capacity { capacity } else { new_tokens };
+
+        // Try to accept request.
+        if tokens >= 1u64 {
+            tokens = tokens - 1u64;
+            results[i] = 1u64;
+            accepted = accepted + 1u64;
+        } else {
+            results[i] = 0u64;
+        };
+        i = i + 1u64;
+    };
+    accepted
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 445: Frequency table for three symbol classes
 //
 // Counts occurrences of class A, B, C symbols.

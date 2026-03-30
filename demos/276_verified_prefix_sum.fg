@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 276: Verified prefix sum — out[i] >= in[i] for all i
 //
 // prefix_sum(src, dst, n) sets dst[i] = src[0] + ... + src[i].

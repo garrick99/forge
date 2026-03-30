@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 456: Log compaction with snapshot and truncation
 //
 // Log entries accumulate; compaction takes a snapshot and truncates old entries.

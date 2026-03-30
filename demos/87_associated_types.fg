@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 87: Associated types — trait with type Item
 //
 // A trait can declare an associated type.  Implementors specify the concrete

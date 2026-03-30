@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 662: buffer operations — append, prepend, drain, compact
 
 fn buf_append(buf: span<u64>, len: u64, val: u64) -> u64

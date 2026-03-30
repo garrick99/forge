@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 99: Enum payloads — complex data in enum variants
 //
 // Enum variants can carry multiple types of data.

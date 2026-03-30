@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 610: min-heap sift operations (array-backed)
 
 fn heap_parent(i: u64) -> u64

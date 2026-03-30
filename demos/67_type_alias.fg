@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 67: Type aliases + chained method calls
 //
 // type Alias = ExistingType;  emits C typedef.

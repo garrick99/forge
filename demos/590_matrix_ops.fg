@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 590: matrix-vector multiply and matrix fill (row-major layout)
 
 fn mat_get(m: span<u64>, rows: u64, cols: u64, r: u64, c: u64) -> u64

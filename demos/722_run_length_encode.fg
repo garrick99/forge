@@ -1,0 +1,41 @@
+// expected: 0
+// Demo 722: Run-length encoding — count consecutive equal elements
+//
+// Scans an input span and writes (value, count) pairs into two output spans.
+// Proves: output index stays within bounds and the total run count equals
+// the number of distinct runs (each run is at least 1 element).
+
+fn rle_encode(input: span<u64>, n: u64, vals: span<u64>, counts: span<u64>, cap: u64) -> u64
+    requires n >= 1u64
+    requires n <= input.len
+    requires cap <= vals.len
+    requires cap <= counts.len
+    requires cap >= 1u64
+    ensures result >= 1u64
+    ensures result <= cap
+{
+    let mut out_idx: u64 = 0u64;
+    let mut run_start: u64 = 0u64;
+
+    vals[0u64] = input[0u64];
+    let mut i: u64 = 1u64;
+    while i < n && out_idx < cap - 1u64
+        invariant i <= n
+        invariant out_idx < cap
+        invariant run_start < i
+        decreases n - i
+    {
+        if input[i] != input[run_start] {
+            counts[out_idx] = i - run_start;
+            out_idx = out_idx + 1u64;
+            vals[out_idx] = input[i];
+            run_start = i;
+        };
+        i = i + 1u64;
+    };
+    // Final run.
+    counts[out_idx] = i - run_start;
+    out_idx + 1u64
+}
+
+fn main() -> u64 { 0u64 }

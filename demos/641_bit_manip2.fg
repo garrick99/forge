@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 641: bit manipulation — rotate, extract, deposit, pack/unpack nibbles
 
 fn rotate_left32(x: u64, n: u64) -> u64

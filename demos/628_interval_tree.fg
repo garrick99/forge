@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 628: interval operations — overlap, containment, merge
 
 fn interval_overlaps(a_lo: u64, a_hi: u64, b_lo: u64, b_hi: u64) -> bool

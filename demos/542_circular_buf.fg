@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 542: verified circular buffer with wrap-around indexing
 
 fn circ_next(idx: u64, cap: u64) -> u64

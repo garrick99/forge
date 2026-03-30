@@ -1,0 +1,77 @@
+// expected: 0
+// Demo 742: Verified brute-force string search
+//
+// Searches for a pattern in a text (both as spans of u64 "characters").
+// Returns the first match index or n if not found.
+// Proves: result <= n, and result < n means there's a match at that position.
+
+fn string_search(text: span<u64>, n: u64, pattern: span<u64>, m: u64) -> u64
+    requires m >= 1u64
+    requires m <= n
+    requires n <= text.len
+    requires m <= pattern.len
+    ensures result <= n
+{
+    let limit: u64 = n - m + 1u64;
+    let mut i: u64 = 0u64;
+    let mut found: u64 = n;
+    while i < limit
+        invariant i <= limit
+        invariant found <= n
+        decreases limit - i
+    {
+        let mut j: u64 = 0u64;
+        let mut match_: bool = true;
+        while j < m && match_
+            invariant j <= m
+            decreases m - j
+        {
+            if text[i + j] != pattern[j] {
+                match_ = false;
+            };
+            j = j + 1u64;
+        };
+        if match_ && found == n {
+            found = i;
+        };
+        i = i + 1u64;
+    };
+    found
+}
+
+// Count all occurrences (overlapping).
+fn count_matches(text: span<u64>, n: u64, pattern: span<u64>, m: u64) -> u64
+    requires m >= 1u64
+    requires m <= n
+    requires n <= text.len
+    requires m <= pattern.len
+    ensures result <= n
+{
+    let limit: u64 = n - m + 1u64;
+    let mut count: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < limit
+        invariant i <= limit
+        invariant count <= i
+        decreases limit - i
+    {
+        let mut j: u64 = 0u64;
+        let mut match_: bool = true;
+        while j < m && match_
+            invariant j <= m
+            decreases m - j
+        {
+            if text[i + j] != pattern[j] {
+                match_ = false;
+            };
+            j = j + 1u64;
+        };
+        if match_ {
+            count = count + 1u64;
+        };
+        i = i + 1u64;
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

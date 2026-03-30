@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 689: crypto utilities — XOR cipher, byte rotation, simple hash
 
 fn xor_cipher(buf: span<u64>, n: u64, key: u64)

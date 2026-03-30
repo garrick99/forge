@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 443: Ring counter (Johnson counter / Gray-like)
 //
 // A modulo-N counter with lap tracking.

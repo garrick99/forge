@@ -1,0 +1,76 @@
+// expected: 0
+// Demo 736: Verified fold / accumulate operations
+//
+// Generic-style accumulation patterns over spans.
+// Proves bounds safety and accumulator invariants.
+
+// Sum of squares: acc += s[i] * s[i].
+fn sum_of_squares(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + s[i] * s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+// Weighted sum: acc += s[i] * (i + 1).
+fn weighted_sum(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + s[i] * (i + 1u64);
+        i = i + 1u64;
+    };
+    acc
+}
+
+// Product of all elements.
+fn product(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+{
+    let mut acc: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc * s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+// Count elements satisfying a threshold.
+fn count_above(s: span<u64>, n: u64, threshold: u64) -> u64
+    requires n <= s.len
+    ensures result <= n
+{
+    let mut count: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant count <= i
+        decreases n - i
+    {
+        if s[i] > threshold {
+            count = count + 1u64;
+        };
+        i = i + 1u64;
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

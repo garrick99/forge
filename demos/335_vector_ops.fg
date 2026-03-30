@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 335: Growable vector with verified length tracking
 //
 // A bounded vector (backed by a fixed array) where push/pop

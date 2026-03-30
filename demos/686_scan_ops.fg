@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 686: scan operations — inclusive/exclusive scan, segmented scan
 
 fn scan_inclusive(src: span<u64>, dst: span<u64>, n: u64)

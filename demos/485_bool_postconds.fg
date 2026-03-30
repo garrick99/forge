@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 485: bool postconditions and conditional returns
 //
 // Exercises functions returning bool with exact postconditions,

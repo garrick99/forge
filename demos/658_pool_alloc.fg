@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 658: pool allocator (array-backed free list)
 
 fn pool_alloc(free_list: span<u64>, n: u64, head: u64) -> u64

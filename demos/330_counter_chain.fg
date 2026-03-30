@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 330: Counter chaining — old() injection across call boundaries
 //
 // Demonstrates that ensures x == old(x) + k postconditions from void

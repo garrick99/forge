@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 345: Event log with capacity and flush
 //
 // An event log buffers events up to a capacity limit.

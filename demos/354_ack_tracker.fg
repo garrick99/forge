@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 354: Acknowledgement tracker (send/ack protocol)
 //
 // Tracks sent and acknowledged sequence numbers.

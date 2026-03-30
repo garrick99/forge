@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 509: scan_add — prefix-sum scan (in-place and out-of-place)
 //
 // scan_add([a, b, c, d]) => [a, a+b, a+b+c, a+b+c+d]

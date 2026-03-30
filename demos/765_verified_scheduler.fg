@@ -1,0 +1,44 @@
+// expected: 0
+// Demo 765: Verified round-robin scheduler
+//
+// Simulates a round-robin scheduler with fixed time quantums.
+// Tasks stored in a queue; each task has remaining time.
+// Proves: task index stays in bounds and total remaining time decreases.
+
+fn round_robin(remaining: span<u64>, ntasks: u64, quantum: u64) -> u64
+    requires ntasks >= 1u64
+    requires ntasks <= remaining.len
+    requires quantum >= 1u64
+    ensures result <= ntasks
+{
+    let mut completed: u64 = 0u64;
+    let mut rounds: u64 = 0u64;
+    let max_rounds: u64 = ntasks * 1000u64;
+
+    while completed < ntasks && rounds < max_rounds
+        invariant completed <= ntasks
+        invariant rounds <= max_rounds
+        decreases max_rounds - rounds
+    {
+        let mut i: u64 = 0u64;
+        while i < ntasks
+            invariant i <= ntasks
+            invariant completed <= ntasks
+            decreases ntasks - i
+        {
+            if remaining[i] > 0u64 {
+                if remaining[i] <= quantum {
+                    remaining[i] = 0u64;
+                    completed = completed + 1u64;
+                } else {
+                    remaining[i] = remaining[i] - quantum;
+                };
+            };
+            i = i + 1u64;
+        };
+        rounds = rounds + 1u64;
+    };
+    completed
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,55 @@
+// expected: 0
+// Demo 727: Verified deduplication on sorted span
+//
+// Removes consecutive duplicates from a sorted array.
+// Proves: output length <= input length, output is subsequence.
+
+fn dedup_sorted(s: span<u64>, n: u64, out: span<u64>) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    requires n <= out.len
+    ensures result >= 1u64
+    ensures result <= n
+{
+    out[0u64] = s[0u64];
+    let mut write: u64 = 1u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant write >= 1u64
+        invariant write <= i
+        decreases n - i
+    {
+        if s[i] != s[i - 1u64] {
+            out[write] = s[i];
+            write = write + 1u64;
+        };
+        i = i + 1u64;
+    };
+    write
+}
+
+// Count distinct values in a sorted span.
+fn count_distinct(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures result >= 1u64
+    ensures result <= n
+{
+    let mut count: u64 = 1u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant count >= 1u64
+        invariant count <= i
+        decreases n - i
+    {
+        if s[i] != s[i - 1u64] {
+            count = count + 1u64;
+        };
+        i = i + 1u64;
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

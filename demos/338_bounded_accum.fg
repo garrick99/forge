@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 338: Bounded accumulator — sum with overflow protection
 //
 // An accumulator that tracks a running total and enforces

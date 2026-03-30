@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 316: File handle typestate with position tracking
 //
 // An abstract file handle whose state machine is fully verified:

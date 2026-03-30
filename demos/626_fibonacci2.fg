@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 626: Fibonacci variants — iterative, memoized in array, tribonacci
 
 fn fib(n: u64) -> u64

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 405: Clock domain crossing tracker
 //
 // Two clock domains A and B exchange data via a synchronizer.

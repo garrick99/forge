@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 195: Verified element-wise scale with quantified postcondition
 //
 // scale(s, n, factor) multiplies every element by factor.

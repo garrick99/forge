@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 368: Free list allocator state
 //
 // A free list tracks free slots and allocated slots.

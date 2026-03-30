@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 522: Fibonacci — iterative with invariants and conditional postconditions
 
 fn fib(n: u64) -> u64

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 447: Epoch-based garbage collection state
 //
 // Objects are allocated into current epoch. On GC, epoch advances and

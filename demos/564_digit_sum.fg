@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 564: decimal digit operations
 
 fn digit_sum(n: u64) -> u64

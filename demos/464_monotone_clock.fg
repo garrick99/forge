@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 464: Monotone clock with tick and skew correction
 //
 // Clock ticks monotonically forward. Skew correction adds offset but

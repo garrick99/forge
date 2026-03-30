@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 483: std::collections showcase — Vec_u64 set, fill, sum, max, min
 //
 // Exercises vec_u64_set, vec_u64_fill, vec_u64_sum, vec_u64_max, vec_u64_min.

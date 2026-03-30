@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 373: Monotonic nonce counter
 //
 // A nonce generator that only ever increments. Each call to

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 613: sparse vector operations (index-value pairs)
 
 fn sparse_dot(idx_a: span<u64>, val_a: span<u64>, na: u64,

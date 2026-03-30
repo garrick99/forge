@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 476: Standard library hello — first program using std::io, std::math
 //
 // The "hello world" for Forge: demonstrates actual output via std::io,

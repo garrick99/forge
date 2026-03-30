@@ -1,0 +1,63 @@
+// expected: 0
+// Demo 768: Verified packed bit array operations
+//
+// Bit array stored as ceil(n/64) u64 words.
+// Proves: all word and bit accesses are within bounds.
+
+fn bit_get(words: span<u64>, nwords: u64, pos: u64) -> bool
+    requires nwords >= 1u64
+    requires nwords <= words.len
+    requires pos / 64u64 < nwords
+{
+    let word_idx: u64 = pos / 64u64;
+    let bit_idx: u64 = pos % 64u64;
+    let mask: u64 = 1u64 * (1u64 << bit_idx);
+    (words[word_idx] & mask) != 0u64
+}
+
+fn bit_set(words: span<u64>, nwords: u64, pos: u64)
+    requires nwords >= 1u64
+    requires nwords <= words.len
+    requires pos / 64u64 < nwords
+{
+    let word_idx: u64 = pos / 64u64;
+    let bit_idx: u64 = pos % 64u64;
+    let mask: u64 = 1u64 << bit_idx;
+    words[word_idx] = words[word_idx] | mask;
+}
+
+fn bit_clear(words: span<u64>, nwords: u64, pos: u64)
+    requires nwords >= 1u64
+    requires nwords <= words.len
+    requires pos / 64u64 < nwords
+{
+    let word_idx: u64 = pos / 64u64;
+    let bit_idx: u64 = pos % 64u64;
+    let mask: u64 = 1u64 << bit_idx;
+    words[word_idx] = words[word_idx] & (mask ^ 18446744073709551615u64);
+}
+
+// Count set bits across all words.
+fn bit_count(words: span<u64>, nwords: u64) -> u64
+    requires nwords <= words.len
+{
+    let mut count: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < nwords
+        invariant i <= nwords
+        decreases nwords - i
+    {
+        // Count bits in words[i] using Kernighan's trick.
+        let mut w: u64 = words[i];
+        while w != 0u64
+            decreases w
+        {
+            w = w & (w - 1u64);
+            count = count + 1u64;
+        };
+        i = i + 1u64;
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

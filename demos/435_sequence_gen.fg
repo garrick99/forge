@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 435: Sequence generator with step and wrap tracking
 //
 // Generates values: current += step each call.

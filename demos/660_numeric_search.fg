@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 660: numerical search — linear, binary, and sentinel search
 
 fn binary_search_left(s: span<u64>, n: u64, target: u64) -> u64

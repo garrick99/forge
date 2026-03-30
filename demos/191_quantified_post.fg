@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 191: Quantified array postcondition
 //
 // After zeroing a span, prove that ALL elements are zero.

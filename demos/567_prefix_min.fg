@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 567: prefix minimum and maximum scans
 
 fn prefix_min(src: span<u64>, dst: span<u64>, n: u64)

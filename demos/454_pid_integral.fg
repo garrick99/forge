@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 454: PID controller with anti-windup integral clamp
 //
 // Integral accumulates error; anti-windup clamps at max_integral.

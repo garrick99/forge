@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 310: Bitwise operation range injection
 //
 // Automatic range facts for bitwise operations:

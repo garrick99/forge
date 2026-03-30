@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 358: Reader-writer lock state
 //
 // A simplified reader-writer lock: multiple readers XOR one writer.

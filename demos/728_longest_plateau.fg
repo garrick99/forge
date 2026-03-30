@@ -1,0 +1,60 @@
+// expected: 0
+// Demo 728: Longest plateau — find longest run of equal consecutive elements
+//
+// Proves: result is at least 1 (every non-empty array has a plateau of length
+// >= 1) and at most n.
+
+fn longest_plateau(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures result >= 1u64
+    ensures result <= n
+{
+    let mut best: u64 = 1u64;
+    let mut cur: u64 = 1u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant best >= 1u64
+        invariant best <= i
+        invariant cur >= 1u64
+        invariant cur <= i
+        decreases n - i
+    {
+        if s[i] == s[i - 1u64] {
+            cur = cur + 1u64;
+            if cur > best {
+                best = cur;
+            };
+        } else {
+            cur = 1u64;
+        };
+        i = i + 1u64;
+    };
+    best
+}
+
+// Count the number of plateaus (runs of equal elements).
+fn count_plateaus(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures result >= 1u64
+    ensures result <= n
+{
+    let mut count: u64 = 1u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant count >= 1u64
+        invariant count <= i
+        decreases n - i
+    {
+        if s[i] != s[i - 1u64] {
+            count = count + 1u64;
+        };
+        i = i + 1u64;
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

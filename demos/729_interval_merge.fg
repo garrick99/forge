@@ -1,0 +1,43 @@
+// expected: 0
+// Demo 729: Verified interval merging
+//
+// Given a list of intervals as (start, end) pairs in two parallel spans,
+// sorted by start, merge overlapping intervals.
+// Proves: output count <= input count.
+
+fn merge_intervals(starts: span<u64>, ends: span<u64>, n: u64,
+                   out_s: span<u64>, out_e: span<u64>) -> u64
+    requires n >= 1u64
+    requires n <= starts.len
+    requires n <= ends.len
+    requires n <= out_s.len
+    requires n <= out_e.len
+    ensures result >= 1u64
+    ensures result <= n
+{
+    out_s[0u64] = starts[0u64];
+    out_e[0u64] = ends[0u64];
+    let mut write: u64 = 0u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant write < i
+        decreases n - i
+    {
+        if starts[i] <= out_e[write] {
+            // Overlapping — extend current interval.
+            if ends[i] > out_e[write] {
+                out_e[write] = ends[i];
+            };
+        } else {
+            // Non-overlapping — start new interval.
+            write = write + 1u64;
+            out_s[write] = starts[i];
+            out_e[write] = ends[i];
+        };
+        i = i + 1u64;
+    };
+    write + 1u64
+}
+
+fn main() -> u64 { 0u64 }

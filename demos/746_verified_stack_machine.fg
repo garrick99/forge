@@ -1,0 +1,71 @@
+// expected: 0
+// Demo 746: Verified stack machine interpreter
+//
+// A tiny stack-based calculator.  Operations encoded as integers:
+//   0 = push next value, 1 = add, 2 = mul, 3 = dup.
+// Proves: stack pointer stays in bounds throughout execution.
+
+fn stack_eval(program: span<u64>, prog_len: u64,
+              stack: span<u64>, stack_cap: u64) -> u64
+    requires prog_len <= program.len
+    requires stack_cap >= 2u64
+    requires stack_cap <= stack.len
+    ensures result <= stack_cap
+{
+    let mut sp: u64 = 0u64;
+    let mut pc: u64 = 0u64;
+    while pc < prog_len
+        invariant pc <= prog_len
+        invariant sp <= stack_cap
+        decreases prog_len - pc
+    {
+        let op: u64 = program[pc];
+        if op == 0u64 {
+            // Push: next word is the value.
+            if pc + 1u64 < prog_len && sp < stack_cap {
+                stack[sp] = program[pc + 1u64];
+                sp = sp + 1u64;
+                pc = pc + 2u64;
+            } else {
+                pc = prog_len;
+            };
+        } else if op == 1u64 {
+            // Add: pop two, push sum.
+            if sp >= 2u64 {
+                let a: u64 = stack[sp - 1u64];
+                let b: u64 = stack[sp - 2u64];
+                sp = sp - 1u64;
+                stack[sp - 1u64] = a + b;
+                pc = pc + 1u64;
+            } else {
+                pc = prog_len;
+            };
+        } else if op == 2u64 {
+            // Mul: pop two, push product.
+            if sp >= 2u64 {
+                let a: u64 = stack[sp - 1u64];
+                let b: u64 = stack[sp - 2u64];
+                sp = sp - 1u64;
+                stack[sp - 1u64] = a * b;
+                pc = pc + 1u64;
+            } else {
+                pc = prog_len;
+            };
+        } else if op == 3u64 {
+            // Dup: push top again.
+            if sp >= 1u64 && sp < stack_cap {
+                stack[sp] = stack[sp - 1u64];
+                sp = sp + 1u64;
+                pc = pc + 1u64;
+            } else {
+                pc = prog_len;
+            };
+        } else {
+            // Unknown opcode — halt.
+            pc = prog_len;
+        };
+    };
+    sp
+}
+
+fn main() -> u64 { 0u64 }

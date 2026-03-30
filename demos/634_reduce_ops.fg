@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 634: parallel-style reduce operations
 
 fn reduce_add(s: span<u64>, n: u64) -> u64

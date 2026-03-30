@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 334: Sliding window protocol state
 //
 // A sliding window tracker for reliable transmission.

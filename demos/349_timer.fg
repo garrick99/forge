@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 349: Timer with start/tick/reset
 //
 // A software timer: tick increments elapsed when running,

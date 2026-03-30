@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 154: Verified prefix sum (exclusive scan)
 //
 // Computes prefix[k] = sum of s[0..k) in-place into a separate output span.

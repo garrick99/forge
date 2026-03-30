@@ -1,0 +1,64 @@
+// expected: 0
+// Demo 762: Verified Sieve of Eratosthenes (bounded)
+//
+// Marks composite numbers in a boolean span.
+// Proves: all array accesses are within [0, n).
+
+fn sieve(is_prime: span<u64>, n: u64)
+    requires n >= 2u64
+    requires n <= is_prime.len
+{
+    // Initialize: all numbers >= 2 are potentially prime.
+    is_prime[0u64] = 0u64;
+    is_prime[1u64] = 0u64;
+    let mut k: u64 = 2u64;
+    while k < n
+        invariant k <= n
+        decreases n - k
+    {
+        is_prime[k] = 1u64;
+        k = k + 1u64;
+    };
+
+    // Sieve: for each prime p, mark p*p, p*p+p, ... as composite.
+    let mut p: u64 = 2u64;
+    while p * p < n
+        invariant p >= 2u64
+        invariant p <= n
+        decreases n - p
+    {
+        if is_prime[p] == 1u64 {
+            let mut m: u64 = p * p;
+            while m < n
+                invariant m <= n * n
+                decreases n - m
+            {
+                is_prime[m] = 0u64;
+                m = m + p;
+            };
+        };
+        p = p + 1u64;
+    };
+}
+
+// Count primes found by the sieve.
+fn count_primes(is_prime: span<u64>, n: u64) -> u64
+    requires n <= is_prime.len
+    ensures result <= n
+{
+    let mut count: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant count <= i
+        decreases n - i
+    {
+        if is_prime[i] == 1u64 {
+            count = count + 1u64;
+        };
+        i = i + 1u64;
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 502: count_ge / count_lt — counting elements relative to a threshold
 
 fn count_ge(s: span<u64>, n: u64, threshold: u64) -> u64

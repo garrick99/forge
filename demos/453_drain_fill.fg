@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 453: Drain-fill cycle with level tracking
 //
 // A tank drains and fills in cycles. Level is bounded by [0, capacity].

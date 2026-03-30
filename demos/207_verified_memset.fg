@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 207: Verified memset — sets all bytes to a value
 //
 // Sets all n elements of dst to val.

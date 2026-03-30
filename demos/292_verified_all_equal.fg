@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 292: Verified all-equal check
 //
 // all_equal(s, n) returns true iff all elements equal s[0].

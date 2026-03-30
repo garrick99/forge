@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 194: Verified prefix sum with quantified non-negativity postcondition
 //
 // Computes prefix sums in-place: s[i] += s[i-1] for i > 0.

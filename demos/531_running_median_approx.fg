@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 531: running min/max tracking with verified bounds
 
 struct MinMax {

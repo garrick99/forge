@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 496: arithmetic bounds — verified upper/lower bounds on expressions
 //
 // Establishes invariants like: product <= max, sum <= cap, ratio <= 1.

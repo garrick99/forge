@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 386: SLO error budget tracker
 //
 // Site Reliability Engineering: an error budget starts full and

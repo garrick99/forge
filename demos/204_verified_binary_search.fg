@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 204: Verified binary search
 //
 // Binary search on a sorted span. Returns the index or n (not found).

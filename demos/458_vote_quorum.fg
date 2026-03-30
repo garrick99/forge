@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 458: Quorum voting with majority check
 //
 // N voters, quorum = N/2 + 1. Votes accumulate; quorum_reached when

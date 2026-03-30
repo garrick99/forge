@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 470: Memory hierarchy L1/L2/L3 cache hit tracking
 //
 // Request goes to L1 first. On L1 miss, goes to L2, then L3, then DRAM.

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 404: 2x2 matrix operation tracker
 //
 // Tracks the elements of a 2x2 matrix through scalar operations.

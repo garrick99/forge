@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 230: Verified add-into — dst[i] += src[i], relate to old values
 //
 // add_into(dst, src, n) computes dst[i] = old(dst[i]) + src[i].

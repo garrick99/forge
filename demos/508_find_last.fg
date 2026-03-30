@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 508: find_last — last occurrence of a value in a span
 
 fn find_last(s: span<u64>, n: u64, target: u64) -> u64

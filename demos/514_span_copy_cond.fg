@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 514: conditional span copy — copy elements matching a predicate
 
 fn copy_if_nonzero(src: span<u64>, n: u64, dst: span<u64>) -> u64

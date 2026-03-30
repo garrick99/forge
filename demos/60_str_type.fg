@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 60: str type — UTF-8 byte span
 //
 // str is a fat pointer over u8 with a .len field (same ABI as span<u8>).

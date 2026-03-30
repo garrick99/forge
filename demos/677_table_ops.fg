@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 677: table operations — lookup, scan, aggregate over 2D arrays
 
 fn tbl_get(t: span<u64>, rows: u64, cols: u64, r: u64, c: u64) -> u64

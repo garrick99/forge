@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 491: verified u8 arithmetic with range postconditions
 //
 // All operations carry postconditions verified by Z3 in Int mode.

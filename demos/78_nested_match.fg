@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 78: Nested pattern matching — matching inside constructors
 //
 // match Result { Ok(Some(v)) => ..., Ok(None) => ..., Err(_) => ... }

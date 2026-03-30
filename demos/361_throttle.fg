@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 361: Token-bucket throttle with refill
 //
 // A throttle with tokens that drain on use and refill by a fixed amount.

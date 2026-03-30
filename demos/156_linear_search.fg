@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 156: Verified linear search
 //
 // Returns the index of the first occurrence of `target` in `s`, or s.len

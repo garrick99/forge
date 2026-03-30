@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 125: Verified 2D vector arithmetic
 //
 // Integer 2D vectors with verified dot product, component-wise ops,

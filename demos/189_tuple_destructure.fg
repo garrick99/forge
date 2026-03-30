@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 189: Tuple let-destructuring
 //
 // Demonstrates let (a, b) = f() syntax.

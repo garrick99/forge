@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 500: milestone — showcase of Forge's verification capabilities
 //
 // 500 verified demos. Each function below is proven correct by Z3.

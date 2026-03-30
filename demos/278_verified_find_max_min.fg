@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 278: Verified find max and min simultaneously
 //
 // max_val(s, n) returns x with x >= s[k] for all k < n.

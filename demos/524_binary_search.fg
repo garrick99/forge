@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 524: binary search — iterative with bounds-only invariants
 
 fn lower_bound(s: span<u64>, n: u64, target: u64) -> u64

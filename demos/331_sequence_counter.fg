@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 331: Sequence number verification
 //
 // A sequence counter used in network protocols: packets must

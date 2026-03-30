@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 366: Connection pool lifecycle
 //
 // A connection pool tracks idle, active, and total connections.

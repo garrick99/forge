@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 332: Token bucket rate limiter with verified capacity
 //
 // A token bucket has tokens that are consumed by requests and

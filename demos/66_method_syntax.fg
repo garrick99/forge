@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 66: Method call syntax — obj.method(args)
 //
 // obj.method(args) desugars to TypeName__method(obj, args).

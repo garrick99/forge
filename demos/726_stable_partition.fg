@@ -1,0 +1,38 @@
+// expected: 0
+// Demo 726: Verified stable partition
+//
+// Partitions elements into two output spans: those <= pivot go to `lo`,
+// those > pivot go to `hi`.  Proves: output counts sum to n.
+
+fn stable_partition(s: span<u64>, n: u64, pivot: u64,
+                    lo: span<u64>, hi: span<u64>) -> (u64, u64)
+    requires n <= s.len
+    requires n <= lo.len
+    requires n <= hi.len
+    ensures result.0 + result.1 == n
+    ensures result.0 <= n
+    ensures result.1 <= n
+{
+    let mut lo_idx: u64 = 0u64;
+    let mut hi_idx: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant lo_idx <= i
+        invariant hi_idx <= i
+        invariant lo_idx + hi_idx == i
+        decreases n - i
+    {
+        if s[i] <= pivot {
+            lo[lo_idx] = s[i];
+            lo_idx = lo_idx + 1u64;
+        } else {
+            hi[hi_idx] = s[i];
+            hi_idx = hi_idx + 1u64;
+        };
+        i = i + 1u64;
+    };
+    (lo_idx, hi_idx)
+}
+
+fn main() -> u64 { 0u64 }

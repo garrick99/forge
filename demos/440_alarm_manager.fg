@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 440: Alarm manager with armed/disarmed states
 //
 // Alarms can be armed, triggered, or silenced.

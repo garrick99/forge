@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 178: Verified NTT round (one butterfly pass)
 //
 // Performs one level of the NTT butterfly pass with stride `half`.

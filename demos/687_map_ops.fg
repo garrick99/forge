@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 687: map operations — apply functions to arrays
 
 fn map_add_scalar(s: span<u64>, n: u64, k: u64)

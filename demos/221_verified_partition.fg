@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 221: Verified Lomuto partition (non-negativity postcondition)
 //
 // partition(s, n, pivot) rearranges s[0..n) so that all elements

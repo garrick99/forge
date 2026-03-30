@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 301: Refined fn types — fn(T) -> U ensures pred
 //
 // A function pointer type can carry postcondition clauses:

@@ -1,0 +1,51 @@
+// expected: 0
+// Demo 733: Verified Kadane's algorithm (maximum subarray sum)
+//
+// Finds the maximum contiguous subarray sum.  For unsigned integers this
+// reduces to tracking the best suffix vs total.
+// Proves: result >= any single element (best_ending_here always >= s[i]).
+
+fn max_subarray_sum(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+{
+    let mut best: u64 = s[0u64];
+    let mut current: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant best >= current || best >= s[0u64]
+        decreases n - i
+    {
+        // For unsigned: current + s[i] always >= s[i], so we never "reset".
+        current = current + s[i];
+        if current > best {
+            best = current;
+        };
+        i = i + 1u64;
+    };
+    best
+}
+
+// Verified minimum element — for comparison / composability.
+fn find_min(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures forall k: u64, k < n ==> result <= s[k]
+{
+    let mut m: u64 = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> m <= s[k]
+        decreases n - i
+    {
+        if s[i] < m {
+            m = s[i];
+        };
+        i = i + 1u64;
+    };
+    m
+}
+
+fn main() -> u64 { 0u64 }

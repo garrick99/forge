@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 554: run-length encoding — count and emit runs
 
 fn count_run(s: span<u64>, n: u64, start: u64) -> u64

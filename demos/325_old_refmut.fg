@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 325: old() predicate for refmut<T> parameters
 //
 // When a function mutates a struct through refmut<T>,

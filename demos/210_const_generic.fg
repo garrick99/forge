@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 210: Const generics — fixed-size buffer operations
 //
 // A generic buffer of size N (compile-time constant).

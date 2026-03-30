@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 595: bit counting operations (popcount, leading/trailing zeros approx)
 
 fn popcount(x: u64) -> u64

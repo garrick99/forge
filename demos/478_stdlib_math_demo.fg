@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 478: std::math showcase — all math functions
 //
 // Exercises min64, max64, clamp64, abs_diff, pow64, ceil_div, round_up,

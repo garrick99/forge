@@ -1,0 +1,66 @@
+// expected: 0
+// Demo 749: Verified Fenwick tree (binary indexed tree) operations
+//
+// Supports point-update and prefix-query on a span of u64.
+// Uses the standard bit-manipulation indexing:
+//   parent in update:  i += i & (-i)  — but for unsigned we use i += (i ^ (i-1)) & i
+//   parent in query:   i -= i & (-i)  — similarly via mask trick
+// Since Forge is unsigned-only, we use the mask identity.
+// Proves: all tree accesses are within bounds.
+
+// Lowest set bit: lsb(i) = i & (~(i-1)) for unsigned.
+// Equivalent to i & (-i) for two's complement.
+fn lsb(i: u64) -> u64
+    requires i >= 1u64
+    ensures result >= 1u64
+    ensures result <= i
+{
+    i & ((i - 1u64) ^ 18446744073709551615u64)
+}
+
+// Point update: add `delta` to position `pos`.
+fn fenwick_update(tree: span<u64>, n: u64, pos: u64, delta: u64)
+    requires n >= 1u64
+    requires n <= tree.len
+    requires pos >= 1u64
+    requires pos <= n
+{
+    let mut i: u64 = pos;
+    while i <= n
+        invariant i >= 1u64
+        invariant i <= n + n
+        decreases n + 1u64 - i
+    {
+        if i <= n {
+            tree[i - 1u64] = tree[i - 1u64] + delta;
+        };
+        let step: u64 = lsb(i);
+        i = i + step;
+    };
+}
+
+// Prefix query: sum of elements [1..pos].
+fn fenwick_query(tree: span<u64>, n: u64, pos: u64) -> u64
+    requires n >= 1u64
+    requires n <= tree.len
+    requires pos >= 1u64
+    requires pos <= n
+{
+    let mut sum: u64 = 0u64;
+    let mut i: u64 = pos;
+    while i >= 1u64
+        invariant i <= n
+        decreases i
+    {
+        sum = sum + tree[i - 1u64];
+        let step: u64 = lsb(i);
+        if step <= i {
+            i = i - step;
+        } else {
+            i = 0u64;
+        };
+    };
+    sum
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 251: Verified linear search returning bool
 //
 // contains(s, n, target) returns true iff some s[i] == target.

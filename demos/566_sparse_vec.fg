@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 566: sparse vector — indices and values in parallel spans
 
 fn sparse_dot(idx: span<u64>, vals: span<u64>, n: u64, dense: span<u64>, d_len: u64) -> u64

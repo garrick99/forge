@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 284: Verified all-nonzero check
 //
 // all_nonzero(s, n) returns true iff all s[i] > 0.

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 690: milestone 5 — verified core algorithms
 
 fn binary_search(s: span<u64>, n: u64, val: u64) -> u64

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 586: bit reversal permutation for FFT index reordering
 
 fn reverse_bits_8(x: u64) -> u64

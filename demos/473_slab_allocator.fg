@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 473: Slab allocator with free list tracking
 //
 // A slab has a fixed number of objects. alloc() takes from free list.

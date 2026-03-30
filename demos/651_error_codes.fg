@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 651: error code utilities and result pattern
 
 fn is_ok(code: u64) -> bool {

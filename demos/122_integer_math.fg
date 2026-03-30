@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 122: Verified integer square root and logarithm
 //
 // isqrt(n): floor(sqrt(n)) — Newton iteration for 6 steps.

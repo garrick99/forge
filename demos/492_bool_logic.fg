@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 492: verified boolean logic functions
 //
 // Boolean combinators with exact postconditions.

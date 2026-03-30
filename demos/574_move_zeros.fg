@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 574: move zeros to end of span, preserving relative order of non-zeros
 
 fn count_nonzero(s: span<u64>, n: u64) -> u64

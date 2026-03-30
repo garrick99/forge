@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 593: median of three and quickselect pivot selection
 
 fn min2(a: u64, b: u64) -> u64

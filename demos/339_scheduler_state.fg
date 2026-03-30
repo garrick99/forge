@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 339: Round-robin scheduler state verification
 //
 // A minimal cooperative scheduler tracks which task is currently

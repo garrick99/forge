@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 117: Verified sliding window statistics (window size 4)
 //
 // A fixed 4-element circular buffer. Supports sum, min, max, and range.

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 198: Verified map — apply a function to every element
 //
 // map_clamp applies clamp255 to every element.

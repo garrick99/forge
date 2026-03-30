@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 258: Verified selection sort single step — find minimum in s[i..n) and swap
 //
 // selection_step(s, n, i) finds the index of the minimum in s[i..n)

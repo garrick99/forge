@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 257: Verified insertion sort single step
 //
 // insert_into_sorted(s, n, pos) inserts s[pos] into the already-sorted

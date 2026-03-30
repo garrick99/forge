@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 353: Resource pool with alloc/free tracking
 //
 // A fixed pool of resources. alloc takes one (free > 0),

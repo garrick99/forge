@@ -1,0 +1,104 @@
+// expected: 0
+// Demo 720: Verified min-heap operations (local invariants)
+//
+// A min-heap stored in a 0-indexed span<u64>.
+// For node i:  left child = 2*i + 1,  right child = 2*i + 2,  parent = (i-1)/2.
+//
+// Heap property: for all i > 0, s[parent(i)] <= s[i].
+//
+// Global "root is minimum" requires path induction through the tree —
+// beyond single-step Z3.  We prove LOCAL operations:
+//
+//   sift_down_root:  ensures root <= both immediate children after one step.
+//   heapify_3:       ensures 3-element subheap is ordered.
+//   count_violations:counts nodes violating the local parent <= child property.
+//   heap_push_tail:  appending at end preserves count.
+
+// Returns whether position i satisfies the heap property with its parent.
+fn node_ok(s: span<u64>, i: u64) -> bool
+    requires i > 0u64
+    requires i < s.len
+    requires (i - 1u64) / 2u64 < s.len
+    ensures result == (s[(i - 1u64) / 2u64] <= s[i])
+{
+    s[(i - 1u64) / 2u64] <= s[i]
+}
+
+// Sift-down root once: swap root with smaller child if root > smaller child.
+// Proves: root <= both immediate children (local heap property at root).
+// Uses ITE-valued writes (no inner if) so extract_block_arr_assigns can see
+// the conditional mutations and build ITE facts for the postcondition proof.
+fn sift_down_root(s: span<u64>, n: u64)
+    requires n >= 1u64
+    requires s.len >= n
+    ensures n >= 2u64 ==> s[0u64] <= s[1u64]
+    ensures n >= 3u64 ==> s[0u64] <= s[2u64]
+{
+    if n == 1u64 {
+        // Single element — trivially ordered.
+    } else if n == 2u64 {
+        // Two elements: unconditionally write min/max so Z3 sees the ITE.
+        let v0: u64 = s[0u64];
+        let v1: u64 = s[1u64];
+        s[0u64] = if v0 <= v1 { v0 } else { v1 };
+        s[1u64] = if v0 <= v1 { v1 } else { v0 };
+    } else if s[1u64] <= s[2u64] {
+        // Child 1 is the smaller child; ensure s[0] <= s[1].
+        let v0: u64 = s[0u64];
+        let v1: u64 = s[1u64];
+        s[0u64] = if v0 <= v1 { v0 } else { v1 };
+        s[1u64] = if v0 <= v1 { v1 } else { v0 };
+    } else {
+        // Child 2 is the smaller child; ensure s[0] <= s[2].
+        let v0: u64 = s[0u64];
+        let v2: u64 = s[2u64];
+        s[0u64] = if v0 <= v2 { v0 } else { v2 };
+        s[2u64] = if v0 <= v2 { v2 } else { v0 };
+    }
+}
+
+// Order 3 elements so that the first is the minimum.
+fn heapify_3(s: span<u64>)
+    requires s.len >= 3u64
+    ensures s[0u64] <= s[1u64]
+    ensures s[0u64] <= s[2u64]
+{
+    if s[1u64] < s[0u64] {
+        let t: u64 = s[0u64]; s[0u64] = s[1u64]; s[1u64] = t;
+    };
+    if s[2u64] < s[0u64] {
+        let t: u64 = s[0u64]; s[0u64] = s[2u64]; s[2u64] = t;
+    };
+}
+
+// Count nodes (i > 0) that violate the parent <= child property.
+fn count_violations(s: span<u64>, n: u64) -> u64
+    requires s.len >= n
+    requires n >= 1u64
+    ensures result < n
+{
+    let mut viol: u64 = 0u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant viol < i
+        decreases n - i
+    {
+        if s[(i - 1u64) / 2u64] > s[i] {
+            viol = viol + 1u64;
+        };
+        i = i + 1u64;
+    };
+    viol
+}
+
+// Insert value at position n in the heap backing array.
+// Only proves bounds: new element is within the span.
+fn heap_append(s: span<u64>, n: u64, val: u64)
+    requires n < s.len
+    ensures s[n] == val
+{
+    s[n] = val;
+}
+
+fn main() -> u64 { 0u64 }

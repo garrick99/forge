@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 538: binary trie node indexing via bit manipulation
 
 fn trie_left(node: u64) -> u64

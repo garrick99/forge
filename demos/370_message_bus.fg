@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 370: Message bus with publish/subscribe counts
 //
 // A message bus tracks: published messages, delivered (received by

@@ -1,0 +1,103 @@
+// expected: 0
+// Demo 717: Verified recursive algorithms
+//
+// Recursive functions proved correct using the induction hypothesis (IH)
+// for self-recursive calls: when a function has a `decreases` clause, any
+// `let x = fn(smaller_args)` call is assumed to satisfy the function's own
+// postconditions with the call arguments substituted.
+//
+//  1. sum_prefix   — sum of s[0..n), base: n==0 => result==0
+//  2. max_array_rec— maximum of s[0..n), IH: forall k < n-1, prev_max >= s[k]
+//  3. count_le     — count elements <= threshold, IH: rest <= n-1
+//  4. bsearch_iter — iterative binary search for comparison (full soundness)
+
+// Recursive sum of s[0..n).
+fn sum_prefix(s: span<u64>, n: u64) -> u64
+    requires n <= s.len
+    ensures n == 0u64 ==> result == 0u64
+    decreases n
+{
+    if n == 0u64 {
+        0u64
+    } else {
+        s[n - 1u64] + sum_prefix(s, n - 1u64)
+    }
+}
+
+// Recursive maximum of s[0..n).  Requires n >= 1.
+// IH: let prev_max = max_array_rec(s, n-1) injects
+//     forall k < n-1, prev_max >= s[k]  into the proof context.
+fn max_array_rec(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures forall k: u64, k < n ==> result >= s[k]
+    decreases n
+{
+    if n == 1u64 {
+        s[0u64]
+    } else {
+        let prev_max: u64 = max_array_rec(s, n - 1u64);
+        // IH injected: forall k < n-1, prev_max >= s[k]
+        if s[n - 1u64] > prev_max {
+            s[n - 1u64]
+        } else {
+            prev_max
+        }
+    }
+}
+
+// Count elements <= threshold in s[0..n).
+// IH: let rest = count_le(s, n-1, threshold) injects  rest <= n-1.
+fn count_le(s: span<u64>, n: u64, threshold: u64) -> u64
+    requires n <= s.len
+    ensures result <= n
+    decreases n
+{
+    if n == 0u64 {
+        0u64
+    } else {
+        let rest: u64 = count_le(s, n - 1u64, threshold);
+        // IH injected: rest <= n-1
+        if s[n - 1u64] <= threshold {
+            rest + 1u64
+        } else {
+            rest
+        }
+    }
+}
+
+// Iterative binary search on sorted s[0..n).
+// Returns index of target, or n if not found.
+// Soundness: result < n  ==>  s[result] == target.
+fn bsearch_iter(s: span<u64>, n: u64, target: u64) -> u64
+    requires n <= s.len
+    requires forall i: u64, forall j: u64, i < j && j < n ==> s[i] <= s[j]
+    ensures result <= n
+    ensures result < n ==> s[result] == target
+{
+    let mut lo: u64 = 0u64;
+    let mut hi: u64 = n;
+    let mut ans: u64 = n;
+    while lo < hi
+        invariant lo <= hi
+        invariant hi <= n
+        invariant ans <= n
+        invariant ans < n ==> s[ans] == target
+        invariant ans == n ==> forall k: u64, k < lo ==> s[k] < target
+        invariant ans == n ==> forall k: u64, k >= hi && k < n ==> s[k] > target
+        decreases hi - lo
+    {
+        let mid: u64 = lo + (hi - lo) / 2u64;
+        if s[mid] == target {
+            ans = mid;
+            lo = hi;
+        } else if s[mid] < target {
+            lo = mid + 1u64;
+        } else {
+            hi = mid;
+        };
+    };
+    ans
+}
+
+fn main() -> u64 { 0u64 }

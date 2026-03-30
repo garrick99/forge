@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 572: variable-length encoding size calculations
 
 fn varint_size(v: u64) -> u64

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 340: Lease tracker — acquired/released state
 //
 // A resource lease tracks how many times it has been acquired

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 648: simple BFS on adjacency matrix
 
 fn adj_get(adj: span<u64>, n: u64, u: u64, v: u64) -> u64

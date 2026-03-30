@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 475: Scatter-gather I/O operation tracker
 //
 // Scatter writes: one source → multiple destinations.

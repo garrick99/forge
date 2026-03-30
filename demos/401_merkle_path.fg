@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 401: Merkle proof path tracker
 //
 // Tracks the depth and sibling count of a Merkle proof path.

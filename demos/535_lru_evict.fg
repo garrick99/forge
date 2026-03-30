@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 535: LRU-style eviction counter tracking
 
 struct LRU {

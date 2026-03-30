@@ -1,0 +1,56 @@
+// expected: 0
+// Demo 779: Verified bitmap allocator
+//
+// Allocates slots from a bitmap (0 = free, 1 = used).
+// First-fit allocation scans for a free slot.
+// Proves: returned index is valid or equals capacity (full).
+
+fn bitmap_alloc(bitmap: span<u64>, cap: u64) -> u64
+    requires cap >= 1u64
+    requires cap <= bitmap.len
+    ensures result <= cap
+{
+    let mut found: u64 = cap;
+    let mut i: u64 = 0u64;
+    while i < cap
+        invariant i <= cap
+        invariant found <= cap
+        decreases cap - i
+    {
+        if bitmap[i] == 0u64 && found == cap {
+            bitmap[i] = 1u64;
+            found = i;
+        };
+        i = i + 1u64;
+    };
+    found
+}
+
+fn bitmap_free(bitmap: span<u64>, cap: u64, idx: u64)
+    requires cap <= bitmap.len
+    requires idx < cap
+{
+    bitmap[idx] = 0u64;
+}
+
+// Count free slots.
+fn bitmap_count_free(bitmap: span<u64>, cap: u64) -> u64
+    requires cap <= bitmap.len
+    ensures result <= cap
+{
+    let mut count: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < cap
+        invariant i <= cap
+        invariant count <= i
+        decreases cap - i
+    {
+        if bitmap[i] == 0u64 {
+            count = count + 1u64;
+        };
+        i = i + 1u64;
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

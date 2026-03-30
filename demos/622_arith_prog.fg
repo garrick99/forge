@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 622: arithmetic and geometric progressions
 
 fn arith_sum(first: u64, last: u64, n: u64) -> u64

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 474: Weighted round-robin scheduler
 //
 // Two classes: high weight=3, low weight=1. Each round dispatches weight items.

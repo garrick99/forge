@@ -1025,6 +1025,44 @@ let rec expr_final_env env expr =
   | EBlock (stmts, trailing) ->
       let env' = stmts_final_env env stmts in
       (match trailing with Some e -> expr_final_env env' e | None -> env')
+  | EIf (cond, then_, else_opt) ->
+      (* Mirror the SExpr(EIf) ITE-modeling path so that top-level EIf
+         function bodies (e.g. sift_down_root's elif chain) capture
+         conditional array and scalar mutations into the proof env. *)
+      let cond_pred = expr_to_pred_simple cond in
+      let is_elif = match else_opt with
+        | Some { expr_desc = EIf _; _ } -> true | _ -> false
+      in
+      let env1 =
+        if is_elif then
+          let chain = collect_chain_var_assigns expr in
+          if chain = [] then env
+          else apply_chain_var_assigns env cond_pred chain
+        else begin
+          let then_assigns = extract_block_var_assigns then_ in
+          let else_assigns = match else_opt with
+            | Some el -> extract_block_var_assigns el | None -> []
+          in
+          if then_assigns = [] && else_assigns = [] then env
+          else apply_if_assigns env cond_pred then_assigns else_assigns
+        end
+      in
+      let env2 =
+        if is_elif then
+          let chain_arr = collect_chain_arr_assigns expr in
+          List.fold_left (fun env_ (arr_id, idx_p, val_p) ->
+            env_array_write env_ arr_id idx_p val_p
+          ) env1 chain_arr
+        else begin
+          let then_arr = extract_block_arr_assigns then_ in
+          let else_arr = match else_opt with
+            | Some el -> extract_block_arr_assigns el | None -> []
+          in
+          if then_arr = [] && else_arr = [] then env1
+          else apply_if_arr_assigns env1 cond_pred then_arr else_arr
+        end
+      in
+      env2
   | _ -> env
 
 and stmts_final_env env stmts =
@@ -3159,6 +3197,46 @@ let check_fn env fn =
              fn.fn_name.name (format_ty body_ty) (format_ty sig_.fs_ret));
        (* Post-body env carries loop postconditions, SSA-assigned values, etc. *)
        let body_env = expr_final_env env' body in
+       (* Inject recursive self-call postconditions as induction hypotheses.
+          For well-founded recursive functions (with decreases), any `let x = fn(args)`
+          recursive call within the body is assumed to satisfy the function's own
+          postconditions with args substituted.  This lets Z3 prove postconditions that
+          require the IH — e.g. max_array_rec result >= all elements, count_le result <= n.
+          Sound because: the decreases clause guarantees termination, so strong induction
+          applies — the postcondition holds for smaller inputs by hypothesis. *)
+       let body_env =
+         if sig_.fs_ensures = [] then body_env
+         else begin
+           let rec inject_rec env_in e =
+             match e.expr_desc with
+             | EBlock (stmts, trailing) ->
+                 let env' = List.fold_left (fun acc stmt ->
+                   match stmt.stmt_desc with
+                   | SLet (name, _, rhs, _) ->
+                       (match rhs.expr_desc with
+                        | ECall ({ expr_desc = EVar fn_id; _ }, call_args)
+                            when fn_id.name = fn.fn_name.name &&
+                                 List.length sig_.fs_params = List.length call_args ->
+                            let acc' = env_add_var acc name.name sig_.fs_ret Unr stmt.stmt_loc in
+                            let arg_subst = List.map2 (fun (pid, _) arg ->
+                              (pid.name, expr_to_pred_simple arg)
+                            ) sig_.fs_params call_args in
+                            let result_subst = ("result", PVar name) :: arg_subst in
+                            List.fold_left (fun e ens ->
+                              env_add_fact e (subst_pred result_subst ens)
+                            ) acc' sig_.fs_ensures
+                        | _ -> acc)
+                   | _ -> acc
+                 ) env_in stmts in
+                 (match trailing with Some t -> inject_rec env' t | None -> env')
+             | EIf (_, then_e, else_opt) ->
+                 let e1 = inject_rec env_in then_e in
+                 (match else_opt with Some el -> inject_rec e1 el | None -> e1)
+             | _ -> env_in
+           in
+           inject_rec body_env body
+         end
+       in
        (* result pred: trailing expression of block, or whole body for simple exprs.
           For trailing ECall, inject callee postconditions into body_env so the
           caller's postcondition check can see them (mirrors the SLet injection). *)

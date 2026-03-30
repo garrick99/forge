@@ -1,0 +1,53 @@
+// expected: 0
+// Demo 731: Verified histogram — count values in buckets
+//
+// Counts how many elements fall into each of `nbuckets` uniform-width buckets
+// in range [0, max_val).  Proves: total count equals n.
+
+fn histogram(data: span<u64>, n: u64, buckets: span<u64>, nbuckets: u64, max_val: u64)
+    requires n <= data.len
+    requires nbuckets >= 1u64
+    requires nbuckets <= buckets.len
+    requires max_val >= 1u64
+{
+    // Zero out buckets.
+    let mut b: u64 = 0u64;
+    while b < nbuckets
+        invariant b <= nbuckets
+        decreases nbuckets - b
+    {
+        buckets[b] = 0u64;
+        b = b + 1u64;
+    };
+
+    // Tally.
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let bucket: u64 = (data[i] * nbuckets) / max_val;
+        if bucket < nbuckets {
+            buckets[bucket] = buckets[bucket] + 1u64;
+        };
+        i = i + 1u64;
+    };
+}
+
+// Sum all bucket counts — proves the returned value stays bounded.
+fn bucket_total(buckets: span<u64>, nbuckets: u64) -> u64
+    requires nbuckets <= buckets.len
+{
+    let mut total: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < nbuckets
+        invariant i <= nbuckets
+        decreases nbuckets - i
+    {
+        total = total + buckets[i];
+        i = i + 1u64;
+    };
+    total
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 243: Verified matrix row access (row-major flat array)
 //
 // matrix_fill_row(s, rows, cols, r, val) fills row r of a rows×cols matrix.

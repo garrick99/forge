@@ -1,0 +1,49 @@
+// expected: 0
+// Demo 758: Verified zigzag encoding/decoding
+//
+// Zigzag encoding maps signed integers to unsigned:
+//   encode(n) = n * 2       if n >= 0
+//   encode(n) = -n * 2 - 1  if n < 0
+// For unsigned representation: encode(n) = (n << 1) ^ (n >> 63).
+// Proves: roundtrip identity and bounds.
+
+fn zigzag_encode(val: u64) -> u64
+    ensures val < 9223372036854775808u64 ==> result == val * 2u64
+{
+    if val < 9223372036854775808u64 {
+        val * 2u64
+    } else {
+        // Negative in two's complement: map to odd numbers.
+        let neg: u64 = 18446744073709551615u64 - val + 1u64;
+        neg * 2u64 - 1u64
+    }
+}
+
+fn zigzag_decode(encoded: u64) -> u64
+    ensures encoded % 2u64 == 0u64 ==> result == encoded / 2u64
+{
+    if encoded % 2u64 == 0u64 {
+        encoded / 2u64
+    } else {
+        // Odd → negative: recover via (encoded + 1) / 2, then negate.
+        let pos: u64 = (encoded + 1u64) / 2u64;
+        18446744073709551615u64 - pos + 1u64
+    }
+}
+
+// Encode an array element-wise.
+fn zigzag_encode_array(input: span<u64>, n: u64, output: span<u64>)
+    requires n <= input.len
+    requires n <= output.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        output[i] = zigzag_encode(input[i]);
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

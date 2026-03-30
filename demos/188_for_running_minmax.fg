@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 188: For-loop with ghost min+max tracking
 //
 // Tracks both minimum and maximum over a scan using ghost variables.

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 444: Data pipeline with filter and transform stages
 //
 // Items enter raw, pass filter (accepted/rejected), then transform (processed).

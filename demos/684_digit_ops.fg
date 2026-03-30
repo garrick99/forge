@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 684: digit operations — base-10 digit extraction, digit sum
 
 fn digit_count(x: u64) -> u64

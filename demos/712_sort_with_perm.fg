@@ -1,0 +1,70 @@
+// expected: 0
+// Demo 712: Selection sort with ghost permutation witness
+//
+// Proves FULL sort correctness: not only is the output sorted, but each
+// output element at position i was originally at position perm[i].
+//
+// Ghost proof strategy:
+//   - perm[0..n) is maintained as a ghost index array alongside s[0..n).
+//   - Initially perm[k] = k (identity permutation).
+//   - Every swap of s[i] <-> s[j] is mirrored in perm[i] <-> perm[j].
+//   - Postcondition: perm is a valid permutation (perm[k] < n, all distinct),
+//     and s[k] == old(s[perm[k]]) for all k < n.
+//
+// The perm array is ghost in intent (the caller may ignore it), but Forge
+// generates verified C that produces it.  A future ghost fn feature would
+// erase it from codegen entirely.
+
+fn selection_sort_perm(s: span<u64>, perm: span<u64>, n: u64)
+    requires s.len == n
+    requires perm.len == n
+    requires forall k: u64, k < n ==> perm[k] == k
+    ensures forall i: u64, forall j: u64, i < j ==> j < n ==> s[i] <= s[j]
+    ensures forall k: u64, k < n ==> perm[k] < n
+    ensures forall i: u64, forall j: u64, i < n ==> j < n ==> i != j ==> perm[i] != perm[j]
+    ensures forall k: u64, k < n ==> s[k] == old(s[perm[k]])
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        // Sorted prefix: s[0..i) is sorted
+        invariant forall p: u64, forall q: u64, p < q ==> q < i ==> s[p] <= s[q]
+        // Frontier: every element in the sorted prefix <= every element in the unsorted suffix
+        invariant forall p: u64, forall q: u64, p < i ==> q >= i ==> q < n ==> s[p] <= s[q]
+        // Perm validity: all indices in bounds
+        invariant forall k: u64, k < n ==> perm[k] < n
+        // Perm injectivity: all distinct
+        invariant forall p: u64, forall q: u64, p < n ==> q < n ==> p != q ==> perm[p] != perm[q]
+        // Perm correctness: output relates to original input via perm
+        invariant forall k: u64, k < n ==> s[k] == old(s[perm[k]])
+        decreases n - i
+    {
+        // Find index of minimum element in s[i..n)
+        let mut min_idx: u64 = i;
+        let mut j: u64 = i + 1u64;
+        while j < n
+            invariant j <= n
+            invariant min_idx >= i
+            invariant min_idx < n
+            invariant forall k: u64, k >= i ==> k < j ==> s[min_idx] <= s[k]
+            decreases n - j
+        {
+            if s[j] < s[min_idx] {
+                min_idx = j;
+                j = j + 1u64;
+            } else {
+                j = j + 1u64;
+            };
+        };
+        // Swap s[i] with s[min_idx], mirror in perm
+        let tmp_s: u64 = s[i];
+        s[i] = s[min_idx];
+        s[min_idx] = tmp_s;
+        let tmp_p: u64 = perm[i];
+        perm[i] = perm[min_idx];
+        perm[min_idx] = tmp_p;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

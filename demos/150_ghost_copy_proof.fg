@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 150: Ghost variable — verified array copy with ghost snapshot
 //
 // Copies src[0..n) into dst[0..n).

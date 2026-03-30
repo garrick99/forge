@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 480: std::mem showcase — span fill, copy, compare, sum, max, min
 //
 // All postconditions verified: forall k < n, dst[k] == v etc.

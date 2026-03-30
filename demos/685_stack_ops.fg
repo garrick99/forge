@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 685: stack operations — push, pop, peek, depth
 
 fn stack_push(s: span<u64>, top: u64, val: u64) -> u64

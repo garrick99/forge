@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 471: Task pool with priority stealing
 //
 // Three priority queues share a pool. steal() moves from low to high queue.

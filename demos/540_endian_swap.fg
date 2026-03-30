@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 540: byte-swap and endian conversion
 
 fn bswap16(v: u64) -> u64

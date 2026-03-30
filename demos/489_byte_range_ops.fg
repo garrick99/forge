@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 489: byte-range arithmetic and classification
 //
 // Verified operations on u8 bytes: range checks, negation, parity, nibbles.

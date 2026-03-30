@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 449: Session tracker with login/logout and duration
 //
 // active_sessions increments on login, decrements on logout.

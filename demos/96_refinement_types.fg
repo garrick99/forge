@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 96: Refinement types — preconditions, postconditions, proven chains
 //
 // Each function's contract is proved independently by the SMT solver.

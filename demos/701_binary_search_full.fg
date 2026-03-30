@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 701: Full binary search correctness
 //
 // Proves both directions:

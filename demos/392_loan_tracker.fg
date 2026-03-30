@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 392: Loan tracker — principal, interest, payments
 //
 // A loan accrues interest each period and accepts payments.

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 343: Rate limiter with window tracking
 //
 // A fixed-window rate limiter: counts requests in the current window.

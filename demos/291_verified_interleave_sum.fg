@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 291: Verified interleaved sum — sum even-indexed and odd-indexed separately
 //
 // sum_even(s, n): sums s[0], s[2], s[4], ...

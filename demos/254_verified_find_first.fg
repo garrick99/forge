@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 254: Verified find_first — returns index of first element >= threshold
 //
 // find_first_ge(s, n, threshold) scans s and returns the index of the first

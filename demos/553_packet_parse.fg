@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 553: packet header parsing and field extraction
 
 fn read_u8(buf: span<u64>, offset: u64) -> u64

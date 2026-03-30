@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 397: Sparse counter — two buckets with overflow tracking
 //
 // A sparse counter maintains two buckets (small and large values).

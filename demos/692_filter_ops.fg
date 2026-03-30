@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 692: filter operations — filter by predicate, compact, gather
 
 fn filter_lt(src: span<u64>, n: u64, dst: span<u64>, threshold: u64) -> u64

@@ -1,0 +1,43 @@
+// expected: 0
+// Demo 766: Verified matrix multiplication
+//
+// Multiplies two matrices: C = A * B.
+// A is m×k, B is k×n, C is m×n.  All stored row-major in flat spans.
+// Proves: all array accesses are within bounds.
+
+fn matmul(a: span<u64>, b: span<u64>, c: span<u64>,
+          m: u64, k: u64, n: u64)
+    requires m * k <= a.len
+    requires k * n <= b.len
+    requires m * n <= c.len
+    requires m >= 1u64
+    requires k >= 1u64
+    requires n >= 1u64
+{
+    let mut i: u64 = 0u64;
+    while i < m
+        invariant i <= m
+        decreases m - i
+    {
+        let mut j: u64 = 0u64;
+        while j < n
+            invariant j <= n
+            decreases n - j
+        {
+            let mut acc: u64 = 0u64;
+            let mut p: u64 = 0u64;
+            while p < k
+                invariant p <= k
+                decreases k - p
+            {
+                acc = acc + a[i * k + p] * b[p * n + j];
+                p = p + 1u64;
+            };
+            c[i * n + j] = acc;
+            j = j + 1u64;
+        };
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

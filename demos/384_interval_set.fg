@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 384: Interval set tracker (lo, hi, count)
 //
 // An interval grows by extending lo downward or hi upward.

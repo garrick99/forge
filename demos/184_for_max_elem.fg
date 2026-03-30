@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 184: For-loop finds maximum element with invariant
 //
 // Scan a span for the maximum element.

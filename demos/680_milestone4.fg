@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 680: milestone 4 — combined verified algorithms
 
 fn gcd(a: u64, b: u64) -> u64

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 272: Verified range fill — fill s[lo..hi) with val
 //
 // fill_range(s, n, lo, hi, val) sets s[i] = val for lo <= i < hi.

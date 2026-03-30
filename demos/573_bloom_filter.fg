@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 573: simplified Bloom filter bit array ops
 
 fn bf_set(bits: span<u64>, hash: u64, nbits: u64)

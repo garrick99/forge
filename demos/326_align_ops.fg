@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 326: Verified alignment and address arithmetic
 //
 // Common low-level operations for aligned memory allocation,

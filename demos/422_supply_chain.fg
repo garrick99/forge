@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 422: Supply chain inventory tracker
 //
 // Three stages: raw → in_process → finished.

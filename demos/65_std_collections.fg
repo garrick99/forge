@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 65: std/collections.fg — Vec_u64 proven-bounds array wrapper
 //
 // Demonstrates: importing std/collections, constructing a Vec_u64,

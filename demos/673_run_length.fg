@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 673: run-length encoding helpers
 
 fn rle_count_run(s: span<u64>, n: u64, start: u64) -> u64

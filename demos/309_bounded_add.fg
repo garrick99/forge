@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 309: Bounded addition stays within range
 //
 // If a <= A and b <= B and A + B <= MAX, then a + b <= A + B <= MAX.

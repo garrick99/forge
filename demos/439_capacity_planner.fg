@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 439: Capacity planner with reserved and used slots
 //
 // total = reserved + available. reserve() moves slots from available to reserved.

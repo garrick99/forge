@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 157: Verified occurrence count
 //
 // Counts how many elements in s equal target.

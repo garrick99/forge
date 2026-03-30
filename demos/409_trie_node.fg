@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 409: Trie node insertion tracker
 //
 // A trie node tracks the number of words passing through it

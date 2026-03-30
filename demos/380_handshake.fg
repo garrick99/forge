@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 380: Three-way handshake state machine
 //
 // Models TCP-style 3-way handshake: SYN sent → SYN-ACK received → ACK sent.

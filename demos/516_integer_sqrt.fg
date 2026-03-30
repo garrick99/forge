@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 516: integer square root — floor(sqrt(n)) with nonlinear invariant
 
 fn floor_sqrt(n: u64) -> u64

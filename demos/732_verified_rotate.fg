@@ -1,0 +1,46 @@
+// expected: 0
+// Demo 732: Verified array rotation
+//
+// Left-rotates span by k positions using the reversal algorithm:
+//   reverse [0, k), reverse [k, n), reverse [0, n).
+// Proves: each reverse sub-call stays in bounds.
+
+fn reverse_range(s: span<u64>, lo: u64, hi: u64)
+    requires hi <= s.len
+    requires lo <= hi
+{
+    let mut l: u64 = lo;
+    let mut r: u64 = hi;
+    while l + 1u64 < r
+        invariant l >= lo
+        invariant r <= hi
+        invariant l <= r
+        decreases r - l
+    {
+        r = r - 1u64;
+        let tmp: u64 = s[l];
+        s[l] = s[r];
+        s[r] = tmp;
+        l = l + 1u64;
+    };
+}
+
+fn rotate_left(s: span<u64>, n: u64, k: u64)
+    requires n <= s.len
+    requires k <= n
+{
+    reverse_range(s, 0u64, k);
+    reverse_range(s, k, n);
+    reverse_range(s, 0u64, n);
+}
+
+fn rotate_right(s: span<u64>, n: u64, k: u64)
+    requires n <= s.len
+    requires k <= n
+{
+    // Right-rotate by k = left-rotate by n-k.
+    let shift: u64 = n - k;
+    rotate_left(s, n, shift);
+}
+
+fn main() -> u64 { 0u64 }

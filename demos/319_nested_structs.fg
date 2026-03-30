@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 319: Nested struct field access in postconditions
 //
 // Demonstrates that the proof engine can now reason about

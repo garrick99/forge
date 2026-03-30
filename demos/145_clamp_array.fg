@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 145: Verified conditional array write — clamp_array
 //
 // Clamps each element of a span to [0, max_val].

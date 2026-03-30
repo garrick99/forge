@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 348: Checkpoint/restore state tracker
 //
 // A value with checkpoint: save() records the current value

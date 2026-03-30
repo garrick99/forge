@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 408: MIDI note state tracker
 //
 // Models MIDI note-on/note-off events. Tracks active notes,

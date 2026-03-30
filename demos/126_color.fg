@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 126: Verified RGB color operations
 //
 // Colors stored as (r, g, b) triples, each in [0, 255].

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 669: sparse array operations — CSR-style index/value arrays
 
 fn sparse_dot(idx: span<u64>, vals: span<u64>, nnz: u64, dense: span<u64>, dense_len: u64) -> u64

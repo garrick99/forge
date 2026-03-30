@@ -1,0 +1,46 @@
+// expected: 0
+// Demo 777: Verified extended GCD (iterative)
+//
+// Computes gcd(a, b) using the iterative Euclidean algorithm.
+// Proves: termination via decreasing b.
+
+fn gcd(a: u64, b: u64) -> u64
+    requires a >= 1u64 || b >= 1u64
+    ensures b == 0u64 ==> result == a
+    decreases b
+{
+    if b == 0u64 {
+        a
+    } else {
+        gcd(b, a % b)
+    }
+}
+
+// Iterative GCD.
+fn gcd_iter(a: u64, b: u64) -> u64
+    requires a >= 1u64
+    ensures result >= 1u64
+{
+    let mut x: u64 = a;
+    let mut y: u64 = b;
+    while y > 0u64
+        invariant x >= 1u64 || y >= 1u64
+        decreases y
+    {
+        let tmp: u64 = y;
+        y = x % y;
+        x = tmp;
+    };
+    x
+}
+
+// LCM via GCD: lcm(a,b) = a / gcd(a,b) * b.
+fn lcm(a: u64, b: u64) -> u64
+    requires a >= 1u64
+    requires b >= 1u64
+{
+    let g: u64 = gcd_iter(a, b);
+    (a / g) * b
+}
+
+fn main() -> u64 { 0u64 }

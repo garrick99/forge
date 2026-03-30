@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 557: circular queue operations on a span
 
 fn queue_enqueue(s: span<u64>, head: u64, tail: u64, cap: u64, val: u64) -> u64

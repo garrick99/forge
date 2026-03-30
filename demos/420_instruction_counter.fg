@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 420: CPU instruction type counter
 //
 // A simple profiler counts instructions by type: loads, stores,

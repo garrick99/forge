@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 74: Default trait methods
 //
 // A trait can provide a default method body.  Types that implement the

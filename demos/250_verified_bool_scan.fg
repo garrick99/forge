@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 250: Verified boolean scan — all_positive(s, n) returns true iff all s[i] > 0
 //
 // Uses bool flag with while loop. The is_sorted-style proof now works

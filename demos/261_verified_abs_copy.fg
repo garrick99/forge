@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 261: Verified absolute-value copy using elif and old()
 //
 // saturating_copy(dst, src, n, cap) copies src to dst, capping at cap.

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 425: Ownership transfer protocol
 //
 // A resource has exactly one owner at a time (owner_id).

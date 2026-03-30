@@ -1,0 +1,62 @@
+// expected: 0
+// Demo 757: Verified Bloom filter operations
+//
+// A Bloom filter backed by a bit-array stored as u64 words.
+// Uses two hash functions (modular) to set/test bits.
+// Proves: all bit array accesses are within bounds.
+
+fn hash1(val: u64, nbits: u64) -> u64
+    requires nbits >= 1u64
+    ensures result < nbits
+{
+    val % nbits
+}
+
+fn hash2(val: u64, nbits: u64) -> u64
+    requires nbits >= 1u64
+    ensures result < nbits
+{
+    (val * 2654435761u64 + 17u64) % nbits
+}
+
+// Set a bit in the bit array.
+fn set_bit(bits: span<u64>, nbits: u64, pos: u64)
+    requires nbits >= 1u64
+    requires nbits <= bits.len
+    requires pos < nbits
+{
+    bits[pos] = 1u64;
+}
+
+// Test a bit.
+fn test_bit(bits: span<u64>, nbits: u64, pos: u64) -> bool
+    requires nbits >= 1u64
+    requires nbits <= bits.len
+    requires pos < nbits
+    ensures result == (bits[pos] != 0u64)
+{
+    bits[pos] != 0u64
+}
+
+// Insert a value into the Bloom filter.
+fn bloom_insert(bits: span<u64>, nbits: u64, val: u64)
+    requires nbits >= 1u64
+    requires nbits <= bits.len
+{
+    let h1: u64 = hash1(val, nbits);
+    let h2: u64 = hash2(val, nbits);
+    set_bit(bits, nbits, h1);
+    set_bit(bits, nbits, h2);
+}
+
+// Query: might the value be in the set?
+fn bloom_query(bits: span<u64>, nbits: u64, val: u64) -> bool
+    requires nbits >= 1u64
+    requires nbits <= bits.len
+{
+    let h1: u64 = hash1(val, nbits);
+    let h2: u64 = hash2(val, nbits);
+    test_bit(bits, nbits, h1) && test_bit(bits, nbits, h2)
+}
+
+fn main() -> u64 { 0u64 }

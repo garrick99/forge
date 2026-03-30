@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 271: Verified chained copy — copy a to b, then b to c
 //
 // copy(dst, src, n): proven dst[k] == src[k] for all k < n.

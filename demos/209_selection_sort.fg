@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 209: Verified selection sort — index bounds proof
 //
 // Selection sort scans for the minimum and swaps it into place.

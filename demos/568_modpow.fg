@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 568: modular exponentiation (square-and-multiply)
 
 fn modpow(base: u64, exp: u64, m: u64) -> u64

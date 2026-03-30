@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 615: digit operations — extract digits, digit sum, digit product
 
 fn digit_sum(n: u64) -> u64 {

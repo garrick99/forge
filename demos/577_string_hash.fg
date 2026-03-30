@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 577: polynomial rolling hash over a byte span
 
 fn fnv1a_update(hash: u64, byte: u64) -> u64

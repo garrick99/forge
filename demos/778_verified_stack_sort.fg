@@ -1,0 +1,65 @@
+// expected: 0
+// Demo 778: Verified stack-based sorting (pancake-style)
+//
+// Sorts the first k elements of a span by repeatedly finding the max
+// and placing it in position.  Uses only reverse as the primitive.
+// Proves: all accesses in bounds.
+
+fn find_max_idx(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures result < n
+{
+    let mut best: u64 = 0u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant best < n
+        decreases n - i
+    {
+        if s[i] > s[best] {
+            best = i;
+        };
+        i = i + 1u64;
+    };
+    best
+}
+
+fn reverse_prefix(s: span<u64>, k: u64)
+    requires k <= s.len
+{
+    let mut lo: u64 = 0u64;
+    let mut hi: u64 = k;
+    while lo + 1u64 < hi
+        invariant lo <= hi
+        invariant hi <= k
+        decreases hi - lo
+    {
+        hi = hi - 1u64;
+        let tmp: u64 = s[lo];
+        s[lo] = s[hi];
+        s[hi] = tmp;
+        lo = lo + 1u64;
+    };
+}
+
+fn pancake_sort(s: span<u64>, n: u64)
+    requires n >= 1u64
+    requires n <= s.len
+{
+    let mut size: u64 = n;
+    while size > 1u64
+        invariant size <= n
+        invariant size >= 1u64
+        decreases size
+    {
+        let max_i: u64 = find_max_idx(s, size);
+        if max_i > 0u64 {
+            reverse_prefix(s, max_i + 1u64);
+        };
+        reverse_prefix(s, size);
+        size = size - 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

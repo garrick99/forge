@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 551: token bucket rate limiter
 
 struct TokenBucket {

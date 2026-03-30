@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 266: Verified dot product over range with forall postcondition
 //
 // dot_partial(a, b, n, lo, hi) computes sum of a[k]*b[k] for k in [lo, hi).

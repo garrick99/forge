@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 605: open-addressing hash table (linear probing, integer keys)
 
 fn hash_slot(key: u64, cap: u64) -> u64

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 187: Check all-positive with for-loop invariant + early semantics
 //
 // Scans a span; returns 1 if all elements > 0, else 0.

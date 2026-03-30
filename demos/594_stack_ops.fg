@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 594: array-backed stack operations
 
 fn stack_push(s: span<u64>, top: u64, val: u64) -> u64

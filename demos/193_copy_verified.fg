@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 193: Verified copy — prove every element was copied correctly
 //
 // copy(dst, src, n) copies src[0..n] into dst[0..n].

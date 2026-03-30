@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 315: Lock typestate verification
 //
 // A mutual exclusion lock with verified acquire/release sequencing.

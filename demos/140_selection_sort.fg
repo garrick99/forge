@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 140: Verified in-place selection sort
 //
 // Proves full sortedness: forall a < b < s.len, s[a] <= s[b]

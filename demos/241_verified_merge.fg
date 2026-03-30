@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 241: Verified merge — copy remaining elements from two sorted spans
 //
 // merge_copy(dst, a, na) copies all elements from a to dst, verifying bounds.

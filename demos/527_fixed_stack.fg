@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 527: verified fixed-size stack with push/pop/peek
 
 struct Stack {

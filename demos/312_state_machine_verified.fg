@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 312: Verified state machine with struct typestate
 //
 // A connection state machine with verified transitions.

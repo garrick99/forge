@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 664: graph operations — degree, in/out degree, adjacency
 
 fn out_degree(adj: span<u64>, n: u64, node: u64) -> u64

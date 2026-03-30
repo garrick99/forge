@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 525: insertion sort — verified sort with index-based inner loop
 
 fn insert_into_sorted(s: span<u64>, pos: u64)

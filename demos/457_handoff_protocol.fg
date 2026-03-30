@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 457: Work handoff protocol between producer and consumer
 //
 // Producer creates work items; handoff transfers them to consumer.

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 410: I/O statistics tracker
 //
 // Tracks read/write bytes and operation counts for a storage device.

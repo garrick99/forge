@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 196: Verified clamp-all — prove all elements are bounded after clamp
 //
 // clamp_all(s, n, lo, hi) clamps every element to [lo, hi].

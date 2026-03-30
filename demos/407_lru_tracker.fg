@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 407: LRU cache eviction tracker
 //
 // An LRU cache tracks hits, misses, evictions, and current occupancy.

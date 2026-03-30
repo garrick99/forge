@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 161: Verified array sum
 //
 // Computes the sum of all elements. Proves that the result is bounded by

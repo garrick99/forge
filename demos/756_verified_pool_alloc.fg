@@ -1,0 +1,51 @@
+// expected: 0
+// Demo 756: Verified pool allocator (fixed-size blocks)
+//
+// A pool allocator backed by a flat span.  Allocates and frees fixed-size
+// blocks tracked by a free-list stored as indices.
+// Proves: all allocations and frees stay within pool bounds.
+
+// Initialize pool: all blocks are free.
+fn pool_init(free_list: span<u64>, pool_size: u64)
+    requires pool_size <= free_list.len
+{
+    let mut i: u64 = 0u64;
+    while i < pool_size
+        invariant i <= pool_size
+        decreases pool_size - i
+    {
+        free_list[i] = i;
+        i = i + 1u64;
+    };
+}
+
+// Allocate: pop from free list.  Returns (block_index, new_count).
+// Requires free list entries are valid indices.
+fn pool_alloc(free_list: span<u64>, pool_size: u64, free_count: u64) -> (u64, u64)
+    requires pool_size >= 1u64
+    requires pool_size <= free_list.len
+    requires free_count >= 1u64
+    requires free_count <= pool_size
+    requires free_list[free_count - 1u64] < pool_size
+    ensures result.0 < pool_size
+    ensures result.1 == free_count - 1u64
+{
+    let new_count: u64 = free_count - 1u64;
+    let block: u64 = free_list[new_count];
+    (block, new_count)
+}
+
+// Free: push block index back onto free list.
+fn pool_free(free_list: span<u64>, pool_size: u64, free_count: u64, block: u64) -> u64
+    requires pool_size >= 1u64
+    requires pool_size <= free_list.len
+    requires free_count < pool_size
+    requires block < pool_size
+    ensures result == free_count + 1u64
+    ensures result <= pool_size
+{
+    free_list[free_count] = block;
+    free_count + 1u64
+}
+
+fn main() -> u64 { 0u64 }

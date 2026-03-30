@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 671: bit matrix operations — row/column ops on flat u64 arrays
 
 fn bmat_get(m: span<u64>, cols: u64, row: u64, col: u64) -> u64

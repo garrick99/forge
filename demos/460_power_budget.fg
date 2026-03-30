@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 460: Power budget management across subsystems
 //
 // Three subsystems: cpu, gpu, io. Each draws power from a budget.

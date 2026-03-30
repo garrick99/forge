@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 653: checksum and hash variants
 
 fn sum_checksum(data: span<u64>, n: u64) -> u64

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 679: sequence operations — zip, interleave, dedup
 
 fn seq_zip_add(a: span<u64>, b: span<u64>, out: span<u64>, n: u64)

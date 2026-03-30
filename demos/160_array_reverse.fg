@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 160: Verified in-place array reversal
 //
 // Reverses a span in place using two-pointer swap.

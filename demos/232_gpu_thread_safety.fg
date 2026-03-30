@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 232: GPU thread safety — verified bounds on thread-indexed access
 //
 // gpu_fill_kernel: each thread writes s[tid] = tid.

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 106: Typestate pattern — connection lifecycle
 //
 // Models a TCP-like connection with states: Closed → Listening → Connected → Closed.

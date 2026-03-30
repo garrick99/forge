@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 242: Verified strided access — every stride-th element
 //
 // fill_stride(s, n, stride, val) fills s[0], s[stride], s[2*stride], ...

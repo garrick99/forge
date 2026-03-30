@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 414: Packet reassembly tracker
 //
 // Tracks fragments arriving for a packet reassembly buffer.

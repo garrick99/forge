@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 311: Verified IPv4 header parser with field-level postconditions
 //
 // Full IPv4 header parse with proven field bounds:

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 212: Two-span operation — add corresponding elements
 //
 // out[i] = a[i] + b[i] for i in n.

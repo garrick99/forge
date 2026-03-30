@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 517: 1D-layout matrix operations on spans
 //
 // Row-major: element (r, c) at index r * cols + c.

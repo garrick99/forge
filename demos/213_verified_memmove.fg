@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 213: Verified memmove (forward copy, non-overlapping assumed)
 //
 // Copies n elements from src to dst, left-to-right.

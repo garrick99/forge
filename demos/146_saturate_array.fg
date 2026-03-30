@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 146: Verified two-sided saturating clamp
 //
 // Clamps each element of a span to [lo_val, hi_val].

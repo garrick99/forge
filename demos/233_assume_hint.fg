@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 233: assume() as a proof hint
 //
 // Sometimes the verifier needs an extra hint to bridge a gap.

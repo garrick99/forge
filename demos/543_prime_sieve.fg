@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 543: sieve of Eratosthenes — mark composite flags
 
 fn sieve_mark(flags: span<u64>, n: u64, p: u64)

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 357: Sliding budget — spend/earn with period resets
 //
 // A budget resets each period. spend() reduces remaining budget,

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 224: Verified sliding window sum
 //
 // sum_range(s, lo, hi) computes the sum of s[lo..hi).

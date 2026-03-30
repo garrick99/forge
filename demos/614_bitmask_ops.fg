@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 614: bitmask and flag operations
 
 fn flag_set(flags: u64, bit: u64) -> u64

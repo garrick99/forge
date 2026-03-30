@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 552: 2D vector operations with integer coordinates
 
 struct Vec2 {

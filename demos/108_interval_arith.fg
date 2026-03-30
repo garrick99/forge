@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 108: Verified interval arithmetic
 //
 // Intervals [lo, hi] with lo <= hi invariant.

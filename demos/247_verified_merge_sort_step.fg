@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 247: Verified merge step — k == i + j invariant with else-if chain
 //
 // merge_step uses a 3-branch else-if: i exhausted → take b[j],

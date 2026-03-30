@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 263: Verified Boyer-Moore majority vote
 //
 // majority_candidate(s, n) returns the majority candidate.

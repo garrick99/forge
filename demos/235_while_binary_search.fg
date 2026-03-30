@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 235: Binary search via while loop with multiple invariants
 //
 // lower_bound(s, n, target) returns the first index where s[k] >= target.

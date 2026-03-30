@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 239: Verified map with old() — elementwise addition
 //
 // map_add(dst, src, n, offset) sets dst[i] = src[i] + offset.

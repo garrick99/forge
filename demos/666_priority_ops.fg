@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 666: priority queue operations — insert, extract, peek
 
 fn pq_peek(h: span<u64>, n: u64) -> u64

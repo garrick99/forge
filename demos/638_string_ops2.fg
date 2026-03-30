@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 638: string/array operations — find, replace, split count
 
 fn find_value(s: span<u64>, n: u64, val: u64) -> u64

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 588: find array bounds — min, max, and their indices
 
 fn find_min(s: span<u64>, n: u64) -> u64

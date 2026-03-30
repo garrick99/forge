@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 307: Cast range injection
 //
 // When casting from a smaller integer type, the proof engine automatically

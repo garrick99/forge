@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 451: Tape drive head position tracker
 //
 // Linear tape: head moves forward (seek_fwd) or backward (seek_bwd).

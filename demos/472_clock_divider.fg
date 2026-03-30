@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 472: Clock divider with output pulse tracking
 //
 // Input clock divided by N. Every N input ticks, one output pulse fires.

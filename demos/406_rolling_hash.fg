@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 406: Rolling hash state tracker
 //
 // A Rabin-Karp style rolling hash: each add() incorporates a new

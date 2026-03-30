@@ -1,0 +1,84 @@
+// expected: 0
+// Demo 760: Verified open-addressing hash table operations
+//
+// Linear-probing hash table with fixed capacity.
+// Keys stored in `keys`, values in `vals`, occupancy in `used` (0/1).
+// Proves: all probe sequences stay within bounds and terminate.
+
+fn hash_key(key: u64, cap: u64) -> u64
+    requires cap >= 1u64
+    ensures result < cap
+{
+    key % cap
+}
+
+// Insert key-value pair.  Returns 1 if inserted, 0 if table full.
+fn ht_insert(keys: span<u64>, vals: span<u64>, used: span<u64>,
+             cap: u64, key: u64, val: u64) -> u64
+    requires cap >= 1u64
+    requires cap <= keys.len
+    requires cap <= vals.len
+    requires cap <= used.len
+    ensures result <= 1u64
+{
+    let start: u64 = hash_key(key, cap);
+    let mut idx: u64 = start;
+    let mut probes: u64 = 0u64;
+    let mut inserted: u64 = 0u64;
+    while probes < cap
+        invariant probes <= cap
+        invariant idx < cap
+        invariant inserted <= 1u64
+        decreases cap - probes
+    {
+        if inserted == 0u64 {
+            if used[idx] == 0u64 {
+                keys[idx] = key;
+                vals[idx] = val;
+                used[idx] = 1u64;
+                inserted = 1u64;
+            } else if keys[idx] == key {
+                // Update existing.
+                vals[idx] = val;
+                inserted = 1u64;
+            };
+        };
+        idx = if idx + 1u64 == cap { 0u64 } else { idx + 1u64 };
+        probes = probes + 1u64;
+    };
+    inserted
+}
+
+// Lookup key.  Returns value if found, default_val otherwise.
+fn ht_lookup(keys: span<u64>, vals: span<u64>, used: span<u64>,
+             cap: u64, key: u64, default_val: u64) -> u64
+    requires cap >= 1u64
+    requires cap <= keys.len
+    requires cap <= vals.len
+    requires cap <= used.len
+{
+    let start: u64 = hash_key(key, cap);
+    let mut idx: u64 = start;
+    let mut probes: u64 = 0u64;
+    let mut res: u64 = default_val;
+    let mut found: bool = false;
+    while probes < cap
+        invariant probes <= cap
+        invariant idx < cap
+        decreases cap - probes
+    {
+        if !found {
+            if used[idx] == 0u64 {
+                probes = cap;
+            } else if keys[idx] == key {
+                res = vals[idx];
+                found = true;
+            };
+        };
+        idx = if idx + 1u64 == cap { 0u64 } else { idx + 1u64 };
+        probes = probes + 1u64;
+    };
+    res
+}
+
+fn main() -> u64 { 0u64 }

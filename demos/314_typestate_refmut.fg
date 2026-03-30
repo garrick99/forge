@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 314: Typestate verification with refmut<T> + requires/ensures
 //
 // Full connection lifecycle verification with in-place mutation.

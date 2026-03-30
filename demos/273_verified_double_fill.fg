@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 273: Verified double fill — fill two non-overlapping ranges
 //
 // fill_range fills s[lo..hi) with val.

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 708: Two-pointer sorted pair search — full correctness
 //
 // Given a sorted array s[0..n) and target T, find indices (lo, hi) such that

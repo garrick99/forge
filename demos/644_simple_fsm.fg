@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 644: simple finite state machine — state transitions and validation
 
 fn fsm_transition(state: u64, input: u64, table: span<u64>, nstates: u64, ninputs: u64) -> u64

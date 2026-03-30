@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 293: Verified saturating-add arrays — dst[i] = min(a[i] + b[i], MAX)
 //
 // sat_add(a, b, dst, n, max_val) adds element-wise, clamping to max_val.

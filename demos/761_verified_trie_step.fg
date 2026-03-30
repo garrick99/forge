@@ -1,0 +1,39 @@
+// expected: 0
+// Demo 761: Verified trie traversal step
+//
+// A trie node table stored flat: each node has 4 children (indices into table).
+// 0 = null/no child.  Proves: all traversal steps stay in bounds.
+
+fn trie_lookup(table: span<u64>, table_size: u64,
+               keys: span<u64>, key_len: u64) -> u64
+    requires table_size >= 4u64
+    requires table_size <= table.len
+    requires key_len <= keys.len
+    requires forall k: u64, k < key_len ==> keys[k] < 4u64
+    ensures result < table_size || result == 0u64
+{
+    let mut node: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < key_len
+        invariant i <= key_len
+        invariant node < table_size || node == 0u64
+        decreases key_len - i
+    {
+        if node + keys[i] < table_size {
+            let child: u64 = table[node + keys[i]];
+            if child < table_size {
+                node = child;
+            } else {
+                node = 0u64;
+                i = key_len;
+            };
+        } else {
+            node = 0u64;
+            i = key_len;
+        };
+        i = i + 1u64;
+    };
+    node
+}
+
+fn main() -> u64 { 0u64 }

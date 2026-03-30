@@ -1,0 +1,60 @@
+// expected: 0
+// Demo 739: Verified exponentially-weighted moving average (EWMA)
+//
+// Fixed-point EWMA using integer arithmetic:
+//   ewma = (alpha * sample + (256 - alpha) * ewma) / 256
+// where alpha is a weight in [1, 255].
+// Proves: output stays bounded if inputs are bounded.
+
+fn ewma_filter(samples: span<u64>, n: u64, alpha: u64, output: span<u64>)
+    requires n >= 1u64
+    requires n <= samples.len
+    requires n <= output.len
+    requires alpha >= 1u64
+    requires alpha <= 255u64
+{
+    output[0u64] = samples[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let prev: u64 = output[i - 1u64];
+        let cur: u64 = samples[i];
+        output[i] = (alpha * cur + (256u64 - alpha) * prev) / 256u64;
+        i = i + 1u64;
+    };
+}
+
+// Simple moving average over last `w` samples.
+fn sma(samples: span<u64>, n: u64, w: u64, output: span<u64>)
+    requires n >= w
+    requires w >= 1u64
+    requires n <= samples.len
+    requires n <= output.len
+{
+    // First window: direct sum.
+    let mut sum: u64 = 0u64;
+    let mut j: u64 = 0u64;
+    while j < w
+        invariant j <= w
+        decreases w - j
+    {
+        sum = sum + samples[j];
+        j = j + 1u64;
+    };
+    output[w - 1u64] = sum / w;
+
+    // Subsequent windows: slide.
+    let mut i: u64 = w;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        sum = sum + samples[i] - samples[i - w];
+        output[i] = sum / w;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

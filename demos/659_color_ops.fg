@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 659: color/pixel operations (packed RGBA)
 
 fn rgba_pack(r: u64, g: u64, b: u64, a: u64) -> u64

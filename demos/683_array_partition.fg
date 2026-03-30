@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 683: array partitioning — stable and unstable partitions
 
 fn partition_lt(s: span<u64>, n: u64, pivot: u64) -> u64

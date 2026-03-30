@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 570: ring counter — modular counter with wraparound
 
 struct RingCounter {

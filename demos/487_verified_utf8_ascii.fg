@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 487: verified ASCII byte classification and transformation
 //
 // All functions carry complete postconditions verified by Z3.

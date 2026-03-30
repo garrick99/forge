@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 663: I/O simulation — byte stream read/write helpers
 
 fn stream_write_u8(buf: span<u64>, pos: u64, val: u64) -> u64

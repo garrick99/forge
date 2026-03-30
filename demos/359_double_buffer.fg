@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 359: Double-buffer swap tracking
 //
 // A double-buffer has a front and back buffer, each with a version.

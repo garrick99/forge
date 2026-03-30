@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 661: linear algebra operations — vector norms, dot products
 
 fn vec_dot(a: span<u64>, b: span<u64>, n: u64) -> u64

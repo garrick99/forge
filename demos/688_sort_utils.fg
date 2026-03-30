@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 688: sort utilities — merge step, find bounds, count inversions
 
 fn merge_sorted(a: span<u64>, na: u64, b: span<u64>, nb: u64, out: span<u64>)
@@ -8,25 +9,21 @@ fn merge_sorted(a: span<u64>, na: u64, b: span<u64>, nb: u64, out: span<u64>)
     let mut i: u64 = 0u64;
     let mut j: u64 = 0u64;
     let mut k: u64 = 0u64;
-    let mut done: bool = false;
-    while !done
+    while i < na && j < nb
         invariant i <= na
         invariant j <= nb
         invariant k == i + j
         decreases na + nb - k
     {
-        if i < na {
-            if j < nb {
-                if a[i] <= b[j] {
-                    out[k] = a[i];
-                    i = i + 1u64;
-                } else {
-                    out[k] = b[j];
-                    j = j + 1u64;
-                };
-                k = k + 1u64;
-            } else { done = true; };
-        } else { done = true; };
+        if a[i] <= b[j] {
+            out[k] = a[i];
+            i = i + 1u64;
+            k = k + 1u64;
+        } else {
+            out[k] = b[j];
+            j = j + 1u64;
+            k = k + 1u64;
+        };
     };
     while i < na
         invariant i <= na

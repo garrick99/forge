@@ -1,0 +1,51 @@
+// expected: 0
+// Demo 767: Verified base conversion
+//
+// Converts an integer to its representation in a given base.
+// Writes digits (least significant first) into an output span.
+// Proves: output index stays in bounds and all digits < base.
+
+fn to_base(val: u64, base: u64, digits: span<u64>, max_digits: u64) -> u64
+    requires base >= 2u64
+    requires max_digits >= 1u64
+    requires max_digits <= digits.len
+    ensures result <= max_digits
+{
+    let mut v: u64 = val;
+    let mut i: u64 = 0u64;
+    if val == 0u64 {
+        digits[0u64] = 0u64;
+        i = 1u64;
+    } else {
+        while v > 0u64 && i < max_digits
+            invariant i <= max_digits
+            decreases v
+        {
+            digits[i] = v % base;
+            v = v / base;
+            i = i + 1u64;
+        };
+    };
+    i
+}
+
+// Convert from base representation back to integer.
+fn from_base(digits: span<u64>, ndigits: u64, base: u64) -> u64
+    requires ndigits <= digits.len
+    requires base >= 2u64
+{
+    let mut val: u64 = 0u64;
+    let mut power: u64 = 1u64;
+    let mut i: u64 = 0u64;
+    while i < ndigits
+        invariant i <= ndigits
+        decreases ndigits - i
+    {
+        val = val + digits[i] * power;
+        power = power * base;
+        i = i + 1u64;
+    };
+    val
+}
+
+fn main() -> u64 { 0u64 }

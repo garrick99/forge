@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 429: Health monitor with consecutive failures
 //
 // Tracks consecutive failures and total checks.

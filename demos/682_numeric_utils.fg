@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 682: numeric utilities — clamping, rounding, alignment
 
 fn clamp(x: u64, lo: u64, hi: u64) -> u64

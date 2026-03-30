@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 560: bit manipulation tricks with verified properties
 
 fn is_power_of_two(x: u64) -> bool

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 523: population count (popcount) and related bit-counting algorithms
 
 fn popcount_loop(x: u64) -> u64

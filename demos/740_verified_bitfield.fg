@@ -1,0 +1,60 @@
+// expected: 0
+// Demo 740: Verified bitfield packing and unpacking
+//
+// Pack and unpack multiple small integers into a single u64 word.
+// Proves: unpacking recovers the original values when values fit in their fields.
+
+// Pack two 32-bit values into one u64.
+fn pack_2x32(hi: u64, lo: u64) -> u64
+    requires hi < 4294967296u64
+    requires lo < 4294967296u64
+    ensures result / 4294967296u64 == hi
+    ensures result % 4294967296u64 == lo
+{
+    hi * 4294967296u64 + lo
+}
+
+// Unpack high 32 bits.
+fn unpack_hi32(packed: u64) -> u64
+    ensures result == packed / 4294967296u64
+{
+    packed / 4294967296u64
+}
+
+// Unpack low 32 bits.
+fn unpack_lo32(packed: u64) -> u64
+    ensures result == packed % 4294967296u64
+{
+    packed % 4294967296u64
+}
+
+// Pack four 16-bit values into one u64.
+fn pack_4x16(a: u64, b: u64, c: u64, d: u64) -> u64
+    requires a < 65536u64
+    requires b < 65536u64
+    requires c < 65536u64
+    requires d < 65536u64
+{
+    a * 65536u64 * 65536u64 * 65536u64 +
+    b * 65536u64 * 65536u64 +
+    c * 65536u64 +
+    d
+}
+
+// Extract the k-th 16-bit field (0 = lowest).
+fn extract_16(packed: u64, k: u64) -> u64
+    requires k < 4u64
+    ensures result < 65536u64
+{
+    if k == 0u64 {
+        packed % 65536u64
+    } else if k == 1u64 {
+        (packed / 65536u64) % 65536u64
+    } else if k == 2u64 {
+        (packed / (65536u64 * 65536u64)) % 65536u64
+    } else {
+        (packed / (65536u64 * 65536u64 * 65536u64)) % 65536u64
+    }
+}
+
+fn main() -> u64 { 0u64 }

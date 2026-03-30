@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 608: array comparison utilities
 
 fn array_lt(a: span<u64>, b: span<u64>, n: u64) -> bool

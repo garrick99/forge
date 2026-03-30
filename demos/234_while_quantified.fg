@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 234: While loop with quantified postcondition
 //
 // fill_while(s, n, val) fills s[0..n) using a while loop.

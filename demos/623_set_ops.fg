@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 623: set operations on sorted arrays — intersection, union, difference
 
 fn set_intersect(a: span<u64>, na: u64, b: span<u64>, nb: u64, out: span<u64>) -> u64

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 484: multi-module demo — mem + str + math together
 //
 // Uses span_fill_u8 to initialize a buffer, constructs a Str,

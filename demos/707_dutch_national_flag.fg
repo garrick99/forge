@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 707: Dutch National Flag — three-way partition
 //
 // Dijkstra's three-color sort. Given a pivot, partitions s[0..n) into:

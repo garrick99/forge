@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 693: bitwise operations — masks, flags, field extraction
 
 fn bit_set(x: u64, pos: u64) -> u64

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 495: integer predicate functions — verified classification
 //
 // Functions that classify integers with exact boolean postconditions.

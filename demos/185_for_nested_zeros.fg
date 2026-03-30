@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 185: Nested for-loops with invariants — zero a 2D matrix
 //
 // Sets all elements of a rows×cols matrix (stored row-major) to zero.

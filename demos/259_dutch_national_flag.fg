@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 259: Verified Dutch National Flag style 3-way scan
 //
 // Counts elements < pivot (lo_cnt) and > pivot (hi_cnt).

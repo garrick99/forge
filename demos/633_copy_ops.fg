@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 633: copy operations — copy, copy_n, copy_stride, copy_overlap
 
 fn copy_n(src: span<u64>, dst: span<u64>, n: u64)

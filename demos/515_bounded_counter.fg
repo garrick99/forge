@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 515: bounded counter — a saturating counter with proven bounds
 
 struct Counter {

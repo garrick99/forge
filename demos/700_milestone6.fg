@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 700: milestone 6 — verified 700-demo milestone
 
 fn sum_array(s: span<u64>, n: u64) -> u64

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 236: Verified GCD via Euclidean algorithm
 //
 // gcd(a, b) returns the GCD via the while loop.

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 147: Verified bubble sort — natural conditional swap form
 //
 // Unlike demo 144 (which used min/max rewrite to avoid conditional array

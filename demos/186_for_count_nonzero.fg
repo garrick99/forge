@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 186: Count non-zero elements with for-loop invariant
 //
 // Counts elements > 0 in a span.

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 168: Verified Hadamard product (elementwise multiply)
 //
 // Computes out[i] = a[i] * b[i] for equal-length spans.

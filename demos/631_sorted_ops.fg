@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 631: operations on sorted arrays — is_sorted check, sorted insert
 
 fn is_sorted(s: span<u64>, n: u64) -> bool

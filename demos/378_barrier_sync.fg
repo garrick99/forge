@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 378: Barrier synchronization counter
 //
 // N threads must all arrive before any can proceed.

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 391: Object pool with generation tagging
 //
 // An object pool assigns generation numbers to detect use-after-free.

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 611: two-pointer techniques on sorted arrays
 
 fn two_sum_sorted(s: span<u64>, n: u64, target: u64) -> bool

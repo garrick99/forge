@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 617: search operations — binary search variants
 
 fn lower_bound(s: span<u64>, n: u64, target: u64) -> u64

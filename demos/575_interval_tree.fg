@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 575: interval operations — overlap, containment, merging
 
 struct Interval {

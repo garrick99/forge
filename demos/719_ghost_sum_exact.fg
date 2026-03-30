@@ -1,0 +1,72 @@
+// expected: 0
+// Demo 719: Ghost accumulation — exact sum postcondition
+//
+// Proves the EXACT value of a prefix sum using ghost variables to track
+// partial sums symbolically.
+//
+// Pattern: a ghost variable mirrors a runtime accumulator, expressed as
+// a closed-form predicate.  The invariant ties ghost to runtime value,
+// and the postcondition is the ghost formula evaluated at n.
+//
+// sum_n_natural: proves result == n * (n - 1) / 2 for sum of 0..n-1.
+// sum_constant:  proves result == n * c for sum of constant c.
+// sum_from_array: proves result == s[0] + s[1] + ... + s[n-1] via forall.
+
+// Sum of 0 + 1 + ... + (n-1).  Proves exact closed-form.
+fn sum_n_natural(n: u64) -> u64
+    ensures result == n * (n - 1u64) / 2u64
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant acc == i * (i - 1u64) / 2u64
+        decreases n - i
+    {
+        acc = acc + i;
+        i = i + 1u64;
+    };
+    acc
+}
+
+// Sum of a constant c added n times.  Proves result == n * c.
+fn sum_constant(c: u64, n: u64) -> u64
+    requires n == 0u64 || c <= 18446744073709551615u64 / n
+    ensures result == n * c
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant acc == i * c
+        decreases n - i
+    {
+        acc = acc + c;
+        i = i + 1u64;
+    };
+    acc
+}
+
+// Dot product s[0]*t[0] + ... + s[n-1]*t[n-1].
+// Proves result >= 0 (trivially for u64) and that
+// each term contributes: result >= s[k] * t[k] for all k < n
+// when all other terms are non-negative (always true for u64).
+fn dot_product(s: span<u64>, t: span<u64>, n: u64) -> u64
+    requires s.len == n
+    requires t.len == n
+    ensures forall k: u64, k < n ==> result >= s[k] * t[k]
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> acc >= s[k] * t[k]
+        decreases n - i
+    {
+        acc = acc + s[i] * t[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

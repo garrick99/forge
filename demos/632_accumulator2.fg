@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 632: accumulator patterns — fold left/right, scan
 
 fn fold_add(s: span<u64>, n: u64, init: u64) -> u64

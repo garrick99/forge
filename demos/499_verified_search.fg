@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 499: verified linear and binary search
 //
 // Linear search with existence postcondition.

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 176: Verified running mean (truncating integer division)
 //
 // Computes the mean of a non-empty bounded span.

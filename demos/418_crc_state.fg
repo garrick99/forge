@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 418: CRC accumulator state
 //
 // A CRC computation processes bytes one at a time. Each process_byte()

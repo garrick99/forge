@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 364: Permission grant/revoke tracker
 //
 // A permissions register: grant() adds a permission slot (up to cap),

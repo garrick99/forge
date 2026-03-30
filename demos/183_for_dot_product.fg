@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 183: Dot product with for-loop invariant
 //
 // Computes dot(a, b) = sum of a[i]*b[i] for i in n.

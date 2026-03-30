@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 537: prefix XOR, AND, OR arrays
 
 fn prefix_xor(src: span<u64>, dst: span<u64>, n: u64)

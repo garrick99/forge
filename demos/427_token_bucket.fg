@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 427: Token bucket with burst tracking
 //
 // Classic token bucket: tokens refill up to capacity each period.

@@ -96,7 +96,7 @@ standard library (math/mem/str/collections/crypto/prelude), error handling, and 
 
 ## Demos
 
-500 demos, all verified by Z3 and compiled clean under `gcc -Wall -Wextra -Werror`.
+780 demos, all verified by Z3 and compiled clean under `gcc -Wall -Wextra -Werror`.
 
 | # | File | What it demonstrates |
 |---|------|----------------------|
@@ -208,20 +208,40 @@ checks, exact division, span predicates (count, max, min, sum), verified compara
 (cmp, max, min, clamp, abs_diff), and verified linear/binary search with quantified
 existence and universally-quantified sortedness postconditions.
 
+Demos 500–710 cover: milestone 500, prefix/scan/reduce patterns, two-pointer,
+merge sorted, matrix ops, sliding window, modular arithmetic, state transitions,
+verified stdlib composition (std::math saturating ops, std::collections Vec),
+sort with permutation witnesses, in-place transforms, ring buffer invariants,
+and full-functional-correctness algorithms (binary search, selection sort, partition,
+merge, insertion sort, quicksort, Dutch national flag, two-pointer sorted pair,
+Kadane's max subarray, three-way merge, milestone 700).
+
+Demos 711–780 cover: cross-function proof composition (callee postconditions feeding
+caller preconditions), verified stack operations (std::collections Vec), recursive
+algorithms with induction hypotheses (sum, max, count), verified min-heap operations
+(sift-down with ITE-valued writes), exponential/gallop search, run-length encoding,
+sliding window sum, Boyer-Moore majority vote, matrix operations (add, scale, transpose,
+multiply), stable partition, sorted dedup, longest plateau, interval merging, checksums
+(additive, XOR, Fletcher), histograms, array rotation (reversal algorithm), Kadane's
+algorithm, counting sort, two-pointer removal, stream compaction (scatter/gather),
+median-of-three, EWMA filter, bitfield packing (2×32, 4×16), 1D convolution/correlation,
+brute-force string search, sparse vector ops (CSR SpMV), LCS dynamic programming,
+edit distance (single-row DP), prefix/suffix max, stack machine interpreter, radix sort
+pass, Fenwick tree (BIT), milestone 750, merge sort step, CRC table, circular buffer ops,
+disjoint memory ops, delta encode/decode, pool allocator, Bloom filter, zigzag encoding,
+top-k selection, open-addressing hash table, trie traversal, sieve of Eratosthenes, DFA
+state machine, array differencing, round-robin scheduler, matrix multiply, base conversion,
+packed bit arrays, interleave/deinterleave, ternary search, Huffman code lengths, reservoir
+sampling, leaky-bucket rate limiter, monotonic stack, Horner polynomial evaluation,
+GCD/LCM (recursive + iterative), pancake sort, bitmap allocator, and multi-stage
+verified pipeline (filter → transform → aggregate → validate).
+
 | # | File | What it demonstrates |
 |---|------|----------------------|
-| 487 | `487_verified_utf8_ascii.fg` | UTF-8 ASCII validation: `!(cond) ==> rhs` conditional postconditions |
-| 488 | `488_not_implies_pattern.fg` | Regression test for `!(cond) ==> rhs` parser precedence |
-| 489 | `489_byte_range_ops.fg` | Nibble extraction, printability, hex classification |
-| 490 | `490_conditional_postconds.fg` | Three-way select, `max3`, `min3`, `clamp3` |
-| 491 | `491_u8_arithmetic.fg` | Safe u8 add/sub, half, triple-clamped, distance, average |
-| 492 | `492_bool_logic.fg` | Full boolean algebra with exact postconditions |
-| 493 | `493_range_checks.fg` | Saturating increment/decrement, bounded multiply |
-| 494 | `494_exact_division.fg` | Ceiling division, round-up, alignment — exact-value postconditions |
-| 497 | `497_span_predicates.fg` | count_nonzero, span_max, span_min, span_sum, span_all_bounded |
-| 498 | `498_verified_comparators.fg` | cmp_u64, max_u64, min_u64, clamp_u64, abs_diff_u64 |
-| 499 | `499_verified_search.fg` | find_first_ge, contains (exists postcondition), is_sorted (forall) |
 | 500 | `500_milestone.fg` | Algebraic laws: commutativity, clamp, identities, div-mul — 500th demo |
+| 700 | `700_milestone6.fg` | Milestone 700 — verified algorithms showcase |
+| 750 | `750_milestone7.fg` | Milestone 750 — four proof patterns (quantified, cross-function, ghost, recursive) |
+| 780 | `780_verified_pipeline.fg` | Multi-stage verified pipeline: filter → transform → aggregate → validate |
 
 ### Intentional failures (in `demos/bad/`)
 
@@ -294,20 +314,22 @@ lemma double_is_even(n: u64) -> bool
 
 ```
 lib/
-  ast/          AST node types (~220 lines)
-  lexer/        Ocamllex lexer (lexer.mll ~290 lines)
-  parser/       Menhir LR(1) grammar (parser.mly ~1085 lines; parser.ml pre-generated)
+  ast/          AST node types (~340 lines)
+  lexer/        Ocamllex lexer (lexer.mll ~225 lines)
+  parser/       Menhir LR(1) grammar (parser.mly ~1125 lines; parser.ml pre-generated)
   tokens/       Standalone token type module
-  types/        Type checker + proof obligation generation (typecheck.ml ~3200 lines)
-  proof/        Z3 bridge + three-tier discharge engine (proof_engine.ml ~1200 lines)
-  codegen/      C99 emitter (codegen_c.ml ~2100 lines) + PTX backend (codegen_ptx.ml)
+  types/        Type checker + proof obligation generation (typecheck.ml ~3700 lines)
+  proof/        Z3 bridge + three-tier discharge engine (proof_engine.ml ~1225 lines)
+  codegen/      C99 emitter (codegen_c.ml ~2150 lines) + PTX backend (codegen_ptx.ml ~620 lines)
 bin/
   main.ml       CLI driver + compiler pipeline (~290 lines)
-demos/          500 passing demos (01–500, excluding intentional failures)
-  bad/          9 intentional failures
+demos/          780 passing demos (01–780, excluding intentional failures)
+  bad/          10 intentional failures
   std/          Standard library modules (prelude, option, result, math, iter,
-                collections, crypto)
+                collections, crypto, mem, str, fmt, io, process)
 ```
+
+Total: ~9700 lines of OCaml.
 
 The pipeline: parse → type-check → generate obligations → discharge (Z3 / guided / manual) → erase proofs → emit C99 or CUDA C.
 

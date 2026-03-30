@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 619: simple encoding — XOR cipher and byte packing/unpacking
 
 fn xor_cipher(data: span<u64>, n: u64, key: u64)

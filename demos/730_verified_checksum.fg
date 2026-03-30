@@ -1,0 +1,65 @@
+// expected: 0
+// Demo 730: Verified checksum computation
+//
+// Implements a simple additive checksum (modular sum) and a Fletcher-style
+// two-component checksum.  Proves bounds safety and basic algebraic invariants.
+
+// Simple additive checksum: sum all bytes mod 256.
+fn checksum_add(data: span<u64>, n: u64) -> u64
+    requires n <= data.len
+    ensures result <= 255u64
+{
+    let mut sum: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant sum <= 255u64
+        decreases n - i
+    {
+        sum = (sum + data[i]) % 256u64;
+        i = i + 1u64;
+    };
+    sum
+}
+
+// XOR checksum: XOR all elements.
+fn checksum_xor(data: span<u64>, n: u64) -> u64
+    requires n <= data.len
+{
+    let mut xor: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        xor = xor ^ data[i];
+        i = i + 1u64;
+    };
+    xor
+}
+
+// Fletcher-style checksum: two running sums, both mod 256.
+// sum1 = running sum of data[i] mod 256
+// sum2 = running sum of sum1 values mod 256
+fn fletcher_checksum(data: span<u64>, n: u64) -> (u64, u64)
+    requires n <= data.len
+    ensures result.0 <= 255u64
+    ensures result.1 <= 255u64
+{
+    let mut sum1: u64 = 0u64;
+    let mut sum2: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant sum1 <= 255u64
+        invariant sum2 <= 255u64
+        decreases n - i
+    {
+        sum1 = (sum1 + data[i]) % 256u64;
+        sum2 = (sum2 + sum1) % 256u64;
+        i = i + 1u64;
+    };
+    (sum1, sum2)
+}
+
+fn main() -> u64 { 0u64 }

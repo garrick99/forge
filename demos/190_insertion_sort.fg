@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 190: Verified insertion sort with nested loop invariants
 //
 // Classic insertion sort. The outer for-loop invariant states

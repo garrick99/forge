@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 379: Capacity gauge with fill/drain/resize
 //
 // A gauge tracks how full a container is (fill_level out of capacity).

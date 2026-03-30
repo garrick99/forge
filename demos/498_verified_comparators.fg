@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 498: verified comparator functions — ordering and equality
 //
 // Comparison combinators with full conditional postconditions.

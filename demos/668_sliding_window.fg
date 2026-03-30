@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 668: sliding window algorithms — sum, max, min over windows
 
 fn window_sum(s: span<u64>, n: u64, w: u64, out: span<u64>)

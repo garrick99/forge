@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 129: Verified decimal digit operations
 //
 // Extract decimal digits, compute digit sums, reverse 2-digit numbers,

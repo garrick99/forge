@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 415: Scored event accumulator
 //
 // Events have scores; the accumulator tracks total_score, max_score

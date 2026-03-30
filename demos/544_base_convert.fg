@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 544: base conversion utilities
 
 fn count_digits_base(n: u64, base: u64) -> u64

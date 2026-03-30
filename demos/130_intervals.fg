@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 130: Verified interval arithmetic
 //
 // Closed integer intervals [lo, hi] with lo <= hi invariant.

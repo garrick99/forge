@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 518: sliding window — fixed-size window min/max/sum
 
 fn window_sum(s: span<u64>, n: u64, w: u64, out: span<u64>)

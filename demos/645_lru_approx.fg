@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 645: LRU-approximate cache — array-backed with age tracking
 
 fn cache_find(keys: span<u64>, n: u64, key: u64) -> u64

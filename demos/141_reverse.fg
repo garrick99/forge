@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 141: In-place array reversal verified with old() in loop invariants
 //
 // ensures forall i < s.len, s[i] == old(s[s.len - 1 - i])

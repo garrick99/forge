@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 656: integer approximations — Newton sqrt, log2, reciprocal approx
 
 fn isqrt2(n: u64) -> u64

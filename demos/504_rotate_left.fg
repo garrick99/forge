@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 504: rotate_left_one — rotate a span left by one position
 //
 // rotate_left_one([a, b, c, d], 4) => [b, c, d, a]

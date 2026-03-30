@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 89: Postconditions (ensures) — verifying function contracts
 //
 // 'ensures result ...' states what holds about the return value.

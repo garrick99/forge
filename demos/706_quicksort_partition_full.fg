@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 706: Quicksort partition — full functional correctness
 //
 // Hoare-style two-pointer partition proves:

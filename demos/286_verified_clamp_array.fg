@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 286: Verified clamp array — clamp each element to [lo, hi]
 //
 // clamp_array(s, n, lo, hi) sets s[i] = max(lo, min(s[i], hi)).

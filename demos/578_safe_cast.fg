@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 578: safe narrowing casts with range checks
 
 fn saturate_to_u8(v: u64) -> u64

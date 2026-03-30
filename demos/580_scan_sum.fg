@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 580: inclusive and exclusive prefix scan (sum)
 
 fn exclusive_scan(src: span<u64>, dst: span<u64>, n: u64)

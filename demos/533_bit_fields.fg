@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 533: bit field extraction and packing
 
 fn extract_bits(v: u64, lo: u64, width: u64) -> u64

@@ -1,0 +1,52 @@
+// expected: 0
+// Demo 763: Verified state machine execution
+//
+// A DFA (deterministic finite automaton) with states 0..nstates-1,
+// tableitions stored in a flat table (state * nalpha + input → next_state).
+// Proves: state always stays in [0, nstates).
+
+fn dfa_run(table: span<u64>, nstates: u64, nalpha: u64,
+           input: span<u64>, input_len: u64, start: u64) -> u64
+    requires nstates >= 1u64
+    requires nalpha >= 1u64
+    requires nstates * nalpha <= table.len
+    requires input_len <= input.len
+    requires start < nstates
+    requires forall k: u64, k < nstates * nalpha ==> table[k] < nstates
+    requires forall k: u64, k < input_len ==> input[k] < nalpha
+    ensures result < nstates
+{
+    let mut state: u64 = start;
+    let mut i: u64 = 0u64;
+    while i < input_len
+        invariant i <= input_len
+        invariant state < nstates
+        decreases input_len - i
+    {
+        let idx: u64 = state * nalpha + input[i];
+        if idx < nstates * nalpha {
+            state = table[idx];
+        };
+        i = i + 1u64;
+    };
+    state
+}
+
+// Check if the DFA accepts (final state is in accept set).
+fn dfa_accepts(table: span<u64>, nstates: u64, nalpha: u64,
+               input: span<u64>, input_len: u64, start: u64,
+               accept: span<u64>) -> bool
+    requires nstates >= 1u64
+    requires nalpha >= 1u64
+    requires nstates * nalpha <= table.len
+    requires input_len <= input.len
+    requires nstates <= accept.len
+    requires start < nstates
+    requires forall k: u64, k < nstates * nalpha ==> table[k] < nstates
+    requires forall k: u64, k < input_len ==> input[k] < nalpha
+{
+    let final_state: u64 = dfa_run(table, nstates, nalpha, input, input_len, start);
+    accept[final_state] != 0u64
+}
+
+fn main() -> u64 { 0u64 }

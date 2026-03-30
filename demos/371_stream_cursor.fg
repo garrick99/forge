@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 371: Stream cursor with mark/reset
 //
 // A stream cursor tracks position and a saved mark.

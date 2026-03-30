@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 592: array rotation by k positions (in-place via reversal)
 
 fn reverse_range(s: span<u64>, lo: u64, hi: u64)

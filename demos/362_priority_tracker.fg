@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 362: Priority level tracker
 //
 // A task's priority level can be raised or lowered within bounds [0, max].

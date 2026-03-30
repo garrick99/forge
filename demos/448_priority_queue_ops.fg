@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 448: Priority queue operations with high/med/low counts
 //
 // Items inserted at three priorities. Each dequeue takes from highest available.

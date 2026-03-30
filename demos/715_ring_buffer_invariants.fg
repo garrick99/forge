@@ -1,0 +1,119 @@
+// expected: 0
+// Demo 715: Ring buffer with head/tail/count invariants
+//
+// Fixed-capacity circular queue backed by a span<u64>.
+// Uses if-else wrap instead of % modulo — Z3 linear arithmetic cannot
+// discharge `x % n < n` without extra axioms, so we use explicit branching.
+//
+// Invariants:
+//   head < cap
+//   tail < cap
+//   count <= cap
+//
+// Proves: enqueue increments count, dequeue decrements count,
+//         count never exceeds capacity, head/tail stay in bounds.
+
+struct RingBuf {
+    data:  span<u64>,
+    cap:   u64,
+    head:  u64,
+    tail:  u64,
+    count: u64,
+}
+
+fn rb_new(data: span<u64>, cap: u64) -> RingBuf
+    requires data.len == cap
+    requires cap > 0u64
+    ensures result.cap   == cap
+    ensures result.head  == 0u64
+    ensures result.tail  == 0u64
+    ensures result.count == 0u64
+{
+    struct RingBuf { data: data, cap: cap, head: 0u64, tail: 0u64, count: 0u64 }
+}
+
+fn rb_next(idx: u64, cap: u64) -> u64
+    requires idx < cap
+    requires cap > 0u64
+    ensures result < cap
+    ensures idx + 1u64 < cap ==> result == idx + 1u64
+    ensures idx + 1u64 >= cap ==> result == 0u64
+{
+    if idx + 1u64 < cap { idx + 1u64 } else { 0u64 }
+}
+
+fn rb_enqueue(rb: refmut<RingBuf>, val: u64)
+    requires (*rb).cap > 0u64
+    requires (*rb).count < (*rb).cap
+    requires (*rb).head < (*rb).cap
+    requires (*rb).tail < (*rb).cap
+    requires (*rb).data.len == (*rb).cap
+    ensures  (*rb).count == old((*rb).count) + 1u64
+    ensures  (*rb).head  == old((*rb).head)
+    ensures  (*rb).cap   == old((*rb).cap)
+    ensures  (*rb).tail  < (*rb).cap
+    ensures  (*rb).count <= (*rb).cap
+{
+    (*rb).data[(*rb).tail] = val;
+    let new_tail: u64 = rb_next((*rb).tail, (*rb).cap);
+    (*rb).tail = new_tail;
+    (*rb).count = (*rb).count + 1u64;
+}
+
+fn rb_dequeue(rb: refmut<RingBuf>) -> u64
+    requires (*rb).cap > 0u64
+    requires (*rb).count > 0u64
+    requires (*rb).head < (*rb).cap
+    requires (*rb).tail < (*rb).cap
+    requires (*rb).data.len == (*rb).cap
+    ensures  (*rb).count == old((*rb).count) - 1u64
+    ensures  (*rb).tail  == old((*rb).tail)
+    ensures  (*rb).cap   == old((*rb).cap)
+    ensures  (*rb).head  < (*rb).cap
+{
+    let val: u64 = (*rb).data[(*rb).head];
+    let new_head: u64 = rb_next((*rb).head, (*rb).cap);
+    (*rb).head = new_head;
+    (*rb).count = (*rb).count - 1u64;
+    val
+}
+
+fn rb_is_empty(rb: ref<RingBuf>) -> bool
+    ensures result == ((*rb).count == 0u64)
+{
+    (*rb).count == 0u64
+}
+
+fn rb_is_full(rb: ref<RingBuf>) -> bool
+    ensures result == ((*rb).count == (*rb).cap)
+{
+    (*rb).count == (*rb).cap
+}
+
+// Fill the ring buffer to capacity by enqueueing from src.
+fn rb_fill(rb: refmut<RingBuf>, src: span<u64>, n: u64)
+    requires n == (*rb).cap - (*rb).count
+    requires n <= src.len
+    requires (*rb).cap > 0u64
+    requires (*rb).head < (*rb).cap
+    requires (*rb).tail < (*rb).cap
+    requires (*rb).data.len == (*rb).cap
+    ensures  (*rb).count == (*rb).cap
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant (*rb).count == old((*rb).count) + i
+        invariant (*rb).cap == old((*rb).cap)
+        invariant (*rb).head == old((*rb).head)
+        invariant (*rb).tail < (*rb).cap
+        invariant (*rb).data.len == (*rb).cap
+        invariant (*rb).count <= (*rb).cap
+        decreases n - i
+    {
+        rb_enqueue(rb, src[i]);
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

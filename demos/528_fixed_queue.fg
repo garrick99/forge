@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 528: verified fixed-size circular queue with enqueue/dequeue
 
 struct Queue {

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 215: Verified iota — fill with 0, 1, 2, ..., n-1
 //
 // iota(s, n) sets s[i] = i for all i in [0, n).

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 697: transform operations — normalize, scale, map with offset
 
 fn transform_scale(s: span<u64>, n: u64, num: u64, den: u64)

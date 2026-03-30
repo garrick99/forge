@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 655: trie-like key operations on sorted integer arrays
 
 fn trie_prefix_count(keys: span<u64>, n: u64, prefix: u64, prefix_bits: u64) -> u64

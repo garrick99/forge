@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 466: Communication channel statistics
 //
 // Tracks bytes sent, received, dropped, and retransmitted.

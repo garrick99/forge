@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 303: Closure simulation — captured environment via struct + fn pointer
 //
 // Forge does not have built-in closures with capture, but the pattern can be

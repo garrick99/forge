@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 300: Higher-order combinators — map, fold, any, compose
 //
 // Demonstrates first-class function pointers and lambda expressions

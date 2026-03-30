@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 402: Bloom filter bit counter
 //
 // A Bloom filter tracks how many bits are set and how many

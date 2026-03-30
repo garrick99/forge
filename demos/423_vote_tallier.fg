@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 423: Election vote tallier with three candidates
 //
 // Three candidates A, B, C. Each vote goes to exactly one.

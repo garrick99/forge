@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 442: Multi-version concurrency control (MVCC) snapshot tracking
 //
 // Each write creates a new version. Reads target a specific snapshot_version.

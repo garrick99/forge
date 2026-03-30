@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 270: Verified histogram — count elements per bucket
 //
 // histogram(s, n, hist, buckets) increments hist[s[i] % buckets] for each s[i].

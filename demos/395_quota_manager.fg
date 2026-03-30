@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 395: Multi-tenant quota manager
 //
 // Tracks used and reserved quota for two tenants sharing a pool.

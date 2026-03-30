@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 281: Verified rotate left by 1 — s[i] = old(s[i+1]) for i < n-1, s[n-1] = old(s[0])
 //
 // rotate_left1(s, n) shifts each element left by one position cyclically.

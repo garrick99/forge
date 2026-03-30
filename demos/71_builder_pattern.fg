@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 71: Builder pattern + method chaining
 //
 // Uses: inherent impl, method call syntax, const, type alias, postconditions.

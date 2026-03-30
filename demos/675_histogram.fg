@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 675: histogram — frequency counting, cumulative distribution
 
 fn hist_build(src: span<u64>, n: u64, hist: span<u64>, bins: u64)

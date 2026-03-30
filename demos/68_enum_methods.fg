@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 68: Enum methods — impl on enums, Option helpers
 //
 // impl Option<u64> { fn is_some, fn unwrap_or, fn map_or }

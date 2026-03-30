@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 92: Struct invariants — properties always hold for valid values
 //
 // 'invariant' inside a struct body states a predicate that must hold

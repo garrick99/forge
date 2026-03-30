@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 696: frequency analysis — mode, count, majority element
 
 fn freq_count_val(s: span<u64>, n: u64, val: u64) -> u64

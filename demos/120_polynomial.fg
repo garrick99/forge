@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 120: Verified polynomial evaluation (Horner's method)
 //
 // Polynomials up to degree 3, stored as coefficient structs.

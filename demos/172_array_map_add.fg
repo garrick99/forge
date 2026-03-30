@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 172: Verified array map (add constant to each element)
 //
 // Adds `delta` to every element of s in-place.

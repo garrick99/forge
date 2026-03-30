@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 461: Multi-lock acquisition ordering with deadlock prevention
 //
 // Locks acquired in order A < B < C (prevents deadlock by ordering).

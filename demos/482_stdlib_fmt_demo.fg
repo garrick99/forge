@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 482: std::fmt showcase — digit counting and parsing
 //
 // count_digits_u64, count_hex_digits, hex_digit, dec_digit, parse_u64_at.

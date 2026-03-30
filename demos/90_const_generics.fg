@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 90: Const generics — functions parameterized by compile-time values
 //
 // FORGE supports const generic parameters with 'const N: u64'.

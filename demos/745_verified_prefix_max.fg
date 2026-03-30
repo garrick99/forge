@@ -1,0 +1,48 @@
+// expected: 0
+// Demo 745: Verified prefix-max and suffix-max
+//
+// Computes running maximum from left and from right.
+// Proves: prefix_max[i] >= s[i] for all i (monotonicity of prefix-max).
+
+fn prefix_max(s: span<u64>, n: u64, out: span<u64>)
+    requires n >= 1u64
+    requires n <= s.len
+    requires n <= out.len
+    ensures forall k: u64, k < n ==> out[k] >= s[k]
+{
+    out[0u64] = s[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> out[k] >= s[k]
+        decreases n - i
+    {
+        let prev: u64 = out[i - 1u64];
+        let cur: u64 = s[i];
+        out[i] = if prev >= cur { prev } else { cur };
+        i = i + 1u64;
+    };
+}
+
+fn suffix_max(s: span<u64>, n: u64, out: span<u64>)
+    requires n >= 1u64
+    requires n <= s.len
+    requires n <= out.len
+    ensures forall k: u64, k < n ==> out[k] >= s[k]
+{
+    out[n - 1u64] = s[n - 1u64];
+    let mut i: u64 = n - 1u64;
+    while i > 0u64
+        invariant i < n
+        invariant forall k: u64, k > i && k < n ==> out[k] >= s[k]
+        invariant out[i] >= s[i]
+        decreases i
+    {
+        i = i - 1u64;
+        let next: u64 = out[i + 1u64];
+        let cur: u64 = s[i];
+        out[i] = if next >= cur { next } else { cur };
+    };
+}
+
+fn main() -> u64 { 0u64 }

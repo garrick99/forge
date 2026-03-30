@@ -1,0 +1,56 @@
+// expected: 0
+// Demo 753: Verified circular buffer operations
+//
+// Ring buffer with head/tail pointers and capacity.
+// Proves: head and tail stay in [0, cap) and count tracks occupancy.
+
+fn ring_enqueue(buf: span<u64>, cap: u64, tail: u64, count: u64, val: u64) -> (u64, u64)
+    requires cap >= 1u64
+    requires cap <= buf.len
+    requires tail < cap
+    requires count < cap
+    ensures result.0 < cap
+    ensures result.1 == count + 1u64
+{
+    buf[tail] = val;
+    let new_tail: u64 = if tail + 1u64 == cap { 0u64 } else { tail + 1u64 };
+    (new_tail, count + 1u64)
+}
+
+fn ring_dequeue(buf: span<u64>, cap: u64, head: u64, count: u64) -> (u64, u64, u64)
+    requires cap >= 1u64
+    requires cap <= buf.len
+    requires head < cap
+    requires count >= 1u64
+    requires count <= cap
+    ensures result.1 < cap
+    ensures result.2 == count - 1u64
+{
+    let val: u64 = buf[head];
+    let new_head: u64 = if head + 1u64 == cap { 0u64 } else { head + 1u64 };
+    (val, new_head, count - 1u64)
+}
+
+// Fill the ring buffer to capacity.
+fn ring_fill(buf: span<u64>, cap: u64, val: u64) -> (u64, u64)
+    requires cap >= 1u64
+    requires cap <= buf.len
+    ensures result.0 < cap || result.0 == 0u64
+    ensures result.1 == cap
+{
+    let mut tail: u64 = 0u64;
+    let mut count: u64 = 0u64;
+    while count < cap
+        invariant tail < cap || tail == 0u64
+        invariant count <= cap
+        invariant tail == count % cap || count == 0u64
+        decreases cap - count
+    {
+        buf[tail] = val;
+        tail = if tail + 1u64 == cap { 0u64 } else { tail + 1u64 };
+        count = count + 1u64;
+    };
+    (tail, count)
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 584: sliding window maximum and sum
 
 fn sliding_sum(s: span<u64>, n: u64, k: u64) -> u64

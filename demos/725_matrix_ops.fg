@@ -1,0 +1,87 @@
+// expected: 0
+// Demo 725: Verified small matrix operations
+//
+// Operations on an n×m matrix stored row-major in a flat span.
+// Proves bounds safety and simple algebraic postconditions.
+
+// Row-major index: row * cols + col
+fn mat_idx(row: u64, col: u64, cols: u64) -> u64
+    ensures result == row * cols + col
+{
+    row * cols + col
+}
+
+// Fill matrix with a constant value.
+fn mat_fill(m: span<u64>, rows: u64, cols: u64, val: u64)
+    requires rows * cols <= m.len
+{
+    let total: u64 = rows * cols;
+    let mut i: u64 = 0u64;
+    while i < total
+        invariant i <= total
+        decreases total - i
+    {
+        m[i] = val;
+        i = i + 1u64;
+    };
+}
+
+// Add two matrices element-wise: c[i] = a[i] + b[i].
+fn mat_add(a: span<u64>, b: span<u64>, c: span<u64>, rows: u64, cols: u64)
+    requires rows * cols <= a.len
+    requires rows * cols <= b.len
+    requires rows * cols <= c.len
+{
+    let total: u64 = rows * cols;
+    let mut i: u64 = 0u64;
+    while i < total
+        invariant i <= total
+        decreases total - i
+    {
+        c[i] = a[i] + b[i];
+        i = i + 1u64;
+    };
+}
+
+// Scale matrix: m[i] = m[i] * scalar.
+fn mat_scale(m: span<u64>, rows: u64, cols: u64, scalar: u64)
+    requires rows * cols <= m.len
+{
+    let total: u64 = rows * cols;
+    let mut i: u64 = 0u64;
+    while i < total
+        invariant i <= total
+        decreases total - i
+    {
+        m[i] = m[i] * scalar;
+        i = i + 1u64;
+    };
+}
+
+// Transpose a square matrix in-place.
+// Only swaps upper triangle with lower triangle.
+fn mat_transpose_square(m: span<u64>, n: u64)
+    requires n * n <= m.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let mut j: u64 = i + 1u64;
+        while j < n
+            invariant j <= n
+            decreases n - j
+        {
+            let idx_ij: u64 = i * n + j;
+            let idx_ji: u64 = j * n + i;
+            let tmp: u64 = m[idx_ij];
+            m[idx_ij] = m[idx_ji];
+            m[idx_ji] = tmp;
+            j = j + 1u64;
+        };
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

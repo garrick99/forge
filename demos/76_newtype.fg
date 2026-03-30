@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 76: Newtype pattern — single-field wrapper structs
 //
 // Wrapping a primitive in a struct creates a distinct type that prevents

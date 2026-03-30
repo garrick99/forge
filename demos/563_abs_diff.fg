@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 563: absolute difference and signed-magnitude operations on u64
 
 fn abs_diff(a: u64, b: u64) -> u64

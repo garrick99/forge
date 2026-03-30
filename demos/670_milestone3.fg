@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 670: milestone 3 — verified algorithms combining prior patterns
 
 fn clamp_u64(x: u64, lo: u64, hi: u64) -> u64

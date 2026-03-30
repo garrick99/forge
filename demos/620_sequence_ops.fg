@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 620: sequence predicates — all, any, none, find
 
 fn all_positive(s: span<u64>, n: u64) -> bool

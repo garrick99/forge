@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 503: span_equal — element-wise equality with quantified postconditions
 
 fn span_equal(a: span<u64>, b: span<u64>, n: u64) -> bool

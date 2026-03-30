@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 164: Verified matrix-vector multiply (row-major flat layout)
 //
 // Computes out[i] = sum_j A[i*cols + j] * x[j]

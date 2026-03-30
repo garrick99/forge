@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 355: Two interdependent counters
 //
 // Two counters A and B where transfers move value between them.

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 274: Verified in-place reverse
 //
 // reverse(s, n) swaps s[i] and s[n-1-i] for i < n/2.

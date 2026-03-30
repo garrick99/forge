@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 306: Verified open-addressing hash table (fixed-size)
 //
 // A simple hash table with linear probing on a fixed-size span.

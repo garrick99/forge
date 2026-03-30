@@ -1,0 +1,51 @@
+// expected: 0
+// Demo 752: Verified CRC-style table lookup
+//
+// Computes a hash by iterating data through a 256-entry lookup table.
+// Proves: all table lookups are within bounds.
+
+fn crc_hash(data: span<u64>, n: u64, table: span<u64>) -> u64
+    requires n <= data.len
+    requires 256u64 <= table.len
+{
+    let mut crc: u64 = 18446744073709551615u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let idx: u64 = (crc ^ data[i]) % 256u64;
+        crc = table[idx] ^ (crc / 256u64);
+        i = i + 1u64;
+    };
+    crc ^ 18446744073709551615u64
+}
+
+// Build a simple CRC table.
+fn build_crc_table(table: span<u64>)
+    requires 256u64 <= table.len
+{
+    let mut i: u64 = 0u64;
+    while i < 256u64
+        invariant i <= 256u64
+        decreases 256u64 - i
+    {
+        let mut crc: u64 = i;
+        let mut j: u64 = 0u64;
+        while j < 8u64
+            invariant j <= 8u64
+            decreases 8u64 - j
+        {
+            if crc % 2u64 == 1u64 {
+                crc = (crc / 2u64) ^ 3988292384u64;
+            } else {
+                crc = crc / 2u64;
+            };
+            j = j + 1u64;
+        };
+        table[i] = crc;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

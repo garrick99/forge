@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 177: Verified NTT butterfly operation
 //
 // Cooley-Tukey butterfly:

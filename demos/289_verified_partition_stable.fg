@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 289: Verified partition count — count elements satisfying predicate
 //
 // count_lt(s, n, pivot) returns count of elements strictly less than pivot.

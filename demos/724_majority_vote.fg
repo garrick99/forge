@@ -1,0 +1,57 @@
+// expected: 0
+// Demo 724: Boyer-Moore majority vote algorithm
+//
+// Finds a candidate for the majority element (appears > n/2 times).
+// Proves: the candidate count is always non-negative (core invariant)
+// and the final candidate index is in bounds.
+
+fn majority_candidate(s: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures result < n
+{
+    let mut candidate: u64 = s[0u64];
+    let mut cand_idx: u64 = 0u64;
+    let mut count: u64 = 1u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant count >= 1u64 || count == 0u64
+        invariant cand_idx < n
+        decreases n - i
+    {
+        if s[i] == candidate {
+            count = count + 1u64;
+        } else if count == 0u64 {
+            candidate = s[i];
+            cand_idx = i;
+            count = 1u64;
+        } else {
+            count = count - 1u64;
+        };
+        i = i + 1u64;
+    };
+    cand_idx
+}
+
+// Verify phase 2: count occurrences of the candidate.
+fn count_occurrences(s: span<u64>, n: u64, val: u64) -> u64
+    requires n <= s.len
+    ensures result <= n
+{
+    let mut count: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant count <= i
+        decreases n - i
+    {
+        if s[i] == val {
+            count = count + 1u64;
+        };
+        i = i + 1u64;
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

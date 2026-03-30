@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 510: next_pow2 — round up to next power of two, and related bit tricks
 
 fn is_pow2(n: u64) -> bool

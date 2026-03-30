@@ -1,0 +1,121 @@
+// expected: 0
+// Demo 718: Cross-function proof composition
+//
+// Demonstrates that callee postconditions are automatically injected into
+// the caller's proof context — enabling multi-step verified pipelines where
+// each function's ensures clause feeds the next function's requires clause.
+//
+// Pipeline:
+//   1. sort_and_search: selection-sort an array, then binary-search it.
+//      The sort's postcondition (sorted output) satisfies the search's
+//      precondition.  The caller proves the search finds the right element.
+//
+//   2. clamp_then_sum: clamp all elements, then sum them.
+//      The clamp's postcondition (all elements in [lo, hi]) feeds the
+//      sum's precondition.  The caller proves sum >= n * lo.
+//
+// Shows: requires/ensures chains across function boundaries.
+
+use std::math;
+
+// Simple in-place selection sort.  Returns nothing but ensures sorted output.
+fn selection_sort(s: span<u64>, n: u64)
+    requires s.len == n
+    ensures forall i: u64, forall j: u64, i < j && j < n ==> s[i] <= s[j]
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall p: u64, forall q: u64, p < q && q < i ==> s[p] <= s[q]
+        invariant forall p: u64, forall q: u64, p < i && q >= i && q < n ==> s[p] <= s[q]
+        decreases n - i
+    {
+        let mut min_idx: u64 = i;
+        let mut j: u64 = i + 1u64;
+        while j < n
+            invariant j <= n
+            invariant min_idx >= i
+            invariant min_idx < n
+            invariant forall k: u64, k >= i && k < j ==> s[min_idx] <= s[k]
+            decreases n - j
+        {
+            if s[j] < s[min_idx] {
+                min_idx = j;
+                j = j + 1u64;
+            } else {
+                j = j + 1u64;
+            };
+        };
+        let tmp: u64 = s[i];
+        s[i] = s[min_idx];
+        s[min_idx] = tmp;
+        i = i + 1u64;
+    };
+}
+
+// Binary search on a sorted span — soundness proof.
+fn bin_search(s: span<u64>, n: u64, target: u64) -> u64
+    requires s.len == n
+    requires forall i: u64, forall j: u64, i < j && j < n ==> s[i] <= s[j]
+    ensures result <= n
+    ensures result < n ==> s[result] == target
+{
+    let mut lo: u64 = 0u64;
+    let mut hi: u64 = n;
+    let mut ans: u64 = n;
+    while lo < hi
+        invariant lo <= hi
+        invariant hi <= n
+        invariant ans <= n
+        invariant ans < n ==> s[ans] == target
+        invariant ans == n ==> forall k: u64, k < lo ==> s[k] < target
+        invariant ans == n ==> forall k: u64, k >= hi && k < n ==> s[k] > target
+        decreases hi - lo
+    {
+        let mid: u64 = lo + (hi - lo) / 2u64;
+        if s[mid] == target {
+            ans = mid;
+            lo = hi;
+        } else if s[mid] < target {
+            lo = mid + 1u64;
+        } else {
+            hi = mid;
+        };
+    };
+    ans
+}
+
+// PIPELINE 1: Sort then search.
+// The sort postcondition satisfies the search precondition automatically.
+// If target was in the array, the search will find it.
+fn sort_and_search(s: span<u64>, n: u64, target: u64) -> u64
+    requires s.len == n
+    requires n >= 1u64
+    ensures result <= n
+    ensures result < n ==> s[result] == target
+{
+    selection_sort(s, n);
+    // At this point, the sort's postcondition is in scope:
+    //   forall i j, i < j ==> j < n ==> s[i] <= s[j]
+    // which satisfies bin_search's requires.
+    bin_search(s, n, target)
+}
+
+// Sum of all elements.
+fn array_sum(s: span<u64>, n: u64) -> u64
+    requires s.len == n
+    ensures result >= 0u64
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + s[i];
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

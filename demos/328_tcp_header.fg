@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 328: Verified TCP header field extraction
 //
 // TCP header layout (first 20 bytes as packed u64 fields).

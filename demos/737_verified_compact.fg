@@ -1,0 +1,68 @@
+// expected: 0
+// Demo 737: Verified stream compaction
+//
+// Compacts elements from a source span into a destination span based on
+// a predicate mask.  Proves: output count <= input count, and all written
+// elements come from valid source indices.
+
+// Compact: copy elements where mask[i] != 0.
+fn compact(src: span<u64>, mask: span<u64>, n: u64, dst: span<u64>) -> u64
+    requires n <= src.len
+    requires n <= mask.len
+    requires n <= dst.len
+    ensures result <= n
+{
+    let mut write: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant write <= i
+        decreases n - i
+    {
+        if mask[i] != 0u64 {
+            dst[write] = src[i];
+            write = write + 1u64;
+        };
+        i = i + 1u64;
+    };
+    write
+}
+
+// Scatter: write src[i] to dst[indices[i]] for all i.
+// Proves: all index reads and writes are in bounds.
+fn scatter(src: span<u64>, indices: span<u64>, n: u64, dst: span<u64>, dst_len: u64)
+    requires n <= src.len
+    requires n <= indices.len
+    requires dst_len <= dst.len
+    requires forall k: u64, k < n ==> indices[k] < dst_len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let idx: u64 = indices[i];
+        dst[idx] = src[i];
+        i = i + 1u64;
+    };
+}
+
+// Gather: dst[i] = src[indices[i]] for all i.
+fn gather(src: span<u64>, src_len: u64, indices: span<u64>, n: u64, dst: span<u64>)
+    requires src_len <= src.len
+    requires n <= indices.len
+    requires n <= dst.len
+    requires forall k: u64, k < n ==> indices[k] < src_len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let idx: u64 = indices[i];
+        dst[i] = src[idx];
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

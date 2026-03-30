@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 375: Shift register state tracker
 //
 // A 3-stage shift register: shift_in loads a new value into stage 0,

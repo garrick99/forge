@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 450: Circuit breaker state machine
 //
 // States: closed (normal), open (failing), half-open (testing).

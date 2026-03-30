@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 667: encoding operations — nibble/byte packing, hex digits
 
 fn nibble_lo(x: u64) -> u64

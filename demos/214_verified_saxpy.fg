@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 214: Verified SAXPY — y[i] += alpha * x[i]
 //
 // The classic BLAS-1 operation, verified.

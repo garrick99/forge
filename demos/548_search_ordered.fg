@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 548: ordered search operations on sorted spans
 
 fn find_first_ge(s: span<u64>, n: u64, target: u64) -> u64

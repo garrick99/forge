@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 139: old() in postconditions — capture pre-call span state
 //
 // For each span<T> parameter s, the compiler adds a snapshot __s_init with:

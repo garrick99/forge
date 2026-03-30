@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 264: Verified matrix row maximum
 //
 // row_max(s, rows, cols, r) returns the maximum value in row r.

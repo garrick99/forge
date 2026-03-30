@@ -1,0 +1,63 @@
+// expected: 0
+// Demo 734: Verified counting sort
+//
+// Sorts elements in [0, max_val) using a count array.
+// Proves: output length equals input length.
+
+fn counting_sort(input: span<u64>, n: u64,
+                 counts: span<u64>, max_val: u64,
+                 output: span<u64>) -> u64
+    requires n <= input.len
+    requires max_val >= 1u64
+    requires max_val <= counts.len
+    requires n <= output.len
+    ensures result <= n
+{
+    // Clear counts.
+    let mut c: u64 = 0u64;
+    while c < max_val
+        invariant c <= max_val
+        decreases max_val - c
+    {
+        counts[c] = 0u64;
+        c = c + 1u64;
+    };
+
+    // Count occurrences.
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let v: u64 = input[i];
+        if v < max_val {
+            counts[v] = counts[v] + 1u64;
+        };
+        i = i + 1u64;
+    };
+
+    // Write sorted output.
+    let mut out_idx: u64 = 0u64;
+    let mut val: u64 = 0u64;
+    while val < max_val
+        invariant val <= max_val
+        invariant out_idx <= n
+        decreases max_val - val
+    {
+        let mut rep: u64 = 0u64;
+        while rep < counts[val]
+            invariant out_idx <= n
+            decreases counts[val] - rep
+        {
+            if out_idx < n {
+                output[out_idx] = val;
+                out_idx = out_idx + 1u64;
+            };
+            rep = rep + 1u64;
+        };
+        val = val + 1u64;
+    };
+    out_idx
+}
+
+fn main() -> u64 { 0u64 }

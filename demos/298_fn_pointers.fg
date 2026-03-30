@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 298: First-class function pointers
 //
 // fn(T) -> U is now a proper type. Functions can be passed as values,

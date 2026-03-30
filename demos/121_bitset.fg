@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 121: Verified 64-bit bitset
 //
 // A single u64 used as a 64-element bitset.

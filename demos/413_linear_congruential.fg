@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 413: Linear congruential generator state
 //
 // LCG: state = (a * state + c) % m

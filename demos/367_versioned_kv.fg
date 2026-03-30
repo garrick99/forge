@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 367: Versioned key-value store (single slot)
 //
 // A single versioned slot: write() stores a value and bumps the version,

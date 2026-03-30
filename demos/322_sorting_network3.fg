@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 322: Verified 3-element sorting network with conditional postconditions
 //
 // A sorting network for 3 values using compare-and-swap (CAS) operations.

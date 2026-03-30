@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 507: running statistics — min, max, and sum tracked simultaneously
 
 struct Stats {

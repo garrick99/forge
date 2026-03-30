@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 85: Strategy pattern — select algorithm variant at call site
 //
 // An enum selects which of several algorithms to run.

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 691: range operations — fill, copy, reverse, shift in ranges
 
 fn range_fill(s: span<u64>, lo: u64, hi: u64, val: u64)

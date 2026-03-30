@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 356: Multi-field state flags with combined transitions
 //
 // A device state with three boolean flags: powered, initialized, active.

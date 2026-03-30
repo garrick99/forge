@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 237: Verified two-pointer sum check
 //
 // two_sum_sorted(s, n, target) returns true if any pair s[lo] + s[hi] == target

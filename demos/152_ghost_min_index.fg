@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 152: Mutable ghost variable — verified minimum index
 //
 // Finds the index of the minimum element in a non-empty span.

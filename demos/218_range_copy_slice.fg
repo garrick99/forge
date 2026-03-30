@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 218: Copy a slice using lo..hi range
 //
 // copy_slice copies src[lo..hi) into dst[lo..hi).

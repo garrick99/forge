@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 136: Mutable span writes with verified postconditions
 //
 // s[i] = v writes to a span element. The proof engine adds s[i] == v as a

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 240: assert() as proof hint inside a loop
 //
 // Demonstrates using assert() to introduce intermediate facts

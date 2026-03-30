@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 421: Button debounce state machine
 //
 // A hardware debouncer: a button press is only registered after

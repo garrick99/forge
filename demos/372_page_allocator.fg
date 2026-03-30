@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 372: Page allocator with order tracking
 //
 // A simple page allocator tracks pages by order (size class).

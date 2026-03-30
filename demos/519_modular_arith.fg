@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 519: modular arithmetic — add, sub, mul, pow with modular reduction
 
 fn mod_add(a: u64, b: u64, m: u64) -> u64

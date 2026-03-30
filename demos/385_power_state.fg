@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 385: Power state manager (S0-S3 sleep states)
 //
 // A device power manager cycles through states:

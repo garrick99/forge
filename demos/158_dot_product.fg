@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 158: Verified dot product
 //
 // Computes the dot product of two equal-length spans.

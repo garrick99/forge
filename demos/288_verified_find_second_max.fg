@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 288: Verified two-pass max — find max, then find second max below it
 //
 // max_of(s, n): returns m with forall k < n, m >= s[k].

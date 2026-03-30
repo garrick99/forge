@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 105: Verified modular arithmetic for cryptography
 //
 // Barrett reduction, modular addition/multiplication with SMT-verified

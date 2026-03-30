@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 365: Flow control — bytes sent/received/dropped
 //
 // A network flow tracker: send() adds to sent, receive() adds to received,

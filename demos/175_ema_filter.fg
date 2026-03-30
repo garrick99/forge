@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 175: Verified EMA (exponential moving average) filter
 //
 // Fixed-point EMA: ema[k+1] = (alpha * s[k] + (256 - alpha) * ema[k]) / 256

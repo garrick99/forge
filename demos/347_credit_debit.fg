@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 347: Credit/debit ledger
 //
 // A simple ledger tracks total credits, total debits, and

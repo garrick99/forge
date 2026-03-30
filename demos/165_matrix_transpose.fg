@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 165: Verified matrix transpose (out-of-place)
 //
 // Computes out[j*rows + i] = A[i*cols + j] for a rows×cols matrix.

@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 585: nth element helpers (selection utilities)
 
 fn min_index(s: span<u64>, n: u64) -> u64

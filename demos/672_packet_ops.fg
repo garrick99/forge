@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 672: packet operations — field extraction from byte buffers
 
 fn pkt_read_u8(buf: span<u64>, off: u64) -> u64

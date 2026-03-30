@@ -1,3 +1,4 @@
+// expected: 0
 // Demo 255: Verified is_sorted with strong postcondition (both directions)
 //
 // is_sorted_strong(s, n) returns true iff s[0] <= s[1] <= ... <= s[n-1].
