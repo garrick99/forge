@@ -1,0 +1,76 @@
+// expected: 0
+// Demo 783: Verified bounded flood fill (iterative with stack)
+//
+// Flood fills a 2D grid (flat row-major) using an explicit stack.
+// Proves: all grid and stack accesses stay in bounds.
+
+fn flood_fill(grid: span<u64>, rows: u64, cols: u64,
+              stack: span<u64>, stack_cap: u64,
+              start_r: u64, start_c: u64, fill_val: u64)
+    requires rows >= 1u64
+    requires cols >= 1u64
+    requires rows * cols <= grid.len
+    requires stack_cap >= 1u64
+    requires stack_cap <= stack.len
+    requires start_r < rows
+    requires start_c < cols
+{
+    let old_val: u64 = grid[start_r * cols + start_c];
+    if old_val == fill_val {
+        // Nothing to do.
+    } else {
+        grid[start_r * cols + start_c] = fill_val;
+        stack[0u64] = start_r * cols + start_c;
+        let mut sp: u64 = 1u64;
+
+        while sp > 0u64
+            invariant sp <= stack_cap
+            decreases stack_cap - sp + sp
+        {
+            sp = sp - 1u64;
+            let pos: u64 = stack[sp];
+            let r: u64 = pos / cols;
+            let c: u64 = pos % cols;
+
+            // Check 4 neighbors.
+            // Up
+            if r > 0u64 {
+                let idx: u64 = (r - 1u64) * cols + c;
+                if idx < rows * cols && grid[idx] == old_val && sp < stack_cap {
+                    grid[idx] = fill_val;
+                    stack[sp] = idx;
+                    sp = sp + 1u64;
+                };
+            };
+            // Down
+            if r + 1u64 < rows {
+                let idx: u64 = (r + 1u64) * cols + c;
+                if idx < rows * cols && grid[idx] == old_val && sp < stack_cap {
+                    grid[idx] = fill_val;
+                    stack[sp] = idx;
+                    sp = sp + 1u64;
+                };
+            };
+            // Left
+            if c > 0u64 {
+                let idx: u64 = r * cols + (c - 1u64);
+                if idx < rows * cols && grid[idx] == old_val && sp < stack_cap {
+                    grid[idx] = fill_val;
+                    stack[sp] = idx;
+                    sp = sp + 1u64;
+                };
+            };
+            // Right
+            if c + 1u64 < cols {
+                let idx: u64 = r * cols + (c + 1u64);
+                if idx < rows * cols && grid[idx] == old_val && sp < stack_cap {
+                    grid[idx] = fill_val;
+                    stack[sp] = idx;
+                    sp = sp + 1u64;
+                };
+            };
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }

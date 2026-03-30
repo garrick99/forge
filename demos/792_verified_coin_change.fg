@@ -1,0 +1,54 @@
+// expected: 0
+// Demo 792: Verified coin change DP
+//
+// Computes minimum number of coins to make amount `target`.
+// dp[j] = min coins for amount j.  Uses sentinel MAX for unreachable.
+// Proves: all accesses in bounds.
+
+fn coin_change(coins: span<u64>, n_coins: u64,
+               dp: span<u64>, target: u64) -> u64
+    requires n_coins >= 1u64
+    requires n_coins <= coins.len
+    requires target + 1u64 <= dp.len
+{
+    let max_val: u64 = target + 1u64;
+    // Initialize all to MAX (unreachable).
+    let mut j: u64 = 0u64;
+    while j <= target
+        invariant j <= target + 1u64
+        decreases target + 1u64 - j
+    {
+        dp[j] = max_val;
+        j = j + 1u64;
+    };
+    dp[0u64] = 0u64;
+
+    // Fill DP.
+    let mut c: u64 = 0u64;
+    while c < n_coins
+        invariant c <= n_coins
+        decreases n_coins - c
+    {
+        let coin: u64 = coins[c];
+        if coin <= target {
+            let mut amt: u64 = coin;
+            while amt <= target
+                invariant amt <= target + 1u64
+                decreases target + 1u64 - amt
+            {
+                let prev: u64 = dp[amt - coin];
+                if prev < max_val {
+                    let candidate: u64 = prev + 1u64;
+                    if candidate < dp[amt] {
+                        dp[amt] = candidate;
+                    };
+                };
+                amt = amt + 1u64;
+            };
+        };
+        c = c + 1u64;
+    };
+    dp[target]
+}
+
+fn main() -> u64 { 0u64 }

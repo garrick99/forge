@@ -1,0 +1,49 @@
+// expected: 0
+// Demo 781: Verified 0/1 knapsack DP (single-row)
+//
+// Classic DP knapsack with O(capacity) space.
+// Proves: all array accesses are within bounds.
+
+fn knapsack(weights: span<u64>, values: span<u64>, n: u64,
+            dp: span<u64>, capacity: u64) -> u64
+    requires n <= weights.len
+    requires n <= values.len
+    requires capacity + 1u64 <= dp.len
+    requires capacity >= 1u64
+{
+    // Zero the DP row.
+    let mut c: u64 = 0u64;
+    while c <= capacity
+        invariant c <= capacity + 1u64
+        decreases capacity + 1u64 - c
+    {
+        dp[c] = 0u64;
+        c = c + 1u64;
+    };
+
+    // Fill DP: iterate items, then capacities in reverse.
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let w: u64 = weights[i];
+        let v: u64 = values[i];
+        let mut cap: u64 = capacity;
+        while cap >= w
+            invariant cap <= capacity
+            decreases cap
+        {
+            let without: u64 = dp[cap];
+            let with: u64 = dp[cap - w] + v;
+            if with > without {
+                dp[cap] = with;
+            };
+            if cap == w { cap = 0u64; } else { cap = cap - 1u64; };
+        };
+        i = i + 1u64;
+    };
+    dp[capacity]
+}
+
+fn main() -> u64 { 0u64 }

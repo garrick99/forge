@@ -1,0 +1,56 @@
+// expected: 0
+// Demo 785: Verified LRU eviction logic
+//
+// Simulates LRU cache eviction: an access array tracks recency.
+// On access, move-to-front; on evict, remove the back element.
+// Proves: all accesses and shifts stay in bounds.
+
+// Move element at position `pos` to the front (index 0) by shifting.
+fn move_to_front(cache: span<u64>, size: u64, pos: u64)
+    requires size >= 1u64
+    requires size <= cache.len
+    requires pos < size
+{
+    let val: u64 = cache[pos];
+    let mut i: u64 = pos;
+    while i > 0u64
+        invariant i <= pos
+        decreases i
+    {
+        cache[i] = cache[i - 1u64];
+        i = i - 1u64;
+    };
+    cache[0u64] = val;
+}
+
+// Evict the least recently used (last element). Returns evicted value.
+fn evict_lru(cache: span<u64>, size: u64) -> u64
+    requires size >= 1u64
+    requires size <= cache.len
+{
+    cache[size - 1u64]
+}
+
+// Search for a key in the cache. Returns position or size if not found.
+fn cache_find(cache: span<u64>, size: u64, key: u64) -> u64
+    requires size <= cache.len
+    ensures result <= size
+{
+    let mut i: u64 = 0u64;
+    let mut found: u64 = size;
+    while i < size
+        invariant i <= size
+        invariant found <= size
+        decreases size - i
+    {
+        if cache[i] == key {
+            found = i;
+            i = size;
+        } else {
+            i = i + 1u64;
+        };
+    };
+    found
+}
+
+fn main() -> u64 { 0u64 }

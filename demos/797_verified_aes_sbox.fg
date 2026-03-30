@@ -1,0 +1,53 @@
+// expected: 0
+// Demo 797: Verified AES S-box lookup
+//
+// Performs S-box substitution on a 16-byte block using a 256-entry table.
+// Proves: all lookups and block writes are within bounds.
+
+fn sbox_substitute(block: span<u64>, sbox: span<u64>)
+    requires 16u64 <= block.len
+    requires 256u64 <= sbox.len
+{
+    let mut i: u64 = 0u64;
+    while i < 16u64
+        invariant i <= 16u64
+        decreases 16u64 - i
+    {
+        let val: u64 = block[i] % 256u64;
+        block[i] = sbox[val];
+        i = i + 1u64;
+    };
+}
+
+// Inverse S-box substitution.
+fn inv_sbox_substitute(block: span<u64>, inv_sbox: span<u64>)
+    requires 16u64 <= block.len
+    requires 256u64 <= inv_sbox.len
+{
+    let mut i: u64 = 0u64;
+    while i < 16u64
+        invariant i <= 16u64
+        decreases 16u64 - i
+    {
+        let val: u64 = block[i] % 256u64;
+        block[i] = inv_sbox[val];
+        i = i + 1u64;
+    };
+}
+
+// XOR two 16-byte blocks (AddRoundKey step).
+fn add_round_key(state: span<u64>, key: span<u64>)
+    requires 16u64 <= state.len
+    requires 16u64 <= key.len
+{
+    let mut i: u64 = 0u64;
+    while i < 16u64
+        invariant i <= 16u64
+        decreases 16u64 - i
+    {
+        state[i] = state[i] ^ key[i];
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

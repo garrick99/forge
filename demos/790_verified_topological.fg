@@ -1,0 +1,78 @@
+// expected: 0
+// Demo 790: Verified topological sort (Kahn's algorithm)
+//
+// Graph stored as adjacency list in flat spans:
+//   adj_ptr[v] = start of v's neighbor list in adj_list.
+// Proves: all accesses in bounds, output count <= n_vertices.
+
+fn kahn_topo_sort(adj_ptr: span<u64>, adj_list: span<u64>,
+                  n_verts: u64, n_edges: u64,
+                  in_degree: span<u64>,
+                  queue: span<u64>, output: span<u64>) -> u64
+    requires n_verts >= 1u64
+    requires n_verts + 1u64 <= adj_ptr.len
+    requires n_edges <= adj_list.len
+    requires n_verts <= in_degree.len
+    requires n_verts <= queue.len
+    requires n_verts <= output.len
+    requires forall k: u64, k <= n_verts ==> adj_ptr[k] <= n_edges
+    requires forall k: u64, k < n_edges ==> adj_list[k] < n_verts
+    ensures result <= n_verts
+{
+    // Enqueue vertices with in-degree 0.
+    let mut front: u64 = 0u64;
+    let mut back: u64 = 0u64;
+    let mut v: u64 = 0u64;
+    while v < n_verts
+        invariant v <= n_verts
+        invariant back <= n_verts
+        decreases n_verts - v
+    {
+        if in_degree[v] == 0u64 && back < n_verts {
+            queue[back] = v;
+            back = back + 1u64;
+        };
+        v = v + 1u64;
+    };
+
+    // Process queue.
+    let mut out_idx: u64 = 0u64;
+    while front < back
+        invariant front <= back
+        invariant back <= n_verts
+        invariant out_idx <= n_verts
+        decreases n_verts - front
+    {
+        let u: u64 = queue[front];
+        front = front + 1u64;
+        if out_idx < n_verts {
+            output[out_idx] = u;
+            out_idx = out_idx + 1u64;
+        };
+
+        // Decrement in-degree for neighbors of u.
+        if u < n_verts {
+            let start: u64 = adj_ptr[u];
+            let end: u64 = adj_ptr[u + 1u64];
+            let mut e: u64 = start;
+            while e < end
+                invariant e <= n_edges
+                invariant back <= n_verts
+                decreases n_edges - e
+            {
+                let nb: u64 = adj_list[e];
+                if in_degree[nb] > 0u64 {
+                    in_degree[nb] = in_degree[nb] - 1u64;
+                    if in_degree[nb] == 0u64 && back < n_verts {
+                        queue[back] = nb;
+                        back = back + 1u64;
+                    };
+                };
+                e = e + 1u64;
+            };
+        };
+    };
+    out_idx
+}
+
+fn main() -> u64 { 0u64 }

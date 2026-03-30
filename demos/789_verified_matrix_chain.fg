@@ -1,0 +1,55 @@
+// expected: 0
+// Demo 789: Verified matrix chain multiplication order (DP)
+//
+// Computes the minimum number of scalar multiplications for a chain
+// of matrices with dimensions p[0]×p[1], p[1]×p[2], ..., p[n-1]×p[n].
+// Uses O(n^2) DP table.  Proves: all table accesses in bounds.
+
+fn matrix_chain_cost(dims: span<u64>, n: u64, dp: span<u64>) -> u64
+    requires n >= 2u64
+    requires n <= dims.len
+    requires n * n <= dp.len
+{
+    // Zero diagonal: cost of single matrix = 0.
+    let mut i: u64 = 0u64;
+    while i < n - 1u64
+        invariant i <= n
+        decreases n - i
+    {
+        dp[i * n + i] = 0u64;
+        i = i + 1u64;
+    };
+
+    // Fill DP for chain lengths 2..n-1.
+    let mut len: u64 = 2u64;
+    while len < n
+        invariant len <= n
+        decreases n - len
+    {
+        let mut start: u64 = 0u64;
+        while start + len < n
+            invariant start + len <= n
+            decreases n - start - len
+        {
+            let end: u64 = start + len - 1u64;
+            dp[start * n + end] = 18446744073709551615u64;
+            let mut k: u64 = start;
+            while k < end
+                invariant k <= end
+                decreases end - k
+            {
+                let cost: u64 = dp[start * n + k] + dp[(k + 1u64) * n + end]
+                    + dims[start] * dims[k + 1u64] * dims[end + 1u64];
+                if cost < dp[start * n + end] {
+                    dp[start * n + end] = cost;
+                };
+                k = k + 1u64;
+            };
+            start = start + 1u64;
+        };
+        len = len + 1u64;
+    };
+    dp[0u64 * n + (n - 2u64)]
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,65 @@
+// expected: 0
+// Demo 786: Verified Haar wavelet transform (1D, in-place)
+//
+// Performs one level of the Haar wavelet decomposition:
+//   avg[i] = (s[2i] + s[2i+1]) / 2
+//   det[i] = (s[2i] - s[2i+1]) / 2
+// Writes averages to first half, details to second half.
+// Proves: all pair accesses are within bounds.
+
+fn haar_forward(s: span<u64>, n: u64, tmp: span<u64>)
+    requires n >= 2u64
+    requires n <= s.len
+    requires n <= tmp.len
+{
+    let half: u64 = n / 2u64;
+    let mut i: u64 = 0u64;
+    while i < half
+        invariant i <= half
+        decreases half - i
+    {
+        let a: u64 = s[i + i];
+        let b: u64 = s[i + i + 1u64];
+        tmp[i] = (a + b) / 2u64;
+        tmp[half + i] = (a - b) / 2u64;
+        i = i + 1u64;
+    };
+    // Copy back.
+    let mut j: u64 = 0u64;
+    while j < n
+        invariant j <= n
+        decreases n - j
+    {
+        s[j] = tmp[j];
+        j = j + 1u64;
+    };
+}
+
+fn haar_inverse(s: span<u64>, n: u64, tmp: span<u64>)
+    requires n >= 2u64
+    requires n <= s.len
+    requires n <= tmp.len
+{
+    let half: u64 = n / 2u64;
+    let mut i: u64 = 0u64;
+    while i < half
+        invariant i <= half
+        decreases half - i
+    {
+        let avg: u64 = s[i];
+        let det: u64 = s[half + i];
+        tmp[i + i] = avg + det;
+        tmp[i + i + 1u64] = avg - det;
+        i = i + 1u64;
+    };
+    let mut j: u64 = 0u64;
+    while j < n
+        invariant j <= n
+        decreases n - j
+    {
+        s[j] = tmp[j];
+        j = j + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

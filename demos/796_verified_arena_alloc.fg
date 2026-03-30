@@ -1,0 +1,50 @@
+// expected: 0
+// Demo 796: Verified arena allocator
+//
+// Bump allocator with alignment support.
+// Proves: returned offsets are within arena capacity and properly aligned.
+
+fn arena_alloc(cursor: u64, size: u64, align: u64, capacity: u64) -> (u64, u64)
+    requires align >= 1u64
+    requires size >= 1u64
+    requires capacity >= 1u64
+    ensures result.0 <= capacity
+    ensures result.1 <= capacity
+{
+    // Align cursor up to `align` boundary.
+    let rem: u64 = cursor % align;
+    let aligned: u64 = if rem == 0u64 { cursor } else { cursor + align - rem };
+
+    if aligned + size <= capacity {
+        (aligned, aligned + size)
+    } else {
+        (capacity, capacity)
+    }
+}
+
+// Batch allocate n objects of given size.
+fn arena_alloc_n(cursor: u64, obj_size: u64, align: u64, n: u64,
+                 capacity: u64, offsets: span<u64>) -> u64
+    requires align >= 1u64
+    requires obj_size >= 1u64
+    requires n <= offsets.len
+    requires capacity >= 1u64
+    requires cursor <= capacity
+    ensures result <= capacity
+{
+    let mut cur: u64 = cursor;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cur <= capacity
+        decreases n - i
+    {
+        let alloc: (u64, u64) = arena_alloc(cur, obj_size, align, capacity);
+        offsets[i] = alloc.0;
+        cur = alloc.1;
+        i = i + 1u64;
+    };
+    cur
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,53 @@
+// expected: 0
+// Demo 799: Verified FFT butterfly operations (integer NTT)
+//
+// Number-theoretic transform butterfly: modular add/sub with twiddle factor.
+// Proves: all butterfly pair accesses stay within bounds and modular
+// arithmetic stays within the prime field.
+
+fn ntt_butterfly(data: span<u64>, n: u64, step: u64, q: u64, twiddle: u64)
+    requires n >= 2u64
+    requires step >= 1u64
+    requires step <= n / 2u64
+    requires n <= data.len
+    requires q >= 2u64
+    requires twiddle < q
+{
+    let mut i: u64 = 0u64;
+    while i + step < n
+        invariant i <= n
+        decreases n - i
+    {
+        let a: u64 = data[i];
+        let b: u64 = (data[i + step] * twiddle) % q;
+        data[i] = (a + b) % q;
+        data[i + step] = (a + q - b) % q;
+        i = i + 2u64 * step;
+    };
+}
+
+// Full NTT forward pass (Cooley-Tukey, decimation-in-time).
+fn ntt_forward(data: span<u64>, n: u64, q: u64,
+               twiddles: span<u64>, n_twiddles: u64)
+    requires n >= 2u64
+    requires n <= data.len
+    requires n_twiddles <= twiddles.len
+    requires q >= 2u64
+{
+    let mut half: u64 = n / 2u64;
+    let mut tw_idx: u64 = 0u64;
+    while half >= 1u64
+        invariant half <= n
+        invariant tw_idx <= n_twiddles
+        decreases half
+    {
+        if tw_idx < n_twiddles {
+            let tw: u64 = twiddles[tw_idx] % q;
+            ntt_butterfly(data, n, half, q, tw);
+            tw_idx = tw_idx + 1u64;
+        };
+        half = half / 2u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

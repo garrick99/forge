@@ -1,0 +1,85 @@
+// expected: 0
+// Demo 798: Verified simple regex matching (NFA simulation)
+//
+// Matches a fixed-alphabet pattern against text using a state set.
+// Pattern encoded as (char, next_state) pairs in a flat table.
+// Proves: all state and text accesses in bounds.
+
+fn nfa_match(pattern: span<u64>, n_states: u64, n_trans: u64,
+             text: span<u64>, text_len: u64,
+             current: span<u64>, next: span<u64>) -> bool
+    requires n_states >= 1u64
+    requires n_states <= current.len
+    requires n_states <= next.len
+    requires n_trans <= pattern.len
+    requires text_len <= text.len
+{
+    // Initialize: only state 0 is active.
+    let mut s: u64 = 0u64;
+    while s < n_states
+        invariant s <= n_states
+        decreases n_states - s
+    {
+        current[s] = 0u64;
+        s = s + 1u64;
+    };
+    current[0u64] = 1u64;
+
+    // Process each text character.
+    let mut t: u64 = 0u64;
+    while t < text_len
+        invariant t <= text_len
+        decreases text_len - t
+    {
+        // Clear next states.
+        let mut s2: u64 = 0u64;
+        while s2 < n_states
+            invariant s2 <= n_states
+            decreases n_states - s2
+        {
+            next[s2] = 0u64;
+            s2 = s2 + 1u64;
+        };
+
+        // For each active state, check transitions.
+        let mut state: u64 = 0u64;
+        while state < n_states
+            invariant state <= n_states
+            decreases n_states - state
+        {
+            if current[state] == 1u64 {
+                // Check pattern entries for this state.
+                let mut e: u64 = 0u64;
+                while e + 2u64 < n_trans
+                    invariant e <= n_trans
+                    decreases n_trans - e
+                {
+                    if pattern[e] == state && pattern[e + 1u64] == text[t] {
+                        let nxt: u64 = pattern[e + 2u64];
+                        if nxt < n_states {
+                            next[nxt] = 1u64;
+                        };
+                    };
+                    e = e + 3u64;
+                };
+            };
+            state = state + 1u64;
+        };
+
+        // Swap current/next.
+        let mut s3: u64 = 0u64;
+        while s3 < n_states
+            invariant s3 <= n_states
+            decreases n_states - s3
+        {
+            current[s3] = next[s3];
+            s3 = s3 + 1u64;
+        };
+        t = t + 1u64;
+    };
+
+    // Check if any accepting state is active (last state = accept).
+    current[n_states - 1u64] == 1u64
+}
+
+fn main() -> u64 { 0u64 }

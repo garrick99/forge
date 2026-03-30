@@ -1,0 +1,56 @@
+// expected: 0
+// Demo 787: Verified Burrows-Wheeler transform step
+//
+// Computes the BWT output column from a sorted suffix array.
+// BWT[i] = text[(sa[i] - 1) mod n].
+// Proves: all text and suffix array accesses are within bounds.
+
+fn bwt_from_sa(text: span<u64>, sa: span<u64>, n: u64, bwt: span<u64>)
+    requires n >= 1u64
+    requires n <= text.len
+    requires n <= sa.len
+    requires n <= bwt.len
+    requires forall k: u64, k < n ==> sa[k] < n
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let idx: u64 = sa[i];
+        if idx == 0u64 {
+            bwt[i] = text[n - 1u64];
+        } else {
+            bwt[i] = text[idx - 1u64];
+        };
+        i = i + 1u64;
+    };
+}
+
+// Count occurrences of each symbol (for BWT inverse setup).
+fn count_symbols(bwt: span<u64>, n: u64, counts: span<u64>, alpha_size: u64)
+    requires n <= bwt.len
+    requires alpha_size <= counts.len
+{
+    let mut c: u64 = 0u64;
+    while c < alpha_size
+        invariant c <= alpha_size
+        decreases alpha_size - c
+    {
+        counts[c] = 0u64;
+        c = c + 1u64;
+    };
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let sym: u64 = bwt[i];
+        if sym < alpha_size {
+            counts[sym] = counts[sym] + 1u64;
+        };
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

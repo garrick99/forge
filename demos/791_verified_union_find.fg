@@ -1,0 +1,53 @@
+// expected: 0
+// Demo 791: Verified union-find (disjoint set) operations
+//
+// Path compression on find, union by rank.
+// Proves: all parent/rank accesses stay within [0, n).
+
+fn find(parent: span<u64>, n: u64, x: u64) -> u64
+    requires n >= 1u64
+    requires n <= parent.len
+    requires x < n
+    requires forall k: u64, k < n ==> parent[k] < n
+    ensures result < n
+{
+    let mut cur: u64 = x;
+    let mut steps: u64 = 0u64;
+    while parent[cur] != cur && steps < n
+        invariant cur < n
+        invariant steps <= n
+        decreases n - steps
+    {
+        cur = parent[cur];
+        steps = steps + 1u64;
+    };
+    // Path compression: point x directly to root.
+    if cur < n {
+        parent[x] = cur;
+    };
+    cur
+}
+
+fn union(parent: span<u64>, rank: span<u64>, n: u64, x: u64, y: u64)
+    requires n >= 1u64
+    requires n <= parent.len
+    requires n <= rank.len
+    requires x < n
+    requires y < n
+    requires forall k: u64, k < n ==> parent[k] < n
+{
+    let rx: u64 = find(parent, n, x);
+    let ry: u64 = find(parent, n, y);
+    if rx != ry {
+        if rank[rx] < rank[ry] {
+            parent[rx] = ry;
+        } else if rank[rx] > rank[ry] {
+            parent[ry] = rx;
+        } else {
+            parent[ry] = rx;
+            rank[rx] = rank[rx] + 1u64;
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }

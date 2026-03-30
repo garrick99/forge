@@ -1,0 +1,66 @@
+// expected: 0
+// Demo 793: Verified BFS level computation
+//
+// Breadth-first search on a graph (CSR adjacency).
+// Computes level[v] = distance from source.
+// Proves: all adjacency and queue accesses in bounds.
+
+fn bfs_levels(adj_ptr: span<u64>, adj_list: span<u64>,
+              n_verts: u64, n_edges: u64,
+              source: u64,
+              level: span<u64>, queue: span<u64>)
+    requires n_verts >= 1u64
+    requires n_verts + 1u64 <= adj_ptr.len
+    requires n_edges <= adj_list.len
+    requires n_verts <= level.len
+    requires n_verts <= queue.len
+    requires source < n_verts
+    requires forall k: u64, k <= n_verts ==> adj_ptr[k] <= n_edges
+    requires forall k: u64, k < n_edges ==> adj_list[k] < n_verts
+{
+    let sentinel: u64 = 18446744073709551615u64;
+
+    // Init levels to sentinel (unvisited).
+    let mut i: u64 = 0u64;
+    while i < n_verts
+        invariant i <= n_verts
+        decreases n_verts - i
+    {
+        level[i] = sentinel;
+        i = i + 1u64;
+    };
+
+    level[source] = 0u64;
+    queue[0u64] = source;
+    let mut front: u64 = 0u64;
+    let mut back: u64 = 1u64;
+
+    while front < back
+        invariant front <= back
+        invariant back <= n_verts
+        decreases n_verts - front
+    {
+        let u: u64 = queue[front];
+        front = front + 1u64;
+        if u < n_verts {
+            let start: u64 = adj_ptr[u];
+            let end: u64 = adj_ptr[u + 1u64];
+            let mut e: u64 = start;
+            while e < end
+                invariant e <= n_edges
+                invariant back <= n_verts
+                decreases n_edges - e
+            {
+                let nb: u64 = adj_list[e];
+                if level[nb] == sentinel && back < n_verts {
+                    level[nb] = level[u] + 1u64;
+                    queue[back] = nb;
+                    back = back + 1u64;
+                };
+                e = e + 1u64;
+            };
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }

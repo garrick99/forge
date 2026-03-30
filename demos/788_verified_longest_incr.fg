@@ -1,0 +1,52 @@
+// expected: 0
+// Demo 788: Verified longest increasing subsequence length (patience sort DP)
+//
+// O(n^2) DP for LIS.  dp[i] = length of LIS ending at index i.
+// Proves: all accesses in bounds and result >= 1.
+
+fn lis_length(s: span<u64>, n: u64, dp: span<u64>) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    requires n <= dp.len
+    ensures result >= 1u64
+{
+    // Initialize: each element is an LIS of length 1.
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        dp[i] = 1u64;
+        i = i + 1u64;
+    };
+
+    // Fill DP.
+    let mut best: u64 = 1u64;
+    let mut i2: u64 = 1u64;
+    while i2 < n
+        invariant i2 <= n
+        invariant best >= 1u64
+        decreases n - i2
+    {
+        let mut j: u64 = 0u64;
+        while j < i2
+            invariant j <= i2
+            decreases i2 - j
+        {
+            if s[j] < s[i2] {
+                let candidate: u64 = dp[j] + 1u64;
+                if candidate > dp[i2] {
+                    dp[i2] = candidate;
+                };
+            };
+            j = j + 1u64;
+        };
+        if dp[i2] > best {
+            best = dp[i2];
+        };
+        i2 = i2 + 1u64;
+    };
+    best
+}
+
+fn main() -> u64 { 0u64 }

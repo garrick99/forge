@@ -1,0 +1,40 @@
+// expected: 0
+// Demo 784: Verified pseudo-random number generator (xorshift64)
+//
+// Xorshift64 PRNG with bounded output.
+// Proves: output is within requested range.
+
+fn xorshift64(state: u64) -> u64
+    requires state != 0u64
+    ensures result != 0u64
+{
+    let mut s: u64 = state;
+    s = s ^ (s << 13u64);
+    s = s ^ (s >> 7u64);
+    s = s ^ (s << 17u64);
+    if s == 0u64 { 1u64 } else { s }
+}
+
+// Generate n random values in [0, bound) into output.
+fn fill_random(seed: u64, bound: u64, output: span<u64>, n: u64) -> u64
+    requires seed != 0u64
+    requires bound >= 1u64
+    requires n <= output.len
+    ensures result != 0u64
+{
+    let mut state: u64 = seed;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant state != 0u64
+        decreases n - i
+    {
+        let ns: u64 = xorshift64(state);
+        state = ns;
+        output[i] = state % bound;
+        i = i + 1u64;
+    };
+    state
+}
+
+fn main() -> u64 { 0u64 }

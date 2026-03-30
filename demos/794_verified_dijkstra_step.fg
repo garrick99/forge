@@ -1,0 +1,86 @@
+// expected: 0
+// Demo 794: Verified Dijkstra relaxation step
+//
+// One relaxation pass over all edges from a source vertex.
+// Not full Dijkstra (no priority queue), but proves the core
+// relax operation preserves distance bounds.
+
+fn relax_edges(adj_ptr: span<u64>, adj_list: span<u64>,
+               weights: span<u64>,
+               n_verts: u64, n_edges: u64,
+               dist: span<u64>, u: u64)
+    requires n_verts >= 1u64
+    requires n_verts + 1u64 <= adj_ptr.len
+    requires n_edges <= adj_list.len
+    requires n_edges <= weights.len
+    requires n_verts <= dist.len
+    requires u < n_verts
+    requires forall k: u64, k <= n_verts ==> adj_ptr[k] <= n_edges
+    requires forall k: u64, k < n_edges ==> adj_list[k] < n_verts
+{
+    let sentinel: u64 = 18446744073709551615u64;
+    let du: u64 = dist[u];
+    if du < sentinel {
+        let start: u64 = adj_ptr[u];
+        let end: u64 = adj_ptr[u + 1u64];
+        let mut e: u64 = start;
+        while e < end
+            invariant e <= n_edges
+            decreases n_edges - e
+        {
+            let v: u64 = adj_list[e];
+            let w: u64 = weights[e];
+            let new_dist: u64 = du + w;
+            if new_dist < dist[v] {
+                dist[v] = new_dist;
+            };
+            e = e + 1u64;
+        };
+    };
+}
+
+// Bellman-Ford: relax all edges n-1 times.
+fn bellman_ford(adj_ptr: span<u64>, adj_list: span<u64>,
+                weights: span<u64>,
+                n_verts: u64, n_edges: u64,
+                dist: span<u64>, source: u64)
+    requires n_verts >= 1u64
+    requires n_verts + 1u64 <= adj_ptr.len
+    requires n_edges <= adj_list.len
+    requires n_edges <= weights.len
+    requires n_verts <= dist.len
+    requires source < n_verts
+    requires forall k: u64, k <= n_verts ==> adj_ptr[k] <= n_edges
+    requires forall k: u64, k < n_edges ==> adj_list[k] < n_verts
+{
+    let sentinel: u64 = 18446744073709551615u64;
+    // Init distances.
+    let mut i: u64 = 0u64;
+    while i < n_verts
+        invariant i <= n_verts
+        decreases n_verts - i
+    {
+        dist[i] = sentinel;
+        i = i + 1u64;
+    };
+    dist[source] = 0u64;
+
+    // Relax n-1 times.
+    let mut round: u64 = 0u64;
+    while round + 1u64 < n_verts
+        invariant round < n_verts
+        decreases n_verts - round - 1u64
+    {
+        let mut u: u64 = 0u64;
+        while u < n_verts
+            invariant u <= n_verts
+            decreases n_verts - u
+        {
+            relax_edges(adj_ptr, adj_list, weights, n_verts, n_edges, dist, u);
+            u = u + 1u64;
+        };
+        round = round + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

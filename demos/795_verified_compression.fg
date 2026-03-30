@@ -1,0 +1,55 @@
+// expected: 0
+// Demo 795: Verified LZ-style compression step
+//
+// Scans input for repeated substrings using a simple hash table.
+// Outputs (literal, offset, length) triples.
+// Proves: all lookback and output accesses are within bounds.
+
+fn lz_compress_step(input: span<u64>, n: u64,
+                    hash_table: span<u64>, ht_size: u64,
+                    output: span<u64>, out_cap: u64) -> u64
+    requires n <= input.len
+    requires ht_size >= 1u64
+    requires ht_size <= hash_table.len
+    requires out_cap <= output.len
+    ensures result <= out_cap
+{
+    let mut i: u64 = 0u64;
+    let mut out_idx: u64 = 0u64;
+
+    // Clear hash table.
+    let mut h: u64 = 0u64;
+    while h < ht_size
+        invariant h <= ht_size
+        decreases ht_size - h
+    {
+        hash_table[h] = n;
+        h = h + 1u64;
+    };
+
+    while i < n
+        invariant i <= n
+        invariant out_idx <= out_cap
+        decreases n - i
+    {
+        let hash: u64 = input[i] % ht_size;
+        let prev: u64 = hash_table[hash];
+
+        if prev < i && prev < n && input[prev] == input[i] && out_idx + 2u64 < out_cap {
+            // Match found: emit (offset, length=1) pair.
+            output[out_idx] = i - prev;
+            output[out_idx + 1u64] = 1u64;
+            out_idx = out_idx + 2u64;
+        } else if out_idx < out_cap {
+            // Literal.
+            output[out_idx] = input[i];
+            out_idx = out_idx + 1u64;
+        };
+
+        hash_table[hash] = i;
+        i = i + 1u64;
+    };
+    out_idx
+}
+
+fn main() -> u64 { 0u64 }
