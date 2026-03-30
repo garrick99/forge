@@ -636,6 +636,13 @@ let rec emit_expr depth e =
   | ECall ({ expr_desc = EVar id; _ }, [])
       when id.name = "warp_id" ->
       "(threadIdx.x >> 5)"
+  (* ---- Shared memory intrinsics ---- *)
+  | ECall ({ expr_desc = EVar id; _ }, [arr; idx])
+      when id.name = "shared_load" ->
+      Printf.sprintf "%s[%s]" (emit_expr depth arr) (emit_expr depth idx)
+  | ECall ({ expr_desc = EVar id; _ }, [arr; idx; v])
+      when id.name = "shared_store" ->
+      Printf.sprintf "(%s[%s] = %s)" (emit_expr depth arr) (emit_expr depth idx) (emit_expr depth v)
   (* ---- Inline assembly ---- *)
   | ECall ({ expr_desc = EVar id; _ }, [{ expr_desc = ELit (LStr s); _ }])
       when id.name = "asm_volatile" ->
@@ -1564,10 +1571,58 @@ and emit_stmt depth s =
    #[device]      → __device__        (GPU helper, called from device only)
    #[host_device] → __host__ __device__ (callable from both)
    (no GPU attr)  → ""               (plain C / host function) *)
-let gpu_qualifier attrs =
+(* Collect all function names called (directly or transitively) from kernel bodies.
+   These need __device__ annotation in CUDA mode. *)
+let device_fn_names : string list ref = ref []
+
+let rec collect_called_fns_expr acc e =
+  match e.expr_desc with
+  | ECall ({ expr_desc = EVar id; _ }, args) ->
+      let acc = id.name :: acc in
+      List.fold_left collect_called_fns_expr acc args
+  | ECall (f, args) ->
+      List.fold_left collect_called_fns_expr (collect_called_fns_expr acc f) args
+  | EBinop (_, l, r) -> collect_called_fns_expr (collect_called_fns_expr acc l) r
+  | EUnop (_, e2) | ERef e2 | ERefMut e2 | EDeref e2 | ECast (e2, _) ->
+      collect_called_fns_expr acc e2
+  | EBlock (stmts, ret) ->
+      let acc = List.fold_left collect_called_fns_stmt acc stmts in
+      (match ret with Some e2 -> collect_called_fns_expr acc e2 | None -> acc)
+  | EIf (c, t, e_opt) ->
+      let acc = collect_called_fns_expr (collect_called_fns_expr acc c) t in
+      (match e_opt with Some e2 -> collect_called_fns_expr acc e2 | None -> acc)
+  | EField (e2, _) | EField_n (e2, _) | EIndex (e2, _) -> collect_called_fns_expr acc e2
+  | ETuple es | EArrayLit es -> List.fold_left collect_called_fns_expr acc es
+  | EAssign (l, r) -> collect_called_fns_expr (collect_called_fns_expr acc l) r
+  | _ -> acc
+
+and collect_called_fns_stmt acc s =
+  match s.stmt_desc with
+  | SLet (_, _, e, _) | SExpr e | SReturn (Some e) | SGhost (_, _, e) ->
+      collect_called_fns_expr acc e
+  | SWhile (c, _, _, body) | SFor (_, c, _, _, body) ->
+      let acc = collect_called_fns_expr acc c in
+      List.fold_left collect_called_fns_stmt acc body
+  | _ -> acc
+
+let compute_device_fns (items : item list) =
+  (* Collect all functions called from #[kernel] functions *)
+  let called = List.fold_left (fun acc item ->
+    match item.item_desc with
+    | IFn fn when List.exists (fun a -> a.attr_name = "kernel") fn.fn_attrs ->
+        (match fn.fn_body with
+         | Some body -> collect_called_fns_expr acc body
+         | None -> acc)
+    | _ -> acc
+  ) [] items in
+  device_fn_names := List.sort_uniq String.compare called
+
+let gpu_qualifier attrs fn_name =
   if List.exists (fun a -> a.attr_name = "kernel") attrs then "__global__ "
   else if List.exists (fun a -> a.attr_name = "host_device") attrs then "__host__ __device__ "
   else if List.exists (fun a -> a.attr_name = "device") attrs then "__device__ "
+  (* Auto-detect: if this function is called from a kernel, add __device__ *)
+  else if List.mem fn_name !device_fn_names then "__device__ "
   else ""
 
 let emit_fn fn =
@@ -1578,7 +1633,7 @@ let emit_fn fn =
     match k with KType | KBounded _ -> Some id.name | _ -> None
   ) fn.fn_generics;
   (* GPU qualifier prefix — erased for non-GPU builds *)
-  let qual = gpu_qualifier fn.fn_attrs in
+  let qual = gpu_qualifier fn.fn_attrs fn.fn_name.name in
   (* requires/ensures are fully erased — proof was discharged *)
   (* KNat generic params become leading uint64_t parameters *)
   let nat_param_strs = List.filter_map (fun (id, k) ->
@@ -1960,6 +2015,8 @@ let rec collect_generic_named_item acc item =
   | _ -> acc
 
 let emit_program prog =
+  (* Compute which functions need __device__ (called from #[kernel]) *)
+  compute_device_fns prog.prog_items;
   (* Build enum constructor registry before any emission *)
   build_enum_registry prog.prog_items;
   (* Build fn_first_param_is_ref: true if first param is ref<T> or refmut<T> *)
@@ -2204,7 +2261,7 @@ let emit_program prog =
       current_type_params := List.filter_map (fun (id, k) ->
         match k with KType | KBounded _ -> Some id.name | _ -> None
       ) fn.fn_generics;
-      let qual = gpu_qualifier fn.fn_attrs in
+      let qual = gpu_qualifier fn.fn_attrs fn.fn_name.name in
       let ret_ty =
         if qual = "__global__ " && fn.fn_ret <> TPrim TUnit then TPrim TUnit
         else fn.fn_ret

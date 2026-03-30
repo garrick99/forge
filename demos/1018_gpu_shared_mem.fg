@@ -1,0 +1,81 @@
+// expected: 0
+// Demo 1018: GPU shared memory — verified block-level reduction
+//
+// Demonstrates shared<u64>[N] declaration and syncthreads().
+// Shared memory is on-chip SRAM (228 KB/SM on RTX 5090).
+
+use std::gpu;
+
+// Block-level sum reduction using shared memory.
+// Each thread loads one element, then cooperatively reduces.
+#[kernel]
+fn block_reduce_sum(data: span<u64>, n: u64, block_results: span<u64>)
+    requires n <= data.len
+{
+    let smem: shared<u64>[256] = 0;
+    let tid: u64 = threadIdx_x;
+    let gid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+
+    // Load global → shared (with bounds guard).
+    if tid < 256u64 && gid < n { smem[tid] = data[gid]; };
+    syncthreads();
+
+    // Tree reduction in shared memory.
+    if tid < 128u64 { smem[tid] = smem[tid] + smem[tid + 128u64]; };
+    syncthreads();
+    if tid < 64u64 { smem[tid] = smem[tid] + smem[tid + 64u64]; };
+    syncthreads();
+    if tid < 32u64 { smem[tid] = smem[tid] + smem[tid + 32u64]; };
+    syncthreads();
+    if tid < 16u64 { smem[tid] = smem[tid] + smem[tid + 16u64]; };
+    syncthreads();
+    if tid < 8u64 { smem[tid] = smem[tid] + smem[tid + 8u64]; };
+    syncthreads();
+    if tid < 4u64 { smem[tid] = smem[tid] + smem[tid + 4u64]; };
+    syncthreads();
+    if tid < 2u64 { smem[tid] = smem[tid] + smem[tid + 2u64]; };
+    syncthreads();
+    if tid < 1u64 { smem[tid] = smem[tid] + smem[tid + 1u64]; };
+
+    // Thread 0 writes block result.
+    if tid == 0u64 && blockIdx_x < block_results.len {
+        block_results[blockIdx_x] = smem[0u64];
+    };
+}
+
+// Shared memory vector dot product (one block, up to 256 elements).
+#[kernel]
+fn dot_product_block(a: span<u64>, b: span<u64>, n: u64, out: span<u64>)
+    requires n <= a.len
+    requires n <= b.len
+{
+    let smem: shared<u64>[256] = 0;
+    let tid: u64 = threadIdx_x;
+
+    // Each thread computes one product.
+    if tid < 256u64 && tid < n {
+        smem[tid] = a[tid] * b[tid];
+    };
+    syncthreads();
+
+    // Reduction.
+    if tid < 128u64 { smem[tid] = smem[tid] + smem[tid + 128u64]; };
+    syncthreads();
+    if tid < 64u64 { smem[tid] = smem[tid] + smem[tid + 64u64]; };
+    syncthreads();
+    if tid < 32u64 { smem[tid] = smem[tid] + smem[tid + 32u64]; };
+    syncthreads();
+
+    // Warp-level final reduction.
+    if tid < 32u64 {
+        let mut val: u64 = smem[tid];
+        val = val + shfl_xor_sync(val, 16u64, 32u64);
+        val = val + shfl_xor_sync(val, 8u64, 32u64);
+        val = val + shfl_xor_sync(val, 4u64, 32u64);
+        val = val + shfl_xor_sync(val, 2u64, 32u64);
+        val = val + shfl_xor_sync(val, 1u64, 32u64);
+        if tid == 0u64 && out.len >= 1u64 { out[0u64] = val; };
+    };
+}
+
+fn main() -> u64 { 0u64 }

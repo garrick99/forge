@@ -52,8 +52,8 @@ typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
 typedef uint64_t (*forge_fn__ret_u64_t)(void);
 
 /* Forward declarations */
-uint64_t warp_reduce_sum(uint64_t val __attribute__((unused)));
-uint64_t warp_reduce_max(uint64_t val __attribute__((unused)));
+__device__ uint64_t warp_reduce_sum(uint64_t val __attribute__((unused)));
+__device__ uint64_t warp_reduce_max(uint64_t val __attribute__((unused)));
 uint64_t warp_reduce_min(uint64_t val __attribute__((unused)));
 uint64_t grid_stride_start(uint64_t block_idx __attribute__((unused)), uint64_t block_dim __attribute__((unused)), uint64_t thread_idx __attribute__((unused)));
 uint64_t grid_stride_step(uint64_t block_dim __attribute__((unused)), uint64_t grid_dim __attribute__((unused)));
@@ -66,7 +66,7 @@ __global__ void vec_mul(forge_span_u64_t a __attribute__((unused)), forge_span_u
 __global__ void histogram(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t bins_ptr __attribute__((unused)), uint64_t nbins __attribute__((unused)));
 int main();
 
-uint64_t warp_reduce_sum(uint64_t val __attribute__((unused))) {
+__device__ uint64_t warp_reduce_sum(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
   v = (v + __shfl_xor_sync(0xffffffff, v, 16, 32));
   v = (v + __shfl_xor_sync(0xffffffff, v, 8, 32));
@@ -76,7 +76,7 @@ uint64_t warp_reduce_sum(uint64_t val __attribute__((unused))) {
   return v;
 }
 
-uint64_t warp_reduce_max(uint64_t val __attribute__((unused))) {
+__device__ uint64_t warp_reduce_max(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
   uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16, 32);
   if ((s > v)) {

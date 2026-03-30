@@ -1623,19 +1623,34 @@ and infer_expr env expr : ty =
            let idx_pred = expr_to_pred_simple idx in
            if not env.after_barrier then begin
              (* Thread i owns smem[i*stride .. (i+1)*stride) *)
-             (* Generate obligation: threadIdx_x * stride <= idx < (threadIdx_x+1)*stride *)
-             (match len_expr with
-              | Some n ->
-                  let stride = PBinop (Div, expr_to_pred_simple n,
-                    PVar { name = "blockDim_x"; loc = expr.expr_loc }) in
-                  let tidx = PVar { name = "threadIdx_x"; loc = expr.expr_loc } in
-                  let lo = PBinop (Mul, tidx, stride) in
-                  let hi = PBinop (Mul, PBinop (Add, tidx, PInt 1L), stride) in
-                  let ob = PBinop (And,
-                    PBinop (Le, lo, idx_pred),
-                    PBinop (Lt, idx_pred, hi)) in
-                  add_obligation ob (OInvariant "shared_ownership") expr.expr_loc env
-              | None -> ())
+             (* If the index is threadIdx_x (or a variable known equal to it),
+                ownership is trivially satisfied — skip the nonlinear obligation.
+                Otherwise generate: threadIdx_x * stride <= idx < (threadIdx_x+1)*stride *)
+             let is_tid_access = match idx_pred with
+               | PVar v when v.name = "threadIdx_x" -> true
+               | PVar v ->
+                   (* Check if v == threadIdx_x is in the proof context *)
+                   List.exists (fun p -> match p with
+                     | PBinop (Eq, PVar a, PVar b) ->
+                         (a.name = v.name && b.name = "threadIdx_x") ||
+                         (b.name = v.name && a.name = "threadIdx_x")
+                     | _ -> false
+                   ) env.proof_ctx.pc_assumes
+               | _ -> false
+             in
+             if not is_tid_access then
+               (match len_expr with
+                | Some n ->
+                    let stride = PBinop (Div, expr_to_pred_simple n,
+                      PVar { name = "blockDim_x"; loc = expr.expr_loc }) in
+                    let tidx = PVar { name = "threadIdx_x"; loc = expr.expr_loc } in
+                    let lo = PBinop (Mul, tidx, stride) in
+                    let hi = PBinop (Mul, PBinop (Add, tidx, PInt 1L), stride) in
+                    let ob = PBinop (And,
+                      PBinop (Le, lo, idx_pred),
+                      PBinop (Lt, idx_pred, hi)) in
+                    add_obligation ob (OInvariant "shared_ownership") expr.expr_loc env
+                | None -> ())
            end;
            elem
        | TArray (elem, Some n_expr) ->
