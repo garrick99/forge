@@ -1,0 +1,347 @@
+// std/matrix.fg — Verified matrix operations (row-major flat layout)
+//
+// Include with:  use std::matrix;
+//
+// Matrices are stored as flat span<u64> in row-major order.
+// Element (i, j) of an m x n matrix is at index i * cols + j.
+// Values use Q16.16 fixed-point where noted (scale = 65536).
+
+// ---- Fill / Initialize -----------------------------------------------------
+
+// Fill entire matrix with zeros.
+fn mat_zeros(m: span<u64>, rows: u64, cols: u64)
+    requires rows * cols <= m.len
+    requires rows > 0u64
+    requires cols > 0u64
+    ensures forall k: u64, k < rows * cols ==> m[k] == 0u64
+{
+    let n: u64 = rows * cols;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> m[k] == 0u64
+        decreases n - i
+    {
+        m[i] = 0u64;
+        i = i + 1u64;
+    }
+}
+
+// Fill entire matrix with a given value.
+fn mat_fill(m: span<u64>, rows: u64, cols: u64, val: u64)
+    requires rows * cols <= m.len
+    requires rows > 0u64
+    requires cols > 0u64
+    ensures forall k: u64, k < rows * cols ==> m[k] == val
+{
+    let n: u64 = rows * cols;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> m[k] == val
+        decreases n - i
+    {
+        m[i] = val;
+        i = i + 1u64;
+    }
+}
+
+// Set matrix to identity (n x n). Diagonal = 65536 (1.0 in Q16.16), rest = 0.
+fn mat_identity(m: span<u64>, n: u64)
+    requires n > 0u64
+    requires n * n <= m.len
+{
+    let total: u64 = n * n;
+    let mut i: u64 = 0u64;
+    while i < total
+        invariant i <= total
+        decreases total - i
+    {
+        m[i] = 0u64;
+        i = i + 1u64;
+    };
+    let mut d: u64 = 0u64;
+    while d < n
+        invariant d <= n
+        decreases n - d
+    {
+        m[d * n + d] = 65536u64;
+        d = d + 1u64;
+    }
+}
+
+// ---- Copy ------------------------------------------------------------------
+
+// Copy src matrix into dst.
+fn mat_copy(src: span<u64>, dst: span<u64>, rows: u64, cols: u64)
+    requires rows * cols <= src.len
+    requires rows * cols <= dst.len
+    requires rows > 0u64
+    requires cols > 0u64
+    ensures forall k: u64, k < rows * cols ==> dst[k] == src[k]
+{
+    let n: u64 = rows * cols;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> dst[k] == src[k]
+        decreases n - i
+    {
+        dst[i] = src[i];
+        i = i + 1u64;
+    }
+}
+
+// ---- Element-wise arithmetic -----------------------------------------------
+
+// c = a + b (element-wise).
+fn mat_add(a: span<u64>, b: span<u64>, c: span<u64>, rows: u64, cols: u64)
+    requires rows * cols <= a.len
+    requires rows * cols <= b.len
+    requires rows * cols <= c.len
+    requires rows > 0u64
+    requires cols > 0u64
+    ensures forall k: u64, k < rows * cols ==> c[k] == a[k] + b[k]
+{
+    let n: u64 = rows * cols;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> c[k] == a[k] + b[k]
+        decreases n - i
+    {
+        c[i] = a[i] + b[i];
+        i = i + 1u64;
+    }
+}
+
+// c = a - b (element-wise).
+fn mat_sub(a: span<u64>, b: span<u64>, c: span<u64>, rows: u64, cols: u64)
+    requires rows * cols <= a.len
+    requires rows * cols <= b.len
+    requires rows * cols <= c.len
+    requires rows > 0u64
+    requires cols > 0u64
+    requires forall k: u64, k < rows * cols ==> a[k] >= b[k]
+    ensures forall k: u64, k < rows * cols ==> c[k] == a[k] - b[k]
+{
+    let n: u64 = rows * cols;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> c[k] == a[k] - b[k]
+        decreases n - i
+    {
+        c[i] = a[i] - b[i];
+        i = i + 1u64;
+    }
+}
+
+// Scale every element: m[k] = (m[k] * scalar) / 65536 (Q16.16 multiply).
+fn mat_scale(m: span<u64>, rows: u64, cols: u64, scalar: u64)
+    requires rows * cols <= m.len
+    requires rows > 0u64
+    requires cols > 0u64
+    requires scalar <= 4294967295u64
+    requires forall k: u64, k < rows * cols ==> m[k] <= 4294967295u64
+{
+    let n: u64 = rows * cols;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        m[i] = (m[i] * scalar) / 65536u64;
+        i = i + 1u64;
+    }
+}
+
+// ---- Matrix multiplication -------------------------------------------------
+
+// c = a * b where a is m_dim x k_dim, b is k_dim x n_dim, c is m_dim x n_dim.
+fn mat_mul(a: span<u64>, b: span<u64>, c: span<u64>, m_dim: u64, k_dim: u64, n_dim: u64)
+    requires m_dim > 0u64
+    requires k_dim > 0u64
+    requires n_dim > 0u64
+    requires m_dim * k_dim <= a.len
+    requires k_dim * n_dim <= b.len
+    requires m_dim * n_dim <= c.len
+{
+    let mut i: u64 = 0u64;
+    while i < m_dim
+        invariant i <= m_dim
+        decreases m_dim - i
+    {
+        let mut j: u64 = 0u64;
+        while j < n_dim
+            invariant j <= n_dim
+            decreases n_dim - j
+        {
+            let mut acc: u64 = 0u64;
+            let mut p: u64 = 0u64;
+            while p < k_dim
+                invariant p <= k_dim
+                decreases k_dim - p
+            {
+                acc = acc + (a[i * k_dim + p] * b[p * n_dim + j]) / 65536u64;
+                p = p + 1u64;
+            };
+            c[i * n_dim + j] = acc;
+            j = j + 1u64;
+        };
+        i = i + 1u64;
+    }
+}
+
+// ---- Transpose -------------------------------------------------------------
+
+// dst = src^T. src is rows x cols, dst is cols x rows.
+fn mat_transpose(src: span<u64>, dst: span<u64>, rows: u64, cols: u64)
+    requires rows > 0u64
+    requires cols > 0u64
+    requires rows * cols <= src.len
+    requires cols * rows <= dst.len
+{
+    let mut i: u64 = 0u64;
+    while i < rows
+        invariant i <= rows
+        decreases rows - i
+    {
+        let mut j: u64 = 0u64;
+        while j < cols
+            invariant j <= cols
+            decreases cols - j
+        {
+            dst[j * rows + i] = src[i * cols + j];
+            j = j + 1u64;
+        };
+        i = i + 1u64;
+    }
+}
+
+// ---- Row / Column operations -----------------------------------------------
+
+// Dot product of two rows in matrix a (row_a and row_b, each of width cols).
+fn mat_dot_row(a: span<u64>, cols: u64, row_a: u64, row_b: u64) -> u64
+    requires cols > 0u64
+    requires (row_a + 1u64) * cols <= a.len
+    requires (row_b + 1u64) * cols <= a.len
+{
+    let mut acc: u64 = 0u64;
+    let mut j: u64 = 0u64;
+    while j < cols
+        invariant j <= cols
+        decreases cols - j
+    {
+        acc = acc + (a[row_a * cols + j] * a[row_b * cols + j]) / 65536u64;
+        j = j + 1u64;
+    };
+    acc
+}
+
+// Sum of all elements in a given row.
+fn mat_row_sum(m: span<u64>, cols: u64, row: u64) -> u64
+    requires cols > 0u64
+    requires (row + 1u64) * cols <= m.len
+{
+    let mut acc: u64 = 0u64;
+    let mut j: u64 = 0u64;
+    while j < cols
+        invariant j <= cols
+        decreases cols - j
+    {
+        acc = acc + m[row * cols + j];
+        j = j + 1u64;
+    };
+    acc
+}
+
+// Sum of all elements in a given column.
+fn mat_col_sum(m: span<u64>, rows: u64, cols: u64, col: u64) -> u64
+    requires rows > 0u64
+    requires cols > 0u64
+    requires col < cols
+    requires rows * cols <= m.len
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < rows
+        invariant i <= rows
+        decreases rows - i
+    {
+        acc = acc + m[i * cols + col];
+        i = i + 1u64;
+    };
+    acc
+}
+
+// ---- Reductions ------------------------------------------------------------
+
+// Frobenius norm squared: sum of squares of all elements.
+fn mat_frobenius_sq(m: span<u64>, rows: u64, cols: u64) -> u64
+    requires rows > 0u64
+    requires cols > 0u64
+    requires rows * cols <= m.len
+{
+    let n: u64 = rows * cols;
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + (m[i] * m[i]) / 65536u64;
+        i = i + 1u64;
+    };
+    acc
+}
+
+// Maximum element in the matrix.
+fn mat_max_element(m: span<u64>, rows: u64, cols: u64) -> u64
+    requires rows > 0u64
+    requires cols > 0u64
+    requires rows * cols <= m.len
+    ensures forall k: u64, k < rows * cols ==> result >= m[k]
+{
+    let n: u64 = rows * cols;
+    let mut mx: u64 = m[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i >= 1u64
+        invariant i <= n
+        invariant forall k: u64, k < i ==> mx >= m[k]
+        decreases n - i
+    {
+        if m[i] > mx {
+            mx = m[i];
+        };
+        i = i + 1u64;
+    };
+    mx
+}
+
+// Minimum element in the matrix.
+fn mat_min_element(m: span<u64>, rows: u64, cols: u64) -> u64
+    requires rows > 0u64
+    requires cols > 0u64
+    requires rows * cols <= m.len
+    ensures forall k: u64, k < rows * cols ==> result <= m[k]
+{
+    let n: u64 = rows * cols;
+    let mut mn: u64 = m[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i >= 1u64
+        invariant i <= n
+        invariant forall k: u64, k < i ==> mn <= m[k]
+        decreases n - i
+    {
+        if m[i] < mn {
+            mn = m[i];
+        };
+        i = i + 1u64;
+    };
+    mn
+}
+
+fn main() -> u64 { 0u64 }

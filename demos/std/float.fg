@@ -1,0 +1,146 @@
+// std/float.fg — Verified fixed-point arithmetic (Q16.16 format)
+//
+// Include with:  use std::float;
+//
+// Scale factor = 65536. A fixed-point value x represents x/65536.
+// All functions carry preconditions and postconditions verified by Z3.
+
+// ---- Conversion ------------------------------------------------------------
+
+// Construct a fixed-point number from an integer.
+fn fp_from_int(n: u64) -> u64
+    requires n <= 65535u64
+    ensures result == n * 65536u64
+{
+    n * 65536u64
+}
+
+// Extract the integer part (truncate toward zero).
+fn fp_to_int(x: u64) -> u64
+    ensures result == x / 65536u64
+{
+    x / 65536u64
+}
+
+// Construct fixed-point from a ratio: (num * 65536) / den.
+fn fp_from_ratio(num: u64, den: u64) -> u64
+    requires den > 0u64
+    requires num <= 281474976710655u64
+    ensures result == (num * 65536u64) / den
+{
+    (num * 65536u64) / den
+}
+
+// ---- Basic arithmetic ------------------------------------------------------
+
+// Add two fixed-point numbers.
+fn fp_add(a: u64, b: u64) -> u64
+    requires a <= 4294967295u64
+    requires b <= 4294967295u64
+    ensures result == a + b
+{
+    a + b
+}
+
+// Subtract two fixed-point numbers.
+fn fp_sub(a: u64, b: u64) -> u64
+    requires a >= b
+    ensures result == a - b
+    ensures result <= a
+{
+    a - b
+}
+
+// Multiply two Q16.16 numbers: (a * b) / 65536.
+fn fp_mul(a: u64, b: u64) -> u64
+    requires a <= 4294967295u64
+    requires b <= 4294967295u64
+    ensures result == (a * b) / 65536u64
+{
+    (a * b) / 65536u64
+}
+
+// Divide two Q16.16 numbers: (a * 65536) / b.
+fn fp_div(a: u64, b: u64) -> u64
+    requires b > 0u64
+    requires a <= 281474976710655u64
+    ensures result == (a * 65536u64) / b
+{
+    (a * 65536u64) / b
+}
+
+// ---- Comparison / selection ------------------------------------------------
+
+// Absolute value for unsigned: identity (u64 is always non-negative).
+fn fp_abs(x: u64) -> u64
+    ensures result == x
+{
+    x
+}
+
+// Minimum of two fixed-point values.
+fn fp_min(a: u64, b: u64) -> u64
+    ensures result <= a
+    ensures result <= b
+    ensures result == a || result == b
+{
+    if a <= b { a } else { b }
+}
+
+// Maximum of two fixed-point values.
+fn fp_max(a: u64, b: u64) -> u64
+    ensures result >= a
+    ensures result >= b
+    ensures result == a || result == b
+{
+    if a >= b { a } else { b }
+}
+
+// Clamp x to [lo, hi].
+fn fp_clamp(x: u64, lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures result >= lo
+    ensures result <= hi
+    ensures x < lo ==> result == lo
+    ensures x > hi ==> result == hi
+    ensures lo <= x && x <= hi ==> result == x
+{
+    if x < lo { lo }
+    else if x > hi { hi }
+    else { x }
+}
+
+// ---- Advanced operations ---------------------------------------------------
+
+// Integer square root via Newton's method (operates on raw u64).
+// Returns floor(sqrt(x)).
+fn fp_sqrt_approx(x: u64) -> u64
+    requires x > 0u64
+    ensures result >= 1u64
+{
+    let mut guess: u64 = x;
+    let mut prev: u64 = x + 1u64;
+    while guess < prev
+        invariant guess >= 1u64
+        invariant prev >= 1u64
+        decreases prev - guess
+    {
+        prev = guess;
+        guess = (guess + x / guess) / 2u64;
+    };
+    guess
+}
+
+// Linear interpolation: a + (b - a) * t / 65536, where t is in [0, 65536].
+fn fp_lerp(a: u64, b: u64, t: u64) -> u64
+    requires a <= b
+    requires t <= 65536u64
+    ensures result >= a
+    ensures result <= b
+{
+    let span_val: u64 = b - a;
+    let frac: u64 = (span_val * t) / 65536u64;
+    a + frac
+}
+
+fn main() -> u64 { 0u64 }

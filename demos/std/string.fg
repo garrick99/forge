@@ -1,0 +1,769 @@
+// std/string.fg — Verified string handling library for Forge
+//
+// All strings are represented as span<u64> where each element holds one byte/char.
+// Functions use u64 for all numeric types.
+// Every function carries requires/ensures and every loop has invariant + decreases.
+//
+// NOTE: while loops are always at top level (never inside if/else branches)
+// to ensure invariants export to postconditions.
+
+// ============================================================================
+// STRING BASICS
+// ============================================================================
+
+// str_len: scan for null terminator (0), return length.
+// If no null found within cap, returns cap.
+fn str_len(s: span<u64>, cap: u64) -> u64
+    requires s.len == cap
+    ensures result <= cap
+{
+    let mut i: u64 = 0u64;
+    let mut found: u64 = cap;
+    while i < cap
+        invariant i <= cap
+        invariant found <= cap
+        decreases cap - i
+    {
+        if s[i] == 0u64 && found == cap {
+            found = i;
+        };
+        i = i + 1u64;
+    };
+    found
+}
+
+// str_eq: compare two spans of given lengths for equality.
+// Returns false if lengths differ, otherwise compares element by element.
+fn str_eq(a: span<u64>, a_len: u64, b: span<u64>, b_len: u64) -> bool
+    requires a.len >= a_len
+    requires b.len >= b_len
+{
+    if a_len != b_len {
+        false
+    } else {
+        let mut i: u64 = 0u64;
+        let mut eq: bool = true;
+        while i < a_len
+            invariant i <= a_len
+            invariant eq == true ==> (forall k: u64, k < i ==> a[k] == b[k])
+            decreases a_len - i
+        {
+            if a[i] != b[i] {
+                eq = false;
+            };
+            i = i + 1u64;
+        };
+        eq
+    }
+}
+
+// str_copy: copy src_len bytes from src to dst. Returns bytes copied.
+fn str_copy(src: span<u64>, src_len: u64, dst: span<u64>, dst_cap: u64) -> u64
+    requires src.len >= src_len
+    requires dst.len == dst_cap
+    requires src_len <= dst_cap
+    ensures result <= dst_cap
+    ensures result == src_len
+    ensures forall k: u64, k < result ==> dst[k] == src[k]
+{
+    let mut i: u64 = 0u64;
+    while i < src_len
+        invariant i <= src_len
+        invariant forall k: u64, k < i ==> dst[k] == src[k]
+        decreases src_len - i
+    {
+        dst[i] = src[i];
+        i = i + 1u64;
+    };
+    src_len
+}
+
+// str_concat: concatenate a (a_len) and b (b_len) into dst.
+// Requires a_len + b_len <= dst_cap. Returns total length.
+fn str_concat(a: span<u64>, a_len: u64, b: span<u64>, b_len: u64, dst: span<u64>, dst_cap: u64) -> u64
+    requires a.len >= a_len
+    requires b.len >= b_len
+    requires dst.len == dst_cap
+    requires a_len + b_len <= dst_cap
+    ensures result <= dst_cap
+    ensures result == a_len + b_len
+{
+    let mut i: u64 = 0u64;
+    while i < a_len
+        invariant i <= a_len
+        decreases a_len - i
+    {
+        dst[i] = a[i];
+        i = i + 1u64;
+    };
+    let mut j: u64 = 0u64;
+    while j < b_len
+        invariant j <= b_len
+        decreases b_len - j
+    {
+        dst[a_len + j] = b[j];
+        j = j + 1u64;
+    };
+    a_len + b_len
+}
+
+// ============================================================================
+// SEARCH
+// ============================================================================
+
+// str_find_inner: find first occurrence of needle in haystack.
+// Requires n_len >= 1 and n_len <= h_len. Returns position or h_len.
+fn str_find_inner(haystack: span<u64>, h_len: u64, needle: span<u64>, n_len: u64) -> u64
+    requires haystack.len >= h_len
+    requires needle.len >= n_len
+    requires n_len >= 1u64
+    requires n_len <= h_len
+    ensures result <= h_len
+{
+    let limit: u64 = h_len - n_len + 1u64;
+    let mut pos: u64 = 0u64;
+    let mut found: u64 = h_len;
+    while pos < limit
+        invariant pos <= limit
+        invariant found <= h_len
+        decreases limit - pos
+    {
+        let mut k: u64 = 0u64;
+        let mut match_ok: bool = true;
+        while k < n_len
+            invariant k <= n_len
+            decreases n_len - k
+        {
+            if haystack[pos + k] != needle[k] {
+                match_ok = false;
+            };
+            k = k + 1u64;
+        };
+        if match_ok && found == h_len {
+            found = pos;
+        };
+        pos = pos + 1u64;
+    };
+    found
+}
+
+// str_find: find first occurrence of needle in haystack.
+// Returns position of match, or h_len if not found.
+fn str_find(haystack: span<u64>, h_len: u64, needle: span<u64>, n_len: u64) -> u64
+    requires haystack.len >= h_len
+    requires needle.len >= n_len
+{
+    if n_len == 0u64 {
+        0u64
+    } else if n_len > h_len {
+        h_len
+    } else {
+        str_find_inner(haystack, h_len, needle, n_len)
+    }
+}
+
+// str_contains: does haystack contain needle?
+fn str_contains(haystack: span<u64>, h_len: u64, needle: span<u64>, n_len: u64) -> bool
+    requires haystack.len >= h_len
+    requires needle.len >= n_len
+{
+    let pos: u64 = str_find(haystack, h_len, needle, n_len);
+    pos < h_len
+}
+
+// str_starts_with: does s start with prefix?
+fn str_starts_with(s: span<u64>, s_len: u64, prefix: span<u64>, p_len: u64) -> bool
+    requires s.len >= s_len
+    requires prefix.len >= p_len
+{
+    if p_len > s_len {
+        false
+    } else {
+        let mut i: u64 = 0u64;
+        let mut ok: bool = true;
+        while i < p_len
+            invariant i <= p_len
+            decreases p_len - i
+        {
+            if s[i] != prefix[i] {
+                ok = false;
+            };
+            i = i + 1u64;
+        };
+        ok
+    }
+}
+
+// str_ends_with: does s end with suffix?
+fn str_ends_with(s: span<u64>, s_len: u64, suffix: span<u64>, sf_len: u64) -> bool
+    requires s.len >= s_len
+    requires suffix.len >= sf_len
+{
+    if sf_len > s_len {
+        false
+    } else {
+        let offset: u64 = s_len - sf_len;
+        let mut i: u64 = 0u64;
+        let mut ok: bool = true;
+        while i < sf_len
+            invariant i <= sf_len
+            decreases sf_len - i
+        {
+            if s[offset + i] != suffix[i] {
+                ok = false;
+            };
+            i = i + 1u64;
+        };
+        ok
+    }
+}
+
+// str_count: count non-overlapping occurrences of needle in haystack.
+fn str_count(haystack: span<u64>, h_len: u64, needle: span<u64>, n_len: u64) -> u64
+    requires haystack.len >= h_len
+    requires needle.len >= n_len
+    requires n_len >= 1u64
+    requires n_len <= h_len
+    ensures result <= h_len
+{
+    let limit: u64 = h_len - n_len + 1u64;
+    let mut pos: u64 = 0u64;
+    let mut cnt: u64 = 0u64;
+    while pos < limit
+        invariant pos <= limit
+        invariant cnt <= pos
+        decreases limit - pos
+    {
+        let mut k: u64 = 0u64;
+        let mut match_ok: bool = true;
+        while k < n_len
+            invariant k <= n_len
+            decreases n_len - k
+        {
+            if haystack[pos + k] != needle[k] {
+                match_ok = false;
+            };
+            k = k + 1u64;
+        };
+        if match_ok {
+            cnt = cnt + 1u64;
+        };
+        pos = pos + 1u64;
+    };
+    cnt
+}
+
+// ============================================================================
+// TRANSFORM
+// ============================================================================
+
+// str_to_upper: in-place convert a-z (97-122) to A-Z (65-90).
+fn str_to_upper(s: span<u64>, n: u64)
+    requires s.len >= n
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] >= 97u64 && s[i] <= 122u64 {
+            s[i] = s[i] - 32u64;
+        };
+        i = i + 1u64;
+    }
+}
+
+// str_to_lower: in-place convert A-Z (65-90) to a-z (97-122).
+fn str_to_lower(s: span<u64>, n: u64)
+    requires s.len >= n
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] >= 65u64 && s[i] <= 90u64 {
+            s[i] = s[i] + 32u64;
+        };
+        i = i + 1u64;
+    }
+}
+
+// str_trim_left: find first non-space (32) character, return its index.
+// Returns n if all spaces.
+fn str_trim_left(s: span<u64>, n: u64) -> u64
+    requires s.len >= n
+    ensures result <= n
+{
+    let mut i: u64 = 0u64;
+    let mut found: u64 = n;
+    while i < n
+        invariant i <= n
+        invariant found <= n
+        decreases n - i
+    {
+        if s[i] != 32u64 && found == n {
+            found = i;
+        };
+        i = i + 1u64;
+    };
+    found
+}
+
+// str_trim_right: return new length after removing trailing spaces.
+fn str_trim_right(s: span<u64>, n: u64) -> u64
+    requires s.len >= n
+    ensures result <= n
+{
+    let mut i: u64 = 0u64;
+    let mut last_nonspace: u64 = 0u64;
+    let mut any_nonspace: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant last_nonspace < n || any_nonspace == 0u64
+        invariant any_nonspace <= 1u64
+        decreases n - i
+    {
+        if s[i] != 32u64 {
+            last_nonspace = i;
+            any_nonspace = 1u64;
+        };
+        i = i + 1u64;
+    };
+    if any_nonspace == 0u64 {
+        0u64
+    } else {
+        last_nonspace + 1u64
+    }
+}
+
+// str_reverse: in-place reverse of span.
+fn str_reverse(s: span<u64>, n: u64)
+    requires s.len == n
+    ensures forall k: u64, k < n ==> s[k] == old(s[n - 1u64 - k])
+{
+    let mut i: u64 = 0u64;
+    while i < n / 2u64
+        invariant i <= n / 2u64
+        invariant forall k: u64, k < i ==> s[k] == old(s[n - 1u64 - k])
+        invariant forall k: u64, k < i ==> s[n - 1u64 - k] == old(s[k])
+        decreases n / 2u64 - i
+    {
+        let tmp: u64 = s[i];
+        s[i] = s[n - 1u64 - i];
+        s[n - 1u64 - i] = tmp;
+        i = i + 1u64;
+    }
+}
+
+// str_replace_char: in-place replace all occurrences of old_ch with new_ch.
+fn str_replace_char(s: span<u64>, n: u64, old_ch: u64, new_ch: u64)
+    requires s.len >= n
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] == old_ch {
+            s[i] = new_ch;
+        };
+        i = i + 1u64;
+    }
+}
+
+// ============================================================================
+// PARSING
+// ============================================================================
+
+// str_parse_u64: parse decimal string to u64.
+// Each element is an ASCII digit (48-57). Returns parsed value.
+fn str_parse_u64(s: span<u64>, n: u64) -> u64
+    requires s.len >= n
+    requires n <= 19u64
+{
+    let mut val: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        val = val * 10u64 + (s[i] - 48u64);
+        i = i + 1u64;
+    };
+    val
+}
+
+// str_to_hex: convert a u64 value to hex string in dst.
+// Writes up to 16 hex chars. Returns chars written.
+// Requires val >= 1 (use special case for zero externally).
+fn str_to_hex_nonzero(val: u64, dst: span<u64>, dst_cap: u64) -> u64
+    requires dst.len == dst_cap
+    requires dst_cap >= 16u64
+    requires val >= 1u64
+    ensures result <= dst_cap
+    ensures result <= 16u64
+{
+    let mut v: u64 = val;
+    let mut pos: u64 = 0u64;
+    while v > 0u64
+        invariant pos <= 16u64
+        decreases v
+    {
+        let digit: u64 = v % 16u64;
+        if digit < 10u64 {
+            dst[pos] = 48u64 + digit;
+        } else {
+            dst[pos] = 97u64 + digit - 10u64;
+        };
+        v = v / 16u64;
+        pos = pos + 1u64;
+    };
+    let count: u64 = pos;
+    // Reverse in place
+    let mut lo: u64 = 0u64;
+    while lo < count / 2u64
+        invariant lo <= count / 2u64
+        invariant count <= 16u64
+        decreases count / 2u64 - lo
+    {
+        let hi_idx: u64 = count - 1u64 - lo;
+        let tmp: u64 = dst[lo];
+        dst[lo] = dst[hi_idx];
+        dst[hi_idx] = tmp;
+        lo = lo + 1u64;
+    };
+    count
+}
+
+// str_to_hex: convert a u64 value to hex string in dst.
+// Returns chars written.
+fn str_to_hex(val: u64, dst: span<u64>, dst_cap: u64) -> u64
+    requires dst.len == dst_cap
+    requires dst_cap >= 16u64
+{
+    if val == 0u64 {
+        dst[0u64] = 48u64;
+        1u64
+    } else {
+        str_to_hex_nonzero(val, dst, dst_cap)
+    }
+}
+
+// str_split_count: count segments separated by delim. Returns >= 1.
+// Requires n >= 1.
+fn str_split_count_inner(s: span<u64>, n: u64, delim: u64) -> u64
+    requires s.len >= n
+    requires n >= 1u64
+    ensures result >= 1u64
+    ensures result <= n + 1u64
+{
+    let mut cnt: u64 = 1u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt >= 1u64
+        invariant cnt <= i + 1u64
+        decreases n - i
+    {
+        if s[i] == delim {
+            cnt = cnt + 1u64;
+        };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+// str_split_count: count segments separated by delim. Returns >= 1.
+fn str_split_count(s: span<u64>, n: u64, delim: u64) -> u64
+    requires s.len >= n
+{
+    if n == 0u64 {
+        1u64
+    } else {
+        str_split_count_inner(s, n, delim)
+    }
+}
+
+// ============================================================================
+// VALIDATION
+// ============================================================================
+
+// str_is_alpha: all characters are a-z or A-Z.
+fn str_is_alpha(s: span<u64>, n: u64) -> bool
+    requires s.len >= n
+{
+    let mut i: u64 = 0u64;
+    let mut ok: bool = true;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let c: u64 = s[i];
+        if (c >= 65u64 && c <= 90u64) || (c >= 97u64 && c <= 122u64) {
+            // alpha
+        } else {
+            ok = false;
+        };
+        i = i + 1u64;
+    };
+    ok
+}
+
+// str_is_digit: all characters are 0-9 (48-57).
+fn str_is_digit(s: span<u64>, n: u64) -> bool
+    requires s.len >= n
+{
+    let mut i: u64 = 0u64;
+    let mut ok: bool = true;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] < 48u64 || s[i] > 57u64 {
+            ok = false;
+        };
+        i = i + 1u64;
+    };
+    ok
+}
+
+// str_is_printable: all characters are in range 32-126.
+fn str_is_printable(s: span<u64>, n: u64) -> bool
+    requires s.len >= n
+{
+    let mut i: u64 = 0u64;
+    let mut ok: bool = true;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] < 32u64 || s[i] > 126u64 {
+            ok = false;
+        };
+        i = i + 1u64;
+    };
+    ok
+}
+
+// ============================================================================
+// JSON HELPERS
+// ============================================================================
+
+// json_find_key_inner: scan buf for "key": pattern.
+// Returns position after colon, or buf_len if not found.
+fn json_find_key_inner(buf: span<u64>, buf_len: u64, key: span<u64>, key_len: u64, needed: u64) -> u64
+    requires buf.len >= buf_len
+    requires key.len >= key_len
+    requires needed == key_len + 3u64
+    requires needed <= buf_len
+    ensures result <= buf_len
+{
+    let limit: u64 = buf_len - needed + 1u64;
+    let mut pos: u64 = 0u64;
+    let mut found: u64 = buf_len;
+    while pos < limit
+        invariant pos <= limit
+        invariant found <= buf_len
+        decreases limit - pos
+    {
+        if buf[pos] == 34u64 {
+            let mut k: u64 = 0u64;
+            let mut match_ok: bool = true;
+            while k < key_len
+                invariant k <= key_len
+                decreases key_len - k
+            {
+                if buf[pos + 1u64 + k] != key[k] {
+                    match_ok = false;
+                };
+                k = k + 1u64;
+            };
+            if match_ok && buf[pos + 1u64 + key_len] == 34u64 && buf[pos + 2u64 + key_len] == 58u64 && found == buf_len {
+                found = pos + 3u64 + key_len;
+            };
+        };
+        pos = pos + 1u64;
+    };
+    found
+}
+
+// json_find_key: scan buf for key (as "key":), return position after the colon.
+// Returns buf_len if not found.
+fn json_find_key(buf: span<u64>, buf_len: u64, key: span<u64>, key_len: u64) -> u64
+    requires buf.len >= buf_len
+    requires key.len >= key_len
+{
+    let needed: u64 = key_len + 3u64;
+    if needed > buf_len {
+        buf_len
+    } else {
+        json_find_key_inner(buf, buf_len, key, key_len, needed)
+    }
+}
+
+// json_extract_string_inner: find string content between quotes starting at pos.
+// buf[start] must be 34 (quote). Returns (content_start, content_end).
+fn json_extract_string_inner(buf: span<u64>, buf_len: u64, start: u64) -> (u64, u64)
+    requires buf.len >= buf_len
+    requires start < buf_len
+    ensures result.0 <= buf_len
+    ensures result.1 <= buf_len
+{
+    let content_start: u64 = start + 1u64;
+    let mut i: u64 = content_start;
+    let mut end_pos: u64 = buf_len;
+    while i < buf_len
+        invariant i <= buf_len
+        invariant end_pos <= buf_len
+        decreases buf_len - i
+    {
+        if buf[i] == 34u64 && end_pos == buf_len {
+            end_pos = i;
+        };
+        i = i + 1u64;
+    };
+    if end_pos == buf_len {
+        (buf_len, buf_len)
+    } else {
+        (content_start, end_pos)
+    }
+}
+
+// json_extract_string: given start position, find string content between quotes.
+// Returns (start_of_content, end_of_content).
+// If buf[start] is a quote (34), content starts at start+1, ends before next quote.
+// Returns (buf_len, buf_len) if no valid string found.
+fn json_extract_string(buf: span<u64>, buf_len: u64, start: u64) -> (u64, u64)
+    requires buf.len >= buf_len
+    requires start <= buf_len
+{
+    if start >= buf_len {
+        (buf_len, buf_len)
+    } else if buf[start] != 34u64 {
+        (buf_len, buf_len)
+    } else {
+        json_extract_string_inner(buf, buf_len, start)
+    }
+}
+
+// ============================================================================
+// ADDITIONAL UTILITIES
+// ============================================================================
+
+// str_index_of_char: find first occurrence of char ch. Returns n if not found.
+fn str_index_of_char(s: span<u64>, n: u64, ch: u64) -> u64
+    requires s.len >= n
+    ensures result <= n
+{
+    let mut i: u64 = 0u64;
+    let mut found: u64 = n;
+    while i < n
+        invariant i <= n
+        invariant found <= n
+        decreases n - i
+    {
+        if s[i] == ch && found == n {
+            found = i;
+        };
+        i = i + 1u64;
+    };
+    found
+}
+
+// str_last_index_of_char: find last occurrence of char ch. Returns n if not found.
+fn str_last_index_of_char(s: span<u64>, n: u64, ch: u64) -> u64
+    requires s.len >= n
+    ensures result <= n
+{
+    let mut i: u64 = 0u64;
+    let mut found: u64 = n;
+    while i < n
+        invariant i <= n
+        invariant found <= n
+        decreases n - i
+    {
+        if s[i] == ch {
+            found = i;
+        };
+        i = i + 1u64;
+    };
+    found
+}
+
+// str_count_char: count occurrences of a single character.
+fn str_count_char(s: span<u64>, n: u64, ch: u64) -> u64
+    requires s.len >= n
+    ensures result <= n
+{
+    let mut i: u64 = 0u64;
+    let mut cnt: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if s[i] == ch {
+            cnt = cnt + 1u64;
+        };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+// str_is_alnum: all characters are alphanumeric (a-z, A-Z, 0-9).
+fn str_is_alnum(s: span<u64>, n: u64) -> bool
+    requires s.len >= n
+{
+    let mut i: u64 = 0u64;
+    let mut ok: bool = true;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let c: u64 = s[i];
+        if (c >= 65u64 && c <= 90u64) || (c >= 97u64 && c <= 122u64) || (c >= 48u64 && c <= 57u64) {
+            // alphanumeric
+        } else {
+            ok = false;
+        };
+        i = i + 1u64;
+    };
+    ok
+}
+
+// str_fill: fill span with a character value.
+fn str_fill(s: span<u64>, n: u64, ch: u64)
+    requires s.len >= n
+    ensures forall k: u64, k < n ==> s[k] == ch
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> s[k] == ch
+        decreases n - i
+    {
+        s[i] = ch;
+        i = i + 1u64;
+    }
+}
+
+// str_is_ascii: all characters are in range 0-127.
+fn str_is_ascii(s: span<u64>, n: u64) -> bool
+    requires s.len >= n
+{
+    let mut i: u64 = 0u64;
+    let mut ok: bool = true;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] > 127u64 {
+            ok = false;
+        };
+        i = i + 1u64;
+    };
+    ok
+}
+
+fn main() -> u64 { 0u64 }

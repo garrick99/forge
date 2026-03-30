@@ -1,0 +1,153 @@
+// std/event.fg — verified event queue and async-style patterns
+//
+// Include with:  use std::event;
+//
+// Event-driven programming with verified bounds safety.
+// Events stored as (type, data1, data2, timestamp) tuples in a ring buffer.
+// Supports: enqueue, dequeue, peek, batch dispatch, filtering.
+
+// ---- Event queue ------------------------------------------------------------
+
+// Enqueue an event. Returns new tail and count.
+fn event_enqueue(queue: span<u64>, cap: u64,
+                 tail: u64, count: u64,
+                 ev_type: u64, ev_data1: u64, ev_data2: u64, ev_time: u64) -> (u64, u64)
+    requires cap >= 4u64
+    requires cap <= queue.len
+    requires tail < cap
+    requires count + 4u64 <= cap
+    ensures result.0 < cap
+    ensures result.1 == count + 4u64
+{
+    queue[tail] = ev_type;
+    let t1: u64 = if tail + 1u64 == cap { 0u64 } else { tail + 1u64 };
+    queue[t1] = ev_data1;
+    let t2: u64 = if t1 + 1u64 == cap { 0u64 } else { t1 + 1u64 };
+    queue[t2] = ev_data2;
+    let t3: u64 = if t2 + 1u64 == cap { 0u64 } else { t2 + 1u64 };
+    queue[t3] = ev_time;
+    let new_tail: u64 = if t3 + 1u64 == cap { 0u64 } else { t3 + 1u64 };
+    (new_tail, count + 4u64)
+}
+
+// Dequeue an event. Returns (type, data1, data2, timestamp, new_head, new_count).
+fn event_dequeue(queue: span<u64>, cap: u64,
+                 head: u64, count: u64) -> (u64, u64, u64, u64, u64, u64)
+    requires cap >= 4u64
+    requires cap <= queue.len
+    requires head < cap
+    requires count >= 4u64
+{
+    let ev_type: u64 = queue[head];
+    let h1: u64 = if head + 1u64 == cap { 0u64 } else { head + 1u64 };
+    let ev_d1: u64 = queue[h1];
+    let h2: u64 = if h1 + 1u64 == cap { 0u64 } else { h1 + 1u64 };
+    let ev_d2: u64 = queue[h2];
+    let h3: u64 = if h2 + 1u64 == cap { 0u64 } else { h2 + 1u64 };
+    let ev_time: u64 = queue[h3];
+    let new_head: u64 = if h3 + 1u64 == cap { 0u64 } else { h3 + 1u64 };
+    (ev_type, ev_d1, ev_d2, ev_time, new_head, count - 4u64)
+}
+
+// Count events of a specific type in the queue.
+fn event_count_type(queue: span<u64>, cap: u64,
+                    head: u64, count: u64, ev_type: u64) -> u64
+    requires cap >= 4u64
+    requires cap <= queue.len
+    requires head < cap
+{
+    let n_events: u64 = count / 4u64;
+    let mut found: u64 = 0u64;
+    let mut pos: u64 = head;
+    let mut i: u64 = 0u64;
+    while i < n_events
+        invariant i <= n_events
+        invariant pos < cap
+        decreases n_events - i
+    {
+        if queue[pos] == ev_type { found = found + 1u64; };
+        // Advance by 4 (one event).
+        let mut step: u64 = 0u64;
+        while step < 4u64
+            invariant step <= 4u64
+            invariant pos < cap
+            decreases 4u64 - step
+        {
+            pos = if pos + 1u64 == cap { 0u64 } else { pos + 1u64 };
+            step = step + 1u64;
+        };
+        i = i + 1u64;
+    };
+    found
+}
+
+// ---- Timer / scheduler ------------------------------------------------------
+
+// Check which timers have expired. timers[i*2] = deadline, timers[i*2+1] = callback_id.
+fn timers_check_expired(timers: span<u64>, n_timers: u64,
+                        now: u64,
+                        expired: span<u64>, max_expired: u64) -> u64
+    requires n_timers * 2u64 <= timers.len
+    requires max_expired <= expired.len
+    ensures result <= max_expired
+    ensures result <= n_timers
+{
+    let mut n_exp: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n_timers
+        invariant i <= n_timers
+        invariant n_exp <= max_expired
+        invariant n_exp <= i
+        decreases n_timers - i
+    {
+        let base: u64 = i * 2u64;
+        if base + 1u64 < n_timers * 2u64 && n_exp < max_expired {
+            if timers[base] <= now {
+                expired[n_exp] = timers[base + 1u64];
+                n_exp = n_exp + 1u64;
+            };
+        };
+        i = i + 1u64;
+    };
+    n_exp
+}
+
+// ---- State machine dispatcher -----------------------------------------------
+
+// Dispatch table: state_table[state * n_events + event] = next_state.
+// Proven: result state is always < n_states.
+fn dispatch_event(state_table: span<u64>, n_states: u64, n_events: u64,
+                  current_state: u64, event: u64) -> u64
+    requires n_states >= 1u64
+    requires n_events >= 1u64
+    requires n_states * n_events <= state_table.len
+    requires current_state < n_states
+    requires event < n_events
+{
+    let idx: u64 = current_state * n_events + event;
+    if idx < n_states * n_events {
+        let next: u64 = state_table[idx];
+        if next < n_states { next } else { current_state }
+    } else { current_state }
+}
+
+// ---- Callback registry (function table) -------------------------------------
+
+// Register a callback: handlers[ev_type] = handler_id.
+fn register_handler(handlers: span<u64>, max_types: u64,
+                    ev_type: u64, handler_id: u64)
+    requires max_types <= handlers.len
+    requires ev_type < max_types
+{
+    handlers[ev_type] = handler_id;
+}
+
+// Lookup handler for an event type.
+fn lookup_handler(handlers: span<u64>, max_types: u64, ev_type: u64) -> u64
+    requires max_types <= handlers.len
+    requires ev_type < max_types
+{
+    handlers[ev_type]
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,253 @@
+// std/ecs.fg — verified Entity Component System for game development
+//
+// Include with:  use std::ecs;
+//
+// SoA (Structure of Arrays) ECS: components stored in parallel spans.
+// Entity ID = index into all component arrays.
+// Bitmask tracks which components an entity has.
+//
+// Every access proven bounds-safe. No entity ID can escape valid range.
+
+// ---- Entity management ------------------------------------------------------
+
+// Component flags (bitmask).
+// Bit 0 = Position, Bit 1 = Velocity, Bit 2 = Health, Bit 3 = Collision,
+// Bit 4 = Sprite, Bit 5 = AI, Bit 6 = Physics, Bit 7 = Active
+
+fn has_component(flags: u64, component: u64) -> bool
+    requires component < 64u64
+{
+    (flags >> component) & 1u64 == 1u64
+}
+
+fn add_component(flags: u64, component: u64) -> u64
+    requires component < 64u64
+{
+    flags | (1u64 << component)
+}
+
+fn remove_component(flags: u64, component: u64) -> u64
+    requires component < 64u64
+{
+    flags & ((1u64 << component) ^ 18446744073709551615u64)
+}
+
+// ---- Entity pool: allocate/free entity IDs ---------------------------------
+
+fn entity_alloc(active: span<u64>, max_entities: u64) -> u64
+    requires max_entities <= active.len
+    ensures result <= max_entities
+{
+    let mut i: u64 = 0u64;
+    let mut found: u64 = max_entities;
+    while i < max_entities
+        invariant i <= max_entities
+        invariant found <= max_entities
+        decreases max_entities - i
+    {
+        if active[i] == 0u64 && found == max_entities {
+            active[i] = 1u64;
+            found = i;
+        };
+        i = i + 1u64;
+    };
+    found
+}
+
+fn entity_free(active: span<u64>, flags: span<u64>,
+               max_entities: u64, entity: u64)
+    requires max_entities <= active.len
+    requires max_entities <= flags.len
+    requires entity < max_entities
+{
+    active[entity] = 0u64;
+    flags[entity] = 0u64;
+}
+
+fn entity_count_active(active: span<u64>, max_entities: u64) -> u64
+    requires max_entities <= active.len
+    ensures result <= max_entities
+{
+    let mut count: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < max_entities
+        invariant i <= max_entities
+        invariant count <= i
+        decreases max_entities - i
+    {
+        if active[i] != 0u64 { count = count + 1u64; };
+        i = i + 1u64;
+    };
+    count
+}
+
+// ---- Systems: operate on entities with matching components -----------------
+
+// Movement system: for entities with Position + Velocity, update position.
+// Component layout: pos_x[i], pos_y[i], vel_x[i], vel_y[i].
+fn system_movement(flags: span<u64>, active: span<u64>,
+                   pos_x: span<u64>, pos_y: span<u64>,
+                   vel_x: span<u64>, vel_y: span<u64>,
+                   n: u64, dt: u64)
+    requires n <= flags.len
+    requires n <= active.len
+    requires n <= pos_x.len
+    requires n <= pos_y.len
+    requires n <= vel_x.len
+    requires n <= vel_y.len
+{
+    let mask: u64 = 3u64; // bits 0+1 = Position + Velocity
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if active[i] != 0u64 && (flags[i] & mask) == mask {
+            pos_x[i] = pos_x[i] + (vel_x[i] * dt) / 65536u64;
+            pos_y[i] = pos_y[i] + (vel_y[i] * dt) / 65536u64;
+        };
+        i = i + 1u64;
+    };
+}
+
+// Health system: for entities with Health component, apply damage.
+// health[i] = current HP. Returns number of entities that died (HP → 0).
+fn system_damage(flags: span<u64>, active: span<u64>,
+                 health: span<u64>, damage: span<u64>,
+                 n: u64) -> u64
+    requires n <= flags.len
+    requires n <= active.len
+    requires n <= health.len
+    requires n <= damage.len
+    ensures result <= n
+{
+    let health_bit: u64 = 2u64; // bit 2 = Health
+    let mut deaths: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant deaths <= i
+        decreases n - i
+    {
+        if active[i] != 0u64 && (flags[i] >> health_bit) & 1u64 == 1u64 {
+            if damage[i] >= health[i] {
+                health[i] = 0u64;
+                active[i] = 0u64;
+                deaths = deaths + 1u64;
+            } else {
+                health[i] = health[i] - damage[i];
+            };
+            damage[i] = 0u64; // clear pending damage
+        };
+        i = i + 1u64;
+    };
+    deaths
+}
+
+// Collision detection: brute-force AABB check between all active entities.
+// Stores colliding pairs in `pairs` span: pairs[k*2] = entity_a, pairs[k*2+1] = entity_b.
+fn system_collision_detect(flags: span<u64>, active: span<u64>,
+                           pos_x: span<u64>, pos_y: span<u64>,
+                           size: span<u64>,
+                           n: u64,
+                           pairs: span<u64>, max_pairs: u64) -> u64
+    requires n <= flags.len
+    requires n <= active.len
+    requires n <= pos_x.len
+    requires n <= pos_y.len
+    requires n <= size.len
+    requires max_pairs * 2u64 <= pairs.len
+    ensures result <= max_pairs
+{
+    let coll_bit: u64 = 3u64; // bit 3 = Collision
+    let mut n_pairs: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant n_pairs <= max_pairs
+        decreases n - i
+    {
+        if active[i] != 0u64 && (flags[i] >> coll_bit) & 1u64 == 1u64 {
+            let mut j: u64 = i + 1u64;
+            while j < n
+                invariant j <= n
+                invariant n_pairs <= max_pairs
+                decreases n - j
+            {
+                if active[j] != 0u64 && (flags[j] >> coll_bit) & 1u64 == 1u64 &&
+                   n_pairs < max_pairs {
+                    // AABB overlap check.
+                    let ax: u64 = pos_x[i]; let ay: u64 = pos_y[i];
+                    let bx: u64 = pos_x[j]; let by: u64 = pos_y[j];
+                    let sa: u64 = size[i]; let sb: u64 = size[j];
+                    let dx: u64 = if ax >= bx { ax - bx } else { bx - ax };
+                    let dy: u64 = if ay >= by { ay - by } else { by - ay };
+                    let pidx: u64 = n_pairs * 2u64;
+                    if dx < sa + sb && dy < sa + sb && pidx + 1u64 < max_pairs * 2u64 {
+                        pairs[pidx] = i;
+                        pairs[pidx + 1u64] = j;
+                        n_pairs = n_pairs + 1u64;
+                    };
+                };
+                j = j + 1u64;
+            };
+        };
+        i = i + 1u64;
+    };
+    n_pairs
+}
+
+// Bounds system: keep all entities within world boundaries.
+fn system_world_bounds(flags: span<u64>, active: span<u64>,
+                       pos_x: span<u64>, pos_y: span<u64>,
+                       n: u64, world_w: u64, world_h: u64)
+    requires n <= flags.len
+    requires n <= active.len
+    requires n <= pos_x.len
+    requires n <= pos_y.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if active[i] != 0u64 {
+            if pos_x[i] > world_w { pos_x[i] = world_w; };
+            if pos_y[i] > world_h { pos_y[i] = world_h; };
+        };
+        i = i + 1u64;
+    };
+}
+
+// Spawn system: initialize a new entity with full component set.
+fn spawn_entity(active: span<u64>, flags: span<u64>,
+                pos_x: span<u64>, pos_y: span<u64>,
+                vel_x: span<u64>, vel_y: span<u64>,
+                health: span<u64>, size: span<u64>,
+                n: u64,
+                x: u64, y: u64, vx: u64, vy: u64,
+                hp: u64, sz: u64) -> u64
+    requires n <= active.len
+    requires n <= flags.len
+    requires n <= pos_x.len
+    requires n <= pos_y.len
+    requires n <= vel_x.len
+    requires n <= vel_y.len
+    requires n <= health.len
+    requires n <= size.len
+    ensures result <= n
+{
+    let id: u64 = entity_alloc(active, n);
+    if id < n {
+        flags[id] = 255u64; // all 8 components
+        pos_x[id] = x;
+        pos_y[id] = y;
+        vel_x[id] = vx;
+        vel_y[id] = vy;
+        health[id] = hp;
+        size[id] = sz;
+    };
+    id
+}
+
+fn main() -> u64 { 0u64 }
