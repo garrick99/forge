@@ -685,7 +685,8 @@ let emit_ptx_program (items : item list) (sm : int) : string =
       "// FORGE-generated PTX — SM_%d\n\
        // Proofs discharged before emission. Correct by construction.\n\n"
       sm);
-    Buffer.add_string buf (Printf.sprintf ".version 8.5\n.target sm_%d\n.address_size 64\n\n" sm);
+    let ptx_ver = if sm >= 120 then "8.8" else "8.5" in
+    Buffer.add_string buf (Printf.sprintf ".version %s\n.target sm_%d\n.address_size 64\n\n" ptx_ver sm);
     List.iter (fun fn ->
       Buffer.add_string buf (emit_kernel fn);
       Buffer.add_char buf '\n'
