@@ -602,6 +602,40 @@ let rec emit_expr depth e =
   | ECall ({ expr_desc = EVar id; _ }, [ptr; value]) when id.name = "volatile_write" ->
       Printf.sprintf "(*(volatile uint64_t*)((uintptr_t)%s) = %s)"
         (emit_expr depth ptr) (emit_expr depth value)
+  (* ---- GPU intrinsics (CUDA C) ---- *)
+  | ECall ({ expr_desc = EVar id; _ }, [v; lane; width])
+      when id.name = "shfl_down_sync" ->
+      Printf.sprintf "__shfl_down_sync(0xffffffff, %s, %s, %s)"
+        (emit_expr depth v) (emit_expr depth lane) (emit_expr depth width)
+  | ECall ({ expr_desc = EVar id; _ }, [v; lane; width])
+      when id.name = "shfl_xor_sync" ->
+      Printf.sprintf "__shfl_xor_sync(0xffffffff, %s, %s, %s)"
+        (emit_expr depth v) (emit_expr depth lane) (emit_expr depth width)
+  | ECall ({ expr_desc = EVar id; _ }, [ptr; v])
+      when id.name = "atom_add" ->
+      Printf.sprintf "atomicAdd((unsigned long long*)%s, %s)"
+        (emit_expr depth ptr) (emit_expr depth v)
+  | ECall ({ expr_desc = EVar id; _ }, [ptr; v])
+      when id.name = "atom_cas" ->
+      Printf.sprintf "atomicCAS((unsigned long long*)%s, 0, %s)"
+        (emit_expr depth ptr) (emit_expr depth v)
+  | ECall ({ expr_desc = EVar id; _ }, [ptr; v])
+      when id.name = "atom_max" ->
+      Printf.sprintf "atomicMax((unsigned long long*)%s, %s)"
+        (emit_expr depth ptr) (emit_expr depth v)
+  | ECall ({ expr_desc = EVar id; _ }, [ptr; v])
+      when id.name = "atom_min" ->
+      Printf.sprintf "atomicMin((unsigned long long*)%s, %s)"
+        (emit_expr depth ptr) (emit_expr depth v)
+  | ECall ({ expr_desc = EVar id; _ }, [pred])
+      when id.name = "ballot_sync" ->
+      Printf.sprintf "__ballot_sync(0xffffffff, %s)" (emit_expr depth pred)
+  | ECall ({ expr_desc = EVar id; _ }, [])
+      when id.name = "lane_id" ->
+      "(threadIdx.x & 31)"
+  | ECall ({ expr_desc = EVar id; _ }, [])
+      when id.name = "warp_id" ->
+      "(threadIdx.x >> 5)"
   (* ---- Inline assembly ---- *)
   | ECall ({ expr_desc = EVar id; _ }, [{ expr_desc = ELit (LStr s); _ }])
       when id.name = "asm_volatile" ->

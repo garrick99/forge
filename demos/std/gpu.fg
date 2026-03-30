@@ -1,0 +1,96 @@
+// std/gpu.fg — verified GPU intrinsics and patterns
+//
+// Include with:  use std::gpu;
+//
+// Warp-level primitives, atomics, and common GPU patterns.
+// Each intrinsic maps to PTX instructions or CUDA C built-ins.
+
+// ---- Warp shuffle ----------------------------------------------------------
+
+// Shuffle down: get value from lane + delta.
+extern fn shfl_down_sync(val: u64, delta: u64, width: u64) -> u64 = "forge_gpu";
+
+// Shuffle XOR: get value from lane ^ mask.
+extern fn shfl_xor_sync(val: u64, mask: u64, width: u64) -> u64 = "forge_gpu";
+
+// ---- Atomic operations -----------------------------------------------------
+
+// Atomic add: atomically adds val to *ptr, returns old value.
+extern fn atom_add(ptr: u64, val: u64) -> u64 = "forge_gpu";
+
+// Atomic compare-and-swap.
+extern fn atom_cas(ptr: u64, val: u64) -> u64 = "forge_gpu";
+
+// Atomic max/min.
+extern fn atom_max(ptr: u64, val: u64) -> u64 = "forge_gpu";
+extern fn atom_min(ptr: u64, val: u64) -> u64 = "forge_gpu";
+
+// ---- Warp vote -------------------------------------------------------------
+
+// Ballot: returns bitmask of threads where predicate is true.
+extern fn ballot_sync(pred: u64) -> u64 = "forge_gpu";
+
+// ---- Lane/warp identification ----------------------------------------------
+
+extern fn lane_id() -> u64 = "forge_gpu";
+extern fn warp_id() -> u64 = "forge_gpu";
+
+// ---- Warp-level reduction patterns -----------------------------------------
+
+// Warp-level sum reduction using butterfly shuffle.
+// Reduces 32 values (one per lane) to a single sum in lane 0.
+fn warp_reduce_sum(val: u64) -> u64 {
+    let mut v: u64 = val;
+    v = v + shfl_xor_sync(v, 16u64, 32u64);
+    v = v + shfl_xor_sync(v, 8u64, 32u64);
+    v = v + shfl_xor_sync(v, 4u64, 32u64);
+    v = v + shfl_xor_sync(v, 2u64, 32u64);
+    v = v + shfl_xor_sync(v, 1u64, 32u64);
+    v
+}
+
+// Warp-level max reduction.
+fn warp_reduce_max(val: u64) -> u64 {
+    let mut v: u64 = val;
+    let mut s: u64 = shfl_xor_sync(v, 16u64, 32u64);
+    if s > v { v = s; };
+    s = shfl_xor_sync(v, 8u64, 32u64);
+    if s > v { v = s; };
+    s = shfl_xor_sync(v, 4u64, 32u64);
+    if s > v { v = s; };
+    s = shfl_xor_sync(v, 2u64, 32u64);
+    if s > v { v = s; };
+    s = shfl_xor_sync(v, 1u64, 32u64);
+    if s > v { v = s; };
+    v
+}
+
+// Warp-level min reduction.
+fn warp_reduce_min(val: u64) -> u64 {
+    let mut v: u64 = val;
+    let mut s: u64 = shfl_xor_sync(v, 16u64, 32u64);
+    if s < v { v = s; };
+    s = shfl_xor_sync(v, 8u64, 32u64);
+    if s < v { v = s; };
+    s = shfl_xor_sync(v, 4u64, 32u64);
+    if s < v { v = s; };
+    s = shfl_xor_sync(v, 2u64, 32u64);
+    if s < v { v = s; };
+    s = shfl_xor_sync(v, 1u64, 32u64);
+    if s < v { v = s; };
+    v
+}
+
+// ---- Grid-stride loop helpers -----------------------------------------------
+// GPU built-ins (threadIdx_x, etc.) are only valid inside #[kernel].
+// Pass them as parameters to non-kernel utility functions.
+
+fn grid_stride_start(block_idx: u64, block_dim: u64, thread_idx: u64) -> u64 {
+    block_idx * block_dim + thread_idx
+}
+
+fn grid_stride_step(block_dim: u64, grid_dim: u64) -> u64 {
+    block_dim * grid_dim
+}
+
+fn main() -> u64 { 0u64 }

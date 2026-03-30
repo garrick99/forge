@@ -367,9 +367,81 @@ let rec lower_expr st e : string =
         dst
       end
 
-  (* Function calls — emit a comment; full calling convention is out of scope
-     for V1 (PTX kernels generally don't call other functions).
-     Device functions would need .callprototype / call instructions. *)
+  (* ---- GPU intrinsics ---- *)
+
+  (* Warp shuffle: shfl_sync(val, src_lane, width) *)
+  | ECall ({ expr_desc = EVar id; _ }, [val_e; lane_e; _width_e])
+      when id.name = "shfl_down_sync" ->
+      let rv = lower_expr st val_e in
+      let rl = lower_expr st lane_e in
+      let dst = fresh_reg st U32 in
+      emit st (Printf.sprintf "shfl.sync.down.b32 %s, %s, %s, 31, 0xffffffff;" dst rv rl);
+      dst
+
+  | ECall ({ expr_desc = EVar id; _ }, [val_e; lane_e; _width_e])
+      when id.name = "shfl_xor_sync" ->
+      let rv = lower_expr st val_e in
+      let rl = lower_expr st lane_e in
+      let dst = fresh_reg st U32 in
+      emit st (Printf.sprintf "shfl.sync.bfly.b32 %s, %s, %s, 31, 0xffffffff;" dst rv rl);
+      dst
+
+  (* Atomic add: atom_add(ptr, val) → old value *)
+  | ECall ({ expr_desc = EVar id; _ }, [ptr_e; val_e])
+      when id.name = "atom_add" ->
+      let rp = lower_expr st ptr_e in
+      let rv = lower_expr st val_e in
+      let dst = fresh_reg st U64 in
+      emit st (Printf.sprintf "atom.global.add.u64 %s, [%s], %s;" dst rp rv);
+      dst
+
+  | ECall ({ expr_desc = EVar id; _ }, [ptr_e; val_e])
+      when id.name = "atom_cas" ->
+      let rp = lower_expr st ptr_e in
+      let rv = lower_expr st val_e in
+      let dst = fresh_reg st U64 in
+      emit st (Printf.sprintf "atom.global.cas.b64 %s, [%s], %s, %s;" dst rp rv rv);
+      dst
+
+  | ECall ({ expr_desc = EVar id; _ }, [ptr_e; val_e])
+      when id.name = "atom_max" ->
+      let rp = lower_expr st ptr_e in
+      let rv = lower_expr st val_e in
+      let dst = fresh_reg st U64 in
+      emit st (Printf.sprintf "atom.global.max.u64 %s, [%s], %s;" dst rp rv);
+      dst
+
+  | ECall ({ expr_desc = EVar id; _ }, [ptr_e; val_e])
+      when id.name = "atom_min" ->
+      let rp = lower_expr st ptr_e in
+      let rv = lower_expr st val_e in
+      let dst = fresh_reg st U64 in
+      emit st (Printf.sprintf "atom.global.min.u64 %s, [%s], %s;" dst rp rv);
+      dst
+
+  (* Warp vote: ballot_sync() → bitmask of active threads *)
+  | ECall ({ expr_desc = EVar id; _ }, [pred_e])
+      when id.name = "ballot_sync" ->
+      let rp = lower_expr st pred_e in
+      let dst = fresh_reg st U32 in
+      let ptmp = fresh_reg st Pred in
+      emit st (Printf.sprintf "setp.ne.u64 %s, %s, 0;" ptmp rp);
+      emit st (Printf.sprintf "vote.sync.ballot.b32 %s, %s, 0xffffffff;" dst ptmp);
+      dst
+
+  (* Lane ID *)
+  | ECall ({ expr_desc = EVar id; _ }, [])
+      when id.name = "lane_id" ->
+      let r = fresh_reg st U32 in
+      emit st (Printf.sprintf "mov.u32 %s, %%laneid;" r); r
+
+  (* Warp ID *)
+  | ECall ({ expr_desc = EVar id; _ }, [])
+      when id.name = "warp_id" ->
+      let r = fresh_reg st U32 in
+      emit st (Printf.sprintf "mov.u32 %s, %%warpid;" r); r
+
+  (* Generic function calls *)
   | ECall ({ expr_desc = EVar id; _ }, _args) ->
       let r = fresh_reg st U64 in
       emit st (Printf.sprintf "mov.u64 %s, 0; // call %s (device fn)" r id.name);
