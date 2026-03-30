@@ -1,0 +1,69 @@
+// expected: 0
+// Demo 820: Verified SHA-256-style compression round
+//
+// One round of a SHA-256-like hash: mix state with message word
+// using bitwise operations and modular addition.
+// Proves: all state and message accesses in bounds.
+
+fn sha_ch(x: u64, y: u64, z: u64) -> u64 {
+    (x & y) ^ ((!x) & z)
+}
+
+fn sha_maj(x: u64, y: u64, z: u64) -> u64 {
+    (x & y) ^ (x & z) ^ (y & z)
+}
+
+fn rotr(x: u64, n: u64) -> u64
+    requires n < 64u64
+{
+    (x >> n) | (x << (64u64 - n))
+}
+
+fn sha_sigma0(x: u64) -> u64 {
+    rotr(x, 2u64) ^ rotr(x, 13u64) ^ rotr(x, 22u64)
+}
+
+fn sha_sigma1(x: u64) -> u64 {
+    rotr(x, 6u64) ^ rotr(x, 11u64) ^ rotr(x, 25u64)
+}
+
+// One SHA-256 compression round.
+// state: [a, b, c, d, e, f, g, h] — 8 elements.
+fn sha_round(state: span<u64>, k: u64, w: u64)
+    requires 8u64 <= state.len
+{
+    let a: u64 = state[0u64]; let b: u64 = state[1u64];
+    let c: u64 = state[2u64]; let d: u64 = state[3u64];
+    let e: u64 = state[4u64]; let f: u64 = state[5u64];
+    let g: u64 = state[6u64]; let h: u64 = state[7u64];
+
+    let t1: u64 = h + sha_sigma1(e) + sha_ch(e, f, g) + k + w;
+    let t2: u64 = sha_sigma0(a) + sha_maj(a, b, c);
+
+    state[7u64] = g;
+    state[6u64] = f;
+    state[5u64] = e;
+    state[4u64] = d + t1;
+    state[3u64] = c;
+    state[2u64] = b;
+    state[1u64] = a;
+    state[0u64] = t1 + t2;
+}
+
+// Run 64 rounds of compression.
+fn sha_compress(state: span<u64>, w: span<u64>, k: span<u64>)
+    requires 8u64 <= state.len
+    requires 64u64 <= w.len
+    requires 64u64 <= k.len
+{
+    let mut i: u64 = 0u64;
+    while i < 64u64
+        invariant i <= 64u64
+        decreases 64u64 - i
+    {
+        sha_round(state, k[i], w[i]);
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

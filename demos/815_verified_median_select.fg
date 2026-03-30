@@ -1,0 +1,53 @@
+// expected: 0
+// Demo 815: Verified median-of-medians partition pivot
+//
+// Finds the median of each group of 5 elements.
+// Proves: all accesses in bounds and output count correct.
+
+fn sort5(s: span<u64>, base: u64)
+    requires base + 5u64 <= s.len
+{
+    // Bubble sort on 5 elements.
+    let mut pass: u64 = 0u64;
+    while pass < 4u64
+        invariant pass <= 4u64
+        decreases 4u64 - pass
+    {
+        let mut j: u64 = 0u64;
+        while j < 4u64 - pass
+            invariant j <= 4u64
+            decreases 4u64 - pass - j
+        {
+            if s[base + j] > s[base + j + 1u64] {
+                let tmp: u64 = s[base + j];
+                s[base + j] = s[base + j + 1u64];
+                s[base + j + 1u64] = tmp;
+            };
+            j = j + 1u64;
+        };
+        pass = pass + 1u64;
+    };
+}
+
+fn medians_of_fives(s: span<u64>, n: u64, medians: span<u64>) -> u64
+    requires n >= 5u64
+    requires n <= s.len
+    requires n / 5u64 <= medians.len
+    ensures result <= n / 5u64
+    ensures result >= 1u64
+{
+    let n_groups: u64 = n / 5u64;
+    let mut g: u64 = 0u64;
+    while g < n_groups
+        invariant g <= n_groups
+        decreases n_groups - g
+    {
+        let base: u64 = g * 5u64;
+        sort5(s, base);
+        medians[g] = s[base + 2u64];
+        g = g + 1u64;
+    };
+    n_groups
+}
+
+fn main() -> u64 { 0u64 }

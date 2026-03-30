@@ -1,0 +1,50 @@
+// expected: 0
+// Demo 819: Verified longest common prefix array
+//
+// Given a suffix array and text, computes the LCP between consecutive
+// suffixes using the Kasai algorithm.  Proves: all accesses in bounds.
+
+fn lcp_array(text: span<u64>, sa: span<u64>, rank: span<u64>,
+             lcp: span<u64>, n: u64)
+    requires n >= 2u64
+    requires n <= text.len
+    requires n <= sa.len
+    requires n <= rank.len
+    requires n <= lcp.len
+    requires forall k: u64, k < n ==> sa[k] < n
+    requires forall k: u64, k < n ==> rank[k] < n
+{
+    let mut k: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let ri: u64 = rank[i];
+        if ri > 0u64 {
+            let j: u64 = sa[ri - 1u64];
+            // Extend common prefix.
+            let mut steps: u64 = 0u64;
+            while i + k < n && j + k < n && steps < n
+                invariant k <= n
+                invariant steps <= n
+                decreases n - steps
+            {
+                if text[i + k] == text[j + k] {
+                    k = k + 1u64;
+                    steps = steps + 1u64;
+                } else {
+                    steps = n;
+                };
+            };
+            lcp[ri] = k;
+            if k > 0u64 { k = k - 1u64; };
+        } else {
+            lcp[0u64] = 0u64;
+            k = 0u64;
+        };
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

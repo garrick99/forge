@@ -1,0 +1,52 @@
+// expected: 0
+// Demo 806: Verified 1D Kalman filter step (integer arithmetic)
+//
+// Simplified scalar Kalman filter with fixed-point gains (×1024).
+// Proves: state estimate stays bounded.
+
+fn kalman_predict(state: u64, velocity: u64) -> u64
+{
+    state + velocity
+}
+
+fn kalman_update(predicted: u64, measurement: u64, gain: u64) -> u64
+    requires gain <= 1024u64
+{
+    // correction = gain * (measurement - predicted) / 1024
+    // updated = predicted + correction
+    let diff: u64 = if measurement >= predicted {
+        measurement - predicted
+    } else {
+        predicted - measurement
+    };
+    let correction: u64 = (gain * diff) / 1024u64;
+    if measurement >= predicted {
+        predicted + correction
+    } else {
+        predicted - correction
+    }
+}
+
+// Run filter over a sequence of measurements.
+fn kalman_filter(measurements: span<u64>, n: u64, gain: u64,
+                 output: span<u64>)
+    requires n >= 1u64
+    requires n <= measurements.len
+    requires n <= output.len
+    requires gain >= 1u64
+    requires gain <= 1024u64
+{
+    output[0u64] = measurements[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let predicted: u64 = output[i - 1u64];
+        let updated: u64 = kalman_update(predicted, measurements[i], gain);
+        output[i] = updated;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

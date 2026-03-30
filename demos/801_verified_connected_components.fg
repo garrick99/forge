@@ -1,0 +1,71 @@
+// expected: 0
+// Demo 801: Verified connected components via iterative label propagation
+//
+// Each vertex gets its own label initially; repeatedly propagate the
+// minimum label from neighbors.  Proves: all accesses in bounds.
+
+fn label_propagate(adj_ptr: span<u64>, adj_list: span<u64>,
+                   n_verts: u64, n_edges: u64,
+                   labels: span<u64>) -> u64
+    requires n_verts >= 1u64
+    requires n_verts + 1u64 <= adj_ptr.len
+    requires n_edges <= adj_list.len
+    requires n_verts <= labels.len
+    requires forall k: u64, k <= n_verts ==> adj_ptr[k] <= n_edges
+    requires forall k: u64, k < n_edges ==> adj_list[k] < n_verts
+    ensures result <= n_verts
+{
+    // Init labels to vertex id.
+    let mut i: u64 = 0u64;
+    while i < n_verts
+        invariant i <= n_verts
+        decreases n_verts - i
+    { labels[i] = i; i = i + 1u64; };
+
+    // Propagate for n_verts rounds (worst case).
+    let mut round: u64 = 0u64;
+    let mut changed: u64 = 1u64;
+    while round < n_verts && changed > 0u64
+        invariant round <= n_verts
+        decreases n_verts - round
+    {
+        changed = 0u64;
+        let mut v: u64 = 0u64;
+        while v < n_verts
+            invariant v <= n_verts
+            decreases n_verts - v
+        {
+            let start: u64 = adj_ptr[v];
+            let end: u64 = adj_ptr[v + 1u64];
+            let mut e: u64 = start;
+            while e < end
+                invariant e <= n_edges
+                decreases n_edges - e
+            {
+                let nb: u64 = adj_list[e];
+                if labels[nb] < labels[v] {
+                    labels[v] = labels[nb];
+                    changed = 1u64;
+                };
+                e = e + 1u64;
+            };
+            v = v + 1u64;
+        };
+        round = round + 1u64;
+    };
+
+    // Count distinct labels.
+    let mut count: u64 = 0u64;
+    let mut v2: u64 = 0u64;
+    while v2 < n_verts
+        invariant v2 <= n_verts
+        invariant count <= v2
+        decreases n_verts - v2
+    {
+        if labels[v2] == v2 { count = count + 1u64; };
+        v2 = v2 + 1u64;
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

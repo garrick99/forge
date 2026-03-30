@@ -1,0 +1,56 @@
+// expected: 0
+// Demo 802: Verified PageRank iteration step (fixed-point arithmetic)
+//
+// One iteration of PageRank using integer arithmetic (scores × 1000).
+// Proves: all graph accesses in bounds.
+
+fn pagerank_step(adj_ptr: span<u64>, adj_list: span<u64>,
+                 n_verts: u64, n_edges: u64,
+                 out_degree: span<u64>,
+                 old_rank: span<u64>, new_rank: span<u64>,
+                 damping: u64)
+    requires n_verts >= 1u64
+    requires n_verts + 1u64 <= adj_ptr.len
+    requires n_edges <= adj_list.len
+    requires n_verts <= out_degree.len
+    requires n_verts <= old_rank.len
+    requires n_verts <= new_rank.len
+    requires damping <= 1000u64
+    requires forall k: u64, k <= n_verts ==> adj_ptr[k] <= n_edges
+    requires forall k: u64, k < n_edges ==> adj_list[k] < n_verts
+{
+    let base: u64 = (1000u64 - damping) / n_verts;
+
+    // Zero new ranks.
+    let mut i: u64 = 0u64;
+    while i < n_verts
+        invariant i <= n_verts
+        decreases n_verts - i
+    { new_rank[i] = base; i = i + 1u64; };
+
+    // Distribute rank along edges.
+    let mut v: u64 = 0u64;
+    while v < n_verts
+        invariant v <= n_verts
+        decreases n_verts - v
+    {
+        let deg: u64 = out_degree[v];
+        if deg > 0u64 {
+            let contrib: u64 = (damping * old_rank[v]) / (1000u64 * deg);
+            let start: u64 = adj_ptr[v];
+            let end: u64 = adj_ptr[v + 1u64];
+            let mut e: u64 = start;
+            while e < end
+                invariant e <= n_edges
+                decreases n_edges - e
+            {
+                let nb: u64 = adj_list[e];
+                new_rank[nb] = new_rank[nb] + contrib;
+                e = e + 1u64;
+            };
+        };
+        v = v + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

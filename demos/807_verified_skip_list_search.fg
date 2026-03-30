@@ -1,0 +1,56 @@
+// expected: 0
+// Demo 807: Verified skip list search (flat representation)
+//
+// Skip list with max_level levels stored as parallel next-pointer spans.
+// next[level * n + node] = next node at that level.
+// Proves: all pointer-chasing accesses stay in bounds.
+
+fn skip_search(next: span<u64>, values: span<u64>,
+               n: u64, max_level: u64,
+               target: u64) -> u64
+    requires n >= 1u64
+    requires max_level >= 1u64
+    requires max_level * n <= next.len
+    requires n <= values.len
+    ensures result <= n
+{
+    let sentinel: u64 = n;
+    let mut cur: u64 = 0u64;
+    let mut lev: u64 = max_level;
+
+    while lev > 0u64
+        invariant lev <= max_level
+        invariant cur < n || cur == sentinel
+        decreases lev
+    {
+        lev = lev - 1u64;
+        let mut steps: u64 = 0u64;
+        while steps < n
+            invariant cur < n || cur == sentinel
+            invariant steps <= n
+            decreases n - steps
+        {
+            if cur < n {
+                let nxt_idx: u64 = lev * n + cur;
+                if nxt_idx < max_level * n {
+                    let nxt: u64 = next[nxt_idx];
+                    if nxt < n && values[nxt] <= target {
+                        cur = nxt;
+                        steps = steps + 1u64;
+                    } else {
+                        steps = n;
+                    };
+                } else {
+                    steps = n;
+                };
+            } else {
+                steps = n;
+            };
+        };
+    };
+
+    // Check if cur has the target value.
+    if cur < n && values[cur] == target { cur } else { sentinel }
+}
+
+fn main() -> u64 { 0u64 }

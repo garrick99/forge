@@ -1,0 +1,52 @@
+// expected: 0
+// Demo 804: Verified 2D cross product and convex hull orientation test
+//
+// Computes orientation of three points using cross product.
+// Proves: all coordinate accesses within bounds.
+
+// Points stored as (x, y) pairs in a flat span: point i = (pts[2*i], pts[2*i+1]).
+fn cross_product(pts: span<u64>, n: u64, a: u64, b: u64, c: u64) -> u64
+    requires n >= 3u64
+    requires n + n <= pts.len
+    requires a < n
+    requires b < n
+    requires c < n
+{
+    let ax: u64 = pts[a + a];
+    let ay: u64 = pts[a + a + 1u64];
+    let bx: u64 = pts[b + b];
+    let by: u64 = pts[b + b + 1u64];
+    let cx: u64 = pts[c + c];
+    let cy: u64 = pts[c + c + 1u64];
+    // (b-a) × (c-a) — using unsigned arithmetic (caller interprets sign).
+    (bx - ax) * (cy - ay) - (by - ay) * (cx - ax)
+}
+
+// Find the point with minimum y (then minimum x as tiebreaker).
+fn find_bottom(pts: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n + n <= pts.len
+    ensures result < n
+{
+    let mut best: u64 = 0u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant best < n
+        decreases n - i
+    {
+        let iy: u64 = pts[i + i + 1u64];
+        let by: u64 = pts[best + best + 1u64];
+        if iy < by {
+            best = i;
+        } else if iy == by {
+            let ix: u64 = pts[i + i];
+            let bx: u64 = pts[best + best];
+            if ix < bx { best = i; };
+        };
+        i = i + 1u64;
+    };
+    best
+}
+
+fn main() -> u64 { 0u64 }

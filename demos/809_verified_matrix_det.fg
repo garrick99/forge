@@ -1,0 +1,44 @@
+// expected: 0
+// Demo 809: Verified 3×3 matrix determinant and inverse check
+//
+// Computes det of a 3×3 matrix stored as 9-element flat span.
+// Proves: all element accesses within bounds.
+
+fn det3(m: span<u64>) -> u64
+    requires 9u64 <= m.len
+{
+    let a: u64 = m[0u64]; let b: u64 = m[1u64]; let c: u64 = m[2u64];
+    let d: u64 = m[3u64]; let e: u64 = m[4u64]; let f: u64 = m[5u64];
+    let g: u64 = m[6u64]; let h: u64 = m[7u64]; let i: u64 = m[8u64];
+    a * (e * i - f * h) - b * (d * i - f * g) + c * (d * h - e * g)
+}
+
+// Trace of 3×3 matrix.
+fn trace3(m: span<u64>) -> u64
+    requires 9u64 <= m.len
+    ensures result == m[0u64] + m[4u64] + m[8u64]
+{
+    m[0u64] + m[4u64] + m[8u64]
+}
+
+// Matrix-vector multiply: y = M * x (3×3 × 3×1).
+fn matvec3(m: span<u64>, x: span<u64>, y: span<u64>)
+    requires 9u64 <= m.len
+    requires 3u64 <= x.len
+    requires 3u64 <= y.len
+{
+    y[0u64] = m[0u64] * x[0u64] + m[1u64] * x[1u64] + m[2u64] * x[2u64];
+    y[1u64] = m[3u64] * x[0u64] + m[4u64] * x[1u64] + m[5u64] * x[2u64];
+    y[2u64] = m[6u64] * x[0u64] + m[7u64] * x[1u64] + m[8u64] * x[2u64];
+}
+
+// Check if matrix is identity.
+fn is_identity3(m: span<u64>) -> bool
+    requires 9u64 <= m.len
+{
+    m[0u64] == 1u64 && m[1u64] == 0u64 && m[2u64] == 0u64 &&
+    m[3u64] == 0u64 && m[4u64] == 1u64 && m[5u64] == 0u64 &&
+    m[6u64] == 0u64 && m[7u64] == 0u64 && m[8u64] == 1u64
+}
+
+fn main() -> u64 { 0u64 }

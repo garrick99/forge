@@ -1,0 +1,38 @@
+// expected: 0
+// Demo 811: Verified run-length decode
+//
+// Decodes (value, count) pairs into a flat output span.
+// Proves: output index stays in bounds and result <= out_cap.
+
+fn rle_decode(vals: span<u64>, counts: span<u64>, n_runs: u64,
+              output: span<u64>, out_cap: u64) -> u64
+    requires n_runs <= vals.len
+    requires n_runs <= counts.len
+    requires out_cap <= output.len
+    ensures result <= out_cap
+{
+    let mut out_idx: u64 = 0u64;
+    let mut r: u64 = 0u64;
+    while r < n_runs
+        invariant r <= n_runs
+        invariant out_idx <= out_cap
+        decreases n_runs - r
+    {
+        let val: u64 = vals[r];
+        let cnt: u64 = counts[r];
+        let mut j: u64 = 0u64;
+        while j < cnt && out_idx < out_cap
+            invariant j <= cnt
+            invariant out_idx <= out_cap
+            decreases cnt - j
+        {
+            output[out_idx] = val;
+            out_idx = out_idx + 1u64;
+            j = j + 1u64;
+        };
+        r = r + 1u64;
+    };
+    out_idx
+}
+
+fn main() -> u64 { 0u64 }

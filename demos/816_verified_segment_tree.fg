@@ -1,0 +1,78 @@
+// expected: 0
+// Demo 816: Verified segment tree (range sum query)
+//
+// Segment tree stored in a 2n-sized span (1-indexed).
+// tree[i] for i >= n stores leaves; internal nodes at i < n.
+// Proves: all tree accesses in bounds.
+
+fn seg_build(data: span<u64>, n: u64, tree: span<u64>)
+    requires n >= 1u64
+    requires n <= data.len
+    requires n + n <= tree.len
+{
+    // Copy leaves.
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        tree[n + i] = data[i];
+        i = i + 1u64;
+    };
+    // Build internal nodes bottom-up.
+    let mut j: u64 = n - 1u64;
+    while j >= 1u64
+        invariant j < n
+        decreases j
+    {
+        tree[j] = tree[j + j] + tree[j + j + 1u64];
+        if j == 1u64 { j = 0u64; } else { j = j - 1u64; };
+    };
+}
+
+fn seg_update(tree: span<u64>, n: u64, pos: u64, val: u64)
+    requires n >= 1u64
+    requires pos < n
+    requires n + n <= tree.len
+{
+    let mut i: u64 = pos + n;
+    tree[i] = val;
+    i = i / 2u64;
+    while i >= 1u64
+        invariant i < n + n
+        decreases i
+    {
+        tree[i] = tree[i + i] + tree[i + i + 1u64];
+        if i == 1u64 { i = 0u64; } else { i = i / 2u64; };
+    };
+}
+
+fn seg_query(tree: span<u64>, n: u64, lo: u64, hi: u64) -> u64
+    requires n >= 1u64
+    requires lo <= hi
+    requires hi <= n
+    requires n + n <= tree.len
+{
+    let mut sum: u64 = 0u64;
+    let mut l: u64 = lo + n;
+    let mut r: u64 = hi + n;
+    while l < r
+        invariant l <= r
+        invariant r <= n + n
+        decreases r - l
+    {
+        if l % 2u64 == 1u64 {
+            sum = sum + tree[l];
+            l = l + 1u64;
+        };
+        if r % 2u64 == 1u64 {
+            r = r - 1u64;
+            sum = sum + tree[r];
+        };
+        l = l / 2u64;
+        r = r / 2u64;
+    };
+    sum
+}
+
+fn main() -> u64 { 0u64 }

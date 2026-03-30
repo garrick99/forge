@@ -1,0 +1,59 @@
+// expected: 0
+// Demo 817: Verified big integer addition (limb-based)
+//
+// Adds two multi-limb unsigned integers stored in spans.
+// Each limb is a u64 word; carry propagation is explicit.
+// Proves: all limb accesses in bounds and carry stays 0 or 1.
+
+fn bigint_add(a: span<u64>, b: span<u64>, result_span: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= a.len
+    requires n <= b.len
+    requires n + 1u64 <= result_span.len
+    ensures result <= 1u64
+{
+    let mut carry: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant carry <= 1u64
+        decreases n - i
+    {
+        let sum: u64 = a[i] + b[i] + carry;
+        // Detect overflow: if sum < a[i] (wrapped around), carry = 1.
+        if sum < a[i] || (carry == 1u64 && sum <= a[i]) {
+            carry = 1u64;
+        } else {
+            carry = 0u64;
+        };
+        result_span[i] = sum;
+        i = i + 1u64;
+    };
+    result_span[n] = carry;
+    carry
+}
+
+// Compare two big integers. Returns 0 if equal, 1 if a > b, 2 if a < b.
+fn bigint_compare(a: span<u64>, b: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n <= a.len
+    requires n <= b.len
+    ensures result <= 2u64
+{
+    let mut res: u64 = 0u64;
+    let mut i: u64 = n;
+    while i > 0u64
+        invariant i <= n
+        invariant res <= 2u64
+        decreases i
+    {
+        i = i - 1u64;
+        if res == 0u64 {
+            if a[i] > b[i] { res = 1u64; }
+            else if a[i] < b[i] { res = 2u64; };
+        };
+    };
+    res
+}
+
+fn main() -> u64 { 0u64 }

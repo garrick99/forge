@@ -1,0 +1,63 @@
+// expected: 0
+// Demo 814: Verified LSB radix sort (multi-pass)
+//
+// Sorts by each digit from least significant to most significant.
+// Each pass is a stable counting sort on one digit.
+// Proves: all accesses in bounds and count invariants hold.
+
+fn radix_sort_pass(input: span<u64>, output: span<u64>, n: u64,
+                   counts: span<u64>, shift: u64)
+    requires shift >= 1u64
+    requires n <= input.len
+    requires n <= output.len
+    requires 256u64 <= counts.len
+{
+    // Clear counts.
+    let mut c: u64 = 0u64;
+    while c < 256u64
+        invariant c <= 256u64
+        decreases 256u64 - c
+    { counts[c] = 0u64; c = c + 1u64; };
+
+    // Count digits.
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let digit: u64 = (input[i] / shift) % 256u64;
+        counts[digit] = counts[digit] + 1u64;
+        i = i + 1u64;
+    };
+
+    // Prefix sum.
+    let mut sum: u64 = 0u64;
+    let mut d: u64 = 0u64;
+    while d < 256u64
+        invariant d <= 256u64
+        invariant sum <= n
+        decreases 256u64 - d
+    {
+        let tmp: u64 = counts[d];
+        counts[d] = sum;
+        if sum + tmp <= n { sum = sum + tmp; };
+        d = d + 1u64;
+    };
+
+    // Scatter.
+    let mut j: u64 = 0u64;
+    while j < n
+        invariant j <= n
+        decreases n - j
+    {
+        let digit2: u64 = (input[j] / shift) % 256u64;
+        let pos: u64 = counts[digit2];
+        if pos < n {
+            output[pos] = input[j];
+            counts[digit2] = pos + 1u64;
+        };
+        j = j + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

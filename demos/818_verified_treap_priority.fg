@@ -1,0 +1,80 @@
+// expected: 0
+// Demo 818: Verified treap priority maintenance check
+//
+// Treap stored flat: keys[i], priorities[i], left[i], right[i].
+// Checks the heap property on priorities (parent <= children).
+// Proves: all accesses in bounds.
+
+fn check_heap_property(priorities: span<u64>, left: span<u64>, right: span<u64>,
+                       n: u64) -> u64
+    requires n <= priorities.len
+    requires n <= left.len
+    requires n <= right.len
+    ensures result <= n
+{
+    let sentinel: u64 = n;
+    let mut violations: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant violations <= i
+        decreases n - i
+    {
+        let l: u64 = left[i];
+        let r: u64 = right[i];
+        if l < n && priorities[l] < priorities[i] {
+            violations = violations + 1u64;
+        };
+        if r < n && priorities[r] < priorities[i] {
+            if violations < i { violations = violations + 1u64; };
+        };
+        i = i + 1u64;
+    };
+    violations
+}
+
+// In-order traversal to verify BST property on keys.
+fn check_bst_inorder(keys: span<u64>, left: span<u64>, right: span<u64>,
+                     n: u64, output: span<u64>,
+                     stack: span<u64>) -> u64
+    requires n >= 1u64
+    requires n <= keys.len
+    requires n <= left.len
+    requires n <= right.len
+    requires n <= output.len
+    requires n <= stack.len
+    ensures result <= n
+{
+    let sentinel: u64 = n;
+    let mut sp: u64 = 0u64;
+    let mut out_idx: u64 = 0u64;
+    let mut cur: u64 = 0u64;
+    let mut steps: u64 = 0u64;
+
+    while steps < n + n
+        invariant sp <= n
+        invariant out_idx <= n
+        invariant steps <= n + n
+        decreases n + n - steps
+    {
+        if cur < n && sp < n {
+            stack[sp] = cur;
+            sp = sp + 1u64;
+            cur = left[cur];
+            if cur >= n { cur = sentinel; };
+        } else if sp > 0u64 {
+            sp = sp - 1u64;
+            let node: u64 = stack[sp];
+            if node < n && out_idx < n {
+                output[out_idx] = keys[node];
+                out_idx = out_idx + 1u64;
+                cur = right[node];
+                if cur >= n { cur = sentinel; };
+            };
+        };
+        steps = steps + 1u64;
+    };
+    out_idx
+}
+
+fn main() -> u64 { 0u64 }

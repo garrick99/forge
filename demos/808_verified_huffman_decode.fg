@@ -1,0 +1,44 @@
+// expected: 0
+// Demo 808: Verified Huffman decode (table-driven)
+//
+// Decodes a bitstream using a lookup table: table[code] = (symbol, length).
+// Symbols and lengths stored in parallel spans.
+// Proves: all table and output accesses in bounds.
+
+fn huffman_decode(bitstream: span<u64>, n_bits: u64,
+                  table_sym: span<u64>, table_len: span<u64>,
+                  table_size: u64,
+                  output: span<u64>, out_cap: u64) -> u64
+    requires n_bits <= bitstream.len
+    requires table_size >= 1u64
+    requires table_size <= table_sym.len
+    requires table_size <= table_len.len
+    requires out_cap <= output.len
+    ensures result <= out_cap
+{
+    let mut bit_pos: u64 = 0u64;
+    let mut out_idx: u64 = 0u64;
+
+    while bit_pos < n_bits && out_idx < out_cap
+        invariant bit_pos <= n_bits
+        invariant out_idx <= out_cap
+        decreases n_bits - bit_pos
+    {
+        let code: u64 = bitstream[bit_pos] % table_size;
+        let sym: u64 = table_sym[code];
+        let len: u64 = table_len[code];
+
+        output[out_idx] = sym;
+        out_idx = out_idx + 1u64;
+
+        let advance: u64 = if len >= 1u64 { len } else { 1u64 };
+        if bit_pos + advance <= n_bits {
+            bit_pos = bit_pos + advance;
+        } else {
+            bit_pos = n_bits;
+        };
+    };
+    out_idx
+}
+
+fn main() -> u64 { 0u64 }

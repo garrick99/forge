@@ -1,0 +1,58 @@
+// expected: 0
+// Demo 813: Verified Rabin-Karp rolling hash
+//
+// Computes polynomial rolling hash over a window of text.
+// base=31, mod=1000000007.  Proves: all accesses in bounds.
+
+fn rolling_hash_init(text: span<u64>, w: u64, base: u64, modulus: u64) -> u64
+    requires w >= 1u64
+    requires w <= text.len
+    requires base >= 2u64
+    requires modulus >= 2u64
+{
+    let mut hash: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < w
+        invariant i <= w
+        decreases w - i
+    {
+        hash = (hash * base + text[i]) % modulus;
+        i = i + 1u64;
+    };
+    hash
+}
+
+fn rolling_hash_search(text: span<u64>, n: u64,
+                       pattern_hash: u64, w: u64,
+                       base: u64, modulus: u64,
+                       base_pow: u64) -> u64
+    requires w >= 1u64
+    requires w <= n
+    requires n <= text.len
+    requires base >= 2u64
+    requires modulus >= 2u64
+    ensures result <= n
+{
+    let mut hash: u64 = rolling_hash_init(text, w, base, modulus);
+    let mut found: u64 = n;
+    if hash == pattern_hash { found = 0u64; };
+
+    let mut i: u64 = 1u64;
+    let limit: u64 = n - w + 1u64;
+    while i < limit
+        invariant i <= limit
+        invariant found <= n
+        decreases limit - i
+    {
+        let remove: u64 = (text[i - 1u64] * base_pow) % modulus;
+        hash = (hash + modulus - remove) % modulus;
+        hash = (hash * base + text[i + w - 1u64]) % modulus;
+        if hash == pattern_hash && found == n {
+            found = i;
+        };
+        i = i + 1u64;
+    };
+    found
+}
+
+fn main() -> u64 { 0u64 }

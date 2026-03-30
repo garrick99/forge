@@ -1,0 +1,63 @@
+// expected: 0
+// Demo 810: Verified trie insert and prefix count
+//
+// Flat trie: nodes stored as (child[0..3], count) in a flat span.
+// node_base = node_id * 5; children at offsets 0-3, count at offset 4.
+// Proves: all node accesses stay in bounds.
+
+fn trie_insert(trie: span<u64>, max_nodes: u64,
+               key: span<u64>, key_len: u64,
+               next_node: u64) -> u64
+    requires max_nodes >= 1u64
+    requires max_nodes * 5u64 <= trie.len
+    requires key_len <= key.len
+    requires forall k: u64, k < key_len ==> key[k] < 4u64
+    requires next_node <= max_nodes
+    ensures result <= max_nodes
+{
+    let mut cur: u64 = 0u64;
+    let mut alloc: u64 = next_node;
+    let mut i: u64 = 0u64;
+    while i < key_len
+        invariant i <= key_len
+        invariant cur < max_nodes
+        invariant alloc <= max_nodes
+        decreases key_len - i
+    {
+        let child_slot: u64 = cur * 5u64 + key[i];
+        if child_slot < max_nodes * 5u64 {
+            let child: u64 = trie[child_slot];
+            if child > 0u64 && child < max_nodes {
+                cur = child;
+            } else if alloc < max_nodes {
+                // Allocate new node.
+                let new_base: u64 = alloc * 5u64;
+                if new_base + 4u64 < max_nodes * 5u64 {
+                    trie[new_base] = 0u64;
+                    trie[new_base + 1u64] = 0u64;
+                    trie[new_base + 2u64] = 0u64;
+                    trie[new_base + 3u64] = 0u64;
+                    trie[new_base + 4u64] = 0u64;
+                    trie[child_slot] = alloc;
+                    cur = alloc;
+                    alloc = alloc + 1u64;
+                } else {
+                    i = key_len;
+                };
+            } else {
+                i = key_len;
+            };
+        } else {
+            i = key_len;
+        };
+        // Increment count at current node.
+        let count_slot: u64 = cur * 5u64 + 4u64;
+        if count_slot < max_nodes * 5u64 {
+            trie[count_slot] = trie[count_slot] + 1u64;
+        };
+        i = i + 1u64;
+    };
+    alloc
+}
+
+fn main() -> u64 { 0u64 }

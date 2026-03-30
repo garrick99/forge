@@ -1,0 +1,52 @@
+// expected: 0
+// Demo 805: Verified interval tree query (flat sorted intervals)
+//
+// Intervals sorted by start; finds all overlapping with a query [qlo, qhi].
+// Proves: all accesses in bounds and result <= n.
+
+fn count_overlapping(starts: span<u64>, ends: span<u64>, n: u64,
+                     qlo: u64, qhi: u64) -> u64
+    requires n <= starts.len
+    requires n <= ends.len
+    requires qlo <= qhi
+    ensures result <= n
+{
+    let mut count: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant count <= i
+        decreases n - i
+    {
+        // Overlap: starts[i] <= qhi && ends[i] >= qlo.
+        if starts[i] <= qhi && ends[i] >= qlo {
+            count = count + 1u64;
+        };
+        i = i + 1u64;
+    };
+    count
+}
+
+// Find first interval that starts after query end (binary search).
+fn first_after(starts: span<u64>, n: u64, qhi: u64) -> u64
+    requires n <= starts.len
+    ensures result <= n
+{
+    let mut lo: u64 = 0u64;
+    let mut hi: u64 = n;
+    while lo < hi
+        invariant lo <= hi
+        invariant hi <= n
+        decreases hi - lo
+    {
+        let mid: u64 = lo + (hi - lo) / 2u64;
+        if starts[mid] <= qhi {
+            lo = mid + 1u64;
+        } else {
+            hi = mid;
+        };
+    };
+    lo
+}
+
+fn main() -> u64 { 0u64 }

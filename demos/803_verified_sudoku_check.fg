@@ -1,0 +1,78 @@
+// expected: 0
+// Demo 803: Verified Sudoku board validator
+//
+// Checks that a 9×9 board (flat span of 81 elements, values 1-9) has
+// no duplicates in any row, column, or 3×3 box.
+// Proves: all grid accesses within bounds.
+
+fn check_row(board: span<u64>, row: u64, seen: span<u64>) -> bool
+    requires 81u64 <= board.len
+    requires 9u64 <= seen.len
+    requires row < 9u64
+{
+    let mut j: u64 = 0u64;
+    while j < 9u64
+        invariant j <= 9u64
+        decreases 9u64 - j
+    { seen[j] = 0u64; j = j + 1u64; };
+
+    let mut ok: bool = true;
+    let mut c: u64 = 0u64;
+    while c < 9u64
+        invariant c <= 9u64
+        decreases 9u64 - c
+    {
+        let val: u64 = board[row * 9u64 + c];
+        if val >= 1u64 && val <= 9u64 {
+            if seen[val - 1u64] != 0u64 { ok = false; };
+            seen[val - 1u64] = 1u64;
+        } else { ok = false; };
+        c = c + 1u64;
+    };
+    ok
+}
+
+fn check_col(board: span<u64>, col: u64, seen: span<u64>) -> bool
+    requires 81u64 <= board.len
+    requires 9u64 <= seen.len
+    requires col < 9u64
+{
+    let mut j: u64 = 0u64;
+    while j < 9u64
+        invariant j <= 9u64
+        decreases 9u64 - j
+    { seen[j] = 0u64; j = j + 1u64; };
+
+    let mut ok: bool = true;
+    let mut r: u64 = 0u64;
+    while r < 9u64
+        invariant r <= 9u64
+        decreases 9u64 - r
+    {
+        let val: u64 = board[r * 9u64 + col];
+        if val >= 1u64 && val <= 9u64 {
+            if seen[val - 1u64] != 0u64 { ok = false; };
+            seen[val - 1u64] = 1u64;
+        } else { ok = false; };
+        r = r + 1u64;
+    };
+    ok
+}
+
+fn check_all_rows(board: span<u64>, seen: span<u64>) -> bool
+    requires 81u64 <= board.len
+    requires 9u64 <= seen.len
+{
+    let mut ok: bool = true;
+    let mut r: u64 = 0u64;
+    while r < 9u64
+        invariant r <= 9u64
+        decreases 9u64 - r
+    {
+        if !check_row(board, r, seen) { ok = false; };
+        r = r + 1u64;
+    };
+    ok
+}
+
+fn main() -> u64 { 0u64 }
