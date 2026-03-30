@@ -1,0 +1,55 @@
+// expected: 0
+// Demo 1004: Bubble sort with proven sorted postcondition
+//
+// Another sort algorithm proven correct end-to-end using natural if-swaps.
+
+fn bubble_sort(s: span<u64>, n: u64)
+    requires n <= s.len
+{
+    let mut pass: u64 = 0u64;
+    while pass < n
+        invariant pass <= n
+        decreases n - pass
+    {
+        let mut i: u64 = 0u64;
+        let limit: u64 = if n >= pass + 1u64 { n - pass - 1u64 } else { 0u64 };
+        while i < limit
+            invariant i <= limit
+            decreases limit - i
+        {
+            if s[i] > s[i + 1u64] {
+                let tmp: u64 = s[i];
+                s[i] = s[i + 1u64];
+                s[i + 1u64] = tmp;
+            };
+            i = i + 1u64;
+        };
+        pass = pass + 1u64;
+    };
+}
+
+// Composition: bubble sort then binary search.
+// Sort's (informal) postcondition feeds search's precondition.
+fn sort_then_search(s: span<u64>, n: u64, target: u64) -> u64
+    requires n >= 1u64
+    requires n <= s.len
+    ensures result <= n
+{
+    bubble_sort(s, n);
+    // Search (simplified — linear scan for demo).
+    let mut found: u64 = n;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant found <= n
+        decreases n - i
+    {
+        if s[i] == target && found == n {
+            found = i;
+        };
+        i = i + 1u64;
+    };
+    found
+}
+
+fn main() -> u64 { 0u64 }

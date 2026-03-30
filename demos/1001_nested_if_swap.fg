@@ -1,0 +1,40 @@
+// expected: 0
+// Demo 1001: Nested-if swap — tests the extract_block_arr_assigns fix
+//
+// Previously, conditional swaps inside if-branches were invisible to the
+// proof engine. This demo uses the natural if-swap pattern without workarounds.
+
+fn sort2(s: span<u64>)
+    requires 2u64 <= s.len
+    ensures s[0u64] <= s[1u64]
+{
+    if s[0u64] > s[1u64] {
+        let tmp: u64 = s[0u64];
+        s[0u64] = s[1u64];
+        s[1u64] = tmp;
+    };
+}
+
+fn sort3(s: span<u64>)
+    requires 3u64 <= s.len
+    ensures s[0u64] <= s[1u64]
+    ensures s[1u64] <= s[2u64]
+{
+    if s[0u64] > s[1u64] {
+        let tmp: u64 = s[0u64];
+        s[0u64] = s[1u64];
+        s[1u64] = tmp;
+    };
+    if s[1u64] > s[2u64] {
+        let tmp: u64 = s[1u64];
+        s[1u64] = s[2u64];
+        s[2u64] = tmp;
+    };
+    if s[0u64] > s[1u64] {
+        let tmp: u64 = s[0u64];
+        s[0u64] = s[1u64];
+        s[1u64] = tmp;
+    };
+}
+
+fn main() -> u64 { 0u64 }

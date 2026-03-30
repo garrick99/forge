@@ -1,0 +1,44 @@
+// expected: 0
+// Demo 1002: Verified insertion sort with SORTED postcondition
+//
+// The crown jewel: a sort function that PROVES its output is sorted.
+//   ensures forall i, forall j, i < j && j < n ==> s[i] <= s[j]
+//
+// Uses the nested-if swap extraction + quantified loop invariants.
+// This is the demo that sells a formally-verified language.
+
+fn insertion_sort_proven(s: span<u64>, n: u64)
+    requires n <= s.len
+    ensures forall i: u64, forall j: u64, i < j && j < n ==> s[i] <= s[j]
+{
+    let mut k: u64 = 0u64;
+    while k < n
+        invariant k <= n
+        invariant forall p: u64, forall q: u64, p < q && q < k ==> s[p] <= s[q]
+        decreases n - k
+    {
+        // Insert s[k] into the sorted prefix s[0..k).
+        let mut j: u64 = k;
+        while j > 0u64
+            invariant j <= k
+            // Elements above j are sorted among themselves.
+            invariant forall p: u64, forall q: u64, p < q && q < k + 1u64 && p >= j && q >= j ==> s[p] <= s[q]
+            // Elements below j are sorted and <= elements above j+1.
+            invariant forall p: u64, forall q: u64, p < q && q < j ==> s[p] <= s[q]
+            invariant forall p: u64, forall q: u64, p < j && q > j && q < k + 1u64 ==> s[p] <= s[q]
+            decreases j
+        {
+            if s[j - 1u64] > s[j] {
+                let tmp: u64 = s[j - 1u64];
+                s[j - 1u64] = s[j];
+                s[j] = tmp;
+                j = j - 1u64;
+            } else {
+                j = 0u64;
+            };
+        };
+        k = k + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

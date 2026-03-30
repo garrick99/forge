@@ -804,7 +804,7 @@ let extract_block_var_assigns expr =
    Handles SExpr(EAssign(EIndex(EVar arr_id, idx), rhs)).
    Let-bindings inside the block are collected first so their values can be
    substituted into subsequent write expressions (enabling `let tmp=s[i]; s[j]=tmp`). *)
-let extract_block_arr_assigns expr =
+let rec extract_block_arr_assigns expr =
   match expr.expr_desc with
   | EBlock (stmts, _) ->
       (* First pass: collect let-binding substitutions so we can inline
@@ -823,15 +823,40 @@ let extract_block_arr_assigns expr =
         | PField (q, f)     -> PField (apply_subst q, f)
         | _                 -> p
       in
-      (* Second pass: collect array writes, substituting let-bound vars. *)
-      List.filter_map (fun s -> match s.stmt_desc with
+      (* Second pass: collect array writes, substituting let-bound vars.
+         Also handles SExpr(EIf(...)) by recursively extracting from
+         both branches and wrapping in PIte — this enables swap patterns
+         inside conditional blocks (e.g. if s[0] > s[1] { swap }). *)
+      List.concat_map (fun s -> match s.stmt_desc with
         | SExpr { expr_desc = EAssign (
             { expr_desc = EIndex ({ expr_desc = EVar arr_id; _ }, idx_expr); _ },
             rhs_expr); _ } ->
-            Some (arr_id,
-                  apply_subst (expr_to_pred_simple idx_expr),
-                  apply_subst (expr_to_pred_simple rhs_expr))
-        | _ -> None
+            [(arr_id,
+              apply_subst (expr_to_pred_simple idx_expr),
+              apply_subst (expr_to_pred_simple rhs_expr))]
+        | SExpr { expr_desc = EIf (cond, then_, else_opt); _ } ->
+            let cond_pred = apply_subst (expr_to_pred_simple cond) in
+            let then_arr = extract_block_arr_assigns then_ in
+            let else_arr = match else_opt with
+              | Some el -> extract_block_arr_assigns el | None -> [] in
+            let same_key (a1, i1, _) (a2, i2, _) =
+              a1.name = a2.name && i1 = i2 in
+            let then_keys = List.map (fun (a, i, _) -> (a, i)) then_arr in
+            List.map (fun (arr_id, idx_p, v_then) ->
+              let v_else = match List.find_opt
+                (fun x -> same_key (arr_id, idx_p, v_then) x) else_arr with
+                | Some (_, _, v) -> v
+                | None -> PIndex (PVar arr_id, idx_p) in
+              (arr_id, idx_p, PIte (cond_pred, v_then, v_else))
+            ) then_arr @
+            List.filter_map (fun (arr_id, idx_p, v_else) ->
+              if List.exists (fun (a2, i2) ->
+                a2.name = arr_id.name && i2 = idx_p) then_keys
+              then None
+              else Some (arr_id, idx_p,
+                PIte (cond_pred, PIndex (PVar arr_id, idx_p), v_else))
+            ) else_arr
+        | _ -> []
       ) stmts
   | _ -> []
 
