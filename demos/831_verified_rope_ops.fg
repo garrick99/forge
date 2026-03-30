@@ -1,0 +1,68 @@
+// expected: 0
+// Demo 831: Verified rope-style string operations (flat buffer with gap)
+//
+// Gap buffer: text stored with a gap [gap_start, gap_end) for O(1) insert.
+// Proves: all buffer accesses in bounds and gap invariants maintained.
+
+fn gap_insert(buf: span<u64>, cap: u64, gap_start: u64, gap_end: u64, ch: u64) -> (u64, u64)
+    requires cap >= 1u64
+    requires cap <= buf.len
+    requires gap_start <= gap_end
+    requires gap_end <= cap
+    requires gap_start < gap_end
+    ensures result.0 <= result.1
+    ensures result.1 <= cap
+{
+    buf[gap_start] = ch;
+    (gap_start + 1u64, gap_end)
+}
+
+fn gap_delete(gap_start: u64, gap_end: u64, cap: u64) -> (u64, u64)
+    requires gap_start <= gap_end
+    requires gap_end <= cap
+    requires gap_start >= 1u64
+    ensures result.0 <= result.1
+    ensures result.1 <= cap
+{
+    (gap_start - 1u64, gap_end)
+}
+
+// Move gap to position `pos` by shifting characters.
+fn gap_move(buf: span<u64>, cap: u64, gap_start: u64, gap_end: u64, pos: u64) -> (u64, u64)
+    requires cap <= buf.len
+    requires gap_start <= gap_end
+    requires gap_end <= cap
+    requires pos <= cap
+    ensures result.0 <= result.1
+    ensures result.1 <= cap
+{
+    let gap_size: u64 = gap_end - gap_start;
+    let mut gs: u64 = gap_start;
+    let mut ge: u64 = gap_end;
+
+    // Move gap left.
+    while gs > pos
+        invariant gs <= ge
+        invariant ge <= cap
+        invariant ge - gs == gap_size
+        decreases gs
+    {
+        ge = ge - 1u64;
+        gs = gs - 1u64;
+        buf[ge] = buf[gs];
+    };
+
+    // Move gap right.
+    while gs < pos && ge < cap
+        invariant gs <= ge
+        invariant ge <= cap
+        decreases cap - gs
+    {
+        buf[gs] = buf[ge];
+        gs = gs + 1u64;
+        ge = ge + 1u64;
+    };
+    (gs, ge)
+}
+
+fn main() -> u64 { 0u64 }

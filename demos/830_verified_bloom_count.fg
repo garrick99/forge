@@ -1,0 +1,57 @@
+// expected: 0
+// Demo 830: Verified counting Bloom filter
+//
+// Extension of standard Bloom filter: each slot holds a counter
+// instead of a single bit.  Supports insert and delete.
+// Proves: all slot accesses in bounds.
+
+fn bloom_hash_a(val: u64, size: u64) -> u64
+    requires size >= 1u64
+    ensures result < size
+{ val % size }
+
+fn bloom_hash_b(val: u64, size: u64) -> u64
+    requires size >= 1u64
+    ensures result < size
+{ (val * 2654435761u64 + 1u64) % size }
+
+fn bloom_hash_c(val: u64, size: u64) -> u64
+    requires size >= 1u64
+    ensures result < size
+{ (val * 40503u64 + 12345u64) % size }
+
+fn counting_bloom_insert(counters: span<u64>, size: u64, val: u64)
+    requires size >= 1u64
+    requires size <= counters.len
+{
+    let h1: u64 = bloom_hash_a(val, size);
+    let h2: u64 = bloom_hash_b(val, size);
+    let h3: u64 = bloom_hash_c(val, size);
+    counters[h1] = counters[h1] + 1u64;
+    counters[h2] = counters[h2] + 1u64;
+    counters[h3] = counters[h3] + 1u64;
+}
+
+fn counting_bloom_delete(counters: span<u64>, size: u64, val: u64)
+    requires size >= 1u64
+    requires size <= counters.len
+{
+    let h1: u64 = bloom_hash_a(val, size);
+    let h2: u64 = bloom_hash_b(val, size);
+    let h3: u64 = bloom_hash_c(val, size);
+    if counters[h1] > 0u64 { counters[h1] = counters[h1] - 1u64; };
+    if counters[h2] > 0u64 { counters[h2] = counters[h2] - 1u64; };
+    if counters[h3] > 0u64 { counters[h3] = counters[h3] - 1u64; };
+}
+
+fn counting_bloom_query(counters: span<u64>, size: u64, val: u64) -> bool
+    requires size >= 1u64
+    requires size <= counters.len
+{
+    let h1: u64 = bloom_hash_a(val, size);
+    let h2: u64 = bloom_hash_b(val, size);
+    let h3: u64 = bloom_hash_c(val, size);
+    counters[h1] > 0u64 && counters[h2] > 0u64 && counters[h3] > 0u64
+}
+
+fn main() -> u64 { 0u64 }

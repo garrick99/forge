@@ -1,0 +1,71 @@
+// expected: 0
+// Demo 827: Verified sparse matrix addition (COO format)
+//
+// COO: (row, col, val) triples. Merges two sorted COO matrices.
+// Proves: output index stays in bounds.
+
+fn coo_add(a_row: span<u64>, a_col: span<u64>, a_val: span<u64>, na: u64,
+           b_row: span<u64>, b_col: span<u64>, b_val: span<u64>, nb: u64,
+           c_row: span<u64>, c_col: span<u64>, c_val: span<u64>, nc_cap: u64) -> u64
+    requires na <= a_row.len
+    requires na <= a_col.len
+    requires na <= a_val.len
+    requires nb <= b_row.len
+    requires nb <= b_col.len
+    requires nb <= b_val.len
+    requires nc_cap <= c_row.len
+    requires nc_cap <= c_col.len
+    requires nc_cap <= c_val.len
+    ensures result <= nc_cap
+{
+    let mut ia: u64 = 0u64;
+    let mut ib: u64 = 0u64;
+    let mut ic: u64 = 0u64;
+
+    while ia < na && ib < nb && ic < nc_cap
+        invariant ia <= na
+        invariant ib <= nb
+        invariant ic <= nc_cap
+        decreases na - ia + nb - ib
+    {
+        if a_row[ia] < b_row[ib] || (a_row[ia] == b_row[ib] && a_col[ia] < b_col[ib]) {
+            c_row[ic] = a_row[ia]; c_col[ic] = a_col[ia]; c_val[ic] = a_val[ia];
+            ia = ia + 1u64;
+            ic = ic + 1u64;
+        } else if b_row[ib] < a_row[ia] || (a_row[ia] == b_row[ib] && b_col[ib] < a_col[ia]) {
+            c_row[ic] = b_row[ib]; c_col[ic] = b_col[ib]; c_val[ic] = b_val[ib];
+            ib = ib + 1u64;
+            ic = ic + 1u64;
+        } else {
+            c_row[ic] = a_row[ia]; c_col[ic] = a_col[ia];
+            c_val[ic] = a_val[ia] + b_val[ib];
+            ia = ia + 1u64;
+            ib = ib + 1u64;
+            ic = ic + 1u64;
+        };
+    };
+
+    // Drain remaining from A.
+    while ia < na && ic < nc_cap
+        invariant ia <= na
+        invariant ic <= nc_cap
+        decreases na - ia
+    {
+        c_row[ic] = a_row[ia]; c_col[ic] = a_col[ia]; c_val[ic] = a_val[ia];
+        ia = ia + 1u64; ic = ic + 1u64;
+    };
+
+    // Drain remaining from B.
+    while ib < nb && ic < nc_cap
+        invariant ib <= nb
+        invariant ic <= nc_cap
+        decreases nb - ib
+    {
+        c_row[ic] = b_row[ib]; c_col[ic] = b_col[ib]; c_val[ic] = b_val[ib];
+        ib = ib + 1u64; ic = ic + 1u64;
+    };
+
+    ic
+}
+
+fn main() -> u64 { 0u64 }

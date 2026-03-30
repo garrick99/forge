@@ -1,0 +1,67 @@
+// expected: 0
+// Demo 836: Verified Dynamic Time Warping distance
+//
+// DTW finds the optimal alignment between two sequences.
+// Uses O(m*n) DP table. Proves: all accesses in bounds.
+
+fn dtw_distance(a: span<u64>, m: u64, b: span<u64>, n: u64,
+                dp: span<u64>) -> u64
+    requires m >= 1u64
+    requires n >= 1u64
+    requires m <= a.len
+    requires n <= b.len
+    requires m * n <= dp.len
+{
+    // Initialize first cell.
+    let diff00: u64 = if a[0u64] >= b[0u64] { a[0u64] - b[0u64] } else { b[0u64] - a[0u64] };
+    dp[0u64] = diff00;
+
+    // First row.
+    let mut j: u64 = 1u64;
+    while j < n
+        invariant j <= n
+        decreases n - j
+    {
+        let diff: u64 = if a[0u64] >= b[j] { a[0u64] - b[j] } else { b[j] - a[0u64] };
+        dp[j] = dp[j - 1u64] + diff;
+        j = j + 1u64;
+    };
+
+    // First column.
+    let mut i: u64 = 1u64;
+    while i < m
+        invariant i <= m
+        decreases m - i
+    {
+        let diff: u64 = if a[i] >= b[0u64] { a[i] - b[0u64] } else { b[0u64] - a[i] };
+        dp[i * n] = dp[(i - 1u64) * n] + diff;
+        i = i + 1u64;
+    };
+
+    // Fill DP table.
+    let mut i2: u64 = 1u64;
+    while i2 < m
+        invariant i2 <= m
+        decreases m - i2
+    {
+        let mut j2: u64 = 1u64;
+        while j2 < n
+            invariant j2 <= n
+            decreases n - j2
+        {
+            let diff: u64 = if a[i2] >= b[j2] { a[i2] - b[j2] } else { b[j2] - a[i2] };
+            let d1: u64 = dp[(i2 - 1u64) * n + j2];
+            let d2: u64 = dp[i2 * n + (j2 - 1u64)];
+            let d3: u64 = dp[(i2 - 1u64) * n + (j2 - 1u64)];
+            let mn: u64 = if d1 <= d2 { d1 } else { d2 };
+            let mn2: u64 = if mn <= d3 { mn } else { d3 };
+            dp[i2 * n + j2] = mn2 + diff;
+            j2 = j2 + 1u64;
+        };
+        i2 = i2 + 1u64;
+    };
+
+    dp[(m - 1u64) * n + (n - 1u64)]
+}
+
+fn main() -> u64 { 0u64 }

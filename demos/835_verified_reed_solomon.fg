@@ -1,0 +1,54 @@
+// expected: 0
+// Demo 835: Verified GF(256) arithmetic for Reed-Solomon
+//
+// Galois Field arithmetic: addition (XOR), multiplication via
+// log/antilog tables.  Proves: all table lookups in bounds.
+
+fn gf_add(a: u64, b: u64) -> u64
+    requires a < 256u64
+    requires b < 256u64
+    ensures result < 256u64
+{
+    (a ^ b) % 256u64
+}
+
+fn gf_mul(a: u64, b: u64, log_table: span<u64>, exp_table: span<u64>) -> u64
+    requires a < 256u64
+    requires b < 256u64
+    requires 256u64 <= log_table.len
+    requires 512u64 <= exp_table.len
+    ensures result < 256u64
+{
+    if a == 0u64 || b == 0u64 { 0u64 }
+    else {
+        let log_sum: u64 = log_table[a] + log_table[b];
+        let idx: u64 = log_sum % 255u64;
+        exp_table[idx] % 256u64
+    }
+}
+
+// Evaluate polynomial at point `x` in GF(256) using Horner's method.
+fn gf_poly_eval(coeffs: span<u64>, n: u64, x: u64,
+                log_table: span<u64>, exp_table: span<u64>) -> u64
+    requires n >= 1u64
+    requires n <= coeffs.len
+    requires x < 256u64
+    requires 256u64 <= log_table.len
+    requires 512u64 <= exp_table.len
+    ensures result < 256u64
+{
+    let mut acc: u64 = coeffs[n - 1u64] % 256u64;
+    let mut i: u64 = n - 1u64;
+    while i > 0u64
+        invariant i < n
+        invariant acc < 256u64
+        decreases i
+    {
+        i = i - 1u64;
+        let prod: u64 = gf_mul(acc, x, log_table, exp_table);
+        acc = gf_add(prod, coeffs[i] % 256u64);
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

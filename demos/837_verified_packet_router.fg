@@ -1,0 +1,38 @@
+// expected: 0
+// Demo 837: Verified packet routing table lookup
+//
+// Longest prefix match on a routing table.
+// Table entries: (prefix, mask_len, next_hop).
+// Proves: all table accesses in bounds and best_hop < n_routes or sentinel.
+
+fn route_lookup(prefixes: span<u64>, mask_lens: span<u64>, next_hops: span<u64>,
+                n_routes: u64, dest_ip: u64) -> u64
+    requires n_routes <= prefixes.len
+    requires n_routes <= mask_lens.len
+    requires n_routes <= next_hops.len
+    ensures result <= n_routes
+{
+    let mut best_hop: u64 = n_routes;
+    let mut best_mask_len: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n_routes
+        invariant i <= n_routes
+        invariant best_hop <= n_routes
+        decreases n_routes - i
+    {
+        let mlen: u64 = mask_lens[i];
+        if mlen <= 64u64 && mlen > 0u64 {
+            let shift: u64 = 64u64 - mlen;
+            let masked_dest: u64 = dest_ip >> shift;
+            let masked_prefix: u64 = prefixes[i] >> shift;
+            if masked_dest == masked_prefix && mlen >= best_mask_len {
+                best_hop = i;
+                best_mask_len = mlen;
+            };
+        };
+        i = i + 1u64;
+    };
+    best_hop
+}
+
+fn main() -> u64 { 0u64 }

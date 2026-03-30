@@ -1,0 +1,77 @@
+// expected: 0
+// Demo 824: Verified string edit operations
+//
+// In-place string operations on a u64 character buffer:
+// reverse, to_upper (shift by 32), trim leading zeros.
+// Proves: all accesses in bounds.
+
+fn str_reverse(s: span<u64>, n: u64)
+    requires n <= s.len
+{
+    let mut l: u64 = 0u64;
+    let mut r: u64 = n;
+    while l + 1u64 < r
+        invariant l <= r
+        invariant r <= n
+        decreases r - l
+    {
+        r = r - 1u64;
+        let tmp: u64 = s[l];
+        s[l] = s[r];
+        s[r] = tmp;
+        l = l + 1u64;
+    };
+}
+
+// Shift lowercase ASCII (97-122) to uppercase (65-90).
+fn to_upper(s: span<u64>, n: u64)
+    requires n <= s.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] >= 97u64 && s[i] <= 122u64 {
+            s[i] = s[i] - 32u64;
+        };
+        i = i + 1u64;
+    };
+}
+
+// Trim leading zeros: returns new start offset.
+fn trim_leading(s: span<u64>, n: u64, ch: u64) -> u64
+    requires n <= s.len
+    ensures result <= n
+{
+    let mut i: u64 = 0u64;
+    let mut found: bool = false;
+    while i < n && !found
+        invariant i <= n
+        decreases n - i
+    {
+        if s[i] != ch { found = true; }
+        else { i = i + 1u64; };
+    };
+    i
+}
+
+// Count character occurrences.
+fn char_count(s: span<u64>, n: u64, ch: u64) -> u64
+    requires n <= s.len
+    ensures result <= n
+{
+    let mut count: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant count <= i
+        decreases n - i
+    {
+        if s[i] == ch { count = count + 1u64; };
+        i = i + 1u64;
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,60 @@
+// expected: 0
+// Demo 838: Verified sparse set (O(1) insert/delete/member)
+//
+// Dense + sparse arrays: member test in O(1), iteration in O(count).
+// Proves: count stays bounded and all accesses valid.
+
+fn sparse_set_contains(dense: span<u64>, sparse: span<u64>,
+                       count: u64, cap: u64, val: u64) -> bool
+    requires cap >= 1u64
+    requires cap <= dense.len
+    requires cap <= sparse.len
+    requires count <= cap
+    requires val < cap
+{
+    let idx: u64 = sparse[val];
+    idx < count && dense[idx] == val
+}
+
+fn sparse_set_insert(dense: span<u64>, sparse: span<u64>,
+                     count: u64, cap: u64, val: u64) -> u64
+    requires cap >= 1u64
+    requires cap <= dense.len
+    requires cap <= sparse.len
+    requires count < cap
+    requires val < cap
+    ensures result <= cap
+    ensures result == count + 1u64 || result == count
+{
+    let idx: u64 = sparse[val];
+    if idx < count && dense[idx] == val {
+        count
+    } else {
+        dense[count] = val;
+        sparse[val] = count;
+        count + 1u64
+    }
+}
+
+fn sparse_set_remove(dense: span<u64>, sparse: span<u64>,
+                     count: u64, cap: u64, val: u64) -> u64
+    requires cap >= 1u64
+    requires cap <= dense.len
+    requires cap <= sparse.len
+    requires count >= 1u64
+    requires count <= cap
+    requires val < cap
+    ensures result < count || result == count
+{
+    let idx: u64 = sparse[val];
+    if idx < count && dense[idx] == val {
+        let last: u64 = dense[count - 1u64];
+        dense[idx] = last;
+        if last < cap { sparse[last] = idx; };
+        count - 1u64
+    } else {
+        count
+    }
+}
+
+fn main() -> u64 { 0u64 }

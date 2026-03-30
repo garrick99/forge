@@ -1,0 +1,51 @@
+// expected: 0
+// Demo 834: Verified Hamming(7,4) encode and syndrome computation
+//
+// Encodes 4 data bits into 7-bit codeword with 3 parity bits.
+// Syndrome computation detects single-bit errors.
+// Proves: all bit positions in bounds and results < 128.
+
+fn hamming_encode(d: u64) -> u64
+    requires d < 16u64
+    ensures result < 128u64
+{
+    let d1: u64 = (d >> 0u64) & 1u64;
+    let d2: u64 = (d >> 1u64) & 1u64;
+    let d3: u64 = (d >> 2u64) & 1u64;
+    let d4: u64 = (d >> 3u64) & 1u64;
+    let p1: u64 = d1 ^ d2 ^ d4;
+    let p2: u64 = d1 ^ d3 ^ d4;
+    let p3: u64 = d2 ^ d3 ^ d4;
+    (p1 << 0u64) | (p2 << 1u64) | (d1 << 2u64) |
+    (p3 << 3u64) | (d2 << 4u64) | (d3 << 5u64) | (d4 << 6u64)
+}
+
+fn hamming_syndrome(codeword: u64) -> u64
+    requires codeword < 128u64
+    ensures result < 8u64
+{
+    let b1: u64 = (codeword >> 0u64) & 1u64;
+    let b2: u64 = (codeword >> 1u64) & 1u64;
+    let b3: u64 = (codeword >> 2u64) & 1u64;
+    let b4: u64 = (codeword >> 3u64) & 1u64;
+    let b5: u64 = (codeword >> 4u64) & 1u64;
+    let b6: u64 = (codeword >> 5u64) & 1u64;
+    let b7: u64 = (codeword >> 6u64) & 1u64;
+    let s1: u64 = b1 ^ b3 ^ b5 ^ b7;
+    let s2: u64 = b2 ^ b3 ^ b6 ^ b7;
+    let s3: u64 = b4 ^ b5 ^ b6 ^ b7;
+    (s3 << 2u64) | (s2 << 1u64) | s1
+}
+
+fn hamming_decode(codeword: u64) -> u64
+    requires codeword < 128u64
+    ensures result < 16u64
+{
+    let d1: u64 = (codeword >> 2u64) & 1u64;
+    let d2: u64 = (codeword >> 4u64) & 1u64;
+    let d3: u64 = (codeword >> 5u64) & 1u64;
+    let d4: u64 = (codeword >> 6u64) & 1u64;
+    d1 | (d2 << 1u64) | (d3 << 2u64) | (d4 << 3u64)
+}
+
+fn main() -> u64 { 0u64 }

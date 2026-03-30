@@ -1,0 +1,48 @@
+// expected: 0
+// Demo 829: Verified Monte Carlo estimation (deterministic simulation)
+//
+// Estimates pi/4 by counting points inside a quarter circle.
+// Uses xorshift64 PRNG. Proves: count <= n_samples.
+
+fn xorshift(state: u64) -> u64
+    requires state != 0u64
+    ensures result != 0u64
+{
+    let mut s: u64 = state;
+    s = s ^ (s << 13u64);
+    s = s ^ (s >> 7u64);
+    s = s ^ (s << 17u64);
+    if s == 0u64 { 1u64 } else { s }
+}
+
+fn monte_carlo_pi(n_samples: u64, radius: u64, seed: u64) -> u64
+    requires n_samples >= 1u64
+    requires radius >= 1u64
+    requires seed != 0u64
+    ensures result <= n_samples
+{
+    let r2: u64 = radius * radius;
+    let mut inside: u64 = 0u64;
+    let mut state: u64 = seed;
+    let mut i: u64 = 0u64;
+    while i < n_samples
+        invariant i <= n_samples
+        invariant inside <= i
+        invariant state != 0u64
+        decreases n_samples - i
+    {
+        let ns1: u64 = xorshift(state);
+        state = ns1;
+        let x: u64 = state % radius;
+        let ns2: u64 = xorshift(state);
+        state = ns2;
+        let y: u64 = state % radius;
+        if x * x + y * y <= r2 {
+            inside = inside + 1u64;
+        };
+        i = i + 1u64;
+    };
+    inside
+}
+
+fn main() -> u64 { 0u64 }

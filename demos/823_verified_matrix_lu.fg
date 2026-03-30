@@ -1,0 +1,44 @@
+// expected: 0
+// Demo 823: Verified LU decomposition (in-place, no pivoting)
+//
+// Decomposes matrix A into L*U in-place for a small n×n matrix.
+// Proves: all accesses within the n*n flat span.
+
+fn lu_decompose(a: span<u64>, n: u64)
+    requires n >= 2u64
+    requires n * n <= a.len
+{
+    let mut k: u64 = 0u64;
+    while k < n
+        invariant k <= n
+        decreases n - k
+    {
+        let pivot_idx: u64 = k * n + k;
+        let pivot: u64 = a[pivot_idx];
+        if pivot > 0u64 {
+            let mut i: u64 = k + 1u64;
+            while i < n
+                invariant i <= n
+                decreases n - i
+            {
+                let lik_idx: u64 = i * n + k;
+                a[lik_idx] = a[lik_idx] / pivot;
+                let lik: u64 = a[lik_idx];
+                let mut j: u64 = k + 1u64;
+                while j < n
+                    invariant j <= n
+                    decreases n - j
+                {
+                    let ij_idx: u64 = i * n + j;
+                    let kj_idx: u64 = k * n + j;
+                    a[ij_idx] = a[ij_idx] - lik * a[kj_idx];
+                    j = j + 1u64;
+                };
+                i = i + 1u64;
+            };
+        };
+        k = k + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

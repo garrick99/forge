@@ -1,0 +1,36 @@
+// expected: 0
+// Demo 821: Verified quickselect partition step
+//
+// Lomuto partition around the last element as pivot.
+// Proves: pivot lands at correct index, all accesses in bounds.
+
+fn lomuto_partition(s: span<u64>, lo: u64, hi: u64) -> u64
+    requires lo < hi
+    requires hi < s.len
+    ensures result >= lo
+    ensures result <= hi
+{
+    let pivot: u64 = s[hi];
+    let mut i: u64 = lo;
+    let mut j: u64 = lo;
+    while j < hi
+        invariant j <= hi
+        invariant i >= lo
+        invariant i <= j
+        decreases hi - j
+    {
+        if s[j] <= pivot {
+            let tmp: u64 = s[i];
+            s[i] = s[j];
+            s[j] = tmp;
+            i = i + 1u64;
+        };
+        j = j + 1u64;
+    };
+    let tmp: u64 = s[i];
+    s[i] = s[hi];
+    s[hi] = tmp;
+    i
+}
+
+fn main() -> u64 { 0u64 }

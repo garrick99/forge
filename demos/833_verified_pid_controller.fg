@@ -1,0 +1,78 @@
+// expected: 0
+// Demo 833: Verified PID controller (integer fixed-point)
+//
+// Proportional-Integral-Derivative controller with anti-windup.
+// All arithmetic scaled by 1024.  Proves: output stays bounded.
+
+fn pid_step(setpoint: u64, measurement: u64,
+            kp: u64, ki: u64, kd: u64,
+            prev_error: u64, integral: u64,
+            max_integral: u64, max_output: u64) -> (u64, u64, u64)
+    requires max_integral >= 1u64
+    requires max_output >= 1u64
+    ensures result.1 <= max_integral
+    ensures result.2 <= max_output
+{
+    let error: u64 = if setpoint >= measurement {
+        setpoint - measurement
+    } else {
+        measurement - setpoint
+    };
+
+    // Integral with anti-windup clamp.
+    let new_integral: u64 = integral + error;
+    let clamped_integral: u64 = if new_integral > max_integral {
+        max_integral
+    } else {
+        new_integral
+    };
+
+    // Derivative (backward difference).
+    let derivative: u64 = if error >= prev_error {
+        error - prev_error
+    } else {
+        prev_error - error
+    };
+
+    // PID output.
+    let p_term: u64 = kp * error / 1024u64;
+    let i_term: u64 = ki * clamped_integral / 1024u64;
+    let d_term: u64 = kd * derivative / 1024u64;
+    let raw_output: u64 = p_term + i_term + d_term;
+    let output: u64 = if raw_output > max_output { max_output } else { raw_output };
+
+    (error, clamped_integral, output)
+}
+
+// Run PID over a sequence of measurements.
+fn pid_run(setpoints: span<u64>, measurements: span<u64>, n: u64,
+           outputs: span<u64>,
+           kp: u64, ki: u64, kd: u64,
+           max_integral: u64, max_output: u64)
+    requires n >= 1u64
+    requires n <= setpoints.len
+    requires n <= measurements.len
+    requires n <= outputs.len
+    requires max_integral >= 1u64
+    requires max_output >= 1u64
+{
+    let mut prev_err: u64 = 0u64;
+    let mut integral: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant integral <= max_integral
+        decreases n - i
+    {
+        let step: (u64, u64, u64) = pid_step(
+            setpoints[i], measurements[i],
+            kp, ki, kd, prev_err, integral,
+            max_integral, max_output);
+        prev_err = step.0;
+        integral = step.1;
+        outputs[i] = step.2;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

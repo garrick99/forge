@@ -1,0 +1,68 @@
+// expected: 0
+// Demo 839: Verified elliptic curve scalar multiplication (Montgomery ladder)
+//
+// Double-and-add ladder for scalar multiplication on a prime-order curve.
+// All arithmetic modular (mod p).  Proves: loop bounds and modular results.
+
+fn mod_add(a: u64, b: u64, p: u64) -> u64
+    requires p >= 2u64
+    requires a < p
+    requires b < p
+    ensures result < p
+{
+    let sum: u64 = a + b;
+    if sum >= p { sum - p } else { sum }
+}
+
+fn mod_sub(a: u64, b: u64, p: u64) -> u64
+    requires p >= 2u64
+    requires a < p
+    requires b < p
+    ensures result < p
+{
+    if a >= b { a - b } else { p - b + a }
+}
+
+fn mod_mul(a: u64, b: u64, p: u64) -> u64
+    requires p >= 2u64
+    ensures result < p
+{
+    (a * b) % p
+}
+
+// Montgomery ladder: computes scalar * base_point (mod p).
+// scalar has `nbits` bits.  Returns result mod p.
+fn scalar_mul(base: u64, scalar: u64, nbits: u64, p: u64) -> u64
+    requires p >= 2u64
+    requires base < p
+    requires nbits >= 1u64
+    requires nbits <= 64u64
+    ensures result < p
+{
+    let mut r0: u64 = 0u64;
+    let mut r1: u64 = base;
+    let mut i: u64 = nbits;
+    while i > 0u64
+        invariant i <= nbits
+        invariant r0 < p
+        invariant r1 < p
+        decreases i
+    {
+        i = i - 1u64;
+        let bit: u64 = (scalar >> i) & 1u64;
+        // Hoist all mod_add calls before the branch so postconditions inject.
+        let sum_r0r1: u64 = mod_add(r0, r1, p);
+        let dbl_r0: u64 = mod_add(r0, r0, p);
+        let dbl_r1: u64 = mod_add(r1, r1, p);
+        if bit == 1u64 {
+            r0 = sum_r0r1;
+            r1 = dbl_r1;
+        } else {
+            r1 = sum_r0r1;
+            r0 = dbl_r0;
+        };
+    };
+    r0
+}
+
+fn main() -> u64 { 0u64 }

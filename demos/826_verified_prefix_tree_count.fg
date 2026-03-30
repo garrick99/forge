@@ -1,0 +1,38 @@
+// expected: 0
+// Demo 826: Verified prefix frequency counter
+//
+// Counts frequency of each unique prefix of length k in an array.
+// Uses a simple scan + comparison approach.
+// Proves: all accesses in bounds and count <= n.
+
+fn count_prefix_matches(s: span<u64>, n: u64, k: u64) -> u64
+    requires k >= 1u64
+    requires k <= n
+    requires n <= s.len
+    ensures result <= n
+{
+    let mut matches: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    let limit: u64 = n - k + 1u64;
+    while i < limit
+        invariant i <= limit
+        invariant matches <= i
+        decreases limit - i
+    {
+        // Compare prefix at i with prefix at 0.
+        let mut j: u64 = 0u64;
+        let mut eq: bool = true;
+        while j < k
+            invariant j <= k
+            decreases k - j
+        {
+            if s[i + j] != s[j] { eq = false; };
+            j = j + 1u64;
+        };
+        if eq { matches = matches + 1u64; };
+        i = i + 1u64;
+    };
+    matches
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,60 @@
+// expected: 0
+// Demo 822: Verified cuckoo hashing insert
+//
+// Two hash tables, two hash functions. Insert displaces existing entries
+// up to max_kicks times.  Proves: all table accesses in bounds.
+
+fn cuckoo_hash1(key: u64, cap: u64) -> u64
+    requires cap >= 1u64
+    ensures result < cap
+{ key % cap }
+
+fn cuckoo_hash2(key: u64, cap: u64) -> u64
+    requires cap >= 1u64
+    ensures result < cap
+{ (key * 2654435761u64 + 1u64) % cap }
+
+fn cuckoo_insert(table1: span<u64>, used1: span<u64>,
+                 table2: span<u64>, used2: span<u64>,
+                 cap: u64, key: u64, max_kicks: u64) -> bool
+    requires cap >= 1u64
+    requires cap <= table1.len
+    requires cap <= used1.len
+    requires cap <= table2.len
+    requires cap <= used2.len
+{
+    let mut cur: u64 = key;
+    let mut kicks: u64 = 0u64;
+    let mut placed: bool = false;
+
+    while kicks < max_kicks && !placed
+        invariant kicks <= max_kicks
+        decreases max_kicks - kicks
+    {
+        let h1: u64 = cuckoo_hash1(cur, cap);
+        if used1[h1] == 0u64 {
+            table1[h1] = cur;
+            used1[h1] = 1u64;
+            placed = true;
+        } else {
+            let evicted: u64 = table1[h1];
+            table1[h1] = cur;
+            cur = evicted;
+
+            let h2: u64 = cuckoo_hash2(cur, cap);
+            if used2[h2] == 0u64 {
+                table2[h2] = cur;
+                used2[h2] = 1u64;
+                placed = true;
+            } else {
+                let evicted2: u64 = table2[h2];
+                table2[h2] = cur;
+                cur = evicted2;
+            };
+        };
+        kicks = kicks + 1u64;
+    };
+    placed
+}
+
+fn main() -> u64 { 0u64 }

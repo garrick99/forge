@@ -1,0 +1,55 @@
+// expected: 0
+// Demo 840: Verified protocol state machine (TCP-like handshake)
+//
+// Models a simplified connection protocol with states:
+//   0=CLOSED, 1=SYN_SENT, 2=SYN_RCVD, 3=ESTABLISHED, 4=FIN_WAIT, 5=CLOSED_FINAL
+// Events: 0=SYN, 1=SYN_ACK, 2=ACK, 3=FIN, 4=FIN_ACK
+// Proves: state always stays in [0, 6) and invalid transitions are rejected.
+
+fn protocol_step(state: u64, event: u64) -> u64
+    requires state < 6u64
+    requires event < 5u64
+    ensures result < 6u64
+{
+    if state == 0u64 {
+        // CLOSED
+        if event == 0u64 { 1u64 } else { 0u64 }
+    } else if state == 1u64 {
+        // SYN_SENT
+        if event == 1u64 { 2u64 } else { 0u64 }
+    } else if state == 2u64 {
+        // SYN_RCVD
+        if event == 2u64 { 3u64 } else { 0u64 }
+    } else if state == 3u64 {
+        // ESTABLISHED
+        if event == 3u64 { 4u64 } else { 3u64 }
+    } else if state == 4u64 {
+        // FIN_WAIT
+        if event == 4u64 { 5u64 } else { 4u64 }
+    } else {
+        // CLOSED_FINAL
+        5u64
+    }
+}
+
+// Run protocol over a sequence of events.
+fn protocol_run(events: span<u64>, n: u64) -> u64
+    requires n <= events.len
+    requires forall k: u64, k < n ==> events[k] < 5u64
+    ensures result < 6u64
+{
+    let mut state: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant state < 6u64
+        decreases n - i
+    {
+        let ns: u64 = protocol_step(state, events[i]);
+        state = ns;
+        i = i + 1u64;
+    };
+    state
+}
+
+fn main() -> u64 { 0u64 }

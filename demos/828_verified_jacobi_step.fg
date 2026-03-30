@@ -1,0 +1,72 @@
+// expected: 0
+// Demo 828: Verified Jacobi iteration step (linear system solver)
+//
+// One step of Jacobi iteration for Ax = b where A is stored row-major.
+// x_new[i] = (b[i] - sum_{j!=i} A[i,j]*x[j]) / A[i,i].
+// Proves: all matrix/vector accesses in bounds.
+
+fn jacobi_step(a: span<u64>, b: span<u64>, x_old: span<u64>,
+               x_new: span<u64>, n: u64)
+    requires n >= 1u64
+    requires n * n <= a.len
+    requires n <= b.len
+    requires n <= x_old.len
+    requires n <= x_new.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let mut sigma: u64 = 0u64;
+        let mut j: u64 = 0u64;
+        while j < n
+            invariant j <= n
+            decreases n - j
+        {
+            if j != i {
+                let aij: u64 = a[i * n + j];
+                sigma = sigma + aij * x_old[j];
+            };
+            j = j + 1u64;
+        };
+        let diag: u64 = a[i * n + i];
+        if diag > 0u64 {
+            x_new[i] = (b[i] - sigma) / diag;
+        } else {
+            x_new[i] = 0u64;
+        };
+        i = i + 1u64;
+    };
+}
+
+// Compute residual norm ||Ax - b||_1.
+fn residual_norm(a: span<u64>, x: span<u64>, b: span<u64>, n: u64) -> u64
+    requires n >= 1u64
+    requires n * n <= a.len
+    requires n <= x.len
+    requires n <= b.len
+{
+    let mut norm: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let mut ax_i: u64 = 0u64;
+        let mut j: u64 = 0u64;
+        while j < n
+            invariant j <= n
+            decreases n - j
+        {
+            ax_i = ax_i + a[i * n + j] * x[j];
+            j = j + 1u64;
+        };
+        let diff: u64 = if ax_i >= b[i] { ax_i - b[i] } else { b[i] - ax_i };
+        norm = norm + diff;
+        i = i + 1u64;
+    };
+    norm
+}
+
+fn main() -> u64 { 0u64 }
