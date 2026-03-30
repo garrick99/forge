@@ -631,6 +631,17 @@ module Z3Bridge = struct
           Some (Printf.sprintf "(assert %s)" (pred_to_smtlib ~bv:use_bv ctx fresh_p))
       ) ctx.pc_lemmas
     in
+    (* --- Enhancement 2: Flatten nested implications for MBQI ---
+       Rewrite P ==> (Q ==> R) to (and P Q) ==> R in the goal.
+       This produces better MBQI trigger patterns for quantified goals. *)
+    let rec flatten_implies p = match p with
+      | PBinop (Implies, lhs, PBinop (Implies, mid, rhs)) ->
+          flatten_implies (PBinop (Implies, PBinop (And, lhs, mid), rhs))
+      | PForall (x, ty, body) -> PForall (x, ty, flatten_implies body)
+      | PExists (x, ty, body) -> PExists (x, ty, flatten_implies body)
+      | _ -> p
+    in
+    let pred = flatten_implies pred in
     let negated = Printf.sprintf "(assert (not %s))" (pred_to_smtlib ~bv:use_bv ctx pred) in
     (* Choose the best check-sat strategy:
        - BV mode: plain check-sat (QF_BV logic)
@@ -652,6 +663,35 @@ module Z3Bridge = struct
       (not (has_quantifiers pred)) &&
       (not (List.exists has_divmod goal_preds)) &&
       (List.exists has_nonlinear goal_preds)
+    in
+    (* --- Enhancement 1: Nonlinear multiplication bounds ---
+       When the context has a < m and the goal involves a * n,
+       add monotonicity hints to help Z3 NIA. *)
+    let nonlinear_hints =
+      if use_bv || is_goal_qf_nonlinear then []
+      else
+        let bounds = List.filter_map (fun p -> match p with
+          | PBinop (Lt, PVar v, PVar b) -> Some (v.name, b.name)
+          | PBinop (Le, PVar v, PVar b) -> Some (v.name, b.name)
+          | PBinop (Lt, PVar v, PInt n) -> Some (v.name, Int64.to_string n)
+          | _ -> None
+        ) ctx.pc_assumes in
+        List.filter_map (fun (v, b) ->
+          let has_product = ref false in
+          let rec scan = function
+            | PBinop (Mul, PVar x, _) when x.name = v -> has_product := true
+            | PBinop (Mul, _, PVar x) when x.name = v -> has_product := true
+            | PBinop (_, l, r) -> scan l; scan r
+            | PUnop (_, p) -> scan p
+            | PIte (c, t, e) -> scan c; scan t; scan e
+            | PIndex (a, i) -> scan a; scan i
+            | _ -> ()
+          in
+          scan pred;
+          if !has_product then
+            Some (Printf.sprintf "(assert (=> (and (>= %s 0) (< %s %s)) (<= (* %s 1) (* %s 1))))" v v b v b)
+          else None
+        ) bounds
     in
     let (effective_assumes, check) =
       if is_goal_qf_nonlinear && not force_nia then
@@ -688,7 +728,7 @@ module Z3Bridge = struct
     in
     (* QF_BV logic hint helps Z3 pick the right solver tactic for bitwise queries *)
     let logic_decl = if use_bv then ["(set-logic QF_BV)"] else [] in
-    String.concat "\n" (logic_decl @ decls @ free_decls @ range_constraints @ free_range_constraints @ uint_array_nonneg @ effective_assumes @ lemma_asserts @ [negated; check])
+    String.concat "\n" (logic_decl @ decls @ free_decls @ range_constraints @ free_range_constraints @ uint_array_nonneg @ nonlinear_hints @ effective_assumes @ lemma_asserts @ [negated; check])
 
   (* Build a consistency check query — same Int/BV mode detection *)
   let build_consistency_query ctx =

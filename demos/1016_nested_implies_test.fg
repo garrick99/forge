@@ -1,0 +1,35 @@
+// expected: 0
+// Demo 1016: Nested implication flattening test
+//
+// Previously, sorted preconditions needed && format:
+//   forall i, forall j, i < j && j < n ==> s[i] <= s[j]
+// Nested implications like:
+//   forall i, forall j, i < j ==> j < n ==> s[i] <= s[j]
+// would fail because MBQI triggers didn't match.
+//
+// The proof engine now auto-flattens P ==> Q ==> R to (P && Q) ==> R.
+// Both formats should work.
+
+use std::search;
+
+// This uses the && format (always worked).
+fn search_and_format(s: span<u64>, n: u64, target: u64) -> u64
+    requires n <= s.len
+    requires forall i: u64, forall j: u64, i < j && j < n ==> s[i] <= s[j]
+    ensures result <= n
+    ensures result < n ==> s[result] == target
+{
+    binary_search(s, n, target)
+}
+
+// This uses nested ==> format (now auto-flattened by proof engine).
+fn search_nested_format(s: span<u64>, n: u64, target: u64) -> u64
+    requires n <= s.len
+    requires forall i: u64, forall j: u64, i < j ==> j < n ==> s[i] <= s[j]
+    ensures result <= n
+    ensures result < n ==> s[result] == target
+{
+    binary_search(s, n, target)
+}
+
+fn main() -> u64 { 0u64 }
