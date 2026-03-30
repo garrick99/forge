@@ -1,0 +1,48 @@
+// expected: 0
+// Demo 843: Verified LZ77 sliding window match finder
+//
+// Finds the longest match in a sliding window of size W.
+// Returns (offset, length) pair.  Proves: all lookback accesses in bounds.
+
+fn find_longest_match(data: span<u64>, n: u64, pos: u64,
+                      window_size: u64, max_match: u64) -> (u64, u64)
+    requires n <= data.len
+    requires pos < n
+    requires window_size >= 1u64
+    requires max_match >= 1u64
+    ensures result.0 <= window_size
+    ensures result.1 <= max_match
+{
+    let start: u64 = if pos >= window_size { pos - window_size } else { 0u64 };
+    let mut best_offset: u64 = 0u64;
+    let mut best_length: u64 = 0u64;
+
+    let mut s: u64 = start;
+    while s < pos
+        invariant s <= pos
+        invariant best_offset <= window_size
+        invariant best_length <= max_match
+        decreases pos - s
+    {
+        let mut len: u64 = 0u64;
+        while len < max_match && pos + len < n && s + len < pos
+            invariant len <= max_match
+            decreases max_match - len
+        {
+            if data[s + len] == data[pos + len] {
+                len = len + 1u64;
+            } else {
+                len = max_match;
+            };
+        };
+        let actual_len: u64 = if len <= max_match { len } else { 0u64 };
+        if actual_len > best_length {
+            best_offset = pos - s;
+            best_length = actual_len;
+        };
+        s = s + 1u64;
+    };
+    (best_offset, best_length)
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,51 @@
+// expected: 0
+// Demo 847: Verified wavefront computation (anti-diagonal DP)
+//
+// Fills a 2D grid along anti-diagonals: cell (i,j) depends on
+// (i-1,j) and (i,j-1).  Proves: all grid accesses in bounds.
+
+fn wavefront_fill(grid: span<u64>, rows: u64, cols: u64)
+    requires rows >= 2u64
+    requires cols >= 2u64
+    requires rows * cols <= grid.len
+{
+    // Initialize first row and column.
+    let mut c: u64 = 0u64;
+    while c < cols
+        invariant c <= cols
+        decreases cols - c
+    { grid[c] = c; c = c + 1u64; };
+
+    let mut r: u64 = 1u64;
+    while r < rows
+        invariant r <= rows
+        decreases rows - r
+    { grid[r * cols] = r; r = r + 1u64; };
+
+    // Fill by anti-diagonals.
+    let total_diags: u64 = rows + cols - 1u64;
+    let mut d: u64 = 2u64;
+    while d < total_diags
+        invariant d <= total_diags
+        decreases total_diags - d
+    {
+        let r_start: u64 = if d >= cols { d - cols + 1u64 } else { 1u64 };
+        let r_end: u64 = if d < rows { d } else { rows - 1u64 };
+        let mut ri: u64 = r_start;
+        while ri <= r_end
+            invariant ri <= rows
+            decreases rows - ri
+        {
+            let ci: u64 = d - ri;
+            if ci > 0u64 && ci < cols && ri < rows {
+                let up: u64 = grid[(ri - 1u64) * cols + ci];
+                let left: u64 = grid[ri * cols + (ci - 1u64)];
+                grid[ri * cols + ci] = up + left;
+            };
+            ri = ri + 1u64;
+        };
+        d = d + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

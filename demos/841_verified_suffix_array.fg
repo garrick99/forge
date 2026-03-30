@@ -1,0 +1,69 @@
+// expected: 0
+// Demo 841: Verified suffix comparison and ranking
+//
+// Compares two suffixes lexicographically and ranks all suffixes
+// by their first character.  Proves: all text accesses in bounds.
+
+fn suffix_compare(text: span<u64>, n: u64, i: u64, j: u64, max_len: u64) -> u64
+    requires n <= text.len
+    requires i < n
+    requires j < n
+    ensures result <= 2u64
+{
+    let mut k: u64 = 0u64;
+    let mut res: u64 = 0u64;
+    while k < max_len && i + k < n && j + k < n && res == 0u64
+        invariant k <= max_len
+        invariant res <= 2u64
+        decreases max_len - k
+    {
+        if text[i + k] < text[j + k] { res = 1u64; }
+        else if text[i + k] > text[j + k] { res = 2u64; };
+        k = k + 1u64;
+    };
+    res
+}
+
+// Rank suffixes by first character into buckets.
+fn rank_by_first(text: span<u64>, n: u64, ranks: span<u64>)
+    requires n >= 1u64
+    requires n <= text.len
+    requires n <= ranks.len
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        ranks[i] = text[i];
+        i = i + 1u64;
+    };
+}
+
+// Count inversions in suffix order (pairs where text[i] > text[j] but i < j).
+fn count_inversions(text: span<u64>, n: u64) -> u64
+    requires n <= text.len
+    ensures result <= n * n
+{
+    let mut count: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant count <= i * n
+        decreases n - i
+    {
+        let mut j: u64 = i + 1u64;
+        while j < n
+            invariant j <= n
+            invariant count <= i * n + j
+            decreases n - j
+        {
+            if text[i] > text[j] { count = count + 1u64; };
+            j = j + 1u64;
+        };
+        i = i + 1u64;
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,36 @@
+// expected: 0
+// Demo 845: Verified disjoint interval scheduling (greedy)
+//
+// Selects maximum set of non-overlapping intervals, sorted by end time.
+// Proves: result <= n and all accesses in bounds.
+
+fn interval_schedule(starts: span<u64>, ends: span<u64>, n: u64,
+                     selected: span<u64>) -> u64
+    requires n >= 1u64
+    requires n <= starts.len
+    requires n <= ends.len
+    requires n <= selected.len
+    ensures result >= 1u64
+    ensures result <= n
+{
+    selected[0u64] = 0u64;
+    let mut count: u64 = 1u64;
+    let mut last_end: u64 = ends[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant count >= 1u64
+        invariant count <= i
+        decreases n - i
+    {
+        if starts[i] >= last_end {
+            selected[count] = i;
+            last_end = ends[i];
+            count = count + 1u64;
+        };
+        i = i + 1u64;
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

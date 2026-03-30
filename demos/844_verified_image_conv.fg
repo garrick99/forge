@@ -1,0 +1,54 @@
+// expected: 0
+// Demo 844: Verified 2D image convolution (3×3 kernel)
+//
+// Applies a fixed 3×3 kernel to a row-major grayscale image.
+// Output is (rows-2)×(cols-2) to avoid boundary handling.
+// Proves: all pixel accesses in bounds.
+
+fn convolve_3x3(image: span<u64>, rows: u64, cols: u64,
+                kernel: span<u64>,
+                output: span<u64>)
+    requires rows >= 3u64
+    requires cols >= 3u64
+    requires rows * cols <= image.len
+    requires 9u64 <= kernel.len
+    requires (rows - 2u64) * (cols - 2u64) <= output.len
+{
+    let out_rows: u64 = rows - 2u64;
+    let out_cols: u64 = cols - 2u64;
+    let mut r: u64 = 0u64;
+    while r < out_rows
+        invariant r <= out_rows
+        decreases out_rows - r
+    {
+        let mut c: u64 = 0u64;
+        while c < out_cols
+            invariant c <= out_cols
+            decreases out_cols - c
+        {
+            let mut acc: u64 = 0u64;
+            let mut kr: u64 = 0u64;
+            while kr < 3u64
+                invariant kr <= 3u64
+                decreases 3u64 - kr
+            {
+                let mut kc: u64 = 0u64;
+                while kc < 3u64
+                    invariant kc <= 3u64
+                    decreases 3u64 - kc
+                {
+                    let img_idx: u64 = (r + kr) * cols + (c + kc);
+                    let ker_idx: u64 = kr * 3u64 + kc;
+                    acc = acc + image[img_idx] * kernel[ker_idx];
+                    kc = kc + 1u64;
+                };
+                kr = kr + 1u64;
+            };
+            output[r * out_cols + c] = acc;
+            c = c + 1u64;
+        };
+        r = r + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

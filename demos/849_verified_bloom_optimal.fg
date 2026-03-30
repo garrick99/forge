@@ -1,0 +1,42 @@
+// expected: 0
+// Demo 849: Verified optimal Bloom filter sizing
+//
+// Computes optimal number of hash functions k = (m/n) * ln2 ≈ (m*45) / (n*65)
+// for m bits and n elements (integer approximation).
+// Also computes expected false positive rate approximation.
+// Proves: all computations stay bounded.
+
+fn optimal_k(m_bits: u64, n_elements: u64) -> u64
+    requires n_elements >= 1u64
+    requires m_bits >= 1u64
+    ensures result >= 1u64
+{
+    // k ≈ (m/n) * 0.693 ≈ (m * 45) / (n * 65)
+    let k: u64 = (m_bits * 45u64) / (n_elements * 65u64);
+    if k == 0u64 { 1u64 } else { k }
+}
+
+// Approximate false positive probability as (1 - e^(-kn/m))^k.
+// Integer approximation: 1000 * (1 - (m - k*n)/(m))^k (very rough).
+fn approx_fpr(m_bits: u64, n_elements: u64, k: u64) -> u64
+    requires m_bits >= 1u64
+    requires k >= 1u64
+    ensures result <= 1000u64
+{
+    let fill: u64 = (k * n_elements * 1000u64) / m_bits;
+    let remain: u64 = if fill >= 1000u64 { 0u64 } else { 1000u64 - fill };
+    // Exponentiate: remain^k / 1000^(k-1).
+    let mut fpr: u64 = remain;
+    let mut i: u64 = 1u64;
+    while i < k
+        invariant i <= k
+        invariant fpr <= 1000u64
+        decreases k - i
+    {
+        fpr = (fpr * remain) / 1000u64;
+        i = i + 1u64;
+    };
+    fpr
+}
+
+fn main() -> u64 { 0u64 }

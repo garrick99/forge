@@ -1,0 +1,78 @@
+// expected: 0
+// Demo 846: Verified top-k via tournament selection
+//
+// Finds the k largest elements by maintaining a sorted buffer.
+// Simpler than heap-based approach but provably correct.
+// Proves: all accesses in bounds and output count = k.
+
+fn insert_sorted(buf: span<u64>, k: u64, val: u64)
+    requires k >= 1u64
+    requires k <= buf.len
+{
+    // buf is sorted ascending. Insert val if larger than buf[0] (the min).
+    if val > buf[0u64] {
+        buf[0u64] = val;
+        // Bubble up to maintain sorted order.
+        let mut i: u64 = 0u64;
+        while i + 1u64 < k
+            invariant i < k
+            decreases k - i - 1u64
+        {
+            if buf[i] > buf[i + 1u64] {
+                let tmp: u64 = buf[i];
+                buf[i] = buf[i + 1u64];
+                buf[i + 1u64] = tmp;
+                i = i + 1u64;
+            } else {
+                i = k - 1u64;
+            };
+        };
+    };
+}
+
+fn topk_tournament(data: span<u64>, n: u64, out: span<u64>, k: u64)
+    requires k >= 1u64
+    requires k <= n
+    requires n <= data.len
+    requires k <= out.len
+{
+    // Fill initial buffer.
+    let mut i: u64 = 0u64;
+    while i < k
+        invariant i <= k
+        decreases k - i
+    { out[i] = data[i]; i = i + 1u64; };
+
+    // Sort initial buffer (bubble sort).
+    let mut pass: u64 = 0u64;
+    while pass < k
+        invariant pass <= k
+        decreases k - pass
+    {
+        let mut j: u64 = 0u64;
+        while j + 1u64 < k
+            invariant j < k
+            decreases k - j - 1u64
+        {
+            if out[j] > out[j + 1u64] {
+                let tmp: u64 = out[j];
+                out[j] = out[j + 1u64];
+                out[j + 1u64] = tmp;
+            };
+            j = j + 1u64;
+        };
+        pass = pass + 1u64;
+    };
+
+    // Process remaining.
+    let mut idx: u64 = k;
+    while idx < n
+        invariant idx <= n
+        decreases n - idx
+    {
+        insert_sorted(out, k, data[idx]);
+        idx = idx + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

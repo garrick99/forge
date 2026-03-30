@@ -1,0 +1,59 @@
+// expected: 0
+// Demo 848: Verified circular double-ended queue (deque)
+//
+// Supports push_front, push_back, pop_front, pop_back.
+// Proves: head/tail wrap correctly and count stays bounded.
+
+fn deque_push_back(buf: span<u64>, cap: u64, tail: u64, count: u64, val: u64) -> (u64, u64)
+    requires cap >= 1u64
+    requires cap <= buf.len
+    requires tail < cap
+    requires count < cap
+    ensures result.0 < cap
+    ensures result.1 == count + 1u64
+{
+    buf[tail] = val;
+    let new_tail: u64 = if tail + 1u64 == cap { 0u64 } else { tail + 1u64 };
+    (new_tail, count + 1u64)
+}
+
+fn deque_push_front(buf: span<u64>, cap: u64, head: u64, count: u64, val: u64) -> (u64, u64)
+    requires cap >= 1u64
+    requires cap <= buf.len
+    requires head < cap
+    requires count < cap
+    ensures result.0 < cap
+    ensures result.1 == count + 1u64
+{
+    let new_head: u64 = if head == 0u64 { cap - 1u64 } else { head - 1u64 };
+    buf[new_head] = val;
+    (new_head, count + 1u64)
+}
+
+fn deque_pop_front(buf: span<u64>, cap: u64, head: u64, count: u64) -> (u64, u64, u64)
+    requires cap >= 1u64
+    requires cap <= buf.len
+    requires head < cap
+    requires count >= 1u64
+    ensures result.1 < cap
+    ensures result.2 == count - 1u64
+{
+    let val: u64 = buf[head];
+    let new_head: u64 = if head + 1u64 == cap { 0u64 } else { head + 1u64 };
+    (val, new_head, count - 1u64)
+}
+
+fn deque_pop_back(buf: span<u64>, cap: u64, tail: u64, count: u64) -> (u64, u64, u64)
+    requires cap >= 1u64
+    requires cap <= buf.len
+    requires tail < cap
+    requires count >= 1u64
+    ensures result.1 < cap
+    ensures result.2 == count - 1u64
+{
+    let new_tail: u64 = if tail == 0u64 { cap - 1u64 } else { tail - 1u64 };
+    let val: u64 = buf[new_tail];
+    (val, new_tail, count - 1u64)
+}
+
+fn main() -> u64 { 0u64 }
