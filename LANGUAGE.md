@@ -1226,5 +1226,71 @@ source.fg
 - Integer mode (default): unbounded integers, cheaper queries
 - Bitvector mode: used when `&`, `|`, `^`, `~`, `<<`, `>>` appear in scope; exact modular wrap-around
 
-**Parser note:** `lib/parser/parser.ml` is pre-generated and committed. Dune 3.22 has a
-cycle bug with Menhir. To regenerate after grammar changes, use `regen_parser.sh`.
+**Parser note:** `lib/parser/parser.ml` is pre-generated and committed. To regenerate after grammar changes, use `regen_parser.sh`.
+
+---
+
+## Union Types
+
+```forge
+union PacketHeader {
+    raw_bytes: u64,
+    tcp_flags: u64,
+    udp_len: u64,
+}
+```
+
+Compiles to `typedef union PacketHeader { ... } PacketHeader;`. Field access uses the same `.field` syntax as structs. Unions share memory — only one field is valid at a time.
+
+## Packed Structs
+
+```forge
+#[packed] struct WireHeader {
+    version: u64,
+    length: u64,
+    checksum: u64,
+}
+```
+
+Compiles to `typedef struct WireHeader { ... } WireHeader __attribute__((packed));`. No padding between fields — required for wire protocol parsing and hardware register layouts.
+
+## Raw Pointer Operations
+
+```forge
+use std::raw;
+
+fn init_registers(base: u64, n: u64) {
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        volatile_write(ptr_offset(base, i), 0u64);
+        i = i + 1u64;
+    };
+    compiler_fence();
+}
+```
+
+Available operations (codegen intrinsics):
+- `ptr_null()` — null pointer
+- `ptr_offset(ptr, n)` — pointer arithmetic
+- `ptr_read(ptr)` / `ptr_write(ptr, val)` — dereference
+- `ptr_to_u64(ptr)` / `u64_to_ptr(val)` — cast
+- `volatile_read(ptr)` / `volatile_write(ptr, val)` — hardware registers
+- `compiler_fence()` / `memory_barrier()` — synchronization
+- `asm_volatile("instruction")` — inline assembly
+- `cpu_relax()` — x86 pause hint
+- `dmb()` — ARM data memory barrier
+
+## Compression Library
+
+```forge
+use std::compress;
+
+let comp_len: u64 = lz_compress(input, n, output, out_cap);
+let decomp_len: u64 = lz_decompress(tokens, comp_len, output, out_cap);
+// ensures decomp_len <= out_cap
+```
+
+LZ77 sliding-window compression with 4096-byte window, 3-byte minimum match, 258-byte maximum match. Every array access proven safe by Z3.
