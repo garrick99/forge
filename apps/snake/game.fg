@@ -1,0 +1,176 @@
+// Verified Snake Game Core
+//
+// Game logic proven memory-safe by Z3.
+// Board is a flat span: 0=empty, 1=snake, 2=food, 3=wall.
+// Snake body stored as a ring buffer of (x,y) positions.
+
+// ---- Board operations (proven bounds-safe) ----------------------------------
+
+fn board_get(board: span<u64>, width: u64, x: u64, y: u64) -> u64
+    requires width >= 1u64
+    requires width * width <= board.len
+{
+    let idx: u64 = y * width + x;
+    if idx < board.len { board[idx] } else { 3u64 }
+}
+
+fn board_set(board: span<u64>, width: u64, x: u64, y: u64, val: u64)
+    requires width >= 1u64
+    requires width * width <= board.len
+{
+    let idx: u64 = y * width + x;
+    if idx < board.len { board[idx] = val; };
+}
+
+fn board_clear(board: span<u64>, size: u64)
+    requires size <= board.len
+{
+    let mut i: u64 = 0u64;
+    while i < size
+        invariant i <= size
+        decreases size - i
+    { board[i] = 0u64; i = i + 1u64; };
+}
+
+// ---- Snake ring buffer ------------------------------------------------------
+
+// Move head forward, return new head position.
+// dir: 0=right, 1=down, 2=left, 3=up
+fn next_pos_x(x: u64, dir: u64, width: u64) -> u64
+    requires width >= 2u64
+    ensures result < width
+{
+    let mut nx: u64 = x;
+    if dir == 0u64 { nx = if x + 1u64 < width { x + 1u64 } else { 0u64 }; }
+    else if dir == 2u64 { nx = if x > 0u64 { x - 1u64 } else { width - 1u64 }; };
+    if nx >= width { 0u64 } else { nx }
+}
+
+fn next_pos_y(y: u64, dir: u64, height: u64) -> u64
+    requires height >= 2u64
+    ensures result < height
+{
+    let mut ny: u64 = y;
+    if dir == 1u64 { ny = if y + 1u64 < height { y + 1u64 } else { 0u64 }; }
+    else if dir == 3u64 { ny = if y > 0u64 { y - 1u64 } else { height - 1u64 }; };
+    if ny >= height { 0u64 } else { ny }
+}
+
+// Advance the snake. Returns: 0=alive, 1=dead (hit self/wall), 2=ate food.
+fn snake_step(board: span<u64>, width: u64,
+              snake_x: span<u64>, snake_y: span<u64>,
+              max_snake: u64,
+              head: u64, tail: u64, length: u64,
+              dir: u64) -> (u64, u64, u64, u64)
+    requires width >= 2u64
+    requires width * width <= board.len
+    requires max_snake >= 2u64
+    requires max_snake <= snake_x.len
+    requires max_snake <= snake_y.len
+    requires head < max_snake
+    requires tail < max_snake
+    ensures result.1 < max_snake
+    ensures result.2 < max_snake
+{
+    // Compute new head position.
+    let old_hx: u64 = snake_x[head];
+    let old_hy: u64 = snake_y[head];
+    let nx: u64 = next_pos_x(old_hx, dir, width);
+    let ny: u64 = next_pos_y(old_hy, dir, width);
+
+    // Check what's at the new position.
+    let cell: u64 = board_get(board, width, nx, ny);
+
+    let mut status: u64 = 0u64;
+    let mut new_head: u64 = head;
+    let mut new_tail: u64 = tail;
+    let mut new_len: u64 = length;
+
+    if cell == 1u64 || cell == 3u64 {
+        status = 1u64;
+    } else {
+        new_head = if head + 1u64 == max_snake { 0u64 } else { head + 1u64 };
+        snake_x[new_head] = nx;
+        snake_y[new_head] = ny;
+        board_set(board, width, nx, ny, 1u64);
+
+        if cell == 2u64 {
+            status = 2u64;
+            new_len = length + 1u64;
+        } else {
+            let tx: u64 = snake_x[tail];
+            let ty: u64 = snake_y[tail];
+            board_set(board, width, tx, ty, 0u64);
+            new_tail = if tail + 1u64 == max_snake { 0u64 } else { tail + 1u64 };
+        };
+    };
+    (status, new_head, new_tail, new_len)
+}
+
+// Place food at a pseudo-random empty cell.
+fn place_food(board: span<u64>, size: u64, seed: u64) -> u64
+    requires size >= 1u64
+    requires size <= board.len
+{
+    let mut pos: u64 = seed % size;
+    let mut attempts: u64 = 0u64;
+    while attempts < size
+        invariant attempts <= size
+        invariant pos < size
+        decreases size - attempts
+    {
+        if board[pos] == 0u64 {
+            board[pos] = 2u64;
+            attempts = size;
+        } else {
+            pos = if pos + 1u64 == size { 0u64 } else { pos + 1u64 };
+            attempts = attempts + 1u64;
+        };
+    };
+    pos
+}
+
+// Initialize game state.
+fn init_game(board: span<u64>, width: u64,
+             snake_x: span<u64>, snake_y: span<u64>,
+             max_snake: u64) -> (u64, u64, u64)
+    requires width >= 4u64
+    requires width * width <= board.len
+    requires max_snake >= 4u64
+    requires max_snake <= snake_x.len
+    requires max_snake <= snake_y.len
+    ensures result.0 < max_snake
+    ensures result.1 < max_snake
+{
+    // Clear board.
+    board_clear(board, width * width);
+
+    // Place initial snake (length 3, heading right).
+    let start_x: u64 = width / 2u64;
+    let start_y: u64 = width / 2u64;
+
+    snake_x[0u64] = start_x - 2u64;
+    snake_y[0u64] = start_y;
+    board_set(board, width, start_x - 2u64, start_y, 1u64);
+
+    snake_x[1u64] = start_x - 1u64;
+    snake_y[1u64] = start_y;
+    board_set(board, width, start_x - 1u64, start_y, 1u64);
+
+    snake_x[2u64] = start_x;
+    snake_y[2u64] = start_y;
+    board_set(board, width, start_x, start_y, 1u64);
+
+    // Place first food.
+    let _food: u64 = place_food(board, width * width, 42u64);
+
+    // Return (head=2, tail=0, length=3).
+    (2u64, 0u64, 3u64)
+}
+
+// Count score (snake length - initial length).
+fn get_score(length: u64) -> u64 {
+    if length > 3u64 { length - 3u64 } else { 0u64 }
+}
+
+fn main() -> u64 { 0u64 }
