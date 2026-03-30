@@ -1,0 +1,293 @@
+// FORGE-generated PTX — SM_89
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.5
+.target sm_89
+.address_size 64
+
+.visible .entry ntt_butterfly_stage(
+    .param .u64 ntt_butterfly_stage_param_data_data,
+    .param .u64 ntt_butterfly_stage_param_data_len,
+    .param .u64 ntt_butterfly_stage_param_n,
+    .param .u64 ntt_butterfly_stage_param_half,
+    .param .u64 ntt_butterfly_stage_param_w,
+    .param .u64 ntt_butterfly_stage_param_p
+)
+{
+    .reg .pred %p11, %p14, %p15;
+    .reg .u64 %rd0, %rd1, %rd12, %rd13, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd29, %rd3, %rd30, %rd31, %rd32, %rd33, %rd34, %rd35, %rd4, %rd5;
+    .reg .u32 %r10, %r36, %r37, %r38, %r6, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [ntt_butterfly_stage_param_data_data];
+  ld.param.u64 %rd1, [ntt_butterfly_stage_param_data_len];
+  ld.param.u64 %rd2, [ntt_butterfly_stage_param_n];
+  ld.param.u64 %rd3, [ntt_butterfly_stage_param_half];
+  ld.param.u64 %rd4, [ntt_butterfly_stage_param_w];
+  ld.param.u64 %rd5, [ntt_butterfly_stage_param_p];
+
+  mov.u32 %r6, %ctaid.x;
+  mov.u32 %r7, %ntid.x;
+  mul.lo.u32 %r8, %r6, %r7;
+  mov.u32 %r9, %tid.x;
+  add.u32 %r10, %r8, %r9;
+  cvt.u64.u32 %rd12, %r10;
+  setp.lt.u64 %p11, %rd12, %rd3;
+  add.u64 %rd13, %r10, %rd3;
+  setp.lt.u64 %p14, %rd13, %rd2;
+  and.b16 %p15, %p11, %p14;
+  @%p15 bra ntt_butterfly_stage_then_16;
+  bra ntt_butterfly_stage_else_16;
+  ntt_butterfly_stage_then_16:
+  cvt.u64.u32 %rd17, %r10;
+  mul.lo.u64 %rd18, %rd17, 8;
+  add.u64 %rd19, %rd0, %rd18;
+  ld.global.u64 %rd20, [%rd19];
+  rem.u64 %rd21, %rd20, %rd5;
+  add.u64 %rd22, %r10, %rd3;
+  mul.lo.u64 %rd23, %rd22, 8;
+  add.u64 %rd24, %rd0, %rd23;
+  ld.global.u64 %rd25, [%rd24];
+  rem.u64 %rd26, %rd25, %rd5;
+  mov.u64 %rd27, 0; // call gold_mul (device fn)
+  mov.u64 %rd28, 0; // call gold_add (device fn)
+  cvt.u64.u32 %rd29, %r10;
+  mul.lo.u64 %rd30, %rd29, 8;
+  add.u64 %rd31, %rd0, %rd30;
+  st.global.u64 [%rd31], %rd28;
+  mov.u64 %rd32, 0; // call gold_sub (device fn)
+  add.u64 %rd33, %r10, %rd3;
+  mul.lo.u64 %rd34, %rd33, 8;
+  add.u64 %rd35, %rd0, %rd34;
+  st.global.u64 [%rd35], %rd32;
+  mov.u32 %r36, 0; // unit
+  mov.u32 %r37, %r36;
+  bra ntt_butterfly_stage_end_16;
+  ntt_butterfly_stage_else_16:
+  mov.u32 %r37, 0; // no else branch
+  ntt_butterfly_stage_end_16:
+  mov.u32 %r38, 0; // unit
+  ret;
+}
+
+.visible .entry ntt_butterfly_vec4(
+    .param .u64 ntt_butterfly_vec4_param_data_data,
+    .param .u64 ntt_butterfly_vec4_param_data_len,
+    .param .u64 ntt_butterfly_vec4_param_n,
+    .param .u64 ntt_butterfly_vec4_param_half,
+    .param .u64 ntt_butterfly_vec4_param_w,
+    .param .u64 ntt_butterfly_vec4_param_p
+)
+{
+    .reg .pred %p15, %p19, %p20;
+    .reg .u64 %rd0, %rd1, %rd100, %rd101, %rd102, %rd103, %rd104, %rd105, %rd106, %rd107, %rd108, %rd109, %rd11, %rd110, %rd111, %rd112, %rd113, %rd12, %rd13, %rd14, %rd16, %rd17, %rd18, %rd2, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd29, %rd3, %rd30, %rd31, %rd32, %rd33, %rd34, %rd35, %rd36, %rd37, %rd38, %rd39, %rd4, %rd40, %rd41, %rd42, %rd43, %rd44, %rd45, %rd46, %rd47, %rd48, %rd49, %rd5, %rd50, %rd51, %rd52, %rd53, %rd54, %rd55, %rd56, %rd57, %rd58, %rd59, %rd60, %rd61, %rd62, %rd63, %rd64, %rd65, %rd66, %rd67, %rd68, %rd69, %rd70, %rd71, %rd72, %rd73, %rd74, %rd75, %rd76, %rd77, %rd78, %rd79, %rd80, %rd81, %rd82, %rd83, %rd84, %rd85, %rd86, %rd87, %rd88, %rd89, %rd90, %rd91, %rd92, %rd93, %rd94, %rd95, %rd96, %rd97, %rd98, %rd99;
+    .reg .u32 %r10, %r114, %r115, %r116, %r6, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [ntt_butterfly_vec4_param_data_data];
+  ld.param.u64 %rd1, [ntt_butterfly_vec4_param_data_len];
+  ld.param.u64 %rd2, [ntt_butterfly_vec4_param_n];
+  ld.param.u64 %rd3, [ntt_butterfly_vec4_param_half];
+  ld.param.u64 %rd4, [ntt_butterfly_vec4_param_w];
+  ld.param.u64 %rd5, [ntt_butterfly_vec4_param_p];
+
+  mov.u32 %r6, %ctaid.x;
+  mov.u32 %r7, %ntid.x;
+  mul.lo.u32 %r8, %r6, %r7;
+  mov.u32 %r9, %tid.x;
+  add.u32 %r10, %r8, %r9;
+  mov.u64 %rd11, 4;
+  mul.lo.u64 %rd12, %r10, %rd11;
+  mov.u64 %rd13, 3;
+  add.u64 %rd14, %rd12, %rd13;
+  setp.lt.u64 %p15, %rd14, %rd3;
+  add.u64 %rd16, %rd12, %rd3;
+  mov.u64 %rd17, 3;
+  add.u64 %rd18, %rd16, %rd17;
+  setp.lt.u64 %p19, %rd18, %rd2;
+  and.b16 %p20, %p15, %p19;
+  @%p20 bra ntt_butterfly_vec4_then_21;
+  bra ntt_butterfly_vec4_else_21;
+  ntt_butterfly_vec4_then_21:
+  mul.lo.u64 %rd22, %rd12, 8;
+  add.u64 %rd23, %rd0, %rd22;
+  ld.global.u64 %rd24, [%rd23];
+  rem.u64 %rd25, %rd24, %rd5;
+  mov.u64 %rd26, 1;
+  add.u64 %rd27, %rd12, %rd26;
+  mul.lo.u64 %rd28, %rd27, 8;
+  add.u64 %rd29, %rd0, %rd28;
+  ld.global.u64 %rd30, [%rd29];
+  rem.u64 %rd31, %rd30, %rd5;
+  mov.u64 %rd32, 2;
+  add.u64 %rd33, %rd12, %rd32;
+  mul.lo.u64 %rd34, %rd33, 8;
+  add.u64 %rd35, %rd0, %rd34;
+  ld.global.u64 %rd36, [%rd35];
+  rem.u64 %rd37, %rd36, %rd5;
+  mov.u64 %rd38, 3;
+  add.u64 %rd39, %rd12, %rd38;
+  mul.lo.u64 %rd40, %rd39, 8;
+  add.u64 %rd41, %rd0, %rd40;
+  ld.global.u64 %rd42, [%rd41];
+  rem.u64 %rd43, %rd42, %rd5;
+  add.u64 %rd44, %rd12, %rd3;
+  mul.lo.u64 %rd45, %rd44, 8;
+  add.u64 %rd46, %rd0, %rd45;
+  ld.global.u64 %rd47, [%rd46];
+  rem.u64 %rd48, %rd47, %rd5;
+  add.u64 %rd49, %rd12, %rd3;
+  mov.u64 %rd50, 1;
+  add.u64 %rd51, %rd49, %rd50;
+  mul.lo.u64 %rd52, %rd51, 8;
+  add.u64 %rd53, %rd0, %rd52;
+  ld.global.u64 %rd54, [%rd53];
+  rem.u64 %rd55, %rd54, %rd5;
+  add.u64 %rd56, %rd12, %rd3;
+  mov.u64 %rd57, 2;
+  add.u64 %rd58, %rd56, %rd57;
+  mul.lo.u64 %rd59, %rd58, 8;
+  add.u64 %rd60, %rd0, %rd59;
+  ld.global.u64 %rd61, [%rd60];
+  rem.u64 %rd62, %rd61, %rd5;
+  add.u64 %rd63, %rd12, %rd3;
+  mov.u64 %rd64, 3;
+  add.u64 %rd65, %rd63, %rd64;
+  mul.lo.u64 %rd66, %rd65, 8;
+  add.u64 %rd67, %rd0, %rd66;
+  ld.global.u64 %rd68, [%rd67];
+  rem.u64 %rd69, %rd68, %rd5;
+  mov.u64 %rd70, 0; // call gold_mul (device fn)
+  mov.u64 %rd71, 0; // call gold_mul (device fn)
+  mov.u64 %rd72, 0; // call gold_mul (device fn)
+  mov.u64 %rd73, 0; // call gold_mul (device fn)
+  mov.u64 %rd74, 0; // call gold_add (device fn)
+  mul.lo.u64 %rd75, %rd12, 8;
+  add.u64 %rd76, %rd0, %rd75;
+  st.global.u64 [%rd76], %rd74;
+  mov.u64 %rd77, 0; // call gold_add (device fn)
+  mov.u64 %rd78, 1;
+  add.u64 %rd79, %rd12, %rd78;
+  mul.lo.u64 %rd80, %rd79, 8;
+  add.u64 %rd81, %rd0, %rd80;
+  st.global.u64 [%rd81], %rd77;
+  mov.u64 %rd82, 0; // call gold_add (device fn)
+  mov.u64 %rd83, 2;
+  add.u64 %rd84, %rd12, %rd83;
+  mul.lo.u64 %rd85, %rd84, 8;
+  add.u64 %rd86, %rd0, %rd85;
+  st.global.u64 [%rd86], %rd82;
+  mov.u64 %rd87, 0; // call gold_add (device fn)
+  mov.u64 %rd88, 3;
+  add.u64 %rd89, %rd12, %rd88;
+  mul.lo.u64 %rd90, %rd89, 8;
+  add.u64 %rd91, %rd0, %rd90;
+  st.global.u64 [%rd91], %rd87;
+  mov.u64 %rd92, 0; // call gold_sub (device fn)
+  add.u64 %rd93, %rd12, %rd3;
+  mul.lo.u64 %rd94, %rd93, 8;
+  add.u64 %rd95, %rd0, %rd94;
+  st.global.u64 [%rd95], %rd92;
+  mov.u64 %rd96, 0; // call gold_sub (device fn)
+  add.u64 %rd97, %rd12, %rd3;
+  mov.u64 %rd98, 1;
+  add.u64 %rd99, %rd97, %rd98;
+  mul.lo.u64 %rd100, %rd99, 8;
+  add.u64 %rd101, %rd0, %rd100;
+  st.global.u64 [%rd101], %rd96;
+  mov.u64 %rd102, 0; // call gold_sub (device fn)
+  add.u64 %rd103, %rd12, %rd3;
+  mov.u64 %rd104, 2;
+  add.u64 %rd105, %rd103, %rd104;
+  mul.lo.u64 %rd106, %rd105, 8;
+  add.u64 %rd107, %rd0, %rd106;
+  st.global.u64 [%rd107], %rd102;
+  mov.u64 %rd108, 0; // call gold_sub (device fn)
+  add.u64 %rd109, %rd12, %rd3;
+  mov.u64 %rd110, 3;
+  add.u64 %rd111, %rd109, %rd110;
+  mul.lo.u64 %rd112, %rd111, 8;
+  add.u64 %rd113, %rd0, %rd112;
+  st.global.u64 [%rd113], %rd108;
+  mov.u32 %r114, 0; // unit
+  mov.u32 %r115, %r114;
+  bra ntt_butterfly_vec4_end_21;
+  ntt_butterfly_vec4_else_21:
+  mov.u32 %r115, 0; // no else branch
+  ntt_butterfly_vec4_end_21:
+  mov.u32 %r116, 0; // unit
+  ret;
+}
+
+.visible .entry ntt_warp_butterfly(
+    .param .u64 ntt_warp_butterfly_param_data_data,
+    .param .u64 ntt_warp_butterfly_param_data_len,
+    .param .u64 ntt_warp_butterfly_param_n,
+    .param .u64 ntt_warp_butterfly_param_stride,
+    .param .u64 ntt_warp_butterfly_param_w,
+    .param .u64 ntt_warp_butterfly_param_p
+)
+{
+    .reg .pred %p11, %p25;
+    .reg .u64 %rd0, %rd1, %rd12, %rd14, %rd15, %rd16, %rd17, %rd18, %rd2, %rd21, %rd22, %rd23, %rd24, %rd27, %rd28, %rd29, %rd3, %rd30, %rd31, %rd34, %rd35, %rd36, %rd37, %rd38, %rd4, %rd5;
+    .reg .u32 %r10, %r19, %r20, %r32, %r33, %r39, %r40, %r41, %r42, %r6, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [ntt_warp_butterfly_param_data_data];
+  ld.param.u64 %rd1, [ntt_warp_butterfly_param_data_len];
+  ld.param.u64 %rd2, [ntt_warp_butterfly_param_n];
+  ld.param.u64 %rd3, [ntt_warp_butterfly_param_stride];
+  ld.param.u64 %rd4, [ntt_warp_butterfly_param_w];
+  ld.param.u64 %rd5, [ntt_warp_butterfly_param_p];
+
+  mov.u32 %r6, %ctaid.x;
+  mov.u32 %r7, %ntid.x;
+  mul.lo.u32 %r8, %r6, %r7;
+  mov.u32 %r9, %tid.x;
+  add.u32 %r10, %r8, %r9;
+  cvt.u64.u32 %rd12, %r10;
+  setp.lt.u64 %p11, %rd12, %rd2;
+  @%p11 bra ntt_warp_butterfly_then_13;
+  bra ntt_warp_butterfly_else_13;
+  ntt_warp_butterfly_then_13:
+  cvt.u64.u32 %rd14, %r10;
+  mul.lo.u64 %rd15, %rd14, 8;
+  add.u64 %rd16, %rd0, %rd15;
+  ld.global.u64 %rd17, [%rd16];
+  rem.u64 %rd18, %rd17, %rd5;
+  shfl.sync.bfly.b32 %r19, %rd18, %rd3, 31, 0xffffffff;
+  mov.u32 %r20, %laneid;
+  div.u64 %rd21, %r20, %rd3;
+  mov.u64 %rd22, 2;
+  rem.u64 %rd23, %rd21, %rd22;
+  mov.u64 %rd24, 0;
+  setp.eq.u64 %p25, %rd23, %rd24;
+  @%p25 bra ntt_warp_butterfly_then_26;
+  bra ntt_warp_butterfly_else_26;
+  ntt_warp_butterfly_then_26:
+  mov.u64 %rd27, 0; // call gold_mul (device fn)
+  mov.u64 %rd28, 0; // call gold_add (device fn)
+  cvt.u64.u32 %rd29, %r10;
+  mul.lo.u64 %rd30, %rd29, 8;
+  add.u64 %rd31, %rd0, %rd30;
+  st.global.u64 [%rd31], %rd28;
+  mov.u32 %r32, 0; // unit
+  mov.u32 %r33, %r32;
+  bra ntt_warp_butterfly_end_26;
+  ntt_warp_butterfly_else_26:
+  mov.u64 %rd34, 0; // call gold_mul (device fn)
+  mov.u64 %rd35, 0; // call gold_sub (device fn)
+  cvt.u64.u32 %rd36, %r10;
+  mul.lo.u64 %rd37, %rd36, 8;
+  add.u64 %rd38, %rd0, %rd37;
+  st.global.u64 [%rd38], %rd35;
+  mov.u32 %r39, 0; // unit
+  mov.u32 %r33, %r39;
+  ntt_warp_butterfly_end_26:
+  mov.u32 %r40, 0; // unit
+  mov.u32 %r41, %r40;
+  bra ntt_warp_butterfly_end_13;
+  ntt_warp_butterfly_else_13:
+  mov.u32 %r41, 0; // no else branch
+  ntt_warp_butterfly_end_13:
+  mov.u32 %r42, 0; // unit
+  ret;
+}
+

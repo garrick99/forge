@@ -1,0 +1,138 @@
+// Verified NTT Butterfly Kernel — Goldilocks prime field
+//
+// Goldilocks prime: p = 2^64 - 2^32 + 1 = 18446744069414584321
+// This is the field used in Plonky2, Plonky3, and STARK provers.
+//
+// Each butterfly computes:
+//   a' = (a + b * w) mod p
+//   b' = (a - b * w) mod p
+//
+// Proven: all array accesses within bounds, modular results < p.
+
+use std::gpu;
+
+// Goldilocks prime.
+fn goldilocks_p() -> u64
+    ensures result == 18446744069414584321u64
+{ 18446744069414584321u64 }
+
+// Goldilocks modular add: (a + b) mod p.
+fn gold_add(a: u64, b: u64, p: u64) -> u64
+    requires p >= 2u64
+    requires a < p
+    requires b < p
+    ensures result < p
+{
+    let sum: u64 = a + b;
+    if sum >= p { sum - p } else { sum }
+}
+
+// Goldilocks modular subtract: (a - b) mod p.
+fn gold_sub(a: u64, b: u64, p: u64) -> u64
+    requires p >= 2u64
+    requires a < p
+    requires b < p
+    ensures result < p
+{
+    if a >= b { a - b } else { p - b + a }
+}
+
+// Goldilocks modular multiply: (a * b) mod p.
+// For the benchmark we use the simple % operator.
+// A production implementation would use Barrett or Montgomery reduction.
+fn gold_mul(a: u64, b: u64, p: u64) -> u64
+    requires p >= 2u64
+    ensures result < p
+{
+    (a * b) % p
+}
+
+// ---- NTT Butterfly kernel ---------------------------------------------------
+
+// One NTT butterfly stage: pairs separated by `half` distance.
+// data[i] and data[i + half] form each butterfly pair.
+// w = twiddle factor for this stage.
+#[kernel]
+fn ntt_butterfly_stage(data: span<u64>, n: u64, half: u64, w: u64, p: u64)
+    requires n <= data.len
+    requires p >= 2u64
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+
+    // Each thread processes one butterfly pair.
+    if tid < half && tid + half < n {
+        let a: u64 = data[tid] % p;
+        let b: u64 = data[tid + half] % p;
+        let bw: u64 = gold_mul(b, w, p);
+        data[tid] = gold_add(a, bw, p);
+        data[tid + half] = gold_sub(a, bw, p);
+    };
+}
+
+// ---- Vectorized NTT: process multiple butterflies per thread ----------------
+
+#[kernel]
+fn ntt_butterfly_vec4(data: span<u64>, n: u64, half: u64, w: u64, p: u64)
+    requires n <= data.len
+    requires p >= 2u64
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    let base: u64 = tid * 4u64;
+
+    if base + 3u64 < half && base + half + 3u64 < n {
+        let a0: u64 = data[base] % p;
+        let a1: u64 = data[base + 1u64] % p;
+        let a2: u64 = data[base + 2u64] % p;
+        let a3: u64 = data[base + 3u64] % p;
+        let b0: u64 = data[base + half] % p;
+        let b1: u64 = data[base + half + 1u64] % p;
+        let b2: u64 = data[base + half + 2u64] % p;
+        let b3: u64 = data[base + half + 3u64] % p;
+
+        let bw0: u64 = gold_mul(b0, w, p);
+        let bw1: u64 = gold_mul(b1, w, p);
+        let bw2: u64 = gold_mul(b2, w, p);
+        let bw3: u64 = gold_mul(b3, w, p);
+
+        data[base] = gold_add(a0, bw0, p);
+        data[base + 1u64] = gold_add(a1, bw1, p);
+        data[base + 2u64] = gold_add(a2, bw2, p);
+        data[base + 3u64] = gold_add(a3, bw3, p);
+        data[base + half] = gold_sub(a0, bw0, p);
+        data[base + half + 1u64] = gold_sub(a1, bw1, p);
+        data[base + half + 2u64] = gold_sub(a2, bw2, p);
+        data[base + half + 3u64] = gold_sub(a3, bw3, p);
+    };
+}
+
+// ---- Warp-level NTT (stride < 32) ------------------------------------------
+// For small strides, butterflies happen entirely in registers via shuffles.
+
+#[kernel]
+fn ntt_warp_butterfly(data: span<u64>, n: u64, stride: u64, w: u64, p: u64)
+    requires n <= data.len
+    requires p >= 2u64
+    requires stride >= 1u64
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        let val: u64 = data[tid] % p;
+
+        // Get partner value via warp shuffle.
+        let partner_val: u64 = shfl_xor_sync(val, stride, 32u64);
+        let lid: u64 = lane_id();
+
+        // Determine if this lane is the "top" or "bottom" of the butterfly.
+        if (lid / stride) % 2u64 == 0u64 {
+            // Top: a' = (val + partner * w) mod p
+            let bw: u64 = gold_mul(partner_val % p, w, p);
+            data[tid] = gold_add(val, bw, p);
+        } else {
+            // Bottom: b' = (partner - val * w) mod p
+            let aw: u64 = gold_mul(val, w, p);
+            data[tid] = gold_sub(partner_val % p, aw, p);
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }
