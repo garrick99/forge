@@ -1,0 +1,35 @@
+// expected: 0
+// Demo 861: Verified Karatsuba multiply — schoolbook fallback
+//
+// schoolbook_mul(a, b) computes a * b directly for small values.
+// split_mul(a_lo, a_hi, b_lo, b_hi, base) uses Karatsuba-style:
+//   z0 = a_lo * b_lo, z2 = a_hi * b_hi,
+//   z1 = (a_lo + a_hi) * (b_lo + b_hi) - z0 - z2
+//   result = z2 * base * base + z1 * base + z0
+// Postcondition: result >= z0 (lower bound).
+//
+fn schoolbook_mul(a: u64, b: u64) -> u64
+    ensures result == a * b
+{
+    a * b
+}
+
+fn karatsuba_step(a_lo: u64, a_hi: u64, b_lo: u64, b_hi: u64, base: u64) -> u64
+    requires a_lo < base
+    requires a_hi < base
+    requires b_lo < base
+    requires b_hi < base
+    requires base > 0u64
+    requires base <= 256u64
+    ensures result >= a_lo * b_lo
+{
+    let z0: u64 = a_lo * b_lo;
+    let z2: u64 = a_hi * b_hi;
+    let sum_a: u64 = a_lo + a_hi;
+    let sum_b: u64 = b_lo + b_hi;
+    let z1_full: u64 = sum_a * sum_b;
+    let z1: u64 = z1_full - z0 - z2;
+    z2 * base * base + z1 * base + z0
+}
+
+fn main() -> u64 { 0u64 }

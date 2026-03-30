@@ -1,0 +1,60 @@
+// expected: 0
+// Demo 872: Verified base64 encode
+//
+// base64_out_len(n) computes the output length for n input bytes: ceil(n/3)*4.
+// base64_encode(input, n, output, out_len, table) encodes 3 bytes -> 4 chars.
+// Postcondition: all output indices are valid table lookups (< 64).
+//
+fn base64_out_len(n: u64) -> u64
+    ensures result >= n
+{
+    let groups: u64 = (n + 2u64) / 3u64;
+    groups * 4u64
+}
+
+fn encode_triple(b0: u64, b1: u64, b2: u64,
+                 table: span<u64>, out: span<u64>, oi: u64)
+    requires table.len == 64u64
+    requires out.len > oi + 3u64
+    requires b0 < 256u64
+    requires b1 < 256u64
+    requires b2 < 256u64
+{
+    let combined: u64 = b0 * 65536u64 + b1 * 256u64 + b2;
+    let i0: u64 = (combined / 262144u64) % 64u64;
+    let i1: u64 = (combined / 4096u64) % 64u64;
+    let i2: u64 = (combined / 64u64) % 64u64;
+    let i3: u64 = combined % 64u64;
+    out[oi] = table[i0];
+    out[oi + 1u64] = table[i1];
+    out[oi + 2u64] = table[i2];
+    out[oi + 3u64] = table[i3];
+}
+
+fn base64_encode(input: span<u64>, n: u64,
+                 output: span<u64>, out_len: u64,
+                 table: span<u64>) -> u64
+    requires input.len == n
+    requires table.len == 64u64
+    requires output.len == out_len
+    requires out_len >= base64_out_len(n)
+    ensures result <= out_len
+{
+    let mut ii: u64 = 0u64;
+    let mut oi: u64 = 0u64;
+    while ii + 2u64 < n
+        invariant ii <= n
+        invariant oi <= out_len
+        decreases n - ii
+    {
+        if oi + 3u64 < out_len {
+            encode_triple(input[ii] % 256u64, input[ii + 1u64] % 256u64, input[ii + 2u64] % 256u64,
+                         table, output, oi);
+            oi = oi + 4u64;
+        };
+        ii = ii + 3u64;
+    };
+    oi
+}
+
+fn main() -> u64 { 0u64 }

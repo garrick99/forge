@@ -1,0 +1,51 @@
+// expected: 0
+// Demo 897: Verified rope concatenation
+//
+// A rope is a flat array with (offset, length) pairs representing pieces.
+// concat(rope_a, na, rope_b, nb, out) merges two ropes into out.
+// Postcondition: output length == na + nb, all entries copied.
+//
+fn rope_concat(a: span<u64>, na: u64, b: span<u64>, nb: u64, out: span<u64>)
+    requires a.len == na
+    requires b.len == nb
+    requires out.len == na + nb
+    ensures forall k: u64, k < na ==> out[k] == a[k]
+{
+    let mut i: u64 = 0u64;
+    while i < na
+        invariant i <= na
+        invariant forall k: u64, k < i ==> out[k] == a[k]
+        decreases na - i
+    {
+        out[i] = a[i];
+        i = i + 1u64;
+    };
+    let mut j: u64 = 0u64;
+    while j < nb
+        invariant j <= nb
+        invariant forall k: u64, k < na ==> out[k] == a[k]
+        decreases nb - j
+    {
+        out[na + j] = b[j];
+        j = j + 1u64;
+    };
+}
+
+fn rope_length(pieces_len: span<u64>, npieces: u64) -> u64
+    requires pieces_len.len == npieces
+    ensures result >= 0u64
+{
+    let mut total: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < npieces
+        invariant i <= npieces
+        invariant total >= 0u64
+        decreases npieces - i
+    {
+        total = total + pieces_len[i];
+        i = i + 1u64;
+    };
+    total
+}
+
+fn main() -> u64 { 0u64 }

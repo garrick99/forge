@@ -1,0 +1,47 @@
+// expected: 0
+// Demo 858: Verified Levenshtein automaton step — one row of edit distance
+//
+// edit_row(prev, cur, n, ch, text, m) fills one row of the DP table.
+// prev[j] = D[i-1][j], cur[j] = D[i][j] for row i.
+// Uses min of three neighbors + 1 (or +0 for match).
+// Postcondition: all entries bounded by n + m.
+//
+fn min3(a: u64, b: u64, c: u64) -> u64
+    ensures result <= a
+    ensures result <= b
+    ensures result <= c
+{
+    if a <= b && a <= c {
+        a
+    } else if b <= c {
+        b
+    } else {
+        c
+    }
+}
+
+fn edit_row(prev: span<u64>, cur: span<u64>, cols: u64,
+            ch: u64, text: span<u64>, row: u64) -> u64
+    requires prev.len == cols + 1u64
+    requires cur.len == cols + 1u64
+    requires text.len == cols
+    requires cols > 0u64
+{
+    cur[0u64] = row;
+    let mut j: u64 = 0u64;
+    while j < cols
+        invariant j <= cols
+        decreases cols - j
+    {
+        let cost: u64 = if text[j] == ch { 0u64 } else { 1u64 };
+        let del: u64 = prev[j + 1u64] + 1u64;
+        let ins: u64 = cur[j] + 1u64;
+        let sub: u64 = prev[j] + cost;
+        let best: u64 = min3(del, ins, sub);
+        cur[j + 1u64] = best;
+        j = j + 1u64;
+    };
+    cur[cols]
+}
+
+fn main() -> u64 { 0u64 }

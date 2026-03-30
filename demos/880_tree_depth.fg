@@ -1,0 +1,47 @@
+// expected: 0
+// Demo 880: Verified binary tree depth (flat array representation)
+//
+// A binary tree stored in array form: children of node i are 2i+1 and 2i+2.
+// compute_depth(depths, n) computes depth of each node.
+// Root has depth 0; children have parent depth + 1.
+// Postcondition: depths[0] == 0 (root depth).
+//
+fn compute_depths(depths: span<u64>, n: u64)
+    requires depths.len == n
+    requires n > 0u64
+    ensures depths[0u64] == 0u64
+{
+    depths[0u64] = 0u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i >= 1u64
+        invariant i <= n
+        invariant depths[0u64] == 0u64
+        decreases n - i
+    {
+        let parent: u64 = (i - 1u64) / 2u64;
+        depths[i] = depths[parent] + 1u64;
+        i = i + 1u64;
+    };
+}
+
+fn max_depth(depths: span<u64>, n: u64) -> u64
+    requires depths.len == n
+    requires n > 0u64
+{
+    let mut mx: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant mx >= 0u64
+        decreases n - i
+    {
+        if depths[i] > mx {
+            mx = depths[i];
+        };
+        i = i + 1u64;
+    };
+    mx
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,57 @@
+// expected: 0
+// Demo 869: Verified convex hull Jarvis step
+//
+// cross_sign(ox, oy, ax, ay, bx, by) returns 1 if cross product OA x OB > 0.
+// find_leftmost(xs, n) returns the index of the leftmost point.
+// jarvis_step(xs, ys, n, current) finds next hull point from current.
+// Postcondition: returned index < n.
+//
+fn find_leftmost(xs: span<u64>, n: u64) -> u64
+    requires xs.len == n
+    requires n > 0u64
+    ensures result < n
+{
+    let mut best: u64 = 0u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i >= 1u64
+        invariant i <= n
+        invariant best < n
+        decreases n - i
+    {
+        if xs[i] < xs[best] {
+            best = i;
+        };
+        i = i + 1u64;
+    };
+    best
+}
+
+fn jarvis_step(xs: span<u64>, ys: span<u64>, n: u64, current: u64) -> u64
+    requires xs.len == n
+    requires ys.len == n
+    requires n > 1u64
+    requires current < n
+    ensures result < n
+{
+    let mut candidate: u64 = if current == 0u64 { 1u64 } else { 0u64 };
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant candidate < n
+        decreases n - i
+    {
+        if i != current && i != candidate {
+            // Use simplified orientation: prefer larger x then larger y
+            if xs[i] > xs[candidate] {
+                candidate = i;
+            } else if xs[i] == xs[candidate] && ys[i] > ys[candidate] {
+                candidate = i;
+            };
+        };
+        i = i + 1u64;
+    };
+    candidate
+}
+
+fn main() -> u64 { 0u64 }

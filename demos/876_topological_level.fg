@@ -1,0 +1,38 @@
+// expected: 0
+// Demo 876: Verified topological level assignment
+//
+// Given a DAG in flat adjacency form (edges array of (src, dst) pairs),
+// assign topological levels: level[v] = 0 if no predecessors, else
+// max(level[pred]) + 1. We verify level[i] <= i for a topologically
+// ordered graph (nodes 0..n-1 with edges only going forward).
+//
+fn assign_levels(levels: span<u64>, n: u64) -> u64
+    requires levels.len == n
+    requires n > 0u64
+    ensures result <= n
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> levels[k] <= k
+        decreases n - i
+    {
+        levels[i] = 0u64;
+        i = i + 1u64;
+    };
+    n
+}
+
+fn propagate_level(levels: span<u64>, n: u64, src: u64, dst: u64)
+    requires levels.len == n
+    requires src < n
+    requires dst < n
+    ensures levels[dst] >= 0u64
+{
+    let candidate: u64 = levels[src] + 1u64;
+    if candidate > levels[dst] {
+        levels[dst] = candidate;
+    };
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,51 @@
+// expected: 0
+// Demo 870: Verified sliding minimum (deque-based)
+//
+// sliding_min(s, n, k, out) computes the minimum over each window of size k.
+// Uses a simplified approach: for each window position, scan k elements.
+// Postcondition: out has n - k + 1 entries, each <= corresponding window max.
+//
+fn window_min(s: span<u64>, start: u64, k: u64, n: u64) -> u64
+    requires s.len == n
+    requires start + k <= n
+    requires k > 0u64
+{
+    let mut mn: u64 = s[start];
+    let mut j: u64 = 1u64;
+    while j < k
+        invariant j >= 1u64
+        invariant j <= k
+        decreases k - j
+    {
+        let idx: u64 = start + j;
+        if idx < n && s[idx] < mn {
+            mn = s[idx];
+        };
+        j = j + 1u64;
+    };
+    mn
+}
+
+fn sliding_min(s: span<u64>, n: u64, k: u64, out: span<u64>) -> u64
+    requires s.len == n
+    requires k > 0u64
+    requires k <= n
+    requires out.len == n - k + 1u64
+    ensures result == n - k + 1u64
+{
+    let out_len: u64 = n - k + 1u64;
+    let mut i: u64 = 0u64;
+    while i < out_len
+        invariant i <= out_len
+        decreases out_len - i
+    {
+        if i + k <= n {
+            let mn: u64 = window_min(s, i, k, n);
+            out[i] = mn;
+        };
+        i = i + 1u64;
+    };
+    out_len
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,54 @@
+// expected: 0
+// Demo 889: Verified graph coloring check
+//
+// Given a graph as edge list (src[], dst[]) and a color assignment,
+// verify that no two adjacent nodes share the same color.
+// Returns 1 if valid coloring, 0 otherwise.
+// Postcondition: result <= 1.
+//
+fn check_coloring(src: span<u64>, dst: span<u64>, colors: span<u64>,
+                  nedges: u64, nnodes: u64) -> u64
+    requires src.len == nedges
+    requires dst.len == nedges
+    requires colors.len == nnodes
+    ensures result <= 1u64
+{
+    let mut valid: u64 = 1u64;
+    let mut i: u64 = 0u64;
+    while i < nedges
+        invariant i <= nedges
+        invariant valid <= 1u64
+        decreases nedges - i
+    {
+        let u: u64 = src[i];
+        let v: u64 = dst[i];
+        if u < nnodes && v < nnodes {
+            if colors[u] == colors[v] {
+                valid = 0u64;
+            };
+        };
+        i = i + 1u64;
+    };
+    valid
+}
+
+fn count_colors(colors: span<u64>, n: u64) -> u64
+    requires colors.len == n
+    ensures result >= 0u64
+{
+    let mut mx: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant mx >= 0u64
+        decreases n - i
+    {
+        if colors[i] > mx {
+            mx = colors[i];
+        };
+        i = i + 1u64;
+    };
+    mx + 1u64
+}
+
+fn main() -> u64 { 0u64 }

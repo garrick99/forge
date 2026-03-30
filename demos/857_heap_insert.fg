@@ -1,0 +1,42 @@
+// expected: 0
+// Demo 857: Verified priority queue insert — binary heap sift-up
+//
+// heap_insert(heap, sz, val) inserts val at position sz and sifts up.
+// Sift-up swaps with parent while child < parent (min-heap).
+// Postcondition: new size is sz + 1.
+//
+fn heap_sift_up(heap: span<u64>, sz: u64) -> u64
+    requires heap.len > sz
+    requires sz > 0u64
+    ensures result <= sz
+{
+    let mut i: u64 = sz;
+    while i > 0u64
+        invariant i <= sz
+        decreases i
+    {
+        let parent: u64 = (i - 1u64) / 2u64;
+        if parent < sz && heap[i] < heap[parent] {
+            let tmp: u64 = heap[i];
+            heap[i] = heap[parent];
+            heap[parent] = tmp;
+            i = parent;
+        } else {
+            i = 0u64;
+        };
+    };
+    i
+}
+
+fn heap_insert(heap: span<u64>, sz: u64, val: u64) -> u64
+    requires heap.len > sz
+    requires sz < heap.len
+    requires sz > 0u64
+    ensures result == sz + 1u64
+{
+    heap[sz] = val;
+    let _pos: u64 = heap_sift_up(heap, sz);
+    sz + 1u64
+}
+
+fn main() -> u64 { 0u64 }

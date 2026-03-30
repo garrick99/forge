@@ -1,0 +1,51 @@
+// expected: 0
+// Demo 882: Verified bit reversal permutation
+//
+// reverse_bits(val, nbits) reverses the lowest nbits of val.
+// Used in FFT butterfly reordering.
+// Postcondition: result fits in nbits (result < 2^nbits approximated).
+//
+fn reverse_bits(val: u64, nbits: u64) -> u64
+    requires nbits > 0u64
+    requires nbits <= 16u64
+    ensures result >= 0u64
+{
+    let mut v: u64 = val;
+    let mut rev: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < nbits
+        invariant i <= nbits
+        invariant rev >= 0u64
+        decreases nbits - i
+    {
+        rev = rev * 2u64 + v % 2u64;
+        v = v / 2u64;
+        i = i + 1u64;
+    };
+    rev
+}
+
+fn bit_reversal_permute(s: span<u64>, tmp: span<u64>, n: u64, nbits: u64)
+    requires s.len == n
+    requires tmp.len == n
+    requires nbits <= 16u64
+    requires nbits > 0u64
+    ensures forall k: u64, k < n ==> tmp[k] >= 0u64
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> tmp[k] >= 0u64
+        decreases n - i
+    {
+        let j: u64 = reverse_bits(i, nbits);
+        if j < n {
+            tmp[i] = s[j];
+        } else {
+            tmp[i] = 0u64;
+        };
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

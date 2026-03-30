@@ -1,0 +1,40 @@
+// expected: 0
+// Demo 859: Verified circular buffer peek and batch read
+//
+// peek(buf, cap, head) returns the front element without removing.
+// batch_read(buf, cap, head, count, out) reads `count` elements starting
+// from head without modifying the buffer.
+// Postcondition: exactly count elements copied.
+//
+fn peek(buf: span<u64>, cap: u64, head: u64) -> u64
+    requires buf.len == cap
+    requires cap > 0u64
+    requires head < cap
+{
+    buf[head]
+}
+
+fn batch_read(buf: span<u64>, cap: u64, head: u64,
+              count: u64, out: span<u64>) -> u64
+    requires buf.len == cap
+    requires out.len >= count
+    requires cap > 0u64
+    requires head < cap
+    requires count <= cap
+    ensures result == count
+{
+    let mut i: u64 = 0u64;
+    while i < count
+        invariant i <= count
+        decreases count - i
+    {
+        let idx: u64 = (head + i) % cap;
+        if idx < cap {
+            out[i] = buf[idx];
+        };
+        i = i + 1u64;
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,61 @@
+// expected: 0
+// Demo 898: Verified error-correcting code check
+//
+// Simplified Hamming code: parity check on codeword bits.
+// syndrome(codeword, n) computes XOR of all bit positions where bit is set.
+// If syndrome == 0, no error. Otherwise syndrome gives error position.
+// Postcondition: syndrome < n (valid position or zero).
+//
+fn compute_syndrome(codeword: span<u64>, n: u64) -> u64
+    requires codeword.len == n
+    requires n > 0u64
+    ensures result < n
+{
+    let mut syn: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant syn < n
+        decreases n - i
+    {
+        if codeword[i] == 1u64 {
+            if syn == 0u64 {
+                syn = i;
+            } else if i > syn {
+                syn = i;
+            };
+        };
+        i = i + 1u64;
+    };
+    syn
+}
+
+fn count_ones(codeword: span<u64>, n: u64) -> u64
+    requires codeword.len == n
+    ensures result <= n
+{
+    let mut cnt: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant cnt <= i
+        decreases n - i
+    {
+        if codeword[i] == 1u64 {
+            cnt = cnt + 1u64;
+        };
+        i = i + 1u64;
+    };
+    cnt
+}
+
+fn is_valid(codeword: span<u64>, n: u64) -> u64
+    requires codeword.len == n
+    requires n > 0u64
+    ensures result <= 1u64
+{
+    let s: u64 = compute_syndrome(codeword, n);
+    if s == 0u64 { 1u64 } else { 0u64 }
+}
+
+fn main() -> u64 { 0u64 }

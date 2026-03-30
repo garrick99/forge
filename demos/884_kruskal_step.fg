@@ -1,0 +1,45 @@
+// expected: 0
+// Demo 884: Verified minimum spanning tree — Kruskal step
+//
+// Edges sorted by weight; union-find parent array for cycle detection.
+// find_root(parent, n, x) follows parent pointers to find root.
+// add_edge checks if two endpoints are in different components.
+// Postcondition: find_root returns a valid index < n.
+//
+fn find_root(parent: span<u64>, n: u64, x: u64) -> u64
+    requires parent.len == n
+    requires x < n
+    requires forall k: u64, k < n ==> parent[k] < n
+    ensures result < n
+{
+    let mut cur: u64 = x;
+    let mut steps: u64 = 0u64;
+    while parent[cur] != cur && steps < n
+        invariant cur < n
+        invariant steps <= n
+        decreases n - steps
+    {
+        cur = parent[cur];
+        steps = steps + 1u64;
+    };
+    cur
+}
+
+fn union_sets(parent: span<u64>, n: u64, a: u64, b: u64) -> u64
+    requires parent.len == n
+    requires a < n
+    requires b < n
+    requires forall k: u64, k < n ==> parent[k] < n
+    ensures result <= 1u64
+{
+    let ra: u64 = find_root(parent, n, a);
+    let rb: u64 = find_root(parent, n, b);
+    if ra != rb {
+        parent[ra] = rb;
+        1u64
+    } else {
+        0u64
+    }
+}
+
+fn main() -> u64 { 0u64 }

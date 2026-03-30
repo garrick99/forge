@@ -1,0 +1,50 @@
+// expected: 0
+// Demo 868: Verified red-black tree color check
+//
+// Flat array representation: node i has left=2i+1, right=2i+2.
+// colors[i]: 0 = black, 1 = red.
+// check_no_red_red(colors, n) verifies no red node has a red parent.
+// Postcondition: returns 1 if valid, 0 if violation found.
+//
+fn check_no_red_red(colors: span<u64>, n: u64) -> u64
+    requires colors.len == n
+    requires n > 0u64
+    ensures result <= 1u64
+{
+    let mut valid: u64 = 1u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i >= 1u64
+        invariant i <= n
+        invariant valid <= 1u64
+        decreases n - i
+    {
+        let parent: u64 = (i - 1u64) / 2u64;
+        if parent < n && colors[i] == 1u64 && colors[parent] == 1u64 {
+            valid = 0u64;
+        };
+        i = i + 1u64;
+    };
+    valid
+}
+
+fn count_black(colors: span<u64>, n: u64) -> u64
+    requires colors.len == n
+    ensures result <= n
+{
+    let mut count: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant count <= i
+        decreases n - i
+    {
+        if colors[i] == 0u64 {
+            count = count + 1u64;
+        };
+        i = i + 1u64;
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

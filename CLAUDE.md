@@ -55,7 +55,13 @@ Pipeline: parse → typecheck → generate obligations → discharge (Z3/guided/
 `OPrecondition`, `OPostcondition`, `OBoundsCheck`, `ONoOverflow`, `OTermination`, `OLinear`, `OInvariant`
 
 ### Cross-function postcondition injection
-When `let x = f(args)` is bound, `inject_postconds` (in `stmts_final_env | SLet`) substitutes the callee's `ensures` clauses into the caller's proof context. This enables multi-step verified pipelines.
+Callee postconditions are injected as facts in four patterns:
+- `let x = f(args)` — SLet path (`inject_postconds`)
+- `x = f(args)` — SExpr/EAssign/EVar path (substitutes result with PVar v)
+- `s[i] = f(args)` — SExpr/EAssign/EIndex path (substitutes result with rhs_pred)
+- `f(args)` — SExpr/ECall void call path (no result substitution)
+
+All four paths exist in BOTH `stmt_final_env` (postcondition proof) and `check_stmt` (intra-body precondition checking).
 
 ### Recursive induction hypothesis injection
 For well-founded recursive functions (`decreases` clause), `inject_rec` walks the body to find recursive `SLet` calls and injects the function's own postconditions as induction hypotheses (sound by strong induction on the decreasing measure).
@@ -102,6 +108,22 @@ if s[0u64] > s[1u64] { let tmp = s[0u64]; s[0u64] = s[1u64]; s[1u64] = tmp; }
 
 ### `while !done` flag pattern
 Avoid boolean flag loops — they break termination proofs when the flag-set branch doesn't decrease the measure. Use direct loop conditions instead.
+
+## Common Proof Workarounds
+
+### Postconditions inside if-branches
+`x = f(args)` inside an `if` branch is not a direct `SExpr(EAssign(EVar, ECall))` — it's wrapped in `SExpr(EIf(cond, EBlock([..., SExpr(EAssign)]), ...))`. Postconditions from `f` are NOT injected. Workaround: hoist the call before the branch:
+```forge
+let result_a = f(x);  // postcondition injected here
+let result_b = g(y);  // postcondition injected here
+if cond { x = result_a; } else { x = result_b; };
+```
+
+### Boolean flag loops
+`while cond && !done` with `done = true` to break: the ITE encoding of the `done` flag combined with the loop variable creates complex expressions Z3 can't handle. Prefer: use `steps = max_val` to force loop exit, or restructure to avoid the flag.
+
+### Early exit via index overflow
+`i = n + 1u64` to break a `while i < n` loop violates `invariant i <= n`. Use a `found` variable or set `i = n` (not n+1) to exit cleanly.
 
 ## Reserved Keywords
 `result`, `trans` — cannot be used as variable names.

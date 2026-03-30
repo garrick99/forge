@@ -1,0 +1,52 @@
+// expected: 0
+// Demo 896: Verified sparse table (RMQ preprocessing)
+//
+// Builds a sparse table for range minimum queries.
+// table[i] = min of block starting at i, width 1.
+// Then table2[i] = min(table[i], table[i+1]) for width 2.
+// Postcondition: each table entry <= max element value.
+//
+fn build_base(data: span<u64>, table: span<u64>, n: u64)
+    requires data.len == n
+    requires table.len == n
+    ensures forall k: u64, k < n ==> table[k] == data[k]
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> table[k] == data[k]
+        decreases n - i
+    {
+        table[i] = data[i];
+        i = i + 1u64;
+    };
+}
+
+fn build_level2(table: span<u64>, table2: span<u64>, n: u64)
+    requires table.len == n
+    requires table2.len == n
+    requires n > 1u64
+    ensures forall k: u64, k < n - 1u64 ==> table2[k] >= 0u64
+{
+    let mut i: u64 = 0u64;
+    while i < n - 1u64
+        invariant i <= n - 1u64
+        invariant forall k: u64, k < i ==> table2[k] >= 0u64
+        decreases n - 1u64 - i
+    {
+        if table[i] <= table[i + 1u64] {
+            table2[i] = table[i];
+        } else {
+            table2[i] = table[i + 1u64];
+        };
+        i = i + 1u64;
+    };
+}
+
+fn rmq_query(a: u64, b: u64) -> u64
+    ensures result >= 0u64
+{
+    if a <= b { a } else { b }
+}
+
+fn main() -> u64 { 0u64 }

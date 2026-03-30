@@ -1,0 +1,53 @@
+// expected: 0
+// Demo 899: Verified probabilistic data structure (HyperLogLog-like)
+//
+// Simplified HyperLogLog: m registers, each tracking max leading zeros.
+// add_hash(registers, m, hash) updates register[hash % m] with
+// leading_zeros(hash / m). estimate returns raw indicator sum.
+// Postcondition: each register <= 64 (max leading zeros for u64).
+//
+fn leading_zeros_approx(val: u64) -> u64
+    ensures result <= 64u64
+{
+    let mut v: u64 = val;
+    let mut cnt: u64 = 0u64;
+    while v > 0u64 && cnt < 64u64
+        invariant cnt <= 64u64
+        decreases 64u64 - cnt
+    {
+        v = v / 2u64;
+        cnt = cnt + 1u64;
+    };
+    if val == 0u64 { 64u64 } else { 64u64 - cnt }
+}
+
+fn hll_add(registers: span<u64>, m: u64, hash: u64)
+    requires registers.len == m
+    requires m > 0u64
+{
+    let idx: u64 = hash % m;
+    let lz: u64 = leading_zeros_approx(hash / m);
+    if lz > registers[idx] {
+        registers[idx] = lz;
+    };
+}
+
+fn hll_estimate(registers: span<u64>, m: u64) -> u64
+    requires registers.len == m
+    requires m > 0u64
+    ensures result >= 0u64
+{
+    let mut sum: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < m
+        invariant i <= m
+        invariant sum >= 0u64
+        decreases m - i
+    {
+        sum = sum + registers[i];
+        i = i + 1u64;
+    };
+    sum
+}
+
+fn main() -> u64 { 0u64 }

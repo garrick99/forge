@@ -1,0 +1,53 @@
+// expected: 0
+// Demo 867: Verified string reverse words
+//
+// reverse_segment(s, lo, hi) reverses elements in s[lo..hi-1].
+// count_words(s, n, sep) counts segments separated by sep.
+// These are building blocks for reversing words in a string (as u64 tokens).
+//
+fn reverse_segment(s: span<u64>, lo: u64, hi: u64)
+    requires s.len >= hi
+    requires lo <= hi
+{
+    let mut left: u64 = lo;
+    let mut right: u64 = hi;
+    while left + 1u64 < right
+        invariant left >= lo
+        invariant right <= hi
+        invariant left <= right
+        decreases right - left
+    {
+        right = right - 1u64;
+        let tmp: u64 = s[left];
+        s[left] = s[right];
+        s[right] = tmp;
+        left = left + 1u64;
+    };
+}
+
+fn count_words(s: span<u64>, n: u64, sep: u64) -> u64
+    requires s.len == n
+    ensures result <= n + 1u64
+{
+    let mut count: u64 = 0u64;
+    let mut in_word: bool = false;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant count <= i + 1u64
+        decreases n - i
+    {
+        if s[i] == sep {
+            in_word = false;
+        } else {
+            if in_word == false {
+                count = count + 1u64;
+                in_word = true;
+            };
+        };
+        i = i + 1u64;
+    };
+    count
+}
+
+fn main() -> u64 { 0u64 }

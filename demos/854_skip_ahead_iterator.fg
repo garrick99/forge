@@ -1,0 +1,52 @@
+// expected: 0
+// Demo 854: Verified skip-ahead iterator — every k-th element
+//
+// sum_every_k(s, n, k) sums every k-th element: s[0], s[k], s[2k], ...
+// Postcondition: the loop visits at most n/k + 1 elements.
+//
+fn count_every_k(s: span<u64>, n: u64, k: u64) -> u64
+    requires s.len == n
+    requires k >= 1u64
+    requires n > 0u64
+    ensures result <= n
+{
+    let mut count: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant count <= n
+        decreases n - i
+    {
+        count = count + 1u64;
+        if i + k >= n {
+            i = n;
+        } else {
+            i = i + k;
+        };
+    };
+    count
+}
+
+fn sum_every_k(s: span<u64>, n: u64, k: u64) -> u64
+    requires s.len == n
+    requires k >= 1u64
+    requires n > 0u64
+    ensures result >= 0u64
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        acc = acc + s[i];
+        if i + k >= n {
+            i = n;
+        } else {
+            i = i + k;
+        };
+    };
+    acc
+}
+
+fn main() -> u64 { 0u64 }

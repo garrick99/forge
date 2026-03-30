@@ -1,0 +1,48 @@
+// expected: 0
+// Demo 894: Verified parallel prefix (Blelloch scan)
+//
+// Simulates the up-sweep phase of Blelloch exclusive scan.
+// For each level d, stride = 2^(d+1), combine pairs.
+// Simplified: iterative up-sweep on flat array.
+// Postcondition: last element contains total sum (>= 0).
+//
+fn upsweep(s: span<u64>, n: u64)
+    requires s.len == n
+    requires n > 0u64
+    ensures s[n - 1u64] >= 0u64
+{
+    let mut stride: u64 = 2u64;
+    while stride <= n
+        invariant stride >= 2u64
+        invariant s[n - 1u64] >= 0u64
+        decreases n + 1u64 - stride
+    {
+        let half: u64 = stride / 2u64;
+        let mut i: u64 = stride - 1u64;
+        while i < n
+            invariant i >= stride - 1u64
+            invariant s[n - 1u64] >= 0u64
+            decreases n - i
+        {
+            s[i] = s[i] + s[i - half];
+            i = i + stride;
+            if i >= n {
+                i = n;
+            };
+        };
+        stride = stride * 2u64;
+        if stride == 0u64 {
+            stride = n + 1u64;
+        };
+    };
+}
+
+fn downsweep_zero(s: span<u64>, n: u64)
+    requires s.len == n
+    requires n > 0u64
+    ensures s[n - 1u64] == 0u64
+{
+    s[n - 1u64] = 0u64;
+}
+
+fn main() -> u64 { 0u64 }

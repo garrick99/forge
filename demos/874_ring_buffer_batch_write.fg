@@ -1,0 +1,54 @@
+// expected: 0
+// Demo 874: Verified ring buffer batch write
+//
+// batch_write(buf, cap, tail, data, n) writes n elements into buf starting
+// at tail, wrapping around. Returns new tail position.
+// Postcondition: new_tail < cap.
+//
+fn batch_write(buf: span<u64>, cap: u64, tail: u64,
+               data: span<u64>, n: u64) -> u64
+    requires buf.len == cap
+    requires data.len == n
+    requires cap > 0u64
+    requires tail < cap
+    requires n <= cap
+    ensures result < cap
+{
+    let mut wi: u64 = tail;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant wi < cap
+        decreases n - i
+    {
+        buf[wi] = data[i];
+        if wi + 1u64 < cap {
+            wi = wi + 1u64;
+        } else {
+            wi = 0u64;
+        };
+        i = i + 1u64;
+    };
+    wi
+}
+
+fn batch_write_with_count(buf: span<u64>, cap: u64, tail: u64,
+                          data: span<u64>, n: u64, cur_size: u64) -> u64
+    requires buf.len == cap
+    requires data.len == n
+    requires cap > 0u64
+    requires tail < cap
+    requires n <= cap
+    requires cur_size <= cap
+    ensures result <= cap
+{
+    let new_tail: u64 = batch_write(buf, cap, tail, data, n);
+    let new_size: u64 = cur_size + n;
+    if new_size > cap {
+        cap
+    } else {
+        new_size
+    }
+}
+
+fn main() -> u64 { 0u64 }

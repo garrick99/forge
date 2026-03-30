@@ -1,0 +1,42 @@
+// expected: 0
+// Demo 863: Verified matrix Cholesky diagonal step
+//
+// cholesky_diag(mat, l_diag, n) computes the diagonal of the Cholesky factor.
+// L[i][i] = M[i][i] - sum(L[i][k]^2 for k < i).
+// We compute the sum-of-squares subtraction for each diagonal entry.
+// Postcondition: all computed values stored in l_diag (length n).
+//
+fn cholesky_diag_sums(mat_diag: span<u64>, l_col: span<u64>,
+                      out: span<u64>, n: u64) -> u64
+    requires mat_diag.len == n
+    requires l_col.len == n
+    requires out.len == n
+    ensures result == n
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let mut sum_sq: u64 = 0u64;
+        let mut k: u64 = 0u64;
+        while k < i
+            invariant k <= i
+            decreases i - k
+        {
+            if k < n {
+                sum_sq = sum_sq + l_col[k] * l_col[k];
+            };
+            k = k + 1u64;
+        };
+        if mat_diag[i] >= sum_sq {
+            out[i] = mat_diag[i] - sum_sq;
+        } else {
+            out[i] = 0u64;
+        };
+        i = i + 1u64;
+    };
+    n
+}
+
+fn main() -> u64 { 0u64 }

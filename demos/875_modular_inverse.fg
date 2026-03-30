@@ -1,0 +1,78 @@
+// expected: 0
+// Demo 875: Verified modular inverse (extended Euclidean)
+//
+// ext_gcd_steps(a, b, max_iter) runs the Euclidean algorithm for at most
+// max_iter steps, returning the GCD. The modular inverse exists when gcd == 1.
+// gcd_check(a, m) returns 1 if gcd(a, m) == 1 (inverse exists), 0 otherwise.
+// Postcondition: gcd result >= 1 for positive inputs.
+//
+fn ext_gcd_steps(a: u64, b: u64, max_iter: u64) -> u64
+    requires a > 0u64
+    requires b > 0u64
+    requires max_iter > 0u64
+    ensures result >= 1u64
+{
+    let mut x: u64 = a;
+    let mut y: u64 = b;
+    let mut steps: u64 = 0u64;
+    while y > 0u64 && steps < max_iter
+        invariant x >= 1u64 || y >= 1u64
+        invariant steps <= max_iter
+        decreases max_iter - steps
+    {
+        let tmp: u64 = y;
+        y = x % y;
+        x = tmp;
+        steps = steps + 1u64;
+    };
+    if x >= 1u64 {
+        x
+    } else {
+        1u64
+    }
+}
+
+fn gcd_check(a: u64, m: u64) -> u64
+    requires a > 0u64
+    requires m > 1u64
+    ensures result <= 1u64
+{
+    let g: u64 = ext_gcd_steps(a, m, 128u64);
+    if g == 1u64 {
+        1u64
+    } else {
+        0u64
+    }
+}
+
+fn mod_inverse_naive(a: u64, m: u64) -> u64
+    requires a > 0u64
+    requires m > 1u64
+    requires a < m
+    ensures result < m
+{
+    let mut candidate: u64 = 1u64;
+    let mut found: u64 = 1u64;
+    let mut i: u64 = 1u64;
+    while i < m
+        invariant i >= 1u64
+        invariant i <= m
+        invariant found < m
+        invariant candidate >= 1u64
+        invariant candidate <= m
+        decreases m - i
+    {
+        let prod: u64 = (a * i) % m;
+        if prod == 1u64 && candidate == 1u64 {
+            found = i;
+        };
+        i = i + 1u64;
+    };
+    if found < m {
+        found
+    } else {
+        0u64
+    }
+}
+
+fn main() -> u64 { 0u64 }

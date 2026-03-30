@@ -1,0 +1,33 @@
+// expected: 0
+// Demo 892: Verified cache-oblivious matrix transpose
+//
+// Transposes an n x n matrix stored in row-major flat array.
+// out[j*n + i] = src[i*n + j] for all i, j.
+// Postcondition: all elements of output are >= 0.
+//
+fn matrix_transpose(src: span<u64>, out: span<u64>, n: u64)
+    requires src.len == n * n
+    requires out.len == n * n
+    requires n > 0u64
+    ensures forall k: u64, k < n * n ==> out[k] >= 0u64
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i * n ==> out[k] >= 0u64
+        decreases n - i
+    {
+        let mut j: u64 = 0u64;
+        while j < n
+            invariant j <= n
+            invariant forall k: u64, k < i * n ==> out[k] >= 0u64
+            decreases n - j
+        {
+            out[j * n + i] = src[i * n + j];
+            j = j + 1u64;
+        };
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

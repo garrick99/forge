@@ -1,0 +1,46 @@
+// expected: 0
+// Demo 851: Verified shellsort step — gap-based insertion
+//
+// gap_insertion(s, n, gap) performs one pass of shell sort with a given gap.
+// Elements at stride `gap` are insertion-sorted.
+// Postcondition: returns count of swaps performed (<= n).
+//
+fn gap_insertion(s: span<u64>, n: u64, gap: u64) -> u64
+    requires s.len == n
+    requires gap >= 1u64
+    requires gap < n
+    ensures result <= n
+{
+    let mut swaps: u64 = 0u64;
+    let mut i: u64 = gap;
+    while i < n
+        invariant i >= gap
+        invariant i <= n
+        invariant swaps <= n
+        decreases n - i
+    {
+        let key: u64 = s[i];
+        let mut j: u64 = i;
+        while j >= gap && s[j - gap] > key
+            invariant j <= i
+            invariant j >= 0u64
+            invariant swaps <= n
+            decreases j
+        {
+            if j < n {
+                s[j] = s[j - gap];
+            };
+            if swaps < n {
+                swaps = swaps + 1u64;
+            };
+            j = j - gap;
+        };
+        if j < n {
+            s[j] = key;
+        };
+        i = i + 1u64;
+    };
+    swaps
+}
+
+fn main() -> u64 { 0u64 }

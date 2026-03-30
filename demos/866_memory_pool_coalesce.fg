@@ -1,0 +1,43 @@
+// expected: 0
+// Demo 866: Verified memory pool coalescing
+//
+// coalesce(starts, sizes, n, out_starts, out_sizes) merges adjacent free blocks.
+// Two blocks are adjacent if starts[i] + sizes[i] == starts[i+1].
+// Returns the number of coalesced blocks (<= n).
+//
+fn coalesce(starts: span<u64>, sizes: span<u64>, n: u64,
+            out_starts: span<u64>, out_sizes: span<u64>) -> u64
+    requires starts.len == n
+    requires sizes.len == n
+    requires out_starts.len == n
+    requires out_sizes.len == n
+    requires n > 0u64
+    ensures result >= 1u64
+    ensures result <= n
+{
+    out_starts[0u64] = starts[0u64];
+    out_sizes[0u64] = sizes[0u64];
+    let mut wi: u64 = 0u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i >= 1u64
+        invariant i <= n
+        invariant wi < n
+        decreases n - i
+    {
+        let prev_end: u64 = out_starts[wi] + out_sizes[wi];
+        if prev_end == starts[i] {
+            out_sizes[wi] = out_sizes[wi] + sizes[i];
+        } else {
+            wi = wi + 1u64;
+            if wi < n {
+                out_starts[wi] = starts[i];
+                out_sizes[wi] = sizes[i];
+            };
+        };
+        i = i + 1u64;
+    };
+    wi + 1u64
+}
+
+fn main() -> u64 { 0u64 }

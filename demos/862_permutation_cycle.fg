@@ -1,0 +1,37 @@
+// expected: 0
+// Demo 862: Verified permutation cycle detection
+//
+// cycle_length(perm, n, start) follows the permutation from `start`
+// until it returns to `start`. Returns the cycle length.
+// Postcondition: cycle length >= 1 and <= n.
+//
+fn cycle_length(perm: span<u64>, n: u64, start: u64) -> u64
+    requires perm.len == n
+    requires n > 0u64
+    requires start < n
+    ensures result >= 1u64
+    ensures result <= n
+{
+    let first: u64 = perm[start];
+    let mut cur: u64 = if first < n { first } else { start };
+    let mut len: u64 = 1u64;
+    while cur != start && len < n
+        invariant len >= 1u64
+        invariant len <= n
+        invariant cur < n
+        decreases n - len
+    {
+        let next: u64 = perm[cur];
+        if next < n {
+            cur = next;
+        } else {
+            cur = start;
+        };
+        if len < n {
+            len = len + 1u64;
+        };
+    };
+    len
+}
+
+fn main() -> u64 { 0u64 }

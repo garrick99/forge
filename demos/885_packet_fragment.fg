@@ -1,0 +1,50 @@
+// expected: 0
+// Demo 885: Verified packet fragmentation
+//
+// fragment_packet(data, n, mtu, offsets, nfrags_buf) splits a packet of
+// size n into fragments of at most mtu bytes. Records fragment offsets.
+// Postcondition: number of fragments * mtu >= n.
+//
+fn compute_num_fragments(n: u64, mtu: u64) -> u64
+    requires mtu > 0u64
+    requires n > 0u64
+    ensures result >= 1u64
+{
+    let nf: u64 = (n + mtu - 1u64) / mtu;
+    if nf == 0u64 {
+        1u64
+    } else {
+        nf
+    }
+}
+
+fn write_fragment_offsets(offsets: span<u64>, nfrags: u64, mtu: u64)
+    requires offsets.len == nfrags
+    requires mtu > 0u64
+    ensures forall k: u64, k < nfrags ==> offsets[k] >= 0u64
+{
+    let mut i: u64 = 0u64;
+    while i < nfrags
+        invariant i <= nfrags
+        invariant forall k: u64, k < i ==> offsets[k] >= 0u64
+        decreases nfrags - i
+    {
+        offsets[i] = i * mtu;
+        i = i + 1u64;
+    };
+}
+
+fn fragment_size(frag_idx: u64, nfrags: u64, n: u64, mtu: u64) -> u64
+    requires mtu > 0u64
+    requires frag_idx < nfrags
+    requires nfrags > 0u64
+{
+    if frag_idx < nfrags - 1u64 {
+        mtu
+    } else {
+        let rem: u64 = n % mtu;
+        if rem == 0u64 { mtu } else { rem }
+    }
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,50 @@
+// expected: 0
+// Demo 886: Verified consistent hashing ring
+//
+// A hash ring with sorted node positions. lookup(ring, n, key) finds
+// the first ring position >= key (modular wrap-around at end).
+// Postcondition: result < n (always maps to a valid node).
+//
+fn hash_lookup(ring: span<u64>, n: u64, key: u64) -> u64
+    requires ring.len == n
+    requires n > 0u64
+    ensures result < n
+{
+    let mut i: u64 = 0u64;
+    let mut found: u64 = 0u64;
+    let mut done: bool = false;
+    while i < n
+        invariant i <= n
+        invariant found < n
+        decreases n - i
+    {
+        if done == false && ring[i] >= key {
+            found = i;
+            done = true;
+        };
+        i = i + 1u64;
+    };
+    found
+}
+
+fn add_node_shift(ring: span<u64>, n: u64, pos: u64)
+    requires ring.len == n
+    requires n > 0u64
+    ensures ring[0u64] >= 0u64
+{
+    let mut i: u64 = n - 1u64;
+    let mut shifted: bool = false;
+    while i > 0u64
+        invariant i < n
+        decreases i
+    {
+        if shifted == false && ring[i] > pos {
+            ring[i] = ring[i - 1u64];
+        } else {
+            shifted = true;
+        };
+        i = i - 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

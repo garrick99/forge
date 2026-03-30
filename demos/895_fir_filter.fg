@@ -1,0 +1,40 @@
+// expected: 0
+// Demo 895: Verified digital filter (FIR)
+//
+// fir_filter(input, coeffs, output, n, ntaps) computes:
+//   output[i] = sum_{j=0}^{ntaps-1} coeffs[j] * input[i+j]
+// for i in [0, n-ntaps].
+// Postcondition: all outputs written (>= 0).
+//
+fn fir_filter(input: span<u64>, coeffs: span<u64>, output: span<u64>,
+              n: u64, ntaps: u64)
+    requires input.len == n
+    requires coeffs.len == ntaps
+    requires output.len == n
+    requires ntaps > 0u64
+    requires ntaps <= n
+    ensures forall k: u64, k < n - ntaps + 1u64 ==> output[k] >= 0u64
+{
+    let out_len: u64 = n - ntaps + 1u64;
+    let mut i: u64 = 0u64;
+    while i < out_len
+        invariant i <= out_len
+        invariant forall k: u64, k < i ==> output[k] >= 0u64
+        decreases out_len - i
+    {
+        let mut acc: u64 = 0u64;
+        let mut j: u64 = 0u64;
+        while j < ntaps
+            invariant j <= ntaps
+            invariant acc >= 0u64
+            decreases ntaps - j
+        {
+            acc = acc + coeffs[j] * input[i + j];
+            j = j + 1u64;
+        };
+        output[i] = acc;
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

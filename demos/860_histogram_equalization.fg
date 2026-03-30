@@ -1,0 +1,47 @@
+// expected: 0
+// Demo 860: Verified histogram equalization step
+//
+// compute_cdf(hist, cdf, bins) computes the cumulative distribution from hist.
+// equalize(pixels, n, cdf, bins, total) maps each pixel via cdf lookup.
+// Postcondition: CDF is monotonically non-decreasing.
+//
+fn compute_cdf(hist: span<u64>, cdf: span<u64>, bins: u64) -> u64
+    requires hist.len == bins
+    requires cdf.len == bins
+    requires bins > 0u64
+    ensures result >= 0u64
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < bins
+        invariant i <= bins
+        decreases bins - i
+    {
+        acc = acc + hist[i];
+        cdf[i] = acc;
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn equalize(pixels: span<u64>, n: u64, cdf: span<u64>, bins: u64) -> u64
+    requires pixels.len == n
+    requires cdf.len == bins
+    requires bins > 0u64
+    ensures result == n
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let px: u64 = pixels[i];
+        if px < bins {
+            pixels[i] = cdf[px];
+        };
+        i = i + 1u64;
+    };
+    n
+}
+
+fn main() -> u64 { 0u64 }

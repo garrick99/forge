@@ -1,0 +1,37 @@
+// expected: 0
+// Demo 871: Verified sparse matrix transpose (COO format)
+//
+// COO stores (row, col, val) triples. Transpose swaps row and col.
+// coo_transpose(rows, cols, vals, out_rows, out_cols, out_vals, nnz)
+// copies with row/col swapped.
+// Postcondition: out_rows[i] == cols[i] and out_cols[i] == rows[i].
+//
+fn coo_transpose(rows: span<u64>, cols: span<u64>, vals: span<u64>,
+                 out_rows: span<u64>, out_cols: span<u64>, out_vals: span<u64>,
+                 nnz: u64)
+    requires rows.len == nnz
+    requires cols.len == nnz
+    requires vals.len == nnz
+    requires out_rows.len == nnz
+    requires out_cols.len == nnz
+    requires out_vals.len == nnz
+    ensures forall k: u64, k < nnz ==> out_rows[k] == old(cols[k])
+    ensures forall k: u64, k < nnz ==> out_cols[k] == old(rows[k])
+    ensures forall k: u64, k < nnz ==> out_vals[k] == old(vals[k])
+{
+    let mut i: u64 = 0u64;
+    while i < nnz
+        invariant i <= nnz
+        invariant forall k: u64, k < i ==> out_rows[k] == old(cols[k])
+        invariant forall k: u64, k < i ==> out_cols[k] == old(rows[k])
+        invariant forall k: u64, k < i ==> out_vals[k] == old(vals[k])
+        decreases nnz - i
+    {
+        out_rows[i] = cols[i];
+        out_cols[i] = rows[i];
+        out_vals[i] = vals[i];
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

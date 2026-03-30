@@ -1,0 +1,40 @@
+// expected: 0
+// Demo 878: Verified histogram bins merge
+//
+// merge_histograms(a, b, out, n) adds bin counts: out[i] = a[i] + b[i].
+// Postcondition: each output bin >= corresponding input bin.
+//
+fn merge_histograms(a: span<u64>, b: span<u64>, out: span<u64>, n: u64)
+    requires a.len == n
+    requires b.len == n
+    requires out.len == n
+    ensures forall k: u64, k < n ==> out[k] >= a[k]
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> out[k] >= a[k]
+        decreases n - i
+    {
+        out[i] = a[i] + b[i];
+        i = i + 1u64;
+    };
+}
+
+fn histogram_total(bins: span<u64>, n: u64) -> u64
+    requires bins.len == n
+    ensures result >= 0u64
+{
+    let mut total: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        total = total + bins[i];
+        i = i + 1u64;
+    };
+    total
+}
+
+fn main() -> u64 { 0u64 }

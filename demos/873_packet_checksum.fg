@@ -1,0 +1,56 @@
+// expected: 0
+// Demo 873: Verified packet checksum (ones complement)
+//
+// ones_complement_sum(data, n) computes a 16-bit ones-complement checksum.
+// Each u64 is treated as a 16-bit word. Carry is folded back.
+// Postcondition: result < 65536 (fits in 16 bits).
+//
+fn fold16(val: u64) -> u64
+    requires val < 4294967296u64
+    ensures result < 65536u64
+{
+    let lo: u64 = val & 65535u64;
+    let hi: u64 = val / 65536u64;
+    let sum: u64 = lo + hi;
+    if sum >= 65536u64 {
+        sum - 65536u64 + 1u64
+    } else {
+        sum
+    }
+}
+
+fn ones_complement_sum(data: span<u64>, n: u64) -> u64
+    requires data.len == n
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let word: u64 = data[i] & 65535u64;
+        let raw: u64 = acc + word;
+        acc = fold16(raw);
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn checksum(data: span<u64>, n: u64) -> u64
+    requires data.len == n
+    ensures result < 65536u64
+{
+    let sum: u64 = ones_complement_sum(data, n);
+    if sum < 65536u64 {
+        let inv: u64 = 65535u64 - sum;
+        if inv < 65536u64 {
+            inv
+        } else {
+            0u64
+        }
+    } else {
+        0u64
+    }
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,41 @@
+// expected: 0
+// Demo 888: Verified trie prefix search
+//
+// Flat trie: children[node * ALPHA + c] = next_node (0 = null).
+// ALPHA = 4 (simplified alphabet). prefix_search walks the trie
+// for each character in the query. Returns 1 if prefix exists, 0 if not.
+// Postcondition: result <= 1.
+//
+fn trie_lookup(children: span<u64>, trie_size: u64, query: span<u64>, qlen: u64) -> u64
+    requires children.len == trie_size
+    requires query.len == qlen
+    requires trie_size > 0u64
+    ensures result <= 1u64
+{
+    let alpha: u64 = 4u64;
+    let mut node: u64 = 1u64;
+    let mut i: u64 = 0u64;
+    let mut found: u64 = 1u64;
+    while i < qlen
+        invariant i <= qlen
+        invariant found <= 1u64
+        decreases qlen - i
+    {
+        if found == 1u64 && node > 0u64 {
+            let c: u64 = query[i];
+            let idx: u64 = node * alpha + c;
+            if idx < trie_size {
+                node = children[idx];
+                if node == 0u64 {
+                    found = 0u64;
+                };
+            } else {
+                found = 0u64;
+            };
+        };
+        i = i + 1u64;
+    };
+    found
+}
+
+fn main() -> u64 { 0u64 }

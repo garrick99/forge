@@ -1,0 +1,86 @@
+// expected: 0
+// Demo 900: Milestone — 7 verification categories in one file
+// 1. Quantified post  2. Composition  3. Induction  4. Graph
+// 5. DP (Kadane)      6. Crypto (CT)  7. Stack
+
+// 1. Quantified postcondition
+fn fill(s: span<u64>, n: u64, v: u64)
+    requires s.len == n
+    ensures forall k: u64, k < n ==> s[k] == v
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> s[k] == v
+        decreases n - i
+    { s[i] = v; i = i + 1u64; };
+}
+
+// 2. Composition — clamp feeds into loop
+fn clamp_u(x: u64, c: u64) -> u64 ensures result <= c { if x > c { c } else { x } }
+
+fn scale_clamp(s: span<u64>, n: u64, f: u64, c: u64)
+    requires s.len == n  ensures forall k: u64, k < n ==> s[k] <= c
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n  invariant forall k: u64, k < i ==> s[k] <= c
+        decreases n - i
+    { let v: u64 = clamp_u(s[i] * f, c); s[i] = v; i = i + 1u64; };
+}
+
+// 3. Induction — factorial
+fn fact(n: u64) -> u64 requires n <= 20u64 ensures result >= 1u64 {
+    let mut a: u64 = 1u64; let mut i: u64 = 1u64;
+    while i <= n
+        invariant a >= 1u64  invariant i <= n + 1u64  decreases n + 1u64 - i
+    { a = a * i; i = i + 1u64; }; a
+}
+
+// 4. Graph — BFS level check
+fn bfs_ok(lev: span<u64>, par: span<u64>, n: u64) -> u64
+    requires lev.len == n  requires par.len == n  requires n > 0u64
+    ensures result <= 1u64
+{
+    let mut ok: u64 = 1u64; let mut i: u64 = 1u64;
+    while i < n
+        invariant i >= 1u64  invariant i <= n  invariant ok <= 1u64
+        decreases n - i
+    { let p: u64 = par[i];
+      if p < n { if lev[i] != lev[p] + 1u64 { ok = 0u64; }; };
+      i = i + 1u64; }; ok
+}
+
+// 5. DP — Kadane max subarray
+fn kadane(s: span<u64>, n: u64) -> u64
+    requires s.len == n  requires n > 0u64  ensures result >= s[0u64]
+{
+    let mut best: u64 = s[0u64]; let mut cur: u64 = s[0u64]; let mut i: u64 = 1u64;
+    while i < n
+        invariant i >= 1u64  invariant i <= n  invariant best >= s[0u64]
+        decreases n - i
+    { if cur + s[i] > s[i] { cur = cur + s[i]; } else { cur = s[i]; };
+      if cur > best { best = cur; }; i = i + 1u64; }; best
+}
+
+// 6. Crypto — constant-time compare
+fn ct_eq(a: span<u64>, b: span<u64>, n: u64) -> u64
+    requires a.len == n  requires b.len == n  ensures result <= 1u64
+{
+    let mut d: u64 = 0u64; let mut i: u64 = 0u64;
+    while i < n invariant i <= n decreases n - i
+    { if a[i] != b[i] { d = d + 1u64; }; i = i + 1u64; };
+    if d == 0u64 { 1u64 } else { 0u64 }
+}
+
+// 7. Stack — push returns new top <= cap
+fn stk_push(d: span<u64>, top: u64, cap: u64, v: u64) -> u64
+    requires d.len == cap  requires top < cap  ensures result <= cap
+{ d[top] = v; top + 1u64 }
+
+fn stk_pop(d: span<u64>, top: u64, cap: u64) -> (u64, u64)
+    requires d.len == cap  requires top > 0u64  requires top <= cap
+    ensures result.1 == top - 1u64
+{ (d[top - 1u64], top - 1u64) }
+
+fn main() -> u64 { 0u64 }

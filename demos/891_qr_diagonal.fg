@@ -1,0 +1,46 @@
+// expected: 0
+// Demo 891: Verified matrix QR diagonal step
+//
+// Computes the diagonal of R in a QR decomposition step.
+// For column k, R[k][k] = norm of column k (approximated as sum of squares).
+// Flat matrix: mat[i*n + j]. Extracts diagonal into diag[].
+// Postcondition: all diagonal entries >= 0.
+//
+fn column_norm_sq(mat: span<u64>, n: u64, col: u64) -> u64
+    requires mat.len == n * n
+    requires col < n
+    requires n > 0u64
+    ensures result >= 0u64
+{
+    let mut acc: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant acc >= 0u64
+        decreases n - i
+    {
+        let v: u64 = mat[i * n + col];
+        acc = acc + v * v;
+        i = i + 1u64;
+    };
+    acc
+}
+
+fn extract_diagonal(mat: span<u64>, diag: span<u64>, n: u64)
+    requires mat.len == n * n
+    requires diag.len == n
+    requires n > 0u64
+    ensures forall k: u64, k < n ==> diag[k] >= 0u64
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> diag[k] >= 0u64
+        decreases n - i
+    {
+        diag[i] = mat[i * n + i];
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

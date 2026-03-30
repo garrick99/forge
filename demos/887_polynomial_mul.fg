@@ -1,0 +1,51 @@
+// expected: 0
+// Demo 887: Verified polynomial multiplication
+//
+// Multiplies two polynomials represented as coefficient arrays.
+// poly_mul(a, na, b, nb, out) computes convolution: out[i+j] += a[i]*b[j].
+// Postcondition: all output coefficients written (>= 0).
+//
+fn poly_zero(out: span<u64>, n: u64)
+    requires out.len == n
+    ensures forall k: u64, k < n ==> out[k] == 0u64
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> out[k] == 0u64
+        decreases n - i
+    {
+        out[i] = 0u64;
+        i = i + 1u64;
+    };
+}
+
+fn poly_mul(a: span<u64>, na: u64, b: span<u64>, nb: u64, out: span<u64>)
+    requires a.len == na
+    requires b.len == nb
+    requires out.len == na + nb
+    requires na > 0u64
+    requires nb > 0u64
+    ensures forall k: u64, k < na + nb ==> out[k] >= 0u64
+{
+    poly_zero(out, na + nb);
+    let mut i: u64 = 0u64;
+    while i < na
+        invariant i <= na
+        invariant forall k: u64, k < na + nb ==> out[k] >= 0u64
+        decreases na - i
+    {
+        let mut j: u64 = 0u64;
+        while j < nb
+            invariant j <= nb
+            invariant forall k: u64, k < na + nb ==> out[k] >= 0u64
+            decreases nb - j
+        {
+            out[i + j] = out[i + j] + a[i] * b[j];
+            j = j + 1u64;
+        };
+        i = i + 1u64;
+    };
+}
+
+fn main() -> u64 { 0u64 }

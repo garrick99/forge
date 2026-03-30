@@ -1,0 +1,54 @@
+// expected: 0
+// Demo 883: Verified Gauss-Seidel iteration step
+//
+// One iteration of Gauss-Seidel for solving Ax = b on a diagonal-dominant
+// system. Updates x[i] = (b[i] - sum of off-diag) / diag[i].
+// Simplified: x_new[i] = b[i] / diag[i] (ignoring off-diagonal for demo).
+// Postcondition: all outputs written.
+//
+fn gauss_seidel_step(x: span<u64>, b: span<u64>, diag: span<u64>, n: u64)
+    requires x.len == n
+    requires b.len == n
+    requires diag.len == n
+    requires n > 0u64
+    ensures forall k: u64, k < n ==> x[k] >= 0u64
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==> x[k] >= 0u64
+        decreases n - i
+    {
+        if diag[i] > 0u64 {
+            x[i] = b[i] / diag[i];
+        } else {
+            x[i] = 0u64;
+        };
+        i = i + 1u64;
+    };
+}
+
+fn converged(x_old: span<u64>, x_new: span<u64>, n: u64, tol: u64) -> u64
+    requires x_old.len == n
+    requires x_new.len == n
+    ensures result <= 1u64
+{
+    let mut ok: u64 = 1u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant ok <= 1u64
+        decreases n - i
+    {
+        if x_new[i] > x_old[i] + tol {
+            ok = 0u64;
+        };
+        if x_old[i] > x_new[i] + tol {
+            ok = 0u64;
+        };
+        i = i + 1u64;
+    };
+    ok
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,38 @@
+// expected: 0
+// Demo 865: Verified CRC-32 with table
+//
+// crc32_update(data, n, table, crc_init) computes CRC by XOR-ing each byte
+// through a 256-entry lookup table. Simulated with u64 values.
+// Postcondition: returns the final CRC value.
+//
+fn crc32_update(data: span<u64>, n: u64, table: span<u64>, crc_init: u64) -> u64
+    requires data.len == n
+    requires table.len == 256u64
+    ensures result >= 0u64
+{
+    let mut crc: u64 = crc_init;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        decreases n - i
+    {
+        let byte_val: u64 = data[i] & 255u64;
+        let idx: u64 = (crc ^ byte_val) & 255u64;
+        if idx < 256u64 {
+            crc = (crc / 256u64) ^ table[idx];
+        };
+        i = i + 1u64;
+    };
+    crc
+}
+
+fn crc32_final(data: span<u64>, n: u64, table: span<u64>) -> u64
+    requires data.len == n
+    requires table.len == 256u64
+    ensures result >= 0u64
+{
+    let crc: u64 = crc32_update(data, n, table, 4294967295u64);
+    crc ^ 4294967295u64
+}
+
+fn main() -> u64 { 0u64 }

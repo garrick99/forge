@@ -1,0 +1,53 @@
+// expected: 0
+// Demo 893: Verified interval scheduling with deadlines
+//
+// Given n jobs with start[], finish[], deadline[], count the number
+// of jobs that can be scheduled (greedy: earliest finish first).
+// A job is accepted if its start >= current_end and finish <= deadline.
+// Postcondition: accepted count <= n.
+//
+fn schedule_jobs(start: span<u64>, finish: span<u64>, deadline: span<u64>,
+                 n: u64) -> u64
+    requires start.len == n
+    requires finish.len == n
+    requires deadline.len == n
+    ensures result <= n
+{
+    let mut accepted: u64 = 0u64;
+    let mut cur_end: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant accepted <= i
+        decreases n - i
+    {
+        if start[i] >= cur_end && finish[i] <= deadline[i] {
+            accepted = accepted + 1u64;
+            cur_end = finish[i];
+        };
+        i = i + 1u64;
+    };
+    accepted
+}
+
+fn max_deadline(deadline: span<u64>, n: u64) -> u64
+    requires deadline.len == n
+    requires n > 0u64
+    ensures result >= deadline[0u64]
+{
+    let mut mx: u64 = deadline[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant mx >= deadline[0u64]
+        decreases n - i
+    {
+        if deadline[i] > mx {
+            mx = deadline[i];
+        };
+        i = i + 1u64;
+    };
+    mx
+}
+
+fn main() -> u64 { 0u64 }

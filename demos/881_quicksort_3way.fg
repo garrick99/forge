@@ -1,0 +1,37 @@
+// expected: 0
+// Demo 881: Verified quicksort 3-way partition (Dutch National Flag)
+//
+// partition_3way(s, n, pivot) partitions into <pivot, ==pivot, >pivot zones.
+// Returns the count of elements < pivot.
+// Invariant: lo + eq + hi == i at each step.
+// Postcondition: result <= n.
+//
+fn partition_3way(s: span<u64>, n: u64, pivot: u64) -> u64
+    requires s.len == n
+    ensures result <= n
+{
+    let mut lo: u64 = 0u64;
+    let mut eq: u64 = 0u64;
+    let mut hi: u64 = 0u64;
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant lo + eq + hi == i
+        invariant lo <= i
+        invariant eq <= i
+        invariant hi <= i
+        decreases n - i
+    {
+        if s[i] < pivot {
+            lo = lo + 1u64;
+        } else if s[i] == pivot {
+            eq = eq + 1u64;
+        } else {
+            hi = hi + 1u64;
+        };
+        i = i + 1u64;
+    };
+    lo
+}
+
+fn main() -> u64 { 0u64 }

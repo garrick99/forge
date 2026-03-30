@@ -1,0 +1,42 @@
+// expected: 0
+// Demo 855: Verified run-length decode with validation
+//
+// rle_decode(encoded, enc_len, out, out_cap) decodes pairs (value, count)
+// from encoded into out. Returns number of elements written.
+// Postcondition: written <= out_cap.
+//
+fn rle_decode(encoded: span<u64>, enc_len: u64,
+              out: span<u64>, out_cap: u64) -> u64
+    requires encoded.len == enc_len
+    requires out.len == out_cap
+    requires enc_len % 2u64 == 0u64
+    ensures result <= out_cap
+{
+    let mut ri: u64 = 0u64;
+    let mut wi: u64 = 0u64;
+    while ri + 1u64 < enc_len
+        invariant ri <= enc_len
+        invariant wi <= out_cap
+        invariant ri % 2u64 == 0u64
+        decreases enc_len - ri
+    {
+        let val: u64 = encoded[ri];
+        let cnt: u64 = encoded[ri + 1u64];
+        let mut j: u64 = 0u64;
+        while j < cnt
+            invariant j <= cnt
+            invariant wi <= out_cap
+            decreases cnt - j
+        {
+            if wi < out_cap {
+                out[wi] = val;
+                wi = wi + 1u64;
+            };
+            j = j + 1u64;
+        };
+        ri = ri + 2u64;
+    };
+    wi
+}
+
+fn main() -> u64 { 0u64 }

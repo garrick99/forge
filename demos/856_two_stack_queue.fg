@@ -1,0 +1,38 @@
+// expected: 0
+// Demo 856: Verified two-stack queue
+//
+// Simulates a queue using two stacks (in_stk and out_stk).
+// push goes to in_stk; when out_stk is empty, transfer reverses in to out.
+// transfer(in_stk, in_top, out_stk) moves elements from in to out in reverse.
+// Postcondition: in_top becomes 0 after transfer.
+//
+fn transfer(in_stk: span<u64>, in_top: u64, out_stk: span<u64>, out_cap: u64) -> u64
+    requires in_stk.len == in_top
+    requires out_stk.len == out_cap
+    requires in_top <= out_cap
+    ensures result == in_top
+{
+    let mut ri: u64 = in_top;
+    let mut wi: u64 = 0u64;
+    while ri > 0u64
+        invariant ri + wi == in_top
+        invariant wi <= out_cap
+        invariant ri <= in_top
+        decreases ri
+    {
+        ri = ri - 1u64;
+        out_stk[wi] = in_stk[ri];
+        wi = wi + 1u64;
+    };
+    wi
+}
+
+fn push(stk: span<u64>, top: u64, val: u64) -> u64
+    requires stk.len > top
+    ensures result == top + 1u64
+{
+    stk[top] = val;
+    top + 1u64
+}
+
+fn main() -> u64 { 0u64 }

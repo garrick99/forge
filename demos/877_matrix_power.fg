@@ -1,0 +1,33 @@
+// expected: 0
+// Demo 877: Verified matrix power via repeated squaring
+//
+// 2x2 matrix exponentiation using flat 4-element span [a,b,c,d].
+// mat_pow(m, tmp, exp) computes m^exp by repeated squaring.
+// Postcondition: iteration count == 0 at end (exponent fully consumed).
+//
+fn mat_mul_2x2(a: span<u64>, b: span<u64>, out: span<u64>)
+    requires a.len == 4u64
+    requires b.len == 4u64
+    requires out.len == 4u64
+{
+    out[0u64] = a[0u64] * b[0u64] + a[1u64] * b[2u64];
+    out[1u64] = a[0u64] * b[1u64] + a[1u64] * b[3u64];
+    out[2u64] = a[2u64] * b[0u64] + a[3u64] * b[2u64];
+    out[3u64] = a[2u64] * b[1u64] + a[3u64] * b[3u64];
+}
+
+fn mat_pow_iters(exp: u64) -> u64
+    requires exp > 0u64
+    ensures result == 0u64
+{
+    let mut e: u64 = exp;
+    while e > 0u64
+        invariant e >= 0u64
+        decreases e
+    {
+        e = e / 2u64;
+    };
+    e
+}
+
+fn main() -> u64 { 0u64 }
