@@ -51,6 +51,41 @@ type proof_ctx = {
 
 let empty_ctx = { pc_vars = []; pc_assumes = []; pc_lemmas = [] }
 
+(* Human-readable predicate formatter *)
+let rec pred_to_string = function
+  | PVar id -> id.name
+  | PInt n -> if n >= 0L then Int64.to_string n
+              else Printf.sprintf "(-%s)" (Int64.to_string (Int64.neg n))
+  | PBool true -> "true" | PBool false -> "false"
+  | PTrue -> "true" | PFalse -> "false"
+  | PBinop (op, l, r) ->
+      let ops = match op with
+        | Add -> "+" | Sub -> "-" | Mul -> "*" | Div -> "/" | Mod -> "%"
+        | Eq -> "==" | Ne -> "!=" | Lt -> "<" | Le -> "<=" | Gt -> ">" | Ge -> ">="
+        | And -> "&&" | Or -> "||" | Implies -> "==>" | Iff -> "<=>"
+        | BitAnd -> "&" | BitOr -> "|" | BitXor -> "^" | Shl -> "<<" | Shr -> ">>"
+      in
+      Printf.sprintf "(%s %s %s)" (pred_to_string l) ops (pred_to_string r)
+  | PUnop (Not, p) -> Printf.sprintf "!(%s)" (pred_to_string p)
+  | PUnop (Neg, p) -> Printf.sprintf "-(%s)" (pred_to_string p)
+  | PUnop (BitNot, p) -> Printf.sprintf "~(%s)" (pred_to_string p)
+  | PIndex (arr, idx) -> Printf.sprintf "%s[%s]" (pred_to_string arr) (pred_to_string idx)
+  | PField (obj, f) -> Printf.sprintf "%s.%s" (pred_to_string obj) f
+  | PIte (c, t, e) -> Printf.sprintf "(if %s then %s else %s)"
+      (pred_to_string c) (pred_to_string t) (pred_to_string e)
+  | PForall (x, _ty, body) ->
+      Printf.sprintf "(forall %s, %s)" x.name (pred_to_string body)
+  | PExists (x, _ty, body) ->
+      Printf.sprintf "(exists %s, %s)" x.name (pred_to_string body)
+  | PApp (f, args) ->
+      Printf.sprintf "%s(%s)" f.name (String.concat ", " (List.map pred_to_string args))
+  | PLex ps -> Printf.sprintf "(%s)" (String.concat ", " (List.map pred_to_string ps))
+  | PStruct (name, fields) ->
+      Printf.sprintf "%s { %s }" name
+        (String.concat ", " (List.map (fun (f, v) -> f ^ ": " ^ pred_to_string v) fields))
+  | POld p -> Printf.sprintf "old(%s)" (pred_to_string p)
+  | PResult -> "result"
+
 let ctx_add_var ctx name ty =
   { ctx with pc_vars = (name, ty) :: ctx.pc_vars }
 
@@ -66,7 +101,7 @@ module Z3Bridge = struct
      This module translates FORGE predicates to Z3 AST nodes. *)
 
   type z3_result =
-    | Sat                        (* formula is satisfiable *)
+    | Sat     of string          (* formula is satisfiable — string is counterexample model *)
     | Unsat                      (* formula is unsatisfiable — negation proves original *)
     | Unknown of string          (* Z3 gave up — escalate to Tier 2 *)
 
@@ -782,27 +817,33 @@ module Z3Bridge = struct
     Sys.remove result_tmp;
     consistent
 
-  let run_z3 query timeout_s =
+  let run_z3 ?(get_model=false) query timeout_s =
+    let full_query = if get_model then query ^ "\n(get-model)\n" else query in
     let tmp = Filename.temp_file "forge_smt" ".smt2" in
     let oc = open_out tmp in
-    output_string oc query;
+    output_string oc full_query;
     close_out oc;
     let result_tmp = Filename.temp_file "forge_smt_result" ".txt" in
     let cmd = Printf.sprintf "z3 -T:%d %s > %s 2>&1" timeout_s tmp result_tmp in
     let rc = Sys.command cmd in
+    let ic = open_in result_tmp in
+    let lines = ref [] in
+    (try while true do lines := input_line ic :: !lines done with End_of_file -> ());
+    close_in ic;
+    let all_lines = List.rev !lines in
     let result =
-      let ic = open_in result_tmp in
-      let rec scan () =
-        match (try Some (input_line ic) with End_of_file -> None) with
-        | None    -> Unknown (Printf.sprintf "z3 exited with code %d" rc)
-        | Some ln -> (match String.trim ln with
-            | "unsat" -> Unsat
-            | "sat"   -> Sat
-            | _       -> scan ())
-      in
-      let r = scan () in
-      close_in ic;
-      r
+      if List.exists (fun l -> String.trim l = "unsat") all_lines then Unsat
+      else if List.exists (fun l -> String.trim l = "sat") all_lines then begin
+        (* Extract model lines (everything after "sat" that looks like model output) *)
+        let model_lines = List.filter (fun l ->
+          let t = String.trim l in
+          t <> "sat" && t <> "" && t <> ")" &&
+          not (String.length t > 0 && t.[0] = ';')
+        ) all_lines in
+        let model = String.concat "\n" model_lines in
+        Sat model
+      end
+      else Unknown (Printf.sprintf "z3 exited with code %d" rc)
     in
     (tmp, result_tmp, result)
 
@@ -818,16 +859,17 @@ module Z3Bridge = struct
       (not (List.exists has_divmod goal_preds)) &&
       (List.exists has_nonlinear goal_preds)
     in
-    let (tmp, result_tmp, result) = run_z3 query 10 in
+    let (tmp, result_tmp, result) = run_z3 ~get_model:true query 10 in
     (* nlsat works over the reals — it may return sat for a goal that is only
        a theorem over integers (e.g. i*cols+j < rows*cols given 0<=i<rows, 0<=j<cols).
        When nlsat returns non-Unsat, retry with the NIA solver. *)
     let result =
-      if used_nlsat && result <> Unsat then
+      let is_unsat = match result with Unsat -> true | _ -> false in
+      if used_nlsat && not is_unsat then
         let nia_query = build_query ~force_nia:true ctx pred in
-        let (tmp2, result_tmp2, nia_result) = run_z3 nia_query 10 in
+        let (tmp2, result_tmp2, nia_result) = run_z3 ~get_model:true nia_query 10 in
         (match nia_result with
-         | Sat | Unknown _ when Sys.getenv_opt "FORGE_DUMP_SMT" <> None ->
+         | Sat _ | Unknown _ when Sys.getenv_opt "FORGE_DUMP_SMT" <> None ->
              Printf.eprintf "[forge-smt] NIA query dumped to %s\n%!" tmp2
          | _ -> Sys.remove tmp2);
         Sys.remove result_tmp2;
@@ -836,7 +878,7 @@ module Z3Bridge = struct
         result
     in
     (match result with
-     | Sat | Unknown _ when Sys.getenv_opt "FORGE_DUMP_SMT" <> None ->
+     | Sat _ | Unknown _ when Sys.getenv_opt "FORGE_DUMP_SMT" <> None ->
          Printf.eprintf "[forge-smt] query dumped to %s\n%!" tmp
      | _ -> Sys.remove tmp);
     Sys.remove result_tmp;
@@ -887,22 +929,56 @@ let try_smt ctx ob : proof_status =
        loop invariants, and refinement types for conflicting constraints"
       ob.ob_loc.file ob.ob_loc.line)
   else
+  let goal_str = pred_to_string ob.ob_pred in
+  let kind_str = match ob.ob_kind with
+    | OPrecondition f  -> "precondition of '" ^ f ^ "'"
+    | OPostcondition f -> "postcondition of '" ^ f ^ "'"
+    | OBoundsCheck a   -> "bounds check: " ^ a
+    | ONoOverflow op   -> "no-overflow: " ^ op
+    | OTermination f   -> "termination: " ^ f
+    | OLinear v        -> "linear usage: " ^ v
+    | OInvariant i     -> "invariant: " ^ i
+  in
   match Z3Bridge.check_valid ctx ob.ob_pred with
-  | Z3Bridge.Unsat   -> Discharged Tier1_SMT
-  | Z3Bridge.Sat     ->
+  | Z3Bridge.Unsat -> Discharged Tier1_SMT
+  | Z3Bridge.Sat model ->
+      (* Parse counterexample model to show concrete failing values *)
+      let model_summary =
+        let lines = String.split_on_char '\n' model in
+        (* Extract (define-fun name () Type value) entries *)
+        let defs = List.filter_map (fun line ->
+          let t = String.trim line in
+          if String.length t > 12 && String.sub t 0 11 = "(define-fun" then
+            (* Parse: (define-fun varname () Int 42) *)
+            let parts = String.split_on_char ' ' t in
+            match parts with
+            | _ :: name :: _ ->
+                (* Find the value — last token before closing paren *)
+                let clean = List.filter (fun s -> s <> "" && s <> ")" && s <> "(") parts in
+                (match List.rev clean with
+                 | value :: _ when name <> "()" ->
+                     let v = String.trim value in
+                     let v = if String.length v > 0 && v.[String.length v - 1] = ')'
+                             then String.sub v 0 (String.length v - 1) else v in
+                     if v <> "" && name <> "define-fun" then Some (name, v) else None
+                 | _ -> None)
+            | _ -> None
+          else None
+        ) lines in
+        if defs = [] then ""
+        else
+          let shown = List.filteri (fun i _ -> i < 8) defs in
+          "\n  counterexample: " ^
+          String.concat ", " (List.map (fun (n, v) -> n ^ " = " ^ v) shown) ^
+          (if List.length defs > 8 then Printf.sprintf " ... (%d more)" (List.length defs - 8) else "")
+      in
       Failed (Printf.sprintf
-        "SMT found counterexample for %s"
-        (match ob.ob_kind with
-         | OPrecondition f  -> "precondition of " ^ f
-         | OPostcondition f -> "postcondition of " ^ f
-         | OBoundsCheck a   -> "bounds check on " ^ a
-         | ONoOverflow op   -> "no-overflow on " ^ op
-         | OTermination f   -> "termination of " ^ f
-         | OLinear v        -> "linear usage of " ^ v
-         | OInvariant i     -> "invariant " ^ i))
+        "cannot prove %s\n  goal: %s%s"
+        kind_str goal_str model_summary)
   | Z3Bridge.Unknown msg ->
-      (* Can't decide — escalate *)
-      Failed (Printf.sprintf "SMT timeout/unknown: %s — needs Tier 2" msg)
+      Failed (Printf.sprintf
+        "SMT timeout on %s (Z3: %s)\n  goal: %s"
+        kind_str msg goal_str)
 
 (* ------------------------------------------------------------------ *)
 (* Tier 2: Guided proof                                                *)
@@ -919,6 +995,7 @@ type tier2_hint =
   | HintAssume     of string   (* "cannot prove — use assume() with justification" *)
 
 let suggest_hint ob : tier2_hint =
+  let goal = pred_to_string ob.ob_pred in
   match ob.ob_kind with
   | OTermination f ->
       HintDecreases (Printf.sprintf
@@ -926,18 +1003,34 @@ let suggest_hint ob : tier2_hint =
          where measure strictly decreases on each recursive call" f)
   | OPrecondition f ->
       HintAssume (Printf.sprintf
-        "cannot automatically prove precondition of '%s' — \
-         either strengthen the caller's type or use assume() with justification" f)
+        "cannot automatically prove precondition of '%s'\n\
+         \x20 need: %s\n\
+         \x20 try: add 'requires %s' to the calling function, or \
+         strengthen the argument types" f goal goal)
+  | OPostcondition f ->
+      HintAssume (Printf.sprintf
+        "cannot prove postcondition of '%s'\n\
+         \x20 need: %s\n\
+         \x20 try: check that the function body actually establishes this, \
+         or weaken the 'ensures' clause" f goal)
   | OInvariant i ->
       HintInvariant (Printf.sprintf
-        "loop invariant '%s' cannot be proven automatically — \
-         add 'invariant: <pred>' to the loop" i)
+        "loop invariant '%s' cannot be proven\n\
+         \x20 need: %s\n\
+         \x20 try: check that the loop body preserves this after every iteration" i goal)
   | OBoundsCheck a ->
       HintAssume (Printf.sprintf
-        "cannot prove array '%s' access is in bounds — \
-         refine the index type or add a bounds precondition" a)
-  | _ ->
-      HintAssume "cannot prove automatically — consider assume() with justification"
+        "cannot prove array '%s' access is in bounds\n\
+         \x20 need: %s\n\
+         \x20 try: add 'if idx < %s.len' guard, or add 'requires idx < %s.len'" a goal a a)
+  | ONoOverflow op ->
+      HintAssume (Printf.sprintf
+        "cannot prove '%s' won't overflow\n\
+         \x20 need: %s" op goal)
+  | OLinear v ->
+      HintAssume (Printf.sprintf
+        "linear value '%s' not consumed exactly once\n\
+         \x20 need: %s" v goal)
 
 (* ------------------------------------------------------------------ *)
 (* Main discharge function                                             *)
@@ -1093,7 +1186,7 @@ let rec check_proof ctx prop term : (unit, string) result =
       let p = prop_to_pred prop in
       (match Z3Bridge.check_valid ctx p with
        | Z3Bridge.Unsat -> Ok ()
-       | Z3Bridge.Sat ->
+       | Z3Bridge.Sat _ ->
            Error "PTAuto: SMT found counterexample — goal is not provable"
        | Z3Bridge.Unknown msg ->
            Error (Printf.sprintf "PTAuto: SMT inconclusive (%s)" msg))
@@ -1157,7 +1250,7 @@ let rec check_proof ctx prop term : (unit, string) result =
            let goal_pred = prop_to_pred prop in
            (match Z3Bridge.check_valid ctx goal_pred with
             | Z3Bridge.Unsat -> Ok ()
-            | Z3Bridge.Sat ->
+            | Z3Bridge.Sat _ ->
                 Error (Printf.sprintf
                   "PTBy: lemma '%s' does not imply the goal — \
                    check that the lemma's statement is relevant" lemma_name.name)
