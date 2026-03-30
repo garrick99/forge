@@ -96,7 +96,7 @@ standard library (math/mem/str/collections/crypto/prelude), error handling, and 
 
 ## Demos
 
-**1000 demos**, all verified by Z3 and compiled clean under `gcc -Wall -Wextra -Werror`.
+**1000+ demos**, all verified by Z3 and compiled clean under `gcc -Wall -Wextra -Werror`.
 
 | # | File | What it demonstrates |
 |---|------|----------------------|
@@ -265,6 +265,9 @@ rotation by GCD cycles, formal power series, streaming median, and the
 | 900 | `900_milestone.fg` | Milestone 900 — seven categories (+ verified data structures) |
 | 950 | `950_milestone_showcase.fg` | Milestone 950 — eight proof categories |
 | 1000 | `1000_grand_finale.fg` | **MILESTONE 1000** — grand finale showcasing all Forge verification capabilities |
+| 1002 | `1002_verified_sort_sorted.fg` | Insertion sort with `ensures forall i j, i<j && j<n ==> s[i] <= s[j]` — **the crown jewel** |
+| 1005 | `1005_stdlib_sort_search.fg` | `std::sort` + `std::search` composition: sort → binary search, full proof chain |
+| 1006 | `1006_verified_ipv4_parser.fg` | **Real-world verified IPv4 packet parser** — eliminates CWE-120/125/131/805 by construction |
 
 ### Intentional failures (in `demos/bad/`)
 
@@ -346,10 +349,10 @@ lib/
   codegen/      C99 emitter (codegen_c.ml ~2150 lines) + PTX backend (codegen_ptx.ml ~620 lines)
 bin/
   main.ml       CLI driver + compiler pipeline (~290 lines)
-demos/          1000 passing demos (01–1000, excluding intentional failures)
+demos/          1000+ passing demos (01–1006, excluding intentional failures)
   bad/          10 intentional failures
-  std/          Standard library modules (prelude, option, result, math, iter,
-                collections, crypto, mem, str, fmt, io, process)
+  std/          Standard library modules (prelude, option, result, math, mem,
+                sort, search, collections, crypto, iter, str, fmt, io, process)
 ```
 
 Total: ~9700 lines of OCaml.
