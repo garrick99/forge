@@ -1,0 +1,117 @@
+// expected: 0
+// Verified BMP image header parser
+//
+// read_u16_le: read little-endian 16-bit value
+// read_u32_le: read little-endian 32-bit value
+// validate_bmp: parse and validate BMP header
+// extract_pixel: returns (r, g, b) at coordinate (x, y)
+
+fn read_u16_le(buf: span<u64>, off: u64) -> u64
+    requires off + 1u64 < buf.len
+    requires buf[off] < 256u64
+    requires buf[off + 1u64] < 256u64
+    ensures result < 65536u64
+{
+    buf[off] + buf[off + 1u64] * 256u64
+}
+
+fn read_u32_le(buf: span<u64>, off: u64) -> u64
+    requires off + 3u64 < buf.len
+    requires buf[off] < 256u64
+    requires buf[off + 1u64] < 256u64
+    requires buf[off + 2u64] < 256u64
+    requires buf[off + 3u64] < 256u64
+    ensures result < 4294967296u64
+{
+    buf[off] + buf[off + 1u64] * 256u64 + buf[off + 2u64] * 65536u64 + buf[off + 3u64] * 16777216u64
+}
+
+// validate_bmp returns (error_code, width, height, pixel_offset, pixel_size)
+// error_code: 0 = ok, 1 = bad magic, 2 = offset oob, 3 = too large, 4 = pixel data overflows
+// On success: pixel_offset + pixel_size <= buf_len
+fn validate_bmp_header(buf: span<u64>, buf_len: u64) -> (u64, u64, u64, u64, u64)
+    requires buf.len == buf_len
+    requires buf_len >= 54u64
+    requires forall k: u64, k < buf_len ==> buf[k] < 256u64
+    ensures result.0 <= 4u64
+{
+    // Check magic bytes 'B' = 66, 'M' = 77
+    if buf[0u64] == 66u64 && buf[1u64] == 77u64 {
+        let pix_off: u64 = read_u32_le(buf, 10u64);
+        let width: u64 = read_u32_le(buf, 18u64);
+        let height: u64 = read_u32_le(buf, 22u64);
+        if pix_off >= buf_len {
+            (2u64, 0u64, 0u64, 0u64, 0u64)
+        } else if width > 10000u64 {
+            (3u64, 0u64, 0u64, 0u64, 0u64)
+        } else if height > 10000u64 {
+            (3u64, 0u64, 0u64, 0u64, 0u64)
+        } else {
+            let remaining: u64 = buf_len - pix_off;
+            let pixel_size: u64 = width * 3u64 * height;
+            if pixel_size > remaining {
+                (4u64, width, height, pix_off, 0u64)
+            } else {
+                (0u64, width, height, pix_off, pixel_size)
+            }
+        }
+    } else {
+        (1u64, 0u64, 0u64, 0u64, 0u64)
+    }
+}
+
+// Verify pixel offset + pixel size is within buffer
+fn check_pixel_bounds(pix_off: u64, pixel_size: u64, buf_len: u64) -> bool
+    requires pix_off < buf_len
+    ensures result == true ==> pix_off + pixel_size <= buf_len
+{
+    if pixel_size <= buf_len - pix_off { true } else { false }
+}
+
+// extract_pixel returns (r, g, b) at pixel (x, y) in a 24-bit BMP
+fn extract_pixel(buf: span<u64>, buf_len: u64,
+                 pixel_offset: u64, x: u64, y: u64, width: u64) -> (u64, u64, u64)
+    requires buf.len == buf_len
+    requires width > 0u64
+    requires x < width
+    requires y < 10000u64
+    requires width <= 10000u64
+    requires pixel_offset + (y * width + x) * 3u64 + 2u64 < buf_len
+    requires forall k: u64, k < buf_len ==> buf[k] < 256u64
+    ensures result.0 < 256u64
+    ensures result.1 < 256u64
+    ensures result.2 < 256u64
+{
+    let byte_off: u64 = pixel_offset + (y * width + x) * 3u64;
+    let b_val: u64 = buf[byte_off];
+    let g_val: u64 = buf[byte_off + 1u64];
+    let r_val: u64 = buf[byte_off + 2u64];
+    (r_val, g_val, b_val)
+}
+
+// count_valid_pixels: count pixels in a row that satisfy bounds
+fn count_valid_pixels(buf: span<u64>, buf_len: u64,
+                      pixel_offset: u64, width: u64) -> u64
+    requires buf.len == buf_len
+    requires width <= 10000u64
+    requires pixel_offset + width * 3u64 <= buf_len
+    requires forall k: u64, k < buf_len ==> buf[k] < 256u64
+    ensures result <= width
+{
+    let mut cnt: u64 = 0u64;
+    for i in width
+        invariant i <= width
+        invariant cnt <= i
+    {
+        let off: u64 = pixel_offset + i * 3u64;
+        let r_v: u64 = buf[off];
+        let g_v: u64 = buf[off + 1u64];
+        let b_v: u64 = buf[off + 2u64];
+        if r_v < 256u64 && g_v < 256u64 && b_v < 256u64 {
+            cnt = cnt + 1u64;
+        };
+    };
+    cnt
+}
+
+fn main() -> u64 { 0u64 }

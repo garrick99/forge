@@ -1,0 +1,113 @@
+// expected: 0
+// Verified sensor monitoring system
+//
+// compute_average: returns sum/n
+// count_violations: count out-of-range readings
+// running_max: track max so far into output span
+// detect_spike: count successive readings differing by > max_delta
+// monitor_pipeline: runs all checks, returns total alerts
+
+fn compute_average(readings: span<u64>, n: u64) -> u64
+    requires readings.len == n
+    requires n > 0u64
+    requires forall k: u64, k < n ==> readings[k] <= 1000000u64
+    ensures result <= 1000000u64
+{
+    let mut total: u64 = 0u64;
+    for i in n
+        invariant i <= n
+        invariant total <= 1000000u64 * i
+    {
+        total = total + readings[i];
+    };
+    total / n
+}
+
+fn count_violations(readings: span<u64>, n: u64, lo_thresh: u64, hi_thresh: u64) -> u64
+    requires readings.len == n
+    requires lo_thresh <= hi_thresh
+    ensures result <= n
+{
+    let mut cnt: u64 = 0u64;
+    for i in n
+        invariant i <= n
+        invariant cnt <= i
+    {
+        if readings[i] < lo_thresh {
+            cnt = cnt + 1u64;
+        } else if readings[i] > hi_thresh {
+            cnt = cnt + 1u64;
+        };
+    };
+    cnt
+}
+
+fn running_max_fn(readings: span<u64>, n: u64, output: span<u64>)
+    requires readings.len == n
+    requires output.len == n
+    requires n > 0u64
+    ensures forall k: u64, k < n ==> output[k] >= readings[k]
+{
+    output[0u64] = readings[0u64];
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant i >= 1u64
+        invariant forall k: u64, k < i ==> output[k] >= readings[k]
+        decreases n - i
+    {
+        if readings[i] > output[i - 1u64] {
+            output[i] = readings[i];
+        } else {
+            output[i] = output[i - 1u64];
+        };
+        i = i + 1u64;
+    }
+}
+
+fn detect_spike(readings: span<u64>, n: u64, max_delta: u64) -> u64
+    requires readings.len == n
+    requires n >= 1u64
+    ensures result < n
+{
+    let mut spikes: u64 = 0u64;
+    let mut i: u64 = 1u64;
+    while i < n
+        invariant i <= n
+        invariant i >= 1u64
+        invariant spikes < i
+        decreases n - i
+    {
+        let curr: u64 = readings[i];
+        let prev: u64 = readings[i - 1u64];
+        if curr > prev {
+            if curr - prev > max_delta {
+                spikes = spikes + 1u64;
+            };
+        } else {
+            if prev - curr > max_delta {
+                spikes = spikes + 1u64;
+            };
+        };
+        i = i + 1u64;
+    };
+    spikes
+}
+
+fn monitor_pipeline(readings: span<u64>, n: u64,
+                    output: span<u64>, lo: u64, hi: u64,
+                    max_delta: u64) -> u64
+    requires readings.len == n
+    requires output.len == n
+    requires n >= 1u64
+    requires lo <= hi
+    requires forall k: u64, k < n ==> readings[k] <= 1000000u64
+    ensures result <= n + n
+{
+    let violations: u64 = count_violations(readings, n, lo, hi);
+    let spikes: u64 = detect_spike(readings, n, max_delta);
+    running_max_fn(readings, n, output);
+    violations + spikes
+}
+
+fn main() -> u64 { 0u64 }

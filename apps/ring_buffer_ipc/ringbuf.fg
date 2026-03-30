@@ -1,0 +1,153 @@
+// expected: 0
+// Verified ring buffer for inter-process communication
+//
+// ring_init: zero the buffer
+// ring_write: write data_len bytes with wrapping
+// ring_read: read up to max_read bytes with wrapping
+// ring_available: returns available space
+// ring_batch_write: write multiple messages with length prefixes
+
+fn ring_init(buf: span<u64>, cap: u64)
+    requires buf.len == cap
+    ensures forall k: u64, k < cap ==> buf[k] == 0u64
+{
+    for i in cap
+        invariant i <= cap
+        invariant forall k: u64, k < i ==> buf[k] == 0u64
+    {
+        buf[i] = 0u64;
+    }
+}
+
+fn ring_available(cap: u64, cnt: u64) -> u64
+    requires cnt <= cap
+    ensures result <= cap
+    ensures result == cap - cnt
+{
+    cap - cnt
+}
+
+// ring_write: write data_len bytes into ring buffer
+// Returns (new_tail, new_count)
+// Wraps around using modular arithmetic
+fn ring_write(buf: span<u64>, cap: u64, tail: u64, cnt: u64,
+              data: span<u64>, data_len: u64) -> (u64, u64)
+    requires buf.len == cap
+    requires data.len == data_len
+    requires cap > 0u64
+    requires tail < cap
+    requires cnt <= cap
+    requires data_len <= cap - cnt
+    ensures result.0 < cap
+    ensures result.1 <= cap
+    ensures result.1 == cnt + data_len
+{
+    let mut t: u64 = tail;
+    let mut c: u64 = cnt;
+    let mut i: u64 = 0u64;
+    while i < data_len
+        invariant i <= data_len
+        invariant t < cap
+        invariant c <= cap
+        invariant c == cnt + i
+        decreases data_len - i
+    {
+        buf[t] = data[i];
+        t = (t + 1u64) % cap;
+        c = c + 1u64;
+        i = i + 1u64;
+    };
+    (t, c)
+}
+
+// ring_read: read up to max_read bytes from ring buffer
+// Returns (new_head, new_count, bytes_read)
+fn ring_read(buf: span<u64>, cap: u64, head: u64, cnt: u64,
+             output: span<u64>, max_read: u64) -> (u64, u64, u64)
+    requires buf.len == cap
+    requires output.len >= max_read
+    requires cap > 0u64
+    requires head < cap
+    requires cnt <= cap
+    ensures result.2 <= max_read
+    ensures result.2 <= cnt
+    ensures result.0 < cap || result.2 == 0u64
+    ensures result.1 <= cap
+{
+    // Compute actual read amount: min(max_read, cnt)
+    let mut to_read: u64 = max_read;
+    if cnt < max_read {
+        to_read = cnt;
+    };
+    let mut h: u64 = head;
+    let mut i: u64 = 0u64;
+    while i < to_read
+        invariant i <= to_read
+        invariant to_read <= max_read
+        invariant to_read <= cnt
+        invariant h < cap
+        decreases to_read - i
+    {
+        output[i] = buf[h];
+        h = (h + 1u64) % cap;
+        i = i + 1u64;
+    };
+    let new_cnt: u64 = cnt - to_read;
+    if to_read == 0u64 {
+        (head, cnt, 0u64)
+    } else {
+        (h, new_cnt, to_read)
+    }
+}
+
+// ring_write_one: write a single value into the ring buffer
+// Returns (new_tail, new_count)
+fn ring_write_one(buf: span<u64>, cap: u64, tail: u64, cnt: u64,
+                  val: u64) -> (u64, u64)
+    requires buf.len == cap
+    requires cap > 0u64
+    requires tail < cap
+    requires cnt < cap
+    ensures result.0 < cap
+    ensures result.1 <= cap
+    ensures result.1 == cnt + 1u64
+{
+    buf[tail] = val;
+    let new_tail: u64 = (tail + 1u64) % cap;
+    (new_tail, cnt + 1u64)
+}
+
+// ring_batch_write: write total_len values from data into ring buffer
+// This is used to batch multiple messages (caller packs length prefixes into data)
+// Returns (new_tail, new_count)
+fn ring_batch_write(buf: span<u64>, cap: u64, tail: u64, cnt: u64,
+                    data: span<u64>, total_len: u64) -> (u64, u64)
+    requires buf.len == cap
+    requires data.len == total_len
+    requires cap > 0u64
+    requires tail < cap
+    requires cnt <= cap
+    requires total_len <= cap - cnt
+    ensures result.0 < cap
+    ensures result.1 <= cap
+    ensures result.1 == cnt + total_len
+{
+    let mut t: u64 = tail;
+    let mut c: u64 = cnt;
+    let mut i: u64 = 0u64;
+    while i < total_len
+        invariant i <= total_len
+        invariant t < cap
+        invariant c <= cap
+        invariant c == cnt + i
+        decreases total_len - i
+    {
+        buf[t] = data[i];
+        t = (t + 1u64) % cap;
+        c = c + 1u64;
+        i = i + 1u64;
+    };
+    (t, c)
+}
+
+fn main() -> u64 { 0u64 }
