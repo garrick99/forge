@@ -51,11 +51,7 @@ void mat_identity(forge_span_u64_t out __attribute__((unused)), uint64_t n __att
       uint64_t j __attribute__((unused)) = 0;
       {
         while ((j < n)) {
-          out.data[((i * n) + j)] = if ((i == j)) {
-            1;
-          } else {
-            0;
-          };
+          out.data[((i * n) + j)] = ((i == j) ? 1 : 0);
           j = (j + 1);
         }
 

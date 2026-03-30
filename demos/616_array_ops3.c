@@ -45,11 +45,7 @@ void zip_max(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __at
   uint64_t i __attribute__((unused)) = 0;
   {
     while ((i < n)) {
-      out.data[i] = if ((a.data[i] >= b.data[i])) {
-        a.data[i];
-      } else {
-        b.data[i];
-      };
+      out.data[i] = ((a.data[i] >= b.data[i]) ? a.data[i] : b.data[i]);
       i = (i + 1);
     }
 
@@ -60,11 +56,7 @@ void zip_min(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __at
   uint64_t i __attribute__((unused)) = 0;
   {
     while ((i < n)) {
-      out.data[i] = if ((a.data[i] <= b.data[i])) {
-        a.data[i];
-      } else {
-        b.data[i];
-      };
+      out.data[i] = ((a.data[i] <= b.data[i]) ? a.data[i] : b.data[i]);
       i = (i + 1);
     }
 
@@ -75,11 +67,7 @@ void zip_sub_sat(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b 
   uint64_t i __attribute__((unused)) = 0;
   {
     while ((i < n)) {
-      out.data[i] = if ((a.data[i] >= b.data[i])) {
-        (a.data[i] - b.data[i]);
-      } else {
-        0;
-      };
+      out.data[i] = ((a.data[i] >= b.data[i]) ? (a.data[i] - b.data[i]) : 0);
       i = (i + 1);
     }
 

@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 54: ? operator — propagate Err on failure
 //
 // The ? operator desugars at parse time to:

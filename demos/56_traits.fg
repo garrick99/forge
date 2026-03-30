@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 56: Trait definitions and implementations
 //
 // trait Hashable { fn hash(self: ref<Point>) -> u64; }

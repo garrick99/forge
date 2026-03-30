@@ -29,44 +29,20 @@ void sift_down_root(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
   } else if ((n == 2)) {
     uint64_t v0 __attribute__((unused)) = s.data[0];
     uint64_t v1 __attribute__((unused)) = s.data[1];
-    s.data[0] = if ((v0 <= v1)) {
-      v0;
-    } else {
-      v1;
-    };
-    s.data[1] = if ((v0 <= v1)) {
-      v1;
-    } else {
-      v0;
-    };
+    s.data[0] = ((v0 <= v1) ? v0 : v1);
+    s.data[1] = ((v0 <= v1) ? v1 : v0);
 
   } else if ((s.data[1] <= s.data[2])) {
     uint64_t v0 __attribute__((unused)) = s.data[0];
     uint64_t v1 __attribute__((unused)) = s.data[1];
-    s.data[0] = if ((v0 <= v1)) {
-      v0;
-    } else {
-      v1;
-    };
-    s.data[1] = if ((v0 <= v1)) {
-      v1;
-    } else {
-      v0;
-    };
+    s.data[0] = ((v0 <= v1) ? v0 : v1);
+    s.data[1] = ((v0 <= v1) ? v1 : v0);
 
   } else {
     uint64_t v0 __attribute__((unused)) = s.data[0];
     uint64_t v2 __attribute__((unused)) = s.data[2];
-    s.data[0] = if ((v0 <= v2)) {
-      v0;
-    } else {
-      v2;
-    };
-    s.data[2] = if ((v0 <= v2)) {
-      v2;
-    } else {
-      v0;
-    };
+    s.data[0] = ((v0 <= v2) ? v0 : v2);
+    s.data[2] = ((v0 <= v2) ? v2 : v0);
 
   }
 }

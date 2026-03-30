@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 70: const declarations — named compile-time constants
 //
 // const NAME: Type = value;  emits C  static const T NAME = VALUE;

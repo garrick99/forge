@@ -694,18 +694,41 @@ let rec emit_expr depth e =
            Printf.sprintf "(%s ? %s : (void)0)"
              (emit_expr depth cond) (emit_expr_value depth then_))
   | EIf (cond, then_, Some else_) ->
-      let then_is_block = match then_.expr_desc with EBlock _ -> true | _ -> false in
-      let else_is_block = match else_.expr_desc with EBlock _ -> true | _ -> false in
-      if then_is_block || else_is_block then
-        Printf.sprintf "if (%s) %s else %s"
-          (emit_expr depth cond)
-          (emit_expr depth then_)
-          (emit_expr depth else_)
-      else
-        Printf.sprintf "(%s ? %s : %s)"
-          (emit_expr depth cond)
-          (emit_expr_value depth then_)
-          (emit_expr_value depth else_)
+      (* Check if branches are simple value-returning blocks (no stmts, just
+         a trailing expr).  If so, emit as ternary — required when the EIf
+         appears as the RHS of an assignment (e.g. s[i] = if c { a } else { b }). *)
+      let rec simple_block_val e = match e.expr_desc with
+        | EBlock ([], Some ret) -> Some ret
+        | EIf (_c2, t2, Some e2) ->
+            (* Nested EIf (elif chain): if both sub-branches are simple,
+               emit as nested ternary.  Wrap as a synthetic ternary expr. *)
+            (match simple_block_val t2, simple_block_val e2 with
+             | Some _, Some _ -> Some e  (* the whole EIf is a value expr *)
+             | _ -> None)
+        | EBlock _ -> None  (* has stmts — not simple *)
+        | _ -> Some e       (* bare expression — always simple *)
+      in
+      let then_simple = simple_block_val then_ in
+      let else_simple = simple_block_val else_ in
+      (match then_simple, else_simple with
+       | Some tv, Some ev ->
+           Printf.sprintf "(%s ? %s : %s)"
+             (emit_expr depth cond)
+             (emit_expr_value depth tv)
+             (emit_expr_value depth ev)
+       | _ ->
+           let then_is_block = match then_.expr_desc with EBlock _ -> true | _ -> false in
+           let else_is_block = match else_.expr_desc with EBlock _ -> true | _ -> false in
+           if then_is_block || else_is_block then
+             Printf.sprintf "if (%s) %s else %s"
+               (emit_expr depth cond)
+               (emit_expr depth then_)
+               (emit_expr depth else_)
+           else
+             Printf.sprintf "(%s ? %s : %s)"
+               (emit_expr depth cond)
+               (emit_expr_value depth then_)
+               (emit_expr_value depth else_))
   | EBlock (stmts, ret) ->
       let buf = Buffer.create 256 in
       Buffer.add_string buf "{\n";

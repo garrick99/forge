@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 77: Match guards — pattern matching with 'if' conditions
 //
 // match x {

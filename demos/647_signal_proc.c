@@ -23,11 +23,7 @@ void threshold_signal(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
   uint64_t i __attribute__((unused)) = 0;
   {
     while ((i < n)) {
-      s.data[i] = if ((s.data[i] >= thresh)) {
-        1;
-      } else {
-        0;
-      };
+      s.data[i] = ((s.data[i] >= thresh) ? 1 : 0);
       i = (i + 1);
     }
 

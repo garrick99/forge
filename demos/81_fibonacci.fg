@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 81: Fibonacci — iterative with loop and mutable-style via let rebinding
 //
 // FORGE doesn't have mutable variables, so we use a loop that carries

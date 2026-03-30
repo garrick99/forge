@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 73: where clauses — alternative syntax for trait bounds
 //
 // fn foo<T>(x: T) where T: Trait  is equivalent to  fn foo<T: Trait>(x: T)

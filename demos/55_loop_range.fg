@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 55: loop { break val } + range patterns
 //
 // loop { ... break val; } evaluates to the break value.

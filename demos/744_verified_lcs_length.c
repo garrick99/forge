@@ -46,11 +46,7 @@ uint64_t lcs_length(forge_span_u64_t a __attribute__((unused)), uint64_t m __att
           } else {
             uint64_t up __attribute__((unused)) = dp.data[(((i2 - 1) * cols) + j2)];
             uint64_t left __attribute__((unused)) = dp.data[((i2 * cols) + (j2 - 1))];
-            dp.data[curr] = if ((up >= left)) {
-              up;
-            } else {
-              left;
-            };
+            dp.data[curr] = ((up >= left) ? up : left);
 
           }
           j2 = (j2 + 1);

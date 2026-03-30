@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 127: Verified modular arithmetic
 //
 // mod_add, mod_sub, mod_mul: results stay in [0, m).

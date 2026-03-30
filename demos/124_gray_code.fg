@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 124: Verified Gray code encoding and decoding
 //
 // Gray codes: consecutive integers differ by exactly one bit.

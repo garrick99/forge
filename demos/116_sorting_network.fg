@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 116: Verified sorting network (4-element)
 //
 // Batcher odd-even merge sort network for 4 elements.

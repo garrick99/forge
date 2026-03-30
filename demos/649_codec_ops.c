@@ -24,11 +24,7 @@ void delta_encode(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t
   uint64_t i __attribute__((unused)) = 1;
   {
     while ((i < n)) {
-      dst.data[i] = if ((src.data[i] >= src.data[(i - 1)])) {
-        (src.data[i] - src.data[(i - 1)]);
-      } else {
-        0;
-      };
+      dst.data[i] = ((src.data[i] >= src.data[(i - 1)]) ? (src.data[i] - src.data[(i - 1)]) : 0);
       i = (i + 1);
     }
 
@@ -59,11 +55,7 @@ void encode_lengths(forge_span_u64_t src __attribute__((unused)), uint64_t n __a
   uint64_t i __attribute__((unused)) = 0;
   {
     while ((i < n)) {
-      out.data[i] = if ((src.data[i] <= max_len)) {
-        src.data[i];
-      } else {
-        max_len;
-      };
+      out.data[i] = ((src.data[i] <= max_len) ? src.data[i] : max_len);
       i = (i + 1);
     }
 

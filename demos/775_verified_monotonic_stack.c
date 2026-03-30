@@ -46,11 +46,7 @@ void prefix_min_stack(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
     while ((i < n)) {
       uint64_t prev __attribute__((unused)) = mins.data[(i - 1)];
       uint64_t cur __attribute__((unused)) = s.data[i];
-      mins.data[i] = if ((prev <= cur)) {
-        prev;
-      } else {
-        cur;
-      };
+      mins.data[i] = ((prev <= cur) ? prev : cur);
       i = (i + 1);
     }
 

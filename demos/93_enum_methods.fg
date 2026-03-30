@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 93: Enum methods and Display patterns
 //
 // impl blocks on enums provide methods dispatched via match.

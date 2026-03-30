@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 84: State machine — type-safe state transitions
 //
 // Each state is a distinct struct. Transitions are functions that

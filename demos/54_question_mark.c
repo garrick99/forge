@@ -43,26 +43,26 @@ Result_u64_u64 div_twice(uint64_t a __attribute__((unused)), uint64_t b __attrib
   uint64_t x;
   switch (safe_div(a, b).tag) {
     case Result_u64_u64_tag_Ok: {
-      uint64_t __qok_2500017 __attribute__((unused)) = safe_div(a, b).data.Ok._v0;
-      x = __qok_2500017;
+      uint64_t __qok_2600017 __attribute__((unused)) = safe_div(a, b).data.Ok._v0;
+      x = __qok_2600017;
       break;
     }
     case Result_u64_u64_tag_Err: {
-      uint64_t __qerr_2500017 __attribute__((unused)) = safe_div(a, b).data.Err._v0;
-      return (Result_u64_u64){ .tag = Result_u64_u64_tag_Err, .data.Err = { ._v0 = __qerr_2500017 } };
+      uint64_t __qerr_2600017 __attribute__((unused)) = safe_div(a, b).data.Err._v0;
+      return (Result_u64_u64){ .tag = Result_u64_u64_tag_Err, .data.Err = { ._v0 = __qerr_2600017 } };
 
     }
   }
   uint64_t y;
   switch (safe_div(x, c).tag) {
     case Result_u64_u64_tag_Ok: {
-      uint64_t __qok_2600017 __attribute__((unused)) = safe_div(x, c).data.Ok._v0;
-      y = __qok_2600017;
+      uint64_t __qok_2700017 __attribute__((unused)) = safe_div(x, c).data.Ok._v0;
+      y = __qok_2700017;
       break;
     }
     case Result_u64_u64_tag_Err: {
-      uint64_t __qerr_2600017 __attribute__((unused)) = safe_div(x, c).data.Err._v0;
-      return (Result_u64_u64){ .tag = Result_u64_u64_tag_Err, .data.Err = { ._v0 = __qerr_2600017 } };
+      uint64_t __qerr_2700017 __attribute__((unused)) = safe_div(x, c).data.Err._v0;
+      return (Result_u64_u64){ .tag = Result_u64_u64_tag_Err, .data.Err = { ._v0 = __qerr_2700017 } };
 
     }
   }

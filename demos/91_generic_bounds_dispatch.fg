@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 91: Trait bounds with concrete dispatch
 //
 // Generic functions can call trait methods on their type parameters

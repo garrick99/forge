@@ -25,11 +25,7 @@ uint64_t all_below(forge_span_u64_t s __attribute__((unused)), uint64_t bound __
   uint64_t idx __attribute__((unused)) = 0;
   {
     while ((idx < s.len)) {
-      ok = if ((s.data[idx] >= bound)) {
-        0;
-      } else {
-        ok;
-      };
+      ok = ((s.data[idx] >= bound) ? 0 : ok);
       idx = (idx + 1);
     }
 
@@ -42,11 +38,7 @@ uint64_t all_above(forge_span_u64_t s __attribute__((unused)), uint64_t lo __att
   uint64_t idx __attribute__((unused)) = 0;
   {
     while ((idx < s.len)) {
-      ok = if ((s.data[idx] <= lo)) {
-        0;
-      } else {
-        ok;
-      };
+      ok = ((s.data[idx] <= lo) ? 0 : ok);
       idx = (idx + 1);
     }
 
@@ -59,11 +51,7 @@ uint64_t count_eq(forge_span_u64_t s __attribute__((unused)), uint64_t target __
   uint64_t idx __attribute__((unused)) = 0;
   {
     while ((idx < s.len)) {
-      cnt = if ((s.data[idx] == target)) {
-        (cnt + 1);
-      } else {
-        cnt;
-      };
+      cnt = ((s.data[idx] == target) ? (cnt + 1) : cnt);
       idx = (idx + 1);
     }
 
@@ -83,16 +71,8 @@ uint64_t find_first(forge_span_u64_t s __attribute__((unused)), uint64_t target 
       } else {
         matched = 0;
       }
-      found_idx = if ((matched == 1)) {
-        idx;
-      } else {
-        found_idx;
-      };
-      found = if ((matched == 1)) {
-        1;
-      } else {
-        found;
-      };
+      found_idx = ((matched == 1) ? idx : found_idx);
+      found = ((matched == 1) ? 1 : found);
       idx = (idx + 1);
     }
 
@@ -105,11 +85,7 @@ uint64_t span_max(forge_span_u64_t s __attribute__((unused))) {
   uint64_t idx __attribute__((unused)) = 1;
   {
     while ((idx < s.len)) {
-      m = if ((s.data[idx] > m)) {
-        s.data[idx];
-      } else {
-        m;
-      };
+      m = ((s.data[idx] > m) ? s.data[idx] : m);
       idx = (idx + 1);
     }
 

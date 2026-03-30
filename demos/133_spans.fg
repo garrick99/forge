@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 133: Verified span (slice) operations
 //
 // span<T> is a fat pointer with bounds: { data: *T, len: u64 }.

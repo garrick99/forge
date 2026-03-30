@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 104: Ring buffer with capacity invariants
 //
 // A fixed-capacity-4 ring buffer with push/pop operations.

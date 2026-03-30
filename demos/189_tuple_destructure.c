@@ -25,9 +25,9 @@ __forge_tuple_u64_u64_t minmax(uint64_t a __attribute__((unused)), uint64_t b __
 }
 
 uint64_t use_minmax(uint64_t x __attribute__((unused)), uint64_t y __attribute__((unused))) {
-  __forge_tuple_u64_u64_t __tup_19_4 __attribute__((unused)) = minmax(x, y);
-  uint64_t lo __attribute__((unused)) = (__tup_19_4)._0;
-  uint64_t hi __attribute__((unused)) = (__tup_19_4)._1;
+  __forge_tuple_u64_u64_t __tup_20_4 __attribute__((unused)) = minmax(x, y);
+  uint64_t lo __attribute__((unused)) = (__tup_20_4)._0;
+  uint64_t hi __attribute__((unused)) = (__tup_20_4)._1;
   return (hi - lo);
 }
 

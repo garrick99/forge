@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 132: Verified recursive functions with termination measures
 //
 // decreases: tells the prover which measure strictly decreases each call.

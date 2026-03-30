@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 98: Multi-return via structs — returning multiple values
 //
 // FORGE uses structs to bundle multiple return values, similar to Rust tuples

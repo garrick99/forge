@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 107: Verified Hamming weight (popcount) with bitwise proofs
 //
 // Parallel prefix algorithm for counting set bits.

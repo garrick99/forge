@@ -42,11 +42,7 @@ uint64_t ht_insert(forge_span_u64_t keys __attribute__((unused)), forge_span_u64
         }
 
       }
-      idx = if (((idx + 1) == cap)) {
-        0;
-      } else {
-        (idx + 1);
-      };
+      idx = (((idx + 1) == cap) ? 0 : (idx + 1));
       probes = (probes + 1);
     }
 
@@ -73,11 +69,7 @@ uint64_t ht_lookup(forge_span_u64_t keys __attribute__((unused)), forge_span_u64
         }
 
       }
-      idx = if (((idx + 1) == cap)) {
-        0;
-      } else {
-        (idx + 1);
-      };
+      idx = (((idx + 1) == cap) ? 0 : (idx + 1));
       probes = (probes + 1);
     }
 

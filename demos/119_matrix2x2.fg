@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 119: Verified 2×2 matrix arithmetic
 //
 // 2×2 matrices stored as four u64 scalars (small values to avoid overflow).

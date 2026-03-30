@@ -65,16 +65,8 @@ uint64_t total_coverage(forge_span_u64_t lo_arr __attribute__((unused)), forge_s
 }
 
 void merge_interval(uint64_t a_lo __attribute__((unused)), uint64_t a_hi __attribute__((unused)), uint64_t b_lo __attribute__((unused)), uint64_t b_hi __attribute__((unused)), uint64_t* out_lo __attribute__((unused)), uint64_t* out_hi __attribute__((unused))) {
-  (*out_lo) = if ((a_lo <= b_lo)) {
-    a_lo;
-  } else {
-    b_lo;
-  };
-  (*out_hi) = if ((a_hi >= b_hi)) {
-    a_hi;
-  } else {
-    b_hi;
-  };
+  (*out_lo) = ((a_lo <= b_lo) ? a_lo : b_lo);
+  (*out_hi) = ((a_hi >= b_hi) ? a_hi : b_hi);
 }
 
 int main() {

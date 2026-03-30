@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 82: Bitwise operations and bit manipulation utilities
 //
 // popcount, leading zeros, rotate left, bit extraction

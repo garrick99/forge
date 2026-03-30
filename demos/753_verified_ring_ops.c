@@ -49,11 +49,7 @@ __forge_tuple_u64_u64_t ring_fill(forge_span_u64_t buf __attribute__((unused)), 
   {
     while ((count < cap)) {
       buf.data[tail] = val;
-      tail = if (((tail + 1) == cap)) {
-        0;
-      } else {
-        (tail + 1);
-      };
+      tail = (((tail + 1) == cap) ? 0 : (tail + 1));
       count = (count + 1);
     }
 

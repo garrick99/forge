@@ -46,11 +46,7 @@ uint64_t edit_distance(forge_span_u64_t a __attribute__((unused)), uint64_t m __
             } else {
               m1 = del;
             }
-            row.data[(j2 + 1)] = if ((m1 <= sub)) {
-              m1;
-            } else {
-              sub;
-            };
+            row.data[(j2 + 1)] = ((m1 <= sub) ? m1 : sub);
 
           }
           prev = saved;

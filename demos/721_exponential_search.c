@@ -23,11 +23,7 @@ uint64_t gallop_bound(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
     while ((bound < n)) {
       if ((s.data[bound] < target)) {
         uint64_t next __attribute__((unused)) = (bound + bound);
-        bound = if ((next >= n)) {
-          n;
-        } else {
-          next;
-        };
+        bound = ((next >= n) ? n : next);
 
       } else {
         bound = n;

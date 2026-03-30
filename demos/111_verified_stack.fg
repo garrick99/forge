@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 111: Verified fixed-size stack (capacity 8, LIFO)
 //
 // A stack stored as an 8-element array with a size counter.

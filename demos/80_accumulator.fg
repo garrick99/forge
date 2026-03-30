@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 80: Accumulator pattern — mutable state via structs + methods
 //
 // A Stats struct accumulates a running sum, count, min, and max.

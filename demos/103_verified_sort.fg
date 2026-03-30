@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 103: Verified sorting network for 4 elements
 //
 // A Batcher odd-even sort (5 comparators) on 4 values.

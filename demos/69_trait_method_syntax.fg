@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 69: Trait methods via dot syntax — x.method() dispatches to TypeName__Trait__method
 //
 // Previously required explicit Point__Hashable__hash(&p).

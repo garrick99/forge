@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 113: Verified DFA-based character classifier
 //
 // A minimal deterministic finite automaton that classifies ASCII bytes.

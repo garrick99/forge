@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 86: OR patterns in match — A | B => body
 //
 // Multiple patterns share one arm body.

@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 135: Quantified postconditions over collections
 //
 // Uses forall/exists in preconditions, postconditions, and loop invariants.

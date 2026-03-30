@@ -34,21 +34,13 @@ RingBuf rbuf_new(uint64_t cap __attribute__((unused))) {
 void rbuf_push(RingBuf* b __attribute__((unused))) {
   (*b).tail = (((*b).tail + 1) % (*b).cap);
   (*b).count = ((*b).count + 1);
-  (*b).state = if (((*b).count == (*b).cap)) {
-    2;
-  } else {
-    1;
-  };
+  (*b).state = (((*b).count == (*b).cap) ? 2 : 1);
 }
 
 void rbuf_pop(RingBuf* b __attribute__((unused))) {
   (*b).head = (((*b).head + 1) % (*b).cap);
   (*b).count = ((*b).count - 1);
-  (*b).state = if (((*b).count == 0)) {
-    0;
-  } else {
-    1;
-  };
+  (*b).state = (((*b).count == 0) ? 0 : 1);
 }
 
 uint64_t rbuf_count(RingBuf* b __attribute__((unused))) {

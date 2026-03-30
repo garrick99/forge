@@ -23,11 +23,7 @@ void prefix_max(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
     while ((i < n)) {
       uint64_t prev __attribute__((unused)) = out.data[(i - 1)];
       uint64_t cur __attribute__((unused)) = s.data[i];
-      out.data[i] = if ((prev >= cur)) {
-        prev;
-      } else {
-        cur;
-      };
+      out.data[i] = ((prev >= cur) ? prev : cur);
       i = (i + 1);
     }
 
@@ -42,11 +38,7 @@ void suffix_max(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
       i = (i - 1);
       uint64_t next __attribute__((unused)) = out.data[(i + 1)];
       uint64_t cur __attribute__((unused)) = s.data[i];
-      out.data[i] = if ((next >= cur)) {
-        next;
-      } else {
-        cur;
-      };
+      out.data[i] = ((next >= cur) ? next : cur);
     }
 
   }

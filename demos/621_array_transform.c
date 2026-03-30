@@ -23,11 +23,7 @@ void array_negate_sat(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
   uint64_t i __attribute__((unused)) = 0;
   {
     while ((i < n)) {
-      s.data[i] = if ((s.data[i] <= max_val)) {
-        (max_val - s.data[i]);
-      } else {
-        0;
-      };
+      s.data[i] = ((s.data[i] <= max_val) ? (max_val - s.data[i]) : 0);
       i = (i + 1);
     }
 
@@ -49,11 +45,7 @@ void array_threshold(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
   uint64_t i __attribute__((unused)) = 0;
   {
     while ((i < n)) {
-      s.data[i] = if ((s.data[i] >= thresh)) {
-        1;
-      } else {
-        0;
-      };
+      s.data[i] = ((s.data[i] >= thresh) ? 1 : 0);
       i = (i + 1);
     }
 
@@ -64,11 +56,7 @@ void array_abs_diff(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t
   uint64_t i __attribute__((unused)) = 0;
   {
     while ((i < n)) {
-      out.data[i] = if ((a.data[i] >= b.data[i])) {
-        (a.data[i] - b.data[i]);
-      } else {
-        (b.data[i] - a.data[i]);
-      };
+      out.data[i] = ((a.data[i] >= b.data[i]) ? (a.data[i] - b.data[i]) : (b.data[i] - a.data[i]));
       i = (i + 1);
     }
 

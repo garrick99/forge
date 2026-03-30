@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 102: Verified GCD + LCM
 //
 // Euclidean GCD with postconditions:

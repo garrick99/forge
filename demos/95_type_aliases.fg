@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 95: Type aliases — names for complex types
 //
 // 'type Alias = ...' creates a synonym for an existing type.

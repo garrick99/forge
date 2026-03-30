@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 63: std/math.fg — integer math utilities
 //
 // Imports abs_diff, min64, max64, clamp64, pow64 from stdlib.

@@ -23,11 +23,7 @@ uint64_t process_requests(forge_span_u64_t arrivals __attribute__((unused)), uin
     while ((i < n)) {
       uint64_t refill __attribute__((unused)) = arrivals.data[i];
       uint64_t new_tokens __attribute__((unused)) = (tokens + (refill * refill_rate));
-      tokens = if ((new_tokens > capacity)) {
-        capacity;
-      } else {
-        new_tokens;
-      };
+      tokens = ((new_tokens > capacity) ? capacity : new_tokens);
       if ((tokens >= 1)) {
         tokens = (tokens - 1);
         results.data[i] = 1;

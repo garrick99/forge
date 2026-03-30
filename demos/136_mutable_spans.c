@@ -68,13 +68,7 @@ void clamp_all(forge_span_u64_t s __attribute__((unused)), uint64_t lo __attribu
   uint64_t idx __attribute__((unused)) = 0;
   {
     while ((idx < s.len)) {
-      s.data[idx] = if ((s.data[idx] < lo)) {
-        lo;
-      } else if ((s.data[idx] > hi)) {
-        hi;
-      } else {
-        s.data[idx];
-      };
+      s.data[idx] = ((s.data[idx] < lo) ? lo : ((s.data[idx] > hi) ? hi : s.data[idx]));
       idx = (idx + 1);
     }
 

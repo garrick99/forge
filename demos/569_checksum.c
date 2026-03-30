@@ -35,11 +35,7 @@ uint64_t inet_checksum(forge_span_u64_t data __attribute__((unused)), uint64_t n
     while ((i < n)) {
       uint64_t word __attribute__((unused)) = (data.data[i] % 65536);
       uint64_t s __attribute__((unused)) = (acc + word);
-      acc = if ((s >= 65536)) {
-        ((s + 1) % 65536);
-      } else {
-        s;
-      };
+      acc = ((s >= 65536) ? ((s + 1) % 65536) : s);
       i = (i + 1);
     }
 

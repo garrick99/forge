@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 59: Trait bound enforcement — impl registration + call-site checking
 //
 // Demonstrates:

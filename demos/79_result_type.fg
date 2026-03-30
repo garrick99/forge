@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 79: Result<T, E> type — error propagation pattern
 //
 // Result is an enum with Ok(T) and Err(E) variants.

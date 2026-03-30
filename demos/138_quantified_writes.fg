@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 138: Quantified writes — index-dependent span initialization
 //
 // Each write s[idx] = f(idx) adds a write fact and frame axiom.

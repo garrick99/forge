@@ -1,4 +1,3 @@
-// expected: 0
 // Demo 97: Generic data structures — Stack<T>, Queue-like structures
 //
 // Demonstrates generic structs that hold typed data.
