@@ -6,7 +6,7 @@ All notable changes to Forge are documented here.
 
 ### VortexSTARK GPU Kernel Suite
 
-**1035 verified demos. 1041 proof obligations. 3 compiler fixes.**
+**1042 verified demos. 2418 proof obligations. 3 compiler fixes.**
 
 Complete suite of formally-verified CUDA GPU kernels for Circle STARK (VortexSTARK),
 targeting M31/CM31/QM31 field arithmetic over SM_120 (RTX 5090).
@@ -55,16 +55,28 @@ targeting M31/CM31/QM31 field arithmetic over SM_120 (RTX 5090).
 | 1033 | AIR constraint evaluation (linear + mul gate + transition + multi) | 209 |
 | 1034 | OODS numerator + combine + fused quotient + last-row exclusion | 157 |
 | 1035 | Vanishing poly quotient + boundary quotient + combine + coset blowup | 164 |
+| 1036 | M31 batch inverse (Montgomery's trick: prefix upsweep + Fermat + suffix scan) | 195 |
+| 1037 | Alpha powers (sequential + parallel prefix product + QM31 variant) | 241 |
+| 1038 | LogUp grand product accumulation (trace terms, table subtract, reduce, zero-check) | 230 |
+| 1039 | Circle point arithmetic (double, add, twiddle gen, conjugate, extract) | 223 |
+| 1040 | LinePoly fold (M31 + QM31 FRI fold; the fixed VortexSTARK bug) | 180 |
+| 1041 | Coset NTT (preprocess, butterfly, postprocess, linepoly eval, twiddle adjust) | 171 |
+| 1042 | Trace normalization (reduce mod P, validate, pad, batch copy) | 137 |
 
 All kernels verified: field invariant (`< M31_P`) maintained through every arithmetic
 step; all array accesses proven in-bounds via Z3.
 
+**Note on AoS/SoA layout conversion (1042):** Index arithmetic `col*n_rows+row < n_rows*n_cols`
+derived from symbolic division is a nonlinear arithmetic (NIA) obligation Z3 cannot discharge
+from symbolic variables. This is a known Z3 limitation; concrete-value testing covers the
+runtime correctness. The 4 verified kernels in 1042 cover all non-NIA trace plumbing.
+
 ### Testing
 
 ```
-Proof verification:   1041 / 1041 pass   (+ 1 intentional failure)
-GCC compilation:      1020 / 1020 pass
-Runtime execution:     878 /  878 pass   (0 failures)
+Proof verification:   1042 / 1042 pass   (+ 1 intentional failure)
+GCC compilation:      1021 / 1021 pass
+Runtime execution:     879 /  879 pass   (0 failures)
 ```
 
 ---

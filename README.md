@@ -193,7 +193,7 @@ The generated C has no bounds checks, no assertions, no runtime overhead — the
 
 ## Demo Corpus
 
-**1035 verified demos** covering:
+**1042 verified demos** covering:
 
 **Algorithms:** sorting (insertion, selection, bubble, merge, quick, radix, bitonic, shellsort), searching (binary, ternary, interpolation, exponential), graphs (BFS, DFS, topological sort, Bellman-Ford, Dijkstra, A*, connected components, PageRank, min-cut, flow augmentation), dynamic programming (knapsack, LCS, edit distance, DTW, coin change, matrix chain, optimal BST)
 
@@ -206,6 +206,10 @@ The generated C has no bounds checks, no assertions, no runtime overhead — the
 - `1030` NTT butterfly (Cooley-Tukey + Gentleman-Sande) · `1031` Circle FFT butterfly
 - `1032` FRI query path verification · `1033` AIR constraint evaluation
 - `1034` OODS evaluation · `1035` Vanishing polynomial quotient
+- `1036` M31 batch inverse (Montgomery's trick) · `1037` Alpha powers (FRI/DEEP combination)
+- `1038` LogUp grand product accumulation · `1039` Circle point arithmetic (group law)
+- `1040` LinePoly fold (the fixed VortexSTARK FRI bug) · `1041` Coset NTT kernels
+- `1042` Trace normalization (reduce mod P, validate, pad, batch copy)
 
 **Data Structures:** segment tree, Fenwick tree, skip list, sparse set, union-find, treap, B-tree, trie, gap buffer, Bloom filter, HyperLogLog, ring buffer, priority queue, deque
 
@@ -236,9 +240,9 @@ bin/
 ## Validation Results
 
 ```
-Proof verification:   1041 / 1041 pass   (+ 1 intentional failure)
-GCC compilation:      1020 / 1020 pass
-Runtime execution:     878 /  878 pass   (0 failures)
+Proof verification:   1042 / 1042 pass   (+ 1 intentional failure)
+GCC compilation:      1021 / 1021 pass
+Runtime execution:     879 /  879 pass   (0 failures)
 ```
 
 ---

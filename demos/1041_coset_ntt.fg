@@ -1,0 +1,188 @@
+// expected: 0
+// Demo 1041: Verified GPU coset NTT kernel for Circle STARK
+//
+// In Circle STARK / stwo, polynomial evaluations are performed on a coset
+// of the standard domain: D' = shift * D where shift is a fixed element.
+//
+// The coset NTT differs from the standard NTT in that twiddle factors are
+// multiplied by powers of the coset shift:
+//
+//   coset_twiddle[i] = shift^i * standard_twiddle[i]
+//
+// This affects both the forward transform (committing to the blowup domain)
+// and the inverse transform (recovering coefficients).
+//
+// GPU kernels:
+//   1. coset_ntt_preprocess_kernel: multiply input by shift^i before NTT
+//      (equivalent to evaluating on shifted domain)
+//   2. coset_ntt_butterfly_kernel: butterfly with coset-adjusted twiddles
+//   3. coset_intt_postprocess_kernel: multiply output by (shift^i)^{-1} after INTT
+//   4. coset_domain_eval_kernel: evaluate polynomial on full coset domain
+//      using precomputed coset point x-coordinates
+//
+// These kernels compose with the standard NTT (1030) and Circle FFT (1031).
+//
+// Formal properties:
+//   - All coset shifts < M31_P (from forall + m31_get)
+//   - m31_mul outputs < M31_P throughout
+//   - Array bounds: all accesses in-range
+
+use std::gpu;
+use std::m31;
+
+fn m31_get(arr: span<u32>, idx: u64) -> u32
+    requires idx < arr.len
+    requires forall k: u64, k < arr.len ==> arr[k] < M31_P
+    ensures result < M31_P
+{
+    assert(arr[idx] < M31_P) "forall k instantiated at idx";
+    arr[idx]
+}
+
+// ---- Kernel 1: Coset NTT preprocessing ------------------------------------
+//
+// Before standard NTT: data[i] *= shift_powers[i]
+// shift_powers[i] = shift^i mod P (precomputed by alpha_powers_kernel 1037)
+#[kernel]
+fn coset_ntt_preprocess_kernel(
+    data:         span<u32>,
+    shift_powers: span<u32>,
+    n:            u64)
+    requires n <= data.len
+    requires n <= shift_powers.len
+    requires forall k: u64, k < data.len         ==> data[k]         < M31_P
+    requires forall k: u64, k < shift_powers.len ==> shift_powers[k] < M31_P
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        assert(tid < data.len)         "data in bounds";
+        assert(tid < shift_powers.len) "shift_powers in bounds";
+
+        let v: u32 = m31_get(data,         tid);
+        let s: u32 = m31_get(shift_powers, tid);
+        data[tid] = m31_mul(v, s);
+    };
+}
+
+// ---- Kernel 2: Coset NTT butterfly with shifted twiddles ------------------
+//
+// Standard butterfly but twiddle[i] = shift^stride * omega^i
+// (the coset-adjusted twiddle factor).
+// Structurally identical to ntt_butterfly_kernel (1030) — same bounds proofs.
+#[kernel]
+fn coset_ntt_butterfly_kernel(data: span<u32>, twiddle: span<u32>, half_n: u64)
+    requires 2u64 * half_n <= data.len
+    requires half_n <= twiddle.len
+    requires forall k: u64, k < data.len    ==> data[k]    < M31_P
+    requires forall k: u64, k < twiddle.len ==> twiddle[k] < M31_P
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < half_n {
+        assert(tid + half_n < data.len) "upper element in bounds";
+        assert(tid < twiddle.len) "twiddle in bounds";
+
+        let a: u32 = m31_get(data,    tid);
+        let b: u32 = m31_get(data,    tid + half_n);
+        let w: u32 = m31_get(twiddle, tid);
+
+        let wb: u32 = m31_mul(w, b);
+        let a2: u32 = m31_add(a, wb);
+        let b2: u32 = m31_sub(a, wb);
+
+        data[tid]          = a2;
+        data[tid + half_n] = b2;
+    };
+}
+
+// ---- Kernel 3: Coset INTT postprocessing -----------------------------------
+//
+// After standard INTT: data[i] *= inv_shift_powers[i]
+// inv_shift_powers[i] = (shift^i)^{-1} = (shift^{-1})^i mod P
+#[kernel]
+fn coset_intt_postprocess_kernel(
+    data:             span<u32>,
+    inv_shift_powers: span<u32>,
+    n:                u64)
+    requires n <= data.len
+    requires n <= inv_shift_powers.len
+    requires forall k: u64, k < data.len             ==> data[k]             < M31_P
+    requires forall k: u64, k < inv_shift_powers.len ==> inv_shift_powers[k] < M31_P
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        assert(tid < data.len)             "data in bounds";
+        assert(tid < inv_shift_powers.len) "inv_shift_powers in bounds";
+
+        let v: u32 = m31_get(data,             tid);
+        let s: u32 = m31_get(inv_shift_powers, tid);
+        data[tid] = m31_mul(v, s);
+    };
+}
+
+// ---- Kernel 4: Coset domain evaluation ------------------------------------
+//
+// Evaluates a polynomial f (given as coefficients) at all points of the coset
+// domain. Uses Horner's method for a degree-d polynomial where d is small.
+// For large N, the full coset NTT (kernels 1-3 composed with standard NTT)
+// is used instead.
+//
+// This kernel handles the n=2 case (LinePoly evaluation on coset domain),
+// which is the inner loop of the FRI fold:
+//   out[i] = f[0] + f[1] * coset_x[i]
+// (identical to linepoly_eval_kernel but using coset x-coordinates)
+#[kernel]
+fn coset_linepoly_eval_kernel(
+    out:     span<u32>,
+    coset_x: span<u32>,
+    f0:      u32,
+    f1:      u32,
+    n:       u64)
+    requires n <= out.len
+    requires n <= coset_x.len
+    requires f0 < M31_P
+    requires f1 < M31_P
+    requires forall k: u64, k < out.len     ==> out[k]     < M31_P
+    requires forall k: u64, k < coset_x.len ==> coset_x[k] < M31_P
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        assert(tid < out.len)     "out in bounds";
+        assert(tid < coset_x.len) "coset_x in bounds";
+
+        let x:   u32 = m31_get(coset_x, tid);
+        let f1x: u32 = m31_mul(f1, x);
+        out[tid] = m31_add(f0, f1x);
+    };
+}
+
+// ---- Kernel 5: Coset twiddle generation -----------------------------------
+//
+// Given standard twiddle[i] = omega^i and coset shift s,
+// compute coset_twiddle[i] = s^i * twiddle[i] for each stage.
+// The shift is applied per-element: shift_pow[i] = s^i (from 1037).
+#[kernel]
+fn coset_twiddle_adjust_kernel(
+    coset_twiddle:  span<u32>,
+    std_twiddle:    span<u32>,
+    shift_pow:      span<u32>,
+    n:              u64)
+    requires n <= coset_twiddle.len
+    requires n <= std_twiddle.len
+    requires n <= shift_pow.len
+    requires forall k: u64, k < coset_twiddle.len ==> coset_twiddle[k] < M31_P
+    requires forall k: u64, k < std_twiddle.len   ==> std_twiddle[k]   < M31_P
+    requires forall k: u64, k < shift_pow.len      ==> shift_pow[k]     < M31_P
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        assert(tid < coset_twiddle.len) "coset_twiddle in bounds";
+        assert(tid < std_twiddle.len)   "std_twiddle in bounds";
+        assert(tid < shift_pow.len)     "shift_pow in bounds";
+
+        let t: u32 = m31_get(std_twiddle, tid);
+        let s: u32 = m31_get(shift_pow,   tid);
+        coset_twiddle[tid] = m31_mul(s, t);
+    };
+}
+
+fn main() -> u64 { 0u64 }

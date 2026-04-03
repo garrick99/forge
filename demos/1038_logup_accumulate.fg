@@ -1,0 +1,233 @@
+// expected: 0
+// Demo 1038: Verified GPU LogUp grand product accumulation for Circle STARK
+//
+// stwo uses the LogUp lookup argument for range checks and other constraints.
+// LogUp encodes a lookup table check as a rational function identity:
+//
+//   sum_{i in trace} 1/(z - trace[i]) = sum_{j in table} mult[j]/(z - table[j])
+//
+// where z is a random challenge (QM31), trace[i] are the looked-up values,
+// table[j] are the table entries, and mult[j] are multiplicities.
+//
+// GPU kernel design: each thread accumulates one element of the rational sum.
+// The sum is computed in QM31 (the challenge z is a QM31 element).
+//
+// For M31 trace values and M31 table entries, each term is:
+//   1/(z - a)  where z is QM31, a is M31
+// = 1/(z_rr - a + z_ri*i + z_ir*j + z_ii*i*j)
+//
+// The denominator is a QM31 element. The inverse is precomputed on CPU.
+//
+// This demo implements:
+//   1. logup_numerator_kernel: for each trace element, compute 1/(z - trace[i])
+//      as a QM31 value using the precomputed inverse.
+//   2. logup_accumulate_kernel: sum all 1/(z - trace[i]) terms into accumulator.
+//   3. logup_table_kernel: subtract the table side (mult[j]/(z - table[j])).
+//   4. logup_verify_zero_kernel: check that the final sum is zero (soundness).
+//
+// Formal properties proven by Z3:
+//   - All arithmetic maintains < M31_P
+//   - Array bounds for all accesses
+//   - Accumulator stays in-field after each add
+
+use std::gpu;
+use std::m31;
+
+fn m31_get(arr: span<u32>, idx: u64) -> u32
+    requires idx < arr.len
+    requires forall k: u64, k < arr.len ==> arr[k] < M31_P
+    ensures result < M31_P
+{
+    assert(arr[idx] < M31_P) "forall k instantiated at idx";
+    arr[idx]
+}
+
+// ---- Kernel 1: LogUp trace term accumulation (QM31 SoA) --------------------
+//
+// For each trace element i:
+//   acc[i] = inv_denom[i]  (precomputed 1/(z - trace[i]) as QM31)
+// This just copies the precomputed inverses into the accumulator.
+// Real computation: host computes z - trace[i] for each i, then batches
+// the inversion using 1036_m31_batch_inverse, then GPU uses this kernel.
+#[kernel]
+fn logup_trace_term_kernel(
+    acc_rr: span<u32>, acc_ri: span<u32>,
+    acc_ir: span<u32>, acc_ii: span<u32>,
+    inv_rr: span<u32>, inv_ri: span<u32>,
+    inv_ir: span<u32>, inv_ii: span<u32>,
+    n: u64)
+    requires n <= acc_rr.len  requires n <= acc_ri.len
+    requires n <= acc_ir.len  requires n <= acc_ii.len
+    requires n <= inv_rr.len  requires n <= inv_ri.len
+    requires n <= inv_ir.len  requires n <= inv_ii.len
+    requires forall k: u64, k < acc_rr.len ==> acc_rr[k] < M31_P
+    requires forall k: u64, k < acc_ri.len ==> acc_ri[k] < M31_P
+    requires forall k: u64, k < acc_ir.len ==> acc_ir[k] < M31_P
+    requires forall k: u64, k < acc_ii.len ==> acc_ii[k] < M31_P
+    requires forall k: u64, k < inv_rr.len ==> inv_rr[k] < M31_P
+    requires forall k: u64, k < inv_ri.len ==> inv_ri[k] < M31_P
+    requires forall k: u64, k < inv_ir.len ==> inv_ir[k] < M31_P
+    requires forall k: u64, k < inv_ii.len ==> inv_ii[k] < M31_P
+{
+    let x: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if x < n {
+        assert(x < acc_rr.len) "acc_rr in bounds";
+        assert(x < acc_ri.len) "acc_ri in bounds";
+        assert(x < acc_ir.len) "acc_ir in bounds";
+        assert(x < acc_ii.len) "acc_ii in bounds";
+        assert(x < inv_rr.len) "inv_rr in bounds";
+        assert(x < inv_ri.len) "inv_ri in bounds";
+        assert(x < inv_ir.len) "inv_ir in bounds";
+        assert(x < inv_ii.len) "inv_ii in bounds";
+
+        let irr: u32 = m31_get(inv_rr, x);
+        let iri: u32 = m31_get(inv_ri, x);
+        let iir: u32 = m31_get(inv_ir, x);
+        let iii: u32 = m31_get(inv_ii, x);
+
+        let arr: u32 = m31_get(acc_rr, x);
+        let ari: u32 = m31_get(acc_ri, x);
+        let air: u32 = m31_get(acc_ir, x);
+        let aii: u32 = m31_get(acc_ii, x);
+
+        // acc[x] += inv[x]  (QM31 add, componentwise)
+        acc_rr[x] = m31_add(arr, irr);
+        acc_ri[x] = m31_add(ari, iri);
+        acc_ir[x] = m31_add(air, iir);
+        acc_ii[x] = m31_add(aii, iii);
+    };
+}
+
+// ---- Kernel 2: LogUp table term subtraction --------------------------------
+//
+// For each table entry j with multiplicity mult[j]:
+//   acc[j] -= mult[j] * inv_table[j]
+// where inv_table[j] = 1/(z - table[j]) precomputed.
+// mult[j] is an M31 element (multiplicity can be > 1 for repeated lookups).
+#[kernel]
+fn logup_table_subtract_kernel(
+    acc_rr: span<u32>, acc_ri: span<u32>,
+    acc_ir: span<u32>, acc_ii: span<u32>,
+    inv_rr: span<u32>, inv_ri: span<u32>,
+    inv_ir: span<u32>, inv_ii: span<u32>,
+    mult:   span<u32>,
+    n: u64)
+    requires n <= acc_rr.len  requires n <= acc_ri.len
+    requires n <= acc_ir.len  requires n <= acc_ii.len
+    requires n <= inv_rr.len  requires n <= inv_ri.len
+    requires n <= inv_ir.len  requires n <= inv_ii.len
+    requires n <= mult.len
+    requires forall k: u64, k < acc_rr.len ==> acc_rr[k] < M31_P
+    requires forall k: u64, k < acc_ri.len ==> acc_ri[k] < M31_P
+    requires forall k: u64, k < acc_ir.len ==> acc_ir[k] < M31_P
+    requires forall k: u64, k < acc_ii.len ==> acc_ii[k] < M31_P
+    requires forall k: u64, k < inv_rr.len ==> inv_rr[k] < M31_P
+    requires forall k: u64, k < inv_ri.len ==> inv_ri[k] < M31_P
+    requires forall k: u64, k < inv_ir.len ==> inv_ir[k] < M31_P
+    requires forall k: u64, k < inv_ii.len ==> inv_ii[k] < M31_P
+    requires forall k: u64, k < mult.len   ==> mult[k]   < M31_P
+{
+    let x: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if x < n {
+        assert(x < acc_rr.len) "acc_rr in bounds";
+        assert(x < mult.len)   "mult in bounds";
+        assert(x < inv_rr.len) "inv_rr in bounds";
+
+        let m:   u32 = m31_get(mult,   x);
+        let irr: u32 = m31_get(inv_rr, x);
+        let iri: u32 = m31_get(inv_ri, x);
+        let iir: u32 = m31_get(inv_ir, x);
+        let iii: u32 = m31_get(inv_ii, x);
+
+        let arr: u32 = m31_get(acc_rr, x);
+        let ari: u32 = m31_get(acc_ri, x);
+        let air: u32 = m31_get(acc_ir, x);
+        let aii: u32 = m31_get(acc_ii, x);
+
+        // term = mult * inv  (QM31 scalar-times-QM31: m is M31 scalar)
+        let trr: u32 = m31_mul(m, irr);
+        let tri: u32 = m31_mul(m, iri);
+        let tir: u32 = m31_mul(m, iir);
+        let tii: u32 = m31_mul(m, iii);
+
+        // acc[x] -= term
+        acc_rr[x] = m31_sub(arr, trr);
+        acc_ri[x] = m31_sub(ari, tri);
+        acc_ir[x] = m31_sub(air, tir);
+        acc_ii[x] = m31_sub(aii, tii);
+    };
+}
+
+// ---- Kernel 3: LogUp running sum reduction ---------------------------------
+//
+// After per-element accumulation, reduce all acc[i] into a single total:
+//   total = sum_{i=0}^{n-1} acc[i]
+// This is a standard parallel reduction. Each step sums pairs:
+//   acc[i] += acc[i + half]  for i in [0, half)
+// Called log2(n) times with halving half.
+#[kernel]
+fn logup_reduce_kernel(
+    acc_rr: span<u32>, acc_ri: span<u32>,
+    acc_ir: span<u32>, acc_ii: span<u32>,
+    half: u64)
+    requires 2u64 * half <= acc_rr.len
+    requires 2u64 * half <= acc_ri.len
+    requires 2u64 * half <= acc_ir.len
+    requires 2u64 * half <= acc_ii.len
+    requires forall k: u64, k < acc_rr.len ==> acc_rr[k] < M31_P
+    requires forall k: u64, k < acc_ri.len ==> acc_ri[k] < M31_P
+    requires forall k: u64, k < acc_ir.len ==> acc_ir[k] < M31_P
+    requires forall k: u64, k < acc_ii.len ==> acc_ii[k] < M31_P
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < half {
+        assert(tid < acc_rr.len) "acc_rr[tid] in bounds";
+        assert(tid + half < acc_rr.len) "acc_rr[tid+half] in bounds";
+
+        let a_rr: u32 = m31_get(acc_rr, tid);
+        let b_rr: u32 = m31_get(acc_rr, tid + half);
+        let a_ri: u32 = m31_get(acc_ri, tid);
+        let b_ri: u32 = m31_get(acc_ri, tid + half);
+        let a_ir: u32 = m31_get(acc_ir, tid);
+        let b_ir: u32 = m31_get(acc_ir, tid + half);
+        let a_ii: u32 = m31_get(acc_ii, tid);
+        let b_ii: u32 = m31_get(acc_ii, tid + half);
+
+        acc_rr[tid] = m31_add(a_rr, b_rr);
+        acc_ri[tid] = m31_add(a_ri, b_ri);
+        acc_ir[tid] = m31_add(a_ir, b_ir);
+        acc_ii[tid] = m31_add(a_ii, b_ii);
+    };
+}
+
+// ---- Kernel 4: LogUp zero-check --------------------------------------------
+//
+// After reduction, acc[0] should be (0,0,0,0) if the lookup argument holds.
+// This kernel writes 1u32 to out[0] if all four components are zero, else 0.
+#[kernel]
+fn logup_zero_check_kernel(
+    acc_rr: span<u32>, acc_ri: span<u32>,
+    acc_ir: span<u32>, acc_ii: span<u32>,
+    out: span<u32>)
+    requires 1u64 <= acc_rr.len  requires 1u64 <= acc_ri.len
+    requires 1u64 <= acc_ir.len  requires 1u64 <= acc_ii.len
+    requires 1u64 <= out.len
+    requires forall k: u64, k < acc_rr.len ==> acc_rr[k] < M31_P
+    requires forall k: u64, k < acc_ri.len ==> acc_ri[k] < M31_P
+    requires forall k: u64, k < acc_ir.len ==> acc_ir[k] < M31_P
+    requires forall k: u64, k < acc_ii.len ==> acc_ii[k] < M31_P
+    requires forall k: u64, k < out.len ==> out[k] < M31_P
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid == 0u64 {
+        let rr: u32 = acc_rr[0u64];
+        let ri: u32 = acc_ri[0u64];
+        let ir: u32 = acc_ir[0u64];
+        let ii: u32 = acc_ii[0u64];
+        let is_zero: u32 = if rr == 0u32 && ri == 0u32 && ir == 0u32 && ii == 0u32
+                           { 1u32 } else { 0u32 };
+        out[0u64] = is_zero;
+    };
+}
+
+fn main() -> u64 { 0u64 }

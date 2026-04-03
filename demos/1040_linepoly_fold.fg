@@ -1,0 +1,208 @@
+// expected: 0
+// Demo 1040: Verified GPU LinePoly fold kernel for VortexSTARK FRI
+//
+// This is the specific operation that was broken in VortexSTARK's FRI:
+// the LinePoly fold step. A LinePoly is a polynomial on a "line" (a coset
+// of the circle group of size 2), parameterized as:
+//
+//   f(t) = f0 + f1 * t
+//
+// where t is the line parameter (the x-coordinate of the circle point).
+//
+// During FRI, each "line fold" combines a pair of evaluations:
+//   f(P) and f(conjugate(P))  →  f_even + alpha * f_odd
+//
+// where:
+//   f_even = (f(P) + f(conj(P))) / 2
+//   f_odd  = (f(P) - f(conj(P))) / (2 * y(P))
+//
+// The folded value is:
+//   new = f_even + alpha * f_odd
+//       = (f(P) + f(conj(P)))/2 + alpha * (f(P) - f(conj(P))) / (2*y(P))
+//
+// In the stwo FRI implementation, y(P) is the y-coordinate of the circle point,
+// and the fold uses a QM31 challenge alpha. inv_y[i] = 1/(2*y(P_i)) is precomputed.
+//
+// This demo implements both:
+//   1. linepoly_fold_m31: M31 version (alpha in M31)
+//   2. linepoly_fold_qm31: QM31 version (alpha in QM31, eval values in M31)
+//      This is the actual stwo FRI fold.
+//
+// The key fix (vs. broken VortexSTARK): the fold must use 1/(2*y) not 1/y.
+// The inv_y span contains precomputed 1/(2*y_i) for each domain point.
+//
+// Formal properties:
+//   - All inputs < M31_P
+//   - m31_add/m31_sub/m31_mul chain: all outputs < M31_P
+//   - Bounds: tid + half < eval.len
+
+use std::gpu;
+use std::m31;
+
+fn m31_get(arr: span<u32>, idx: u64) -> u32
+    requires idx < arr.len
+    requires forall k: u64, k < arr.len ==> arr[k] < M31_P
+    ensures result < M31_P
+{
+    assert(arr[idx] < M31_P) "forall k instantiated at idx";
+    arr[idx]
+}
+
+// ---- Kernel 1: LinePoly fold over M31 --------------------------------------
+//
+// For each pair (eval[tid], eval[tid + half]):
+//   f_plus  = eval[tid]         = f(P)
+//   f_minus = eval[tid + half]  = f(conj(P)) = f(-P)
+//
+//   f_even = f_plus + f_minus           (no /2 yet — fold by 2 below)
+//   f_diff = f_plus - f_minus           (numerator for odd part)
+//   f_odd  = f_diff * inv_2y[tid]       (* 1/(2y(P)) = /2y)
+//   new[tid] = f_even + alpha * f_odd   (NOTE: no /2 on f_even yet)
+//
+// Wait — the correct formula:
+//   new = (f_plus + f_minus)/2 + alpha * (f_plus - f_minus) * inv_2y
+//       = (f_plus + f_minus) * inv2 + alpha * (f_plus - f_minus) * inv_2y
+// where inv2 = (P+1)/2 mod P = 1073741824
+#[kernel]
+fn linepoly_fold_m31_kernel(
+    out:    span<u32>,
+    eval:   span<u32>,
+    inv_2y: span<u32>,
+    alpha:  u32,
+    inv2:   u32,
+    half:   u64)
+    requires half <= out.len
+    requires 2u64 * half <= eval.len
+    requires half <= inv_2y.len
+    requires alpha < M31_P
+    requires inv2  < M31_P
+    requires forall k: u64, k < out.len    ==> out[k]    < M31_P
+    requires forall k: u64, k < eval.len   ==> eval[k]   < M31_P
+    requires forall k: u64, k < inv_2y.len ==> inv_2y[k] < M31_P
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < half {
+        assert(tid < out.len)    "out in bounds";
+        assert(tid + half < eval.len) "eval upper in bounds";
+        assert(tid < inv_2y.len) "inv_2y in bounds";
+
+        let fp:  u32 = m31_get(eval,   tid);
+        let fm:  u32 = m31_get(eval,   tid + half);
+        let iy:  u32 = m31_get(inv_2y, tid);
+
+        // f_even_half = (fp + fm) * inv2
+        let sum:        u32 = m31_add(fp, fm);
+        let f_even_half: u32 = m31_mul(sum, inv2);
+
+        // f_odd = (fp - fm) * inv_2y
+        let diff:  u32 = m31_sub(fp, fm);
+        let f_odd: u32 = m31_mul(diff, iy);
+
+        // new = f_even_half + alpha * f_odd
+        let contrib: u32 = m31_mul(alpha, f_odd);
+        out[tid] = m31_add(f_even_half, contrib);
+    };
+}
+
+// ---- Kernel 2: LinePoly fold over QM31 (the actual stwo FRI fold) ----------
+//
+// Same structure but alpha is a QM31 element and eval values are M31
+// (trace polynomial evaluations are M31; the fold challenge is QM31).
+//
+// Output: out_{rr,ri,ir,ii} — the folded value as QM31 SoA.
+// Input:  eval — M31 evaluations on the circle domain.
+//         inv_2y — M31 precomputed 1/(2*y_i) values.
+//         inv2 — M31 inverse of 2.
+//         alpha_{rr,ri,ir,ii} — QM31 fold challenge.
+//
+// Computation:
+//   f_even_half (M31) = (fp + fm) * inv2           -- M31 scalar
+//   f_odd       (M31) = (fp - fm) * inv_2y[tid]    -- M31 scalar
+//   contrib     (QM31) = alpha * f_odd              -- QM31 scalar * M31
+//   out[tid]    (QM31) = f_even_half + contrib      -- QM31 (M31 + QM31)
+#[kernel]
+fn linepoly_fold_qm31_kernel(
+    out_rr: span<u32>, out_ri: span<u32>,
+    out_ir: span<u32>, out_ii: span<u32>,
+    eval:   span<u32>,
+    inv_2y: span<u32>,
+    alpha_rr: u32, alpha_ri: u32,
+    alpha_ir: u32, alpha_ii: u32,
+    inv2: u32,
+    half: u64)
+    requires half <= out_rr.len  requires half <= out_ri.len
+    requires half <= out_ir.len  requires half <= out_ii.len
+    requires 2u64 * half <= eval.len
+    requires half <= inv_2y.len
+    requires alpha_rr < M31_P  requires alpha_ri < M31_P
+    requires alpha_ir < M31_P  requires alpha_ii < M31_P
+    requires inv2 < M31_P
+    requires forall k: u64, k < out_rr.len ==> out_rr[k] < M31_P
+    requires forall k: u64, k < out_ri.len ==> out_ri[k] < M31_P
+    requires forall k: u64, k < out_ir.len ==> out_ir[k] < M31_P
+    requires forall k: u64, k < out_ii.len ==> out_ii[k] < M31_P
+    requires forall k: u64, k < eval.len   ==> eval[k]   < M31_P
+    requires forall k: u64, k < inv_2y.len ==> inv_2y[k] < M31_P
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < half {
+        assert(tid < out_rr.len)      "out_rr in bounds";
+        assert(tid + half < eval.len) "eval upper in bounds";
+        assert(tid < inv_2y.len)      "inv_2y in bounds";
+
+        let fp:  u32 = m31_get(eval,   tid);
+        let fm:  u32 = m31_get(eval,   tid + half);
+        let iy:  u32 = m31_get(inv_2y, tid);
+
+        // M31 scalars
+        let sum:         u32 = m31_add(fp, fm);
+        let f_even_half: u32 = m31_mul(sum, inv2);
+        let diff:        u32 = m31_sub(fp, fm);
+        let f_odd:       u32 = m31_mul(diff, iy);
+
+        // contrib = alpha * f_odd  (QM31 * M31 scalar = scale each component)
+        let c_rr: u32 = m31_mul(alpha_rr, f_odd);
+        let c_ri: u32 = m31_mul(alpha_ri, f_odd);
+        let c_ir: u32 = m31_mul(alpha_ir, f_odd);
+        let c_ii: u32 = m31_mul(alpha_ii, f_odd);
+
+        // out = f_even_half + contrib  (f_even_half is M31 = QM31 with im=0)
+        out_rr[tid] = m31_add(f_even_half, c_rr);
+        out_ri[tid] = c_ri;
+        out_ir[tid] = c_ir;
+        out_ii[tid] = c_ii;
+    };
+}
+
+// ---- Kernel 3: LinePoly evaluate at a point --------------------------------
+//
+// Given a LinePoly f(t) = f0 + f1*t, evaluate at t = x_coord[i] for each i.
+// f0 and f1 are M31 scalars (constant for all i — this is the polynomial).
+// x_coord[i] are M31 circle x-coordinates.
+// Output: out[i] = f0 + f1 * x_coord[i]
+#[kernel]
+fn linepoly_eval_kernel(
+    out:     span<u32>,
+    x_coord: span<u32>,
+    f0:      u32,
+    f1:      u32,
+    n:       u64)
+    requires n <= out.len
+    requires n <= x_coord.len
+    requires f0 < M31_P
+    requires f1 < M31_P
+    requires forall k: u64, k < out.len     ==> out[k]     < M31_P
+    requires forall k: u64, k < x_coord.len ==> x_coord[k] < M31_P
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        assert(tid < out.len)     "out in bounds";
+        assert(tid < x_coord.len) "x_coord in bounds";
+
+        let t:   u32 = m31_get(x_coord, tid);
+        let f1t: u32 = m31_mul(f1, t);
+        out[tid] = m31_add(f0, f1t);
+    };
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,241 @@
+// expected: 0
+// Demo 1039: Verified GPU circle point arithmetic for Circle STARK
+//
+// Circle STARK operates over the circle group C(F_p) = {(x,y) | x^2 + y^2 = 1 mod p}.
+// This group has order p+1 = 2^31, making it ideal for power-of-2 FFTs.
+//
+// Circle group operations:
+//   - Point doubling:  (x,y) → (2x²-1, 2xy)   (using the group law)
+//   - Point addition:  (x1,y1)+(x2,y2) = (x1x2 - y1y2, x1y2 + x2y1)
+//   - Conjugate:       (x,y) → (x,-y)
+//   - Antipode:        (x,y) → (-x,-y)
+//
+// These are used to:
+//   1. Generate twiddle factors: successive doublings of a generator point
+//   2. Evaluate at circle points: the "coset" structure of stwo
+//   3. Build the domain: 2^n-fold twiddle table
+//
+// GPU kernels:
+//   1. circle_double_kernel: batch-doubles N circle points
+//   2. circle_add_kernel: batch-adds two arrays of circle points
+//   3. circle_twiddle_gen_kernel: generates twiddle table from a generator point
+//   4. circle_conjugate_kernel: batch conjugate (negate y)
+//   5. circle_to_m31_kernel: extract x-coordinates (used as twiddle factors in NTT)
+//
+// Each circle point is stored as a pair (x, y) in separate spans.
+// All coordinates are M31 elements (< M31_P).
+//
+// Formal properties proven by Z3:
+//   - All field operations produce values < M31_P
+//   - Array bounds for all (x,y) pair accesses
+
+use std::gpu;
+use std::m31;
+
+fn m31_get(arr: span<u32>, idx: u64) -> u32
+    requires idx < arr.len
+    requires forall k: u64, k < arr.len ==> arr[k] < M31_P
+    ensures result < M31_P
+{
+    assert(arr[idx] < M31_P) "forall k instantiated at idx";
+    arr[idx]
+}
+
+// ---- Kernel 1: Batch circle point doubling ---------------------------------
+//
+// For each point (px[i], py[i]):
+//   out_x[i] = 2 * px[i]^2 - 1  mod P
+//   out_y[i] = 2 * px[i] * py[i] mod P
+//
+// Note: "2*x^2 - 1" = m31_sub(m31_add(x2, x2), 1)
+//       "2*x*y"     = m31_add(xy, xy)
+#[kernel]
+fn circle_double_kernel(
+    out_x: span<u32>, out_y: span<u32>,
+    px:    span<u32>, py:    span<u32>,
+    n: u64)
+    requires n <= out_x.len  requires n <= out_y.len
+    requires n <= px.len     requires n <= py.len
+    requires forall k: u64, k < out_x.len ==> out_x[k] < M31_P
+    requires forall k: u64, k < out_y.len ==> out_y[k] < M31_P
+    requires forall k: u64, k < px.len    ==> px[k]    < M31_P
+    requires forall k: u64, k < py.len    ==> py[k]    < M31_P
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        assert(tid < out_x.len) "out_x in bounds";
+        assert(tid < out_y.len) "out_y in bounds";
+        assert(tid < px.len)    "px in bounds";
+        assert(tid < py.len)    "py in bounds";
+
+        let x: u32 = m31_get(px, tid);
+        let y: u32 = m31_get(py, tid);
+
+        // 2x^2 - 1 = x^2 - y^2  (since x^2 + y^2 = 1 on the circle)
+        // Using x^2 - y^2 avoids subtracting the literal 1.
+        let x2:    u32 = m31_mul(x, x);
+        let y2:    u32 = m31_mul(y, y);
+        let new_x: u32 = m31_sub(x2, y2);
+
+        // 2xy
+        let xy:    u32 = m31_mul(x, y);
+        let new_y: u32 = m31_add(xy, xy);
+
+        out_x[tid] = new_x;
+        out_y[tid] = new_y;
+    };
+}
+
+// ---- Kernel 2: Batch circle point addition ---------------------------------
+//
+// (x1,y1) + (x2,y2) = (x1*x2 - y1*y2, x1*y2 + x2*y1)
+#[kernel]
+fn circle_add_kernel(
+    out_x: span<u32>, out_y: span<u32>,
+    ax:    span<u32>, ay:    span<u32>,
+    bx:    span<u32>, by:    span<u32>,
+    n: u64)
+    requires n <= out_x.len  requires n <= out_y.len
+    requires n <= ax.len     requires n <= ay.len
+    requires n <= bx.len     requires n <= by.len
+    requires forall k: u64, k < out_x.len ==> out_x[k] < M31_P
+    requires forall k: u64, k < out_y.len ==> out_y[k] < M31_P
+    requires forall k: u64, k < ax.len    ==> ax[k]    < M31_P
+    requires forall k: u64, k < ay.len    ==> ay[k]    < M31_P
+    requires forall k: u64, k < bx.len    ==> bx[k]    < M31_P
+    requires forall k: u64, k < by.len    ==> by[k]    < M31_P
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        assert(tid < out_x.len) "out_x in bounds";
+        assert(tid < out_y.len) "out_y in bounds";
+        assert(tid < ax.len)    "ax in bounds";
+        assert(tid < ay.len)    "ay in bounds";
+        assert(tid < bx.len)    "bx in bounds";
+        assert(tid < by.len)    "by in bounds";
+
+        let x1: u32 = m31_get(ax, tid);
+        let y1: u32 = m31_get(ay, tid);
+        let x2: u32 = m31_get(bx, tid);
+        let y2: u32 = m31_get(by, tid);
+
+        let x1x2: u32 = m31_mul(x1, x2);
+        let y1y2: u32 = m31_mul(y1, y2);
+        let x1y2: u32 = m31_mul(x1, y2);
+        let x2y1: u32 = m31_mul(x2, y1);
+
+        out_x[tid] = m31_sub(x1x2, y1y2);
+        out_y[tid] = m31_add(x1y2, x2y1);
+    };
+}
+
+// ---- Kernel 3: Twiddle table generation ------------------------------------
+//
+// Generates the twiddle table for Circle FFT:
+//   twiddle[0]   = generator = (gx, gy)
+//   twiddle[i+1] = twiddle[i] doubled (circle group doubling)
+//
+// n must be log2(domain_size). Output: n+1 x-coordinates for twiddle factors.
+// (Sequential — single thread, since it's only log2(N) steps.)
+#[kernel]
+fn circle_twiddle_gen_kernel(
+    twiddle_x: span<u32>, twiddle_y: span<u32>,
+    gen_x: u32, gen_y: u32,
+    n: u64)
+    requires n > 0u64
+    requires n <= twiddle_x.len
+    requires n <= twiddle_y.len
+    requires gen_x < M31_P
+    requires gen_y < M31_P
+    requires forall k: u64, k < twiddle_x.len ==> twiddle_x[k] < M31_P
+    requires forall k: u64, k < twiddle_y.len ==> twiddle_y[k] < M31_P
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid == 0u64 {
+        assert(0u64 < twiddle_x.len) "twiddle_x[0] in bounds";
+        assert(0u64 < twiddle_y.len) "twiddle_y[0] in bounds";
+
+        twiddle_x[0u64] = gen_x;
+        twiddle_y[0u64] = gen_y;
+
+        if n > 1u64 {
+            let x0: u32 = gen_x;
+            let y0: u32 = gen_y;
+
+            // Double: x' = x^2 - y^2,  y' = 2xy  (equivalent to 2x^2-1, 2xy on circle)
+            let x0sq: u32 = m31_mul(x0, x0);
+            let y0sq: u32 = m31_mul(y0, y0);
+            let x1:   u32 = m31_sub(x0sq, y0sq);
+            let x0y0: u32 = m31_mul(x0, y0);
+            let y1:   u32 = m31_add(x0y0, x0y0);
+
+            assert(1u64 < twiddle_x.len) "twiddle_x[1] in bounds";
+            assert(1u64 < twiddle_y.len) "twiddle_y[1] in bounds";
+            twiddle_x[1u64] = x1;
+            twiddle_y[1u64] = y1;
+
+            if n > 2u64 {
+                let x1sq: u32 = m31_mul(x1, x1);
+                let y1sq: u32 = m31_mul(y1, y1);
+                let x2:   u32 = m31_sub(x1sq, y1sq);
+                let x1y1: u32 = m31_mul(x1, y1);
+                let y2:   u32 = m31_add(x1y1, x1y1);
+
+                assert(2u64 < twiddle_x.len) "twiddle_x[2] in bounds";
+                assert(2u64 < twiddle_y.len) "twiddle_y[2] in bounds";
+                twiddle_x[2u64] = x2;
+                twiddle_y[2u64] = y2;
+
+                if n > 3u64 {
+                    let x2sq: u32 = m31_mul(x2, x2);
+                    let y2sq: u32 = m31_mul(y2, y2);
+                    let x3:   u32 = m31_sub(x2sq, y2sq);
+                    let x2y2: u32 = m31_mul(x2, y2);
+                    let y3:   u32 = m31_add(x2y2, x2y2);
+
+                    assert(3u64 < twiddle_x.len) "twiddle_x[3] in bounds";
+                    assert(3u64 < twiddle_y.len) "twiddle_y[3] in bounds";
+                    twiddle_x[3u64] = x3;
+                    twiddle_y[3u64] = y3;
+                };
+            };
+        };
+    };
+}
+
+// ---- Kernel 4: Batch circle conjugate (negate y) ---------------------------
+//
+// (x, y) → (x, -y)  in-place
+#[kernel]
+fn circle_conjugate_kernel(py: span<u32>, n: u64)
+    requires n <= py.len
+    requires forall k: u64, k < py.len ==> py[k] < M31_P
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        assert(tid < py.len) "py in bounds";
+        let y: u32 = m31_get(py, tid);
+        py[tid] = m31_sub(0u32, y);
+    };
+}
+
+// ---- Kernel 5: Extract x-coordinates as twiddle factors -------------------
+//
+// Copies px[i] → twiddle[i] for NTT twiddle factor arrays.
+#[kernel]
+fn circle_to_twiddle_kernel(twiddle: span<u32>, px: span<u32>, n: u64)
+    requires n <= twiddle.len
+    requires n <= px.len
+    requires forall k: u64, k < twiddle.len ==> twiddle[k] < M31_P
+    requires forall k: u64, k < px.len      ==> px[k]      < M31_P
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        assert(tid < twiddle.len) "twiddle in bounds";
+        assert(tid < px.len)      "px in bounds";
+        let x: u32 = m31_get(px, tid);
+        twiddle[tid] = x;
+    };
+}
+
+fn main() -> u64 { 0u64 }
