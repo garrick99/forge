@@ -111,9 +111,10 @@ fn str_concat(a: span<u64>, a_len: u64, b: span<u64>, b_len: u64, dst: span<u64>
 // SEARCH
 // ============================================================================
 
-// str_find_inner: find first occurrence of needle in haystack.
-// Requires n_len >= 1 and n_len <= h_len. Returns position or h_len.
-fn str_find_inner(haystack: span<u64>, h_len: u64, needle: span<u64>, n_len: u64) -> u64
+// str_find: find first occurrence of needle in haystack.
+// Returns position of match, or h_len if not found.
+// Requires n_len >= 1 and n_len <= h_len.
+fn str_find(haystack: span<u64>, h_len: u64, needle: span<u64>, n_len: u64) -> u64
     requires haystack.len >= h_len
     requires needle.len >= n_len
     requires n_len >= 1u64
@@ -147,25 +148,12 @@ fn str_find_inner(haystack: span<u64>, h_len: u64, needle: span<u64>, n_len: u64
     found
 }
 
-// str_find: find first occurrence of needle in haystack.
-// Returns position of match, or h_len if not found.
-fn str_find(haystack: span<u64>, h_len: u64, needle: span<u64>, n_len: u64) -> u64
-    requires haystack.len >= h_len
-    requires needle.len >= n_len
-{
-    if n_len == 0u64 {
-        0u64
-    } else if n_len > h_len {
-        h_len
-    } else {
-        str_find_inner(haystack, h_len, needle, n_len)
-    }
-}
-
 // str_contains: does haystack contain needle?
 fn str_contains(haystack: span<u64>, h_len: u64, needle: span<u64>, n_len: u64) -> bool
     requires haystack.len >= h_len
     requires needle.len >= n_len
+    requires n_len >= 1u64
+    requires n_len <= h_len
 {
     let pos: u64 = str_find(haystack, h_len, needle, n_len);
     pos < h_len
@@ -175,47 +163,41 @@ fn str_contains(haystack: span<u64>, h_len: u64, needle: span<u64>, n_len: u64) 
 fn str_starts_with(s: span<u64>, s_len: u64, prefix: span<u64>, p_len: u64) -> bool
     requires s.len >= s_len
     requires prefix.len >= p_len
+    requires p_len <= s_len
 {
-    if p_len > s_len {
-        false
-    } else {
-        let mut i: u64 = 0u64;
-        let mut ok: bool = true;
-        while i < p_len
-            invariant i <= p_len
-            decreases p_len - i
-        {
-            if s[i] != prefix[i] {
-                ok = false;
-            };
-            i = i + 1u64;
+    let mut i: u64 = 0u64;
+    let mut ok: bool = true;
+    while i < p_len
+        invariant i <= p_len
+        decreases p_len - i
+    {
+        if s[i] != prefix[i] {
+            ok = false;
         };
-        ok
-    }
+        i = i + 1u64;
+    };
+    ok
 }
 
 // str_ends_with: does s end with suffix?
 fn str_ends_with(s: span<u64>, s_len: u64, suffix: span<u64>, sf_len: u64) -> bool
     requires s.len >= s_len
     requires suffix.len >= sf_len
+    requires sf_len <= s_len
 {
-    if sf_len > s_len {
-        false
-    } else {
-        let offset: u64 = s_len - sf_len;
-        let mut i: u64 = 0u64;
-        let mut ok: bool = true;
-        while i < sf_len
-            invariant i <= sf_len
-            decreases sf_len - i
-        {
-            if s[offset + i] != suffix[i] {
-                ok = false;
-            };
-            i = i + 1u64;
+    let offset: u64 = s_len - sf_len;
+    let mut i: u64 = 0u64;
+    let mut ok: bool = true;
+    while i < sf_len
+        invariant i <= sf_len
+        decreases sf_len - i
+    {
+        if s[offset + i] != suffix[i] {
+            ok = false;
         };
-        ok
-    }
+        i = i + 1u64;
+    };
+    ok
 }
 
 // str_count: count non-overlapping occurrences of needle in haystack.
@@ -394,10 +376,9 @@ fn str_parse_u64(s: span<u64>, n: u64) -> u64
     val
 }
 
-// str_to_hex: convert a u64 value to hex string in dst.
+// str_to_hex: convert a nonzero u64 value to hex string in dst.
 // Writes up to 16 hex chars. Returns chars written.
-// Requires val >= 1 (use special case for zero externally).
-fn str_to_hex_nonzero(val: u64, dst: span<u64>, dst_cap: u64) -> u64
+fn str_to_hex(val: u64, dst: span<u64>, dst_cap: u64) -> u64
     requires dst.len == dst_cap
     requires dst_cap >= 16u64
     requires val >= 1u64
@@ -436,23 +417,9 @@ fn str_to_hex_nonzero(val: u64, dst: span<u64>, dst_cap: u64) -> u64
     count
 }
 
-// str_to_hex: convert a u64 value to hex string in dst.
-// Returns chars written.
-fn str_to_hex(val: u64, dst: span<u64>, dst_cap: u64) -> u64
-    requires dst.len == dst_cap
-    requires dst_cap >= 16u64
-{
-    if val == 0u64 {
-        dst[0u64] = 48u64;
-        1u64
-    } else {
-        str_to_hex_nonzero(val, dst, dst_cap)
-    }
-}
-
 // str_split_count: count segments separated by delim. Returns >= 1.
 // Requires n >= 1.
-fn str_split_count_inner(s: span<u64>, n: u64, delim: u64) -> u64
+fn str_split_count(s: span<u64>, n: u64, delim: u64) -> u64
     requires s.len >= n
     requires n >= 1u64
     ensures result >= 1u64
@@ -472,17 +439,6 @@ fn str_split_count_inner(s: span<u64>, n: u64, delim: u64) -> u64
         i = i + 1u64;
     };
     cnt
-}
-
-// str_split_count: count segments separated by delim. Returns >= 1.
-fn str_split_count(s: span<u64>, n: u64, delim: u64) -> u64
-    requires s.len >= n
-{
-    if n == 0u64 {
-        1u64
-    } else {
-        str_split_count_inner(s, n, delim)
-    }
 }
 
 // ============================================================================
@@ -550,15 +506,16 @@ fn str_is_printable(s: span<u64>, n: u64) -> bool
 // JSON HELPERS
 // ============================================================================
 
-// json_find_key_inner: scan buf for "key": pattern.
+// json_find_key: scan buf for "key": pattern.
 // Returns position after colon, or buf_len if not found.
-fn json_find_key_inner(buf: span<u64>, buf_len: u64, key: span<u64>, key_len: u64, needed: u64) -> u64
+// Requires that buf_len >= key_len + 3 (room for "key":).
+fn json_find_key(buf: span<u64>, buf_len: u64, key: span<u64>, key_len: u64) -> u64
     requires buf.len >= buf_len
     requires key.len >= key_len
-    requires needed == key_len + 3u64
-    requires needed <= buf_len
+    requires buf_len >= key_len + 3u64
     ensures result <= buf_len
 {
+    let needed: u64 = key_len + 3u64;
     let limit: u64 = buf_len - needed + 1u64;
     let mut pos: u64 = 0u64;
     let mut found: u64 = buf_len;
@@ -588,23 +545,10 @@ fn json_find_key_inner(buf: span<u64>, buf_len: u64, key: span<u64>, key_len: u6
     found
 }
 
-// json_find_key: scan buf for key (as "key":), return position after the colon.
-// Returns buf_len if not found.
-fn json_find_key(buf: span<u64>, buf_len: u64, key: span<u64>, key_len: u64) -> u64
-    requires buf.len >= buf_len
-    requires key.len >= key_len
-{
-    let needed: u64 = key_len + 3u64;
-    if needed > buf_len {
-        buf_len
-    } else {
-        json_find_key_inner(buf, buf_len, key, key_len, needed)
-    }
-}
-
-// json_extract_string_inner: find string content between quotes starting at pos.
+// json_extract_string: find string content between quotes starting at start.
 // buf[start] must be 34 (quote). Returns (content_start, content_end).
-fn json_extract_string_inner(buf: span<u64>, buf_len: u64, start: u64) -> (u64, u64)
+// Returns (buf_len, buf_len) if no closing quote found.
+fn json_extract_string(buf: span<u64>, buf_len: u64, start: u64) -> (u64, u64)
     requires buf.len >= buf_len
     requires start < buf_len
     ensures result.0 <= buf_len
@@ -627,23 +571,6 @@ fn json_extract_string_inner(buf: span<u64>, buf_len: u64, start: u64) -> (u64, 
         (buf_len, buf_len)
     } else {
         (content_start, end_pos)
-    }
-}
-
-// json_extract_string: given start position, find string content between quotes.
-// Returns (start_of_content, end_of_content).
-// If buf[start] is a quote (34), content starts at start+1, ends before next quote.
-// Returns (buf_len, buf_len) if no valid string found.
-fn json_extract_string(buf: span<u64>, buf_len: u64, start: u64) -> (u64, u64)
-    requires buf.len >= buf_len
-    requires start <= buf_len
-{
-    if start >= buf_len {
-        (buf_len, buf_len)
-    } else if buf[start] != 34u64 {
-        (buf_len, buf_len)
-    } else {
-        json_extract_string_inner(buf, buf_len, start)
     }
 }
 

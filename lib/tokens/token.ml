@@ -14,7 +14,7 @@ type token =
   | FN | TYPE | STRUCT | ENUM | IMPL | USE | EXTERN | TASK | CHAN | UNION
 
   (* Keywords — types *)
-  | SPAN | SHARED | UNIFORM | VARYING | KERNEL | COALESCED | SYNCTHREADS | STR_TY
+  | SPAN | SHARED | UNIFORM | VARYING | KERNEL | DEVICE | PARALLEL | COALESCED | SYNCTHREADS | STR_TY
 
   (* Keywords — control flow *)
   | LET | MUT | CONST | RETURN | IF | ELSE | MATCH | FOR | WHILE | LOOP

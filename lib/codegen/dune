@@ -2,4 +2,4 @@
  (name codegen)
  (wrapped false)
  (libraries ast proof)
- (modules codegen_c codegen_ptx))
+ (modules codegen_c codegen_ptx codegen_cuda))

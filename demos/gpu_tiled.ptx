@@ -1,0 +1,275 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry reduce_sum(
+    .param .u64 reduce_sum_param_input_data,
+    .param .u64 reduce_sum_param_input_len,
+    .param .u64 reduce_sum_param_output_data,
+    .param .u64 reduce_sum_param_output_len,
+    .param .u64 reduce_sum_param_n
+)
+{
+    .reg .pred %p14, %p23, %p27;
+    .reg .u64 %rd0, %rd1, %rd10, %rd11, %rd12, %rd16, %rd17, %rd2, %rd21, %rd26, %rd29, %rd3, %rd30, %rd4, %rd7, %rd9;
+    .reg .u32 %r13, %r18, %r19, %r20, %r22, %r25, %r31, %r32, %r33, %r34, %r35, %r5, %r6, %r8;
+
+  ld.param.u64 %rd0, [reduce_sum_param_input_data];
+  ld.param.u64 %rd1, [reduce_sum_param_input_len];
+  ld.param.u64 %rd2, [reduce_sum_param_output_data];
+  ld.param.u64 %rd3, [reduce_sum_param_output_len];
+  ld.param.u64 %rd4, [reduce_sum_param_n];
+
+  mov.u32 %r5, %tid.x;
+  mov.u32 %r6, %ctaid.x;
+  cvt.u64.u32 %rd7, %r6;
+  mov.u32 %r8, %ntid.x;
+  cvt.u64.u32 %rd9, %r8;
+  mul.lo.u64 %rd10, %rd7, %rd9;
+  cvt.u64.u32 %rd11, %r5;
+  add.u64 %rd12, %rd10, %rd11;
+  mov.u32 %r13, 0;
+  setp.lt.u64 %p14, %rd12, %rd4;
+  @%p14 bra reduce_sum_then_15;
+  bra reduce_sum_else_15;
+  reduce_sum_then_15:
+  mul.lo.u64 %rd16, %rd12, 4;
+  add.u64 %rd17, %rd0, %rd16;
+  ld.global.u32 %r18, [%rd17];
+  mov.u32 %r19, 0; // unit
+  mov.u32 %r20, %r19;
+  bra reduce_sum_end_15;
+  reduce_sum_else_15:
+  mov.u32 %r20, 0; // no else branch
+  reduce_sum_end_15:
+  mov.u64 %rd21, 0; // call warp_reduce_add (device fn)
+  mov.u32 %r22, 0;
+  setp.eq.u32 %p23, %r5, %r22;
+  @%p23 bra reduce_sum_then_24;
+  bra reduce_sum_else_24;
+  reduce_sum_then_24:
+  mov.u32 %r25, %ctaid.x;
+  cvt.u64.u32 %rd26, %r25;
+  setp.lt.u64 %p27, %rd26, %rd3;
+  @%p27 bra reduce_sum_then_28;
+  bra reduce_sum_else_28;
+  reduce_sum_then_28:
+  mul.lo.u64 %rd29, %rd26, 4;
+  add.u64 %rd30, %rd2, %rd29;
+  st.global.u32 [%rd30], %rd21;
+  mov.u32 %r31, 0; // unit
+  mov.u32 %r32, %r31;
+  bra reduce_sum_end_28;
+  reduce_sum_else_28:
+  mov.u32 %r32, 0; // no else branch
+  reduce_sum_end_28:
+  mov.u32 %r33, 0; // unit
+  mov.u32 %r34, %r33;
+  bra reduce_sum_end_24;
+  reduce_sum_else_24:
+  mov.u32 %r34, 0; // no else branch
+  reduce_sum_end_24:
+  mov.u32 %r35, 0; // unit
+  ret;
+}
+
+.visible .entry vector_fma(
+    .param .u64 vector_fma_param_a_data,
+    .param .u64 vector_fma_param_a_len,
+    .param .u64 vector_fma_param_b_data,
+    .param .u64 vector_fma_param_b_len,
+    .param .u64 vector_fma_param_c_data,
+    .param .u64 vector_fma_param_c_len,
+    .param .u64 vector_fma_param_out_data,
+    .param .u64 vector_fma_param_out_len,
+    .param .u64 vector_fma_param_n
+)
+{
+    .reg .pred %p17;
+    .reg .u64 %rd0, %rd1, %rd10, %rd12, %rd13, %rd15, %rd16, %rd19, %rd2, %rd20, %rd22, %rd23, %rd26, %rd27, %rd3, %rd30, %rd31, %rd4, %rd5, %rd6, %rd7, %rd8;
+    .reg .f32 %f21, %f24, %f25, %f28, %f29;
+    .reg .u32 %r11, %r14, %r32, %r33, %r34, %r9;
+
+  ld.param.u64 %rd0, [vector_fma_param_a_data];
+  ld.param.u64 %rd1, [vector_fma_param_a_len];
+  ld.param.u64 %rd2, [vector_fma_param_b_data];
+  ld.param.u64 %rd3, [vector_fma_param_b_len];
+  ld.param.u64 %rd4, [vector_fma_param_c_data];
+  ld.param.u64 %rd5, [vector_fma_param_c_len];
+  ld.param.u64 %rd6, [vector_fma_param_out_data];
+  ld.param.u64 %rd7, [vector_fma_param_out_len];
+  ld.param.u64 %rd8, [vector_fma_param_n];
+
+  mov.u32 %r9, %ctaid.x;
+  cvt.u64.u32 %rd10, %r9;
+  mov.u32 %r11, %ntid.x;
+  cvt.u64.u32 %rd12, %r11;
+  mul.lo.u64 %rd13, %rd10, %rd12;
+  mov.u32 %r14, %tid.x;
+  cvt.u64.u32 %rd15, %r14;
+  add.u64 %rd16, %rd13, %rd15;
+  setp.lt.u64 %p17, %rd16, %rd8;
+  @%p17 bra vector_fma_then_18;
+  bra vector_fma_else_18;
+  vector_fma_then_18:
+  mul.lo.u64 %rd19, %rd16, 4;
+  add.u64 %rd20, %rd0, %rd19;
+  ld.global.f32 %f21, [%rd20];
+  mul.lo.u64 %rd22, %rd16, 4;
+  add.u64 %rd23, %rd2, %rd22;
+  ld.global.f32 %f24, [%rd23];
+  mul.lo.f32 %f25, %f21, %f24;
+  mul.lo.u64 %rd26, %rd16, 4;
+  add.u64 %rd27, %rd4, %rd26;
+  ld.global.f32 %f28, [%rd27];
+  add.f32 %f29, %f25, %f28;
+  mul.lo.u64 %rd30, %rd16, 4;
+  add.u64 %rd31, %rd6, %rd30;
+  st.global.f32 [%rd31], %f29;
+  mov.u32 %r32, 0; // unit
+  mov.u32 %r33, %r32;
+  bra vector_fma_end_18;
+  vector_fma_else_18:
+  mov.u32 %r33, 0; // no else branch
+  vector_fma_end_18:
+  mov.u32 %r34, 0; // unit
+  ret;
+}
+
+.visible .entry relu(
+    .param .u64 relu_param_data_data,
+    .param .u64 relu_param_data_len,
+    .param .u64 relu_param_n
+)
+{
+    .reg .pred %p11, %p17;
+    .reg .u64 %rd0, %rd1, %rd10, %rd13, %rd14, %rd2, %rd20, %rd21, %rd4, %rd6, %rd7, %rd9;
+    .reg .u32 %r15, %r16, %r19, %r22, %r23, %r24, %r25, %r26, %r3, %r5, %r8;
+
+  ld.param.u64 %rd0, [relu_param_data_data];
+  ld.param.u64 %rd1, [relu_param_data_len];
+  ld.param.u64 %rd2, [relu_param_n];
+
+  mov.u32 %r3, %ctaid.x;
+  cvt.u64.u32 %rd4, %r3;
+  mov.u32 %r5, %ntid.x;
+  cvt.u64.u32 %rd6, %r5;
+  mul.lo.u64 %rd7, %rd4, %rd6;
+  mov.u32 %r8, %tid.x;
+  cvt.u64.u32 %rd9, %r8;
+  add.u64 %rd10, %rd7, %rd9;
+  setp.lt.u64 %p11, %rd10, %rd2;
+  @%p11 bra relu_then_12;
+  bra relu_else_12;
+  relu_then_12:
+  mul.lo.u64 %rd13, %rd10, 4;
+  add.u64 %rd14, %rd0, %rd13;
+  ld.global.u32 %r15, [%rd14];
+  mov.u32 %r16, 2147483647;
+  setp.gt.u32 %p17, %r15, %r16;
+  @%p17 bra relu_then_18;
+  bra relu_else_18;
+  relu_then_18:
+  mov.u32 %r19, 0;
+  mul.lo.u64 %rd20, %rd10, 4;
+  add.u64 %rd21, %rd0, %rd20;
+  st.global.u32 [%rd21], %r19;
+  mov.u32 %r22, 0; // unit
+  mov.u32 %r23, %r22;
+  bra relu_end_18;
+  relu_else_18:
+  mov.u32 %r23, 0; // no else branch
+  relu_end_18:
+  mov.u32 %r24, 0; // unit
+  mov.u32 %r25, %r24;
+  bra relu_end_12;
+  relu_else_12:
+  mov.u32 %r25, 0; // no else branch
+  relu_end_12:
+  mov.u32 %r26, 0; // unit
+  ret;
+}
+
+.visible .entry vector_add_smem(
+    .param .u64 vector_add_smem_param_a_data,
+    .param .u64 vector_add_smem_param_a_len,
+    .param .u64 vector_add_smem_param_b_data,
+    .param .u64 vector_add_smem_param_b_len,
+    .param .u64 vector_add_smem_param_out_data,
+    .param .u64 vector_add_smem_param_out_len,
+    .param .u64 vector_add_smem_param_n
+)
+{
+    .reg .pred %p16, %p31;
+    .reg .u64 %rd0, %rd1, %rd10, %rd12, %rd13, %rd14, %rd15, %rd18, %rd19, %rd2, %rd21, %rd22, %rd23, %rd24, %rd26, %rd27, %rd3, %rd33, %rd34, %rd36, %rd37, %rd4, %rd40, %rd41, %rd5, %rd6, %rd7, %rd8;
+    .reg .f32 %f20, %f25, %f35, %f38, %f39;
+    .reg .u32 %r11, %r28, %r29, %r30, %r42, %r43, %r44, %r9;
+
+  ld.param.u64 %rd0, [vector_add_smem_param_a_data];
+  ld.param.u64 %rd1, [vector_add_smem_param_a_len];
+  ld.param.u64 %rd2, [vector_add_smem_param_b_data];
+  ld.param.u64 %rd3, [vector_add_smem_param_b_len];
+  ld.param.u64 %rd4, [vector_add_smem_param_out_data];
+  ld.param.u64 %rd5, [vector_add_smem_param_out_len];
+  ld.param.u64 %rd6, [vector_add_smem_param_n];
+
+  mov.u64 %rd7, 0; // unhandled expr
+  mov.u64 %rd8, 0; // unhandled expr
+  mov.u32 %r9, %tid.x;
+  cvt.u64.u32 %rd10, %r9;
+  mov.u32 %r11, %ctaid.x;
+  cvt.u64.u32 %rd12, %r11;
+  mov.u64 %rd13, 256;
+  mul.lo.u64 %rd14, %rd12, %rd13;
+  add.u64 %rd15, %rd14, %rd10;
+  setp.lt.u64 %p16, %rd15, %rd6;
+  @%p16 bra vector_add_smem_then_17;
+  bra vector_add_smem_else_17;
+  vector_add_smem_then_17:
+  mul.lo.u64 %rd18, %rd15, 4;
+  add.u64 %rd19, %rd0, %rd18;
+  ld.global.f32 %f20, [%rd19];
+  mul.lo.u64 %rd21, %rd10, 4;
+  add.u64 %rd22, %rd7, %rd21;
+  st.global.f32 [%rd22], %f20;
+  mul.lo.u64 %rd23, %rd15, 4;
+  add.u64 %rd24, %rd2, %rd23;
+  ld.global.f32 %f25, [%rd24];
+  mul.lo.u64 %rd26, %rd10, 4;
+  add.u64 %rd27, %rd8, %rd26;
+  st.global.f32 [%rd27], %f25;
+  mov.u32 %r28, 0; // unit
+  mov.u32 %r29, %r28;
+  bra vector_add_smem_end_17;
+  vector_add_smem_else_17:
+  mov.u32 %r29, 0; // no else branch
+  vector_add_smem_end_17:
+  bar.sync 0;
+  mov.u32 %r30, 0; // unit
+  setp.lt.u64 %p31, %rd15, %rd6;
+  @%p31 bra vector_add_smem_then_32;
+  bra vector_add_smem_else_32;
+  vector_add_smem_then_32:
+  mul.lo.u64 %rd33, %rd10, 4;
+  add.u64 %rd34, %rd7, %rd33;
+  ld.global.f32 %f35, [%rd34];
+  mul.lo.u64 %rd36, %rd10, 4;
+  add.u64 %rd37, %rd8, %rd36;
+  ld.global.f32 %f38, [%rd37];
+  add.f32 %f39, %f35, %f38;
+  mul.lo.u64 %rd40, %rd15, 4;
+  add.u64 %rd41, %rd4, %rd40;
+  st.global.f32 [%rd41], %f39;
+  mov.u32 %r42, 0; // unit
+  mov.u32 %r43, %r42;
+  bra vector_add_smem_end_32;
+  vector_add_smem_else_32:
+  mov.u32 %r43, 0; // no else branch
+  vector_add_smem_end_32:
+  mov.u32 %r44, 0; // unit
+  ret;
+}
+

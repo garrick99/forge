@@ -17,7 +17,7 @@ use std::gpu;
 
 // Grid-stride sum: each thread accumulates its slice, then warp-reduces.
 #[kernel]
-fn reduce_sum(data: span<u64>, n: u64, result_ptr: u64)
+fn reduce_sum(data: span<u64>, n: u64, result_ptr: raw<u64>)
     requires n <= data.len
 {
     let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
@@ -40,7 +40,7 @@ fn reduce_sum(data: span<u64>, n: u64, result_ptr: u64)
 
 // Verified warp-level max reduction kernel.
 #[kernel]
-fn reduce_max(data: span<u64>, n: u64, result_ptr: u64)
+fn reduce_max(data: span<u64>, n: u64, result_ptr: raw<u64>)
     requires n <= data.len
 {
     let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
@@ -98,14 +98,14 @@ fn vec_mul(a: span<u64>, b: span<u64>, c: span<u64>, n: u64)
 
 // Histogram via atomics: count occurrences of each value in [0, nbins).
 #[kernel]
-fn histogram(data: span<u64>, n: u64, bins_ptr: u64, nbins: u64)
+fn histogram(data: span<u64>, n: u64, bins_ptr: raw<u64>, nbins: u64)
     requires n <= data.len
 {
     let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
     if tid < n {
         let val: u64 = data[tid];
         if val < nbins {
-            let bin_addr: u64 = bins_ptr + val * 8u64;
+            let bin_addr: raw<u64> = bins_ptr + val * 8u64;
             let _old: u64 = atom_add(bin_addr, 1u64);
         };
     };

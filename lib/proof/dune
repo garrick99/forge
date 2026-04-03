@@ -1,4 +1,4 @@
 (library
  (name proof)
  (wrapped false)
- (libraries ast))
+ (libraries ast unix))

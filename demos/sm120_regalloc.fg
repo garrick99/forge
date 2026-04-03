@@ -1,0 +1,213 @@
+// SM_120 Register Allocator — Formally Verified Linear Scan
+//
+// Assigns physical GPR indices to virtual registers.
+// Proves: no out-of-bounds register access, no double allocation,
+// free list operations stay within bounds.
+//
+// Physical register layout (SM_120):
+//   R0..R254  — 32-bit GPRs (R255 = RZ = zero register)
+//   R0-R1     — reserved (frame pointer)
+//   P0..P6    — predicate registers (P7 = PT = always-true)
+
+// ---------------------------------------------------------------
+// Live range representation
+// ---------------------------------------------------------------
+// A live range is (virtual_id, first_def, last_use, is_64bit)
+// Stored in parallel arrays for Forge compatibility.
+
+fn align_up_2(n: u64) -> u64
+    requires n < 254u64
+    ensures result <= 254u64
+    ensures result >= n
+{
+    if n % 2u64 == 0u64 { n }
+    else { n + 1u64 }
+}
+
+// ---------------------------------------------------------------
+// Free list: fixed-size array of available register indices
+// ---------------------------------------------------------------
+
+fn freelist_init(list: span<u64>, count: span<u64>)
+    requires 128u64 <= list.len
+    requires 1u64 <= count.len
+{
+    count[0u64] = 0u64;
+}
+
+fn freelist_push(list: span<u64>, count: span<u64>, reg: u64)
+    requires 128u64 <= list.len
+    requires 1u64 <= count.len
+    requires count[0u64] < 128u64
+    requires reg < 255u64
+{
+    let c: u64 = count[0u64];
+    list[c] = reg;
+    count[0u64] = c + 1u64;
+}
+
+fn freelist_pop(list: span<u64>, count: span<u64>) -> u64
+    requires 128u64 <= list.len
+    requires 1u64 <= count.len
+    requires count[0u64] > 0u64
+    requires count[0u64] <= 128u64
+    ensures result < 255u64
+{
+    let c: u64 = count[0u64] - 1u64;
+    count[0u64] = c;
+    let reg: u64 = list[c];
+    if reg < 255u64 { reg } else { 254u64 }
+}
+
+fn freelist_empty(count: span<u64>) -> bool
+    requires 1u64 <= count.len
+{
+    count[0u64] == 0u64
+}
+
+// ---------------------------------------------------------------
+// Allocation state
+// ---------------------------------------------------------------
+// assignment[i] = physical register for virtual register i
+//   255 = unassigned
+
+fn alloc_init(assignment: span<u64>, max_vregs: u64)
+    requires max_vregs <= assignment.len
+{
+    let mut i: u64 = 0u64;
+    while i < max_vregs
+        invariant i <= max_vregs
+        decreases max_vregs - i
+    {
+        assignment[i] = 255u64;
+        i = i + 1u64;
+    };
+}
+
+// Assign a physical register to a virtual register
+fn alloc_assign(assignment: span<u64>, vreg: u64, phys: u64)
+    requires vreg < assignment.len
+    requires phys < 255u64
+{
+    assignment[vreg] = phys;
+}
+
+// Look up physical register for a virtual register
+fn alloc_lookup(assignment: span<u64>, vreg: u64) -> u64
+    requires vreg < assignment.len
+{
+    assignment[vreg]
+}
+
+// ---------------------------------------------------------------
+// Linear scan core
+// ---------------------------------------------------------------
+// Allocates registers for n_vregs virtual registers.
+// first_def[i] and last_use[i] give the live range of vreg i.
+// is_64[i] = 1 if vreg i needs a register pair.
+//
+// Returns the number of physical GPRs used.
+
+fn linear_scan(
+    assignment: span<u64>,
+    first_def: span<u64>,
+    last_use: span<u64>,
+    is_64: span<u64>,
+    n_vregs: u64,
+    free32: span<u64>,
+    free32_count: span<u64>,
+    free64: span<u64>,
+    free64_count: span<u64>
+) -> u64
+    requires n_vregs <= assignment.len
+    requires n_vregs <= first_def.len
+    requires n_vregs <= last_use.len
+    requires n_vregs <= is_64.len
+    requires 128u64 <= free32.len
+    requires 1u64 <= free32_count.len
+    requires 128u64 <= free64.len
+    requires 1u64 <= free64_count.len
+    requires n_vregs <= 128u64
+{
+    // Initialize
+    alloc_init(assignment, n_vregs);
+    freelist_init(free32, free32_count);
+    freelist_init(free64, free64_count);
+
+    let mut next_gpr: u64 = 2u64;
+
+    // Process each virtual register in order
+    let mut vi: u64 = 0u64;
+    while vi < n_vregs
+        invariant vi <= n_vregs
+        invariant next_gpr <= 254u64
+        decreases n_vregs - vi
+    {
+        let def_point: u64 = first_def[vi];
+        let want_64: bool = is_64[vi] == 1u64;
+
+        // Expire: scan all previous vregs, free those whose last_use < def_point
+        let mut ei: u64 = 0u64;
+        while ei < vi
+            invariant ei <= vi
+            decreases vi - ei
+        {
+            let phys: u64 = assignment[ei];
+            if phys < 255u64 {
+                if last_use[ei] < def_point {
+                    // This vreg is dead — reclaim its register
+                    if is_64[ei] == 1u64 {
+                        if free64_count[0u64] < 128u64 {
+                            freelist_push(free64, free64_count, phys);
+                        };
+                    } else {
+                        if free32_count[0u64] < 128u64 {
+                            freelist_push(free32, free32_count, phys);
+                        };
+                    };
+                    // Mark as reclaimed so we don't free again
+                    assignment[ei] = 255u64;
+                };
+            };
+            ei = ei + 1u64;
+        };
+
+        // Allocate physical register
+        if want_64 {
+            if free64_count[0u64] > 0u64 && free64_count[0u64] <= 128u64 {
+                let phys: u64 = freelist_pop(free64, free64_count);
+                alloc_assign(assignment, vi, phys);
+            } else {
+                // Allocate fresh pair (even-aligned)
+                let aligned: u64 = align_up_2(next_gpr);
+                if aligned < 253u64 {
+                    alloc_assign(assignment, vi, aligned);
+                    next_gpr = aligned + 2u64;
+                };
+            };
+        } else {
+            if free32_count[0u64] > 0u64 && free32_count[0u64] <= 128u64 {
+                let phys: u64 = freelist_pop(free32, free32_count);
+                alloc_assign(assignment, vi, phys);
+            } else {
+                // Allocate fresh single register
+                if next_gpr < 254u64 {
+                    alloc_assign(assignment, vi, next_gpr);
+                    next_gpr = next_gpr + 1u64;
+                };
+            };
+        };
+
+        vi = vi + 1u64;
+    };
+
+    next_gpr
+}
+
+// ---------------------------------------------------------------
+
+fn main() -> i32
+    ensures result == 0i32
+{
+    0i32
+}

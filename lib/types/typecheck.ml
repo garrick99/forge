@@ -412,6 +412,7 @@ let rec ty_eq t1 t2 =
   | TPrim p1, TRefined (p2, _, _) -> p1 = p2
   | TRef t1, TRef t2 -> ty_eq t1 t2
   | TRefMut t1, TRefMut t2 -> ty_eq t1 t2
+  | TRaw t1, TRaw t2 -> ty_eq t1 t2
   | TOwn t1, TOwn t2 -> ty_eq t1 t2
   | TSlice t1, TSlice t2 -> ty_eq t1 t2
   | TSpan t1, TSpan t2 -> ty_eq t1 t2
@@ -460,6 +461,11 @@ let ty_compatible t1 t2 =
 
 (* Numeric type for binary operation result *)
 let numeric_result_ty t1 t2 =
+  (* Pointer arithmetic: raw<T> +/- integer = raw<T> *)
+  match t1, t2 with
+  | TRaw t, _ -> TRaw t
+  | _, TRaw t -> TRaw t
+  | _ ->
   match base_ty t1, base_ty t2 with
   | TPrim (TUint U64), _ | _, TPrim (TUint U64) -> TPrim (TUint U64)
   | TPrim (TUint U32), _ | _, TPrim (TUint U32) -> TPrim (TUint U32)
@@ -3134,14 +3140,15 @@ let check_fn env fn =
   let sig_ = collect_fn_sig fn in
   (* Process function attributes *)
   let is_kernel    = List.exists (fun a -> a.attr_name = "kernel")    fn.fn_attrs in
+  let is_device_fn = List.exists (fun a -> a.attr_name = "device")   fn.fn_attrs in
   let is_coalesced = List.exists (fun a -> a.attr_name = "coalesced") fn.fn_attrs in
   let is_ind_cpa   = List.exists (fun a -> a.attr_name = "ind_cpa")   fn.fn_attrs in
-  let env = if is_kernel    then { env with is_gpu_fn    = true } else env in
+  let env = if is_kernel || is_device_fn then { env with is_gpu_fn = true } else env in
   let env = if is_coalesced then { env with coalesced_fn = true } else env in
   (* Inject GPU built-in variables for kernel functions.
      threadIdx_x/y/z are varying (per-thread); blockIdx/blockDim/gridDim are uniform. *)
   let env =
-    if is_kernel then begin
+    if is_kernel || is_device_fn then begin
       let mk nm = { name = nm; loc = dummy_loc } in
       let varying_u32 = TQual (Varying, TPrim (TUint U32)) in
       let uniform_u32 = TPrim (TUint U32) in
@@ -3162,6 +3169,40 @@ let check_fn env fn =
       let e = env_add_fact e (PBinop (Lt, PVar (mk "threadIdx_x"), PVar (mk "blockDim_x"))) in
       let e = env_add_fact e (PBinop (Lt, PVar (mk "threadIdx_y"), PVar (mk "blockDim_y"))) in
       let e = env_add_fact e (PBinop (Lt, PVar (mk "threadIdx_z"), PVar (mk "blockDim_z"))) in
+      (* GPU intrinsic functions *)
+      let mk_p n t = ({ name = n; loc = dummy_loc }, t) in
+      let gpu_fn name params ret = {
+        fs_name = name; fs_type_params = []; fs_generics = [];
+        fs_params = params; fs_ret = ret;
+        fs_requires = []; fs_ensures = []; fs_decreases = None;
+      } in
+      let u32 = TPrim (TUint U32) in
+      let u64 = TPrim (TUint U64) in
+      let _f32 = TPrim (TFloat F32) in
+      (* Warp shuffles: shfl_down_sync(val, delta, width) -> val *)
+      let e = env_add_fn e "shfl_down_sync"
+        (gpu_fn "shfl_down_sync" [mk_p "val" u32; mk_p "delta" u32; mk_p "width" u32] u32) in
+      let e = env_add_fn e "shfl_xor_sync"
+        (gpu_fn "shfl_xor_sync" [mk_p "val" u32; mk_p "mask" u32; mk_p "width" u32] u32) in
+      let e = env_add_fn e "shfl_up_sync"
+        (gpu_fn "shfl_up_sync" [mk_p "val" u32; mk_p "delta" u32; mk_p "width" u32] u32) in
+      (* Atomics: atom_add(ptr, val) -> old *)
+      let e = env_add_fn e "atom_add"
+        (gpu_fn "atom_add" [mk_p "ptr" (TRaw u64); mk_p "val" u64] u64) in
+      let e = env_add_fn e "atom_cas"
+        (gpu_fn "atom_cas" [mk_p "ptr" (TRaw u64); mk_p "val" u64] u64) in
+      let e = env_add_fn e "atom_max"
+        (gpu_fn "atom_max" [mk_p "ptr" (TRaw u64); mk_p "val" u64] u64) in
+      let e = env_add_fn e "atom_min"
+        (gpu_fn "atom_min" [mk_p "ptr" (TRaw u64); mk_p "val" u64] u64) in
+      (* Warp vote *)
+      let e = env_add_fn e "ballot_sync"
+        (gpu_fn "ballot_sync" [mk_p "pred" u64] u32) in
+      (* Lane/warp ID *)
+      let e = env_add_fn e "lane_id"
+        (gpu_fn "lane_id" [] u32) in
+      let e = env_add_fn e "warp_id"
+        (gpu_fn "warp_id" [] u32) in
       e
     end else env
   in

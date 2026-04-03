@@ -1,0 +1,36 @@
+// GPU Vector Add — proven-correct SIMT kernels
+// Forge verifies bounds safety + termination, emits optimized CUDA C.
+// Pipeline: forge cuda → OpenCUDA → OpenPTXas → RTX 5090
+
+#[kernel]
+fn vector_add(a: span<f32>, b: span<f32>, out: span<f32>, n: u64)
+    requires n <= a.len
+    requires n <= b.len
+    requires n <= out.len
+{
+    let gid: u64 = (blockIdx_x as u64) * (blockDim_x as u64) + (threadIdx_x as u64);
+    if gid < n {
+        out[gid] = a[gid] + b[gid];
+    };
+}
+
+#[kernel]
+fn vector_scale(data: span<f32>, scale: f32, n: u64)
+    requires n <= data.len
+{
+    let gid: u64 = (blockIdx_x as u64) * (blockDim_x as u64) + (threadIdx_x as u64);
+    if gid < n {
+        data[gid] = data[gid] * scale;
+    };
+}
+
+#[kernel]
+fn saxpy(x: span<f32>, y: span<f32>, alpha: f32, n: u64)
+    requires n <= x.len
+    requires n <= y.len
+{
+    let gid: u64 = (blockIdx_x as u64) * (blockDim_x as u64) + (threadIdx_x as u64);
+    if gid < n {
+        y[gid] = alpha * x[gid] + y[gid];
+    };
+}

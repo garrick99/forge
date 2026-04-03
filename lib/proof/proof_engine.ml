@@ -793,6 +793,27 @@ module Z3Bridge = struct
     let logic_decl = if use_bv then ["(set-logic QF_BV)"] else [] in
     String.concat "\n" (logic_decl @ decls @ range_constraints @ assumes @ ["(check-sat)"])
 
+  let z3_bin () =
+    match Sys.getenv_opt "FORGE_Z3" with
+    | Some p -> p
+    | None -> "z3"
+
+  let run_z3_process args =
+    (* Platform-independent Z3 invocation via Unix.create_process.
+       No shell involved — works on Win32, Unix, and Cygwin. *)
+    let bin = z3_bin () in
+    let argv = Array.of_list (bin :: args) in
+    let (rd, wr) = Unix.pipe () in
+    let pid = Unix.create_process bin argv Unix.stdin wr wr in
+    Unix.close wr;
+    let ic = Unix.in_channel_of_descr rd in
+    let lines = ref [] in
+    (try while true do lines := input_line ic :: !lines done with End_of_file -> ());
+    close_in ic;
+    let (_, status) = Unix.waitpid [] pid in
+    let rc = match status with Unix.WEXITED c -> c | _ -> 1 in
+    (rc, List.rev !lines)
+
   let check_consistent ctx : bool =
     (* Returns true if context is consistent (satisfiable) *)
     let query = build_consistency_query ctx in
@@ -800,21 +821,16 @@ module Z3Bridge = struct
     let oc = open_out tmp in
     output_string oc query;
     close_out oc;
-    let result_tmp = Filename.temp_file "forge_smt_cons_r" ".txt" in
-    let cmd = Printf.sprintf "z3 -T:10 %s > %s 2>&1" tmp result_tmp in
-    let rc = Sys.command cmd in
+    let (rc, lines) = run_z3_process ["-T:10"; tmp] in
     let consistent =
       if rc = 0 then begin
-        let ic = open_in result_tmp in
-        let line = try input_line ic with End_of_file -> "" in
-        close_in ic;
+        let line = match lines with l :: _ -> l | [] -> "" in
         match String.trim line with
-        | "unsat" -> false   (* assumes are unsatisfiable — inconsistent *)
-        | _       -> true    (* sat or unknown — treat as consistent *)
-      end else true          (* Z3 failed — assume consistent *)
+        | "unsat" -> false
+        | _       -> true
+      end else true
     in
     Sys.remove tmp;
-    Sys.remove result_tmp;
     consistent
 
   let run_z3 ?(get_model=false) query timeout_s =
@@ -823,18 +839,10 @@ module Z3Bridge = struct
     let oc = open_out tmp in
     output_string oc full_query;
     close_out oc;
-    let result_tmp = Filename.temp_file "forge_smt_result" ".txt" in
-    let cmd = Printf.sprintf "z3 -T:%d %s > %s 2>&1" timeout_s tmp result_tmp in
-    let rc = Sys.command cmd in
-    let ic = open_in result_tmp in
-    let lines = ref [] in
-    (try while true do lines := input_line ic :: !lines done with End_of_file -> ());
-    close_in ic;
-    let all_lines = List.rev !lines in
+    let (rc, all_lines) = run_z3_process [Printf.sprintf "-T:%d" timeout_s; tmp] in
     let result =
       if List.exists (fun l -> String.trim l = "unsat") all_lines then Unsat
       else if List.exists (fun l -> String.trim l = "sat") all_lines then begin
-        (* Extract model lines (everything after "sat" that looks like model output) *)
         let model_lines = List.filter (fun l ->
           let t = String.trim l in
           t <> "sat" && t <> "" && t <> ")" &&
@@ -845,7 +853,7 @@ module Z3Bridge = struct
       end
       else Unknown (Printf.sprintf "z3 exited with code %d" rc)
     in
-    (tmp, result_tmp, result)
+    (tmp, result)
 
   let check_valid ctx pred : z3_result =
     let query = build_query ctx pred in
@@ -859,7 +867,7 @@ module Z3Bridge = struct
       (not (List.exists has_divmod goal_preds)) &&
       (List.exists has_nonlinear goal_preds)
     in
-    let (tmp, result_tmp, result) = run_z3 ~get_model:true query 10 in
+    let (tmp, result) = run_z3 ~get_model:true query 10 in
     (* nlsat works over the reals — it may return sat for a goal that is only
        a theorem over integers (e.g. i*cols+j < rows*cols given 0<=i<rows, 0<=j<cols).
        When nlsat returns non-Unsat, retry with the NIA solver. *)
@@ -867,12 +875,11 @@ module Z3Bridge = struct
       let is_unsat = match result with Unsat -> true | _ -> false in
       if used_nlsat && not is_unsat then
         let nia_query = build_query ~force_nia:true ctx pred in
-        let (tmp2, result_tmp2, nia_result) = run_z3 ~get_model:true nia_query 10 in
+        let (tmp2, nia_result) = run_z3 ~get_model:true nia_query 10 in
         (match nia_result with
          | Sat _ | Unknown _ when Sys.getenv_opt "FORGE_DUMP_SMT" <> None ->
              Printf.eprintf "[forge-smt] NIA query dumped to %s\n%!" tmp2
          | _ -> Sys.remove tmp2);
-        Sys.remove result_tmp2;
         nia_result
       else
         result
@@ -881,7 +888,6 @@ module Z3Bridge = struct
      | Sat _ | Unknown _ when Sys.getenv_opt "FORGE_DUMP_SMT" <> None ->
          Printf.eprintf "[forge-smt] query dumped to %s\n%!" tmp
      | _ -> Sys.remove tmp);
-    Sys.remove result_tmp;
     result
 end
 

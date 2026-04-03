@@ -19,7 +19,6 @@ uint64_t str_len(forge_span_u64_t s __attribute__((unused)), uint64_t cap __attr
 _Bool str_eq(forge_span_u64_t a __attribute__((unused)), uint64_t a_len __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t b_len __attribute__((unused)));
 uint64_t str_copy(forge_span_u64_t src __attribute__((unused)), uint64_t src_len __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t dst_cap __attribute__((unused)));
 uint64_t str_concat(forge_span_u64_t a __attribute__((unused)), uint64_t a_len __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t b_len __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t dst_cap __attribute__((unused)));
-uint64_t str_find_inner(forge_span_u64_t haystack __attribute__((unused)), uint64_t h_len __attribute__((unused)), forge_span_u64_t needle __attribute__((unused)), uint64_t n_len __attribute__((unused)));
 uint64_t str_find(forge_span_u64_t haystack __attribute__((unused)), uint64_t h_len __attribute__((unused)), forge_span_u64_t needle __attribute__((unused)), uint64_t n_len __attribute__((unused)));
 _Bool str_contains(forge_span_u64_t haystack __attribute__((unused)), uint64_t h_len __attribute__((unused)), forge_span_u64_t needle __attribute__((unused)), uint64_t n_len __attribute__((unused)));
 _Bool str_starts_with(forge_span_u64_t s __attribute__((unused)), uint64_t s_len __attribute__((unused)), forge_span_u64_t prefix __attribute__((unused)), uint64_t p_len __attribute__((unused)));
@@ -32,16 +31,12 @@ uint64_t str_trim_right(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 void str_reverse(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)));
 void str_replace_char(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t old_ch __attribute__((unused)), uint64_t new_ch __attribute__((unused)));
 uint64_t str_parse_u64(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)));
-uint64_t str_to_hex_nonzero(uint64_t val __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t dst_cap __attribute__((unused)));
 uint64_t str_to_hex(uint64_t val __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t dst_cap __attribute__((unused)));
-uint64_t str_split_count_inner(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t delim __attribute__((unused)));
 uint64_t str_split_count(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t delim __attribute__((unused)));
 _Bool str_is_alpha(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)));
 _Bool str_is_digit(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)));
 _Bool str_is_printable(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)));
-uint64_t json_find_key_inner(forge_span_u64_t buf __attribute__((unused)), uint64_t buf_len __attribute__((unused)), forge_span_u64_t key __attribute__((unused)), uint64_t key_len __attribute__((unused)), uint64_t needed __attribute__((unused)));
 uint64_t json_find_key(forge_span_u64_t buf __attribute__((unused)), uint64_t buf_len __attribute__((unused)), forge_span_u64_t key __attribute__((unused)), uint64_t key_len __attribute__((unused)));
-__forge_tuple_u64_u64_t json_extract_string_inner(forge_span_u64_t buf __attribute__((unused)), uint64_t buf_len __attribute__((unused)), uint64_t start __attribute__((unused)));
 __forge_tuple_u64_u64_t json_extract_string(forge_span_u64_t buf __attribute__((unused)), uint64_t buf_len __attribute__((unused)), uint64_t start __attribute__((unused)));
 uint64_t str_index_of_char(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t ch __attribute__((unused)));
 uint64_t str_last_index_of_char(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t ch __attribute__((unused)));
@@ -119,7 +114,7 @@ uint64_t str_concat(forge_span_u64_t a __attribute__((unused)), uint64_t a_len _
   return (a_len + b_len);
 }
 
-uint64_t str_find_inner(forge_span_u64_t haystack __attribute__((unused)), uint64_t h_len __attribute__((unused)), forge_span_u64_t needle __attribute__((unused)), uint64_t n_len __attribute__((unused))) {
+uint64_t str_find(forge_span_u64_t haystack __attribute__((unused)), uint64_t h_len __attribute__((unused)), forge_span_u64_t needle __attribute__((unused)), uint64_t n_len __attribute__((unused))) {
   uint64_t limit __attribute__((unused)) = ((h_len - n_len) + 1);
   uint64_t pos __attribute__((unused)) = 0;
   uint64_t found __attribute__((unused)) = h_len;
@@ -148,62 +143,42 @@ uint64_t str_find_inner(forge_span_u64_t haystack __attribute__((unused)), uint6
   return found;
 }
 
-uint64_t str_find(forge_span_u64_t haystack __attribute__((unused)), uint64_t h_len __attribute__((unused)), forge_span_u64_t needle __attribute__((unused)), uint64_t n_len __attribute__((unused))) {
-  if ((n_len == 0)) {
-    return 0;
-  } else {
-    if ((n_len > h_len)) {
-      return h_len;
-    } else {
-      return str_find_inner(haystack, h_len, needle, n_len);
-    }
-  }
-}
-
 _Bool str_contains(forge_span_u64_t haystack __attribute__((unused)), uint64_t h_len __attribute__((unused)), forge_span_u64_t needle __attribute__((unused)), uint64_t n_len __attribute__((unused))) {
   uint64_t pos __attribute__((unused)) = str_find(haystack, h_len, needle, n_len);
   return (pos < h_len);
 }
 
 _Bool str_starts_with(forge_span_u64_t s __attribute__((unused)), uint64_t s_len __attribute__((unused)), forge_span_u64_t prefix __attribute__((unused)), uint64_t p_len __attribute__((unused))) {
-  if ((p_len > s_len)) {
-    return 0;
-  } else {
-    uint64_t i __attribute__((unused)) = 0;
-    _Bool ok __attribute__((unused)) = 1;
-    {
-      while ((i < p_len)) {
-        if ((s.data[i] != prefix.data[i])) {
-          ok = 0;
+  uint64_t i __attribute__((unused)) = 0;
+  _Bool ok __attribute__((unused)) = 1;
+  {
+    while ((i < p_len)) {
+      if ((s.data[i] != prefix.data[i])) {
+        ok = 0;
 
-        }
-        i = (i + 1);
       }
-
+      i = (i + 1);
     }
-    return ok;
+
   }
+  return ok;
 }
 
 _Bool str_ends_with(forge_span_u64_t s __attribute__((unused)), uint64_t s_len __attribute__((unused)), forge_span_u64_t suffix __attribute__((unused)), uint64_t sf_len __attribute__((unused))) {
-  if ((sf_len > s_len)) {
-    return 0;
-  } else {
-    uint64_t offset __attribute__((unused)) = (s_len - sf_len);
-    uint64_t i __attribute__((unused)) = 0;
-    _Bool ok __attribute__((unused)) = 1;
-    {
-      while ((i < sf_len)) {
-        if ((s.data[(offset + i)] != suffix.data[i])) {
-          ok = 0;
+  uint64_t offset __attribute__((unused)) = (s_len - sf_len);
+  uint64_t i __attribute__((unused)) = 0;
+  _Bool ok __attribute__((unused)) = 1;
+  {
+    while ((i < sf_len)) {
+      if ((s.data[(offset + i)] != suffix.data[i])) {
+        ok = 0;
 
-        }
-        i = (i + 1);
       }
-
+      i = (i + 1);
     }
-    return ok;
+
   }
+  return ok;
 }
 
 uint64_t str_count(forge_span_u64_t haystack __attribute__((unused)), uint64_t h_len __attribute__((unused)), forge_span_u64_t needle __attribute__((unused)), uint64_t n_len __attribute__((unused))) {
@@ -341,7 +316,7 @@ uint64_t str_parse_u64(forge_span_u64_t s __attribute__((unused)), uint64_t n __
   return val;
 }
 
-uint64_t str_to_hex_nonzero(uint64_t val __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t dst_cap __attribute__((unused))) {
+uint64_t str_to_hex(uint64_t val __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t dst_cap __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
   uint64_t pos __attribute__((unused)) = 0;
   {
@@ -374,16 +349,7 @@ uint64_t str_to_hex_nonzero(uint64_t val __attribute__((unused)), forge_span_u64
   return count;
 }
 
-uint64_t str_to_hex(uint64_t val __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t dst_cap __attribute__((unused))) {
-  if ((val == 0)) {
-    dst.data[0] = 48;
-    return 1;
-  } else {
-    return str_to_hex_nonzero(val, dst, dst_cap);
-  }
-}
-
-uint64_t str_split_count_inner(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t delim __attribute__((unused))) {
+uint64_t str_split_count(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t delim __attribute__((unused))) {
   uint64_t cnt __attribute__((unused)) = 1;
   uint64_t i __attribute__((unused)) = 0;
   {
@@ -397,14 +363,6 @@ uint64_t str_split_count_inner(forge_span_u64_t s __attribute__((unused)), uint6
 
   }
   return cnt;
-}
-
-uint64_t str_split_count(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t delim __attribute__((unused))) {
-  if ((n == 0)) {
-    return 1;
-  } else {
-    return str_split_count_inner(s, n, delim);
-  }
 }
 
 _Bool str_is_alpha(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -458,7 +416,8 @@ _Bool str_is_printable(forge_span_u64_t s __attribute__((unused)), uint64_t n __
   return ok;
 }
 
-uint64_t json_find_key_inner(forge_span_u64_t buf __attribute__((unused)), uint64_t buf_len __attribute__((unused)), forge_span_u64_t key __attribute__((unused)), uint64_t key_len __attribute__((unused)), uint64_t needed __attribute__((unused))) {
+uint64_t json_find_key(forge_span_u64_t buf __attribute__((unused)), uint64_t buf_len __attribute__((unused)), forge_span_u64_t key __attribute__((unused)), uint64_t key_len __attribute__((unused))) {
+  uint64_t needed __attribute__((unused)) = (key_len + 3);
   uint64_t limit __attribute__((unused)) = ((buf_len - needed) + 1);
   uint64_t pos __attribute__((unused)) = 0;
   uint64_t found __attribute__((unused)) = buf_len;
@@ -490,16 +449,7 @@ uint64_t json_find_key_inner(forge_span_u64_t buf __attribute__((unused)), uint6
   return found;
 }
 
-uint64_t json_find_key(forge_span_u64_t buf __attribute__((unused)), uint64_t buf_len __attribute__((unused)), forge_span_u64_t key __attribute__((unused)), uint64_t key_len __attribute__((unused))) {
-  uint64_t needed __attribute__((unused)) = (key_len + 3);
-  if ((needed > buf_len)) {
-    return buf_len;
-  } else {
-    return json_find_key_inner(buf, buf_len, key, key_len, needed);
-  }
-}
-
-__forge_tuple_u64_u64_t json_extract_string_inner(forge_span_u64_t buf __attribute__((unused)), uint64_t buf_len __attribute__((unused)), uint64_t start __attribute__((unused))) {
+__forge_tuple_u64_u64_t json_extract_string(forge_span_u64_t buf __attribute__((unused)), uint64_t buf_len __attribute__((unused)), uint64_t start __attribute__((unused))) {
   uint64_t content_start __attribute__((unused)) = (start + 1);
   uint64_t i __attribute__((unused)) = content_start;
   uint64_t end_pos __attribute__((unused)) = buf_len;
@@ -517,18 +467,6 @@ __forge_tuple_u64_u64_t json_extract_string_inner(forge_span_u64_t buf __attribu
     return (__forge_tuple_u64_u64_t){ ._0 = buf_len, ._1 = buf_len };
   } else {
     return (__forge_tuple_u64_u64_t){ ._0 = content_start, ._1 = end_pos };
-  }
-}
-
-__forge_tuple_u64_u64_t json_extract_string(forge_span_u64_t buf __attribute__((unused)), uint64_t buf_len __attribute__((unused)), uint64_t start __attribute__((unused))) {
-  if ((start >= buf_len)) {
-    return (__forge_tuple_u64_u64_t){ ._0 = buf_len, ._1 = buf_len };
-  } else {
-    if ((buf.data[start] != 34)) {
-      return (__forge_tuple_u64_u64_t){ ._0 = buf_len, ._1 = buf_len };
-    } else {
-      return json_extract_string_inner(buf, buf_len, start);
-    }
   }
 }
 

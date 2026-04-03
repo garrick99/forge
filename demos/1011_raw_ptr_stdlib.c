@@ -8,6 +8,9 @@
 #  define __attribute__(x)
 #endif
 
+/* span<T> typedefs — fat pointers with proven bounds */
+typedef struct { uint8_t* data; uintptr_t len; } forge_span_u8_t;
+
 uint64_t ptr_null(void);  /* extern: forge_raw */
 
 uint64_t ptr_offset(uint64_t ptr, uint64_t n);  /* extern: forge_raw */
@@ -28,12 +31,19 @@ void compiler_fence(void);  /* extern: forge_raw */
 
 void memory_barrier(void);  /* extern: forge_raw */
 
+void asm_volatile(forge_span_u8_t code);  /* extern: forge_raw */
+
+void cpu_relax(void);  /* extern: forge_raw */
+
+void dmb(void);  /* extern: forge_raw */
+
 /* Function pointer typedefs */
 typedef uint64_t (*forge_fn__ret_u64_t)(void);
 typedef uint64_t (*forge_fn_u64_u64_ret_u64_t)(uint64_t, uint64_t);
 typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
 typedef void (*forge_fn_u64_u64_ret_unit_t)(uint64_t, uint64_t);
 typedef void (*forge_fn__ret_unit_t)(void);
+typedef void (*forge_fn_str_ret_unit_t)(forge_span_u8_t);
 
 /* Forward declarations */
 void init_device_regs(uint64_t base __attribute__((unused)), uint64_t n_regs __attribute__((unused)));

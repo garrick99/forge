@@ -74,6 +74,8 @@ type token =
   | LBRACE
   | LAND
   | KERNEL
+  | DEVICE
+  | PARALLEL
   | ISIZE
   | INVARIANT
   | INT_SUFF of (int64 * string)

@@ -31,13 +31,13 @@ uint64_t shfl_down_sync(uint64_t val, uint64_t delta, uint64_t width);  /* exter
 
 uint64_t shfl_xor_sync(uint64_t val, uint64_t mask, uint64_t width);  /* extern: forge_gpu */
 
-uint64_t atom_add(uint64_t ptr, uint64_t val);  /* extern: forge_gpu */
+uint64_t atom_add(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
 
-uint64_t atom_cas(uint64_t ptr, uint64_t val);  /* extern: forge_gpu */
+uint64_t atom_cas(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
 
-uint64_t atom_max(uint64_t ptr, uint64_t val);  /* extern: forge_gpu */
+uint64_t atom_max(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
 
-uint64_t atom_min(uint64_t ptr, uint64_t val);  /* extern: forge_gpu */
+uint64_t atom_min(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
 
 uint64_t ballot_sync(uint64_t pred);  /* extern: forge_gpu */
 
@@ -47,7 +47,7 @@ uint64_t warp_id(void);  /* extern: forge_gpu */
 
 /* Function pointer typedefs */
 typedef uint64_t (*forge_fn_u64_u64_u64_ret_u64_t)(uint64_t, uint64_t, uint64_t);
-typedef uint64_t (*forge_fn_u64_u64_ret_u64_t)(uint64_t, uint64_t);
+typedef uint64_t (*forge_fn_ptr_u64_u64_ret_u64_t)(uint64_t*, uint64_t);
 typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
 typedef uint64_t (*forge_fn__ret_u64_t)(void);
 

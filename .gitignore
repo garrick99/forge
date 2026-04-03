@@ -36,3 +36,19 @@ Thumbs.db
 
 # Temp
 divide.fg
+
+# Compiled objects and binaries
+*.o
+*.obj
+*.cubin
+apps/sysdiag/sysdiag
+apps/kernel_module/forge_sniffer
+demos/test_enum
+
+# Compiler-emitted test outputs (generated, not source)
+test/programs/*.c
+test/programs/*.cu
+
+# Build symlinks / stdlib copies
+analysis/vortex_ntt/std
+apps/gpu_bench/std

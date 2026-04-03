@@ -1,0 +1,244 @@
+// SM_120 Scoreboard — Formally Verified Dependency Tracker
+//
+// Tracks register write-after-read and read-after-write hazards
+// for SM_120 instruction scheduling. Generates correct ctrl words.
+//
+// SM_120 ctrl word (23 bits):
+//   [22:17] stall  — cycle count to wait
+//   [16]    yield  — yield hint
+//   [15]    wbar   — write-after-read barrier flag
+//   [14:10] rbar   — read barrier mask (OR-combine)
+//   [9:4]   wdep   — write dependency slot
+//   [3:0]   misc   — instruction sequence counter
+
+// ---------------------------------------------------------------
+// Ctrl word construction
+// ---------------------------------------------------------------
+
+fn make_ctrl(stall: u64, yield_hint: u64, wbar: u64, rbar: u64, wdep: u64, misc: u64) -> u64
+    requires stall < 64u64
+    requires yield_hint < 2u64
+    requires wbar < 2u64
+    requires rbar < 32u64
+    requires wdep < 64u64
+    requires misc < 16u64
+    ensures result < 8388608u64
+{
+    let ctrl: u64 = (stall * 131072u64)
+                  + (yield_hint * 65536u64)
+                  + (wbar * 32768u64)
+                  + (rbar * 1024u64)
+                  + (wdep * 16u64)
+                  + misc;
+    ctrl
+}
+
+// Extract fields from a ctrl word
+fn ctrl_stall(ctrl: u64) -> u64
+    requires ctrl < 8388608u64
+    ensures result < 64u64
+{
+    (ctrl / 131072u64) & 63u64
+}
+
+fn ctrl_rbar(ctrl: u64) -> u64
+    requires ctrl < 8388608u64
+    ensures result < 32u64
+{
+    (ctrl / 1024u64) & 31u64
+}
+
+fn ctrl_wdep(ctrl: u64) -> u64
+    requires ctrl < 8388608u64
+    ensures result < 64u64
+{
+    (ctrl / 16u64) & 63u64
+}
+
+fn ctrl_misc(ctrl: u64) -> u64
+    requires ctrl < 8388608u64
+    ensures result < 16u64
+{
+    ctrl & 15u64
+}
+
+// ---------------------------------------------------------------
+// Scoreboard slot constants
+// ---------------------------------------------------------------
+// wdep values (which scoreboard slot a result goes to)
+
+fn WDEP_LDC() -> u64 ensures result == 49u64 { 49u64 }
+fn WDEP_LDS() -> u64 ensures result == 51u64 { 51u64 }
+fn WDEP_LDG() -> u64 ensures result == 53u64 { 53u64 }
+fn WDEP_LDG2() -> u64 ensures result == 55u64 { 55u64 }
+fn WDEP_ALU() -> u64 ensures result == 62u64 { 62u64 }
+fn WDEP_NONE() -> u64 ensures result == 63u64 { 63u64 }
+
+// rbar bit masks (OR-combine to wait for multiple slots)
+fn RBAR_BASE() -> u64 ensures result == 1u64  { 1u64 }
+fn RBAR_LDC() -> u64  ensures result == 3u64  { 3u64 }
+fn RBAR_LDS() -> u64  ensures result == 5u64  { 5u64 }
+fn RBAR_LDG() -> u64  ensures result == 9u64  { 9u64 }
+
+// ---------------------------------------------------------------
+// Scoreboard state: tracks which register is pending on which slot
+// ---------------------------------------------------------------
+// State is a fixed array of 256 entries (one per GPR).
+// Each entry holds the scoreboard slot (wdep) of the pending write,
+// or 63 (WDEP_NONE) if the register has no pending write.
+//
+// When an instruction writes Rdest with wdep=0x35 (LDG slot):
+//   state[dest] = 0x35
+//
+// When a subsequent instruction reads Rsrc:
+//   if state[src] != WDEP_NONE:
+//     rbar |= barrier_bit_for(state[src])
+//     (add a read barrier to wait for that slot)
+
+fn scoreboard_init(state: span<u64>)
+    requires 256u64 <= state.len
+{
+    let mut i: u64 = 0u64;
+    while i < 256u64
+        invariant i <= 256u64
+        decreases 256u64 - i
+    {
+        state[i] = 63u64;
+        i = i + 1u64;
+    };
+}
+
+fn scoreboard_write(state: span<u64>, reg: u64, wdep: u64)
+    requires 256u64 <= state.len
+    requires reg < 256u64
+    requires wdep < 64u64
+{
+    state[reg] = wdep;
+}
+
+fn scoreboard_clear(state: span<u64>, reg: u64)
+    requires 256u64 <= state.len
+    requires reg < 256u64
+{
+    state[reg] = 63u64;
+}
+
+// Map a wdep slot to the corresponding rbar bit
+fn wdep_to_rbar_bit(wdep: u64) -> u64
+    requires wdep < 64u64
+    ensures result < 32u64
+{
+    if wdep == 49u64 { 3u64 }
+    else if wdep == 51u64 { 5u64 }
+    else if wdep == 53u64 { 9u64 }
+    else if wdep == 55u64 { 9u64 }
+    else if wdep == 62u64 { 1u64 }
+    else { 1u64 }
+}
+
+// Check what barrier a read of register `reg` requires
+fn scoreboard_read_barrier(state: span<u64>, reg: u64) -> u64
+    requires 256u64 <= state.len
+    requires reg < 256u64
+    requires state[reg] < 64u64
+    ensures result < 32u64
+{
+    let pending: u64 = state[reg];
+    if pending == 63u64 { 1u64 }
+    else if pending == 49u64 { 3u64 }
+    else if pending == 51u64 { 5u64 }
+    else if pending == 53u64 { 9u64 }
+    else if pending == 55u64 { 9u64 }
+    else if pending == 62u64 { 1u64 }
+    else { 1u64 }
+}
+
+// Compute rbar for an instruction that reads src0 and src1
+fn scoreboard_read2(state: span<u64>, src0: u64, src1: u64) -> u64
+    requires 256u64 <= state.len
+    requires src0 < 256u64
+    requires src1 < 256u64
+    requires state[src0] < 64u64
+    requires state[src1] < 64u64
+    ensures result < 32u64
+{
+    let r0: u64 = scoreboard_read_barrier(state, src0);
+    let r1: u64 = scoreboard_read_barrier(state, src1);
+    r0 | r1
+}
+
+// Compute rbar for an instruction that reads src0, src1, and src2
+fn scoreboard_read3(state: span<u64>, src0: u64, src1: u64, src2: u64) -> u64
+    requires 256u64 <= state.len
+    requires src0 < 256u64
+    requires src1 < 256u64
+    requires src2 < 256u64
+    requires state[src0] < 64u64
+    requires state[src1] < 64u64
+    requires state[src2] < 64u64
+    ensures result < 32u64
+{
+    let r0: u64 = scoreboard_read_barrier(state, src0);
+    let r1: u64 = scoreboard_read_barrier(state, src1);
+    let r2: u64 = scoreboard_read_barrier(state, src2);
+    r0 | r1 | r2
+}
+
+// ---------------------------------------------------------------
+// Full ctrl word generation for an ALU instruction
+// ---------------------------------------------------------------
+
+fn ctrl_for_alu(state: span<u64>, dest: u64, src0: u64, src1: u64, misc: u64) -> u64
+    requires 256u64 <= state.len
+    requires dest < 255u64
+    requires src0 < 256u64
+    requires src1 < 256u64
+    requires misc < 16u64
+    requires state[src0] < 64u64
+    requires state[src1] < 64u64
+    ensures result < 8388608u64
+{
+    let rbar: u64 = scoreboard_read2(state, src0, src1);
+    let ctrl: u64 = make_ctrl(0u64, 0u64, 0u64, rbar, 62u64, misc);
+
+    // Record that dest is now pending on ALU slot
+    scoreboard_write(state, dest, 62u64);
+
+    ctrl
+}
+
+fn ctrl_for_ldg(state: span<u64>, dest: u64, addr_reg: u64) -> u64
+    requires 256u64 <= state.len
+    requires dest < 255u64
+    requires addr_reg < 256u64
+    requires state[addr_reg] < 64u64
+    ensures result < 8388608u64
+{
+    let rbar: u64 = scoreboard_read_barrier(state, addr_reg);
+    let ctrl: u64 = make_ctrl(0u64, 0u64, 0u64, rbar, 53u64, 5u64);
+
+    // Dest is pending on LDG slot
+    scoreboard_write(state, dest, 53u64);
+
+    ctrl
+}
+
+fn ctrl_for_stg(state: span<u64>, addr_reg: u64, data_reg: u64) -> u64
+    requires 256u64 <= state.len
+    requires addr_reg < 256u64
+    requires data_reg < 256u64
+    requires state[addr_reg] < 64u64
+    requires state[data_reg] < 64u64
+    ensures result < 8388608u64
+{
+    let rbar: u64 = scoreboard_read2(state, addr_reg, data_reg);
+    make_ctrl(0u64, 0u64, 0u64, rbar, 63u64, 5u64)
+}
+
+// ---------------------------------------------------------------
+
+fn main() -> i32
+    ensures result == 0i32
+{
+    0i32
+}

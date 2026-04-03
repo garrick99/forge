@@ -13,7 +13,7 @@ typedef struct { uint64_t* data; uintptr_t len; } forge_span_u64_t;
 
 /* Forward declarations */
 uint64_t find(forge_span_u64_t parent __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t x __attribute__((unused)));
-void forge_union(forge_span_u64_t parent __attribute__((unused)), forge_span_u64_t rank __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t x __attribute__((unused)), uint64_t y __attribute__((unused)));
+void uf_uf_union(forge_span_u64_t parent __attribute__((unused)), forge_span_u64_t rank __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t x __attribute__((unused)), uint64_t y __attribute__((unused)));
 int main();
 
 uint64_t find(forge_span_u64_t parent __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t x __attribute__((unused))) {
@@ -33,7 +33,7 @@ uint64_t find(forge_span_u64_t parent __attribute__((unused)), uint64_t n __attr
   return cur;
 }
 
-void forge_union(forge_span_u64_t parent __attribute__((unused)), forge_span_u64_t rank __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t x __attribute__((unused)), uint64_t y __attribute__((unused))) {
+void uf_uf_union(forge_span_u64_t parent __attribute__((unused)), forge_span_u64_t rank __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t x __attribute__((unused)), uint64_t y __attribute__((unused))) {
   uint64_t rx __attribute__((unused)) = find(parent, n, x);
   uint64_t ry __attribute__((unused)) = find(parent, n, y);
   if ((rx != ry)) {

@@ -1,0 +1,90 @@
+// GPU Tiled Kernels — __shared__ memory + syncthreads + warp shuffles
+// Proven bounds safety on all global memory accesses.
+
+#[device]
+fn warp_reduce_add(v: u32) -> u32
+{
+    let mut x: u32 = v;
+    x = x + shfl_down_sync(x, 16u32, 32u32);
+    x = x + shfl_down_sync(x, 8u32, 32u32);
+    x = x + shfl_down_sync(x, 4u32, 32u32);
+    x = x + shfl_down_sync(x, 2u32, 32u32);
+    x = x + shfl_down_sync(x, 1u32, 32u32);
+    x
+}
+
+// Per-thread partial sum, then warp reduce
+#[kernel]
+fn reduce_sum(input: span<u32>, output: span<u32>, n: u64)
+    requires n <= input.len
+    requires 1u64 <= output.len
+{
+    let tid: u32 = threadIdx_x;
+    let gid: u64 = (blockIdx_x as u64) * (blockDim_x as u64) + (tid as u64);
+
+    let mut val: u32 = 0u32;
+    if gid < n {
+        val = input[gid];
+    };
+
+    // Warp-level reduction — no shared memory needed
+    let reduced: u32 = warp_reduce_add(val);
+
+    // Lane 0 of each warp writes result
+    if tid == 0u32 {
+        let bid: u64 = blockIdx_x as u64;
+        if bid < output.len {
+            output[bid] = reduced;
+        };
+    };
+}
+
+// Elementwise multiply-accumulate
+#[kernel]
+fn vector_fma(a: span<f32>, b: span<f32>, c: span<f32>, out: span<f32>, n: u64)
+    requires n <= a.len
+    requires n <= b.len
+    requires n <= c.len
+    requires n <= out.len
+{
+    let gid: u64 = (blockIdx_x as u64) * (blockDim_x as u64) + (threadIdx_x as u64);
+    if gid < n {
+        out[gid] = a[gid] * b[gid] + c[gid];
+    };
+}
+
+// Elementwise ReLU activation (in-place)
+#[kernel]
+fn relu(data: span<u32>, n: u64)
+    requires n <= data.len
+{
+    let gid: u64 = (blockIdx_x as u64) * (blockDim_x as u64) + (threadIdx_x as u64);
+    if gid < n {
+        if data[gid] > 2147483647u32 {
+            data[gid] = 0u32;
+        };
+    };
+}
+
+// Tiled vector add — demonstrates __shared__ declaration + syncthreads
+#[kernel]
+fn vector_add_smem(a: span<f32>, b: span<f32>, out: span<f32>, n: u64)
+    requires n <= a.len
+    requires n <= b.len
+    requires n <= out.len
+{
+    let sa: shared<f32>[256] = [0.0; 256u64];
+    let sb: shared<f32>[256] = [0.0; 256u64];
+    let tid: u64 = threadIdx_x as u64;
+    let gid: u64 = (blockIdx_x as u64) * 256u64 + tid;
+
+    if gid < n {
+        sa[tid] = a[gid];
+        sb[tid] = b[gid];
+    };
+    syncthreads();
+
+    if gid < n {
+        out[gid] = sa[tid] + sb[tid];
+    };
+}

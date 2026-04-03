@@ -31,13 +31,13 @@ uint64_t shfl_down_sync(uint64_t val, uint64_t delta, uint64_t width);  /* exter
 
 uint64_t shfl_xor_sync(uint64_t val, uint64_t mask, uint64_t width);  /* extern: forge_gpu */
 
-uint64_t atom_add(uint64_t ptr, uint64_t val);  /* extern: forge_gpu */
+uint64_t atom_add(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
 
-uint64_t atom_cas(uint64_t ptr, uint64_t val);  /* extern: forge_gpu */
+uint64_t atom_cas(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
 
-uint64_t atom_max(uint64_t ptr, uint64_t val);  /* extern: forge_gpu */
+uint64_t atom_max(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
 
-uint64_t atom_min(uint64_t ptr, uint64_t val);  /* extern: forge_gpu */
+uint64_t atom_min(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
 
 uint64_t ballot_sync(uint64_t pred);  /* extern: forge_gpu */
 
@@ -47,7 +47,7 @@ uint64_t warp_id(void);  /* extern: forge_gpu */
 
 /* Function pointer typedefs */
 typedef uint64_t (*forge_fn_u64_u64_u64_ret_u64_t)(uint64_t, uint64_t, uint64_t);
-typedef uint64_t (*forge_fn_u64_u64_ret_u64_t)(uint64_t, uint64_t);
+typedef uint64_t (*forge_fn_ptr_u64_u64_ret_u64_t)(uint64_t*, uint64_t);
 typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
 typedef uint64_t (*forge_fn__ret_u64_t)(void);
 
@@ -58,12 +58,12 @@ uint64_t warp_reduce_min(uint64_t val __attribute__((unused)));
 uint64_t grid_stride_start(uint64_t block_idx __attribute__((unused)), uint64_t block_dim __attribute__((unused)), uint64_t thread_idx __attribute__((unused)));
 uint64_t grid_stride_step(uint64_t block_dim __attribute__((unused)), uint64_t grid_dim __attribute__((unused)));
 int main();
-__global__ void reduce_sum(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t result_ptr __attribute__((unused)));
-__global__ void reduce_max(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t result_ptr __attribute__((unused)));
+__global__ void reduce_sum(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t* result_ptr __attribute__((unused)));
+__global__ void reduce_max(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t* result_ptr __attribute__((unused)));
 __global__ void saxpy(forge_span_u64_t x __attribute__((unused)), forge_span_u64_t y __attribute__((unused)), uint64_t a __attribute__((unused)), uint64_t n __attribute__((unused)));
 __global__ void vec_add(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t c __attribute__((unused)), uint64_t n __attribute__((unused)));
 __global__ void vec_mul(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t c __attribute__((unused)), uint64_t n __attribute__((unused)));
-__global__ void histogram(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t bins_ptr __attribute__((unused)), uint64_t nbins __attribute__((unused)));
+__global__ void histogram(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t* bins_ptr __attribute__((unused)), uint64_t nbins __attribute__((unused)));
 int main();
 
 __device__ uint64_t warp_reduce_sum(uint64_t val __attribute__((unused))) {
@@ -149,7 +149,7 @@ int main() {
 
 }
 
-__global__ void reduce_sum(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t result_ptr __attribute__((unused))) {
+__global__ void reduce_sum(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t* result_ptr __attribute__((unused))) {
   uint64_t tid __attribute__((unused)) = ((blockIdx_x * blockDim_x) + threadIdx_x);
   uint64_t stride __attribute__((unused)) = (blockDim_x * gridDim_x);
   uint64_t acc __attribute__((unused)) = 0;
@@ -166,7 +166,7 @@ __global__ void reduce_sum(forge_span_u64_t data __attribute__((unused)), uint64
   }
 }
 
-__global__ void reduce_max(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t result_ptr __attribute__((unused))) {
+__global__ void reduce_max(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t* result_ptr __attribute__((unused))) {
   uint64_t tid __attribute__((unused)) = ((blockIdx_x * blockDim_x) + threadIdx_x);
   uint64_t val __attribute__((unused)) = 0;
   if ((tid < n)) {
@@ -205,12 +205,12 @@ __global__ void vec_mul(forge_span_u64_t a __attribute__((unused)), forge_span_u
   }
 }
 
-__global__ void histogram(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t bins_ptr __attribute__((unused)), uint64_t nbins __attribute__((unused))) {
+__global__ void histogram(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t* bins_ptr __attribute__((unused)), uint64_t nbins __attribute__((unused))) {
   uint64_t tid __attribute__((unused)) = ((blockIdx_x * blockDim_x) + threadIdx_x);
   if ((tid < n)) {
     uint64_t val __attribute__((unused)) = data.data[tid];
     if ((val < nbins)) {
-      uint64_t bin_addr __attribute__((unused)) = (bins_ptr + (val * 8));
+      uint64_t* bin_addr __attribute__((unused)) = (bins_ptr + (val * 8));
       uint64_t _old __attribute__((unused)) = atomicAdd((unsigned long long*)bin_addr, 1);
 
     }

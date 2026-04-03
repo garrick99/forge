@@ -1,0 +1,162 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry vector_add(
+    .param .u64 vector_add_param_a_data,
+    .param .u64 vector_add_param_a_len,
+    .param .u64 vector_add_param_b_data,
+    .param .u64 vector_add_param_b_len,
+    .param .u64 vector_add_param_out_data,
+    .param .u64 vector_add_param_out_len,
+    .param .u64 vector_add_param_n
+)
+{
+    .reg .pred %p15;
+    .reg .u64 %rd0, %rd1, %rd10, %rd11, %rd13, %rd14, %rd17, %rd18, %rd2, %rd20, %rd21, %rd24, %rd25, %rd3, %rd4, %rd5, %rd6, %rd8;
+    .reg .f32 %f19, %f22, %f23;
+    .reg .u32 %r12, %r26, %r27, %r28, %r7, %r9;
+
+  ld.param.u64 %rd0, [vector_add_param_a_data];
+  ld.param.u64 %rd1, [vector_add_param_a_len];
+  ld.param.u64 %rd2, [vector_add_param_b_data];
+  ld.param.u64 %rd3, [vector_add_param_b_len];
+  ld.param.u64 %rd4, [vector_add_param_out_data];
+  ld.param.u64 %rd5, [vector_add_param_out_len];
+  ld.param.u64 %rd6, [vector_add_param_n];
+
+  mov.u32 %r7, %ctaid.x;
+  cvt.u64.u32 %rd8, %r7;
+  mov.u32 %r9, %ntid.x;
+  cvt.u64.u32 %rd10, %r9;
+  mul.lo.u64 %rd11, %rd8, %rd10;
+  mov.u32 %r12, %tid.x;
+  cvt.u64.u32 %rd13, %r12;
+  add.u64 %rd14, %rd11, %rd13;
+  setp.lt.u64 %p15, %rd14, %rd6;
+  @%p15 bra vector_add_then_16;
+  bra vector_add_else_16;
+  vector_add_then_16:
+  mul.lo.u64 %rd17, %rd14, 4;
+  add.u64 %rd18, %rd0, %rd17;
+  ld.global.f32 %f19, [%rd18];
+  mul.lo.u64 %rd20, %rd14, 4;
+  add.u64 %rd21, %rd2, %rd20;
+  ld.global.f32 %f22, [%rd21];
+  add.f32 %f23, %f19, %f22;
+  mul.lo.u64 %rd24, %rd14, 4;
+  add.u64 %rd25, %rd4, %rd24;
+  st.global.f32 [%rd25], %f23;
+  mov.u32 %r26, 0; // unit
+  mov.u32 %r27, %r26;
+  bra vector_add_end_16;
+  vector_add_else_16:
+  mov.u32 %r27, 0; // no else branch
+  vector_add_end_16:
+  mov.u32 %r28, 0; // unit
+  ret;
+}
+
+.visible .entry vector_scale(
+    .param .u64 vector_scale_param_data_data,
+    .param .u64 vector_scale_param_data_len,
+    .param .u32 vector_scale_param_scale,
+    .param .u64 vector_scale_param_n
+)
+{
+    .reg .pred %p12;
+    .reg .u64 %rd0, %rd1, %rd10, %rd11, %rd14, %rd15, %rd18, %rd19, %rd3, %rd5, %rd7, %rd8;
+    .reg .f32 %f16, %f17, %f2;
+    .reg .u32 %r20, %r21, %r22, %r4, %r6, %r9;
+
+  ld.param.u64 %rd0, [vector_scale_param_data_data];
+  ld.param.u64 %rd1, [vector_scale_param_data_len];
+  ld.param.u32 %f2, [vector_scale_param_scale];
+  ld.param.u64 %rd3, [vector_scale_param_n];
+
+  mov.u32 %r4, %ctaid.x;
+  cvt.u64.u32 %rd5, %r4;
+  mov.u32 %r6, %ntid.x;
+  cvt.u64.u32 %rd7, %r6;
+  mul.lo.u64 %rd8, %rd5, %rd7;
+  mov.u32 %r9, %tid.x;
+  cvt.u64.u32 %rd10, %r9;
+  add.u64 %rd11, %rd8, %rd10;
+  setp.lt.u64 %p12, %rd11, %rd3;
+  @%p12 bra vector_scale_then_13;
+  bra vector_scale_else_13;
+  vector_scale_then_13:
+  mul.lo.u64 %rd14, %rd11, 4;
+  add.u64 %rd15, %rd0, %rd14;
+  ld.global.f32 %f16, [%rd15];
+  mul.lo.f32 %f17, %f16, %f2;
+  mul.lo.u64 %rd18, %rd11, 4;
+  add.u64 %rd19, %rd0, %rd18;
+  st.global.f32 [%rd19], %f17;
+  mov.u32 %r20, 0; // unit
+  mov.u32 %r21, %r20;
+  bra vector_scale_end_13;
+  vector_scale_else_13:
+  mov.u32 %r21, 0; // no else branch
+  vector_scale_end_13:
+  mov.u32 %r22, 0; // unit
+  ret;
+}
+
+.visible .entry saxpy(
+    .param .u64 saxpy_param_x_data,
+    .param .u64 saxpy_param_x_len,
+    .param .u64 saxpy_param_y_data,
+    .param .u64 saxpy_param_y_len,
+    .param .u32 saxpy_param_alpha,
+    .param .u64 saxpy_param_n
+)
+{
+    .reg .pred %p14;
+    .reg .u64 %rd0, %rd1, %rd10, %rd12, %rd13, %rd16, %rd17, %rd2, %rd20, %rd21, %rd24, %rd25, %rd3, %rd5, %rd7, %rd9;
+    .reg .f32 %f18, %f19, %f22, %f23, %f4;
+    .reg .u32 %r11, %r26, %r27, %r28, %r6, %r8;
+
+  ld.param.u64 %rd0, [saxpy_param_x_data];
+  ld.param.u64 %rd1, [saxpy_param_x_len];
+  ld.param.u64 %rd2, [saxpy_param_y_data];
+  ld.param.u64 %rd3, [saxpy_param_y_len];
+  ld.param.u32 %f4, [saxpy_param_alpha];
+  ld.param.u64 %rd5, [saxpy_param_n];
+
+  mov.u32 %r6, %ctaid.x;
+  cvt.u64.u32 %rd7, %r6;
+  mov.u32 %r8, %ntid.x;
+  cvt.u64.u32 %rd9, %r8;
+  mul.lo.u64 %rd10, %rd7, %rd9;
+  mov.u32 %r11, %tid.x;
+  cvt.u64.u32 %rd12, %r11;
+  add.u64 %rd13, %rd10, %rd12;
+  setp.lt.u64 %p14, %rd13, %rd5;
+  @%p14 bra saxpy_then_15;
+  bra saxpy_else_15;
+  saxpy_then_15:
+  mul.lo.u64 %rd16, %rd13, 4;
+  add.u64 %rd17, %rd0, %rd16;
+  ld.global.f32 %f18, [%rd17];
+  mul.lo.f32 %f19, %f4, %f18;
+  mul.lo.u64 %rd20, %rd13, 4;
+  add.u64 %rd21, %rd2, %rd20;
+  ld.global.f32 %f22, [%rd21];
+  add.f32 %f23, %f19, %f22;
+  mul.lo.u64 %rd24, %rd13, 4;
+  add.u64 %rd25, %rd2, %rd24;
+  st.global.f32 [%rd25], %f23;
+  mov.u32 %r26, 0; // unit
+  mov.u32 %r27, %r26;
+  bra saxpy_end_15;
+  saxpy_else_15:
+  mov.u32 %r27, 0; // no else branch
+  saxpy_end_15:
+  mov.u32 %r28, 0; // unit
+  ret;
+}
+

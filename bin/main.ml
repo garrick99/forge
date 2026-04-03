@@ -11,7 +11,8 @@ let usage = {|
 FORGE compiler (forge-0)
 
 Usage:
-  forge build <file.fg>      compile: prove all obligations, emit C
+  forge build <file.fg>      compile: prove all obligations, emit C99/CUDA C
+  forge cuda <file.fg>       compile: prove + emit optimized CUDA C (.cu)
   forge check <file.fg>      proof check only — no codegen
   forge audit <file.c>       dump assume log from generated C
   forge version              print version info
@@ -233,6 +234,109 @@ let compile path emit_code =
   end
 
 (* ------------------------------------------------------------------ *)
+(* CUDA compile pipeline                                                *)
+(* ------------------------------------------------------------------ *)
+
+let compile_cuda path =
+  Printf.printf "[forge] %s (CUDA target)\n%!" path;
+  loaded_files := [];
+  Codegen_c.reset_codegen_state ();
+
+  (* 1. Parse *)
+  Printf.printf "[forge] parsing...\n%!";
+  let raw = parse_file path in
+  let base_dir = Filename.dirname path in
+  let resolved_items = resolve_uses base_dir raw.Ast.prog_items in
+  let prog = { raw with Ast.prog_items = resolved_items } in
+  Printf.printf "[forge] parsed %d top-level items\n%!"
+    (List.length prog.Ast.prog_items);
+
+  (* 2. Type check *)
+  Printf.printf "[forge] type checking...\n%!";
+  let (tc_errors, obligations, extra_items) = typecheck_program prog in
+  let prog = { prog with Ast.prog_items = prog.Ast.prog_items @ extra_items } in
+
+  if tc_errors <> [] then begin
+    Printf.eprintf "[forge] type errors:\n";
+    List.iter (fun e ->
+      match e with
+      | TypeError (loc, msg) ->
+          Printf.eprintf "  %s:%d:%d: %s\n" loc.file loc.line loc.col msg
+      | LinearityError (loc, msg) ->
+          Printf.eprintf "  %s:%d:%d: linearity: %s\n" loc.file loc.line loc.col msg
+      | UnboundVar (loc, name) ->
+          Printf.eprintf "  %s:%d:%d: unbound variable '%s'\n"
+            loc.file loc.line loc.col name
+      | UnboundFn (loc, name) ->
+          Printf.eprintf "  %s:%d:%d: unbound function '%s'\n"
+            loc.file loc.line loc.col name
+      | ArityMismatch (loc, fn, exp, got) ->
+          Printf.eprintf "  %s:%d:%d: '%s' expects %d args, got %d\n"
+            loc.file loc.line loc.col fn exp got
+      | ProofError pe ->
+          Printf.eprintf "  %s\n" (format_error pe)
+    ) tc_errors;
+    exit 1
+  end;
+
+  Printf.printf "[forge] %d proof obligations generated\n%!"
+    (List.length obligations);
+
+  (* 3. Discharge proofs *)
+  Printf.printf "[forge] discharging proof obligations...\n%!";
+  let env = empty_env in
+  let summary = discharge_all obligations env in
+
+  Printf.printf "[forge] proof summary: %d total, %d SMT, %d guided, %d manual, %d failed\n%!"
+    summary.ds_total summary.ds_tier1 summary.ds_tier2 summary.ds_tier3 summary.ds_failed;
+
+  if summary.ds_failed > 0 || summary.ds_vacuous > 0 then begin
+    Printf.eprintf "[forge] %d proof obligation(s) could not be discharged\n"
+      (summary.ds_failed + summary.ds_vacuous);
+    exit 1
+  end;
+
+  Printf.printf "[forge] all obligations discharged\n%!";
+
+  (* 4. Emit optimized CUDA C via codegen_cuda *)
+  Printf.printf "[forge] erasing proofs...\n%!";
+  let cuda_code = Codegen_cuda.emit_cuda_program prog.prog_items 120 in
+  if cuda_code = "" then begin
+    (* No GPU functions — fall back to standard codegen_c *)
+    Printf.printf "[forge] no #[kernel]/#[device]/#[parallel] functions found\n";
+    Printf.printf "[forge] falling back to C99 emission...\n%!";
+    let (code, _) = emit_program prog in
+    let out_path = Filename.remove_extension path ^ ".c" in
+    let oc = open_out out_path in
+    output_string oc code;
+    close_out oc;
+    Printf.printf "[forge] wrote %s\n%!" out_path
+  end else begin
+    let out_path = Filename.remove_extension path ^ ".cu" in
+    Printf.printf "[forge] emitting optimized CUDA C...\n%!";
+    let oc = open_out out_path in
+    output_string oc cuda_code;
+    close_out oc;
+    Printf.printf "[forge] wrote %s\n%!" out_path;
+    Printf.printf "[forge] pipeline: opencuda %s → openptxas → SM_120 cubin\n%!" out_path;
+    (* Also emit PTX *)
+    let ptx = Codegen_ptx.emit_ptx_program prog.prog_items 120 in
+    if ptx <> "" then begin
+      let ptx_path = Filename.remove_extension path ^ ".ptx" in
+      let ocp = open_out ptx_path in
+      output_string ocp ptx;
+      close_out ocp;
+      Printf.printf "[forge] wrote %s (direct PTX)\n%!" ptx_path
+    end
+  end;
+
+  let assumes = dump_assume_log () in
+  if assumes = [] then
+    Printf.printf "[forge] assume audit: 0 assumptions (clean)\n%!"
+  else
+    Printf.printf "[forge] assume audit: %d assumption(s)\n%!" (List.length assumes)
+
+(* ------------------------------------------------------------------ *)
 (* Audit subcommand                                                     *)
 (* ------------------------------------------------------------------ *)
 
@@ -278,6 +382,7 @@ let () =
       Printf.printf "  Z3 SMT backend (Tier 1 automatic)\n";
       Printf.printf "  Target: C99\n"
   | ["build"; path]  -> compile path true
+  | ["cuda"; path]   -> compile_cuda path
   | ["check"; path]  -> compile path false
   | ["audit"; path]  -> audit path
   | []               -> print_string usage

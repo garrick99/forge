@@ -58,13 +58,3 @@ uint64_t run() {
   return 42;
 }
 
-
-/* ---- FORGE ASSUMPTION AUDIT LOG ----
-   Total assumptions: 3
-   [ASSUME] demos/40_ind_cpa.fg:54  (ind_cpa_secure encrypt_word)
-             "ind_cpa: 'encrypt_word' — keys: [key], nonces: nonce (enforce single-use via lin bindings at call sites), ciphertext: secret<u64>"
-   [ASSUME] demos/40_ind_cpa.fg:62  (ind_cpa_secure decrypt_word)
-             "ind_cpa: 'decrypt_word' — keys: [key, ciphertext], nonces: nonce (enforce single-use via lin bindings at call sites), ciphertext: secret<u64>"
-   [ASSUME] demos/40_ind_cpa.fg:74  (ind_cpa_secure aead_encrypt)
-             "ind_cpa: 'aead_encrypt' — keys: [key, auth_key], nonces: nonce (enforce single-use via lin bindings at call sites), ciphertext: secret<u64>"
-   ---- END AUDIT LOG ---- */

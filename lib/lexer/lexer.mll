@@ -55,6 +55,8 @@ let kw_table = Hashtbl.of_seq @@ List.to_seq [
   "uniform",      UNIFORM;
   "varying",      VARYING;
   "kernel",       KERNEL;
+  "device",       DEVICE;
+  "parallel",     PARALLEL;
   "coalesced",    COALESCED;
   "syncthreads",  SYNCTHREADS;
   "forall",       FORALL;
@@ -136,6 +138,7 @@ let float_lit = digit+ '.' digit* (['e' 'E'] ['+' '-']? digit+)?
               | digit+ ['e' 'E'] ['+' '-']? digit+
 (* integer type suffixes: u8/u16/u32/u64/u128/usize/i8/i16/i32/i64/i128/isize *)
 let int_type_suf = ('u'|'i') ("8" | "16" | "32" | "64" | "128" | "size")
+let float_type_suf = 'f' ("32" | "64")
 
 rule token = parse
   | ws+     { token lexbuf }
@@ -146,6 +149,9 @@ rule token = parse
   (* Typed integer literals — must precede plain int_lit (longest match wins) *)
   | (digit+ as n) (int_type_suf as s)       { INT_SUFF (parse_int n lexbuf, s) }
   | ("0x" hex+ as n) (int_type_suf as s)    { INT_SUFF (parse_int n lexbuf, s) }
+
+  (* Typed float literals — e.g. 0.0f32, 1.5f64 *)
+  | (float_lit as f) (float_type_suf as _s) { FLOAT (float_of_string f) }
 
   (* Plain literals *)
   | int_lit as n   { INT (parse_int n lexbuf) }

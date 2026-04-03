@@ -1,8 +1,8 @@
-// FORGE-generated PTX — SM_89
+// FORGE-generated PTX — SM_120
 // Proofs discharged before emission. Correct by construction.
 
-.version 8.5
-.target sm_89
+.version 8.8
+.target sm_120
 .address_size 64
 
 .visible .entry reduce_step(

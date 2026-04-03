@@ -1,0 +1,111 @@
+// expected: 0
+// Windows Build Demo — Proven-correct modular arithmetic, GCD, and bounds
+// Verifies: overflow safety, loop termination, postcondition correctness.
+// Compiles to C99, builds natively with MSVC on Windows.
+
+fn mod_add(a: u64, b: u64, m: u64) -> u64
+    requires m > 0u64
+    requires a < m
+    requires b < m
+    ensures result < m
+{
+    let sum: u64 = a + b;
+    if sum >= m {
+        sum - m
+    } else {
+        sum
+    }
+}
+
+fn mod_mul(a: u64, b: u64, m: u64) -> u64
+    requires m > 0u64
+    requires m <= 4294967296u64
+    requires a < m
+    requires b < m
+    ensures result < m
+{
+    (a * b) % m
+}
+
+fn mod_exp(base: u64, exp: u64, m: u64) -> u64
+    requires m > 1u64
+    requires base < m
+    requires m <= 4294967296u64
+    ensures result < m
+{
+    let mut b: u64 = base;
+    let mut e: u64 = exp;
+    let mut acc: u64 = 1u64;
+    while e > 0u64
+        invariant acc < m
+        invariant b < m
+        decreases e
+    {
+        if e % 2u64 == 1u64 {
+            acc = (acc * b) % m;
+        };
+        b = (b * b) % m;
+        e = e / 2u64;
+    };
+    acc
+}
+
+fn clamp(val: u64, lo: u64, hi: u64) -> u64
+    requires lo <= hi
+    ensures result >= lo
+    ensures result <= hi
+{
+    if val < lo {
+        lo
+    } else if val > hi {
+        hi
+    } else {
+        val
+    }
+}
+
+fn abs_diff(a: u64, b: u64) -> u64
+    ensures a >= b ==> result == a - b
+    ensures b > a ==> result == b - a
+{
+    if a >= b {
+        a - b
+    } else {
+        b - a
+    }
+}
+
+fn fibonacci(n: u64) -> u64
+    requires n <= 93u64
+    decreases n
+{
+    if n == 0u64 {
+        0u64
+    } else if n == 1u64 {
+        1u64
+    } else {
+        fibonacci(n - 1u64) + fibonacci(n - 2u64)
+    }
+}
+
+fn main() -> i32
+    ensures result == 0i32
+{
+    // Modular exponentiation: 3^10 mod 101
+    let r: u64 = mod_exp(3u64, 10u64, 101u64);
+
+    // Modular arithmetic chain
+    let x: u64 = mod_add(50u64, 60u64, 101u64);
+    let y: u64 = mod_mul(x, 7u64, 101u64);
+
+    // Clamp
+    let c: u64 = clamp(500u64, 0u64, 255u64);
+
+    // Absolute difference
+    let d: u64 = abs_diff(42u64, 99u64);
+
+    // Fibonacci
+    let f: u64 = fibonacci(10u64);
+
+    0i32
+}

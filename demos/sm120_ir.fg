@@ -1,0 +1,181 @@
+// SM_120 Instruction IR — Algebraic Data Types for GPU Assembler
+//
+// This is the intermediate representation for OpenPTXas, expressed
+// as Forge algebraic types with proven invariants.
+// Each instruction variant carries its operands as data payloads.
+
+// ---------------------------------------------------------------
+// Register types
+// ---------------------------------------------------------------
+
+enum RegKind {
+    GPR(u64),
+    UReg(u64),
+    Pred(u64),
+    RZ,
+    PT,
+}
+
+fn reg_index(r: RegKind) -> u64
+{
+    match r {
+        GPR(i) => i,
+        UReg(i) => i,
+        Pred(i) => i,
+        RZ => 255u64,
+        PT => 7u64,
+    }
+}
+
+fn is_gpr(r: RegKind) -> bool
+{
+    match r {
+        GPR(_) => true,
+        _ => false,
+    }
+}
+
+// ---------------------------------------------------------------
+// Operand types
+// ---------------------------------------------------------------
+
+enum Operand {
+    OpReg(RegKind),
+    OpImm(u64),
+    OpSR(u64),
+}
+
+fn operand_as_byte(op: Operand) -> u64
+{
+    match op {
+        OpReg(r) => {
+            let idx: u64 = reg_index(r);
+            if idx < 256u64 { idx } else { 255u64 }
+        },
+        OpImm(v) => { if v < 256u64 { v } else { v % 256u64 } },
+        OpSR(code) => { if code < 256u64 { code } else { code % 256u64 } },
+    }
+}
+
+// ---------------------------------------------------------------
+// Instruction variants
+// ---------------------------------------------------------------
+
+enum Insn {
+    Nop,
+    Exit,
+    Mov(RegKind, RegKind),
+    S2R(RegKind, u64),
+    IADD3(RegKind, RegKind, RegKind, RegKind),
+    FADD(RegKind, RegKind, RegKind),
+    LDG(RegKind, RegKind),
+    STG(RegKind, RegKind),
+    SETP(RegKind, RegKind, RegKind),
+    BRA(u64),
+}
+
+// Extract destination register (or RZ if none)
+fn insn_dest(insn: Insn) -> RegKind
+{
+    match insn {
+        Nop => RZ,
+        Exit => RZ,
+        Mov(d, _) => d,
+        S2R(d, _) => d,
+        IADD3(d, _, _, _) => d,
+        FADD(d, _, _) => d,
+        LDG(d, _) => d,
+        STG(_, _) => RZ,
+        SETP(d, _, _) => d,
+        BRA(_) => RZ,
+    }
+}
+
+// Does this instruction write a GPR?
+fn insn_writes_gpr(insn: Insn) -> bool
+{
+    match insn {
+        Nop => false,
+        Exit => false,
+        STG(_, _) => false,
+        BRA(_) => false,
+        _ => true,
+    }
+}
+
+// ---------------------------------------------------------------
+// Opcode lookup
+// ---------------------------------------------------------------
+
+fn insn_opcode_lo(insn: Insn) -> u64
+    ensures result < 256u64
+{
+    match insn {
+        Nop => 24u64,
+        Exit => 77u64,
+        Mov(_, _) => 2u64,
+        S2R(_, _) => 25u64,
+        IADD3(_, _, _, _) => 16u64,
+        FADD(_, _, _) => 21u64,
+        LDG(_, _) => 129u64,
+        STG(_, _) => 133u64,
+        SETP(_, _, _) => 12u64,
+        BRA(_) => 47u64,
+    }
+}
+
+fn insn_opcode_hi(insn: Insn) -> u64
+    ensures result < 256u64
+{
+    match insn {
+        Nop => 121u64,
+        Exit => 121u64,
+        Mov(_, _) => 121u64,
+        S2R(_, _) => 121u64,
+        IADD3(_, _, _, _) => 120u64,
+        FADD(_, _, _) => 122u64,
+        LDG(_, _) => 120u64,
+        STG(_, _) => 120u64,
+        SETP(_, _, _) => 122u64,
+        BRA(_) => 121u64,
+    }
+}
+
+// ---------------------------------------------------------------
+// Wdep slot for scoreboard
+// ---------------------------------------------------------------
+
+fn insn_wdep(insn: Insn) -> u64
+    ensures result < 64u64
+{
+    match insn {
+        Nop => 63u64,
+        Exit => 63u64,
+        Mov(_, _) => 62u64,
+        S2R(_, _) => 49u64,
+        IADD3(_, _, _, _) => 62u64,
+        FADD(_, _, _) => 62u64,
+        LDG(_, _) => 53u64,
+        STG(_, _) => 63u64,
+        SETP(_, _, _) => 62u64,
+        BRA(_) => 63u64,
+    }
+}
+
+fn main() -> i32
+    ensures result == 0i32
+{
+    // Build some instructions using algebraic types
+    let nop: Insn = Nop;
+    let mov: Insn = Mov(GPR(5u64), GPR(3u64));
+    let add: Insn = IADD3(GPR(4u64), GPR(2u64), GPR(3u64), RZ);
+    let load: Insn = LDG(GPR(6u64), GPR(0u64));
+
+    // Query properties — all proven by construction
+    let nop_opc: u64 = insn_opcode_lo(nop);
+    let mov_dest: RegKind = insn_dest(mov);
+    let add_wdep: u64 = insn_wdep(add);
+    let load_writes: bool = insn_writes_gpr(load);
+
+    0i32
+}

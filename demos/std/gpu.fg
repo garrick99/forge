@@ -16,14 +16,14 @@ extern fn shfl_xor_sync(val: u64, mask: u64, width: u64) -> u64 = "forge_gpu";
 // ---- Atomic operations -----------------------------------------------------
 
 // Atomic add: atomically adds val to *ptr, returns old value.
-extern fn atom_add(ptr: u64, val: u64) -> u64 = "forge_gpu";
+extern fn atom_add(ptr: raw<u64>, val: u64) -> u64 = "forge_gpu";
 
 // Atomic compare-and-swap.
-extern fn atom_cas(ptr: u64, val: u64) -> u64 = "forge_gpu";
+extern fn atom_cas(ptr: raw<u64>, val: u64) -> u64 = "forge_gpu";
 
 // Atomic max/min.
-extern fn atom_max(ptr: u64, val: u64) -> u64 = "forge_gpu";
-extern fn atom_min(ptr: u64, val: u64) -> u64 = "forge_gpu";
+extern fn atom_max(ptr: raw<u64>, val: u64) -> u64 = "forge_gpu";
+extern fn atom_min(ptr: raw<u64>, val: u64) -> u64 = "forge_gpu";
 
 // ---- Warp vote -------------------------------------------------------------
 
