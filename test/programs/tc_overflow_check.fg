@@ -1,0 +1,9 @@
+// Targeted test: ONoOverflow is generated for arithmetic and discharged when bounded.
+// Tests: overflow check generation in check_expr for addition.
+
+fn safe_add(a: u64, b: u64) -> u64
+    requires a <= 1000000u64 && b <= 1000000u64
+    ensures result == a + b
+{ a + b }
+// expected: 0
+fn main() -> u64 { 0u64 }

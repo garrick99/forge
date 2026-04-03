@@ -1,0 +1,6 @@
+// expect-error: proof obligation(s) could not be discharged
+// Targeted test: bounds check fires when index is unconstrained.
+// Tests: OBoundsCheck is not discharged when requires is missing.
+
+fn get_unsafe(s: span<u64>, i: u64) -> u64
+{ s[i] }   // no requires i < s.len — must be rejected

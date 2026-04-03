@@ -1,0 +1,16 @@
+// Targeted test: plain-IDENT attributes (e.g. #[foobar]) are accepted on fn and struct.
+// Regression test for the packed_struct_def shift/reduce conflict (state 722).
+// Before the fix, #[name] where name was a plain IDENT (not a keyword) silently
+// failed to parse because the packed_struct_def rule shifted RBRACKET, causing a
+// parse error when FN was seen instead of STRUCT.
+
+#[foobar]
+fn annotated(x: u64) -> u64
+    ensures result == x
+{ x }
+
+#[custom_attr]
+struct Point { x: u64, y: u64, }
+
+// expected: 0
+fn main() -> u64 { 0u64 }

@@ -1,3 +1,4 @@
+// expect-error: proof obligation(s) could not be discharged
 // FORGE Bad Demo 04 — Struct Invariant Violation (correctly rejected)
 //
 // This program SHOULD FAIL to compile.

@@ -1,0 +1,8 @@
+// Targeted test: bounds check obligation is generated and discharged for proven-safe access.
+// Tests: OBoundsCheck, span<T> index proof, requires propagation into proof_ctx.
+
+fn get(s: span<u64>, i: u64) -> u64
+    requires i < s.len
+{ s[i] }
+// expected: 0
+fn main() -> u64 { 0u64 }

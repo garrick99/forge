@@ -1,3 +1,4 @@
+// expect-error: proof obligation(s) could not be discharged
 // FORGE Bad Demo 02 — False Loop Invariant (correctly rejected)
 //
 // This program SHOULD FAIL to compile.

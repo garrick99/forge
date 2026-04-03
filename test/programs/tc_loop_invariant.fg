@@ -1,0 +1,19 @@
+// Targeted test: loop invariant propagates to postcondition via post-loop substitution.
+// Tests: i→n substitution in stmt_final_env, OPostcondition for quantified ensures.
+
+fn fill(s: span<u64>, n: u64, val: u64)
+    requires n <= s.len
+    ensures forall k: u64, k < n ==> s[k] == val
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall j: u64, j < i ==> s[j] == val
+        decreases n - i
+    {
+        s[i] = val;
+        i = i + 1u64;
+    };
+}
+// expected: 0
+fn main() -> u64 { 0u64 }

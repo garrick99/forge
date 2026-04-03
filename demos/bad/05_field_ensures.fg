@@ -1,3 +1,4 @@
+// expect-error: proof obligation(s) could not be discharged
 // FORGE Bad Demo 05 — Field Postcondition Violation (correctly rejected)
 //
 // This program SHOULD FAIL to compile.

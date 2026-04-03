@@ -1,0 +1,13 @@
+// Targeted test: inline lemmas inside proof{} blocks are proved and applied.
+// Tests: pc_lemmas injection in build_query, PTBy proof term application.
+
+fn double_and_halve(n: u64) -> u64
+    ensures result <= n
+{
+    proof {
+        lemma half_le(x: u64): x / 2u64 <= x { auto }
+    };
+    2u64 * (n / 2u64)
+}
+// expected: 0
+fn main() -> u64 { 0u64 }

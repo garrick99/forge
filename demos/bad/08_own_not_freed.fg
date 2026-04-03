@@ -1,3 +1,4 @@
+// expect-error: linearity.*linear variable
 // BAD demo 08: own<T> not freed — linear must-use violation
 //
 // FORGE catches this at compile time: a linear variable that is

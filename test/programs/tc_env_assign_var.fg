@@ -1,0 +1,14 @@
+// Targeted test: env_assign_var correctly renames old facts after reassignment.
+// Tests: SSA-lite renaming — old(x) is tracked as __x_pN, new x is distinct.
+// If env_assign_var is broken, the postcondition would see x == 0 AND x == 1 simultaneously.
+
+fn bump(x: u64) -> u64
+    requires x < 1000u64
+    ensures result == x + 1u64
+{
+    let mut v: u64 = x;
+    v = v + 1u64;
+    v
+}
+// expected: 0
+fn main() -> u64 { 0u64 }

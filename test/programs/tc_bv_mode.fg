@@ -1,0 +1,13 @@
+// Targeted test: BV mode activates for bitwise operations, Int mode for arithmetic.
+// Tests: has_bitwise_ops detection, BV/Int mode switching in Z3Bridge.
+
+fn mask_low(x: u64) -> u64
+    ensures result == x & 0xFFFFFFFFu64
+{ x & 0xFFFFFFFFu64 }
+
+fn add_bounds(a: u64, b: u64) -> u64
+    requires a <= 100u64 && b <= 100u64
+    ensures result <= 200u64
+{ a + b }
+// expected: 0
+fn main() -> u64 { 0u64 }

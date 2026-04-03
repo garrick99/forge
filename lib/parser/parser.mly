@@ -20,7 +20,7 @@ open Lexing
 
 (* Declaration keywords *)
 %token FN TYPE STRUCT ENUM IMPL TRAIT USE EXTERN TASK CHAN UNION
-%token SPAN SHARED UNIFORM VARYING KERNEL COALESCED SYNCTHREADS STR_TY
+%token SPAN SHARED UNIFORM VARYING KERNEL DEVICE PARALLEL COALESCED SYNCTHREADS STR_TY
 
 (* Control flow *)
 %token LET GHOST MUT CONST RETURN IF ELSE MATCH FOR WHILE LOOP IN BREAK CONTINUE
@@ -151,8 +151,6 @@ item:
     { mk_item (IType t) $startpos }
   | s = struct_def
     { mk_item (IStruct s) $startpos }
-  | s = packed_struct_def
-    { mk_item (IStruct s) $startpos }
   | u = union_def
     { mk_item (IStruct u) $startpos }
   | e = enum_def
@@ -268,7 +266,7 @@ type_params:
 (* ------------------------------------------------------------------ *)
 
 struct_def:
-  | STRUCT name = ident params = kind_params
+  | attrs = list(attr_clause) STRUCT name = ident params = kind_params
     LBRACE
       fields = list(struct_field)
       invars = list(invariant_clause)
@@ -280,7 +278,7 @@ struct_def:
         sd_fields = fields;
         sd_invars = invars;
         sd_is_union = false;
-        sd_is_packed = false;
+        sd_is_packed = List.exists (fun a -> a.attr_name = "packed") attrs;
       }
     }
 
@@ -300,21 +298,6 @@ union_def:
       }
     }
 
-packed_struct_def:
-  | HASH LBRACKET IDENT RBRACKET STRUCT name = ident params = kind_params
-    LBRACE
-      fields = list(struct_field)
-    RBRACE
-    {
-      {
-        sd_name   = name;
-        sd_params = params;
-        sd_fields = fields;
-        sd_invars = [];
-        sd_is_union = false;
-        sd_is_packed = true;
-      }
-    }
 
 struct_field:
   | name = ident COLON t = ty COMMA
@@ -1137,6 +1120,8 @@ ident:
   | BY         { mk_ident "by"         $startpos }
   (* GPU attribute names must be usable as plain identifiers *)
   | KERNEL     { mk_ident "kernel"     $startpos }
+  | DEVICE     { mk_ident "device"    $startpos }
+  | PARALLEL   { mk_ident "parallel"  $startpos }
   | COALESCED  { mk_ident "coalesced"  $startpos }
   | SPAN       { mk_ident "span"       $startpos }
   | SHARED     { mk_ident "shared"     $startpos }

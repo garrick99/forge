@@ -1,3 +1,4 @@
+// expect-error: ind_cpa.*key.*must not be declassified
 // bad/06: #[ind_cpa] violation — key is declassified inside the cipher
 //
 // This should NOT compile:

@@ -1,0 +1,12 @@
+// Targeted test: stmt_final_env is correctly implemented for if-expressions.
+// If stmt_final_env for EIf is missing or wrong, the postcondition cannot see
+// what was established in the branches.
+
+fn abs_val(x: i64) -> i64
+    ensures result >= 0i64
+    ensures result == x || result == (0i64 - x)
+{
+    if x >= 0i64 { x } else { 0i64 - x }
+}
+// expected: 0
+fn main() -> u64 { 0u64 }

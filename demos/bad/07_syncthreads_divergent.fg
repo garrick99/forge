@@ -1,3 +1,4 @@
+// expect-error: syncthreads.*divergent
 // BAD Demo 07: __syncthreads() inside a divergent branch
 //
 // If the warp-condition is varying (per-thread), then some threads

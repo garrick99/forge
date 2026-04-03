@@ -1,0 +1,8 @@
+// expect-error: proof obligation(s) could not be discharged
+// Targeted test: division-by-zero precondition fires when divisor is unconstrained.
+// Tests: OBoundsCheck / precondition generation for division operations.
+// Note: Forge checks the divisor != 0 precondition before emitting a divide instruction.
+
+fn bad_div(a: u64, b: u64) -> u64
+    ensures result <= a
+{ a / b }  // b may be 0 — Forge must reject this

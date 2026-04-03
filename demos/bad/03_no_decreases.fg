@@ -1,3 +1,4 @@
+// expect-error: recursive call.*requires a.*decreases
 // FORGE Bad Demo 03 — Recursive Function Without decreases (correctly rejected)
 //
 // This program SHOULD FAIL to compile.

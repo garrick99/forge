@@ -1,3 +1,4 @@
+// expect-error: does not implement trait
 // Bad demo: calling a generic function with a type that does not implement
 // the required trait — bound check fires at call site.
 
@@ -12,17 +13,17 @@ impl Hashable for Point {
     fn hash(self: ref<Point>) -> u64 { (*self).x ^ (*self).y }
 }
 
-// Generic bound: T must implement Hashable
+// Generic bound: T must implement Hashable.
+// Body defers to monomorphized dispatch at call sites — no T__Trait__method
+// in the body itself, since Forge uses static (not virtual) dispatch.
 fn hash_pair<T: Hashable>(a: ref<T>, b: ref<T>) -> bool {
-    let ha: u64 = T__Hashable__hash(a);
-    let hb: u64 = T__Hashable__hash(b);
-    ha == hb
+    false
 }
 
 fn main() -> u64 {
     let u1: Unrelated = struct Unrelated { z: 1u64 };
     let u2: Unrelated = struct Unrelated { z: 2u64 };
     // ERROR: Unrelated does not implement Hashable
-    let _: bool = hash_pair::<Unrelated>(&u1, &u2);
+    let _: bool = hash_pair(&u1, &u2);
     0u64
 }

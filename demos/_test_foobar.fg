@@ -1,0 +1,2 @@
+#[foobar]
+fn foo(x: u64) -> u64 { x }
