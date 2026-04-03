@@ -1,0 +1,194 @@
+// expected: 0
+// Demo 1031: Verified GPU Circle NTT (CFFT) butterfly kernel over M31
+//
+// Circle STARK (stwo) uses a Circle FFT rather than a standard NTT.
+// The circle group C(F_p) has order p+1, and evaluations are over the
+// standard position set — the "circle domain."
+//
+// Circle FFT structure (stwo notation):
+//   Domain: D_n = {(x,y) | x^2 + y^2 = 1} of size 2^n
+//   Folding: at each layer, fold pairs using the x-coordinate as twiddle
+//
+// The circle butterfly at layer k:
+//   Given pair (f(P), f(-P)) and twiddle t = x(P):
+//     f_0 = f(P) + f(-P)       (even part)
+//     f_1 = (f(P) - f(-P)) * t  (odd part, scaled by x-coord)
+//   Output: (f_0, f_1)
+//
+// This is analogous to the standard butterfly but uses the circle group
+// structure. The twiddle factors are x-coordinates of circle points,
+// which are M31 elements.
+//
+// GPU design: N/2 threads, thread tid handles pair (tid, tid + half_n).
+// Twiddle factors are M31 x-coordinates for each pair.
+//
+// Two kernels:
+//   1. cfft_butterfly_kernel: forward CFFT butterfly
+//   2. icfft_butterfly_kernel: inverse CFFT butterfly
+//      f(P)  = (f_0 + f_1 * t_inv) / 2
+//      f(-P) = (f_0 - f_1 * t_inv) / 2
+//      (the /2 = mul by inverse of 2 mod P = (P+1)/2)
+//
+// The M31 constant: INV2 = (M31_P + 1) / 2 = 1073741824
+// (2 * INV2 = P + 1 ≡ 1 mod P)
+//
+// Formal properties proven by Z3:
+//   - Array bounds: tid + half_n < data.len
+//   - Field invariant preserved through m31_add/m31_sub/m31_mul
+
+use std::gpu;
+use std::m31;
+
+// Helper: read one M31 element, proving result < M31_P.
+fn m31_get(arr: span<u32>, idx: u64) -> u32
+    requires idx < arr.len
+    requires forall k: u64, k < arr.len ==> arr[k] < M31_P
+    ensures result < M31_P
+{
+    assert(arr[idx] < M31_P) "forall k instantiated at idx";
+    arr[idx]
+}
+
+// ---- Kernel 1: Circle FFT butterfly (forward) ------------------------------
+//
+// f_even[tid]       = f[tid] + f[tid + half_n]
+// f_odd[tid+half_n] = (f[tid] - f[tid + half_n]) * twiddle[tid]
+//
+// twiddle[tid] = x-coordinate of the circle point for this pair.
+#[kernel]
+fn cfft_butterfly_kernel(data: span<u32>, twiddle: span<u32>, half_n: u64)
+    requires 2u64 * half_n <= data.len
+    requires half_n <= twiddle.len
+    requires forall k: u64, k < data.len    ==> data[k]    < M31_P
+    requires forall k: u64, k < twiddle.len ==> twiddle[k] < M31_P
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < half_n {
+        assert(tid + half_n < data.len) "upper element in bounds";
+        assert(tid < twiddle.len) "twiddle in bounds";
+
+        let fa: u32 = m31_get(data, tid);
+        let fb: u32 = m31_get(data, tid + half_n);
+        let t:  u32 = m31_get(twiddle, tid);
+
+        // even = fa + fb,  odd = (fa - fb) * t
+        let f_even: u32 = m31_add(fa, fb);
+        let diff:   u32 = m31_sub(fa, fb);
+        let f_odd:  u32 = m31_mul(diff, t);
+
+        data[tid]          = f_even;
+        data[tid + half_n] = f_odd;
+    };
+}
+
+// ---- Kernel 2: Circle FFT butterfly (inverse) ------------------------------
+//
+// Inverse of the forward butterfly.
+// Given (f_even, f_odd) and twiddle t:
+//   fa = (f_even + f_odd * t_inv) / 2
+//   fb = (f_even - f_odd * t_inv) / 2
+//
+// where t_inv = the multiplicative inverse of t in M31.
+// Since t is precomputed on CPU (1/t mod P), the host passes inv_twiddle.
+//
+// Division by 2: multiply by INV2 = (P+1)/2 mod P = 1073741824
+// But since INV2 is a fixed constant, the host passes it as inv2.
+#[kernel]
+fn icfft_butterfly_kernel(
+    data: span<u32>, inv_twiddle: span<u32>, inv2: u32, half_n: u64)
+    requires 2u64 * half_n <= data.len
+    requires half_n <= inv_twiddle.len
+    requires inv2 < M31_P
+    requires forall k: u64, k < data.len        ==> data[k]        < M31_P
+    requires forall k: u64, k < inv_twiddle.len ==> inv_twiddle[k] < M31_P
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < half_n {
+        assert(tid + half_n < data.len) "upper element in bounds";
+        assert(tid < inv_twiddle.len) "inv_twiddle in bounds";
+
+        let f_even: u32 = m31_get(data, tid);
+        let f_odd:  u32 = m31_get(data, tid + half_n);
+        let ti:     u32 = m31_get(inv_twiddle, tid);
+
+        // odd_scaled = f_odd * t_inv
+        let odd_scaled: u32 = m31_mul(f_odd, ti);
+
+        // fa = (f_even + odd_scaled) / 2 = (f_even + odd_scaled) * inv2
+        // fb = (f_even - odd_scaled) / 2 = (f_even - odd_scaled) * inv2
+        let sum:  u32 = m31_add(f_even, odd_scaled);
+        let diff: u32 = m31_sub(f_even, odd_scaled);
+        let fa:   u32 = m31_mul(sum,  inv2);
+        let fb:   u32 = m31_mul(diff, inv2);
+
+        data[tid]          = fa;
+        data[tid + half_n] = fb;
+    };
+}
+
+// ---- Kernel 3: Coset evaluation shift --------------------------------------
+//
+// In stwo, evaluations are sometimes on a coset gD rather than D.
+// To shift from D to gD, multiply data[i] by the coset shift factor g^i.
+// The shift_factors array precomputes g^0, g^1, ..., g^{n-1} mod P.
+#[kernel]
+fn cfft_coset_shift_kernel(data: span<u32>, shift_factors: span<u32>, n: u64)
+    requires n <= data.len
+    requires n <= shift_factors.len
+    requires forall k: u64, k < data.len         ==> data[k]         < M31_P
+    requires forall k: u64, k < shift_factors.len ==> shift_factors[k] < M31_P
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        assert(tid < data.len) "data in bounds";
+        assert(tid < shift_factors.len) "shift_factors in bounds";
+
+        let v: u32 = m31_get(data, tid);
+        let s: u32 = m31_get(shift_factors, tid);
+        data[tid] = m31_mul(v, s);
+    };
+}
+
+// ---- Kernel 4: Fold two evaluations into one (FRI fold step) ---------------
+//
+// FRI fold using circle group structure:
+//   new[i] = (eval[i] + eval[i + half] + alpha * (eval[i] - eval[i+half]) * twiddle[i]) / 2
+//
+// This combines the butterfly fold + random linear combination for soundness.
+// alpha is the FRI folding challenge (a QM31 element passed as M31 re/im parts).
+// For the M31 version (alpha in M31, not QM31):
+//   new[i] = eval[i] + alpha * twiddle[i] * (eval[i] - eval[i+half])
+//
+// Output has size half_n.
+#[kernel]
+fn cfft_fri_fold_kernel(
+    out: span<u32>, eval: span<u32>, twiddle: span<u32>, alpha: u32, half_n: u64)
+    requires half_n <= out.len
+    requires 2u64 * half_n <= eval.len
+    requires half_n <= twiddle.len
+    requires alpha < M31_P
+    requires forall k: u64, k < out.len     ==> out[k]     < M31_P
+    requires forall k: u64, k < eval.len    ==> eval[k]    < M31_P
+    requires forall k: u64, k < twiddle.len ==> twiddle[k] < M31_P
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < half_n {
+        assert(tid < out.len) "out in bounds";
+        assert(tid + half_n < eval.len) "eval upper in bounds";
+        assert(tid < twiddle.len) "twiddle in bounds";
+
+        let ea: u32 = m31_get(eval, tid);
+        let eb: u32 = m31_get(eval, tid + half_n);
+        let t:  u32 = m31_get(twiddle, tid);
+
+        // fold = ea + alpha * t * (ea - eb)
+        let diff:    u32 = m31_sub(ea, eb);
+        let td:      u32 = m31_mul(t, diff);
+        let atd:  u32 = m31_mul(alpha, td);
+        let fold: u32 = m31_add(ea, atd);
+
+        out[tid] = fold;
+    };
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,350 @@
+// expected: 0
+// Demo 1029: Verified GPU full Poseidon2 permutation kernel over M31
+//
+// This demo combines all Poseidon2 building blocks into a single-kernel
+// full permutation over width-16 M31 state. One CUDA thread processes
+// one complete Poseidon2 permutation (R_F full + R_P partial + R_F full rounds).
+//
+// Standard Poseidon2 parameters for M31 (as used in Plonky3/stwo):
+//   WIDTH   = 16
+//   R_F     = 4  (half-rounds; total full rounds = 2*R_F = 8)
+//   R_P     = 22 (partial rounds)
+//
+// Round structure for one thread:
+//   External rounds (first half):
+//     for r in 0..R_F:  add_rc(r), sbox_full(), mds_external()
+//   Internal rounds:
+//     for r in 0..R_P:  add_rc_partial(r), sbox_partial(), mds_internal()
+//   External rounds (second half):
+//     for r in 0..R_F:  add_rc(R_F+R_P+r), sbox_full(), mds_external()
+//
+// For verifiability, we unroll 2 external + 1 partial rounds, prove bounds hold
+// at each step. The GPU kernel processes this unrolled sequence.
+//
+// Since fully unrolling 8+22+8 = 38 rounds would be very large, this demo
+// proves the structural correctness of a 1-external + 1-partial + 1-external
+// kernel, demonstrating that the field invariant (all < M31_P) is preserved
+// through each sub-step when inputs are < M31_P.
+//
+// Key invariant: if state[i] < M31_P before each step, then state[i] < M31_P after.
+// This is guaranteed by:
+//   - m31_add, m31_mul postconditions: result < M31_P
+//   - Chained through all 3 step types
+//
+// Formal properties proven by Z3:
+//   - All arithmetic operations maintain x < M31_P throughout
+//   - Array bounds preserved across all sub-steps
+//   - Round constants (from rc/rc_partial) < M31_P via forall + m31_get
+
+use std::gpu;
+use std::m31;
+
+// Helper: read one M31 element, proving result < M31_P.
+fn m31_get(arr: span<u32>, idx: u64) -> u32
+    requires idx < arr.len
+    requires forall k: u64, k < arr.len ==> arr[k] < M31_P
+    ensures result < M31_P
+{
+    assert(arr[idx] < M31_P) "forall k instantiated at idx";
+    arr[idx]
+}
+
+// S-box: x^5 mod P
+fn m31_pow5(x: u32) -> u32
+    requires x < M31_P
+    ensures result < M31_P
+{
+    let x2: u32 = m31_mul(x, x);
+    let x4: u32 = m31_mul(x2, x2);
+    m31_mul(x4, x)
+}
+
+// M4 helper functions (one output per position in the 4-element group)
+fn mds_m4_0(a: u32, b: u32, c: u32, d: u32) -> u32
+    requires a < M31_P  requires b < M31_P
+    requires c < M31_P  requires d < M31_P
+    ensures result < M31_P
+{
+    let t0: u32 = m31_add(a, b);
+    let t1: u32 = m31_add(c, d);
+    let t2: u32 = m31_add(m31_add(b, b), t1);
+    let t3: u32 = m31_add(m31_add(d, d), t0);
+    let four_t0: u32 = m31_add(m31_add(t0, t0), m31_add(t0, t0));
+    let t5: u32 = m31_add(four_t0, t2);
+    m31_add(t3, t5)
+}
+
+fn mds_m4_1(a: u32, b: u32, c: u32, d: u32) -> u32
+    requires a < M31_P  requires b < M31_P
+    requires c < M31_P  requires d < M31_P
+    ensures result < M31_P
+{
+    let t0: u32 = m31_add(a, b);
+    let t1: u32 = m31_add(c, d);
+    let t2: u32 = m31_add(m31_add(b, b), t1);
+    let four_t0: u32 = m31_add(m31_add(t0, t0), m31_add(t0, t0));
+    m31_add(four_t0, t2)
+}
+
+fn mds_m4_2(a: u32, b: u32, c: u32, d: u32) -> u32
+    requires a < M31_P  requires b < M31_P
+    requires c < M31_P  requires d < M31_P
+    ensures result < M31_P
+{
+    let t0: u32 = m31_add(a, b);
+    let t1: u32 = m31_add(c, d);
+    let t2: u32 = m31_add(m31_add(b, b), t1);
+    let t3: u32 = m31_add(m31_add(d, d), t0);
+    let four_t1: u32 = m31_add(m31_add(t1, t1), m31_add(t1, t1));
+    let t4: u32 = m31_add(four_t1, t3);
+    m31_add(t2, t4)
+}
+
+fn mds_m4_3(a: u32, b: u32, c: u32, d: u32) -> u32
+    requires a < M31_P  requires b < M31_P
+    requires c < M31_P  requires d < M31_P
+    ensures result < M31_P
+{
+    let t0: u32 = m31_add(a, b);
+    let t1: u32 = m31_add(c, d);
+    let t3: u32 = m31_add(m31_add(d, d), t0);
+    let four_t1: u32 = m31_add(m31_add(t1, t1), m31_add(t1, t1));
+    m31_add(four_t1, t3)
+}
+
+// ---- GPU kernel: Full Poseidon2 round sequence (1 ext + 1 partial + 1 ext) --
+//
+// Demonstrates preservation of field invariant through:
+//   add_round_constants → sbox_full → mds_external
+//   add_partial_rc      → sbox_partial → mds_internal
+//   add_round_constants → sbox_full → mds_external
+//
+// Round constants: rc[0..15] for external, rc_p for partial element 0,
+// mu[0..15] for internal MDS diagonal.
+// The same rc span is reused for both external rounds in this demo.
+#[kernel]
+fn poseidon2_round_kernel(
+    state:   span<u32>,
+    rc:      span<u32>,
+    mu:      span<u32>,
+    rc_p:    u32,
+    n:       u64)
+    requires n * 16u64 <= state.len
+    requires 16u64 <= rc.len
+    requires 16u64 <= mu.len
+    requires rc_p < M31_P
+    requires forall k: u64, k < state.len ==> state[k] < M31_P
+    requires forall k: u64, k < rc.len    ==> rc[k]    < M31_P
+    requires forall k: u64, k < mu.len    ==> mu[k]    < M31_P
+{
+    let gid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if gid < n {
+        let base: u64 = gid * 16u64;
+        assert(base + 15u64 < state.len) "state block in bounds";
+
+        // ── Step 1: Load initial state ──────────────────────────────────────
+        let e0:  u32 = m31_get(state, base + 0u64);
+        let e1:  u32 = m31_get(state, base + 1u64);
+        let e2:  u32 = m31_get(state, base + 2u64);
+        let e3:  u32 = m31_get(state, base + 3u64);
+        let e4:  u32 = m31_get(state, base + 4u64);
+        let e5:  u32 = m31_get(state, base + 5u64);
+        let e6:  u32 = m31_get(state, base + 6u64);
+        let e7:  u32 = m31_get(state, base + 7u64);
+        let e8:  u32 = m31_get(state, base + 8u64);
+        let e9:  u32 = m31_get(state, base + 9u64);
+        let e10: u32 = m31_get(state, base + 10u64);
+        let e11: u32 = m31_get(state, base + 11u64);
+        let e12: u32 = m31_get(state, base + 12u64);
+        let e13: u32 = m31_get(state, base + 13u64);
+        let e14: u32 = m31_get(state, base + 14u64);
+        let e15: u32 = m31_get(state, base + 15u64);
+
+        // Load round constants
+        let r0:  u32 = m31_get(rc, 0u64);   let r1:  u32 = m31_get(rc, 1u64);
+        let r2:  u32 = m31_get(rc, 2u64);   let r3:  u32 = m31_get(rc, 3u64);
+        let r4:  u32 = m31_get(rc, 4u64);   let r5:  u32 = m31_get(rc, 5u64);
+        let r6:  u32 = m31_get(rc, 6u64);   let r7:  u32 = m31_get(rc, 7u64);
+        let r8:  u32 = m31_get(rc, 8u64);   let r9:  u32 = m31_get(rc, 9u64);
+        let r10: u32 = m31_get(rc, 10u64);  let r11: u32 = m31_get(rc, 11u64);
+        let r12: u32 = m31_get(rc, 12u64);  let r13: u32 = m31_get(rc, 13u64);
+        let r14: u32 = m31_get(rc, 14u64);  let r15: u32 = m31_get(rc, 15u64);
+
+        // Load mu constants
+        let mu0:  u32 = m31_get(mu, 0u64);   let mu1:  u32 = m31_get(mu, 1u64);
+        let mu2:  u32 = m31_get(mu, 2u64);   let mu3:  u32 = m31_get(mu, 3u64);
+        let mu4:  u32 = m31_get(mu, 4u64);   let mu5:  u32 = m31_get(mu, 5u64);
+        let mu6:  u32 = m31_get(mu, 6u64);   let mu7:  u32 = m31_get(mu, 7u64);
+        let mu8:  u32 = m31_get(mu, 8u64);   let mu9:  u32 = m31_get(mu, 9u64);
+        let mu10: u32 = m31_get(mu, 10u64);  let mu11: u32 = m31_get(mu, 11u64);
+        let mu12: u32 = m31_get(mu, 12u64);  let mu13: u32 = m31_get(mu, 13u64);
+        let mu14: u32 = m31_get(mu, 14u64);  let mu15: u32 = m31_get(mu, 15u64);
+
+        // ── Step 2: External round (add_rc → sbox_full → mds_external) ──────
+
+        // 2a. Add round constants
+        let a0:  u32 = m31_add(e0,  r0);   let a1:  u32 = m31_add(e1,  r1);
+        let a2:  u32 = m31_add(e2,  r2);   let a3:  u32 = m31_add(e3,  r3);
+        let a4:  u32 = m31_add(e4,  r4);   let a5:  u32 = m31_add(e5,  r5);
+        let a6:  u32 = m31_add(e6,  r6);   let a7:  u32 = m31_add(e7,  r7);
+        let a8:  u32 = m31_add(e8,  r8);   let a9:  u32 = m31_add(e9,  r9);
+        let a10: u32 = m31_add(e10, r10);  let a11: u32 = m31_add(e11, r11);
+        let a12: u32 = m31_add(e12, r12);  let a13: u32 = m31_add(e13, r13);
+        let a14: u32 = m31_add(e14, r14);  let a15: u32 = m31_add(e15, r15);
+
+        // 2b. S-box (x^5) on all 16
+        let b0:  u32 = m31_pow5(a0);   let b1:  u32 = m31_pow5(a1);
+        let b2:  u32 = m31_pow5(a2);   let b3:  u32 = m31_pow5(a3);
+        let b4:  u32 = m31_pow5(a4);   let b5:  u32 = m31_pow5(a5);
+        let b6:  u32 = m31_pow5(a6);   let b7:  u32 = m31_pow5(a7);
+        let b8:  u32 = m31_pow5(a8);   let b9:  u32 = m31_pow5(a9);
+        let b10: u32 = m31_pow5(a10);  let b11: u32 = m31_pow5(a11);
+        let b12: u32 = m31_pow5(a12);  let b13: u32 = m31_pow5(a13);
+        let b14: u32 = m31_pow5(a14);  let b15: u32 = m31_pow5(a15);
+
+        // 2c. External MDS: sum + M4 on each group of 4
+        let ext1_sum01:   u32 = m31_add(b0, b1);
+        let ext1_sum23:   u32 = m31_add(b2, b3);
+        let ext1_sum45:   u32 = m31_add(b4, b5);
+        let ext1_sum67:   u32 = m31_add(b6, b7);
+        let ext1_sum89:   u32 = m31_add(b8, b9);
+        let ext1_sum1011: u32 = m31_add(b10, b11);
+        let ext1_sum1213: u32 = m31_add(b12, b13);
+        let ext1_sum1415: u32 = m31_add(b14, b15);
+        let ext1_sum0to3:   u32 = m31_add(ext1_sum01, ext1_sum23);
+        let ext1_sum4to7:   u32 = m31_add(ext1_sum45, ext1_sum67);
+        let ext1_sum8to11:  u32 = m31_add(ext1_sum89, ext1_sum1011);
+        let ext1_sum12to15: u32 = m31_add(ext1_sum1213, ext1_sum1415);
+        let ext1_sum0to7:   u32 = m31_add(ext1_sum0to3, ext1_sum4to7);
+        let ext1_sum8to15:  u32 = m31_add(ext1_sum8to11, ext1_sum12to15);
+        let ext1_total:     u32 = m31_add(ext1_sum0to7, ext1_sum8to15);
+
+        let c0:  u32 = m31_add(mds_m4_0(b0, b1, b2, b3), ext1_total);
+        let c1:  u32 = m31_add(mds_m4_1(b0, b1, b2, b3), ext1_total);
+        let c2:  u32 = m31_add(mds_m4_2(b0, b1, b2, b3), ext1_total);
+        let c3:  u32 = m31_add(mds_m4_3(b0, b1, b2, b3), ext1_total);
+        let c4:  u32 = m31_add(mds_m4_0(b4, b5, b6, b7), ext1_total);
+        let c5:  u32 = m31_add(mds_m4_1(b4, b5, b6, b7), ext1_total);
+        let c6:  u32 = m31_add(mds_m4_2(b4, b5, b6, b7), ext1_total);
+        let c7:  u32 = m31_add(mds_m4_3(b4, b5, b6, b7), ext1_total);
+        let c8:  u32 = m31_add(mds_m4_0(b8, b9, b10, b11), ext1_total);
+        let c9:  u32 = m31_add(mds_m4_1(b8, b9, b10, b11), ext1_total);
+        let c10: u32 = m31_add(mds_m4_2(b8, b9, b10, b11), ext1_total);
+        let c11: u32 = m31_add(mds_m4_3(b8, b9, b10, b11), ext1_total);
+        let c12: u32 = m31_add(mds_m4_0(b12, b13, b14, b15), ext1_total);
+        let c13: u32 = m31_add(mds_m4_1(b12, b13, b14, b15), ext1_total);
+        let c14: u32 = m31_add(mds_m4_2(b12, b13, b14, b15), ext1_total);
+        let c15: u32 = m31_add(mds_m4_3(b12, b13, b14, b15), ext1_total);
+
+        // ── Step 3: Partial round (add_rc_partial → sbox_partial → mds_internal)
+
+        // 3a. Add rc_p only to element 0
+        let d0: u32 = m31_add(c0, rc_p);
+
+        // 3b. S-box on element 0 only
+        let f0: u32 = m31_pow5(d0);
+
+        // 3c. Internal MDS: state[i] += mu[i] * sum
+        // Partial sum using d0 (sboxed) for index 0, cN for others
+        let int_sum01:   u32 = m31_add(f0, c1);
+        let int_sum23:   u32 = m31_add(c2, c3);
+        let int_sum45:   u32 = m31_add(c4, c5);
+        let int_sum67:   u32 = m31_add(c6, c7);
+        let int_sum89:   u32 = m31_add(c8, c9);
+        let int_sum1011: u32 = m31_add(c10, c11);
+        let int_sum1213: u32 = m31_add(c12, c13);
+        let int_sum1415: u32 = m31_add(c14, c15);
+        let int_sum0to3:   u32 = m31_add(int_sum01, int_sum23);
+        let int_sum4to7:   u32 = m31_add(int_sum45, int_sum67);
+        let int_sum8to11:  u32 = m31_add(int_sum89, int_sum1011);
+        let int_sum12to15: u32 = m31_add(int_sum1213, int_sum1415);
+        let int_sum0to7:   u32 = m31_add(int_sum0to3, int_sum4to7);
+        let int_sum8to15:  u32 = m31_add(int_sum8to11, int_sum12to15);
+        let int_total:     u32 = m31_add(int_sum0to7, int_sum8to15);
+
+        let g0:  u32 = m31_add(f0, m31_mul(mu0,  int_total));
+        let g1:  u32 = m31_add(c1, m31_mul(mu1,  int_total));
+        let g2:  u32 = m31_add(c2, m31_mul(mu2,  int_total));
+        let g3:  u32 = m31_add(c3, m31_mul(mu3,  int_total));
+        let g4:  u32 = m31_add(c4, m31_mul(mu4,  int_total));
+        let g5:  u32 = m31_add(c5, m31_mul(mu5,  int_total));
+        let g6:  u32 = m31_add(c6, m31_mul(mu6,  int_total));
+        let g7:  u32 = m31_add(c7, m31_mul(mu7,  int_total));
+        let g8:  u32 = m31_add(c8, m31_mul(mu8,  int_total));
+        let g9:  u32 = m31_add(c9, m31_mul(mu9,  int_total));
+        let g10: u32 = m31_add(c10, m31_mul(mu10, int_total));
+        let g11: u32 = m31_add(c11, m31_mul(mu11, int_total));
+        let g12: u32 = m31_add(c12, m31_mul(mu12, int_total));
+        let g13: u32 = m31_add(c13, m31_mul(mu13, int_total));
+        let g14: u32 = m31_add(c14, m31_mul(mu14, int_total));
+        let g15: u32 = m31_add(c15, m31_mul(mu15, int_total));
+
+        // ── Step 4: External round (add_rc → sbox_full → mds_external) ──────
+
+        // 4a. Add round constants again (same rc span reused for this demo)
+        let h0:  u32 = m31_add(g0,  r0);   let h1:  u32 = m31_add(g1,  r1);
+        let h2:  u32 = m31_add(g2,  r2);   let h3:  u32 = m31_add(g3,  r3);
+        let h4:  u32 = m31_add(g4,  r4);   let h5:  u32 = m31_add(g5,  r5);
+        let h6:  u32 = m31_add(g6,  r6);   let h7:  u32 = m31_add(g7,  r7);
+        let h8:  u32 = m31_add(g8,  r8);   let h9:  u32 = m31_add(g9,  r9);
+        let h10: u32 = m31_add(g10, r10);  let h11: u32 = m31_add(g11, r11);
+        let h12: u32 = m31_add(g12, r12);  let h13: u32 = m31_add(g13, r13);
+        let h14: u32 = m31_add(g14, r14);  let h15: u32 = m31_add(g15, r15);
+
+        // 4b. S-box on all 16
+        let p0:  u32 = m31_pow5(h0);   let p1:  u32 = m31_pow5(h1);
+        let p2:  u32 = m31_pow5(h2);   let p3:  u32 = m31_pow5(h3);
+        let p4:  u32 = m31_pow5(h4);   let p5:  u32 = m31_pow5(h5);
+        let p6:  u32 = m31_pow5(h6);   let p7:  u32 = m31_pow5(h7);
+        let p8:  u32 = m31_pow5(h8);   let p9:  u32 = m31_pow5(h9);
+        let p10: u32 = m31_pow5(h10);  let p11: u32 = m31_pow5(h11);
+        let p12: u32 = m31_pow5(h12);  let p13: u32 = m31_pow5(h13);
+        let p14: u32 = m31_pow5(h14);  let p15: u32 = m31_pow5(h15);
+
+        // 4c. External MDS
+        let ext2_sum01:   u32 = m31_add(p0, p1);
+        let ext2_sum23:   u32 = m31_add(p2, p3);
+        let ext2_sum45:   u32 = m31_add(p4, p5);
+        let ext2_sum67:   u32 = m31_add(p6, p7);
+        let ext2_sum89:   u32 = m31_add(p8, p9);
+        let ext2_sum1011: u32 = m31_add(p10, p11);
+        let ext2_sum1213: u32 = m31_add(p12, p13);
+        let ext2_sum1415: u32 = m31_add(p14, p15);
+        let ext2_sum0to3:   u32 = m31_add(ext2_sum01, ext2_sum23);
+        let ext2_sum4to7:   u32 = m31_add(ext2_sum45, ext2_sum67);
+        let ext2_sum8to11:  u32 = m31_add(ext2_sum89, ext2_sum1011);
+        let ext2_sum12to15: u32 = m31_add(ext2_sum1213, ext2_sum1415);
+        let ext2_sum0to7:   u32 = m31_add(ext2_sum0to3, ext2_sum4to7);
+        let ext2_sum8to15:  u32 = m31_add(ext2_sum8to11, ext2_sum12to15);
+        let ext2_total:     u32 = m31_add(ext2_sum0to7, ext2_sum8to15);
+
+        let j0:  u32 = m31_add(mds_m4_0(p0, p1, p2, p3), ext2_total);
+        let j1:  u32 = m31_add(mds_m4_1(p0, p1, p2, p3), ext2_total);
+        let j2:  u32 = m31_add(mds_m4_2(p0, p1, p2, p3), ext2_total);
+        let j3:  u32 = m31_add(mds_m4_3(p0, p1, p2, p3), ext2_total);
+        let j4:  u32 = m31_add(mds_m4_0(p4, p5, p6, p7), ext2_total);
+        let j5:  u32 = m31_add(mds_m4_1(p4, p5, p6, p7), ext2_total);
+        let j6:  u32 = m31_add(mds_m4_2(p4, p5, p6, p7), ext2_total);
+        let j7:  u32 = m31_add(mds_m4_3(p4, p5, p6, p7), ext2_total);
+        let j8:  u32 = m31_add(mds_m4_0(p8, p9, p10, p11), ext2_total);
+        let j9:  u32 = m31_add(mds_m4_1(p8, p9, p10, p11), ext2_total);
+        let j10: u32 = m31_add(mds_m4_2(p8, p9, p10, p11), ext2_total);
+        let j11: u32 = m31_add(mds_m4_3(p8, p9, p10, p11), ext2_total);
+        let j12: u32 = m31_add(mds_m4_0(p12, p13, p14, p15), ext2_total);
+        let j13: u32 = m31_add(mds_m4_1(p12, p13, p14, p15), ext2_total);
+        let j14: u32 = m31_add(mds_m4_2(p12, p13, p14, p15), ext2_total);
+        let j15: u32 = m31_add(mds_m4_3(p12, p13, p14, p15), ext2_total);
+
+        // ── Step 5: Write final state ────────────────────────────────────────
+        state[base + 0u64]  = j0;   state[base + 1u64]  = j1;
+        state[base + 2u64]  = j2;   state[base + 3u64]  = j3;
+        state[base + 4u64]  = j4;   state[base + 5u64]  = j5;
+        state[base + 6u64]  = j6;   state[base + 7u64]  = j7;
+        state[base + 8u64]  = j8;   state[base + 9u64]  = j9;
+        state[base + 10u64] = j10;  state[base + 11u64] = j11;
+        state[base + 12u64] = j12;  state[base + 13u64] = j13;
+        state[base + 14u64] = j14;  state[base + 15u64] = j15;
+    };
+}
+
+fn main() -> u64 { 0u64 }

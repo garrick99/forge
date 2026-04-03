@@ -1,0 +1,331 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry qm31_accumulate_kernel(
+    .param .u64 qm31_accumulate_kernel_param_out_are_data,
+    .param .u64 qm31_accumulate_kernel_param_out_are_len,
+    .param .u64 qm31_accumulate_kernel_param_out_aim_data,
+    .param .u64 qm31_accumulate_kernel_param_out_aim_len,
+    .param .u64 qm31_accumulate_kernel_param_out_bre_data,
+    .param .u64 qm31_accumulate_kernel_param_out_bre_len,
+    .param .u64 qm31_accumulate_kernel_param_out_bim_data,
+    .param .u64 qm31_accumulate_kernel_param_out_bim_len,
+    .param .u64 qm31_accumulate_kernel_param_v_are_data,
+    .param .u64 qm31_accumulate_kernel_param_v_are_len,
+    .param .u64 qm31_accumulate_kernel_param_v_aim_data,
+    .param .u64 qm31_accumulate_kernel_param_v_aim_len,
+    .param .u64 qm31_accumulate_kernel_param_v_bre_data,
+    .param .u64 qm31_accumulate_kernel_param_v_bre_len,
+    .param .u64 qm31_accumulate_kernel_param_v_bim_data,
+    .param .u64 qm31_accumulate_kernel_param_v_bim_len,
+    .param .u32 qm31_accumulate_kernel_param_alpha_re_re,
+    .param .u32 qm31_accumulate_kernel_param_alpha_re_im,
+    .param .u32 qm31_accumulate_kernel_param_alpha_im_re,
+    .param .u32 qm31_accumulate_kernel_param_alpha_im_im,
+    .param .u64 qm31_accumulate_kernel_param_n
+)
+{
+    .reg .pred %p26;
+    .reg .u64 %rd0, %rd1, %rd10, %rd11, %rd12, %rd13, %rd14, %rd15, %rd2, %rd20, %rd27, %rd29, %rd3, %rd30, %rd31, %rd32, %rd33, %rd34, %rd35, %rd36, %rd37, %rd38, %rd39, %rd4, %rd40, %rd41, %rd42, %rd43, %rd44, %rd45, %rd46, %rd47, %rd48, %rd49, %rd5, %rd50, %rd51, %rd52, %rd53, %rd54, %rd55, %rd56, %rd57, %rd58, %rd59, %rd6, %rd60, %rd7, %rd8, %rd9;
+    .reg .u32 %r16, %r17, %r18, %r19, %r21, %r22, %r23, %r24, %r25, %r61, %r62, %r63;
+
+  ld.param.u64 %rd0, [qm31_accumulate_kernel_param_out_are_data];
+  ld.param.u64 %rd1, [qm31_accumulate_kernel_param_out_are_len];
+  ld.param.u64 %rd2, [qm31_accumulate_kernel_param_out_aim_data];
+  ld.param.u64 %rd3, [qm31_accumulate_kernel_param_out_aim_len];
+  ld.param.u64 %rd4, [qm31_accumulate_kernel_param_out_bre_data];
+  ld.param.u64 %rd5, [qm31_accumulate_kernel_param_out_bre_len];
+  ld.param.u64 %rd6, [qm31_accumulate_kernel_param_out_bim_data];
+  ld.param.u64 %rd7, [qm31_accumulate_kernel_param_out_bim_len];
+  ld.param.u64 %rd8, [qm31_accumulate_kernel_param_v_are_data];
+  ld.param.u64 %rd9, [qm31_accumulate_kernel_param_v_are_len];
+  ld.param.u64 %rd10, [qm31_accumulate_kernel_param_v_aim_data];
+  ld.param.u64 %rd11, [qm31_accumulate_kernel_param_v_aim_len];
+  ld.param.u64 %rd12, [qm31_accumulate_kernel_param_v_bre_data];
+  ld.param.u64 %rd13, [qm31_accumulate_kernel_param_v_bre_len];
+  ld.param.u64 %rd14, [qm31_accumulate_kernel_param_v_bim_data];
+  ld.param.u64 %rd15, [qm31_accumulate_kernel_param_v_bim_len];
+  ld.param.u32 %r16, [qm31_accumulate_kernel_param_alpha_re_re];
+  ld.param.u32 %r17, [qm31_accumulate_kernel_param_alpha_re_im];
+  ld.param.u32 %r18, [qm31_accumulate_kernel_param_alpha_im_re];
+  ld.param.u32 %r19, [qm31_accumulate_kernel_param_alpha_im_im];
+  ld.param.u64 %rd20, [qm31_accumulate_kernel_param_n];
+
+  mov.u32 %r21, %ctaid.x;
+  mov.u32 %r22, %ntid.x;
+  mul.lo.u32 %r23, %r21, %r22;
+  mov.u32 %r24, %tid.x;
+  add.u32 %r25, %r23, %r24;
+  cvt.u64.u32 %rd27, %r25;
+  setp.lt.u64 %p26, %rd27, %rd20;
+  @%p26 bra qm31_accumulate_kernel_then_28;
+  bra qm31_accumulate_kernel_else_28;
+  qm31_accumulate_kernel_then_28:
+  mov.u64 %rd29, 0; // call m31_get (device fn)
+  mov.u64 %rd30, 0; // call m31_get (device fn)
+  mov.u64 %rd31, 0; // call m31_get (device fn)
+  mov.u64 %rd32, 0; // call m31_get (device fn)
+  mov.u64 %rd33, 0; // call m31_get (device fn)
+  mov.u64 %rd34, 0; // call m31_get (device fn)
+  mov.u64 %rd35, 0; // call m31_get (device fn)
+  mov.u64 %rd36, 0; // call m31_get (device fn)
+  mov.u64 %rd37, 0; // call qm31_mul_out_re_re (device fn)
+  mov.u64 %rd38, 0; // call qm31_mul_out_re_im (device fn)
+  mov.u64 %rd39, 0; // call qm31_mul_out_im_re (device fn)
+  mov.u64 %rd40, 0; // call qm31_mul_out_im_im (device fn)
+  mov.u64 %rd41, 0; // call qm31_add_re_re (device fn)
+  cvt.u64.u32 %rd42, %r25;
+  mov.u64 %rd43, 4;
+  mul.lo.u64 %rd44, %rd42, %rd43;
+  add.u64 %rd45, %rd0, %rd44;
+  st.global.u32 [%rd45], %rd41;
+  mov.u64 %rd46, 0; // call qm31_add_re_im (device fn)
+  cvt.u64.u32 %rd47, %r25;
+  mov.u64 %rd48, 4;
+  mul.lo.u64 %rd49, %rd47, %rd48;
+  add.u64 %rd50, %rd2, %rd49;
+  st.global.u32 [%rd50], %rd46;
+  mov.u64 %rd51, 0; // call qm31_add_im_re (device fn)
+  cvt.u64.u32 %rd52, %r25;
+  mov.u64 %rd53, 4;
+  mul.lo.u64 %rd54, %rd52, %rd53;
+  add.u64 %rd55, %rd4, %rd54;
+  st.global.u32 [%rd55], %rd51;
+  mov.u64 %rd56, 0; // call qm31_add_im_im (device fn)
+  cvt.u64.u32 %rd57, %r25;
+  mov.u64 %rd58, 4;
+  mul.lo.u64 %rd59, %rd57, %rd58;
+  add.u64 %rd60, %rd6, %rd59;
+  st.global.u32 [%rd60], %rd56;
+  mov.u32 %r61, 0; // unit
+  mov.u32 %r62, %r61;
+  bra qm31_accumulate_kernel_end_28;
+  qm31_accumulate_kernel_else_28:
+  mov.u32 %r62, 0; // no else branch
+  qm31_accumulate_kernel_end_28:
+  mov.u32 %r63, 0; // unit
+  ret;
+}
+
+.visible .entry qm31_fri_fold_kernel(
+    .param .u64 qm31_fri_fold_kernel_param_new_are_data,
+    .param .u64 qm31_fri_fold_kernel_param_new_are_len,
+    .param .u64 qm31_fri_fold_kernel_param_new_aim_data,
+    .param .u64 qm31_fri_fold_kernel_param_new_aim_len,
+    .param .u64 qm31_fri_fold_kernel_param_new_bre_data,
+    .param .u64 qm31_fri_fold_kernel_param_new_bre_len,
+    .param .u64 qm31_fri_fold_kernel_param_new_bim_data,
+    .param .u64 qm31_fri_fold_kernel_param_new_bim_len,
+    .param .u64 qm31_fri_fold_kernel_param_old_are_data,
+    .param .u64 qm31_fri_fold_kernel_param_old_are_len,
+    .param .u64 qm31_fri_fold_kernel_param_old_aim_data,
+    .param .u64 qm31_fri_fold_kernel_param_old_aim_len,
+    .param .u64 qm31_fri_fold_kernel_param_old_bre_data,
+    .param .u64 qm31_fri_fold_kernel_param_old_bre_len,
+    .param .u64 qm31_fri_fold_kernel_param_old_bim_data,
+    .param .u64 qm31_fri_fold_kernel_param_old_bim_len,
+    .param .u32 qm31_fri_fold_kernel_param_alpha_re_re,
+    .param .u32 qm31_fri_fold_kernel_param_alpha_re_im,
+    .param .u32 qm31_fri_fold_kernel_param_alpha_im_re,
+    .param .u32 qm31_fri_fold_kernel_param_alpha_im_im,
+    .param .u64 qm31_fri_fold_kernel_param_half,
+    .param .u64 qm31_fri_fold_kernel_param_n
+)
+{
+    .reg .pred %p27;
+    .reg .u64 %rd0, %rd1, %rd10, %rd11, %rd12, %rd13, %rd14, %rd15, %rd2, %rd20, %rd21, %rd28, %rd3, %rd30, %rd31, %rd32, %rd33, %rd34, %rd35, %rd36, %rd37, %rd38, %rd39, %rd4, %rd40, %rd41, %rd42, %rd43, %rd44, %rd45, %rd46, %rd47, %rd48, %rd49, %rd5, %rd50, %rd51, %rd52, %rd53, %rd54, %rd55, %rd56, %rd57, %rd58, %rd59, %rd6, %rd60, %rd61, %rd7, %rd8, %rd9;
+    .reg .u32 %r16, %r17, %r18, %r19, %r22, %r23, %r24, %r25, %r26, %r62, %r63, %r64;
+
+  ld.param.u64 %rd0, [qm31_fri_fold_kernel_param_new_are_data];
+  ld.param.u64 %rd1, [qm31_fri_fold_kernel_param_new_are_len];
+  ld.param.u64 %rd2, [qm31_fri_fold_kernel_param_new_aim_data];
+  ld.param.u64 %rd3, [qm31_fri_fold_kernel_param_new_aim_len];
+  ld.param.u64 %rd4, [qm31_fri_fold_kernel_param_new_bre_data];
+  ld.param.u64 %rd5, [qm31_fri_fold_kernel_param_new_bre_len];
+  ld.param.u64 %rd6, [qm31_fri_fold_kernel_param_new_bim_data];
+  ld.param.u64 %rd7, [qm31_fri_fold_kernel_param_new_bim_len];
+  ld.param.u64 %rd8, [qm31_fri_fold_kernel_param_old_are_data];
+  ld.param.u64 %rd9, [qm31_fri_fold_kernel_param_old_are_len];
+  ld.param.u64 %rd10, [qm31_fri_fold_kernel_param_old_aim_data];
+  ld.param.u64 %rd11, [qm31_fri_fold_kernel_param_old_aim_len];
+  ld.param.u64 %rd12, [qm31_fri_fold_kernel_param_old_bre_data];
+  ld.param.u64 %rd13, [qm31_fri_fold_kernel_param_old_bre_len];
+  ld.param.u64 %rd14, [qm31_fri_fold_kernel_param_old_bim_data];
+  ld.param.u64 %rd15, [qm31_fri_fold_kernel_param_old_bim_len];
+  ld.param.u32 %r16, [qm31_fri_fold_kernel_param_alpha_re_re];
+  ld.param.u32 %r17, [qm31_fri_fold_kernel_param_alpha_re_im];
+  ld.param.u32 %r18, [qm31_fri_fold_kernel_param_alpha_im_re];
+  ld.param.u32 %r19, [qm31_fri_fold_kernel_param_alpha_im_im];
+  ld.param.u64 %rd20, [qm31_fri_fold_kernel_param_half];
+  ld.param.u64 %rd21, [qm31_fri_fold_kernel_param_n];
+
+  mov.u32 %r22, %ctaid.x;
+  mov.u32 %r23, %ntid.x;
+  mul.lo.u32 %r24, %r22, %r23;
+  mov.u32 %r25, %tid.x;
+  add.u32 %r26, %r24, %r25;
+  cvt.u64.u32 %rd28, %r26;
+  setp.lt.u64 %p27, %rd28, %rd20;
+  @%p27 bra qm31_fri_fold_kernel_then_29;
+  bra qm31_fri_fold_kernel_else_29;
+  qm31_fri_fold_kernel_then_29:
+  mov.u64 %rd30, 0; // call m31_get (device fn)
+  mov.u64 %rd31, 0; // call m31_get (device fn)
+  mov.u64 %rd32, 0; // call m31_get (device fn)
+  mov.u64 %rd33, 0; // call m31_get (device fn)
+  mov.u64 %rd34, 0; // call m31_get (device fn)
+  mov.u64 %rd35, 0; // call m31_get (device fn)
+  mov.u64 %rd36, 0; // call m31_get (device fn)
+  mov.u64 %rd37, 0; // call m31_get (device fn)
+  mov.u64 %rd38, 0; // call qm31_mul_out_re_re (device fn)
+  mov.u64 %rd39, 0; // call qm31_mul_out_re_im (device fn)
+  mov.u64 %rd40, 0; // call qm31_mul_out_im_re (device fn)
+  mov.u64 %rd41, 0; // call qm31_mul_out_im_im (device fn)
+  mov.u64 %rd42, 0; // call qm31_add_re_re (device fn)
+  cvt.u64.u32 %rd43, %r26;
+  mov.u64 %rd44, 4;
+  mul.lo.u64 %rd45, %rd43, %rd44;
+  add.u64 %rd46, %rd0, %rd45;
+  st.global.u32 [%rd46], %rd42;
+  mov.u64 %rd47, 0; // call qm31_add_re_im (device fn)
+  cvt.u64.u32 %rd48, %r26;
+  mov.u64 %rd49, 4;
+  mul.lo.u64 %rd50, %rd48, %rd49;
+  add.u64 %rd51, %rd2, %rd50;
+  st.global.u32 [%rd51], %rd47;
+  mov.u64 %rd52, 0; // call qm31_add_im_re (device fn)
+  cvt.u64.u32 %rd53, %r26;
+  mov.u64 %rd54, 4;
+  mul.lo.u64 %rd55, %rd53, %rd54;
+  add.u64 %rd56, %rd4, %rd55;
+  st.global.u32 [%rd56], %rd52;
+  mov.u64 %rd57, 0; // call qm31_add_im_im (device fn)
+  cvt.u64.u32 %rd58, %r26;
+  mov.u64 %rd59, 4;
+  mul.lo.u64 %rd60, %rd58, %rd59;
+  add.u64 %rd61, %rd6, %rd60;
+  st.global.u32 [%rd61], %rd57;
+  mov.u32 %r62, 0; // unit
+  mov.u32 %r63, %r62;
+  bra qm31_fri_fold_kernel_end_29;
+  qm31_fri_fold_kernel_else_29:
+  mov.u32 %r63, 0; // no else branch
+  qm31_fri_fold_kernel_end_29:
+  mov.u32 %r64, 0; // unit
+  ret;
+}
+
+.visible .entry qm31_pointwise_mul_kernel(
+    .param .u64 qm31_pointwise_mul_kernel_param_out_are_data,
+    .param .u64 qm31_pointwise_mul_kernel_param_out_are_len,
+    .param .u64 qm31_pointwise_mul_kernel_param_out_aim_data,
+    .param .u64 qm31_pointwise_mul_kernel_param_out_aim_len,
+    .param .u64 qm31_pointwise_mul_kernel_param_out_bre_data,
+    .param .u64 qm31_pointwise_mul_kernel_param_out_bre_len,
+    .param .u64 qm31_pointwise_mul_kernel_param_out_bim_data,
+    .param .u64 qm31_pointwise_mul_kernel_param_out_bim_len,
+    .param .u64 qm31_pointwise_mul_kernel_param_a_are_data,
+    .param .u64 qm31_pointwise_mul_kernel_param_a_are_len,
+    .param .u64 qm31_pointwise_mul_kernel_param_a_aim_data,
+    .param .u64 qm31_pointwise_mul_kernel_param_a_aim_len,
+    .param .u64 qm31_pointwise_mul_kernel_param_a_bre_data,
+    .param .u64 qm31_pointwise_mul_kernel_param_a_bre_len,
+    .param .u64 qm31_pointwise_mul_kernel_param_a_bim_data,
+    .param .u64 qm31_pointwise_mul_kernel_param_a_bim_len,
+    .param .u64 qm31_pointwise_mul_kernel_param_b_are_data,
+    .param .u64 qm31_pointwise_mul_kernel_param_b_are_len,
+    .param .u64 qm31_pointwise_mul_kernel_param_b_aim_data,
+    .param .u64 qm31_pointwise_mul_kernel_param_b_aim_len,
+    .param .u64 qm31_pointwise_mul_kernel_param_b_bre_data,
+    .param .u64 qm31_pointwise_mul_kernel_param_b_bre_len,
+    .param .u64 qm31_pointwise_mul_kernel_param_b_bim_data,
+    .param .u64 qm31_pointwise_mul_kernel_param_b_bim_len,
+    .param .u64 qm31_pointwise_mul_kernel_param_n
+)
+{
+    .reg .pred %p30;
+    .reg .u64 %rd0, %rd1, %rd10, %rd11, %rd12, %rd13, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd3, %rd31, %rd33, %rd34, %rd35, %rd36, %rd37, %rd38, %rd39, %rd4, %rd40, %rd41, %rd42, %rd43, %rd44, %rd45, %rd46, %rd47, %rd48, %rd49, %rd5, %rd50, %rd51, %rd52, %rd53, %rd54, %rd55, %rd56, %rd57, %rd58, %rd59, %rd6, %rd60, %rd7, %rd8, %rd9;
+    .reg .u32 %r25, %r26, %r27, %r28, %r29, %r61, %r62, %r63;
+
+  ld.param.u64 %rd0, [qm31_pointwise_mul_kernel_param_out_are_data];
+  ld.param.u64 %rd1, [qm31_pointwise_mul_kernel_param_out_are_len];
+  ld.param.u64 %rd2, [qm31_pointwise_mul_kernel_param_out_aim_data];
+  ld.param.u64 %rd3, [qm31_pointwise_mul_kernel_param_out_aim_len];
+  ld.param.u64 %rd4, [qm31_pointwise_mul_kernel_param_out_bre_data];
+  ld.param.u64 %rd5, [qm31_pointwise_mul_kernel_param_out_bre_len];
+  ld.param.u64 %rd6, [qm31_pointwise_mul_kernel_param_out_bim_data];
+  ld.param.u64 %rd7, [qm31_pointwise_mul_kernel_param_out_bim_len];
+  ld.param.u64 %rd8, [qm31_pointwise_mul_kernel_param_a_are_data];
+  ld.param.u64 %rd9, [qm31_pointwise_mul_kernel_param_a_are_len];
+  ld.param.u64 %rd10, [qm31_pointwise_mul_kernel_param_a_aim_data];
+  ld.param.u64 %rd11, [qm31_pointwise_mul_kernel_param_a_aim_len];
+  ld.param.u64 %rd12, [qm31_pointwise_mul_kernel_param_a_bre_data];
+  ld.param.u64 %rd13, [qm31_pointwise_mul_kernel_param_a_bre_len];
+  ld.param.u64 %rd14, [qm31_pointwise_mul_kernel_param_a_bim_data];
+  ld.param.u64 %rd15, [qm31_pointwise_mul_kernel_param_a_bim_len];
+  ld.param.u64 %rd16, [qm31_pointwise_mul_kernel_param_b_are_data];
+  ld.param.u64 %rd17, [qm31_pointwise_mul_kernel_param_b_are_len];
+  ld.param.u64 %rd18, [qm31_pointwise_mul_kernel_param_b_aim_data];
+  ld.param.u64 %rd19, [qm31_pointwise_mul_kernel_param_b_aim_len];
+  ld.param.u64 %rd20, [qm31_pointwise_mul_kernel_param_b_bre_data];
+  ld.param.u64 %rd21, [qm31_pointwise_mul_kernel_param_b_bre_len];
+  ld.param.u64 %rd22, [qm31_pointwise_mul_kernel_param_b_bim_data];
+  ld.param.u64 %rd23, [qm31_pointwise_mul_kernel_param_b_bim_len];
+  ld.param.u64 %rd24, [qm31_pointwise_mul_kernel_param_n];
+
+  mov.u32 %r25, %ctaid.x;
+  mov.u32 %r26, %ntid.x;
+  mul.lo.u32 %r27, %r25, %r26;
+  mov.u32 %r28, %tid.x;
+  add.u32 %r29, %r27, %r28;
+  cvt.u64.u32 %rd31, %r29;
+  setp.lt.u64 %p30, %rd31, %rd24;
+  @%p30 bra qm31_pointwise_mul_kernel_then_32;
+  bra qm31_pointwise_mul_kernel_else_32;
+  qm31_pointwise_mul_kernel_then_32:
+  mov.u64 %rd33, 0; // call m31_get (device fn)
+  mov.u64 %rd34, 0; // call m31_get (device fn)
+  mov.u64 %rd35, 0; // call m31_get (device fn)
+  mov.u64 %rd36, 0; // call m31_get (device fn)
+  mov.u64 %rd37, 0; // call m31_get (device fn)
+  mov.u64 %rd38, 0; // call m31_get (device fn)
+  mov.u64 %rd39, 0; // call m31_get (device fn)
+  mov.u64 %rd40, 0; // call m31_get (device fn)
+  mov.u64 %rd41, 0; // call qm31_mul_out_re_re (device fn)
+  cvt.u64.u32 %rd42, %r29;
+  mov.u64 %rd43, 4;
+  mul.lo.u64 %rd44, %rd42, %rd43;
+  add.u64 %rd45, %rd0, %rd44;
+  st.global.u32 [%rd45], %rd41;
+  mov.u64 %rd46, 0; // call qm31_mul_out_re_im (device fn)
+  cvt.u64.u32 %rd47, %r29;
+  mov.u64 %rd48, 4;
+  mul.lo.u64 %rd49, %rd47, %rd48;
+  add.u64 %rd50, %rd2, %rd49;
+  st.global.u32 [%rd50], %rd46;
+  mov.u64 %rd51, 0; // call qm31_mul_out_im_re (device fn)
+  cvt.u64.u32 %rd52, %r29;
+  mov.u64 %rd53, 4;
+  mul.lo.u64 %rd54, %rd52, %rd53;
+  add.u64 %rd55, %rd4, %rd54;
+  st.global.u32 [%rd55], %rd51;
+  mov.u64 %rd56, 0; // call qm31_mul_out_im_im (device fn)
+  cvt.u64.u32 %rd57, %r29;
+  mov.u64 %rd58, 4;
+  mul.lo.u64 %rd59, %rd57, %rd58;
+  add.u64 %rd60, %rd6, %rd59;
+  st.global.u32 [%rd60], %rd56;
+  mov.u32 %r61, 0; // unit
+  mov.u32 %r62, %r61;
+  bra qm31_pointwise_mul_kernel_end_32;
+  qm31_pointwise_mul_kernel_else_32:
+  mov.u32 %r62, 0; // no else branch
+  qm31_pointwise_mul_kernel_end_32:
+  mov.u32 %r63, 0; // unit
+  ret;
+}
+

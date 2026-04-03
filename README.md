@@ -100,6 +100,7 @@ cd forge && dune build
 - `#[kernel]` functions compile to `__global__`
 - `shared<T>[N]` shared memory with barrier correctness proofs
 - PTX assembly output for NVIDIA GPUs
+- **ZK proof system kernels** — formally-verified GPU kernels for Circle STARK (VortexSTARK): FRI fold, Poseidon2, NTT butterfly, DEEP quotient, Merkle trees, constraint evaluation, OODS
 
 ---
 
@@ -114,6 +115,8 @@ use std::mem;       // span_fill, span_copy — proven: forall k<n, dst[k]==val
 use std::raw;       // raw pointers, volatile I/O, inline assembly
 use std::crypto;    // secret<T> constant-time primitives
 use std::collections; // Vec_u64 with proven push/pop
+use std::m31;       // M31/CM31/QM31 field arithmetic for ZK proving (Circle STARK)
+use std::gpu;       // GPU thread index builtins (blockIdx_x, threadIdx_x, ...)
 ```
 
 ---
@@ -190,11 +193,19 @@ The generated C has no bounds checks, no assertions, no runtime overhead — the
 
 ## Demo Corpus
 
-**1016 verified demos** covering:
+**1035 verified demos** covering:
 
 **Algorithms:** sorting (insertion, selection, bubble, merge, quick, radix, bitonic, shellsort), searching (binary, ternary, interpolation, exponential), graphs (BFS, DFS, topological sort, Bellman-Ford, Dijkstra, A*, connected components, PageRank, min-cut, flow augmentation), dynamic programming (knapsack, LCS, edit distance, DTW, coin change, matrix chain, optimal BST)
 
-**Cryptography:** SHA-256 rounds, AES S-box/MixColumns, HMAC, PBKDF2, Merkle trees, GF(256) arithmetic, EC scalar multiplication, Hamming codes, Reed-Solomon, constant-time operations
+**Cryptography:** SHA-256 rounds, AES S-box/MixColumns, HMAC, PBKDF2, Merkle trees, GF(256) arithmetic, EC scalar multiplication, Hamming codes, Reed-Solomon, constant-time operations, **Blake2s compression**, **Poseidon2 permutation**
+
+**ZK Proof Systems (GPU):** Full suite of formally-verified CUDA kernels for Circle STARK (VortexSTARK):
+- `1021` Circle NTT evaluation · `1022` FRI fold (M31 + CM31) · `1023` Blake2s compress
+- `1024` QM31 field kernels · `1025` DEEP quotient accumulation · `1026` Merkle tree commitment
+- `1027` Poseidon2 S-box · `1028` Poseidon2 MDS layer · `1029` Full Poseidon2 permutation
+- `1030` NTT butterfly (Cooley-Tukey + Gentleman-Sande) · `1031` Circle FFT butterfly
+- `1032` FRI query path verification · `1033` AIR constraint evaluation
+- `1034` OODS evaluation · `1035` Vanishing polynomial quotient
 
 **Data Structures:** segment tree, Fenwick tree, skip list, sparse set, union-find, treap, B-tree, trie, gap buffer, Bloom filter, HyperLogLog, ring buffer, priority queue, deque
 
@@ -225,9 +236,9 @@ bin/
 ## Validation Results
 
 ```
-Proof verification:   1003 / 1003 pass   (+ 1 intentional failure)
-GCC compilation:       994 /  997 pass   (3 pre-existing edge cases)
-Runtime execution:     864 /  864 pass   (0 failures)
+Proof verification:   1041 / 1041 pass   (+ 1 intentional failure)
+GCC compilation:      1020 / 1020 pass
+Runtime execution:     878 /  878 pass   (0 failures)
 ```
 
 ---

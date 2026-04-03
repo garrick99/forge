@@ -1,0 +1,173 @@
+// expected: 0
+// Demo 1030: Verified GPU NTT butterfly kernel over M31
+//
+// The Number Theoretic Transform (NTT) is the core of FRI commitment in
+// VortexSTARK. The butterfly operation is the fundamental building block
+// of the Cooley-Tukey radix-2 NTT.
+//
+// Cooley-Tukey butterfly (one stage of NTT):
+//   Given a pair (a, b) and twiddle factor w:
+//     a' = a + w*b
+//     b' = a - w*b
+//
+// GPU kernel design:
+//   - N/2 threads, each handles one butterfly pair
+//   - Thread tid processes elements at positions (tid, tid + half_n)
+//     within its block/stage
+//   - Twiddle factors are precomputed: twiddle[tid] = w^tid mod P
+//
+// Two kernels:
+//   1. ntt_butterfly_kernel: in-place Cooley-Tukey butterfly stage
+//   2. intt_butterfly_kernel: in-place inverse (Gentleman-Sande) butterfly stage
+//      (a' = a + b,  b' = w*(a - b)  — the "decimation in frequency" form)
+//
+// Both kernels maintain: all elements < M31_P before and after each stage.
+//
+// Formal properties proven by Z3:
+//   - Array bounds: tid < half_n ==> tid + half_n < data.len
+//   - Field invariant: forall k < data.len, data[k] < M31_P
+//   - Twiddle factors < M31_P: via forall + m31_get
+//   - m31_add/m31_sub/m31_mul postconditions chain through butterfly
+
+use std::gpu;
+use std::m31;
+
+// Helper: read one M31 element, proving result < M31_P.
+fn m31_get(arr: span<u32>, idx: u64) -> u32
+    requires idx < arr.len
+    requires forall k: u64, k < arr.len ==> arr[k] < M31_P
+    ensures result < M31_P
+{
+    assert(arr[idx] < M31_P) "forall k instantiated at idx";
+    arr[idx]
+}
+
+// ---- Kernel 1: Cooley-Tukey NTT butterfly stage ----------------------------
+//
+// One stage of the NTT. Called log2(N) times with decreasing half_n.
+// Thread tid handles the pair: (data[offset + tid], data[offset + tid + half_n])
+//
+// The `offset` parameter allows processing different groups within a block.
+// For a full NTT: call with offset = 0, half_n = N/2 for stage 0,
+//                              offset varying, half_n = N/4 for stage 1, etc.
+//
+// Precondition: 2 * half_n <= data.len  (both halves fit)
+//               half_n <= twiddle.len    (one twiddle per thread)
+//               forall k < data.len, data[k] < M31_P
+//               forall k < twiddle.len, twiddle[k] < M31_P
+#[kernel]
+fn ntt_butterfly_kernel(data: span<u32>, twiddle: span<u32>, half_n: u64)
+    requires 2u64 * half_n <= data.len
+    requires half_n <= twiddle.len
+    requires forall k: u64, k < data.len    ==> data[k]    < M31_P
+    requires forall k: u64, k < twiddle.len ==> twiddle[k] < M31_P
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < half_n {
+        assert(tid + half_n < data.len) "upper element in bounds";
+        assert(tid < twiddle.len) "twiddle in bounds";
+
+        // Load pair and twiddle
+        let a: u32 = m31_get(data, tid);
+        let b: u32 = m31_get(data, tid + half_n);
+        let w: u32 = m31_get(twiddle, tid);
+
+        // Butterfly: a' = a + w*b,  b' = a - w*b
+        let wb:  u32 = m31_mul(w, b);
+        let a2:  u32 = m31_add(a, wb);
+        let b2:  u32 = m31_sub(a, wb);
+
+        // Write back (reads done, now safe to write)
+        data[tid]          = a2;
+        data[tid + half_n] = b2;
+    };
+}
+
+// ---- Kernel 2: Gentleman-Sande INTT butterfly stage ------------------------
+//
+// Inverse NTT butterfly (decimation-in-frequency form):
+//   a' = a + b
+//   b' = w * (a - b)
+//
+// After all stages, divide by N (apply the N^{-1} mod P scaling).
+// This kernel handles one stage; the scaling is a separate kernel.
+#[kernel]
+fn intt_butterfly_kernel(data: span<u32>, twiddle: span<u32>, half_n: u64)
+    requires 2u64 * half_n <= data.len
+    requires half_n <= twiddle.len
+    requires forall k: u64, k < data.len    ==> data[k]    < M31_P
+    requires forall k: u64, k < twiddle.len ==> twiddle[k] < M31_P
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < half_n {
+        assert(tid + half_n < data.len) "upper element in bounds";
+        assert(tid < twiddle.len) "twiddle in bounds";
+
+        let a: u32 = m31_get(data, tid);
+        let b: u32 = m31_get(data, tid + half_n);
+        let w: u32 = m31_get(twiddle, tid);
+
+        // Gentleman-Sande: a' = a + b,  b' = w*(a - b)
+        let a2: u32 = m31_add(a, b);
+        let d:  u32 = m31_sub(a, b);
+        let b2: u32 = m31_mul(w, d);
+
+        data[tid]          = a2;
+        data[tid + half_n] = b2;
+    };
+}
+
+// ---- Kernel 3: NTT scaling (multiply by N^{-1} mod P) ----------------------
+//
+// After INTT butterfly stages, all N elements must be divided by N.
+// This is done as multiplication by inv_n = N^{-1} mod P.
+//
+// One thread per element: data[tid] = data[tid] * inv_n mod P
+#[kernel]
+fn ntt_scale_kernel(data: span<u32>, inv_n: u32, n: u64)
+    requires n <= data.len
+    requires inv_n < M31_P
+    requires forall k: u64, k < data.len ==> data[k] < M31_P
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        assert(tid < data.len) "element in bounds";
+        let v: u32 = m31_get(data, tid);
+        data[tid] = m31_mul(v, inv_n);
+    };
+}
+
+// ---- Kernel 4: Bit-reversal permutation ------------------------------------
+//
+// NTT algorithms require bit-reversal reordering. This kernel performs
+// an in-place bit-reversal swap for pairs (tid, rev_tid) where rev_tid > tid.
+// The host precomputes the bit-reversal index array `rev`.
+//
+// For each tid where rev[tid] > tid: swap data[tid] with data[rev[tid]]
+// (pairs where rev[tid] == tid are identity and need no swap)
+#[kernel]
+fn ntt_bitrev_kernel(data: span<u32>, rev: span<u64>, n: u64)
+    requires n <= data.len
+    requires n <= rev.len
+    requires forall k: u64, k < data.len ==> data[k] < M31_P
+    requires forall k: u64, k < rev.len  ==> rev[k]  < n
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        assert(tid < data.len) "tid in data bounds";
+        assert(tid < rev.len)  "tid in rev bounds";
+
+        // Load rev[tid]; both loads must precede any writes
+        let rtid: u64 = rev[tid];
+        assert(rtid < data.len) "rtid in data bounds";
+
+        if rtid > tid {
+            let va: u32 = m31_get(data, tid);
+            let vb: u32 = m31_get(data, rtid);
+            data[tid]  = vb;
+            data[rtid] = va;
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }

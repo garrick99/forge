@@ -1,0 +1,219 @@
+// expected: 0
+// Demo 1024: Verified GPU QM31 kernels for VortexSTARK
+//
+// QM31 = CM31[j]/(j^2 - (2+i)) is the degree-4 extension field used in
+// Circle STARK proofs (stwo, VortexSTARK). It is the "native" field for
+// evaluating trace polynomials at the DEEP query point z.
+//
+// An element of QM31 is (a, b) where a, b ∈ CM31:
+//   element = a + b*j
+//   j^2 = 2 + i  (where i^2 = -1 in M31)
+//
+// Representation: four u32 components (a_re, a_im, b_re, b_im), all < M31_P.
+//
+// Kernels in this demo:
+//
+//   1. qm31_accumulate_kernel
+//      Implements the DEEP quotient accumulation step:
+//        out[i] += alpha * v[i]   (QM31 multiply-accumulate)
+//      Used in VortexSTARK to combine multiple trace columns into a single
+//      DEEP quotient polynomial with random QM31 challenge alpha.
+//
+//   2. qm31_fri_fold_kernel
+//      FRI fold over QM31 evaluations:
+//        new[i] = old[i] + alpha * old[i + half]   (QM31 arithmetic)
+//      Used for the FRI layers after the DEEP quotient is formed.
+//
+//   3. qm31_pointwise_mul_kernel
+//      Element-wise QM31 multiplication:
+//        out[i] = a[i] * b[i]   (QM31)
+//      Used for constraint evaluation: multiply numerator by inverse denominator.
+//
+// Formal properties proven by Z3:
+//   - Array bounds: all reads/writes in-range (via m31_get helper + preconditions)
+//   - M31 field invariant: all elements < P (via forall preconditions)
+//   - Output values < P: postconditions of all M31/CM31/QM31 arithmetic functions
+
+use std::gpu;
+use std::m31;
+
+// Helper: read one M31 element, proving result < M31_P (see 1021_circle_ntt.fg).
+fn m31_get(arr: span<u32>, idx: u64) -> u32
+    requires idx < arr.len
+    requires forall k: u64, k < arr.len ==> arr[k] < M31_P
+    ensures result < M31_P
+{
+    assert(arr[idx] < M31_P) "forall k instantiated at idx";
+    arr[idx]
+}
+
+// ---- Kernel 1: QM31 multiply-accumulate for DEEP quotient ------------------
+//
+// out[i] += alpha * v[i]  in QM31.
+//
+// Layouts (SoA — struct of arrays, one array per component):
+//   out_are[i], out_aim[i], out_bre[i], out_bim[i]  -- output QM31 element i
+//   v_are[i], v_aim[i], v_bre[i], v_bim[i]          -- input QM31 element i
+//   alpha = (alpha_re_re, alpha_re_im, alpha_im_re, alpha_im_im)  -- fixed challenge
+//
+// n  = number of elements
+#[kernel]
+fn qm31_accumulate_kernel(
+    out_are: span<u32>, out_aim: span<u32>,
+    out_bre: span<u32>, out_bim: span<u32>,
+    v_are:   span<u32>, v_aim:   span<u32>,
+    v_bre:   span<u32>, v_bim:   span<u32>,
+    alpha_re_re: u32, alpha_re_im: u32,
+    alpha_im_re: u32, alpha_im_im: u32,
+    n: u64)
+    requires n <= out_are.len  requires n <= out_aim.len
+    requires n <= out_bre.len  requires n <= out_bim.len
+    requires n <= v_are.len    requires n <= v_aim.len
+    requires n <= v_bre.len    requires n <= v_bim.len
+    requires alpha_re_re < M31_P  requires alpha_re_im < M31_P
+    requires alpha_im_re < M31_P  requires alpha_im_im < M31_P
+    requires forall k: u64, k < out_are.len ==> out_are[k] < M31_P
+    requires forall k: u64, k < out_aim.len ==> out_aim[k] < M31_P
+    requires forall k: u64, k < out_bre.len ==> out_bre[k] < M31_P
+    requires forall k: u64, k < out_bim.len ==> out_bim[k] < M31_P
+    requires forall k: u64, k < v_are.len   ==> v_are[k]   < M31_P
+    requires forall k: u64, k < v_aim.len   ==> v_aim[k]   < M31_P
+    requires forall k: u64, k < v_bre.len   ==> v_bre[k]   < M31_P
+    requires forall k: u64, k < v_bim.len   ==> v_bim[k]   < M31_P
+{
+    let i: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if i < n {
+        // Load out[i] and v[i] as QM31 elements: (re_re, re_im, im_re, im_im)
+        let o_rr: u32 = m31_get(out_are, i);  let o_ri: u32 = m31_get(out_aim, i);
+        let o_ir: u32 = m31_get(out_bre, i);  let o_ii: u32 = m31_get(out_bim, i);
+        let v_rr: u32 = m31_get(v_are,   i);  let v_ri: u32 = m31_get(v_aim,   i);
+        let v_ir: u32 = m31_get(v_bre,   i);  let v_ii: u32 = m31_get(v_bim,   i);
+
+        // alpha * v[i]  (QM31 multiply, 4 output components)
+        let av_rr: u32 = qm31_mul_out_re_re(alpha_re_re, alpha_re_im,
+                                             alpha_im_re, alpha_im_im,
+                                             v_rr, v_ri, v_ir, v_ii);
+        let av_ri: u32 = qm31_mul_out_re_im(alpha_re_re, alpha_re_im,
+                                             alpha_im_re, alpha_im_im,
+                                             v_rr, v_ri, v_ir, v_ii);
+        let av_ir: u32 = qm31_mul_out_im_re(alpha_re_re, alpha_re_im,
+                                             alpha_im_re, alpha_im_im,
+                                             v_rr, v_ri, v_ir, v_ii);
+        let av_ii: u32 = qm31_mul_out_im_im(alpha_re_re, alpha_re_im,
+                                             alpha_im_re, alpha_im_im,
+                                             v_rr, v_ri, v_ir, v_ii);
+
+        // out[i] += alpha * v[i]
+        out_are[i] = qm31_add_re_re(o_rr, av_rr);
+        out_aim[i] = qm31_add_re_im(o_ri, av_ri);
+        out_bre[i] = qm31_add_im_re(o_ir, av_ir);
+        out_bim[i] = qm31_add_im_im(o_ii, av_ii);
+    };
+}
+
+// ---- Kernel 2: QM31 FRI fold -----------------------------------------------
+//
+// new[i] = old[i] + alpha * old[i + half]   in QM31.
+// Used for FRI folding of the DEEP quotient polynomial.
+#[kernel]
+fn qm31_fri_fold_kernel(
+    new_are: span<u32>, new_aim: span<u32>,
+    new_bre: span<u32>, new_bim: span<u32>,
+    old_are: span<u32>, old_aim: span<u32>,
+    old_bre: span<u32>, old_bim: span<u32>,
+    alpha_re_re: u32, alpha_re_im: u32,
+    alpha_im_re: u32, alpha_im_im: u32,
+    half: u64, n: u64)
+    requires n == half + half
+    requires n <= old_are.len  requires n <= old_aim.len
+    requires n <= old_bre.len  requires n <= old_bim.len
+    requires half <= new_are.len  requires half <= new_aim.len
+    requires half <= new_bre.len  requires half <= new_bim.len
+    requires alpha_re_re < M31_P  requires alpha_re_im < M31_P
+    requires alpha_im_re < M31_P  requires alpha_im_im < M31_P
+    requires forall k: u64, k < old_are.len ==> old_are[k] < M31_P
+    requires forall k: u64, k < old_aim.len ==> old_aim[k] < M31_P
+    requires forall k: u64, k < old_bre.len ==> old_bre[k] < M31_P
+    requires forall k: u64, k < old_bim.len ==> old_bim[k] < M31_P
+{
+    let i: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if i < half {
+        // Load old[i]
+        let a_rr: u32 = m31_get(old_are, i);  let a_ri: u32 = m31_get(old_aim, i);
+        let a_ir: u32 = m31_get(old_bre, i);  let a_ii: u32 = m31_get(old_bim, i);
+        // Load old[i + half]
+        let b_rr: u32 = m31_get(old_are, i + half);
+        let b_ri: u32 = m31_get(old_aim, i + half);
+        let b_ir: u32 = m31_get(old_bre, i + half);
+        let b_ii: u32 = m31_get(old_bim, i + half);
+
+        // alpha * old[i + half]  (QM31 multiply)
+        let ab_rr: u32 = qm31_mul_out_re_re(alpha_re_re, alpha_re_im,
+                                              alpha_im_re, alpha_im_im,
+                                              b_rr, b_ri, b_ir, b_ii);
+        let ab_ri: u32 = qm31_mul_out_re_im(alpha_re_re, alpha_re_im,
+                                              alpha_im_re, alpha_im_im,
+                                              b_rr, b_ri, b_ir, b_ii);
+        let ab_ir: u32 = qm31_mul_out_im_re(alpha_re_re, alpha_re_im,
+                                              alpha_im_re, alpha_im_im,
+                                              b_rr, b_ri, b_ir, b_ii);
+        let ab_ii: u32 = qm31_mul_out_im_im(alpha_re_re, alpha_re_im,
+                                              alpha_im_re, alpha_im_im,
+                                              b_rr, b_ri, b_ir, b_ii);
+
+        // new[i] = old[i] + alpha * old[i + half]
+        new_are[i] = qm31_add_re_re(a_rr, ab_rr);
+        new_aim[i] = qm31_add_re_im(a_ri, ab_ri);
+        new_bre[i] = qm31_add_im_re(a_ir, ab_ir);
+        new_bim[i] = qm31_add_im_im(a_ii, ab_ii);
+    };
+}
+
+// ---- Kernel 3: QM31 pointwise multiply for constraint evaluation -----------
+//
+// out[i] = a[i] * b[i]   in QM31.
+// Used in VortexSTARK to multiply the constraint numerator polynomial by the
+// precomputed inverse denominator (1 / (x - z)) at each domain point.
+#[kernel]
+fn qm31_pointwise_mul_kernel(
+    out_are: span<u32>, out_aim: span<u32>,
+    out_bre: span<u32>, out_bim: span<u32>,
+    a_are:   span<u32>, a_aim:   span<u32>,
+    a_bre:   span<u32>, a_bim:   span<u32>,
+    b_are:   span<u32>, b_aim:   span<u32>,
+    b_bre:   span<u32>, b_bim:   span<u32>,
+    n: u64)
+    requires n <= out_are.len  requires n <= out_aim.len
+    requires n <= out_bre.len  requires n <= out_bim.len
+    requires n <= a_are.len    requires n <= a_aim.len
+    requires n <= a_bre.len    requires n <= a_bim.len
+    requires n <= b_are.len    requires n <= b_aim.len
+    requires n <= b_bre.len    requires n <= b_bim.len
+    requires forall k: u64, k < a_are.len ==> a_are[k] < M31_P
+    requires forall k: u64, k < a_aim.len ==> a_aim[k] < M31_P
+    requires forall k: u64, k < a_bre.len ==> a_bre[k] < M31_P
+    requires forall k: u64, k < a_bim.len ==> a_bim[k] < M31_P
+    requires forall k: u64, k < b_are.len ==> b_are[k] < M31_P
+    requires forall k: u64, k < b_aim.len ==> b_aim[k] < M31_P
+    requires forall k: u64, k < b_bre.len ==> b_bre[k] < M31_P
+    requires forall k: u64, k < b_bim.len ==> b_bim[k] < M31_P
+{
+    let i: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if i < n {
+        let a_rr: u32 = m31_get(a_are, i);  let a_ri: u32 = m31_get(a_aim, i);
+        let a_ir: u32 = m31_get(a_bre, i);  let a_ii: u32 = m31_get(a_bim, i);
+        let b_rr: u32 = m31_get(b_are, i);  let b_ri: u32 = m31_get(b_aim, i);
+        let b_ir: u32 = m31_get(b_bre, i);  let b_ii: u32 = m31_get(b_bim, i);
+
+        out_are[i] = qm31_mul_out_re_re(a_rr, a_ri, a_ir, a_ii,
+                                         b_rr, b_ri, b_ir, b_ii);
+        out_aim[i] = qm31_mul_out_re_im(a_rr, a_ri, a_ir, a_ii,
+                                         b_rr, b_ri, b_ir, b_ii);
+        out_bre[i] = qm31_mul_out_im_re(a_rr, a_ri, a_ir, a_ii,
+                                         b_rr, b_ri, b_ir, b_ii);
+        out_bim[i] = qm31_mul_out_im_im(a_rr, a_ri, a_ir, a_ii,
+                                         b_rr, b_ri, b_ir, b_ii);
+    };
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,143 @@
+// expected: 0
+// Demo 1025: Verified GPU DEEP quotient kernel for VortexSTARK
+//
+// The DEEP (Domain Extension for Eliminating Pretenders) technique is the
+// core of Circle STARK's soundness amplification. For each trace column p_j,
+// the verifier picks a random QM31 point z and the prover computes the
+// DEEP quotient:
+//
+//   q_j(x) = (p_j(x) - p_j(z)) / (x - z)
+//
+// This must be a polynomial (degree drops by 1) IFF p_j(z) is correctly
+// committed. The denominator (x - z) is precomputed over the entire domain.
+//
+// GPU kernel design:
+//   - One thread per domain point x (N threads total)
+//   - Each thread computes p_j(x) - p_j(z), then multiplies by inv_denom[x]
+//   - inv_denom[x] = 1 / (x - z) precomputed on CPU (field inverse)
+//   - Result accumulated into quotient_re/im arrays with random challenge beta
+//
+// Formal properties proven by Z3:
+//   1. Array bounds: all reads/writes in-range
+//   2. M31 field invariant: all input elements < P
+//   3. Output values < P: from M31/QM31 arithmetic postconditions
+//
+// This kernel is the "inner loop" of VortexSTARK proof generation.
+// The outer loop (over all columns j) runs this kernel once per column.
+
+use std::gpu;
+use std::m31;
+
+// Helper: read one M31 element, proving result < M31_P.
+fn m31_get(arr: span<u32>, idx: u64) -> u32
+    requires idx < arr.len
+    requires forall k: u64, k < arr.len ==> arr[k] < M31_P
+    ensures result < M31_P
+{
+    assert(arr[idx] < M31_P) "forall k instantiated at idx";
+    arr[idx]
+}
+
+// ---- Kernel: DEEP quotient accumulation ------------------------------------
+//
+// For one trace column j, compute:
+//   quotient[x] += beta^j * (p_j(x) - p_j_at_z) * inv_denom[x]
+//
+// where:
+//   p_j_at_z = the claimed evaluation p_j(z)   (QM31, from proof transcript)
+//   inv_denom[x] = 1/(x - z)                   (QM31, precomputed)
+//   beta = random QM31 challenge                (for combining columns)
+//
+// Arrays (SoA layout, 4 arrays of u32 per QM31 array):
+//   quot_{are,aim,bre,bim}   -- in/out quotient accumulator (N elements)
+//   eval_{are,aim,bre,bim}   -- p_j(x) evaluations on domain (N QM31 elements)
+//   inv_d_{are,aim,bre,bim}  -- precomputed 1/(x-z) on domain (N QM31 elements)
+//   p_at_z_{re_re,re_im,im_re,im_im} -- claimed p_j(z) (single QM31 scalar)
+//   beta_{re_re,re_im,im_re,im_im}   -- column combination challenge
+//   n                                -- domain size
+//
+// Each thread: out[x] += beta * (eval[x] - p_at_z) * inv_denom[x]
+#[kernel]
+fn deep_quotient_accumulate(
+    quot_are: span<u32>, quot_aim: span<u32>,
+    quot_bre: span<u32>, quot_bim: span<u32>,
+    eval_are: span<u32>, eval_aim: span<u32>,
+    eval_bre: span<u32>, eval_bim: span<u32>,
+    inv_d_are: span<u32>, inv_d_aim: span<u32>,
+    inv_d_bre: span<u32>, inv_d_bim: span<u32>,
+    p_at_z_rr: u32, p_at_z_ri: u32,
+    p_at_z_ir: u32, p_at_z_ii: u32,
+    beta_rr: u32, beta_ri: u32,
+    beta_ir: u32, beta_ii: u32,
+    n: u64)
+    requires n <= quot_are.len  requires n <= quot_aim.len
+    requires n <= quot_bre.len  requires n <= quot_bim.len
+    requires n <= eval_are.len  requires n <= eval_aim.len
+    requires n <= eval_bre.len  requires n <= eval_bim.len
+    requires n <= inv_d_are.len requires n <= inv_d_aim.len
+    requires n <= inv_d_bre.len requires n <= inv_d_bim.len
+    requires p_at_z_rr < M31_P  requires p_at_z_ri < M31_P
+    requires p_at_z_ir < M31_P  requires p_at_z_ii < M31_P
+    requires beta_rr < M31_P    requires beta_ri < M31_P
+    requires beta_ir < M31_P    requires beta_ii < M31_P
+    requires forall k: u64, k < quot_are.len ==> quot_are[k] < M31_P
+    requires forall k: u64, k < quot_aim.len ==> quot_aim[k] < M31_P
+    requires forall k: u64, k < quot_bre.len ==> quot_bre[k] < M31_P
+    requires forall k: u64, k < quot_bim.len ==> quot_bim[k] < M31_P
+    requires forall k: u64, k < eval_are.len ==> eval_are[k] < M31_P
+    requires forall k: u64, k < eval_aim.len ==> eval_aim[k] < M31_P
+    requires forall k: u64, k < eval_bre.len ==> eval_bre[k] < M31_P
+    requires forall k: u64, k < eval_bim.len ==> eval_bim[k] < M31_P
+    requires forall k: u64, k < inv_d_are.len ==> inv_d_are[k] < M31_P
+    requires forall k: u64, k < inv_d_aim.len ==> inv_d_aim[k] < M31_P
+    requires forall k: u64, k < inv_d_bre.len ==> inv_d_bre[k] < M31_P
+    requires forall k: u64, k < inv_d_bim.len ==> inv_d_bim[k] < M31_P
+{
+    let x: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if x < n {
+        // Load eval[x] and accumulator quot[x]
+        let e_rr: u32 = m31_get(eval_are, x);  let e_ri: u32 = m31_get(eval_aim, x);
+        let e_ir: u32 = m31_get(eval_bre, x);  let e_ii: u32 = m31_get(eval_bim, x);
+
+        let q_rr: u32 = m31_get(quot_are, x);  let q_ri: u32 = m31_get(quot_aim, x);
+        let q_ir: u32 = m31_get(quot_bre, x);  let q_ii: u32 = m31_get(quot_bim, x);
+
+        // Load inv_denom[x]
+        let d_rr: u32 = m31_get(inv_d_are, x); let d_ri: u32 = m31_get(inv_d_aim, x);
+        let d_ir: u32 = m31_get(inv_d_bre, x); let d_ii: u32 = m31_get(inv_d_bim, x);
+
+        // diff = eval[x] - p_at_z   (QM31 subtraction, componentwise)
+        let df_rr: u32 = qm31_sub_re_re(e_rr, p_at_z_rr);
+        let df_ri: u32 = qm31_sub_re_im(e_ri, p_at_z_ri);
+        let df_ir: u32 = qm31_sub_im_re(e_ir, p_at_z_ir);
+        let df_ii: u32 = qm31_sub_im_im(e_ii, p_at_z_ii);
+
+        // term = diff * inv_denom[x]  (QM31 multiply)
+        let t_rr: u32 = qm31_mul_out_re_re(df_rr, df_ri, df_ir, df_ii,
+                                             d_rr, d_ri, d_ir, d_ii);
+        let t_ri: u32 = qm31_mul_out_re_im(df_rr, df_ri, df_ir, df_ii,
+                                             d_rr, d_ri, d_ir, d_ii);
+        let t_ir: u32 = qm31_mul_out_im_re(df_rr, df_ri, df_ir, df_ii,
+                                             d_rr, d_ri, d_ir, d_ii);
+        let t_ii: u32 = qm31_mul_out_im_im(df_rr, df_ri, df_ir, df_ii,
+                                             d_rr, d_ri, d_ir, d_ii);
+
+        // contribution = beta * term  (QM31 multiply, for column combination)
+        let c_rr: u32 = qm31_mul_out_re_re(beta_rr, beta_ri, beta_ir, beta_ii,
+                                             t_rr, t_ri, t_ir, t_ii);
+        let c_ri: u32 = qm31_mul_out_re_im(beta_rr, beta_ri, beta_ir, beta_ii,
+                                             t_rr, t_ri, t_ir, t_ii);
+        let c_ir: u32 = qm31_mul_out_im_re(beta_rr, beta_ri, beta_ir, beta_ii,
+                                             t_rr, t_ri, t_ir, t_ii);
+        let c_ii: u32 = qm31_mul_out_im_im(beta_rr, beta_ri, beta_ir, beta_ii,
+                                             t_rr, t_ri, t_ir, t_ii);
+
+        // quot[x] += contribution
+        quot_are[x] = qm31_add_re_re(q_rr, c_rr);
+        quot_aim[x] = qm31_add_re_im(q_ri, c_ri);
+        quot_bre[x] = qm31_add_im_re(q_ir, c_ir);
+        quot_bim[x] = qm31_add_im_im(q_ii, c_ii);
+    };
+}
+
+fn main() -> u64 { 0u64 }

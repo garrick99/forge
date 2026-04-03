@@ -1,0 +1,233 @@
+// expected: 0
+// Demo 1033: Verified GPU constraint evaluation kernel for VortexSTARK
+//
+// In a Circle STARK, the AIR (Algebraic Intermediate Representation) is
+// expressed as a set of polynomial constraints over the trace columns.
+// For a simple example: a Fibonacci-like constraint
+//   c(x) = trace[next(x), 0] - trace[x, 0] - trace[x, 1]
+// where next(x) is the next point on the circle domain.
+//
+// The constraint evaluation kernel:
+//   1. Reads trace values at current and next positions
+//   2. Evaluates the constraint polynomial at each domain point
+//   3. Accumulates into a quotient array: quot[x] += alpha^i * c_i(x)
+//
+// For VortexSTARK, the trace is stored in SoA (struct of arrays) layout:
+//   Each column is a contiguous span<u32> of N M31 elements.
+//
+// This demo implements three AIR constraint patterns:
+//   1. Linear constraint: c(x) = a[x] + b[x] - c[x]       (boundary check)
+//   2. Quadratic constraint: c(x) = a[x] * b[x] - c[x]    (multiplication gate)
+//   3. Transition constraint: c(x) = a[next[x]] - a[x] - b[x]  (step relation)
+//
+// Constraints are accumulated into a quotient array using a random challenge.
+// The "next" position array encodes the circle group successor for each point.
+//
+// Formal properties proven by Z3:
+//   - All trace reads within bounds
+//   - next[x] < n ensures the next-row read is valid
+//   - m31_add/m31_sub/m31_mul field invariant maintained throughout
+//   - Accumulation output < M31_P
+
+use std::gpu;
+use std::m31;
+
+// Helper: read one M31 element, proving result < M31_P.
+fn m31_get(arr: span<u32>, idx: u64) -> u32
+    requires idx < arr.len
+    requires forall k: u64, k < arr.len ==> arr[k] < M31_P
+    ensures result < M31_P
+{
+    assert(arr[idx] < M31_P) "forall k instantiated at idx";
+    arr[idx]
+}
+
+// ---- Kernel 1: Linear constraint evaluation --------------------------------
+//
+// Evaluates: constraint[x] = col_a[x] + col_b[x] - col_c[x]
+// Accumulates: quot[x] += alpha * constraint[x]
+#[kernel]
+fn linear_constraint_kernel(
+    quot:  span<u32>,
+    col_a: span<u32>,
+    col_b: span<u32>,
+    col_c: span<u32>,
+    alpha: u32,
+    n:     u64)
+    requires n <= quot.len
+    requires n <= col_a.len
+    requires n <= col_b.len
+    requires n <= col_c.len
+    requires alpha < M31_P
+    requires forall k: u64, k < quot.len  ==> quot[k]  < M31_P
+    requires forall k: u64, k < col_a.len ==> col_a[k] < M31_P
+    requires forall k: u64, k < col_b.len ==> col_b[k] < M31_P
+    requires forall k: u64, k < col_c.len ==> col_c[k] < M31_P
+{
+    let x: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if x < n {
+        assert(x < quot.len)  "quot in bounds";
+        assert(x < col_a.len) "col_a in bounds";
+        assert(x < col_b.len) "col_b in bounds";
+        assert(x < col_c.len) "col_c in bounds";
+
+        let a: u32 = m31_get(col_a, x);
+        let b: u32 = m31_get(col_b, x);
+        let c: u32 = m31_get(col_c, x);
+        let q: u32 = m31_get(quot,  x);
+
+        // constraint = a + b - c
+        let ab:  u32 = m31_add(a, b);
+        let con: u32 = m31_sub(ab, c);
+
+        // accumulate: quot[x] += alpha * constraint
+        let ac:  u32 = m31_mul(alpha, con);
+        quot[x] = m31_add(q, ac);
+    };
+}
+
+// ---- Kernel 2: Multiplication gate constraint ------------------------------
+//
+// Evaluates: constraint[x] = col_a[x] * col_b[x] - col_c[x]
+// Accumulates: quot[x] += alpha * constraint[x]
+#[kernel]
+fn mul_gate_constraint_kernel(
+    quot:  span<u32>,
+    col_a: span<u32>,
+    col_b: span<u32>,
+    col_c: span<u32>,
+    alpha: u32,
+    n:     u64)
+    requires n <= quot.len
+    requires n <= col_a.len
+    requires n <= col_b.len
+    requires n <= col_c.len
+    requires alpha < M31_P
+    requires forall k: u64, k < quot.len  ==> quot[k]  < M31_P
+    requires forall k: u64, k < col_a.len ==> col_a[k] < M31_P
+    requires forall k: u64, k < col_b.len ==> col_b[k] < M31_P
+    requires forall k: u64, k < col_c.len ==> col_c[k] < M31_P
+{
+    let x: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if x < n {
+        assert(x < quot.len)  "quot in bounds";
+        assert(x < col_a.len) "col_a in bounds";
+        assert(x < col_b.len) "col_b in bounds";
+        assert(x < col_c.len) "col_c in bounds";
+
+        let a: u32 = m31_get(col_a, x);
+        let b: u32 = m31_get(col_b, x);
+        let c: u32 = m31_get(col_c, x);
+        let q: u32 = m31_get(quot,  x);
+
+        // constraint = a * b - c
+        let ab:  u32 = m31_mul(a, b);
+        let con: u32 = m31_sub(ab, c);
+
+        // accumulate
+        let ac:  u32 = m31_mul(alpha, con);
+        quot[x] = m31_add(q, ac);
+    };
+}
+
+// ---- Kernel 3: Transition constraint (step relation) -----------------------
+//
+// Evaluates: constraint[x] = col_a[next_pos[x]] - col_a[x] - col_b[x]
+//   where next_pos[x] is the successor in the circle domain.
+//
+// next_pos is a precomputed array: next_pos[x] = the index of the next
+// circle point after x. For a power-of-2 domain, next_pos[x] = (x+1) mod n.
+#[kernel]
+fn transition_constraint_kernel(
+    quot:     span<u32>,
+    col_a:    span<u32>,
+    col_b:    span<u32>,
+    next_pos: span<u64>,
+    alpha:    u32,
+    n:        u64)
+    requires n <= quot.len
+    requires n <= col_a.len
+    requires n <= col_b.len
+    requires n <= next_pos.len
+    requires alpha < M31_P
+    requires forall k: u64, k < quot.len     ==> quot[k]     < M31_P
+    requires forall k: u64, k < col_a.len    ==> col_a[k]    < M31_P
+    requires forall k: u64, k < col_b.len    ==> col_b[k]    < M31_P
+    requires forall k: u64, k < next_pos.len ==> next_pos[k] < n
+{
+    let x: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if x < n {
+        assert(x < quot.len)     "quot in bounds";
+        assert(x < col_a.len)    "col_a in bounds";
+        assert(x < col_b.len)    "col_b in bounds";
+        assert(x < next_pos.len) "next_pos in bounds";
+
+        let nx: u64 = next_pos[x];
+        assert(nx < n)        "forall k instantiated at x";
+        assert(nx < col_a.len) "col_a next in bounds";
+
+        let a_cur:  u32 = m31_get(col_a, x);
+        let a_next: u32 = m31_get(col_a, nx);
+        let b:      u32 = m31_get(col_b, x);
+        let q:      u32 = m31_get(quot,  x);
+
+        // constraint = a[next] - a[x] - b[x]
+        let diff: u32 = m31_sub(a_next, a_cur);
+        let con:  u32 = m31_sub(diff, b);
+
+        // accumulate
+        let ac:  u32 = m31_mul(alpha, con);
+        quot[x] = m31_add(q, ac);
+    };
+}
+
+// ---- Kernel 4: Multi-constraint accumulation with sequential alphas --------
+//
+// Accumulates multiple constraints into a single quotient:
+//   quot[x] += alpha^0 * c0[x] + alpha^1 * c1[x] + alpha^2 * c2[x]
+//
+// This is more efficient than calling three separate kernels for small AIRs.
+// Computes alpha^2 as m31_mul(alpha, alpha) locally.
+#[kernel]
+fn multi_constraint_kernel(
+    quot: span<u32>,
+    c0:   span<u32>,
+    c1:   span<u32>,
+    c2:   span<u32>,
+    alpha: u32,
+    n:     u64)
+    requires n <= quot.len
+    requires n <= c0.len
+    requires n <= c1.len
+    requires n <= c2.len
+    requires alpha < M31_P
+    requires forall k: u64, k < quot.len ==> quot[k] < M31_P
+    requires forall k: u64, k < c0.len   ==> c0[k]   < M31_P
+    requires forall k: u64, k < c1.len   ==> c1[k]   < M31_P
+    requires forall k: u64, k < c2.len   ==> c2[k]   < M31_P
+{
+    let x: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if x < n {
+        assert(x < quot.len) "quot in bounds";
+        assert(x < c0.len)   "c0 in bounds";
+        assert(x < c1.len)   "c1 in bounds";
+        assert(x < c2.len)   "c2 in bounds";
+
+        let v0: u32 = m31_get(c0,   x);
+        let v1: u32 = m31_get(c1,   x);
+        let v2: u32 = m31_get(c2,   x);
+        let q:  u32 = m31_get(quot, x);
+
+        // alpha^2 = alpha * alpha
+        let alpha2: u32 = m31_mul(alpha, alpha);
+
+        // acc = v0 + alpha * v1 + alpha^2 * v2
+        let a1:  u32 = m31_mul(alpha,  v1);
+        let a2:  u32 = m31_mul(alpha2, v2);
+        let acc: u32 = m31_add(m31_add(v0, a1), a2);
+
+        quot[x] = m31_add(q, acc);
+    };
+}
+
+fn main() -> u64 { 0u64 }

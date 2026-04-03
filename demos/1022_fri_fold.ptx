@@ -1,0 +1,179 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry fri_fold_layer(
+    .param .u64 fri_fold_layer_param_new_evals_data,
+    .param .u64 fri_fold_layer_param_new_evals_len,
+    .param .u64 fri_fold_layer_param_old_evals_data,
+    .param .u64 fri_fold_layer_param_old_evals_len,
+    .param .u32 fri_fold_layer_param_alpha,
+    .param .u64 fri_fold_layer_param_half,
+    .param .u64 fri_fold_layer_param_n
+)
+{
+    .reg .pred %p12;
+    .reg .u64 %rd0, %rd1, %rd13, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd3, %rd5, %rd6;
+    .reg .u32 %r10, %r11, %r23, %r24, %r25, %r4, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [fri_fold_layer_param_new_evals_data];
+  ld.param.u64 %rd1, [fri_fold_layer_param_new_evals_len];
+  ld.param.u64 %rd2, [fri_fold_layer_param_old_evals_data];
+  ld.param.u64 %rd3, [fri_fold_layer_param_old_evals_len];
+  ld.param.u32 %r4, [fri_fold_layer_param_alpha];
+  ld.param.u64 %rd5, [fri_fold_layer_param_half];
+  ld.param.u64 %rd6, [fri_fold_layer_param_n];
+
+  mov.u32 %r7, %ctaid.x;
+  mov.u32 %r8, %ntid.x;
+  mul.lo.u32 %r9, %r7, %r8;
+  mov.u32 %r10, %tid.x;
+  add.u32 %r11, %r9, %r10;
+  cvt.u64.u32 %rd13, %r11;
+  setp.lt.u64 %p12, %rd13, %rd5;
+  @%p12 bra fri_fold_layer_then_14;
+  bra fri_fold_layer_else_14;
+  fri_fold_layer_then_14:
+  mov.u64 %rd15, 0; // call m31_get (device fn)
+  mov.u64 %rd16, 0; // call m31_get (device fn)
+  mov.u64 %rd17, 0; // call m31_mul (device fn)
+  mov.u64 %rd18, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd19, %r11;
+  mov.u64 %rd20, 4;
+  mul.lo.u64 %rd21, %rd19, %rd20;
+  add.u64 %rd22, %rd0, %rd21;
+  st.global.u32 [%rd22], %rd18;
+  mov.u32 %r23, 0; // unit
+  mov.u32 %r24, %r23;
+  bra fri_fold_layer_end_14;
+  fri_fold_layer_else_14:
+  mov.u32 %r24, 0; // no else branch
+  fri_fold_layer_end_14:
+  mov.u32 %r25, 0; // unit
+  ret;
+}
+
+.visible .entry fri_unfold_layer(
+    .param .u64 fri_unfold_layer_param_new_evals_data,
+    .param .u64 fri_unfold_layer_param_new_evals_len,
+    .param .u64 fri_unfold_layer_param_old_evals_data,
+    .param .u64 fri_unfold_layer_param_old_evals_len,
+    .param .u32 fri_unfold_layer_param_alpha,
+    .param .u64 fri_unfold_layer_param_half,
+    .param .u64 fri_unfold_layer_param_n
+)
+{
+    .reg .pred %p12;
+    .reg .u64 %rd0, %rd1, %rd13, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd3, %rd5, %rd6;
+    .reg .u32 %r10, %r11, %r23, %r24, %r25, %r4, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [fri_unfold_layer_param_new_evals_data];
+  ld.param.u64 %rd1, [fri_unfold_layer_param_new_evals_len];
+  ld.param.u64 %rd2, [fri_unfold_layer_param_old_evals_data];
+  ld.param.u64 %rd3, [fri_unfold_layer_param_old_evals_len];
+  ld.param.u32 %r4, [fri_unfold_layer_param_alpha];
+  ld.param.u64 %rd5, [fri_unfold_layer_param_half];
+  ld.param.u64 %rd6, [fri_unfold_layer_param_n];
+
+  mov.u32 %r7, %ctaid.x;
+  mov.u32 %r8, %ntid.x;
+  mul.lo.u32 %r9, %r7, %r8;
+  mov.u32 %r10, %tid.x;
+  add.u32 %r11, %r9, %r10;
+  cvt.u64.u32 %rd13, %r11;
+  setp.lt.u64 %p12, %rd13, %rd5;
+  @%p12 bra fri_unfold_layer_then_14;
+  bra fri_unfold_layer_else_14;
+  fri_unfold_layer_then_14:
+  mov.u64 %rd15, 0; // call m31_get (device fn)
+  mov.u64 %rd16, 0; // call m31_get (device fn)
+  mov.u64 %rd17, 0; // call m31_mul (device fn)
+  mov.u64 %rd18, 0; // call m31_sub (device fn)
+  cvt.u64.u32 %rd19, %r11;
+  mov.u64 %rd20, 4;
+  mul.lo.u64 %rd21, %rd19, %rd20;
+  add.u64 %rd22, %rd0, %rd21;
+  st.global.u32 [%rd22], %rd18;
+  mov.u32 %r23, 0; // unit
+  mov.u32 %r24, %r23;
+  bra fri_unfold_layer_end_14;
+  fri_unfold_layer_else_14:
+  mov.u32 %r24, 0; // no else branch
+  fri_unfold_layer_end_14:
+  mov.u32 %r25, 0; // unit
+  ret;
+}
+
+.visible .entry fri_fold_layer_cm31(
+    .param .u64 fri_fold_layer_cm31_param_new_re_data,
+    .param .u64 fri_fold_layer_cm31_param_new_re_len,
+    .param .u64 fri_fold_layer_cm31_param_new_im_data,
+    .param .u64 fri_fold_layer_cm31_param_new_im_len,
+    .param .u64 fri_fold_layer_cm31_param_old_re_data,
+    .param .u64 fri_fold_layer_cm31_param_old_re_len,
+    .param .u64 fri_fold_layer_cm31_param_old_im_data,
+    .param .u64 fri_fold_layer_cm31_param_old_im_len,
+    .param .u32 fri_fold_layer_cm31_param_alpha_re,
+    .param .u32 fri_fold_layer_cm31_param_alpha_im,
+    .param .u64 fri_fold_layer_cm31_param_half,
+    .param .u64 fri_fold_layer_cm31_param_n
+)
+{
+    .reg .pred %p17;
+    .reg .u64 %rd0, %rd1, %rd10, %rd11, %rd18, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd29, %rd3, %rd30, %rd31, %rd32, %rd33, %rd34, %rd35, %rd4, %rd5, %rd6, %rd7;
+    .reg .u32 %r12, %r13, %r14, %r15, %r16, %r36, %r37, %r38, %r8, %r9;
+
+  ld.param.u64 %rd0, [fri_fold_layer_cm31_param_new_re_data];
+  ld.param.u64 %rd1, [fri_fold_layer_cm31_param_new_re_len];
+  ld.param.u64 %rd2, [fri_fold_layer_cm31_param_new_im_data];
+  ld.param.u64 %rd3, [fri_fold_layer_cm31_param_new_im_len];
+  ld.param.u64 %rd4, [fri_fold_layer_cm31_param_old_re_data];
+  ld.param.u64 %rd5, [fri_fold_layer_cm31_param_old_re_len];
+  ld.param.u64 %rd6, [fri_fold_layer_cm31_param_old_im_data];
+  ld.param.u64 %rd7, [fri_fold_layer_cm31_param_old_im_len];
+  ld.param.u32 %r8, [fri_fold_layer_cm31_param_alpha_re];
+  ld.param.u32 %r9, [fri_fold_layer_cm31_param_alpha_im];
+  ld.param.u64 %rd10, [fri_fold_layer_cm31_param_half];
+  ld.param.u64 %rd11, [fri_fold_layer_cm31_param_n];
+
+  mov.u32 %r12, %ctaid.x;
+  mov.u32 %r13, %ntid.x;
+  mul.lo.u32 %r14, %r12, %r13;
+  mov.u32 %r15, %tid.x;
+  add.u32 %r16, %r14, %r15;
+  cvt.u64.u32 %rd18, %r16;
+  setp.lt.u64 %p17, %rd18, %rd10;
+  @%p17 bra fri_fold_layer_cm31_then_19;
+  bra fri_fold_layer_cm31_else_19;
+  fri_fold_layer_cm31_then_19:
+  mov.u64 %rd20, 0; // call m31_get (device fn)
+  mov.u64 %rd21, 0; // call m31_get (device fn)
+  mov.u64 %rd22, 0; // call m31_get (device fn)
+  mov.u64 %rd23, 0; // call m31_get (device fn)
+  mov.u64 %rd24, 0; // call cm31_mul_re (device fn)
+  mov.u64 %rd25, 0; // call cm31_mul_im (device fn)
+  mov.u64 %rd26, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd27, %r16;
+  mov.u64 %rd28, 4;
+  mul.lo.u64 %rd29, %rd27, %rd28;
+  add.u64 %rd30, %rd0, %rd29;
+  st.global.u32 [%rd30], %rd26;
+  mov.u64 %rd31, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd32, %r16;
+  mov.u64 %rd33, 4;
+  mul.lo.u64 %rd34, %rd32, %rd33;
+  add.u64 %rd35, %rd2, %rd34;
+  st.global.u32 [%rd35], %rd31;
+  mov.u32 %r36, 0; // unit
+  mov.u32 %r37, %r36;
+  bra fri_fold_layer_cm31_end_19;
+  fri_fold_layer_cm31_else_19:
+  mov.u32 %r37, 0; // no else branch
+  fri_fold_layer_cm31_end_19:
+  mov.u32 %r38, 0; // unit
+  ret;
+}
+

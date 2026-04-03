@@ -1,0 +1,174 @@
+// expected: 0
+// Demo 1034: Verified GPU OODS (Out-Of-Domain Sampling) evaluation kernel
+//
+// OODS is the core of Circle STARK's soundness argument. The prover commits to
+// trace polynomial p(x), then the verifier samples a random point z outside the
+// evaluation domain. The prover provides the claimed value p(z).
+//
+// The DEEP technique (from 1025) uses OODS: the quotient polynomial
+//   q(x) = (p(x) - p(z)) / (x - z)
+// is well-defined as a polynomial iff p(z) is correctly committed.
+//
+// For Circle STARK, z is a QM31 point on the complex circle, and p is evaluated
+// in the "circle polynomial" sense. But the GPU kernel structure for OODS
+// is straightforward: for each trace column and each domain point x,
+// compute the contribution to the OODS quotient.
+//
+// This demo implements:
+//   1. oods_eval_kernel: Evaluates the OODS quotient term for a single column
+//      over the full domain. For each x:
+//        numerator[x] = eval[x] - p_at_z  (in M31 — the real part of QM31 contrib)
+//      The caller then multiplies by inv_denom[x] separately (1025_deep_quotient.fg).
+//
+//   2. oods_combine_kernel: Combines multiple column OODS numerators with
+//      random challenge beta: combined[x] += beta^j * numerator_j[x]
+//
+//   3. oods_batch_eval_kernel: Batched version — computes both the numerator
+//      and multiplies by inv_denom in one pass (combining 1025 and this demo).
+//
+// Key property proven: all field arithmetic maintains elements < M31_P,
+// and all array accesses are within bounds.
+
+use std::gpu;
+use std::m31;
+
+// Helper: read one M31 element, proving result < M31_P.
+fn m31_get(arr: span<u32>, idx: u64) -> u32
+    requires idx < arr.len
+    requires forall k: u64, k < arr.len ==> arr[k] < M31_P
+    ensures result < M31_P
+{
+    assert(arr[idx] < M31_P) "forall k instantiated at idx";
+    arr[idx]
+}
+
+// ---- Kernel 1: OODS numerator computation ----------------------------------
+//
+// For one trace column: numerator[x] = eval[x] - p_at_z
+// where p_at_z is the claimed evaluation at the OODS point z.
+// Both eval[x] and p_at_z are M31 values (one component of the QM31 value).
+#[kernel]
+fn oods_numerator_kernel(
+    numer:   span<u32>,
+    eval:    span<u32>,
+    p_at_z:  u32,
+    n:       u64)
+    requires n <= numer.len
+    requires n <= eval.len
+    requires p_at_z < M31_P
+    requires forall k: u64, k < numer.len ==> numer[k] < M31_P
+    requires forall k: u64, k < eval.len  ==> eval[k]  < M31_P
+{
+    let x: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if x < n {
+        assert(x < numer.len) "numer in bounds";
+        assert(x < eval.len)  "eval in bounds";
+
+        let v: u32 = m31_get(eval, x);
+        numer[x] = m31_sub(v, p_at_z);
+    };
+}
+
+// ---- Kernel 2: OODS column combination ------------------------------------
+//
+// Combines J column numerators into one:
+//   combined[x] += beta^j * numer_j[x]
+// This kernel handles one column at a time (called J times by the host).
+// beta_pow = beta^j passed by host (pre-computed).
+#[kernel]
+fn oods_combine_kernel(
+    combined:  span<u32>,
+    numer:     span<u32>,
+    beta_pow:  u32,
+    n:         u64)
+    requires n <= combined.len
+    requires n <= numer.len
+    requires beta_pow < M31_P
+    requires forall k: u64, k < combined.len ==> combined[k] < M31_P
+    requires forall k: u64, k < numer.len    ==> numer[k]    < M31_P
+{
+    let x: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if x < n {
+        assert(x < combined.len) "combined in bounds";
+        assert(x < numer.len)    "numer in bounds";
+
+        let c: u32 = m31_get(combined, x);
+        let v: u32 = m31_get(numer,    x);
+
+        // combined[x] += beta^j * numer[x]
+        let bv: u32 = m31_mul(beta_pow, v);
+        combined[x] = m31_add(c, bv);
+    };
+}
+
+// ---- Kernel 3: Batched OODS quotient (numerator * inv_denom in one pass) ---
+//
+// Computes: quot[x] += beta_pow * (eval[x] - p_at_z) * inv_denom[x]
+// This is the same as 1025_deep_quotient.fg but for M31 (not QM31),
+// and in a single fused kernel.
+#[kernel]
+fn oods_quotient_fused_kernel(
+    quot:      span<u32>,
+    eval:      span<u32>,
+    inv_denom: span<u32>,
+    p_at_z:    u32,
+    beta_pow:  u32,
+    n:         u64)
+    requires n <= quot.len
+    requires n <= eval.len
+    requires n <= inv_denom.len
+    requires p_at_z < M31_P
+    requires beta_pow < M31_P
+    requires forall k: u64, k < quot.len      ==> quot[k]      < M31_P
+    requires forall k: u64, k < eval.len      ==> eval[k]      < M31_P
+    requires forall k: u64, k < inv_denom.len ==> inv_denom[k] < M31_P
+{
+    let x: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if x < n {
+        assert(x < quot.len)      "quot in bounds";
+        assert(x < eval.len)      "eval in bounds";
+        assert(x < inv_denom.len) "inv_denom in bounds";
+
+        let v:   u32 = m31_get(eval,      x);
+        let d:   u32 = m31_get(inv_denom, x);
+        let q:   u32 = m31_get(quot,      x);
+
+        // numer = v - p_at_z
+        let num: u32 = m31_sub(v, p_at_z);
+        // term = numer * inv_denom
+        let t:   u32 = m31_mul(num, d);
+        // contribution = beta_pow * term
+        let con: u32 = m31_mul(beta_pow, t);
+        // accumulate
+        quot[x] = m31_add(q, con);
+    };
+}
+
+// ---- Kernel 4: OODS domain validity check (last row exclusion) -------------
+//
+// In Circle STARK, the constraint C(x) = 0 for all x in domain EXCEPT
+// the last row (where boundary conditions may differ). This kernel
+// zeroes out the constraint at the excluded position.
+//
+// excluded_pos is the index of the last row in the domain.
+// The kernel writes 0 to quot[excluded_pos] to remove its contribution.
+#[kernel]
+fn oods_exclude_last_row_kernel(
+    quot:         span<u32>,
+    excluded_pos: u64,
+    n:            u64)
+    requires n <= quot.len
+    requires excluded_pos < n
+    requires forall k: u64, k < quot.len ==> quot[k] < M31_P
+{
+    let x: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if x < n {
+        assert(x < quot.len) "quot in bounds";
+        if x == excluded_pos {
+            assert(excluded_pos < quot.len) "excluded_pos in bounds";
+            quot[excluded_pos] = 0u32;
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }

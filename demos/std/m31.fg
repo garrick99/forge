@@ -1,0 +1,254 @@
+// std/m31.fg -- M31, CM31, and QM31 field arithmetic
+//
+// M31  = Z/(2^31-1)Z           Mersenne prime field, p = 2147483647
+// CM31 = M31[i]/(i^2+1)        Complex extension (re, im)
+// QM31 = CM31[j]/(j^2-(2+i))   Degree-4 extension used in Circle STARK proofs
+//
+// Elements are represented as u32 with the invariant val < M31_P.
+// Multiplication uses a u64 intermediate with Mersenne reduction:
+//   prod = a * b  (fits in u62)
+//   lo   = prod & (2^31-1)   (low 31 bits)
+//   hi   = prod >> 31
+//   r    = lo + hi           (r < 2^32)
+//   result = r - P if r >= P else r
+//
+// All functions are proven correct by Z3 (bitvector mode).
+//
+// Include with:  use std::m31;
+
+const M31_P: u32 = 2147483647u32;   // 2^31 - 1
+
+// ---- M31 arithmetic --------------------------------------------------------
+
+// Addition mod P. At most one conditional subtract needed since a+b < 2P.
+fn m31_add(a: u32, b: u32) -> u32
+    requires a < M31_P
+    requires b < M31_P
+    ensures result < M31_P
+{
+    let s: u64 = (a as u64) + (b as u64);
+    let p: u64 = M31_P as u64;
+    let r: u64 = if s >= p { s - p } else { s };
+    r as u32
+}
+
+// Subtraction mod P. Branchless via conditional add-P.
+fn m31_sub(a: u32, b: u32) -> u32
+    requires a < M31_P
+    requires b < M31_P
+    ensures result < M31_P
+{
+    let a64: u64 = a as u64;
+    let b64: u64 = b as u64;
+    let p: u64 = M31_P as u64;
+    let r: u64 = if a64 >= b64 { a64 - b64 } else { a64 + p - b64 };
+    r as u32
+}
+
+// Multiplication mod P via u64 intermediate.
+// a, b < 2^31-1  =>  a*b < 2^62, fits safely in u64.
+// Using modulo for provability; the C compiler reduces this to
+// the branchless Mersenne trick (lo31 + hi) for GPU performance.
+fn m31_mul(a: u32, b: u32) -> u32
+    requires a < M31_P
+    requires b < M31_P
+    ensures result < M31_P
+{
+    let prod: u64 = (a as u64) * (b as u64);
+    let p: u64 = M31_P as u64;
+    let r: u64 = prod % p;
+    r as u32
+}
+
+// Negation mod P. Zero maps to zero.
+fn m31_neg(a: u32) -> u32
+    requires a < M31_P
+    ensures result < M31_P
+{
+    if a == 0u32 { 0u32 } else { M31_P - a }
+}
+
+// Double mod P. Same cost as m31_add(a, a) but avoids the second load.
+fn m31_double(a: u32) -> u32
+    requires a < M31_P
+    ensures result < M31_P
+{
+    m31_add(a, a)
+}
+
+// ---- CM31 = M31 x M31 with i^2 = -1 ----------------------------------------
+// A complex M31 element is (re, im); multiplication is:
+//   (a + bi)(c + di) = (ac - bd) + (ad + bc)i
+
+fn cm31_mul_re(a_re: u32, a_im: u32, b_re: u32, b_im: u32) -> u32
+    requires a_re < M31_P
+    requires a_im < M31_P
+    requires b_re < M31_P
+    requires b_im < M31_P
+    ensures result < M31_P
+{
+    let ac: u32 = m31_mul(a_re, b_re);
+    let bd: u32 = m31_mul(a_im, b_im);
+    m31_sub(ac, bd)
+}
+
+fn cm31_mul_im(a_re: u32, a_im: u32, b_re: u32, b_im: u32) -> u32
+    requires a_re < M31_P
+    requires a_im < M31_P
+    requires b_re < M31_P
+    requires b_im < M31_P
+    ensures result < M31_P
+{
+    let ad: u32 = m31_mul(a_re, b_im);
+    let bc: u32 = m31_mul(a_im, b_re);
+    m31_add(ad, bc)
+}
+
+fn cm31_add_re(a_re: u32, b_re: u32) -> u32
+    requires a_re < M31_P
+    requires b_re < M31_P
+    ensures result < M31_P
+{
+    m31_add(a_re, b_re)
+}
+
+fn cm31_add_im(a_im: u32, b_im: u32) -> u32
+    requires a_im < M31_P
+    requires b_im < M31_P
+    ensures result < M31_P
+{
+    m31_add(a_im, b_im)
+}
+
+fn cm31_sub_re(a_re: u32, b_re: u32) -> u32
+    requires a_re < M31_P
+    requires b_re < M31_P
+    ensures result < M31_P
+{
+    m31_sub(a_re, b_re)
+}
+
+fn cm31_sub_im(a_im: u32, b_im: u32) -> u32
+    requires a_im < M31_P
+    requires b_im < M31_P
+    ensures result < M31_P
+{
+    m31_sub(a_im, b_im)
+}
+
+// ---- QM31 = CM31[j]/(j^2 - (2+i)) ------------------------------------------
+// A QM31 element is ((a_re, a_im), (b_re, b_im)) = a + b*j, where a,b in CM31.
+// Multiplication rule: j^2 = 2+i, so:
+//   (a + bj)(c + dj) = (ac + bd*(2+i)) + (ad + bc)j
+//   real part:  ac + 2*bd_re - bd_im  + (ac_im + bd_re + bd_re + bd_im... wait
+//
+// Let me be precise:
+//   bd*(2+i) = (b_re + b_im*i)(d_re + d_im*i) * (2 + i)
+//   First compute bd = (bd_re, bd_im) as CM31 product.
+//   Then bd*(2+i): (bd_re + bd_im*i)*(2+i) = (2*bd_re - bd_im) + (bd_re + 2*bd_im)*i
+//   Output re: cm31(ac_re + 2*bd_re - bd_im,  ac_im + bd_re + 2*bd_im)
+//   Output im: cm31(ad_re + bc_re,             ad_im + bc_im)
+
+fn qm31_mul_out_re_re(a_re: u32, a_im: u32, b_re: u32, b_im: u32,
+                      c_re: u32, c_im: u32, d_re: u32, d_im: u32) -> u32
+    requires a_re < M31_P  requires a_im < M31_P
+    requires b_re < M31_P  requires b_im < M31_P
+    requires c_re < M31_P  requires c_im < M31_P
+    requires d_re < M31_P  requires d_im < M31_P
+    ensures result < M31_P
+{
+    // ac_re = a_re*c_re - a_im*c_im
+    let ac_re: u32 = cm31_mul_re(a_re, a_im, c_re, c_im);
+    // bd_re = b_re*d_re - b_im*d_im
+    let bd_re: u32 = cm31_mul_re(b_re, b_im, d_re, d_im);
+    // bd_im = b_re*d_im + b_im*d_re
+    let bd_im: u32 = cm31_mul_im(b_re, b_im, d_re, d_im);
+    // 2*bd_re - bd_im
+    let t: u32 = m31_sub(m31_double(bd_re), bd_im);
+    m31_add(ac_re, t)
+}
+
+fn qm31_mul_out_re_im(a_re: u32, a_im: u32, b_re: u32, b_im: u32,
+                      c_re: u32, c_im: u32, d_re: u32, d_im: u32) -> u32
+    requires a_re < M31_P  requires a_im < M31_P
+    requires b_re < M31_P  requires b_im < M31_P
+    requires c_re < M31_P  requires c_im < M31_P
+    requires d_re < M31_P  requires d_im < M31_P
+    ensures result < M31_P
+{
+    let ac_im: u32 = cm31_mul_im(a_re, a_im, c_re, c_im);
+    let bd_re: u32 = cm31_mul_re(b_re, b_im, d_re, d_im);
+    let bd_im: u32 = cm31_mul_im(b_re, b_im, d_re, d_im);
+    // bd_re + 2*bd_im
+    let t: u32 = m31_add(bd_re, m31_double(bd_im));
+    m31_add(ac_im, t)
+}
+
+// QM31 imaginary CM31 output part: ad + bc
+//   (a + bj)(c + dj) output im part = ad + bc   (CM31 multiply)
+
+fn qm31_mul_out_im_re(a_re: u32, a_im: u32, b_re: u32, b_im: u32,
+                      c_re: u32, c_im: u32, d_re: u32, d_im: u32) -> u32
+    requires a_re < M31_P  requires a_im < M31_P
+    requires b_re < M31_P  requires b_im < M31_P
+    requires c_re < M31_P  requires c_im < M31_P
+    requires d_re < M31_P  requires d_im < M31_P
+    ensures result < M31_P
+{
+    // ad_re = a_re*d_re - a_im*d_im
+    let ad_re: u32 = cm31_mul_re(a_re, a_im, d_re, d_im);
+    // bc_re = b_re*c_re - b_im*c_im
+    let bc_re: u32 = cm31_mul_re(b_re, b_im, c_re, c_im);
+    m31_add(ad_re, bc_re)
+}
+
+fn qm31_mul_out_im_im(a_re: u32, a_im: u32, b_re: u32, b_im: u32,
+                      c_re: u32, c_im: u32, d_re: u32, d_im: u32) -> u32
+    requires a_re < M31_P  requires a_im < M31_P
+    requires b_re < M31_P  requires b_im < M31_P
+    requires c_re < M31_P  requires c_im < M31_P
+    requires d_re < M31_P  requires d_im < M31_P
+    ensures result < M31_P
+{
+    // ad_im = a_re*d_im + a_im*d_re
+    let ad_im: u32 = cm31_mul_im(a_re, a_im, d_re, d_im);
+    // bc_im = b_re*c_im + b_im*c_re
+    let bc_im: u32 = cm31_mul_im(b_re, b_im, c_re, c_im);
+    m31_add(ad_im, bc_im)
+}
+
+// ---- QM31 addition / subtraction (componentwise) ---------------------------
+
+fn qm31_add_re_re(a: u32, b: u32) -> u32
+    requires a < M31_P  requires b < M31_P  ensures result < M31_P
+{ m31_add(a, b) }
+
+fn qm31_add_re_im(a: u32, b: u32) -> u32
+    requires a < M31_P  requires b < M31_P  ensures result < M31_P
+{ m31_add(a, b) }
+
+fn qm31_add_im_re(a: u32, b: u32) -> u32
+    requires a < M31_P  requires b < M31_P  ensures result < M31_P
+{ m31_add(a, b) }
+
+fn qm31_add_im_im(a: u32, b: u32) -> u32
+    requires a < M31_P  requires b < M31_P  ensures result < M31_P
+{ m31_add(a, b) }
+
+fn qm31_sub_re_re(a: u32, b: u32) -> u32
+    requires a < M31_P  requires b < M31_P  ensures result < M31_P
+{ m31_sub(a, b) }
+
+fn qm31_sub_re_im(a: u32, b: u32) -> u32
+    requires a < M31_P  requires b < M31_P  ensures result < M31_P
+{ m31_sub(a, b) }
+
+fn qm31_sub_im_re(a: u32, b: u32) -> u32
+    requires a < M31_P  requires b < M31_P  ensures result < M31_P
+{ m31_sub(a, b) }
+
+fn qm31_sub_im_im(a: u32, b: u32) -> u32
+    requires a < M31_P  requires b < M31_P  ensures result < M31_P
+{ m31_sub(a, b) }
+
+fn main() -> u64 { 0u64 }

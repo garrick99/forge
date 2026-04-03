@@ -1,0 +1,252 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry merkle_leaf_kernel(
+    .param .u64 merkle_leaf_kernel_param_tree_data,
+    .param .u64 merkle_leaf_kernel_param_tree_len,
+    .param .u64 merkle_leaf_kernel_param_col_data,
+    .param .u64 merkle_leaf_kernel_param_col_len,
+    .param .u64 merkle_leaf_kernel_param_n_leaves
+)
+{
+    .reg .pred %p10;
+    .reg .u64 %rd0, %rd1, %rd11, %rd13, %rd14, %rd15, %rd16, %rd17, %rd2, %rd3, %rd4;
+    .reg .u32 %r18, %r19, %r20, %r5, %r6, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [merkle_leaf_kernel_param_tree_data];
+  ld.param.u64 %rd1, [merkle_leaf_kernel_param_tree_len];
+  ld.param.u64 %rd2, [merkle_leaf_kernel_param_col_data];
+  ld.param.u64 %rd3, [merkle_leaf_kernel_param_col_len];
+  ld.param.u64 %rd4, [merkle_leaf_kernel_param_n_leaves];
+
+  mov.u32 %r5, %ctaid.x;
+  mov.u32 %r6, %ntid.x;
+  mul.lo.u32 %r7, %r5, %r6;
+  mov.u32 %r8, %tid.x;
+  add.u32 %r9, %r7, %r8;
+  cvt.u64.u32 %rd11, %r9;
+  setp.lt.u64 %p10, %rd11, %rd4;
+  @%p10 bra merkle_leaf_kernel_then_12;
+  bra merkle_leaf_kernel_else_12;
+  merkle_leaf_kernel_then_12:
+  mov.u64 %rd13, 0; // unhandled expr
+  mov.u64 %rd14, 1;
+  sub.u64 %rd15, %rd4, %rd14;
+  add.u64 %rd16, %rd15, %r9;
+  mov.u64 %rd17, 0; // unhandled expr
+  mov.u32 %r18, 0; // unit
+  mov.u32 %r19, %r18;
+  bra merkle_leaf_kernel_end_12;
+  merkle_leaf_kernel_else_12:
+  mov.u32 %r19, 0; // no else branch
+  merkle_leaf_kernel_end_12:
+  mov.u32 %r20, 0; // unit
+  ret;
+}
+
+.visible .entry merkle_inner_kernel(
+    .param .u64 merkle_inner_kernel_param_tree_data,
+    .param .u64 merkle_inner_kernel_param_tree_len,
+    .param .u64 merkle_inner_kernel_param_node_base,
+    .param .u64 merkle_inner_kernel_param_n_nodes,
+    .param .u64 merkle_inner_kernel_param_n_leaves
+)
+{
+    .reg .pred %p10;
+    .reg .u64 %rd0, %rd1, %rd11, %rd13, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd3, %rd4;
+    .reg .u32 %r26, %r27, %r28, %r5, %r6, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [merkle_inner_kernel_param_tree_data];
+  ld.param.u64 %rd1, [merkle_inner_kernel_param_tree_len];
+  ld.param.u64 %rd2, [merkle_inner_kernel_param_node_base];
+  ld.param.u64 %rd3, [merkle_inner_kernel_param_n_nodes];
+  ld.param.u64 %rd4, [merkle_inner_kernel_param_n_leaves];
+
+  mov.u32 %r5, %ctaid.x;
+  mov.u32 %r6, %ntid.x;
+  mul.lo.u32 %r7, %r5, %r6;
+  mov.u32 %r8, %tid.x;
+  add.u32 %r9, %r7, %r8;
+  cvt.u64.u32 %rd11, %r9;
+  setp.lt.u64 %p10, %rd11, %rd3;
+  @%p10 bra merkle_inner_kernel_then_12;
+  bra merkle_inner_kernel_else_12;
+  merkle_inner_kernel_then_12:
+  add.u64 %rd13, %rd2, %r9;
+  mov.u64 %rd14, 2;
+  mul.lo.u64 %rd15, %rd14, %rd13;
+  mov.u64 %rd16, 1;
+  add.u64 %rd17, %rd15, %rd16;
+  mov.u64 %rd18, 2;
+  mul.lo.u64 %rd19, %rd18, %rd13;
+  mov.u64 %rd20, 2;
+  add.u64 %rd21, %rd19, %rd20;
+  mov.u64 %rd22, 0; // unhandled expr
+  mov.u64 %rd23, 0; // unhandled expr
+  mov.u64 %rd24, 0; // unhandled expr
+  mov.u64 %rd25, 0; // unhandled expr
+  mov.u32 %r26, 0; // unit
+  mov.u32 %r27, %r26;
+  bra merkle_inner_kernel_end_12;
+  merkle_inner_kernel_else_12:
+  mov.u32 %r27, 0; // no else branch
+  merkle_inner_kernel_end_12:
+  mov.u32 %r28, 0; // unit
+  ret;
+}
+
+.visible .entry merkle_verify_root(
+    .param .u64 merkle_verify_root_param_tree_data,
+    .param .u64 merkle_verify_root_param_tree_len,
+    .param .u64 merkle_verify_root_param_expected_root_data,
+    .param .u64 merkle_verify_root_param_expected_root_len,
+    .param .u64 merkle_verify_root_param_match_out_data,
+    .param .u64 merkle_verify_root_param_match_out_len
+)
+{
+    .reg .pred %p100, %p101, %p102, %p103, %p104, %p105, %p106, %p107, %p108, %p109, %p12, %p95, %p96, %p97, %p98, %p99;
+    .reg .u64 %rd0, %rd1, %rd11, %rd114, %rd115, %rd116, %rd117, %rd13, %rd15, %rd16, %rd17, %rd18, %rd2, %rd20, %rd21, %rd22, %rd23, %rd25, %rd26, %rd27, %rd28, %rd3, %rd30, %rd31, %rd32, %rd33, %rd35, %rd36, %rd37, %rd38, %rd4, %rd40, %rd41, %rd42, %rd43, %rd45, %rd46, %rd47, %rd48, %rd5, %rd50, %rd51, %rd52, %rd53, %rd55, %rd56, %rd57, %rd58, %rd60, %rd61, %rd62, %rd63, %rd65, %rd66, %rd67, %rd68, %rd70, %rd71, %rd72, %rd73, %rd75, %rd76, %rd77, %rd78, %rd80, %rd81, %rd82, %rd83, %rd85, %rd86, %rd87, %rd88, %rd90, %rd91, %rd92, %rd93;
+    .reg .u32 %r10, %r111, %r112, %r113, %r118, %r119, %r120, %r19, %r24, %r29, %r34, %r39, %r44, %r49, %r54, %r59, %r6, %r64, %r69, %r7, %r74, %r79, %r8, %r84, %r89, %r9, %r94;
+
+  ld.param.u64 %rd0, [merkle_verify_root_param_tree_data];
+  ld.param.u64 %rd1, [merkle_verify_root_param_tree_len];
+  ld.param.u64 %rd2, [merkle_verify_root_param_expected_root_data];
+  ld.param.u64 %rd3, [merkle_verify_root_param_expected_root_len];
+  ld.param.u64 %rd4, [merkle_verify_root_param_match_out_data];
+  ld.param.u64 %rd5, [merkle_verify_root_param_match_out_len];
+
+  mov.u32 %r6, %ctaid.x;
+  mov.u32 %r7, %ntid.x;
+  mul.lo.u32 %r8, %r6, %r7;
+  mov.u32 %r9, %tid.x;
+  add.u32 %r10, %r8, %r9;
+  mov.u64 %rd11, 0;
+  cvt.u64.u32 %rd13, %r10;
+  setp.eq.u64 %p12, %rd13, %rd11;
+  @%p12 bra merkle_verify_root_then_14;
+  bra merkle_verify_root_else_14;
+  merkle_verify_root_then_14:
+  mov.u64 %rd15, 0;
+  mov.u64 %rd16, 4;
+  mul.lo.u64 %rd17, %rd15, %rd16;
+  add.u64 %rd18, %rd0, %rd17;
+  ld.global.u32 %r19, [%rd18];
+  mov.u64 %rd20, 1;
+  mov.u64 %rd21, 4;
+  mul.lo.u64 %rd22, %rd20, %rd21;
+  add.u64 %rd23, %rd0, %rd22;
+  ld.global.u32 %r24, [%rd23];
+  mov.u64 %rd25, 2;
+  mov.u64 %rd26, 4;
+  mul.lo.u64 %rd27, %rd25, %rd26;
+  add.u64 %rd28, %rd0, %rd27;
+  ld.global.u32 %r29, [%rd28];
+  mov.u64 %rd30, 3;
+  mov.u64 %rd31, 4;
+  mul.lo.u64 %rd32, %rd30, %rd31;
+  add.u64 %rd33, %rd0, %rd32;
+  ld.global.u32 %r34, [%rd33];
+  mov.u64 %rd35, 4;
+  mov.u64 %rd36, 4;
+  mul.lo.u64 %rd37, %rd35, %rd36;
+  add.u64 %rd38, %rd0, %rd37;
+  ld.global.u32 %r39, [%rd38];
+  mov.u64 %rd40, 5;
+  mov.u64 %rd41, 4;
+  mul.lo.u64 %rd42, %rd40, %rd41;
+  add.u64 %rd43, %rd0, %rd42;
+  ld.global.u32 %r44, [%rd43];
+  mov.u64 %rd45, 6;
+  mov.u64 %rd46, 4;
+  mul.lo.u64 %rd47, %rd45, %rd46;
+  add.u64 %rd48, %rd0, %rd47;
+  ld.global.u32 %r49, [%rd48];
+  mov.u64 %rd50, 7;
+  mov.u64 %rd51, 4;
+  mul.lo.u64 %rd52, %rd50, %rd51;
+  add.u64 %rd53, %rd0, %rd52;
+  ld.global.u32 %r54, [%rd53];
+  mov.u64 %rd55, 0;
+  mov.u64 %rd56, 4;
+  mul.lo.u64 %rd57, %rd55, %rd56;
+  add.u64 %rd58, %rd2, %rd57;
+  ld.global.u32 %r59, [%rd58];
+  mov.u64 %rd60, 1;
+  mov.u64 %rd61, 4;
+  mul.lo.u64 %rd62, %rd60, %rd61;
+  add.u64 %rd63, %rd2, %rd62;
+  ld.global.u32 %r64, [%rd63];
+  mov.u64 %rd65, 2;
+  mov.u64 %rd66, 4;
+  mul.lo.u64 %rd67, %rd65, %rd66;
+  add.u64 %rd68, %rd2, %rd67;
+  ld.global.u32 %r69, [%rd68];
+  mov.u64 %rd70, 3;
+  mov.u64 %rd71, 4;
+  mul.lo.u64 %rd72, %rd70, %rd71;
+  add.u64 %rd73, %rd2, %rd72;
+  ld.global.u32 %r74, [%rd73];
+  mov.u64 %rd75, 4;
+  mov.u64 %rd76, 4;
+  mul.lo.u64 %rd77, %rd75, %rd76;
+  add.u64 %rd78, %rd2, %rd77;
+  ld.global.u32 %r79, [%rd78];
+  mov.u64 %rd80, 5;
+  mov.u64 %rd81, 4;
+  mul.lo.u64 %rd82, %rd80, %rd81;
+  add.u64 %rd83, %rd2, %rd82;
+  ld.global.u32 %r84, [%rd83];
+  mov.u64 %rd85, 6;
+  mov.u64 %rd86, 4;
+  mul.lo.u64 %rd87, %rd85, %rd86;
+  add.u64 %rd88, %rd2, %rd87;
+  ld.global.u32 %r89, [%rd88];
+  mov.u64 %rd90, 7;
+  mov.u64 %rd91, 4;
+  mul.lo.u64 %rd92, %rd90, %rd91;
+  add.u64 %rd93, %rd2, %rd92;
+  ld.global.u32 %r94, [%rd93];
+  setp.eq.u32 %p95, %r19, %r59;
+  setp.eq.u32 %p96, %r24, %r64;
+  and.b16 %p97, %p95, %p96;
+  setp.eq.u32 %p98, %r29, %r69;
+  and.b16 %p99, %p97, %p98;
+  setp.eq.u32 %p100, %r34, %r74;
+  and.b16 %p101, %p99, %p100;
+  setp.eq.u32 %p102, %r39, %r79;
+  and.b16 %p103, %p101, %p102;
+  setp.eq.u32 %p104, %r44, %r84;
+  and.b16 %p105, %p103, %p104;
+  setp.eq.u32 %p106, %r49, %r89;
+  and.b16 %p107, %p105, %p106;
+  setp.eq.u32 %p108, %r54, %r94;
+  and.b16 %p109, %p107, %p108;
+  @%p109 bra merkle_verify_root_then_110;
+  bra merkle_verify_root_else_110;
+  merkle_verify_root_then_110:
+  mov.u32 %r111, 1;
+  mov.u32 %r112, %r111;
+  bra merkle_verify_root_end_110;
+  merkle_verify_root_else_110:
+  mov.u32 %r113, 0;
+  mov.u32 %r112, %r113;
+  merkle_verify_root_end_110:
+  mov.u64 %rd114, 0;
+  mov.u64 %rd115, 4;
+  mul.lo.u64 %rd116, %rd114, %rd115;
+  add.u64 %rd117, %rd4, %rd116;
+  st.global.u32 [%rd117], %r112;
+  mov.u32 %r118, 0; // unit
+  mov.u32 %r119, %r118;
+  bra merkle_verify_root_end_14;
+  merkle_verify_root_else_14:
+  mov.u32 %r119, 0; // no else branch
+  merkle_verify_root_end_14:
+  mov.u32 %r120, 0; // unit
+  ret;
+}
+

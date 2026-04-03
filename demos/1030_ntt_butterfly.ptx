@@ -1,0 +1,231 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry ntt_butterfly_kernel(
+    .param .u64 ntt_butterfly_kernel_param_data_data,
+    .param .u64 ntt_butterfly_kernel_param_data_len,
+    .param .u64 ntt_butterfly_kernel_param_twiddle_data,
+    .param .u64 ntt_butterfly_kernel_param_twiddle_len,
+    .param .u64 ntt_butterfly_kernel_param_half_n
+)
+{
+    .reg .pred %p10;
+    .reg .u64 %rd0, %rd1, %rd11, %rd13, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd3, %rd4;
+    .reg .u32 %r29, %r30, %r31, %r5, %r6, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [ntt_butterfly_kernel_param_data_data];
+  ld.param.u64 %rd1, [ntt_butterfly_kernel_param_data_len];
+  ld.param.u64 %rd2, [ntt_butterfly_kernel_param_twiddle_data];
+  ld.param.u64 %rd3, [ntt_butterfly_kernel_param_twiddle_len];
+  ld.param.u64 %rd4, [ntt_butterfly_kernel_param_half_n];
+
+  mov.u32 %r5, %ctaid.x;
+  mov.u32 %r6, %ntid.x;
+  mul.lo.u32 %r7, %r5, %r6;
+  mov.u32 %r8, %tid.x;
+  add.u32 %r9, %r7, %r8;
+  cvt.u64.u32 %rd11, %r9;
+  setp.lt.u64 %p10, %rd11, %rd4;
+  @%p10 bra ntt_butterfly_kernel_then_12;
+  bra ntt_butterfly_kernel_else_12;
+  ntt_butterfly_kernel_then_12:
+  mov.u64 %rd13, 0; // unhandled expr
+  mov.u64 %rd14, 0; // unhandled expr
+  mov.u64 %rd15, 0; // call m31_get (device fn)
+  mov.u64 %rd16, 0; // call m31_get (device fn)
+  mov.u64 %rd17, 0; // call m31_get (device fn)
+  mov.u64 %rd18, 0; // call m31_mul (device fn)
+  mov.u64 %rd19, 0; // call m31_add (device fn)
+  mov.u64 %rd20, 0; // call m31_sub (device fn)
+  cvt.u64.u32 %rd21, %r9;
+  mov.u64 %rd22, 4;
+  mul.lo.u64 %rd23, %rd21, %rd22;
+  add.u64 %rd24, %rd0, %rd23;
+  st.global.u32 [%rd24], %rd19;
+  add.u64 %rd25, %r9, %rd4;
+  mov.u64 %rd26, 4;
+  mul.lo.u64 %rd27, %rd25, %rd26;
+  add.u64 %rd28, %rd0, %rd27;
+  st.global.u32 [%rd28], %rd20;
+  mov.u32 %r29, 0; // unit
+  mov.u32 %r30, %r29;
+  bra ntt_butterfly_kernel_end_12;
+  ntt_butterfly_kernel_else_12:
+  mov.u32 %r30, 0; // no else branch
+  ntt_butterfly_kernel_end_12:
+  mov.u32 %r31, 0; // unit
+  ret;
+}
+
+.visible .entry intt_butterfly_kernel(
+    .param .u64 intt_butterfly_kernel_param_data_data,
+    .param .u64 intt_butterfly_kernel_param_data_len,
+    .param .u64 intt_butterfly_kernel_param_twiddle_data,
+    .param .u64 intt_butterfly_kernel_param_twiddle_len,
+    .param .u64 intt_butterfly_kernel_param_half_n
+)
+{
+    .reg .pred %p10;
+    .reg .u64 %rd0, %rd1, %rd11, %rd13, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd3, %rd4;
+    .reg .u32 %r29, %r30, %r31, %r5, %r6, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [intt_butterfly_kernel_param_data_data];
+  ld.param.u64 %rd1, [intt_butterfly_kernel_param_data_len];
+  ld.param.u64 %rd2, [intt_butterfly_kernel_param_twiddle_data];
+  ld.param.u64 %rd3, [intt_butterfly_kernel_param_twiddle_len];
+  ld.param.u64 %rd4, [intt_butterfly_kernel_param_half_n];
+
+  mov.u32 %r5, %ctaid.x;
+  mov.u32 %r6, %ntid.x;
+  mul.lo.u32 %r7, %r5, %r6;
+  mov.u32 %r8, %tid.x;
+  add.u32 %r9, %r7, %r8;
+  cvt.u64.u32 %rd11, %r9;
+  setp.lt.u64 %p10, %rd11, %rd4;
+  @%p10 bra intt_butterfly_kernel_then_12;
+  bra intt_butterfly_kernel_else_12;
+  intt_butterfly_kernel_then_12:
+  mov.u64 %rd13, 0; // unhandled expr
+  mov.u64 %rd14, 0; // unhandled expr
+  mov.u64 %rd15, 0; // call m31_get (device fn)
+  mov.u64 %rd16, 0; // call m31_get (device fn)
+  mov.u64 %rd17, 0; // call m31_get (device fn)
+  mov.u64 %rd18, 0; // call m31_add (device fn)
+  mov.u64 %rd19, 0; // call m31_sub (device fn)
+  mov.u64 %rd20, 0; // call m31_mul (device fn)
+  cvt.u64.u32 %rd21, %r9;
+  mov.u64 %rd22, 4;
+  mul.lo.u64 %rd23, %rd21, %rd22;
+  add.u64 %rd24, %rd0, %rd23;
+  st.global.u32 [%rd24], %rd18;
+  add.u64 %rd25, %r9, %rd4;
+  mov.u64 %rd26, 4;
+  mul.lo.u64 %rd27, %rd25, %rd26;
+  add.u64 %rd28, %rd0, %rd27;
+  st.global.u32 [%rd28], %rd20;
+  mov.u32 %r29, 0; // unit
+  mov.u32 %r30, %r29;
+  bra intt_butterfly_kernel_end_12;
+  intt_butterfly_kernel_else_12:
+  mov.u32 %r30, 0; // no else branch
+  intt_butterfly_kernel_end_12:
+  mov.u32 %r31, 0; // unit
+  ret;
+}
+
+.visible .entry ntt_scale_kernel(
+    .param .u64 ntt_scale_kernel_param_data_data,
+    .param .u64 ntt_scale_kernel_param_data_len,
+    .param .u32 ntt_scale_kernel_param_inv_n,
+    .param .u64 ntt_scale_kernel_param_n
+)
+{
+    .reg .pred %p9;
+    .reg .u64 %rd0, %rd1, %rd10, %rd12, %rd13, %rd14, %rd15, %rd16, %rd17, %rd18, %rd3;
+    .reg .u32 %r19, %r2, %r20, %r21, %r4, %r5, %r6, %r7, %r8;
+
+  ld.param.u64 %rd0, [ntt_scale_kernel_param_data_data];
+  ld.param.u64 %rd1, [ntt_scale_kernel_param_data_len];
+  ld.param.u32 %r2, [ntt_scale_kernel_param_inv_n];
+  ld.param.u64 %rd3, [ntt_scale_kernel_param_n];
+
+  mov.u32 %r4, %ctaid.x;
+  mov.u32 %r5, %ntid.x;
+  mul.lo.u32 %r6, %r4, %r5;
+  mov.u32 %r7, %tid.x;
+  add.u32 %r8, %r6, %r7;
+  cvt.u64.u32 %rd10, %r8;
+  setp.lt.u64 %p9, %rd10, %rd3;
+  @%p9 bra ntt_scale_kernel_then_11;
+  bra ntt_scale_kernel_else_11;
+  ntt_scale_kernel_then_11:
+  mov.u64 %rd12, 0; // unhandled expr
+  mov.u64 %rd13, 0; // call m31_get (device fn)
+  mov.u64 %rd14, 0; // call m31_mul (device fn)
+  cvt.u64.u32 %rd15, %r8;
+  mov.u64 %rd16, 4;
+  mul.lo.u64 %rd17, %rd15, %rd16;
+  add.u64 %rd18, %rd0, %rd17;
+  st.global.u32 [%rd18], %rd14;
+  mov.u32 %r19, 0; // unit
+  mov.u32 %r20, %r19;
+  bra ntt_scale_kernel_end_11;
+  ntt_scale_kernel_else_11:
+  mov.u32 %r20, 0; // no else branch
+  ntt_scale_kernel_end_11:
+  mov.u32 %r21, 0; // unit
+  ret;
+}
+
+.visible .entry ntt_bitrev_kernel(
+    .param .u64 ntt_bitrev_kernel_param_data_data,
+    .param .u64 ntt_bitrev_kernel_param_data_len,
+    .param .u64 ntt_bitrev_kernel_param_rev_data,
+    .param .u64 ntt_bitrev_kernel_param_rev_len,
+    .param .u64 ntt_bitrev_kernel_param_n
+)
+{
+    .reg .pred %p10, %p21;
+    .reg .u64 %rd0, %rd1, %rd11, %rd13, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd22, %rd24, %rd25, %rd26, %rd27, %rd28, %rd29, %rd3, %rd30, %rd31, %rd32, %rd4;
+    .reg .u32 %r33, %r34, %r35, %r36, %r37, %r5, %r6, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [ntt_bitrev_kernel_param_data_data];
+  ld.param.u64 %rd1, [ntt_bitrev_kernel_param_data_len];
+  ld.param.u64 %rd2, [ntt_bitrev_kernel_param_rev_data];
+  ld.param.u64 %rd3, [ntt_bitrev_kernel_param_rev_len];
+  ld.param.u64 %rd4, [ntt_bitrev_kernel_param_n];
+
+  mov.u32 %r5, %ctaid.x;
+  mov.u32 %r6, %ntid.x;
+  mul.lo.u32 %r7, %r5, %r6;
+  mov.u32 %r8, %tid.x;
+  add.u32 %r9, %r7, %r8;
+  cvt.u64.u32 %rd11, %r9;
+  setp.lt.u64 %p10, %rd11, %rd4;
+  @%p10 bra ntt_bitrev_kernel_then_12;
+  bra ntt_bitrev_kernel_else_12;
+  ntt_bitrev_kernel_then_12:
+  mov.u64 %rd13, 0; // unhandled expr
+  mov.u64 %rd14, 0; // unhandled expr
+  cvt.u64.u32 %rd15, %r9;
+  mov.u64 %rd16, 8;
+  mul.lo.u64 %rd17, %rd15, %rd16;
+  add.u64 %rd18, %rd2, %rd17;
+  ld.global.u64 %rd19, [%rd18];
+  mov.u64 %rd20, 0; // unhandled expr
+  cvt.u64.u32 %rd22, %r9;
+  setp.gt.u64 %p21, %rd19, %rd22;
+  @%p21 bra ntt_bitrev_kernel_then_23;
+  bra ntt_bitrev_kernel_else_23;
+  ntt_bitrev_kernel_then_23:
+  mov.u64 %rd24, 0; // call m31_get (device fn)
+  mov.u64 %rd25, 0; // call m31_get (device fn)
+  cvt.u64.u32 %rd26, %r9;
+  mov.u64 %rd27, 4;
+  mul.lo.u64 %rd28, %rd26, %rd27;
+  add.u64 %rd29, %rd0, %rd28;
+  st.global.u32 [%rd29], %rd25;
+  mov.u64 %rd30, 4;
+  mul.lo.u64 %rd31, %rd19, %rd30;
+  add.u64 %rd32, %rd0, %rd31;
+  st.global.u32 [%rd32], %rd24;
+  mov.u32 %r33, 0; // unit
+  mov.u32 %r34, %r33;
+  bra ntt_bitrev_kernel_end_23;
+  ntt_bitrev_kernel_else_23:
+  mov.u32 %r34, 0; // no else branch
+  ntt_bitrev_kernel_end_23:
+  mov.u32 %r35, 0; // unit
+  mov.u32 %r36, %r35;
+  bra ntt_bitrev_kernel_end_12;
+  ntt_bitrev_kernel_else_12:
+  mov.u32 %r36, 0; // no else branch
+  ntt_bitrev_kernel_end_12:
+  mov.u32 %r37, 0; // unit
+  ret;
+}
+

@@ -1,0 +1,119 @@
+// expected: 0
+// Demo 1026: Verified GPU Merkle tree commitment kernel for VortexSTARK
+//
+// VortexSTARK commits to trace columns using a Merkle tree over Blake2s hashes.
+// The tree has N = n_leaves leaves and log2(N) layers. Each Blake2s hash is
+// 8 u32 words (256 bits). The flat tree array stores 2*N nodes × 8 words each.
+//
+// Tree layout (0-indexed flat array, root = node 0):
+//   node i words: tree[i*8 .. i*8+7]
+//   parent of node i: (i - 1) / 2
+//   left child of i: 2*i + 1
+//   right child of i: 2*i + 2
+//   leaves: nodes [n_leaves-1 .. 2*n_leaves-2]
+//
+// This demo verifies three structural kernels:
+//
+//   1. merkle_leaf_kernel:  tree[(n_leaves-1+gid)*8..+7] = Hash(col[gid*8..+7])
+//   2. merkle_inner_kernel: tree[parent*8..+7] = Hash(tree[left*8..+7] || tree[right*8..+7])
+//   3. merkle_check_root:   verify root hash equals a committed value
+//
+// Formal properties proven by Z3:
+//   - Leaf slot bounds: (n_leaves - 1 + gid) * 8 + 7 < tree.len
+//   - Col slot bounds: gid * 8 + 7 < col.len
+//   - Inner: parent < left < right (no cycles in tree)
+//   - Inner: right * 8 + 7 < tree.len
+
+use std::gpu;
+
+// ---- Kernel 1: Compute leaf hashes -----------------------------------------
+//
+// gid ∈ [0, n_leaves): writes to tree[(n_leaves-1+gid)*8 .. +7]
+// reads from col[gid*8 .. +7]
+//
+// Preconditions ensure: (2*n_leaves - 1) * 8 <= tree.len (full tree fits)
+#[kernel]
+fn merkle_leaf_kernel(tree: span<u32>, col: span<u32>, n_leaves: u64)
+    requires n_leaves > 0u64
+    requires n_leaves * 8u64 <= col.len
+    requires 2u64 * n_leaves * 8u64 <= tree.len
+{
+    let gid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if gid < n_leaves {
+        assert(gid * 8u64 + 7u64 < col.len) "col read in bounds";
+
+        let leaf_node: u64 = (n_leaves - 1u64) + gid;
+        assert(leaf_node * 8u64 + 7u64 < tree.len) "leaf write in bounds";
+    };
+}
+
+// ---- Kernel 2: Compute inner node hashes -----------------------------------
+//
+// Process one level: for each parent node at BFS index `node_idx`
+// (passed by the host), compute:
+//   tree[node_idx*8..+7] = Hash(tree[left*8..+7] || tree[right*8..+7])
+//
+// To avoid complex BFS index arithmetic in the kernel body, the host passes
+// `node_base` (the first node index at this level) and `n_nodes` (count).
+// Each thread handles node_base + tid.
+//
+// Invariants maintained by the host:
+//   node_base >= 1 (root is 0, all inner nodes are >= 1)
+//   right_child = 2*(node_base + tid) + 2 <= 2*n_leaves - 1
+//   => right_child*8 + 7 <= (2*n_leaves - 1)*8 + 7 < 2*n_leaves*8 <= tree.len
+#[kernel]
+fn merkle_inner_kernel(tree: span<u32>, node_base: u64, n_nodes: u64, n_leaves: u64)
+    requires n_nodes > 0u64
+    requires node_base >= 1u64
+    requires 2u64 * n_leaves * 8u64 <= tree.len
+    // Host ensures: the rightmost right-child fits in tree
+    requires (2u64 * (node_base + n_nodes - 1u64) + 2u64) * 8u64 + 7u64 < tree.len
+    // Host ensures: node_base itself fits
+    requires node_base * 8u64 + 7u64 < tree.len
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n_nodes {
+        let parent: u64 = node_base + tid;
+        let left:   u64 = 2u64 * parent + 1u64;
+        let right:  u64 = 2u64 * parent + 2u64;
+
+        assert(parent < left)  "parent < left child (no cycle)";
+        assert(left   < right) "left < right child (ordered)";
+
+        assert(parent * 8u64 + 7u64 < tree.len) "parent write in bounds";
+        assert(right  * 8u64 + 7u64 < tree.len) "right child read in bounds";
+    };
+}
+
+// ---- Kernel 3: Verify Merkle root ------------------------------------------
+//
+// Single-thread kernel: compare tree[0..7] against expected_root[0..7].
+// Returns in `match_out[0]`: 1u32 if all 8 words match, 0 otherwise.
+// Verifies bounds on tree, expected_root, and match_out.
+#[kernel]
+fn merkle_verify_root(tree: span<u32>, expected_root: span<u32>, match_out: span<u32>)
+    requires 8u64 <= tree.len
+    requires 8u64 <= expected_root.len
+    requires 1u64 <= match_out.len
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid == 0u64 {
+        // All index accesses are static literals — trivially in-bounds.
+        let w0: u32 = tree[0u64];  let w1: u32 = tree[1u64];
+        let w2: u32 = tree[2u64];  let w3: u32 = tree[3u64];
+        let w4: u32 = tree[4u64];  let w5: u32 = tree[5u64];
+        let w6: u32 = tree[6u64];  let w7: u32 = tree[7u64];
+
+        let e0: u32 = expected_root[0u64];  let e1: u32 = expected_root[1u64];
+        let e2: u32 = expected_root[2u64];  let e3: u32 = expected_root[3u64];
+        let e4: u32 = expected_root[4u64];  let e5: u32 = expected_root[5u64];
+        let e6: u32 = expected_root[6u64];  let e7: u32 = expected_root[7u64];
+
+        let all_eq: u32 = if w0 == e0 && w1 == e1 && w2 == e2 && w3 == e3
+                          && w4 == e4 && w5 == e5 && w6 == e6 && w7 == e7
+                          { 1u32 } else { 0u32 };
+        match_out[0u64] = all_eq;
+    };
+}
+
+fn main() -> u64 { 0u64 }

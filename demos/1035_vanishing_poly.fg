@@ -1,0 +1,190 @@
+// expected: 0
+// Demo 1035: Verified GPU vanishing polynomial evaluation kernel for Circle STARK
+//
+// In Circle STARK, the AIR constraint is:
+//   C(x) = 0  for all x in the evaluation domain D
+//
+// To prove C(x) = 0 on D, the prover divides by the vanishing polynomial:
+//   Z_D(x) = prod_{p in D} (x - p)
+//
+// The quotient polynomial Q = C / Z_D must be a polynomial of lower degree.
+// The verifier checks that FRI(Q) gives the right degree bound.
+//
+// For a circle domain of size N = 2^n, the vanishing polynomial has a
+// compact formula using repeated squaring in the circle group:
+//   Z_D(x, y) = y * (x^2 - coset_x^2) * ... (for coset circles)
+//   or for the standard domain: Z_D = product of linear factors
+//
+// In practice for VortexSTARK, the GPU computes:
+//   1. inv_z[x] = 1 / Z_D(x)  for each domain point x (precomputed on CPU)
+//   2. q[x] = C[x] * inv_z[x]  (this kernel)
+//
+// This demo proves that the pointwise multiplication C * inv_Z is
+// field-invariant and in-bounds.
+//
+// Additionally, we implement the boundary constraint vanishing polynomial,
+// which vanishes on a single point: Z_{x0}(x) = x - x0.
+// For the boundary quotient: bq[x] = (trace[x] - boundary_val) / (x - x0)
+// where the division is implemented as multiplication by the precomputed inverse.
+//
+// Formal properties proven by Z3:
+//   - All inputs < M31_P
+//   - m31_mul outputs < M31_P
+//   - Array bounds for all accesses
+
+use std::gpu;
+use std::m31;
+
+// Helper: read one M31 element, proving result < M31_P.
+fn m31_get(arr: span<u32>, idx: u64) -> u32
+    requires idx < arr.len
+    requires forall k: u64, k < arr.len ==> arr[k] < M31_P
+    ensures result < M31_P
+{
+    assert(arr[idx] < M31_P) "forall k instantiated at idx";
+    arr[idx]
+}
+
+// ---- Kernel 1: Constraint quotient via precomputed inv_Z -------------------
+//
+// quot[x] = constraint[x] * inv_z[x]
+// where inv_z[x] = 1 / Z_D(x) precomputed by CPU.
+#[kernel]
+fn quotient_by_inv_vanishing_kernel(
+    quot:       span<u32>,
+    constraint: span<u32>,
+    inv_z:      span<u32>,
+    n:          u64)
+    requires n <= quot.len
+    requires n <= constraint.len
+    requires n <= inv_z.len
+    requires forall k: u64, k < quot.len       ==> quot[k]       < M31_P
+    requires forall k: u64, k < constraint.len ==> constraint[k] < M31_P
+    requires forall k: u64, k < inv_z.len      ==> inv_z[k]      < M31_P
+{
+    let x: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if x < n {
+        assert(x < quot.len)       "quot in bounds";
+        assert(x < constraint.len) "constraint in bounds";
+        assert(x < inv_z.len)      "inv_z in bounds";
+
+        let c: u32 = m31_get(constraint, x);
+        let z: u32 = m31_get(inv_z,      x);
+        quot[x] = m31_mul(c, z);
+    };
+}
+
+// ---- Kernel 2: Boundary quotient computation --------------------------------
+//
+// For a boundary constraint at position x0:
+//   boundary_quot[x] = (trace[x] - boundary_val) * inv_z_boundary[x]
+//   where inv_z_boundary[x] = 1 / (x_coord[x] - x0) precomputed by CPU.
+//
+// x_coord[x] is the x-coordinate of the x-th circle point in the domain.
+// boundary_val is the expected trace value at the boundary point.
+// inv_z_boundary[x] must have the boundary point excluded (or handled separately).
+#[kernel]
+fn boundary_quotient_kernel(
+    bquot:          span<u32>,
+    trace:          span<u32>,
+    inv_z_boundary: span<u32>,
+    boundary_val:   u32,
+    n:              u64)
+    requires n <= bquot.len
+    requires n <= trace.len
+    requires n <= inv_z_boundary.len
+    requires boundary_val < M31_P
+    requires forall k: u64, k < bquot.len          ==> bquot[k]          < M31_P
+    requires forall k: u64, k < trace.len           ==> trace[k]           < M31_P
+    requires forall k: u64, k < inv_z_boundary.len  ==> inv_z_boundary[k]  < M31_P
+{
+    let x: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if x < n {
+        assert(x < bquot.len)          "bquot in bounds";
+        assert(x < trace.len)          "trace in bounds";
+        assert(x < inv_z_boundary.len) "inv_z_boundary in bounds";
+
+        let t: u32 = m31_get(trace,           x);
+        let z: u32 = m31_get(inv_z_boundary,  x);
+
+        // numerator = trace[x] - boundary_val
+        let num:  u32 = m31_sub(t, boundary_val);
+        bquot[x] = m31_mul(num, z);
+    };
+}
+
+// ---- Kernel 3: Combined AIR + boundary quotient accumulation ---------------
+//
+// Computes the full VortexSTARK quotient polynomial for one step:
+//   Q[x] = alpha * constraint_quot[x] + beta * boundary_quot[x]
+// where constraint_quot and boundary_quot are already divided by their
+// respective vanishing polynomials.
+//
+// The final quotient polynomial is the sum used for FRI commitment.
+#[kernel]
+fn combine_quotients_kernel(
+    combined:         span<u32>,
+    constraint_quot:  span<u32>,
+    boundary_quot:    span<u32>,
+    alpha:            u32,
+    beta:             u32,
+    n:                u64)
+    requires n <= combined.len
+    requires n <= constraint_quot.len
+    requires n <= boundary_quot.len
+    requires alpha < M31_P
+    requires beta  < M31_P
+    requires forall k: u64, k < combined.len        ==> combined[k]        < M31_P
+    requires forall k: u64, k < constraint_quot.len ==> constraint_quot[k] < M31_P
+    requires forall k: u64, k < boundary_quot.len   ==> boundary_quot[k]   < M31_P
+{
+    let x: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if x < n {
+        assert(x < combined.len)        "combined in bounds";
+        assert(x < constraint_quot.len) "constraint_quot in bounds";
+        assert(x < boundary_quot.len)   "boundary_quot in bounds";
+
+        let cq: u32 = m31_get(constraint_quot, x);
+        let bq: u32 = m31_get(boundary_quot,   x);
+
+        let t1: u32 = m31_mul(alpha, cq);
+        let t2: u32 = m31_mul(beta,  bq);
+        combined[x] = m31_add(t1, t2);
+    };
+}
+
+// ---- Kernel 4: Coset shift for blowup factor --------------------------------
+//
+// Before FRI, the quotient polynomial is evaluated on a larger coset domain
+// (the "blowup" domain) to ensure degree separation. The coset domain is
+// g * D where g is a generator element.
+//
+// This kernel shifts from the evaluation domain to the blowup coset:
+//   blowup[x] = quot[x] * shift_power[x]
+// where shift_power[x] = g^x mod P (precomputed).
+#[kernel]
+fn coset_blowup_shift_kernel(
+    blowup:      span<u32>,
+    quot:        span<u32>,
+    shift_power: span<u32>,
+    n:           u64)
+    requires n <= blowup.len
+    requires n <= quot.len
+    requires n <= shift_power.len
+    requires forall k: u64, k < blowup.len      ==> blowup[k]      < M31_P
+    requires forall k: u64, k < quot.len        ==> quot[k]        < M31_P
+    requires forall k: u64, k < shift_power.len ==> shift_power[k] < M31_P
+{
+    let x: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if x < n {
+        assert(x < blowup.len)      "blowup in bounds";
+        assert(x < quot.len)        "quot in bounds";
+        assert(x < shift_power.len) "shift_power in bounds";
+
+        let q: u32 = m31_get(quot,        x);
+        let s: u32 = m31_get(shift_power, x);
+        blowup[x] = m31_mul(q, s);
+    };
+}
+
+fn main() -> u64 { 0u64 }

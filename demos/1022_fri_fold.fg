@@ -1,0 +1,123 @@
+// expected: 0
+// Demo 1022: Verified GPU FRI fold kernel over M31
+//
+// FRI (Fast Reed-Solomon IOP) is the polynomial commitment scheme underlying
+// Circle STARK proofs (stwo, VortexSTARK). The core operation is the fold step:
+// given evaluations on a domain of size N, produce evaluations on a domain of
+// size N/2 by folding pairs with a random challenge alpha:
+//
+//   new[i] = old[i] + alpha * old[i + half]   mod P    for i in 0..half
+//
+// where alpha is the verifier's random challenge (Fiat-Shamir in the SNARK).
+//
+// This is the M31 version (real FRI, not circle FRI), used in the inner FRI
+// layers after the initial circle-to-line projection in VortexSTARK.
+//
+// Formal properties proven by Z3:
+//   1. old[i] read:       i < half, N <= old.len, N == 2*half => i < old.len
+//   2. old[i+half] read:  i + half < N <= old.len
+//   3. new[i] write:      i < half <= new.len
+//   4. M31 field invariant: old elements < P (forall precondition)
+//   5. alpha < P:         passed as precondition
+//   6. Output values < P: postconditions of m31_add / m31_mul
+//
+// The demo also includes a batched-FRI fold that processes QM31 evaluations
+// (used in VortexSTARK where the trace columns are over the QM31 extension field).
+
+use std::gpu;
+use std::m31;
+
+// Helper: read one M31 element from a span, proving result < M31_P.
+// Same pattern as 1021_circle_ntt.fg — see comments there for rationale.
+fn m31_get(arr: span<u32>, idx: u64) -> u32
+    requires idx < arr.len
+    requires forall k: u64, k < arr.len ==> arr[k] < M31_P
+    ensures result < M31_P
+{
+    assert(arr[idx] < M31_P) "forall k precondition instantiated at idx";
+    arr[idx]
+}
+
+// One FRI fold layer: new[i] = old[i] + alpha * old[i + half] mod P
+//
+// Parameters:
+//   new_evals  -- output span, size >= half (written by this kernel)
+//   old_evals  -- input span, size >= N = 2*half (read-only)
+//   alpha      -- folding challenge, alpha < P
+//   half       -- N/2 for this layer
+//   n          -- total element count = 2 * half
+#[kernel]
+fn fri_fold_layer(new_evals: span<u32>, old_evals: span<u32>,
+                  alpha: u32, half: u64, n: u64)
+    requires n == half + half
+    requires n <= old_evals.len
+    requires half <= new_evals.len
+    requires alpha < M31_P
+    requires forall k: u64, k < old_evals.len ==> old_evals[k] < M31_P
+{
+    let i: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if i < half {
+        let a: u32 = m31_get(old_evals, i);
+        let b: u32 = m31_get(old_evals, i + half);
+        let ab: u32 = m31_mul(alpha, b);
+        new_evals[i] = m31_add(a, ab);
+    };
+}
+
+// Additive inverse FRI fold: new[i] = old[i] - alpha * old[i + half] mod P
+// Used in the inverse direction (expanding from N/2 to N evaluations).
+#[kernel]
+fn fri_unfold_layer(new_evals: span<u32>, old_evals: span<u32>,
+                    alpha: u32, half: u64, n: u64)
+    requires n == half + half
+    requires n <= old_evals.len
+    requires half <= new_evals.len
+    requires alpha < M31_P
+    requires forall k: u64, k < old_evals.len ==> old_evals[k] < M31_P
+{
+    let i: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if i < half {
+        let a: u32 = m31_get(old_evals, i);
+        let b: u32 = m31_get(old_evals, i + half);
+        let ab: u32 = m31_mul(alpha, b);
+        new_evals[i] = m31_sub(a, ab);
+    };
+}
+
+// CM31 FRI fold: new[i] = old_re[i] + alpha_re*old_re[i+half] - alpha_im*old_im[i+half]
+//                         + i*(old_im[i] + alpha_re*old_im[i+half] + alpha_im*old_re[i+half])
+//
+// This is one step of the complex-extension FRI used in VortexSTARK inner layers.
+// The alpha challenge is in CM31 = M31[i]/(i^2+1).
+#[kernel]
+fn fri_fold_layer_cm31(new_re: span<u32>, new_im: span<u32>,
+                       old_re: span<u32>, old_im: span<u32>,
+                       alpha_re: u32, alpha_im: u32,
+                       half: u64, n: u64)
+    requires n == half + half
+    requires n <= old_re.len
+    requires n <= old_im.len
+    requires half <= new_re.len
+    requires half <= new_im.len
+    requires alpha_re < M31_P
+    requires alpha_im < M31_P
+    requires forall k: u64, k < old_re.len ==> old_re[k] < M31_P
+    requires forall k: u64, k < old_im.len ==> old_im[k] < M31_P
+{
+    let i: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if i < half {
+        let a_re: u32 = m31_get(old_re, i);
+        let a_im: u32 = m31_get(old_im, i);
+        let b_re: u32 = m31_get(old_re, i + half);
+        let b_im: u32 = m31_get(old_im, i + half);
+
+        // alpha * b  (CM31 multiply)
+        let ab_re: u32 = cm31_mul_re(alpha_re, alpha_im, b_re, b_im);
+        let ab_im: u32 = cm31_mul_im(alpha_re, alpha_im, b_re, b_im);
+
+        new_re[i] = m31_add(a_re, ab_re);
+        new_im[i] = m31_add(a_im, ab_im);
+    };
+}
+
+fn main() -> u64 { 0u64 }

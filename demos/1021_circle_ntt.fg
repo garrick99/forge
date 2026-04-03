@@ -1,0 +1,132 @@
+// expected: 0
+// Demo 1021: Verified GPU Circle NTT butterfly kernel over M31
+//
+// The Circle NTT is the core of the Circle STARK proof system (stwo, VortexSTARK).
+// It operates over M31 = Z/(2^31-1)Z and uses the circle group C(F_p) where
+// the "twisting" action replaces standard roots of unity.
+//
+// A circle NTT layer folds N/2 butterfly pairs in parallel:
+//   for i in 0..half:
+//     u = re[i],        v = re[i + half]
+//     tw = twiddle[i]   (precomputed circle point x-coordinate)
+//     re[i]        = u + tw * v   mod P
+//     re[i + half] = u - tw * v   mod P
+//
+// This kernel dispatches one thread per butterfly pair. With a 256-thread block
+// and grid_x = ceil(half / 256) blocks, all N/2 pairs are processed in parallel.
+//
+// Formal properties proven by Z3:
+//   1. re[i] read:          i < half, n <= re.len, n == 2*half => i < re.len
+//   2. re[i+half] read:     i + half < n <= re.len
+//   3. twiddle[i] read:     i < half <= twiddle.len
+//   4. re[i] write:         i < re.len (from above)
+//   5. re[i+half] write:    i + half < re.len (from above)
+//   6. M31 field invariant: re/twiddle elements < P (forall precondition)
+//   7. Output values < P:   postconditions of m31_add / m31_sub / m31_neg
+//
+// The mathematical correctness of circle NTT twiddle factors is
+// established separately in VortexSTARK's CPU-side precomputation.
+
+use std::gpu;
+use std::m31;
+
+// Helper: read one M31 element, proving the result < M31_P from the
+// array-wide forall invariant. This separates forall instantiation from
+// kernel body verification, which lets Z3 instantiate at a concrete idx.
+fn m31_get(arr: span<u32>, idx: u64) -> u32
+    requires idx < arr.len
+    requires forall k: u64, k < arr.len ==> arr[k] < M31_P
+    ensures result < M31_P
+{
+    assert(arr[idx] < M31_P) "forall k precondition instantiated at idx";
+    arr[idx]
+}
+
+// One radix-2 butterfly layer of the circle NTT.
+//
+// Parameters:
+//   re      -- flat array of M31 elements in-place (all < M31_P)
+//   twiddle -- precomputed twiddle factors for this layer (all < M31_P)
+//   half    -- N/2 for this layer
+//   n       -- total element count (= 2 * half)
+#[kernel]
+fn circle_ntt_layer(re: span<u32>, twiddle: span<u32>, half: u64, n: u64)
+    requires n == half + half
+    requires n <= re.len
+    requires half <= twiddle.len
+    requires forall k: u64, k < re.len ==> re[k] < M31_P
+    requires forall k: u64, k < twiddle.len ==> twiddle[k] < M31_P
+{
+    let i: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if i < half {
+        let u: u32  = m31_get(re, i);
+        let v: u32  = m31_get(re, i + half);
+        let tw: u32 = m31_get(twiddle, i);
+
+        let tv: u32 = m31_mul(tw, v);
+        re[i]        = m31_add(u, tv);
+        re[i + half] = m31_sub(u, tv);
+    };
+}
+
+// Inverse butterfly: conjugate twiddle (tw -> -tw), used in INTT.
+#[kernel]
+fn circle_intt_layer(re: span<u32>, twiddle: span<u32>, half: u64, n: u64)
+    requires n == half + half
+    requires n <= re.len
+    requires half <= twiddle.len
+    requires forall k: u64, k < re.len ==> re[k] < M31_P
+    requires forall k: u64, k < twiddle.len ==> twiddle[k] < M31_P
+{
+    let i: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if i < half {
+        let u: u32  = m31_get(re, i);
+        let v: u32  = m31_get(re, i + half);
+        let tw: u32 = m31_get(twiddle, i);
+
+        // Inverse twiddle: negate tw before multiplying (circle conjugate).
+        let neg_tw: u32 = m31_neg(tw);
+        let tv: u32 = m31_mul(neg_tw, v);
+        re[i]        = m31_add(u, tv);
+        re[i + half] = m31_sub(u, tv);
+    };
+}
+
+// CM31 butterfly: one layer of a complex-extension NTT.
+// Each element is (re_arr[i], im_arr[i]) in CM31.
+// twiddle_re / twiddle_im are the CM31 twiddle factors.
+#[kernel]
+fn circle_ntt_layer_cm31(re_arr: span<u32>, im_arr: span<u32>,
+                         tw_re: span<u32>, tw_im: span<u32>,
+                         half: u64, n: u64)
+    requires n == half + half
+    requires n <= re_arr.len
+    requires n <= im_arr.len
+    requires half <= tw_re.len
+    requires half <= tw_im.len
+    requires forall k: u64, k < re_arr.len ==> re_arr[k] < M31_P
+    requires forall k: u64, k < im_arr.len ==> im_arr[k] < M31_P
+    requires forall k: u64, k < tw_re.len ==> tw_re[k] < M31_P
+    requires forall k: u64, k < tw_im.len ==> tw_im[k] < M31_P
+{
+    let i: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if i < half {
+        let u_re: u32 = m31_get(re_arr, i);
+        let u_im: u32 = m31_get(im_arr, i);
+        let v_re: u32 = m31_get(re_arr, i + half);
+        let v_im: u32 = m31_get(im_arr, i + half);
+        let twr: u32  = m31_get(tw_re, i);
+        let twi: u32  = m31_get(tw_im, i);
+
+        // tv = twiddle * v  (CM31 multiply)
+        let tv_re: u32 = cm31_mul_re(twr, twi, v_re, v_im);
+        let tv_im: u32 = cm31_mul_im(twr, twi, v_re, v_im);
+
+        re_arr[i]        = cm31_add_re(u_re, tv_re);
+        im_arr[i]        = cm31_add_im(u_im, tv_im);
+        re_arr[i + half] = cm31_sub_re(u_re, tv_re);
+        im_arr[i + half] = cm31_sub_im(u_im, tv_im);
+    };
+}
+
+fn main() -> u64 { 0u64 }

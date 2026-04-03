@@ -1,0 +1,53 @@
+// expected: 0
+// Demo 1020: Verified GPU IOMMU stress kernel
+//
+// The gpu_stress kernel is the application-side component of the NVIDIA driver
+// bug reproducer: HYPERVISOR_ERROR 0x00020001 after TDR + WSL2 IOMMU
+// page-table corruption (2026-04-02, RTX 5090, driver 595.79).
+//
+// Design:
+//   - Each thread runs an LCG (Knuth MMIX) for `iters` steps.
+//   - Every 1024 steps: scatter write to data[acc % n] forces IOMMU TLB churn.
+//   - Terminal store: data[gid] = final acc.
+//
+// LCG parameters (passed as kernel args so Z3 has no secret constants):
+//   mul = 6364136223846793005  (Knuth MMIX multiplier)
+//   add = 1442695040888963407  (Knuth MMIX addend)
+//
+// Formal properties proven by Z3 (bitvector mode, u64):
+//   1. data[gid] read:      gid < n, n <= data.len  =>  gid < data.len
+//   2. data[acc % n] write: acc % n < n, n <= data.len  =>  acc % n < data.len
+//   3. data[gid] write:     gid < n, n <= data.len  =>  gid < data.len
+//   4. Loop terminates:     decreases iters - k
+//
+// If running this kernel crashes Windows, the fault is in nvlddmkm.sys /
+// Hyper-V VT-d IOMMU -- NOT in the application.
+//
+// Emits CUDA C (.cu) and PTX (.ptx) via the full Forge pipeline.
+
+use std::gpu;
+
+#[kernel]
+fn gpu_stress(data: span<u64>, n: u64, iters: u64, lcg_mul: u64, lcg_add: u64)
+    requires n <= data.len
+    requires n > 0u64
+{
+    let gid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if gid < n {
+        let mut acc: u64 = data[gid] + gid + 1u64;
+        let mut k: u64 = 0u64;
+        while k < iters
+            invariant k <= iters
+            decreases iters - k
+        {
+            acc = acc * lcg_mul + lcg_add;
+            if k % 1024u64 == 0u64 {
+                data[acc % n] = acc;
+            };
+            k = k + 1u64;
+        };
+        data[gid] = acc;
+    };
+}
+
+fn main() -> u64 { 0u64 }

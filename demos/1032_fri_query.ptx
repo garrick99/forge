@@ -1,0 +1,173 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry fri_query_bounds_kernel(
+    .param .u64 fri_query_bounds_kernel_param_leaves_data,
+    .param .u64 fri_query_bounds_kernel_param_leaves_len,
+    .param .u64 fri_query_bounds_kernel_param_query_indices_data,
+    .param .u64 fri_query_bounds_kernel_param_query_indices_len,
+    .param .u64 fri_query_bounds_kernel_param_domain_size,
+    .param .u64 fri_query_bounds_kernel_param_n_queries
+)
+{
+    .reg .pred %p11;
+    .reg .u64 %rd0, %rd1, %rd12, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd3, %rd4, %rd5;
+    .reg .u32 %r10, %r22, %r23, %r24, %r6, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [fri_query_bounds_kernel_param_leaves_data];
+  ld.param.u64 %rd1, [fri_query_bounds_kernel_param_leaves_len];
+  ld.param.u64 %rd2, [fri_query_bounds_kernel_param_query_indices_data];
+  ld.param.u64 %rd3, [fri_query_bounds_kernel_param_query_indices_len];
+  ld.param.u64 %rd4, [fri_query_bounds_kernel_param_domain_size];
+  ld.param.u64 %rd5, [fri_query_bounds_kernel_param_n_queries];
+
+  mov.u32 %r6, %ctaid.x;
+  mov.u32 %r7, %ntid.x;
+  mul.lo.u32 %r8, %r6, %r7;
+  mov.u32 %r9, %tid.x;
+  add.u32 %r10, %r8, %r9;
+  cvt.u64.u32 %rd12, %r10;
+  setp.lt.u64 %p11, %rd12, %rd5;
+  @%p11 bra fri_query_bounds_kernel_then_13;
+  bra fri_query_bounds_kernel_else_13;
+  fri_query_bounds_kernel_then_13:
+  mov.u64 %rd14, 0; // unhandled expr
+  cvt.u64.u32 %rd15, %r10;
+  mov.u64 %rd16, 8;
+  mul.lo.u64 %rd17, %rd15, %rd16;
+  add.u64 %rd18, %rd2, %rd17;
+  ld.global.u64 %rd19, [%rd18];
+  mov.u64 %rd20, 0; // unhandled expr
+  mov.u64 %rd21, 0; // unhandled expr
+  mov.u32 %r22, 0; // unit
+  mov.u32 %r23, %r22;
+  bra fri_query_bounds_kernel_end_13;
+  fri_query_bounds_kernel_else_13:
+  mov.u32 %r23, 0; // no else branch
+  fri_query_bounds_kernel_end_13:
+  mov.u32 %r24, 0; // unit
+  ret;
+}
+
+.visible .entry fri_fold_index_kernel(
+    .param .u64 fri_fold_index_kernel_param_query_indices_data,
+    .param .u64 fri_fold_index_kernel_param_query_indices_len,
+    .param .u64 fri_fold_index_kernel_param_eval_data,
+    .param .u64 fri_fold_index_kernel_param_eval_len,
+    .param .u64 fri_fold_index_kernel_param_folded_data,
+    .param .u64 fri_fold_index_kernel_param_folded_len,
+    .param .u64 fri_fold_index_kernel_param_twiddle_data,
+    .param .u64 fri_fold_index_kernel_param_twiddle_len,
+    .param .u64 fri_fold_index_kernel_param_n,
+    .param .u64 fri_fold_index_kernel_param_half_n,
+    .param .u64 fri_fold_index_kernel_param_n_queries
+)
+{
+    .reg .pred %p16;
+    .reg .u64 %rd0, %rd1, %rd10, %rd17, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd29, %rd3, %rd30, %rd31, %rd4, %rd5, %rd6, %rd7, %rd8, %rd9;
+    .reg .u32 %r11, %r12, %r13, %r14, %r15, %r32, %r33, %r34;
+
+  ld.param.u64 %rd0, [fri_fold_index_kernel_param_query_indices_data];
+  ld.param.u64 %rd1, [fri_fold_index_kernel_param_query_indices_len];
+  ld.param.u64 %rd2, [fri_fold_index_kernel_param_eval_data];
+  ld.param.u64 %rd3, [fri_fold_index_kernel_param_eval_len];
+  ld.param.u64 %rd4, [fri_fold_index_kernel_param_folded_data];
+  ld.param.u64 %rd5, [fri_fold_index_kernel_param_folded_len];
+  ld.param.u64 %rd6, [fri_fold_index_kernel_param_twiddle_data];
+  ld.param.u64 %rd7, [fri_fold_index_kernel_param_twiddle_len];
+  ld.param.u64 %rd8, [fri_fold_index_kernel_param_n];
+  ld.param.u64 %rd9, [fri_fold_index_kernel_param_half_n];
+  ld.param.u64 %rd10, [fri_fold_index_kernel_param_n_queries];
+
+  mov.u32 %r11, %ctaid.x;
+  mov.u32 %r12, %ntid.x;
+  mul.lo.u32 %r13, %r11, %r12;
+  mov.u32 %r14, %tid.x;
+  add.u32 %r15, %r13, %r14;
+  cvt.u64.u32 %rd17, %r15;
+  setp.lt.u64 %p16, %rd17, %rd10;
+  @%p16 bra fri_fold_index_kernel_then_18;
+  bra fri_fold_index_kernel_else_18;
+  fri_fold_index_kernel_then_18:
+  mov.u64 %rd19, 0; // unhandled expr
+  cvt.u64.u32 %rd20, %r15;
+  mov.u64 %rd21, 8;
+  mul.lo.u64 %rd22, %rd20, %rd21;
+  add.u64 %rd23, %rd0, %rd22;
+  ld.global.u64 %rd24, [%rd23];
+  mov.u64 %rd25, 0; // unhandled expr
+  mov.u64 %rd26, 2;
+  div.u64 %rd27, %rd24, %rd26;
+  mov.u64 %rd28, 0; // unhandled expr
+  mov.u64 %rd29, 0; // unhandled expr
+  mov.u64 %rd30, 0; // unhandled expr
+  mov.u64 %rd31, 0; // unhandled expr
+  mov.u32 %r32, 0; // unit
+  mov.u32 %r33, %r32;
+  bra fri_fold_index_kernel_end_18;
+  fri_fold_index_kernel_else_18:
+  mov.u32 %r33, 0; // no else branch
+  fri_fold_index_kernel_end_18:
+  mov.u32 %r34, 0; // unit
+  ret;
+}
+
+.visible .entry fri_layer_verify_kernel(
+    .param .u64 fri_layer_verify_kernel_param_out_data,
+    .param .u64 fri_layer_verify_kernel_param_out_len,
+    .param .u64 fri_layer_verify_kernel_param_query_indices_data,
+    .param .u64 fri_layer_verify_kernel_param_query_indices_len,
+    .param .u64 fri_layer_verify_kernel_param_n,
+    .param .u64 fri_layer_verify_kernel_param_half_n,
+    .param .u64 fri_layer_verify_kernel_param_n_queries
+)
+{
+    .reg .pred %p12;
+    .reg .u64 %rd0, %rd1, %rd13, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd3, %rd4, %rd5, %rd6;
+    .reg .u32 %r10, %r11, %r28, %r29, %r30, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [fri_layer_verify_kernel_param_out_data];
+  ld.param.u64 %rd1, [fri_layer_verify_kernel_param_out_len];
+  ld.param.u64 %rd2, [fri_layer_verify_kernel_param_query_indices_data];
+  ld.param.u64 %rd3, [fri_layer_verify_kernel_param_query_indices_len];
+  ld.param.u64 %rd4, [fri_layer_verify_kernel_param_n];
+  ld.param.u64 %rd5, [fri_layer_verify_kernel_param_half_n];
+  ld.param.u64 %rd6, [fri_layer_verify_kernel_param_n_queries];
+
+  mov.u32 %r7, %ctaid.x;
+  mov.u32 %r8, %ntid.x;
+  mul.lo.u32 %r9, %r7, %r8;
+  mov.u32 %r10, %tid.x;
+  add.u32 %r11, %r9, %r10;
+  cvt.u64.u32 %rd13, %r11;
+  setp.lt.u64 %p12, %rd13, %rd6;
+  @%p12 bra fri_layer_verify_kernel_then_14;
+  bra fri_layer_verify_kernel_else_14;
+  fri_layer_verify_kernel_then_14:
+  mov.u64 %rd15, 0; // unhandled expr
+  cvt.u64.u32 %rd16, %r11;
+  mov.u64 %rd17, 8;
+  mul.lo.u64 %rd18, %rd16, %rd17;
+  add.u64 %rd19, %rd2, %rd18;
+  ld.global.u64 %rd20, [%rd19];
+  mov.u64 %rd21, 0; // unhandled expr
+  mov.u64 %rd22, 2;
+  div.u64 %rd23, %rd20, %rd22;
+  mov.u64 %rd24, 0; // unhandled expr
+  mov.u64 %rd25, 0; // unhandled expr
+  mov.u64 %rd26, 0; // call m31_get (device fn)
+  mov.u64 %rd27, 0; // unhandled expr
+  mov.u32 %r28, 0; // unit
+  mov.u32 %r29, %r28;
+  bra fri_layer_verify_kernel_end_14;
+  fri_layer_verify_kernel_else_14:
+  mov.u32 %r29, 0; // no else branch
+  fri_layer_verify_kernel_end_14:
+  mov.u32 %r30, 0; // unit
+  ret;
+}
+

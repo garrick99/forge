@@ -1,0 +1,185 @@
+// expected: 0
+// Demo 1027: Verified GPU Poseidon2 permutation kernel over M31
+//
+// Poseidon2 is an algebraic hash function optimized for ZK proving (Plonky3,
+// stwo experimental). Unlike Blake2s, Poseidon2 has a low-degree polynomial
+// description, making the hash itself efficiently provable in a STARK.
+//
+// Poseidon2 over M31 operates on a state of WIDTH = 16 M31 elements.
+// One full permutation:
+//   R_F full rounds (S-box x^5 on all 16 elements)
+//   R_P partial rounds (S-box on element 0 only)
+//   R_F full rounds
+//
+// S-box: x^5 mod P  (bijection over M31 since gcd(5, P-1) = 1)
+//
+// Key design notes for provability:
+//   - m31_get results MUST be stored in let-bindings before passing to callee
+//     (Forge does not propagate postconditions from nested inline calls)
+//   - Array writes invalidate forall preconditions; reads must all come BEFORE
+//     any writes to the same span in a function body
+//
+// Formal properties proven by Z3:
+//   - m31_pow5: result < P (via chain of m31_mul postconditions)
+//   - bounds: gid*16 + 15 < state.len, rc.len >= 16
+//   - field invariant: all elements < P (via forall + m31_get helper)
+
+use std::gpu;
+use std::m31;
+
+// Helper: read one M31 element, proving result < M31_P.
+fn m31_get(arr: span<u32>, idx: u64) -> u32
+    requires idx < arr.len
+    requires forall k: u64, k < arr.len ==> arr[k] < M31_P
+    ensures result < M31_P
+{
+    assert(arr[idx] < M31_P) "forall k instantiated at idx";
+    arr[idx]
+}
+
+// Poseidon2 S-box: x^5 mod P
+fn m31_pow5(x: u32) -> u32
+    requires x < M31_P
+    ensures result < M31_P
+{
+    let x2: u32 = m31_mul(x, x);
+    let x4: u32 = m31_mul(x2, x2);
+    m31_mul(x4, x)
+}
+
+// ---- GPU kernel: Poseidon2 full-round S-box layer (width 16) ---------------
+//
+// Each thread applies x^5 mod P to all 16 elements of one state block.
+// Pattern: read all 16 into let-bindings FIRST, then write back.
+// This avoids the forall invalidation problem from interleaved read/write.
+#[kernel]
+fn poseidon2_sbox_kernel(state: span<u32>, n: u64)
+    requires n * 16u64 <= state.len
+    requires forall k: u64, k < state.len ==> state[k] < M31_P
+{
+    let gid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if gid < n {
+        let base: u64 = gid * 16u64;
+        assert(base + 15u64 < state.len) "state block in bounds";
+
+        // Read all 16 elements into let-bindings via m31_get.
+        // The let-binding captures m31_get's `ensures result < M31_P`
+        // so the subsequent m31_pow5 calls can use it.
+        let e0:  u32 = m31_get(state, base + 0u64);
+        let e1:  u32 = m31_get(state, base + 1u64);
+        let e2:  u32 = m31_get(state, base + 2u64);
+        let e3:  u32 = m31_get(state, base + 3u64);
+        let e4:  u32 = m31_get(state, base + 4u64);
+        let e5:  u32 = m31_get(state, base + 5u64);
+        let e6:  u32 = m31_get(state, base + 6u64);
+        let e7:  u32 = m31_get(state, base + 7u64);
+        let e8:  u32 = m31_get(state, base + 8u64);
+        let e9:  u32 = m31_get(state, base + 9u64);
+        let e10: u32 = m31_get(state, base + 10u64);
+        let e11: u32 = m31_get(state, base + 11u64);
+        let e12: u32 = m31_get(state, base + 12u64);
+        let e13: u32 = m31_get(state, base + 13u64);
+        let e14: u32 = m31_get(state, base + 14u64);
+        let e15: u32 = m31_get(state, base + 15u64);
+
+        // Apply S-box — each eN < M31_P from m31_get postcondition
+        let s0:  u32 = m31_pow5(e0);   let s1:  u32 = m31_pow5(e1);
+        let s2:  u32 = m31_pow5(e2);   let s3:  u32 = m31_pow5(e3);
+        let s4:  u32 = m31_pow5(e4);   let s5:  u32 = m31_pow5(e5);
+        let s6:  u32 = m31_pow5(e6);   let s7:  u32 = m31_pow5(e7);
+        let s8:  u32 = m31_pow5(e8);   let s9:  u32 = m31_pow5(e9);
+        let s10: u32 = m31_pow5(e10);  let s11: u32 = m31_pow5(e11);
+        let s12: u32 = m31_pow5(e12);  let s13: u32 = m31_pow5(e13);
+        let s14: u32 = m31_pow5(e14);  let s15: u32 = m31_pow5(e15);
+
+        // Write back (all writes happen after all reads)
+        state[base + 0u64]  = s0;   state[base + 1u64]  = s1;
+        state[base + 2u64]  = s2;   state[base + 3u64]  = s3;
+        state[base + 4u64]  = s4;   state[base + 5u64]  = s5;
+        state[base + 6u64]  = s6;   state[base + 7u64]  = s7;
+        state[base + 8u64]  = s8;   state[base + 9u64]  = s9;
+        state[base + 10u64] = s10;  state[base + 11u64] = s11;
+        state[base + 12u64] = s12;  state[base + 13u64] = s13;
+        state[base + 14u64] = s14;  state[base + 15u64] = s15;
+    };
+}
+
+// ---- GPU kernel: Poseidon2 round constant addition -------------------------
+//
+// state[gid*16 + k] += rc[k] mod P  for k in 0..15
+// All reads come before all writes (same read-then-write pattern).
+#[kernel]
+fn poseidon2_add_rc_kernel(state: span<u32>, rc: span<u32>, n: u64)
+    requires n * 16u64 <= state.len
+    requires 16u64 <= rc.len
+    requires forall k: u64, k < state.len ==> state[k] < M31_P
+    requires forall k: u64, k < rc.len    ==> rc[k]    < M31_P
+{
+    let gid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if gid < n {
+        let base: u64 = gid * 16u64;
+        assert(base + 15u64 < state.len) "state block in bounds";
+
+        // Read all state and rc values first
+        let e0:  u32 = m31_get(state, base + 0u64);
+        let e1:  u32 = m31_get(state, base + 1u64);
+        let e2:  u32 = m31_get(state, base + 2u64);
+        let e3:  u32 = m31_get(state, base + 3u64);
+        let e4:  u32 = m31_get(state, base + 4u64);
+        let e5:  u32 = m31_get(state, base + 5u64);
+        let e6:  u32 = m31_get(state, base + 6u64);
+        let e7:  u32 = m31_get(state, base + 7u64);
+        let e8:  u32 = m31_get(state, base + 8u64);
+        let e9:  u32 = m31_get(state, base + 9u64);
+        let e10: u32 = m31_get(state, base + 10u64);
+        let e11: u32 = m31_get(state, base + 11u64);
+        let e12: u32 = m31_get(state, base + 12u64);
+        let e13: u32 = m31_get(state, base + 13u64);
+        let e14: u32 = m31_get(state, base + 14u64);
+        let e15: u32 = m31_get(state, base + 15u64);
+
+        let r0:  u32 = m31_get(rc, 0u64);   let r1:  u32 = m31_get(rc, 1u64);
+        let r2:  u32 = m31_get(rc, 2u64);   let r3:  u32 = m31_get(rc, 3u64);
+        let r4:  u32 = m31_get(rc, 4u64);   let r5:  u32 = m31_get(rc, 5u64);
+        let r6:  u32 = m31_get(rc, 6u64);   let r7:  u32 = m31_get(rc, 7u64);
+        let r8:  u32 = m31_get(rc, 8u64);   let r9:  u32 = m31_get(rc, 9u64);
+        let r10: u32 = m31_get(rc, 10u64);  let r11: u32 = m31_get(rc, 11u64);
+        let r12: u32 = m31_get(rc, 12u64);  let r13: u32 = m31_get(rc, 13u64);
+        let r14: u32 = m31_get(rc, 14u64);  let r15: u32 = m31_get(rc, 15u64);
+
+        // Write results (all after all reads)
+        state[base + 0u64]  = m31_add(e0,  r0);
+        state[base + 1u64]  = m31_add(e1,  r1);
+        state[base + 2u64]  = m31_add(e2,  r2);
+        state[base + 3u64]  = m31_add(e3,  r3);
+        state[base + 4u64]  = m31_add(e4,  r4);
+        state[base + 5u64]  = m31_add(e5,  r5);
+        state[base + 6u64]  = m31_add(e6,  r6);
+        state[base + 7u64]  = m31_add(e7,  r7);
+        state[base + 8u64]  = m31_add(e8,  r8);
+        state[base + 9u64]  = m31_add(e9,  r9);
+        state[base + 10u64] = m31_add(e10, r10);
+        state[base + 11u64] = m31_add(e11, r11);
+        state[base + 12u64] = m31_add(e12, r12);
+        state[base + 13u64] = m31_add(e13, r13);
+        state[base + 14u64] = m31_add(e14, r14);
+        state[base + 15u64] = m31_add(e15, r15);
+    };
+}
+
+// ---- GPU kernel: Poseidon2 partial round (S-box on element 0 only) ---------
+#[kernel]
+fn poseidon2_partial_sbox_kernel(state: span<u32>, n: u64)
+    requires n * 16u64 <= state.len
+    requires forall k: u64, k < state.len ==> state[k] < M31_P
+{
+    let gid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if gid < n {
+        let base: u64 = gid * 16u64;
+        assert(base < state.len) "element 0 in bounds";
+        let e0: u32 = m31_get(state, base);
+        state[base] = m31_pow5(e0);
+    };
+}
+
+fn main() -> u64 { 0u64 }

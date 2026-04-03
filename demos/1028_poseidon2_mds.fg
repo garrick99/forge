@@ -1,0 +1,324 @@
+// expected: 0
+// Demo 1028: Verified GPU Poseidon2 MDS linear layer over M31
+//
+// The Poseidon2 MDS (Maximum Distance Separable) linear layer mixes a 16-element
+// state using a structured matrix multiplication over M31. Unlike generic MDS,
+// Poseidon2 uses a specific Cauchy-based matrix that can be computed efficiently.
+//
+// For WIDTH = 16, the Poseidon2 external linear layer uses:
+//   M4 = [[2,3,1,1],[1,2,3,1],[1,1,2,3],[3,1,1,2]]  (4x4 circulant)
+//   The full 16x16 matrix is M4 ⊗ I4 applied to groups of 4.
+//
+// In practice, the Poseidon2 external linear layer decomposes as:
+//   1. Apply M4 to each of the four groups [0..3], [4..7], [8..11], [12..15]
+//   2. Add the sum of all 16 elements (scaled) to each element
+//
+// The M4 application to a 4-element vector [a,b,c,d]:
+//   t0 = a + b;  t1 = c + d
+//   t2 = 2b + t1;  t3 = 2d + t0
+//   t4 = 4t1 + t3;  t5 = 4t0 + t2
+//   out = [t3 + t5, t5, t2 + t4, t4]
+//   (Plonky3 Poseidon2 M4 formula)
+//
+// For the internal (partial) linear layer, only add a scalar multiple of the sum:
+//   state[i] += mu_i * sum(state)
+//
+// Formal properties proven by Z3:
+//   - All m31_add/m31_mul inputs satisfy x < M31_P
+//   - All outputs of m31_add/m31_mul are < M31_P
+//   - Array bounds: gid*16 + 15 < state.len
+
+use std::gpu;
+use std::m31;
+
+// Helper: read one M31 element, proving result < M31_P.
+fn m31_get(arr: span<u32>, idx: u64) -> u32
+    requires idx < arr.len
+    requires forall k: u64, k < arr.len ==> arr[k] < M31_P
+    ensures result < M31_P
+{
+    assert(arr[idx] < M31_P) "forall k instantiated at idx";
+    arr[idx]
+}
+
+// Apply M4 to a 4-element group and write back.
+// Takes the 4 elements by value (already loaded, < M31_P each),
+// returns 4 output elements.
+//
+// M4 formula (Plonky3):
+//   t0 = a + b
+//   t1 = c + d
+//   t2 = 2b + t1   = b + b + c + d
+//   t3 = 2d + t0   = a + b + d + d
+//   t4 = 4*t1 + t3 = a + b + 4c + 5d
+//   t5 = 4*t0 + t2 = 4a + 5b + c + d
+//   [t3+t5, t5, t2+t4, t4]
+//   = [5a+6b+c+d, 4a+5b+c+d, a+b+5c+6d, a+b+4c+5d]
+//
+// We implement this as a sequence of m31_add operations.
+fn mds_m4_0(a: u32, b: u32, c: u32, d: u32) -> u32
+    requires a < M31_P  requires b < M31_P
+    requires c < M31_P  requires d < M31_P
+    ensures result < M31_P
+{
+    let t0: u32 = m31_add(a, b);
+    let t1: u32 = m31_add(c, d);
+    let t2: u32 = m31_add(m31_add(b, b), t1);
+    let t3: u32 = m31_add(m31_add(d, d), t0);
+    let t5: u32 = m31_add(m31_add(m31_add(m31_add(t0, t0), m31_add(t0, t0)), t2), 0u32);
+    // t5 = 4*t0 + t2; use: 4*t0 = t0+t0+t0+t0
+    let four_t0: u32 = m31_add(m31_add(t0, t0), m31_add(t0, t0));
+    let t5r: u32 = m31_add(four_t0, t2);
+    m31_add(t3, t5r)
+}
+
+fn mds_m4_1(a: u32, b: u32, c: u32, d: u32) -> u32
+    requires a < M31_P  requires b < M31_P
+    requires c < M31_P  requires d < M31_P
+    ensures result < M31_P
+{
+    let t0: u32 = m31_add(a, b);
+    let t1: u32 = m31_add(c, d);
+    let t2: u32 = m31_add(m31_add(b, b), t1);
+    let four_t0: u32 = m31_add(m31_add(t0, t0), m31_add(t0, t0));
+    m31_add(four_t0, t2)
+}
+
+fn mds_m4_2(a: u32, b: u32, c: u32, d: u32) -> u32
+    requires a < M31_P  requires b < M31_P
+    requires c < M31_P  requires d < M31_P
+    ensures result < M31_P
+{
+    let t0: u32 = m31_add(a, b);
+    let t1: u32 = m31_add(c, d);
+    let t2: u32 = m31_add(m31_add(b, b), t1);
+    let t3: u32 = m31_add(m31_add(d, d), t0);
+    let four_t1: u32 = m31_add(m31_add(t1, t1), m31_add(t1, t1));
+    let t4: u32 = m31_add(four_t1, t3);
+    m31_add(t2, t4)
+}
+
+fn mds_m4_3(a: u32, b: u32, c: u32, d: u32) -> u32
+    requires a < M31_P  requires b < M31_P
+    requires c < M31_P  requires d < M31_P
+    ensures result < M31_P
+{
+    let t0: u32 = m31_add(a, b);
+    let t1: u32 = m31_add(c, d);
+    let t3: u32 = m31_add(m31_add(d, d), t0);
+    let four_t1: u32 = m31_add(m31_add(t1, t1), m31_add(t1, t1));
+    m31_add(four_t1, t3)
+}
+
+// ---- GPU kernel: Poseidon2 external MDS linear layer (width 16) -------------
+//
+// Each thread processes one 16-element state block.
+// Applies M4 to each of the four groups of 4, then adds the row-sum to each.
+//
+// Algorithm:
+//   1. Load all 16 elements (read-before-write)
+//   2. Compute sum of all 16
+//   3. Apply M4 to groups [0..3], [4..7], [8..11], [12..15]
+//   4. Add sum to each output (for the Poseidon2 external layer formula)
+//   5. Write back
+#[kernel]
+fn poseidon2_mds_kernel(state: span<u32>, n: u64)
+    requires n * 16u64 <= state.len
+    requires forall k: u64, k < state.len ==> state[k] < M31_P
+{
+    let gid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if gid < n {
+        let base: u64 = gid * 16u64;
+        assert(base + 15u64 < state.len) "state block in bounds";
+
+        // Read all 16 elements first
+        let e0:  u32 = m31_get(state, base + 0u64);
+        let e1:  u32 = m31_get(state, base + 1u64);
+        let e2:  u32 = m31_get(state, base + 2u64);
+        let e3:  u32 = m31_get(state, base + 3u64);
+        let e4:  u32 = m31_get(state, base + 4u64);
+        let e5:  u32 = m31_get(state, base + 5u64);
+        let e6:  u32 = m31_get(state, base + 6u64);
+        let e7:  u32 = m31_get(state, base + 7u64);
+        let e8:  u32 = m31_get(state, base + 8u64);
+        let e9:  u32 = m31_get(state, base + 9u64);
+        let e10: u32 = m31_get(state, base + 10u64);
+        let e11: u32 = m31_get(state, base + 11u64);
+        let e12: u32 = m31_get(state, base + 12u64);
+        let e13: u32 = m31_get(state, base + 13u64);
+        let e14: u32 = m31_get(state, base + 14u64);
+        let e15: u32 = m31_get(state, base + 15u64);
+
+        // Sum all 16 elements
+        let sum01:   u32 = m31_add(e0, e1);
+        let sum23:   u32 = m31_add(e2, e3);
+        let sum45:   u32 = m31_add(e4, e5);
+        let sum67:   u32 = m31_add(e6, e7);
+        let sum89:   u32 = m31_add(e8, e9);
+        let sum1011: u32 = m31_add(e10, e11);
+        let sum1213: u32 = m31_add(e12, e13);
+        let sum1415: u32 = m31_add(e14, e15);
+        let sum0to3:   u32 = m31_add(sum01, sum23);
+        let sum4to7:   u32 = m31_add(sum45, sum67);
+        let sum8to11:  u32 = m31_add(sum89, sum1011);
+        let sum12to15: u32 = m31_add(sum1213, sum1415);
+        let sum0to7:   u32 = m31_add(sum0to3, sum4to7);
+        let sum8to15:  u32 = m31_add(sum8to11, sum12to15);
+        let total:     u32 = m31_add(sum0to7, sum8to15);
+
+        // Apply M4 to group 0: [e0, e1, e2, e3]
+        let m0: u32 = mds_m4_0(e0, e1, e2, e3);
+        let m1: u32 = mds_m4_1(e0, e1, e2, e3);
+        let m2: u32 = mds_m4_2(e0, e1, e2, e3);
+        let m3: u32 = mds_m4_3(e0, e1, e2, e3);
+
+        // Apply M4 to group 1: [e4, e5, e6, e7]
+        let m4: u32 = mds_m4_0(e4, e5, e6, e7);
+        let m5: u32 = mds_m4_1(e4, e5, e6, e7);
+        let m6: u32 = mds_m4_2(e4, e5, e6, e7);
+        let m7: u32 = mds_m4_3(e4, e5, e6, e7);
+
+        // Apply M4 to group 2: [e8, e9, e10, e11]
+        let m8:  u32 = mds_m4_0(e8, e9, e10, e11);
+        let m9:  u32 = mds_m4_1(e8, e9, e10, e11);
+        let m10: u32 = mds_m4_2(e8, e9, e10, e11);
+        let m11: u32 = mds_m4_3(e8, e9, e10, e11);
+
+        // Apply M4 to group 3: [e12, e13, e14, e15]
+        let m12: u32 = mds_m4_0(e12, e13, e14, e15);
+        let m13: u32 = mds_m4_1(e12, e13, e14, e15);
+        let m14: u32 = mds_m4_2(e12, e13, e14, e15);
+        let m15: u32 = mds_m4_3(e12, e13, e14, e15);
+
+        // Add total sum to each (external Poseidon2 linear layer)
+        let s0:  u32 = m31_add(m0,  total);
+        let s1:  u32 = m31_add(m1,  total);
+        let s2:  u32 = m31_add(m2,  total);
+        let s3:  u32 = m31_add(m3,  total);
+        let s4:  u32 = m31_add(m4,  total);
+        let s5:  u32 = m31_add(m5,  total);
+        let s6:  u32 = m31_add(m6,  total);
+        let s7:  u32 = m31_add(m7,  total);
+        let s8:  u32 = m31_add(m8,  total);
+        let s9:  u32 = m31_add(m9,  total);
+        let s10: u32 = m31_add(m10, total);
+        let s11: u32 = m31_add(m11, total);
+        let s12: u32 = m31_add(m12, total);
+        let s13: u32 = m31_add(m13, total);
+        let s14: u32 = m31_add(m14, total);
+        let s15: u32 = m31_add(m15, total);
+
+        // Write back (all after all reads)
+        state[base + 0u64]  = s0;   state[base + 1u64]  = s1;
+        state[base + 2u64]  = s2;   state[base + 3u64]  = s3;
+        state[base + 4u64]  = s4;   state[base + 5u64]  = s5;
+        state[base + 6u64]  = s6;   state[base + 7u64]  = s7;
+        state[base + 8u64]  = s8;   state[base + 9u64]  = s9;
+        state[base + 10u64] = s10;  state[base + 11u64] = s11;
+        state[base + 12u64] = s12;  state[base + 13u64] = s13;
+        state[base + 14u64] = s14;  state[base + 15u64] = s15;
+    };
+}
+
+// ---- GPU kernel: Poseidon2 internal MDS linear layer ------------------------
+//
+// The internal linear layer adds a diagonal matrix D to the identity:
+//   state[i] = state[i] * (1 + d_i) + sum(state) * d_i
+//            = state[i] + d_i * (state[i] + sum)
+//            = state[i] + d_i * full_sum   where full_sum = sum_j(state[j])
+//
+// In the standard Poseidon2 formulation for M31/width-16:
+//   The internal matrix is I + v * 1^T  where v is a specific vector.
+//   Each element becomes: state[i] + sum(state) * mu_i
+//   where mu_i = d_i for i < 15, mu_15 = d_15 - 1
+//
+// For the kernel, mu constants are passed as a span<u32> of 16 values.
+// This is the sum-of-row formulation: state[i] += mu[i] * total_sum.
+#[kernel]
+fn poseidon2_internal_mds_kernel(state: span<u32>, mu: span<u32>, n: u64)
+    requires n * 16u64 <= state.len
+    requires 16u64 <= mu.len
+    requires forall k: u64, k < state.len ==> state[k] < M31_P
+    requires forall k: u64, k < mu.len    ==> mu[k]    < M31_P
+{
+    let gid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if gid < n {
+        let base: u64 = gid * 16u64;
+        assert(base + 15u64 < state.len) "state block in bounds";
+
+        // Read all 16 state elements
+        let e0:  u32 = m31_get(state, base + 0u64);
+        let e1:  u32 = m31_get(state, base + 1u64);
+        let e2:  u32 = m31_get(state, base + 2u64);
+        let e3:  u32 = m31_get(state, base + 3u64);
+        let e4:  u32 = m31_get(state, base + 4u64);
+        let e5:  u32 = m31_get(state, base + 5u64);
+        let e6:  u32 = m31_get(state, base + 6u64);
+        let e7:  u32 = m31_get(state, base + 7u64);
+        let e8:  u32 = m31_get(state, base + 8u64);
+        let e9:  u32 = m31_get(state, base + 9u64);
+        let e10: u32 = m31_get(state, base + 10u64);
+        let e11: u32 = m31_get(state, base + 11u64);
+        let e12: u32 = m31_get(state, base + 12u64);
+        let e13: u32 = m31_get(state, base + 13u64);
+        let e14: u32 = m31_get(state, base + 14u64);
+        let e15: u32 = m31_get(state, base + 15u64);
+
+        // Read all 16 mu constants
+        let mu0:  u32 = m31_get(mu, 0u64);   let mu1:  u32 = m31_get(mu, 1u64);
+        let mu2:  u32 = m31_get(mu, 2u64);   let mu3:  u32 = m31_get(mu, 3u64);
+        let mu4:  u32 = m31_get(mu, 4u64);   let mu5:  u32 = m31_get(mu, 5u64);
+        let mu6:  u32 = m31_get(mu, 6u64);   let mu7:  u32 = m31_get(mu, 7u64);
+        let mu8:  u32 = m31_get(mu, 8u64);   let mu9:  u32 = m31_get(mu, 9u64);
+        let mu10: u32 = m31_get(mu, 10u64);  let mu11: u32 = m31_get(mu, 11u64);
+        let mu12: u32 = m31_get(mu, 12u64);  let mu13: u32 = m31_get(mu, 13u64);
+        let mu14: u32 = m31_get(mu, 14u64);  let mu15: u32 = m31_get(mu, 15u64);
+
+        // Compute total sum
+        let sum01:   u32 = m31_add(e0, e1);
+        let sum23:   u32 = m31_add(e2, e3);
+        let sum45:   u32 = m31_add(e4, e5);
+        let sum67:   u32 = m31_add(e6, e7);
+        let sum89:   u32 = m31_add(e8, e9);
+        let sum1011: u32 = m31_add(e10, e11);
+        let sum1213: u32 = m31_add(e12, e13);
+        let sum1415: u32 = m31_add(e14, e15);
+        let sum0to3:   u32 = m31_add(sum01, sum23);
+        let sum4to7:   u32 = m31_add(sum45, sum67);
+        let sum8to11:  u32 = m31_add(sum89, sum1011);
+        let sum12to15: u32 = m31_add(sum1213, sum1415);
+        let sum0to7:   u32 = m31_add(sum0to3, sum4to7);
+        let sum8to15:  u32 = m31_add(sum8to11, sum12to15);
+        let total:     u32 = m31_add(sum0to7, sum8to15);
+
+        // state[i] += mu[i] * total
+        let s0:  u32 = m31_add(e0,  m31_mul(mu0,  total));
+        let s1:  u32 = m31_add(e1,  m31_mul(mu1,  total));
+        let s2:  u32 = m31_add(e2,  m31_mul(mu2,  total));
+        let s3:  u32 = m31_add(e3,  m31_mul(mu3,  total));
+        let s4:  u32 = m31_add(e4,  m31_mul(mu4,  total));
+        let s5:  u32 = m31_add(e5,  m31_mul(mu5,  total));
+        let s6:  u32 = m31_add(e6,  m31_mul(mu6,  total));
+        let s7:  u32 = m31_add(e7,  m31_mul(mu7,  total));
+        let s8:  u32 = m31_add(e8,  m31_mul(mu8,  total));
+        let s9:  u32 = m31_add(e9,  m31_mul(mu9,  total));
+        let s10: u32 = m31_add(e10, m31_mul(mu10, total));
+        let s11: u32 = m31_add(e11, m31_mul(mu11, total));
+        let s12: u32 = m31_add(e12, m31_mul(mu12, total));
+        let s13: u32 = m31_add(e13, m31_mul(mu13, total));
+        let s14: u32 = m31_add(e14, m31_mul(mu14, total));
+        let s15: u32 = m31_add(e15, m31_mul(mu15, total));
+
+        // Write back
+        state[base + 0u64]  = s0;   state[base + 1u64]  = s1;
+        state[base + 2u64]  = s2;   state[base + 3u64]  = s3;
+        state[base + 4u64]  = s4;   state[base + 5u64]  = s5;
+        state[base + 6u64]  = s6;   state[base + 7u64]  = s7;
+        state[base + 8u64]  = s8;   state[base + 9u64]  = s9;
+        state[base + 10u64] = s10;  state[base + 11u64] = s11;
+        state[base + 12u64] = s12;  state[base + 13u64] = s13;
+        state[base + 14u64] = s14;  state[base + 15u64] = s15;
+    };
+}
+
+fn main() -> u64 { 0u64 }

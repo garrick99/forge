@@ -1,0 +1,149 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry deep_quotient_accumulate(
+    .param .u64 deep_quotient_accumulate_param_quot_are_data,
+    .param .u64 deep_quotient_accumulate_param_quot_are_len,
+    .param .u64 deep_quotient_accumulate_param_quot_aim_data,
+    .param .u64 deep_quotient_accumulate_param_quot_aim_len,
+    .param .u64 deep_quotient_accumulate_param_quot_bre_data,
+    .param .u64 deep_quotient_accumulate_param_quot_bre_len,
+    .param .u64 deep_quotient_accumulate_param_quot_bim_data,
+    .param .u64 deep_quotient_accumulate_param_quot_bim_len,
+    .param .u64 deep_quotient_accumulate_param_eval_are_data,
+    .param .u64 deep_quotient_accumulate_param_eval_are_len,
+    .param .u64 deep_quotient_accumulate_param_eval_aim_data,
+    .param .u64 deep_quotient_accumulate_param_eval_aim_len,
+    .param .u64 deep_quotient_accumulate_param_eval_bre_data,
+    .param .u64 deep_quotient_accumulate_param_eval_bre_len,
+    .param .u64 deep_quotient_accumulate_param_eval_bim_data,
+    .param .u64 deep_quotient_accumulate_param_eval_bim_len,
+    .param .u64 deep_quotient_accumulate_param_inv_d_are_data,
+    .param .u64 deep_quotient_accumulate_param_inv_d_are_len,
+    .param .u64 deep_quotient_accumulate_param_inv_d_aim_data,
+    .param .u64 deep_quotient_accumulate_param_inv_d_aim_len,
+    .param .u64 deep_quotient_accumulate_param_inv_d_bre_data,
+    .param .u64 deep_quotient_accumulate_param_inv_d_bre_len,
+    .param .u64 deep_quotient_accumulate_param_inv_d_bim_data,
+    .param .u64 deep_quotient_accumulate_param_inv_d_bim_len,
+    .param .u32 deep_quotient_accumulate_param_p_at_z_rr,
+    .param .u32 deep_quotient_accumulate_param_p_at_z_ri,
+    .param .u32 deep_quotient_accumulate_param_p_at_z_ir,
+    .param .u32 deep_quotient_accumulate_param_p_at_z_ii,
+    .param .u32 deep_quotient_accumulate_param_beta_rr,
+    .param .u32 deep_quotient_accumulate_param_beta_ri,
+    .param .u32 deep_quotient_accumulate_param_beta_ir,
+    .param .u32 deep_quotient_accumulate_param_beta_ii,
+    .param .u64 deep_quotient_accumulate_param_n
+)
+{
+    .reg .pred %p38;
+    .reg .u64 %rd0, %rd1, %rd10, %rd11, %rd12, %rd13, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd3, %rd32, %rd39, %rd4, %rd41, %rd42, %rd43, %rd44, %rd45, %rd46, %rd47, %rd48, %rd49, %rd5, %rd50, %rd51, %rd52, %rd53, %rd54, %rd55, %rd56, %rd57, %rd58, %rd59, %rd6, %rd60, %rd61, %rd62, %rd63, %rd64, %rd65, %rd66, %rd67, %rd68, %rd69, %rd7, %rd70, %rd71, %rd72, %rd73, %rd74, %rd75, %rd76, %rd77, %rd78, %rd79, %rd8, %rd80, %rd81, %rd82, %rd83, %rd84, %rd9;
+    .reg .u32 %r24, %r25, %r26, %r27, %r28, %r29, %r30, %r31, %r33, %r34, %r35, %r36, %r37, %r85, %r86, %r87;
+
+  ld.param.u64 %rd0, [deep_quotient_accumulate_param_quot_are_data];
+  ld.param.u64 %rd1, [deep_quotient_accumulate_param_quot_are_len];
+  ld.param.u64 %rd2, [deep_quotient_accumulate_param_quot_aim_data];
+  ld.param.u64 %rd3, [deep_quotient_accumulate_param_quot_aim_len];
+  ld.param.u64 %rd4, [deep_quotient_accumulate_param_quot_bre_data];
+  ld.param.u64 %rd5, [deep_quotient_accumulate_param_quot_bre_len];
+  ld.param.u64 %rd6, [deep_quotient_accumulate_param_quot_bim_data];
+  ld.param.u64 %rd7, [deep_quotient_accumulate_param_quot_bim_len];
+  ld.param.u64 %rd8, [deep_quotient_accumulate_param_eval_are_data];
+  ld.param.u64 %rd9, [deep_quotient_accumulate_param_eval_are_len];
+  ld.param.u64 %rd10, [deep_quotient_accumulate_param_eval_aim_data];
+  ld.param.u64 %rd11, [deep_quotient_accumulate_param_eval_aim_len];
+  ld.param.u64 %rd12, [deep_quotient_accumulate_param_eval_bre_data];
+  ld.param.u64 %rd13, [deep_quotient_accumulate_param_eval_bre_len];
+  ld.param.u64 %rd14, [deep_quotient_accumulate_param_eval_bim_data];
+  ld.param.u64 %rd15, [deep_quotient_accumulate_param_eval_bim_len];
+  ld.param.u64 %rd16, [deep_quotient_accumulate_param_inv_d_are_data];
+  ld.param.u64 %rd17, [deep_quotient_accumulate_param_inv_d_are_len];
+  ld.param.u64 %rd18, [deep_quotient_accumulate_param_inv_d_aim_data];
+  ld.param.u64 %rd19, [deep_quotient_accumulate_param_inv_d_aim_len];
+  ld.param.u64 %rd20, [deep_quotient_accumulate_param_inv_d_bre_data];
+  ld.param.u64 %rd21, [deep_quotient_accumulate_param_inv_d_bre_len];
+  ld.param.u64 %rd22, [deep_quotient_accumulate_param_inv_d_bim_data];
+  ld.param.u64 %rd23, [deep_quotient_accumulate_param_inv_d_bim_len];
+  ld.param.u32 %r24, [deep_quotient_accumulate_param_p_at_z_rr];
+  ld.param.u32 %r25, [deep_quotient_accumulate_param_p_at_z_ri];
+  ld.param.u32 %r26, [deep_quotient_accumulate_param_p_at_z_ir];
+  ld.param.u32 %r27, [deep_quotient_accumulate_param_p_at_z_ii];
+  ld.param.u32 %r28, [deep_quotient_accumulate_param_beta_rr];
+  ld.param.u32 %r29, [deep_quotient_accumulate_param_beta_ri];
+  ld.param.u32 %r30, [deep_quotient_accumulate_param_beta_ir];
+  ld.param.u32 %r31, [deep_quotient_accumulate_param_beta_ii];
+  ld.param.u64 %rd32, [deep_quotient_accumulate_param_n];
+
+  mov.u32 %r33, %ctaid.x;
+  mov.u32 %r34, %ntid.x;
+  mul.lo.u32 %r35, %r33, %r34;
+  mov.u32 %r36, %tid.x;
+  add.u32 %r37, %r35, %r36;
+  cvt.u64.u32 %rd39, %r37;
+  setp.lt.u64 %p38, %rd39, %rd32;
+  @%p38 bra deep_quotient_accumulate_then_40;
+  bra deep_quotient_accumulate_else_40;
+  deep_quotient_accumulate_then_40:
+  mov.u64 %rd41, 0; // call m31_get (device fn)
+  mov.u64 %rd42, 0; // call m31_get (device fn)
+  mov.u64 %rd43, 0; // call m31_get (device fn)
+  mov.u64 %rd44, 0; // call m31_get (device fn)
+  mov.u64 %rd45, 0; // call m31_get (device fn)
+  mov.u64 %rd46, 0; // call m31_get (device fn)
+  mov.u64 %rd47, 0; // call m31_get (device fn)
+  mov.u64 %rd48, 0; // call m31_get (device fn)
+  mov.u64 %rd49, 0; // call m31_get (device fn)
+  mov.u64 %rd50, 0; // call m31_get (device fn)
+  mov.u64 %rd51, 0; // call m31_get (device fn)
+  mov.u64 %rd52, 0; // call m31_get (device fn)
+  mov.u64 %rd53, 0; // call qm31_sub_re_re (device fn)
+  mov.u64 %rd54, 0; // call qm31_sub_re_im (device fn)
+  mov.u64 %rd55, 0; // call qm31_sub_im_re (device fn)
+  mov.u64 %rd56, 0; // call qm31_sub_im_im (device fn)
+  mov.u64 %rd57, 0; // call qm31_mul_out_re_re (device fn)
+  mov.u64 %rd58, 0; // call qm31_mul_out_re_im (device fn)
+  mov.u64 %rd59, 0; // call qm31_mul_out_im_re (device fn)
+  mov.u64 %rd60, 0; // call qm31_mul_out_im_im (device fn)
+  mov.u64 %rd61, 0; // call qm31_mul_out_re_re (device fn)
+  mov.u64 %rd62, 0; // call qm31_mul_out_re_im (device fn)
+  mov.u64 %rd63, 0; // call qm31_mul_out_im_re (device fn)
+  mov.u64 %rd64, 0; // call qm31_mul_out_im_im (device fn)
+  mov.u64 %rd65, 0; // call qm31_add_re_re (device fn)
+  cvt.u64.u32 %rd66, %r37;
+  mov.u64 %rd67, 4;
+  mul.lo.u64 %rd68, %rd66, %rd67;
+  add.u64 %rd69, %rd0, %rd68;
+  st.global.u32 [%rd69], %rd65;
+  mov.u64 %rd70, 0; // call qm31_add_re_im (device fn)
+  cvt.u64.u32 %rd71, %r37;
+  mov.u64 %rd72, 4;
+  mul.lo.u64 %rd73, %rd71, %rd72;
+  add.u64 %rd74, %rd2, %rd73;
+  st.global.u32 [%rd74], %rd70;
+  mov.u64 %rd75, 0; // call qm31_add_im_re (device fn)
+  cvt.u64.u32 %rd76, %r37;
+  mov.u64 %rd77, 4;
+  mul.lo.u64 %rd78, %rd76, %rd77;
+  add.u64 %rd79, %rd4, %rd78;
+  st.global.u32 [%rd79], %rd75;
+  mov.u64 %rd80, 0; // call qm31_add_im_im (device fn)
+  cvt.u64.u32 %rd81, %r37;
+  mov.u64 %rd82, 4;
+  mul.lo.u64 %rd83, %rd81, %rd82;
+  add.u64 %rd84, %rd6, %rd83;
+  st.global.u32 [%rd84], %rd80;
+  mov.u32 %r85, 0; // unit
+  mov.u32 %r86, %r85;
+  bra deep_quotient_accumulate_end_40;
+  deep_quotient_accumulate_else_40:
+  mov.u32 %r86, 0; // no else branch
+  deep_quotient_accumulate_end_40:
+  mov.u32 %r87, 0; // unit
+  ret;
+}
+

@@ -1,0 +1,403 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry poseidon2_mds_kernel(
+    .param .u64 poseidon2_mds_kernel_param_state_data,
+    .param .u64 poseidon2_mds_kernel_param_state_len,
+    .param .u64 poseidon2_mds_kernel_param_n
+)
+{
+    .reg .pred %p8;
+    .reg .u64 %rd0, %rd1, %rd100, %rd101, %rd102, %rd103, %rd104, %rd105, %rd106, %rd107, %rd108, %rd109, %rd11, %rd110, %rd111, %rd112, %rd113, %rd114, %rd115, %rd116, %rd117, %rd118, %rd119, %rd12, %rd120, %rd121, %rd122, %rd123, %rd124, %rd125, %rd126, %rd127, %rd128, %rd129, %rd13, %rd130, %rd131, %rd132, %rd133, %rd134, %rd135, %rd136, %rd137, %rd138, %rd139, %rd14, %rd140, %rd141, %rd142, %rd143, %rd144, %rd145, %rd146, %rd147, %rd148, %rd149, %rd15, %rd150, %rd151, %rd152, %rd153, %rd154, %rd155, %rd156, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd29, %rd30, %rd31, %rd32, %rd33, %rd34, %rd35, %rd36, %rd37, %rd38, %rd39, %rd40, %rd41, %rd42, %rd43, %rd44, %rd45, %rd46, %rd47, %rd48, %rd49, %rd50, %rd51, %rd52, %rd53, %rd54, %rd55, %rd56, %rd57, %rd58, %rd59, %rd60, %rd61, %rd62, %rd63, %rd64, %rd65, %rd66, %rd67, %rd68, %rd69, %rd70, %rd71, %rd72, %rd73, %rd74, %rd75, %rd76, %rd77, %rd78, %rd79, %rd80, %rd81, %rd82, %rd83, %rd84, %rd85, %rd86, %rd87, %rd88, %rd89, %rd9, %rd90, %rd91, %rd92, %rd93, %rd94, %rd95, %rd96, %rd97, %rd98, %rd99;
+    .reg .u32 %r157, %r158, %r159, %r3, %r4, %r5, %r6, %r7;
+
+  ld.param.u64 %rd0, [poseidon2_mds_kernel_param_state_data];
+  ld.param.u64 %rd1, [poseidon2_mds_kernel_param_state_len];
+  ld.param.u64 %rd2, [poseidon2_mds_kernel_param_n];
+
+  mov.u32 %r3, %ctaid.x;
+  mov.u32 %r4, %ntid.x;
+  mul.lo.u32 %r5, %r3, %r4;
+  mov.u32 %r6, %tid.x;
+  add.u32 %r7, %r5, %r6;
+  cvt.u64.u32 %rd9, %r7;
+  setp.lt.u64 %p8, %rd9, %rd2;
+  @%p8 bra poseidon2_mds_kernel_then_10;
+  bra poseidon2_mds_kernel_else_10;
+  poseidon2_mds_kernel_then_10:
+  mov.u64 %rd11, 16;
+  mul.lo.u64 %rd12, %r7, %rd11;
+  mov.u64 %rd13, 0; // unhandled expr
+  mov.u64 %rd14, 0; // call m31_get (device fn)
+  mov.u64 %rd15, 0; // call m31_get (device fn)
+  mov.u64 %rd16, 0; // call m31_get (device fn)
+  mov.u64 %rd17, 0; // call m31_get (device fn)
+  mov.u64 %rd18, 0; // call m31_get (device fn)
+  mov.u64 %rd19, 0; // call m31_get (device fn)
+  mov.u64 %rd20, 0; // call m31_get (device fn)
+  mov.u64 %rd21, 0; // call m31_get (device fn)
+  mov.u64 %rd22, 0; // call m31_get (device fn)
+  mov.u64 %rd23, 0; // call m31_get (device fn)
+  mov.u64 %rd24, 0; // call m31_get (device fn)
+  mov.u64 %rd25, 0; // call m31_get (device fn)
+  mov.u64 %rd26, 0; // call m31_get (device fn)
+  mov.u64 %rd27, 0; // call m31_get (device fn)
+  mov.u64 %rd28, 0; // call m31_get (device fn)
+  mov.u64 %rd29, 0; // call m31_get (device fn)
+  mov.u64 %rd30, 0; // call m31_add (device fn)
+  mov.u64 %rd31, 0; // call m31_add (device fn)
+  mov.u64 %rd32, 0; // call m31_add (device fn)
+  mov.u64 %rd33, 0; // call m31_add (device fn)
+  mov.u64 %rd34, 0; // call m31_add (device fn)
+  mov.u64 %rd35, 0; // call m31_add (device fn)
+  mov.u64 %rd36, 0; // call m31_add (device fn)
+  mov.u64 %rd37, 0; // call m31_add (device fn)
+  mov.u64 %rd38, 0; // call m31_add (device fn)
+  mov.u64 %rd39, 0; // call m31_add (device fn)
+  mov.u64 %rd40, 0; // call m31_add (device fn)
+  mov.u64 %rd41, 0; // call m31_add (device fn)
+  mov.u64 %rd42, 0; // call m31_add (device fn)
+  mov.u64 %rd43, 0; // call m31_add (device fn)
+  mov.u64 %rd44, 0; // call m31_add (device fn)
+  mov.u64 %rd45, 0; // call mds_m4_0 (device fn)
+  mov.u64 %rd46, 0; // call mds_m4_1 (device fn)
+  mov.u64 %rd47, 0; // call mds_m4_2 (device fn)
+  mov.u64 %rd48, 0; // call mds_m4_3 (device fn)
+  mov.u64 %rd49, 0; // call mds_m4_0 (device fn)
+  mov.u64 %rd50, 0; // call mds_m4_1 (device fn)
+  mov.u64 %rd51, 0; // call mds_m4_2 (device fn)
+  mov.u64 %rd52, 0; // call mds_m4_3 (device fn)
+  mov.u64 %rd53, 0; // call mds_m4_0 (device fn)
+  mov.u64 %rd54, 0; // call mds_m4_1 (device fn)
+  mov.u64 %rd55, 0; // call mds_m4_2 (device fn)
+  mov.u64 %rd56, 0; // call mds_m4_3 (device fn)
+  mov.u64 %rd57, 0; // call mds_m4_0 (device fn)
+  mov.u64 %rd58, 0; // call mds_m4_1 (device fn)
+  mov.u64 %rd59, 0; // call mds_m4_2 (device fn)
+  mov.u64 %rd60, 0; // call mds_m4_3 (device fn)
+  mov.u64 %rd61, 0; // call m31_add (device fn)
+  mov.u64 %rd62, 0; // call m31_add (device fn)
+  mov.u64 %rd63, 0; // call m31_add (device fn)
+  mov.u64 %rd64, 0; // call m31_add (device fn)
+  mov.u64 %rd65, 0; // call m31_add (device fn)
+  mov.u64 %rd66, 0; // call m31_add (device fn)
+  mov.u64 %rd67, 0; // call m31_add (device fn)
+  mov.u64 %rd68, 0; // call m31_add (device fn)
+  mov.u64 %rd69, 0; // call m31_add (device fn)
+  mov.u64 %rd70, 0; // call m31_add (device fn)
+  mov.u64 %rd71, 0; // call m31_add (device fn)
+  mov.u64 %rd72, 0; // call m31_add (device fn)
+  mov.u64 %rd73, 0; // call m31_add (device fn)
+  mov.u64 %rd74, 0; // call m31_add (device fn)
+  mov.u64 %rd75, 0; // call m31_add (device fn)
+  mov.u64 %rd76, 0; // call m31_add (device fn)
+  mov.u64 %rd77, 0;
+  add.u64 %rd78, %rd12, %rd77;
+  mov.u64 %rd79, 4;
+  mul.lo.u64 %rd80, %rd78, %rd79;
+  add.u64 %rd81, %rd0, %rd80;
+  st.global.u32 [%rd81], %rd61;
+  mov.u64 %rd82, 1;
+  add.u64 %rd83, %rd12, %rd82;
+  mov.u64 %rd84, 4;
+  mul.lo.u64 %rd85, %rd83, %rd84;
+  add.u64 %rd86, %rd0, %rd85;
+  st.global.u32 [%rd86], %rd62;
+  mov.u64 %rd87, 2;
+  add.u64 %rd88, %rd12, %rd87;
+  mov.u64 %rd89, 4;
+  mul.lo.u64 %rd90, %rd88, %rd89;
+  add.u64 %rd91, %rd0, %rd90;
+  st.global.u32 [%rd91], %rd63;
+  mov.u64 %rd92, 3;
+  add.u64 %rd93, %rd12, %rd92;
+  mov.u64 %rd94, 4;
+  mul.lo.u64 %rd95, %rd93, %rd94;
+  add.u64 %rd96, %rd0, %rd95;
+  st.global.u32 [%rd96], %rd64;
+  mov.u64 %rd97, 4;
+  add.u64 %rd98, %rd12, %rd97;
+  mov.u64 %rd99, 4;
+  mul.lo.u64 %rd100, %rd98, %rd99;
+  add.u64 %rd101, %rd0, %rd100;
+  st.global.u32 [%rd101], %rd65;
+  mov.u64 %rd102, 5;
+  add.u64 %rd103, %rd12, %rd102;
+  mov.u64 %rd104, 4;
+  mul.lo.u64 %rd105, %rd103, %rd104;
+  add.u64 %rd106, %rd0, %rd105;
+  st.global.u32 [%rd106], %rd66;
+  mov.u64 %rd107, 6;
+  add.u64 %rd108, %rd12, %rd107;
+  mov.u64 %rd109, 4;
+  mul.lo.u64 %rd110, %rd108, %rd109;
+  add.u64 %rd111, %rd0, %rd110;
+  st.global.u32 [%rd111], %rd67;
+  mov.u64 %rd112, 7;
+  add.u64 %rd113, %rd12, %rd112;
+  mov.u64 %rd114, 4;
+  mul.lo.u64 %rd115, %rd113, %rd114;
+  add.u64 %rd116, %rd0, %rd115;
+  st.global.u32 [%rd116], %rd68;
+  mov.u64 %rd117, 8;
+  add.u64 %rd118, %rd12, %rd117;
+  mov.u64 %rd119, 4;
+  mul.lo.u64 %rd120, %rd118, %rd119;
+  add.u64 %rd121, %rd0, %rd120;
+  st.global.u32 [%rd121], %rd69;
+  mov.u64 %rd122, 9;
+  add.u64 %rd123, %rd12, %rd122;
+  mov.u64 %rd124, 4;
+  mul.lo.u64 %rd125, %rd123, %rd124;
+  add.u64 %rd126, %rd0, %rd125;
+  st.global.u32 [%rd126], %rd70;
+  mov.u64 %rd127, 10;
+  add.u64 %rd128, %rd12, %rd127;
+  mov.u64 %rd129, 4;
+  mul.lo.u64 %rd130, %rd128, %rd129;
+  add.u64 %rd131, %rd0, %rd130;
+  st.global.u32 [%rd131], %rd71;
+  mov.u64 %rd132, 11;
+  add.u64 %rd133, %rd12, %rd132;
+  mov.u64 %rd134, 4;
+  mul.lo.u64 %rd135, %rd133, %rd134;
+  add.u64 %rd136, %rd0, %rd135;
+  st.global.u32 [%rd136], %rd72;
+  mov.u64 %rd137, 12;
+  add.u64 %rd138, %rd12, %rd137;
+  mov.u64 %rd139, 4;
+  mul.lo.u64 %rd140, %rd138, %rd139;
+  add.u64 %rd141, %rd0, %rd140;
+  st.global.u32 [%rd141], %rd73;
+  mov.u64 %rd142, 13;
+  add.u64 %rd143, %rd12, %rd142;
+  mov.u64 %rd144, 4;
+  mul.lo.u64 %rd145, %rd143, %rd144;
+  add.u64 %rd146, %rd0, %rd145;
+  st.global.u32 [%rd146], %rd74;
+  mov.u64 %rd147, 14;
+  add.u64 %rd148, %rd12, %rd147;
+  mov.u64 %rd149, 4;
+  mul.lo.u64 %rd150, %rd148, %rd149;
+  add.u64 %rd151, %rd0, %rd150;
+  st.global.u32 [%rd151], %rd75;
+  mov.u64 %rd152, 15;
+  add.u64 %rd153, %rd12, %rd152;
+  mov.u64 %rd154, 4;
+  mul.lo.u64 %rd155, %rd153, %rd154;
+  add.u64 %rd156, %rd0, %rd155;
+  st.global.u32 [%rd156], %rd76;
+  mov.u32 %r157, 0; // unit
+  mov.u32 %r158, %r157;
+  bra poseidon2_mds_kernel_end_10;
+  poseidon2_mds_kernel_else_10:
+  mov.u32 %r158, 0; // no else branch
+  poseidon2_mds_kernel_end_10:
+  mov.u32 %r159, 0; // unit
+  ret;
+}
+
+.visible .entry poseidon2_internal_mds_kernel(
+    .param .u64 poseidon2_internal_mds_kernel_param_state_data,
+    .param .u64 poseidon2_internal_mds_kernel_param_state_len,
+    .param .u64 poseidon2_internal_mds_kernel_param_mu_data,
+    .param .u64 poseidon2_internal_mds_kernel_param_mu_len,
+    .param .u64 poseidon2_internal_mds_kernel_param_n
+)
+{
+    .reg .pred %p10;
+    .reg .u64 %rd0, %rd1, %rd100, %rd101, %rd102, %rd103, %rd104, %rd105, %rd106, %rd107, %rd108, %rd109, %rd11, %rd110, %rd111, %rd112, %rd113, %rd114, %rd115, %rd116, %rd117, %rd118, %rd119, %rd120, %rd121, %rd122, %rd123, %rd124, %rd125, %rd126, %rd127, %rd128, %rd129, %rd13, %rd130, %rd131, %rd132, %rd133, %rd134, %rd135, %rd136, %rd137, %rd138, %rd139, %rd14, %rd140, %rd141, %rd142, %rd143, %rd144, %rd145, %rd146, %rd147, %rd148, %rd149, %rd15, %rd150, %rd151, %rd152, %rd153, %rd154, %rd155, %rd156, %rd157, %rd158, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd29, %rd3, %rd30, %rd31, %rd32, %rd33, %rd34, %rd35, %rd36, %rd37, %rd38, %rd39, %rd4, %rd40, %rd41, %rd42, %rd43, %rd44, %rd45, %rd46, %rd47, %rd48, %rd49, %rd50, %rd51, %rd52, %rd53, %rd54, %rd55, %rd56, %rd57, %rd58, %rd59, %rd60, %rd61, %rd62, %rd63, %rd64, %rd65, %rd66, %rd67, %rd68, %rd69, %rd70, %rd71, %rd72, %rd73, %rd74, %rd75, %rd76, %rd77, %rd78, %rd79, %rd80, %rd81, %rd82, %rd83, %rd84, %rd85, %rd86, %rd87, %rd88, %rd89, %rd90, %rd91, %rd92, %rd93, %rd94, %rd95, %rd96, %rd97, %rd98, %rd99;
+    .reg .u32 %r159, %r160, %r161, %r5, %r6, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [poseidon2_internal_mds_kernel_param_state_data];
+  ld.param.u64 %rd1, [poseidon2_internal_mds_kernel_param_state_len];
+  ld.param.u64 %rd2, [poseidon2_internal_mds_kernel_param_mu_data];
+  ld.param.u64 %rd3, [poseidon2_internal_mds_kernel_param_mu_len];
+  ld.param.u64 %rd4, [poseidon2_internal_mds_kernel_param_n];
+
+  mov.u32 %r5, %ctaid.x;
+  mov.u32 %r6, %ntid.x;
+  mul.lo.u32 %r7, %r5, %r6;
+  mov.u32 %r8, %tid.x;
+  add.u32 %r9, %r7, %r8;
+  cvt.u64.u32 %rd11, %r9;
+  setp.lt.u64 %p10, %rd11, %rd4;
+  @%p10 bra poseidon2_internal_mds_kernel_then_12;
+  bra poseidon2_internal_mds_kernel_else_12;
+  poseidon2_internal_mds_kernel_then_12:
+  mov.u64 %rd13, 16;
+  mul.lo.u64 %rd14, %r9, %rd13;
+  mov.u64 %rd15, 0; // unhandled expr
+  mov.u64 %rd16, 0; // call m31_get (device fn)
+  mov.u64 %rd17, 0; // call m31_get (device fn)
+  mov.u64 %rd18, 0; // call m31_get (device fn)
+  mov.u64 %rd19, 0; // call m31_get (device fn)
+  mov.u64 %rd20, 0; // call m31_get (device fn)
+  mov.u64 %rd21, 0; // call m31_get (device fn)
+  mov.u64 %rd22, 0; // call m31_get (device fn)
+  mov.u64 %rd23, 0; // call m31_get (device fn)
+  mov.u64 %rd24, 0; // call m31_get (device fn)
+  mov.u64 %rd25, 0; // call m31_get (device fn)
+  mov.u64 %rd26, 0; // call m31_get (device fn)
+  mov.u64 %rd27, 0; // call m31_get (device fn)
+  mov.u64 %rd28, 0; // call m31_get (device fn)
+  mov.u64 %rd29, 0; // call m31_get (device fn)
+  mov.u64 %rd30, 0; // call m31_get (device fn)
+  mov.u64 %rd31, 0; // call m31_get (device fn)
+  mov.u64 %rd32, 0; // call m31_get (device fn)
+  mov.u64 %rd33, 0; // call m31_get (device fn)
+  mov.u64 %rd34, 0; // call m31_get (device fn)
+  mov.u64 %rd35, 0; // call m31_get (device fn)
+  mov.u64 %rd36, 0; // call m31_get (device fn)
+  mov.u64 %rd37, 0; // call m31_get (device fn)
+  mov.u64 %rd38, 0; // call m31_get (device fn)
+  mov.u64 %rd39, 0; // call m31_get (device fn)
+  mov.u64 %rd40, 0; // call m31_get (device fn)
+  mov.u64 %rd41, 0; // call m31_get (device fn)
+  mov.u64 %rd42, 0; // call m31_get (device fn)
+  mov.u64 %rd43, 0; // call m31_get (device fn)
+  mov.u64 %rd44, 0; // call m31_get (device fn)
+  mov.u64 %rd45, 0; // call m31_get (device fn)
+  mov.u64 %rd46, 0; // call m31_get (device fn)
+  mov.u64 %rd47, 0; // call m31_get (device fn)
+  mov.u64 %rd48, 0; // call m31_add (device fn)
+  mov.u64 %rd49, 0; // call m31_add (device fn)
+  mov.u64 %rd50, 0; // call m31_add (device fn)
+  mov.u64 %rd51, 0; // call m31_add (device fn)
+  mov.u64 %rd52, 0; // call m31_add (device fn)
+  mov.u64 %rd53, 0; // call m31_add (device fn)
+  mov.u64 %rd54, 0; // call m31_add (device fn)
+  mov.u64 %rd55, 0; // call m31_add (device fn)
+  mov.u64 %rd56, 0; // call m31_add (device fn)
+  mov.u64 %rd57, 0; // call m31_add (device fn)
+  mov.u64 %rd58, 0; // call m31_add (device fn)
+  mov.u64 %rd59, 0; // call m31_add (device fn)
+  mov.u64 %rd60, 0; // call m31_add (device fn)
+  mov.u64 %rd61, 0; // call m31_add (device fn)
+  mov.u64 %rd62, 0; // call m31_add (device fn)
+  mov.u64 %rd63, 0; // call m31_add (device fn)
+  mov.u64 %rd64, 0; // call m31_add (device fn)
+  mov.u64 %rd65, 0; // call m31_add (device fn)
+  mov.u64 %rd66, 0; // call m31_add (device fn)
+  mov.u64 %rd67, 0; // call m31_add (device fn)
+  mov.u64 %rd68, 0; // call m31_add (device fn)
+  mov.u64 %rd69, 0; // call m31_add (device fn)
+  mov.u64 %rd70, 0; // call m31_add (device fn)
+  mov.u64 %rd71, 0; // call m31_add (device fn)
+  mov.u64 %rd72, 0; // call m31_add (device fn)
+  mov.u64 %rd73, 0; // call m31_add (device fn)
+  mov.u64 %rd74, 0; // call m31_add (device fn)
+  mov.u64 %rd75, 0; // call m31_add (device fn)
+  mov.u64 %rd76, 0; // call m31_add (device fn)
+  mov.u64 %rd77, 0; // call m31_add (device fn)
+  mov.u64 %rd78, 0; // call m31_add (device fn)
+  mov.u64 %rd79, 0;
+  add.u64 %rd80, %rd14, %rd79;
+  mov.u64 %rd81, 4;
+  mul.lo.u64 %rd82, %rd80, %rd81;
+  add.u64 %rd83, %rd0, %rd82;
+  st.global.u32 [%rd83], %rd63;
+  mov.u64 %rd84, 1;
+  add.u64 %rd85, %rd14, %rd84;
+  mov.u64 %rd86, 4;
+  mul.lo.u64 %rd87, %rd85, %rd86;
+  add.u64 %rd88, %rd0, %rd87;
+  st.global.u32 [%rd88], %rd64;
+  mov.u64 %rd89, 2;
+  add.u64 %rd90, %rd14, %rd89;
+  mov.u64 %rd91, 4;
+  mul.lo.u64 %rd92, %rd90, %rd91;
+  add.u64 %rd93, %rd0, %rd92;
+  st.global.u32 [%rd93], %rd65;
+  mov.u64 %rd94, 3;
+  add.u64 %rd95, %rd14, %rd94;
+  mov.u64 %rd96, 4;
+  mul.lo.u64 %rd97, %rd95, %rd96;
+  add.u64 %rd98, %rd0, %rd97;
+  st.global.u32 [%rd98], %rd66;
+  mov.u64 %rd99, 4;
+  add.u64 %rd100, %rd14, %rd99;
+  mov.u64 %rd101, 4;
+  mul.lo.u64 %rd102, %rd100, %rd101;
+  add.u64 %rd103, %rd0, %rd102;
+  st.global.u32 [%rd103], %rd67;
+  mov.u64 %rd104, 5;
+  add.u64 %rd105, %rd14, %rd104;
+  mov.u64 %rd106, 4;
+  mul.lo.u64 %rd107, %rd105, %rd106;
+  add.u64 %rd108, %rd0, %rd107;
+  st.global.u32 [%rd108], %rd68;
+  mov.u64 %rd109, 6;
+  add.u64 %rd110, %rd14, %rd109;
+  mov.u64 %rd111, 4;
+  mul.lo.u64 %rd112, %rd110, %rd111;
+  add.u64 %rd113, %rd0, %rd112;
+  st.global.u32 [%rd113], %rd69;
+  mov.u64 %rd114, 7;
+  add.u64 %rd115, %rd14, %rd114;
+  mov.u64 %rd116, 4;
+  mul.lo.u64 %rd117, %rd115, %rd116;
+  add.u64 %rd118, %rd0, %rd117;
+  st.global.u32 [%rd118], %rd70;
+  mov.u64 %rd119, 8;
+  add.u64 %rd120, %rd14, %rd119;
+  mov.u64 %rd121, 4;
+  mul.lo.u64 %rd122, %rd120, %rd121;
+  add.u64 %rd123, %rd0, %rd122;
+  st.global.u32 [%rd123], %rd71;
+  mov.u64 %rd124, 9;
+  add.u64 %rd125, %rd14, %rd124;
+  mov.u64 %rd126, 4;
+  mul.lo.u64 %rd127, %rd125, %rd126;
+  add.u64 %rd128, %rd0, %rd127;
+  st.global.u32 [%rd128], %rd72;
+  mov.u64 %rd129, 10;
+  add.u64 %rd130, %rd14, %rd129;
+  mov.u64 %rd131, 4;
+  mul.lo.u64 %rd132, %rd130, %rd131;
+  add.u64 %rd133, %rd0, %rd132;
+  st.global.u32 [%rd133], %rd73;
+  mov.u64 %rd134, 11;
+  add.u64 %rd135, %rd14, %rd134;
+  mov.u64 %rd136, 4;
+  mul.lo.u64 %rd137, %rd135, %rd136;
+  add.u64 %rd138, %rd0, %rd137;
+  st.global.u32 [%rd138], %rd74;
+  mov.u64 %rd139, 12;
+  add.u64 %rd140, %rd14, %rd139;
+  mov.u64 %rd141, 4;
+  mul.lo.u64 %rd142, %rd140, %rd141;
+  add.u64 %rd143, %rd0, %rd142;
+  st.global.u32 [%rd143], %rd75;
+  mov.u64 %rd144, 13;
+  add.u64 %rd145, %rd14, %rd144;
+  mov.u64 %rd146, 4;
+  mul.lo.u64 %rd147, %rd145, %rd146;
+  add.u64 %rd148, %rd0, %rd147;
+  st.global.u32 [%rd148], %rd76;
+  mov.u64 %rd149, 14;
+  add.u64 %rd150, %rd14, %rd149;
+  mov.u64 %rd151, 4;
+  mul.lo.u64 %rd152, %rd150, %rd151;
+  add.u64 %rd153, %rd0, %rd152;
+  st.global.u32 [%rd153], %rd77;
+  mov.u64 %rd154, 15;
+  add.u64 %rd155, %rd14, %rd154;
+  mov.u64 %rd156, 4;
+  mul.lo.u64 %rd157, %rd155, %rd156;
+  add.u64 %rd158, %rd0, %rd157;
+  st.global.u32 [%rd158], %rd78;
+  mov.u32 %r159, 0; // unit
+  mov.u32 %r160, %r159;
+  bra poseidon2_internal_mds_kernel_end_12;
+  poseidon2_internal_mds_kernel_else_12:
+  mov.u32 %r160, 0; // no else branch
+  poseidon2_internal_mds_kernel_end_12:
+  mov.u32 %r161, 0; // unit
+  ret;
+}
+

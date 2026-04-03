@@ -1496,6 +1496,7 @@ let format_obligation_kind = function
   | ONoOverflow op   -> "no overflow: " ^ op
   | OTermination f   -> "termination: " ^ f
   | OLinear v        -> "linear: " ^ v
+  | OInvariant "assert" -> "assert"
   | OInvariant i     -> "invariant: " ^ i
 
 (* ------------------------------------------------------------------ *)

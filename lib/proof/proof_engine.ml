@@ -344,15 +344,42 @@ module Z3Bridge = struct
         let qs = if bv then sort_to_smt (ty_to_sort ty) else "Int" in
         let body_s = pred_to_smtlib ~bv ctx body in
         (* In Int mode, add non-negativity guard for unsigned binders *)
-        (* In Int mode, add non-negativity guard for unsigned binders *)
         let unsigned_binder =
           (not bv) && (match ty with
             | TPrim (TUint _) | TRefined (TUint _, _, _) -> true | _ -> false)
         in
-        if unsigned_binder then
-          Printf.sprintf "(forall ((%s %s)) (=> (>= %s 0) %s))" x.name qs x.name body_s
-        else
-          Printf.sprintf "(forall ((%s %s)) %s)" x.name qs body_s
+        (* Collect (select arr binder) trigger terms so Z3 reliably instantiates
+           this forall when it encounters array reads indexed by the bound variable.
+           Without explicit triggers, Z3's E-matching may miss instantiations inside
+           kernel bodies (where the binder appears as a concrete thread index). *)
+        let rec collect_triggers acc p =
+          match p with
+          | PIndex (arr, PVar idx) when idx.name = x.name ->
+              let arr_s = pred_to_smtlib ~bv ctx arr in
+              let term = Printf.sprintf "(select %s %s)" arr_s x.name in
+              if List.mem term acc then acc else term :: acc
+          | PIndex (a, i)         -> collect_triggers (collect_triggers acc a) i
+          | PBinop (_, l, r)      -> collect_triggers (collect_triggers acc l) r
+          | PUnop (_, p')         -> collect_triggers acc p'
+          | PIte (c, t, e)        -> collect_triggers (collect_triggers (collect_triggers acc c) t) e
+          | PForall (_, _, inner) -> collect_triggers acc inner
+          | PExists (_, _, inner) -> collect_triggers acc inner
+          | PApp (_, args)        -> List.fold_left collect_triggers acc args
+          | _                     -> acc
+        in
+        let triggers = collect_triggers [] body in
+        let guarded_body =
+          if unsigned_binder then
+            Printf.sprintf "(=> (>= %s 0) %s)" x.name body_s
+          else
+            body_s
+        in
+        (match triggers with
+         | [] ->
+             Printf.sprintf "(forall ((%s %s)) %s)" x.name qs guarded_body
+         | _ ->
+             let pat = String.concat " " triggers in
+             Printf.sprintf "(forall ((%s %s)) (! %s :pattern (%s)))" x.name qs guarded_body pat)
     | PExists (x, ty, body) ->
         let qs = if bv then sort_to_smt (ty_to_sort ty) else "Int" in
         let body_s = pred_to_smtlib ~bv ctx body in
@@ -505,10 +532,13 @@ module Z3Bridge = struct
         List.fold_left (fun a (_, p) -> collect_array_var_names a p) acc fields
     | _ -> acc
 
-  (* Range constraints for unsigned types in Int mode *)
-  let is_unsigned = function
+  (* Range constraints for unsigned types in Int mode.
+     Strip qualifiers (Varying, Uniform, etc.) before checking — a varying u32
+     is still unsigned and must have a non-negativity constraint in Int mode. *)
+  let rec is_unsigned = function
     | TPrim (TUint _) | TRefined (TUint _, _, _) -> true
-    | _ -> false
+    | TQual (_, inner)                           -> is_unsigned inner
+    | _                                          -> false
 
   (* Upper bounds as strings to avoid OCaml int overflow on u64/u128. *)
   let uint_max_str = function
@@ -578,12 +608,16 @@ module Z3Bridge = struct
         let upper =
           if force_nia then []  (* skip upper bounds — causes NIA timeout *)
           else List.filter_map (fun (name, ty) ->
-            match ty with
-            | TPrim (TUint w) | TRefined (TUint w, _, _) ->
-                (match uint_max_str w with
-                 | Some m -> Some (Printf.sprintf "(assert (<= %s %s))" name m)
-                 | None   -> None)
-            | _ -> None
+            let rec width_of = function
+              | TPrim (TUint w) | TRefined (TUint w, _, _) -> Some w
+              | TQual (_, inner)                           -> width_of inner
+              | _                                          -> None
+            in
+            (match width_of ty with
+             | Some w -> (match uint_max_str w with
+               | Some m -> Some (Printf.sprintf "(assert (<= %s %s))" name m)
+               | None   -> None)
+             | None -> None)
           ) ctx.pc_vars
         in
         nonneg @ upper
@@ -943,6 +977,7 @@ let try_smt ctx ob : proof_status =
     | ONoOverflow op   -> "no-overflow: " ^ op
     | OTermination f   -> "termination: " ^ f
     | OLinear v        -> "linear usage: " ^ v
+    | OInvariant "assert" -> "assert"
     | OInvariant i     -> "invariant: " ^ i
   in
   match Z3Bridge.check_valid ctx ob.ob_pred with
@@ -1019,6 +1054,11 @@ let suggest_hint ob : tier2_hint =
          \x20 need: %s\n\
          \x20 try: check that the function body actually establishes this, \
          or weaken the 'ensures' clause" f goal)
+  | OInvariant i when i = "assert" ->
+      HintInvariant (Printf.sprintf
+        "assertion cannot be proven\n\
+         \x20 need: %s\n\
+         \x20 try: add missing preconditions, or use assume() with justification" goal)
   | OInvariant i ->
       HintInvariant (Printf.sprintf
         "loop invariant '%s' cannot be proven\n\

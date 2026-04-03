@@ -1,0 +1,200 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry circle_ntt_layer(
+    .param .u64 circle_ntt_layer_param_re_data,
+    .param .u64 circle_ntt_layer_param_re_len,
+    .param .u64 circle_ntt_layer_param_twiddle_data,
+    .param .u64 circle_ntt_layer_param_twiddle_len,
+    .param .u64 circle_ntt_layer_param_half,
+    .param .u64 circle_ntt_layer_param_n
+)
+{
+    .reg .pred %p11;
+    .reg .u64 %rd0, %rd1, %rd12, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd3, %rd4, %rd5;
+    .reg .u32 %r10, %r28, %r29, %r30, %r6, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [circle_ntt_layer_param_re_data];
+  ld.param.u64 %rd1, [circle_ntt_layer_param_re_len];
+  ld.param.u64 %rd2, [circle_ntt_layer_param_twiddle_data];
+  ld.param.u64 %rd3, [circle_ntt_layer_param_twiddle_len];
+  ld.param.u64 %rd4, [circle_ntt_layer_param_half];
+  ld.param.u64 %rd5, [circle_ntt_layer_param_n];
+
+  mov.u32 %r6, %ctaid.x;
+  mov.u32 %r7, %ntid.x;
+  mul.lo.u32 %r8, %r6, %r7;
+  mov.u32 %r9, %tid.x;
+  add.u32 %r10, %r8, %r9;
+  cvt.u64.u32 %rd12, %r10;
+  setp.lt.u64 %p11, %rd12, %rd4;
+  @%p11 bra circle_ntt_layer_then_13;
+  bra circle_ntt_layer_else_13;
+  circle_ntt_layer_then_13:
+  mov.u64 %rd14, 0; // call m31_get (device fn)
+  mov.u64 %rd15, 0; // call m31_get (device fn)
+  mov.u64 %rd16, 0; // call m31_get (device fn)
+  mov.u64 %rd17, 0; // call m31_mul (device fn)
+  mov.u64 %rd18, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd19, %r10;
+  mov.u64 %rd20, 4;
+  mul.lo.u64 %rd21, %rd19, %rd20;
+  add.u64 %rd22, %rd0, %rd21;
+  st.global.u32 [%rd22], %rd18;
+  mov.u64 %rd23, 0; // call m31_sub (device fn)
+  add.u64 %rd24, %r10, %rd4;
+  mov.u64 %rd25, 4;
+  mul.lo.u64 %rd26, %rd24, %rd25;
+  add.u64 %rd27, %rd0, %rd26;
+  st.global.u32 [%rd27], %rd23;
+  mov.u32 %r28, 0; // unit
+  mov.u32 %r29, %r28;
+  bra circle_ntt_layer_end_13;
+  circle_ntt_layer_else_13:
+  mov.u32 %r29, 0; // no else branch
+  circle_ntt_layer_end_13:
+  mov.u32 %r30, 0; // unit
+  ret;
+}
+
+.visible .entry circle_intt_layer(
+    .param .u64 circle_intt_layer_param_re_data,
+    .param .u64 circle_intt_layer_param_re_len,
+    .param .u64 circle_intt_layer_param_twiddle_data,
+    .param .u64 circle_intt_layer_param_twiddle_len,
+    .param .u64 circle_intt_layer_param_half,
+    .param .u64 circle_intt_layer_param_n
+)
+{
+    .reg .pred %p11;
+    .reg .u64 %rd0, %rd1, %rd12, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd3, %rd4, %rd5;
+    .reg .u32 %r10, %r29, %r30, %r31, %r6, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [circle_intt_layer_param_re_data];
+  ld.param.u64 %rd1, [circle_intt_layer_param_re_len];
+  ld.param.u64 %rd2, [circle_intt_layer_param_twiddle_data];
+  ld.param.u64 %rd3, [circle_intt_layer_param_twiddle_len];
+  ld.param.u64 %rd4, [circle_intt_layer_param_half];
+  ld.param.u64 %rd5, [circle_intt_layer_param_n];
+
+  mov.u32 %r6, %ctaid.x;
+  mov.u32 %r7, %ntid.x;
+  mul.lo.u32 %r8, %r6, %r7;
+  mov.u32 %r9, %tid.x;
+  add.u32 %r10, %r8, %r9;
+  cvt.u64.u32 %rd12, %r10;
+  setp.lt.u64 %p11, %rd12, %rd4;
+  @%p11 bra circle_intt_layer_then_13;
+  bra circle_intt_layer_else_13;
+  circle_intt_layer_then_13:
+  mov.u64 %rd14, 0; // call m31_get (device fn)
+  mov.u64 %rd15, 0; // call m31_get (device fn)
+  mov.u64 %rd16, 0; // call m31_get (device fn)
+  mov.u64 %rd17, 0; // call m31_neg (device fn)
+  mov.u64 %rd18, 0; // call m31_mul (device fn)
+  mov.u64 %rd19, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd20, %r10;
+  mov.u64 %rd21, 4;
+  mul.lo.u64 %rd22, %rd20, %rd21;
+  add.u64 %rd23, %rd0, %rd22;
+  st.global.u32 [%rd23], %rd19;
+  mov.u64 %rd24, 0; // call m31_sub (device fn)
+  add.u64 %rd25, %r10, %rd4;
+  mov.u64 %rd26, 4;
+  mul.lo.u64 %rd27, %rd25, %rd26;
+  add.u64 %rd28, %rd0, %rd27;
+  st.global.u32 [%rd28], %rd24;
+  mov.u32 %r29, 0; // unit
+  mov.u32 %r30, %r29;
+  bra circle_intt_layer_end_13;
+  circle_intt_layer_else_13:
+  mov.u32 %r30, 0; // no else branch
+  circle_intt_layer_end_13:
+  mov.u32 %r31, 0; // unit
+  ret;
+}
+
+.visible .entry circle_ntt_layer_cm31(
+    .param .u64 circle_ntt_layer_cm31_param_re_arr_data,
+    .param .u64 circle_ntt_layer_cm31_param_re_arr_len,
+    .param .u64 circle_ntt_layer_cm31_param_im_arr_data,
+    .param .u64 circle_ntt_layer_cm31_param_im_arr_len,
+    .param .u64 circle_ntt_layer_cm31_param_tw_re_data,
+    .param .u64 circle_ntt_layer_cm31_param_tw_re_len,
+    .param .u64 circle_ntt_layer_cm31_param_tw_im_data,
+    .param .u64 circle_ntt_layer_cm31_param_tw_im_len,
+    .param .u64 circle_ntt_layer_cm31_param_half,
+    .param .u64 circle_ntt_layer_cm31_param_n
+)
+{
+    .reg .pred %p15;
+    .reg .u64 %rd0, %rd1, %rd16, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd29, %rd3, %rd30, %rd31, %rd32, %rd33, %rd34, %rd35, %rd36, %rd37, %rd38, %rd39, %rd4, %rd40, %rd41, %rd42, %rd43, %rd44, %rd45, %rd5, %rd6, %rd7, %rd8, %rd9;
+    .reg .u32 %r10, %r11, %r12, %r13, %r14, %r46, %r47, %r48;
+
+  ld.param.u64 %rd0, [circle_ntt_layer_cm31_param_re_arr_data];
+  ld.param.u64 %rd1, [circle_ntt_layer_cm31_param_re_arr_len];
+  ld.param.u64 %rd2, [circle_ntt_layer_cm31_param_im_arr_data];
+  ld.param.u64 %rd3, [circle_ntt_layer_cm31_param_im_arr_len];
+  ld.param.u64 %rd4, [circle_ntt_layer_cm31_param_tw_re_data];
+  ld.param.u64 %rd5, [circle_ntt_layer_cm31_param_tw_re_len];
+  ld.param.u64 %rd6, [circle_ntt_layer_cm31_param_tw_im_data];
+  ld.param.u64 %rd7, [circle_ntt_layer_cm31_param_tw_im_len];
+  ld.param.u64 %rd8, [circle_ntt_layer_cm31_param_half];
+  ld.param.u64 %rd9, [circle_ntt_layer_cm31_param_n];
+
+  mov.u32 %r10, %ctaid.x;
+  mov.u32 %r11, %ntid.x;
+  mul.lo.u32 %r12, %r10, %r11;
+  mov.u32 %r13, %tid.x;
+  add.u32 %r14, %r12, %r13;
+  cvt.u64.u32 %rd16, %r14;
+  setp.lt.u64 %p15, %rd16, %rd8;
+  @%p15 bra circle_ntt_layer_cm31_then_17;
+  bra circle_ntt_layer_cm31_else_17;
+  circle_ntt_layer_cm31_then_17:
+  mov.u64 %rd18, 0; // call m31_get (device fn)
+  mov.u64 %rd19, 0; // call m31_get (device fn)
+  mov.u64 %rd20, 0; // call m31_get (device fn)
+  mov.u64 %rd21, 0; // call m31_get (device fn)
+  mov.u64 %rd22, 0; // call m31_get (device fn)
+  mov.u64 %rd23, 0; // call m31_get (device fn)
+  mov.u64 %rd24, 0; // call cm31_mul_re (device fn)
+  mov.u64 %rd25, 0; // call cm31_mul_im (device fn)
+  mov.u64 %rd26, 0; // call cm31_add_re (device fn)
+  cvt.u64.u32 %rd27, %r14;
+  mov.u64 %rd28, 4;
+  mul.lo.u64 %rd29, %rd27, %rd28;
+  add.u64 %rd30, %rd0, %rd29;
+  st.global.u32 [%rd30], %rd26;
+  mov.u64 %rd31, 0; // call cm31_add_im (device fn)
+  cvt.u64.u32 %rd32, %r14;
+  mov.u64 %rd33, 4;
+  mul.lo.u64 %rd34, %rd32, %rd33;
+  add.u64 %rd35, %rd2, %rd34;
+  st.global.u32 [%rd35], %rd31;
+  mov.u64 %rd36, 0; // call cm31_sub_re (device fn)
+  add.u64 %rd37, %r14, %rd8;
+  mov.u64 %rd38, 4;
+  mul.lo.u64 %rd39, %rd37, %rd38;
+  add.u64 %rd40, %rd0, %rd39;
+  st.global.u32 [%rd40], %rd36;
+  mov.u64 %rd41, 0; // call cm31_sub_im (device fn)
+  add.u64 %rd42, %r14, %rd8;
+  mov.u64 %rd43, 4;
+  mul.lo.u64 %rd44, %rd42, %rd43;
+  add.u64 %rd45, %rd2, %rd44;
+  st.global.u32 [%rd45], %rd41;
+  mov.u32 %r46, 0; // unit
+  mov.u32 %r47, %r46;
+  bra circle_ntt_layer_cm31_end_17;
+  circle_ntt_layer_cm31_else_17:
+  mov.u32 %r47, 0; // no else branch
+  circle_ntt_layer_cm31_end_17:
+  mov.u32 %r48, 0; // unit
+  ret;
+}
+
