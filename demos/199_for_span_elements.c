@@ -16,7 +16,7 @@ uint64_t sum_elements(forge_span_u64_t s __attribute__((unused)));
 int main();
 
 uint64_t sum_elements(forge_span_u64_t s __attribute__((unused))) {
-  uint64_t total __attribute__((unused)) = 0;
+  uint64_t total __attribute__((unused)) = 0ULL;
   {
     { forge_span_u64_t __span_x = s;
       for (uint64_t __i_x = 0; __i_x < __span_x.len; __i_x++) {
@@ -30,7 +30,7 @@ uint64_t sum_elements(forge_span_u64_t s __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

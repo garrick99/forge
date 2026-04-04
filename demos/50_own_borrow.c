@@ -74,15 +74,15 @@ Point* point_scale(Point* p __attribute__((unused)), uint64_t factor __attribute
 }
 
 uint64_t run() {
-  Point* p __attribute__((unused)) = __forge_own_alloc_Point((Point){ .x = 3, .y = 7 });
+  Point* p __attribute__((unused)) = __forge_own_alloc_Point((Point){ .x = 3ULL, .y = 7ULL });
   __forge_tuple_u64_own_Point_t __tup_68_4 __attribute__((unused)) = point_x(p);
   uint64_t x0 __attribute__((unused)) = (__tup_68_4)._0;
   Point* p1 __attribute__((unused)) = (__tup_68_4)._1;
   __forge_tuple_u64_own_Point_t __tup_69_4 __attribute__((unused)) = point_y(p1);
   uint64_t y0 __attribute__((unused)) = (__tup_69_4)._0;
   Point* p2 __attribute__((unused)) = (__tup_69_4)._1;
-  Point* p3 __attribute__((unused)) = point_translate(p2, 10, 20);
-  Point* p4 __attribute__((unused)) = point_scale(p3, 2);
+  Point* p3 __attribute__((unused)) = point_translate(p2, 10ULL, 20ULL);
+  Point* p4 __attribute__((unused)) = point_scale(p3, 2ULL);
   __forge_tuple_u64_own_Point_t __tup_78_4 __attribute__((unused)) = point_x(p4);
   uint64_t xf __attribute__((unused)) = (__tup_78_4)._0;
   Point* p5 __attribute__((unused)) = (__tup_78_4)._1;

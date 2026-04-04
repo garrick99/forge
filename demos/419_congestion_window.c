@@ -27,32 +27,32 @@ uint64_t loss_count();
 int main();
 
 CWnd cwnd_new(uint64_t initial __attribute__((unused)), uint64_t ssthresh __attribute__((unused))) {
-  return (CWnd){ .cwnd = initial, .ssthresh = ssthresh, .losses = 0 };
+  return (CWnd){ .cwnd = initial, .ssthresh = ssthresh, .losses = 0ULL };
 }
 
 void cwnd_slow_start(CWnd* c __attribute__((unused))) {
-  (*c).cwnd = ((*c).cwnd * 2);
+  (*c).cwnd = ((*c).cwnd * 2ULL);
 }
 
 void cwnd_cong_avoid(CWnd* c __attribute__((unused))) {
-  (*c).cwnd = ((*c).cwnd + 1);
+  (*c).cwnd = ((*c).cwnd + 1ULL);
 }
 
 void cwnd_loss(CWnd* c __attribute__((unused))) {
-  (*c).ssthresh = ((*c).cwnd / 2);
-  (*c).cwnd = 1;
-  (*c).losses = ((*c).losses + 1);
+  (*c).ssthresh = ((*c).cwnd / 2ULL);
+  (*c).cwnd = 1ULL;
+  (*c).losses = ((*c).losses + 1ULL);
 }
 
 uint64_t slow_start_doubles() {
-  CWnd c __attribute__((unused)) = cwnd_new(1, 16);
+  CWnd c __attribute__((unused)) = cwnd_new(1ULL, 16ULL);
   cwnd_slow_start((&c));
   cwnd_slow_start((&c));
   return c.cwnd;
 }
 
 uint64_t cong_avoid_inc() {
-  CWnd c __attribute__((unused)) = cwnd_new(1, 16);
+  CWnd c __attribute__((unused)) = cwnd_new(1ULL, 16ULL);
   cwnd_slow_start((&c));
   cwnd_slow_start((&c));
   cwnd_slow_start((&c));
@@ -65,7 +65,7 @@ uint64_t cong_avoid_inc() {
 }
 
 uint64_t loss_resets_cwnd() {
-  CWnd c __attribute__((unused)) = cwnd_new(1, 32);
+  CWnd c __attribute__((unused)) = cwnd_new(1ULL, 32ULL);
   cwnd_slow_start((&c));
   cwnd_slow_start((&c));
   cwnd_slow_start((&c));
@@ -74,7 +74,7 @@ uint64_t loss_resets_cwnd() {
 }
 
 uint64_t loss_sets_ssthresh() {
-  CWnd c __attribute__((unused)) = cwnd_new(1, 32);
+  CWnd c __attribute__((unused)) = cwnd_new(1ULL, 32ULL);
   cwnd_slow_start((&c));
   cwnd_slow_start((&c));
   cwnd_slow_start((&c));
@@ -83,7 +83,7 @@ uint64_t loss_sets_ssthresh() {
 }
 
 uint64_t loss_count() {
-  CWnd c __attribute__((unused)) = cwnd_new(1, 32);
+  CWnd c __attribute__((unused)) = cwnd_new(1ULL, 32ULL);
   cwnd_slow_start((&c));
   cwnd_slow_start((&c));
   cwnd_loss((&c));
@@ -95,7 +95,7 @@ uint64_t loss_count() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

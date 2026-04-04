@@ -28,19 +28,19 @@ uint64_t push_pop_state(uint64_t cap __attribute__((unused)));
 int main();
 
 RingBuf rbuf_new(uint64_t cap __attribute__((unused))) {
-  return (RingBuf){ .head = 0, .tail = 0, .count = 0, .cap = cap, .state = 0 };
+  return (RingBuf){ .head = 0ULL, .tail = 0ULL, .count = 0ULL, .cap = cap, .state = 0ULL };
 }
 
 void rbuf_push(RingBuf* b __attribute__((unused))) {
-  (*b).tail = (((*b).tail + 1) % (*b).cap);
-  (*b).count = ((*b).count + 1);
-  (*b).state = (((*b).count == (*b).cap) ? 2 : 1);
+  (*b).tail = (((*b).tail + 1ULL) % (*b).cap);
+  (*b).count = ((*b).count + 1ULL);
+  (*b).state = (((*b).count == (*b).cap) ? 2ULL : 1ULL);
 }
 
 void rbuf_pop(RingBuf* b __attribute__((unused))) {
-  (*b).head = (((*b).head + 1) % (*b).cap);
-  (*b).count = ((*b).count - 1);
-  (*b).state = (((*b).count == 0) ? 0 : 1);
+  (*b).head = (((*b).head + 1ULL) % (*b).cap);
+  (*b).count = ((*b).count - 1ULL);
+  (*b).state = (((*b).count == 0ULL) ? 0ULL : 1ULL);
 }
 
 uint64_t rbuf_count(RingBuf* b __attribute__((unused))) {
@@ -73,7 +73,7 @@ uint64_t push_pop_state(uint64_t cap __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

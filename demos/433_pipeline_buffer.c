@@ -27,23 +27,23 @@ uint64_t total_popped();
 int main();
 
 PipelineBuffer pb_new(uint64_t capacity __attribute__((unused))) {
-  return (PipelineBuffer){ .pushed = 0, .popped = 0, .capacity = capacity, .stalls = 0 };
+  return (PipelineBuffer){ .pushed = 0ULL, .popped = 0ULL, .capacity = capacity, .stalls = 0ULL };
 }
 
 void pb_push(PipelineBuffer* b __attribute__((unused))) {
-  (*b).pushed = ((*b).pushed + 1);
+  (*b).pushed = ((*b).pushed + 1ULL);
 }
 
 void pb_stall(PipelineBuffer* b __attribute__((unused))) {
-  (*b).stalls = ((*b).stalls + 1);
+  (*b).stalls = ((*b).stalls + 1ULL);
 }
 
 void pb_pop(PipelineBuffer* b __attribute__((unused))) {
-  (*b).popped = ((*b).popped + 1);
+  (*b).popped = ((*b).popped + 1ULL);
 }
 
 uint64_t push_3() {
-  PipelineBuffer b __attribute__((unused)) = pb_new(4);
+  PipelineBuffer b __attribute__((unused)) = pb_new(4ULL);
   pb_push((&b));
   pb_push((&b));
   pb_push((&b));
@@ -51,7 +51,7 @@ uint64_t push_3() {
 }
 
 uint64_t push_pop_size() {
-  PipelineBuffer b __attribute__((unused)) = pb_new(4);
+  PipelineBuffer b __attribute__((unused)) = pb_new(4ULL);
   pb_push((&b));
   pb_push((&b));
   pb_pop((&b));
@@ -59,7 +59,7 @@ uint64_t push_pop_size() {
 }
 
 uint64_t stall_count() {
-  PipelineBuffer b __attribute__((unused)) = pb_new(2);
+  PipelineBuffer b __attribute__((unused)) = pb_new(2ULL);
   pb_push((&b));
   pb_push((&b));
   pb_stall((&b));
@@ -70,7 +70,7 @@ uint64_t stall_count() {
 }
 
 uint64_t total_popped() {
-  PipelineBuffer b __attribute__((unused)) = pb_new(4);
+  PipelineBuffer b __attribute__((unused)) = pb_new(4ULL);
   pb_push((&b));
   pb_push((&b));
   pb_push((&b));
@@ -81,7 +81,7 @@ uint64_t total_popped() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

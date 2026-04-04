@@ -26,19 +26,19 @@ uint64_t all_delivered();
 int main();
 
 MsgBus bus_new() {
-  return (MsgBus){ .published = 0, .delivered = 0, .subscribers = 0 };
+  return (MsgBus){ .published = 0ULL, .delivered = 0ULL, .subscribers = 0ULL };
 }
 
 void bus_subscribe(MsgBus* b __attribute__((unused))) {
-  (*b).subscribers = ((*b).subscribers + 1);
+  (*b).subscribers = ((*b).subscribers + 1ULL);
 }
 
 void bus_publish(MsgBus* b __attribute__((unused))) {
-  (*b).published = ((*b).published + 1);
+  (*b).published = ((*b).published + 1ULL);
 }
 
 void bus_deliver(MsgBus* b __attribute__((unused))) {
-  (*b).delivered = ((*b).delivered + 1);
+  (*b).delivered = ((*b).delivered + 1ULL);
 }
 
 uint64_t three_subscribers() {
@@ -79,7 +79,7 @@ uint64_t all_delivered() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

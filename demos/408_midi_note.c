@@ -27,17 +27,17 @@ uint64_t all_released();
 int main();
 
 MidiState midi_new() {
-  return (MidiState){ .active = 0, .note_ons = 0, .note_offs = 0, .max_active = 128 };
+  return (MidiState){ .active = 0ULL, .note_ons = 0ULL, .note_offs = 0ULL, .max_active = 128ULL };
 }
 
 void midi_note_on(MidiState* m __attribute__((unused))) {
-  (*m).active = ((*m).active + 1);
-  (*m).note_ons = ((*m).note_ons + 1);
+  (*m).active = ((*m).active + 1ULL);
+  (*m).note_ons = ((*m).note_ons + 1ULL);
 }
 
 void midi_note_off(MidiState* m __attribute__((unused))) {
-  (*m).active = ((*m).active - 1);
-  (*m).note_offs = ((*m).note_offs + 1);
+  (*m).active = ((*m).active - 1ULL);
+  (*m).note_offs = ((*m).note_offs + 1ULL);
 }
 
 uint64_t four_notes_on() {
@@ -88,7 +88,7 @@ uint64_t all_released() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

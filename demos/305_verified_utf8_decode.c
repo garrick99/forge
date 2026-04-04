@@ -23,44 +23,44 @@ uint64_t count_ascii(forge_span_u8_t buf __attribute__((unused)), uint64_t n __a
 int main();
 
 Utf8Result decode_utf8_byte(forge_span_u8_t buf __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t b0 __attribute__((unused)) = ((uint64_t)buf.data[0]);
-  if ((b0 < 128)) {
-    return (Utf8Result){ .codepoint = b0, .len = 1, .valid = 1 };
+  uint64_t b0 __attribute__((unused)) = ((uint64_t)buf.data[0ULL]);
+  if ((b0 < 128ULL)) {
+    return (Utf8Result){ .codepoint = b0, .len = 1ULL, .valid = 1 };
   } else {
-    if ((b0 < 192)) {
-      return (Utf8Result){ .codepoint = 0, .len = 1, .valid = 0 };
+    if ((b0 < 192ULL)) {
+      return (Utf8Result){ .codepoint = 0ULL, .len = 1ULL, .valid = 0 };
     } else {
-      if ((b0 < 224)) {
-        if ((n >= 2)) {
-          uint64_t b1 __attribute__((unused)) = ((uint64_t)buf.data[1]);
-          uint64_t cp __attribute__((unused)) = (((b0 - 192) * 64) + (b1 % 64));
-          return (Utf8Result){ .codepoint = cp, .len = 2, .valid = 1 };
+      if ((b0 < 224ULL)) {
+        if ((n >= 2ULL)) {
+          uint64_t b1 __attribute__((unused)) = ((uint64_t)buf.data[1ULL]);
+          uint64_t cp __attribute__((unused)) = (((b0 - 192ULL) * 64ULL) + (b1 % 64ULL));
+          return (Utf8Result){ .codepoint = cp, .len = 2ULL, .valid = 1 };
         } else {
-          return (Utf8Result){ .codepoint = 0, .len = 1, .valid = 0 };
+          return (Utf8Result){ .codepoint = 0ULL, .len = 1ULL, .valid = 0 };
         }
       } else {
-        if ((b0 < 240)) {
-          if ((n >= 3)) {
-            uint64_t b1 __attribute__((unused)) = ((uint64_t)buf.data[1]);
-            uint64_t b2 __attribute__((unused)) = ((uint64_t)buf.data[2]);
-            uint64_t cp __attribute__((unused)) = ((((b0 - 224) * 4096) + ((b1 % 64) * 64)) + (b2 % 64));
-            return (Utf8Result){ .codepoint = cp, .len = 3, .valid = 1 };
+        if ((b0 < 240ULL)) {
+          if ((n >= 3ULL)) {
+            uint64_t b1 __attribute__((unused)) = ((uint64_t)buf.data[1ULL]);
+            uint64_t b2 __attribute__((unused)) = ((uint64_t)buf.data[2ULL]);
+            uint64_t cp __attribute__((unused)) = ((((b0 - 224ULL) * 4096ULL) + ((b1 % 64ULL) * 64ULL)) + (b2 % 64ULL));
+            return (Utf8Result){ .codepoint = cp, .len = 3ULL, .valid = 1 };
           } else {
-            return (Utf8Result){ .codepoint = 0, .len = 1, .valid = 0 };
+            return (Utf8Result){ .codepoint = 0ULL, .len = 1ULL, .valid = 0 };
           }
         } else {
-          if ((b0 < 248)) {
-            if ((n >= 4)) {
-              uint64_t b1 __attribute__((unused)) = ((uint64_t)buf.data[1]);
-              uint64_t b2 __attribute__((unused)) = ((uint64_t)buf.data[2]);
-              uint64_t b3 __attribute__((unused)) = ((uint64_t)buf.data[3]);
-              uint64_t cp __attribute__((unused)) = (((((b0 - 240) * 262144) + ((b1 % 64) * 4096)) + ((b2 % 64) * 64)) + (b3 % 64));
-              return (Utf8Result){ .codepoint = cp, .len = 4, .valid = 1 };
+          if ((b0 < 248ULL)) {
+            if ((n >= 4ULL)) {
+              uint64_t b1 __attribute__((unused)) = ((uint64_t)buf.data[1ULL]);
+              uint64_t b2 __attribute__((unused)) = ((uint64_t)buf.data[2ULL]);
+              uint64_t b3 __attribute__((unused)) = ((uint64_t)buf.data[3ULL]);
+              uint64_t cp __attribute__((unused)) = (((((b0 - 240ULL) * 262144ULL) + ((b1 % 64ULL) * 4096ULL)) + ((b2 % 64ULL) * 64ULL)) + (b3 % 64ULL));
+              return (Utf8Result){ .codepoint = cp, .len = 4ULL, .valid = 1 };
             } else {
-              return (Utf8Result){ .codepoint = 0, .len = 1, .valid = 0 };
+              return (Utf8Result){ .codepoint = 0ULL, .len = 1ULL, .valid = 0 };
             }
           } else {
-            return (Utf8Result){ .codepoint = 0, .len = 1, .valid = 0 };
+            return (Utf8Result){ .codepoint = 0ULL, .len = 1ULL, .valid = 0 };
           }
         }
       }
@@ -69,16 +69,16 @@ Utf8Result decode_utf8_byte(forge_span_u8_t buf __attribute__((unused)), uint64_
 }
 
 uint64_t count_ascii(forge_span_u8_t buf __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t b __attribute__((unused)) = ((uint64_t)buf.data[i]);
-      if ((b < 128)) {
-        count = (count + 1);
+      if ((b < 128ULL)) {
+        count = (count + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -86,7 +86,7 @@ uint64_t count_ascii(forge_span_u8_t buf __attribute__((unused)), uint64_t n __a
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

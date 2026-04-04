@@ -19,12 +19,12 @@ uint64_t count_above(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 int main();
 
 uint64_t sum_of_squares(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + (s.data[i] * s.data[i]));
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -32,12 +32,12 @@ uint64_t sum_of_squares(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 }
 
 uint64_t weighted_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      acc = (acc + (s.data[i] * (i + 1)));
-      i = (i + 1);
+      acc = (acc + (s.data[i] * (i + 1ULL)));
+      i = (i + 1ULL);
     }
 
   }
@@ -45,12 +45,12 @@ uint64_t weighted_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
 }
 
 uint64_t product(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = s.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t acc __attribute__((unused)) = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       acc = (acc * s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -58,15 +58,15 @@ uint64_t product(forge_span_u64_t s __attribute__((unused)), uint64_t n __attrib
 }
 
 uint64_t count_above(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t threshold __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((s.data[i] > threshold)) {
-        count = (count + 1);
+        count = (count + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -74,7 +74,7 @@ uint64_t count_above(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

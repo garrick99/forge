@@ -27,55 +27,55 @@ uint64_t bytes_written();
 int main();
 
 ScatterGather sg_new() {
-  return (ScatterGather){ .scatter_ops = 0, .gather_ops = 0, .total_ops = 0, .bytes_written = 0, .bytes_read = 0 };
+  return (ScatterGather){ .scatter_ops = 0ULL, .gather_ops = 0ULL, .total_ops = 0ULL, .bytes_written = 0ULL, .bytes_read = 0ULL };
 }
 
 void sg_scatter(ScatterGather* s __attribute__((unused)), uint64_t bytes __attribute__((unused))) {
-  (*s).scatter_ops = ((*s).scatter_ops + 1);
-  (*s).total_ops = ((*s).total_ops + 1);
+  (*s).scatter_ops = ((*s).scatter_ops + 1ULL);
+  (*s).total_ops = ((*s).total_ops + 1ULL);
   (*s).bytes_written = ((*s).bytes_written + bytes);
 }
 
 void sg_gather(ScatterGather* s __attribute__((unused)), uint64_t bytes __attribute__((unused))) {
-  (*s).gather_ops = ((*s).gather_ops + 1);
-  (*s).total_ops = ((*s).total_ops + 1);
+  (*s).gather_ops = ((*s).gather_ops + 1ULL);
+  (*s).total_ops = ((*s).total_ops + 1ULL);
   (*s).bytes_read = ((*s).bytes_read + bytes);
 }
 
 uint64_t three_scatters() {
   ScatterGather s __attribute__((unused)) = sg_new();
-  sg_scatter((&s), 64);
-  sg_scatter((&s), 64);
-  sg_scatter((&s), 64);
+  sg_scatter((&s), 64ULL);
+  sg_scatter((&s), 64ULL);
+  sg_scatter((&s), 64ULL);
   return s.scatter_ops;
 }
 
 uint64_t mixed_ops() {
   ScatterGather s __attribute__((unused)) = sg_new();
-  sg_scatter((&s), 100);
-  sg_scatter((&s), 100);
-  sg_gather((&s), 80);
-  sg_gather((&s), 80);
+  sg_scatter((&s), 100ULL);
+  sg_scatter((&s), 100ULL);
+  sg_gather((&s), 80ULL);
+  sg_gather((&s), 80ULL);
   return s.total_ops;
 }
 
 uint64_t ops_sum() {
   ScatterGather s __attribute__((unused)) = sg_new();
-  sg_scatter((&s), 50);
-  sg_gather((&s), 30);
-  sg_scatter((&s), 50);
+  sg_scatter((&s), 50ULL);
+  sg_gather((&s), 30ULL);
+  sg_scatter((&s), 50ULL);
   return ((s.total_ops - s.scatter_ops) - s.gather_ops);
 }
 
 uint64_t bytes_written() {
   ScatterGather s __attribute__((unused)) = sg_new();
-  sg_scatter((&s), 64);
-  sg_scatter((&s), 128);
+  sg_scatter((&s), 64ULL);
+  sg_scatter((&s), 128ULL);
   return s.bytes_written;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -37,14 +37,14 @@ __global__ void fp64_bench(forge_span_f64_t out __attribute__((unused)), uint64_
   double a1 __attribute__((unused)) = 2;
   double a2 __attribute__((unused)) = 3;
   double a3 __attribute__((unused)) = 4;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n_iters)) {
       a0 = ((a0 * b) + c);
       a1 = ((a1 * b) + c);
       a2 = ((a2 * b) + c);
       a3 = ((a3 * b) + c);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -55,7 +55,7 @@ __global__ void fp64_bench(forge_span_f64_t out __attribute__((unused)), uint64_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

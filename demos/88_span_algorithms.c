@@ -21,19 +21,19 @@ uint64_t clamp(uint64_t x __attribute__((unused)), uint64_t lo __attribute__((un
 uint64_t clamp_span4(forge_span_u64_t s __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused)));
 
 uint64_t span_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return 0;
+  if ((n == 0ULL)) {
+    return 0ULL;
   } else {
-    if ((n == 1)) {
-      return s.data[0];
+    if ((n == 1ULL)) {
+      return s.data[0ULL];
     } else {
-      if ((n == 2)) {
-        return (s.data[0] + s.data[1]);
+      if ((n == 2ULL)) {
+        return (s.data[0ULL] + s.data[1ULL]);
       } else {
-        if ((n == 3)) {
-          return ((s.data[0] + s.data[1]) + s.data[2]);
+        if ((n == 3ULL)) {
+          return ((s.data[0ULL] + s.data[1ULL]) + s.data[2ULL]);
         } else {
-          return (((s.data[0] + s.data[1]) + s.data[2]) + s.data[3]);
+          return (((s.data[0ULL] + s.data[1ULL]) + s.data[2ULL]) + s.data[3ULL]);
         }
       }
     }
@@ -41,10 +41,10 @@ uint64_t span_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __attri
 }
 
 uint64_t span_max4(forge_span_u64_t s __attribute__((unused))) {
-  uint64_t a __attribute__((unused)) = s.data[0];
-  uint64_t b __attribute__((unused)) = s.data[1];
-  uint64_t c __attribute__((unused)) = s.data[2];
-  uint64_t d __attribute__((unused)) = s.data[3];
+  uint64_t a __attribute__((unused)) = s.data[0ULL];
+  uint64_t b __attribute__((unused)) = s.data[1ULL];
+  uint64_t c __attribute__((unused)) = s.data[2ULL];
+  uint64_t d __attribute__((unused)) = s.data[3ULL];
   uint64_t ab;
   if ((a > b)) {
     ab = a;
@@ -65,23 +65,23 @@ uint64_t span_max4(forge_span_u64_t s __attribute__((unused))) {
 }
 
 uint64_t dot_product4(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused))) {
-  return ((((a.data[0] * b.data[0]) + (a.data[1] * b.data[1])) + (a.data[2] * b.data[2])) + (a.data[3] * b.data[3]));
+  return ((((a.data[0ULL] * b.data[0ULL]) + (a.data[1ULL] * b.data[1ULL])) + (a.data[2ULL] * b.data[2ULL])) + (a.data[3ULL] * b.data[3ULL]));
 }
 
 uint64_t contains4(forge_span_u64_t s __attribute__((unused)), uint64_t v __attribute__((unused))) {
-  if ((s.data[0] == v)) {
-    return 1;
+  if ((s.data[0ULL] == v)) {
+    return 1ULL;
   } else {
-    if ((s.data[1] == v)) {
-      return 1;
+    if ((s.data[1ULL] == v)) {
+      return 1ULL;
     } else {
-      if ((s.data[2] == v)) {
-        return 1;
+      if ((s.data[2ULL] == v)) {
+        return 1ULL;
       } else {
-        if ((s.data[3] == v)) {
-          return 1;
+        if ((s.data[3ULL] == v)) {
+          return 1ULL;
         } else {
-          return 0;
+          return 0ULL;
         }
       }
     }
@@ -105,6 +105,6 @@ uint64_t clamp(uint64_t x __attribute__((unused)), uint64_t lo __attribute__((un
 }
 
 uint64_t clamp_span4(forge_span_u64_t s __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
-  return (((clamp(s.data[0], lo, hi) + clamp(s.data[1], lo, hi)) + clamp(s.data[2], lo, hi)) + clamp(s.data[3], lo, hi));
+  return (((clamp(s.data[0ULL], lo, hi) + clamp(s.data[1ULL], lo, hi)) + clamp(s.data[2ULL], lo, hi)) + clamp(s.data[3ULL], lo, hi));
 }
 

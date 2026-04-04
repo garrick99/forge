@@ -28,62 +28,62 @@ uint64_t count_tracks();
 int main();
 
 MinMax mm_new() {
-  return (MinMax){ .min = 0, .max = 0, .count = 0, .has_data = 0 };
+  return (MinMax){ .min = 0ULL, .max = 0ULL, .count = 0ULL, .has_data = 0ULL };
 }
 
 void mm_first(MinMax* m __attribute__((unused)), uint64_t v __attribute__((unused))) {
   (*m).min = v;
   (*m).max = v;
-  (*m).has_data = 1;
-  (*m).count = 1;
+  (*m).has_data = 1ULL;
+  (*m).count = 1ULL;
 }
 
 void mm_update_max(MinMax* m __attribute__((unused)), uint64_t v __attribute__((unused))) {
   (*m).max = v;
-  (*m).count = ((*m).count + 1);
+  (*m).count = ((*m).count + 1ULL);
 }
 
 void mm_update_min(MinMax* m __attribute__((unused)), uint64_t v __attribute__((unused))) {
   (*m).min = v;
-  (*m).count = ((*m).count + 1);
+  (*m).count = ((*m).count + 1ULL);
 }
 
 uint64_t first_val_min() {
   MinMax m __attribute__((unused)) = mm_new();
-  mm_first((&m), 10);
+  mm_first((&m), 10ULL);
   return m.min;
 }
 
 uint64_t first_val_max() {
   MinMax m __attribute__((unused)) = mm_new();
-  mm_first((&m), 10);
+  mm_first((&m), 10ULL);
   return m.max;
 }
 
 uint64_t expand_max() {
   MinMax m __attribute__((unused)) = mm_new();
-  mm_first((&m), 10);
-  mm_update_max((&m), 30);
+  mm_first((&m), 10ULL);
+  mm_update_max((&m), 30ULL);
   return m.max;
 }
 
 uint64_t shrink_min() {
   MinMax m __attribute__((unused)) = mm_new();
-  mm_first((&m), 10);
-  mm_update_min((&m), 3);
+  mm_first((&m), 10ULL);
+  mm_update_min((&m), 3ULL);
   return m.min;
 }
 
 uint64_t count_tracks() {
   MinMax m __attribute__((unused)) = mm_new();
-  mm_first((&m), 10);
-  mm_update_max((&m), 20);
-  mm_update_min((&m), 5);
+  mm_first((&m), 10ULL);
+  mm_update_max((&m), 20ULL);
+  mm_update_min((&m), 5ULL);
   return m.count;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

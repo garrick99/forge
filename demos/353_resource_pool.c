@@ -26,21 +26,21 @@ uint64_t alloc_free_cycle();
 int main();
 
 Pool pool_new(uint64_t total __attribute__((unused))) {
-  return (Pool){ .free = total, .used = 0, .total = total };
+  return (Pool){ .free = total, .used = 0ULL, .total = total };
 }
 
 void pool_alloc(Pool* p __attribute__((unused))) {
-  (*p).free = ((*p).free - 1);
-  (*p).used = ((*p).used + 1);
+  (*p).free = ((*p).free - 1ULL);
+  (*p).used = ((*p).used + 1ULL);
 }
 
 void pool_free(Pool* p __attribute__((unused))) {
-  (*p).used = ((*p).used - 1);
-  (*p).free = ((*p).free + 1);
+  (*p).used = ((*p).used - 1ULL);
+  (*p).free = ((*p).free + 1ULL);
 }
 
 uint64_t initial_free() {
-  Pool p __attribute__((unused)) = pool_new(5);
+  Pool p __attribute__((unused)) = pool_new(5ULL);
   return p.free;
 }
 
@@ -71,7 +71,7 @@ uint64_t balance_preserved(uint64_t total __attribute__((unused))) {
 }
 
 uint64_t alloc_free_cycle() {
-  Pool p __attribute__((unused)) = pool_new(4);
+  Pool p __attribute__((unused)) = pool_new(4ULL);
   pool_alloc((&p));
   pool_alloc((&p));
   pool_alloc((&p));
@@ -84,7 +84,7 @@ uint64_t alloc_free_cycle() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

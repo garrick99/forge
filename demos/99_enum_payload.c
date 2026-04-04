@@ -68,7 +68,7 @@ uint64_t area(Shape s __attribute__((unused))) {
   switch (s.tag) {
     case Shape_tag_Circle: {
       uint64_t r __attribute__((unused)) = s.data.Circle._v0;
-      return ((r * r) * 3);
+      return ((r * r) * 3ULL);
     }
     case Shape_tag_Rectangle: {
       uint64_t w __attribute__((unused)) = s.data.Rectangle._v0;
@@ -78,7 +78,7 @@ uint64_t area(Shape s __attribute__((unused))) {
     case Shape_tag_Triangle: {
       uint64_t b __attribute__((unused)) = s.data.Triangle._v0;
       uint64_t h __attribute__((unused)) = s.data.Triangle._v1;
-      return ((b * h) / 2);
+      return ((b * h) / 2ULL);
     }
     default: __builtin_unreachable();
   }
@@ -88,12 +88,12 @@ uint64_t perimeter_approx(Shape s __attribute__((unused))) {
   switch (s.tag) {
     case Shape_tag_Circle: {
       uint64_t r __attribute__((unused)) = s.data.Circle._v0;
-      return (r * 6);
+      return (r * 6ULL);
     }
     case Shape_tag_Rectangle: {
       uint64_t w __attribute__((unused)) = s.data.Rectangle._v0;
       uint64_t h __attribute__((unused)) = s.data.Rectangle._v1;
-      return ((2 * w) + (2 * h));
+      return ((2ULL * w) + (2ULL * h));
     }
     case Shape_tag_Triangle: {
       uint64_t b __attribute__((unused)) = s.data.Triangle._v0;
@@ -109,7 +109,7 @@ uint64_t is_large(Shape s __attribute__((unused))) {
     case Shape_tag_Circle: {
       uint64_t r __attribute__((unused)) = s.data.Circle._v0;
       if ((r > 10)) {
-        return 1;
+        return 1ULL;
       } else {
       goto forge_match_default_2;
       }
@@ -118,7 +118,7 @@ uint64_t is_large(Shape s __attribute__((unused))) {
       uint64_t w __attribute__((unused)) = s.data.Rectangle._v0;
       uint64_t h __attribute__((unused)) = s.data.Rectangle._v1;
       if (((w * h) > 100)) {
-        return 1;
+        return 1ULL;
       } else {
       goto forge_match_default_2;
       }
@@ -126,7 +126,7 @@ uint64_t is_large(Shape s __attribute__((unused))) {
     default: ;
     forge_match_default_2:
     {
-      return 0;
+      return 0ULL;
     }
   }
 }
@@ -153,7 +153,7 @@ uint64_t eval(Expr e __attribute__((unused))) {
       if ((a >= b)) {
         return (a - b);
       } else {
-        return 0;
+        return 0ULL;
       }
     }
     default: __builtin_unreachable();
@@ -161,19 +161,19 @@ uint64_t eval(Expr e __attribute__((unused))) {
 }
 
 int main() {
-  Shape c __attribute__((unused)) = (Shape){ .tag = Shape_tag_Circle, .data.Circle = { ._v0 = 5 } };
-  Shape r __attribute__((unused)) = (Shape){ .tag = Shape_tag_Rectangle, .data.Rectangle = { ._v0 = 4, ._v1 = 6 } };
-  Shape t __attribute__((unused)) = (Shape){ .tag = Shape_tag_Triangle, .data.Triangle = { ._v0 = 8, ._v1 = 6 } };
+  Shape c __attribute__((unused)) = (Shape){ .tag = Shape_tag_Circle, .data.Circle = { ._v0 = 5ULL } };
+  Shape r __attribute__((unused)) = (Shape){ .tag = Shape_tag_Rectangle, .data.Rectangle = { ._v0 = 4ULL, ._v1 = 6ULL } };
+  Shape t __attribute__((unused)) = (Shape){ .tag = Shape_tag_Triangle, .data.Triangle = { ._v0 = 8ULL, ._v1 = 6ULL } };
   uint64_t ac __attribute__((unused)) = area(c);
   uint64_t ar __attribute__((unused)) = area(r);
   uint64_t at __attribute__((unused)) = area(t);
-  uint64_t pc __attribute__((unused)) = perimeter_approx((Shape){ .tag = Shape_tag_Circle, .data.Circle = { ._v0 = 10 } });
-  uint64_t pr __attribute__((unused)) = perimeter_approx((Shape){ .tag = Shape_tag_Rectangle, .data.Rectangle = { ._v0 = 3, ._v1 = 4 } });
-  uint64_t lg1 __attribute__((unused)) = is_large((Shape){ .tag = Shape_tag_Circle, .data.Circle = { ._v0 = 15 } });
-  uint64_t lg2 __attribute__((unused)) = is_large((Shape){ .tag = Shape_tag_Circle, .data.Circle = { ._v0 = 5 } });
-  uint64_t e1 __attribute__((unused)) = eval((Expr){ .tag = Expr_tag_Add, .data.Add = { ._v0 = 3, ._v1 = 4 } });
-  uint64_t e2 __attribute__((unused)) = eval((Expr){ .tag = Expr_tag_Mul, .data.Mul = { ._v0 = 6, ._v1 = 7 } });
-  uint64_t e3 __attribute__((unused)) = eval((Expr){ .tag = Expr_tag_Sub, .data.Sub = { ._v0 = 10, ._v1 = 3 } });
+  uint64_t pc __attribute__((unused)) = perimeter_approx((Shape){ .tag = Shape_tag_Circle, .data.Circle = { ._v0 = 10ULL } });
+  uint64_t pr __attribute__((unused)) = perimeter_approx((Shape){ .tag = Shape_tag_Rectangle, .data.Rectangle = { ._v0 = 3ULL, ._v1 = 4ULL } });
+  uint64_t lg1 __attribute__((unused)) = is_large((Shape){ .tag = Shape_tag_Circle, .data.Circle = { ._v0 = 15ULL } });
+  uint64_t lg2 __attribute__((unused)) = is_large((Shape){ .tag = Shape_tag_Circle, .data.Circle = { ._v0 = 5ULL } });
+  uint64_t e1 __attribute__((unused)) = eval((Expr){ .tag = Expr_tag_Add, .data.Add = { ._v0 = 3ULL, ._v1 = 4ULL } });
+  uint64_t e2 __attribute__((unused)) = eval((Expr){ .tag = Expr_tag_Mul, .data.Mul = { ._v0 = 6ULL, ._v1 = 7ULL } });
+  uint64_t e3 __attribute__((unused)) = eval((Expr){ .tag = Expr_tag_Sub, .data.Sub = { ._v0 = 10ULL, ._v1 = 3ULL } });
   return (int)((((((((ac + ar) + at) + lg1) + lg2) + e1) + e2) + e3));
 
 }

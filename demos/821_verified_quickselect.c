@@ -25,10 +25,10 @@ uint64_t lomuto_partition(forge_span_u64_t s __attribute__((unused)), uint64_t l
         uint64_t tmp __attribute__((unused)) = s.data[i];
         s.data[i] = s.data[j];
         s.data[j] = tmp;
-        i = (i + 1);
+        i = (i + 1ULL);
 
       }
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
@@ -39,7 +39,7 @@ uint64_t lomuto_partition(forge_span_u64_t s __attribute__((unused)), uint64_t l
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

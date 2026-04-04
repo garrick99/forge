@@ -109,14 +109,14 @@ uint64_t network_sorted(uint64_t a __attribute__((unused)), uint64_t b __attribu
   uint64_t lo __attribute__((unused)) = min3(a, b, c);
   uint64_t hi __attribute__((unused)) = max3(a, b, c);
   if ((lo <= hi)) {
-    return 1;
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

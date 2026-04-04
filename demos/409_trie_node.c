@@ -26,20 +26,20 @@ uint64_t children_count();
 int main();
 
 TrieNode trie_new() {
-  return (TrieNode){ .prefix_count = 0, .terminal_count = 0, .children = 0 };
+  return (TrieNode){ .prefix_count = 0ULL, .terminal_count = 0ULL, .children = 0ULL };
 }
 
 void trie_pass_through(TrieNode* t __attribute__((unused))) {
-  (*t).prefix_count = ((*t).prefix_count + 1);
+  (*t).prefix_count = ((*t).prefix_count + 1ULL);
 }
 
 void trie_terminal(TrieNode* t __attribute__((unused))) {
-  (*t).prefix_count = ((*t).prefix_count + 1);
-  (*t).terminal_count = ((*t).terminal_count + 1);
+  (*t).prefix_count = ((*t).prefix_count + 1ULL);
+  (*t).terminal_count = ((*t).terminal_count + 1ULL);
 }
 
 void trie_add_child(TrieNode* t __attribute__((unused))) {
-  (*t).children = ((*t).children + 1);
+  (*t).children = ((*t).children + 1ULL);
 }
 
 uint64_t five_pass_through() {
@@ -81,7 +81,7 @@ uint64_t children_count() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

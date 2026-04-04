@@ -20,16 +20,16 @@ RingBuf ring_make(uint64_t capacity __attribute__((unused)));
 int main();
 
 RingBuf ring_push(RingBuf buf __attribute__((unused))) {
-  uint64_t new_tail __attribute__((unused)) = ((buf.tail + 1) % buf.cap);
+  uint64_t new_tail __attribute__((unused)) = ((buf.tail + 1ULL) % buf.cap);
   return (RingBuf){ .head = buf.head, .tail = new_tail, .cap = buf.cap };
 }
 
 RingBuf ring_make(uint64_t capacity __attribute__((unused))) {
-  return (RingBuf){ .head = 0, .tail = 0, .cap = capacity };
+  return (RingBuf){ .head = 0ULL, .tail = 0ULL, .cap = capacity };
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

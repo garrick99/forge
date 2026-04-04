@@ -19,8 +19,8 @@ uint64_t aead_encrypt(volatile uint64_t key __attribute__((unused)), volatile ui
 uint64_t run();
 
 uint64_t key_schedule(volatile uint64_t key __attribute__((unused)), uint64_t round __attribute__((unused))) {
-  volatile uint64_t r __attribute__((unused)) = (key ^ (round * 6364136223846793005));
-  return ((r ^ (r >> 33)) ^ (r << 31));
+  volatile uint64_t r __attribute__((unused)) = (key ^ (round * 6364136223846793005ULL));
+  return ((r ^ (r >> 33ULL)) ^ (r << 31ULL));
 }
 
 uint64_t ct_xor(volatile uint64_t ks __attribute__((unused)), uint64_t plaintext __attribute__((unused))) {
@@ -28,33 +28,33 @@ uint64_t ct_xor(volatile uint64_t ks __attribute__((unused)), uint64_t plaintext
 }
 
 uint64_t encrypt_word(volatile uint64_t key __attribute__((unused)), uint64_t nonce __attribute__((unused)), uint64_t plaintext __attribute__((unused))) {
-  volatile uint64_t ks __attribute__((unused)) = key_schedule(key, (nonce % 20));
+  volatile uint64_t ks __attribute__((unused)) = key_schedule(key, (nonce % 20ULL));
   return ct_xor(ks, plaintext);
 }
 
 uint64_t decrypt_word(volatile uint64_t key __attribute__((unused)), uint64_t nonce __attribute__((unused)), volatile uint64_t ciphertext __attribute__((unused))) {
-  volatile uint64_t ks __attribute__((unused)) = key_schedule(key, (nonce % 20));
+  volatile uint64_t ks __attribute__((unused)) = key_schedule(key, (nonce % 20ULL));
   return (ks ^ ciphertext);
 }
 
 uint64_t aead_encrypt(volatile uint64_t key __attribute__((unused)), volatile uint64_t auth_key __attribute__((unused)), uint64_t nonce __attribute__((unused)), uint64_t plaintext __attribute__((unused))) {
   volatile uint64_t ct __attribute__((unused)) = encrypt_word(key, nonce, plaintext);
   volatile uint64_t tag __attribute__((unused)) = (auth_key ^ ct);
-  return (ct ^ (tag >> 32));
+  return (ct ^ (tag >> 32ULL));
 }
 
 uint64_t run() {
-  volatile uint64_t key __attribute__((unused)) = -2401053089206453570;
-  uint64_t nonce __attribute__((unused)) = 7;
-  volatile uint64_t ct __attribute__((unused)) = encrypt_word(key, nonce, 100);
-  uint64_t nonce2 __attribute__((unused)) = 8;
-  volatile uint64_t ct2 __attribute__((unused)) = encrypt_word(key, nonce2, 200);
-  uint64_t nonce3 __attribute__((unused)) = 7;
+  volatile uint64_t key __attribute__((unused)) = 0xdeadbeefcafebabeULL;
+  uint64_t nonce __attribute__((unused)) = 7ULL;
+  volatile uint64_t ct __attribute__((unused)) = encrypt_word(key, nonce, 100ULL);
+  uint64_t nonce2 __attribute__((unused)) = 8ULL;
+  volatile uint64_t ct2 __attribute__((unused)) = encrypt_word(key, nonce2, 200ULL);
+  uint64_t nonce3 __attribute__((unused)) = 7ULL;
   volatile uint64_t pt1 __attribute__((unused)) = decrypt_word(key, nonce3, ct);
-  uint64_t nonce4 __attribute__((unused)) = 8;
+  uint64_t nonce4 __attribute__((unused)) = 8ULL;
   volatile uint64_t pt2 __attribute__((unused)) = decrypt_word(key, nonce4, ct2);
   volatile uint64_t check __attribute__((unused)) = (pt1 + pt2);
   uint64_t _unused __attribute__((unused)) = check;
-  return 42;
+  return 42ULL;
 }
 

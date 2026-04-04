@@ -23,7 +23,7 @@ uint64_t check_floor_log2_8();
 int main();
 
 _Bool is_pow2(uint64_t n __attribute__((unused))) {
-  return ((n & (n - 1)) == 0);
+  return ((n & (n - 1ULL)) == 0ULL);
 }
 
 uint64_t next_pow2(uint64_t n __attribute__((unused))) {
@@ -34,31 +34,31 @@ uint64_t next_pow2(uint64_t n __attribute__((unused))) {
     }
 
   }
-  uint64_t v __attribute__((unused)) = (n - 1);
-  v = (v | (v >> 1));
-  v = (v | (v >> 2));
-  v = (v | (v >> 4));
-  v = (v | (v >> 8));
-  v = (v | (v >> 16));
-  v = (v | (v >> 32));
-  return (v + 1);
+  uint64_t v __attribute__((unused)) = (n - 1ULL);
+  v = (v | (v >> 1ULL));
+  v = (v | (v >> 2ULL));
+  v = (v | (v >> 4ULL));
+  v = (v | (v >> 8ULL));
+  v = (v | (v >> 16ULL));
+  v = (v | (v >> 32ULL));
+  return (v + 1ULL);
 }
 
 uint64_t low_bit(uint64_t n __attribute__((unused))) {
-  return (n & (0 - n));
+  return (n & (0ULL - n));
 }
 
 uint64_t mask_below(uint64_t pos __attribute__((unused))) {
-  return ((1 << pos) - 1);
+  return ((1ULL << pos) - 1ULL);
 }
 
 uint64_t floor_log2(uint64_t n __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = n;
-  uint64_t c __attribute__((unused)) = 0;
+  uint64_t c __attribute__((unused)) = 0ULL;
   {
-    while ((v > 1)) {
-      v = (v >> 1);
-      c = (c + 1);
+    while ((v > 1ULL)) {
+      v = (v >> 1ULL);
+      c = (c + 1ULL);
     }
 
   }
@@ -66,31 +66,31 @@ uint64_t floor_log2(uint64_t n __attribute__((unused))) {
 }
 
 _Bool check_is_pow2_8() {
-  return is_pow2(8);
+  return is_pow2(8ULL);
 }
 
 _Bool check_is_pow2_7() {
-  return is_pow2(7);
+  return is_pow2(7ULL);
 }
 
 uint64_t check_next_pow2_5() {
-  return next_pow2(5);
+  return next_pow2(5ULL);
 }
 
 uint64_t check_next_pow2_8() {
-  return next_pow2(8);
+  return next_pow2(8ULL);
 }
 
 uint64_t check_low_bit_12() {
-  return low_bit(12);
+  return low_bit(12ULL);
 }
 
 uint64_t check_floor_log2_8() {
-  return floor_log2(8);
+  return floor_log2(8ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

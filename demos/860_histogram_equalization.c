@@ -17,13 +17,13 @@ uint64_t equalize(forge_span_u64_t pixels __attribute__((unused)), uint64_t n __
 int main();
 
 uint64_t compute_cdf(forge_span_u64_t hist __attribute__((unused)), forge_span_u64_t cdf __attribute__((unused)), uint64_t bins __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < bins)) {
       acc = (acc + hist.data[i]);
       cdf.data[i] = acc;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -31,7 +31,7 @@ uint64_t compute_cdf(forge_span_u64_t hist __attribute__((unused)), forge_span_u
 }
 
 uint64_t equalize(forge_span_u64_t pixels __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t cdf __attribute__((unused)), uint64_t bins __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t px __attribute__((unused)) = pixels.data[i];
@@ -39,7 +39,7 @@ uint64_t equalize(forge_span_u64_t pixels __attribute__((unused)), uint64_t n __
         pixels.data[i] = cdf.data[px];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -47,7 +47,7 @@ uint64_t equalize(forge_span_u64_t pixels __attribute__((unused)), uint64_t n __
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

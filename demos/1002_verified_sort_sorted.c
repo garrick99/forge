@@ -16,33 +16,33 @@ void insertion_sort_proven(forge_span_u64_t s __attribute__((unused)), uint64_t 
 int main();
 
 void insertion_sort_proven(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while ((k < n)) {
       uint64_t j __attribute__((unused)) = k;
       {
-        while ((j > 0)) {
-          if ((s.data[(j - 1)] > s.data[j])) {
-            uint64_t tmp __attribute__((unused)) = s.data[(j - 1)];
-            s.data[(j - 1)] = s.data[j];
+        while ((j > 0ULL)) {
+          if ((s.data[(j - 1ULL)] > s.data[j])) {
+            uint64_t tmp __attribute__((unused)) = s.data[(j - 1ULL)];
+            s.data[(j - 1ULL)] = s.data[j];
             s.data[j] = tmp;
-            j = (j - 1);
+            j = (j - 1ULL);
 
           } else {
-            j = 0;
+            j = 0ULL;
 
           }
         }
 
       }
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -24,39 +24,39 @@ uint64_t sbox_lookup(uint64_t input __attribute__((unused)), forge_span_u64_t sb
 }
 
 void sub_bytes(forge_span_u64_t block __attribute__((unused)), forge_span_u64_t sbox __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t b __attribute__((unused)) = (block.data[i] & 255);
+      uint64_t b __attribute__((unused)) = (block.data[i] & 255ULL);
       block.data[i] = sbox.data[b];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void xor_roundkey(forge_span_u64_t block __attribute__((unused)), forge_span_u64_t key __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       block.data[i] = (block.data[i] ^ key.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t shift_row(forge_span_u64_t block __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t shift __attribute__((unused))) {
-  return ((shift + 1) % n);
+  return ((shift + 1ULL) % n);
 }
 
 uint64_t block_sum(forge_span_u64_t block __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t s __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t s __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s = (s + block.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -64,7 +64,7 @@ uint64_t block_sum(forge_span_u64_t block __attribute__((unused)), uint64_t n __
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

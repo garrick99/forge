@@ -18,24 +18,24 @@ int main();
 
 uint64_t check_heap_property(forge_span_u64_t priorities __attribute__((unused)), forge_span_u64_t left __attribute__((unused)), forge_span_u64_t right __attribute__((unused)), uint64_t n __attribute__((unused))) {
   uint64_t sentinel __attribute__((unused)) = n;
-  uint64_t violations __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t violations __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t l __attribute__((unused)) = left.data[i];
       uint64_t r __attribute__((unused)) = right.data[i];
       if (((l < n) && (priorities.data[l] < priorities.data[i]))) {
-        violations = (violations + 1);
+        violations = (violations + 1ULL);
 
       }
       if (((r < n) && (priorities.data[r] < priorities.data[i]))) {
         if ((violations < i)) {
-          violations = (violations + 1);
+          violations = (violations + 1ULL);
 
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -44,27 +44,27 @@ uint64_t check_heap_property(forge_span_u64_t priorities __attribute__((unused))
 
 uint64_t check_bst_inorder(forge_span_u64_t keys __attribute__((unused)), forge_span_u64_t left __attribute__((unused)), forge_span_u64_t right __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t output __attribute__((unused)), forge_span_u64_t stack __attribute__((unused))) {
   uint64_t sentinel __attribute__((unused)) = n;
-  uint64_t sp __attribute__((unused)) = 0;
-  uint64_t out_idx __attribute__((unused)) = 0;
-  uint64_t cur __attribute__((unused)) = 0;
-  uint64_t steps __attribute__((unused)) = 0;
+  uint64_t sp __attribute__((unused)) = 0ULL;
+  uint64_t out_idx __attribute__((unused)) = 0ULL;
+  uint64_t cur __attribute__((unused)) = 0ULL;
+  uint64_t steps __attribute__((unused)) = 0ULL;
   {
     while ((steps < (n + n))) {
       if (((cur < n) && (sp < n))) {
         stack.data[sp] = cur;
-        sp = (sp + 1);
+        sp = (sp + 1ULL);
         cur = left.data[cur];
         if ((cur >= n)) {
           cur = sentinel;
 
         }
 
-      } else if ((sp > 0)) {
-        sp = (sp - 1);
+      } else if ((sp > 0ULL)) {
+        sp = (sp - 1ULL);
         uint64_t node __attribute__((unused)) = stack.data[sp];
         if (((node < n) && (out_idx < n))) {
           output.data[out_idx] = keys.data[node];
-          out_idx = (out_idx + 1);
+          out_idx = (out_idx + 1ULL);
           cur = right.data[node];
           if ((cur >= n)) {
             cur = sentinel;
@@ -74,7 +74,7 @@ uint64_t check_bst_inorder(forge_span_u64_t keys __attribute__((unused)), forge_
         }
 
       }
-      steps = (steps + 1);
+      steps = (steps + 1ULL);
     }
 
   }
@@ -82,7 +82,7 @@ uint64_t check_bst_inorder(forge_span_u64_t keys __attribute__((unused)), forge_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

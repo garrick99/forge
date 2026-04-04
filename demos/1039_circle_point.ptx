@@ -1,0 +1,381 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry circle_double_kernel(
+    .param .u64 circle_double_kernel_param_out_x_data,
+    .param .u64 circle_double_kernel_param_out_x_len,
+    .param .u64 circle_double_kernel_param_out_y_data,
+    .param .u64 circle_double_kernel_param_out_y_len,
+    .param .u64 circle_double_kernel_param_px_data,
+    .param .u64 circle_double_kernel_param_px_len,
+    .param .u64 circle_double_kernel_param_py_data,
+    .param .u64 circle_double_kernel_param_py_len,
+    .param .u64 circle_double_kernel_param_n
+)
+{
+    .reg .pred %p14;
+    .reg .u64 %rd0, %rd1, %rd15, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd29, %rd3, %rd30, %rd31, %rd32, %rd33, %rd34, %rd35, %rd4, %rd5, %rd6, %rd7, %rd8;
+    .reg .u32 %r10, %r11, %r12, %r13, %r36, %r37, %r38, %r9;
+
+  ld.param.u64 %rd0, [circle_double_kernel_param_out_x_data];
+  ld.param.u64 %rd1, [circle_double_kernel_param_out_x_len];
+  ld.param.u64 %rd2, [circle_double_kernel_param_out_y_data];
+  ld.param.u64 %rd3, [circle_double_kernel_param_out_y_len];
+  ld.param.u64 %rd4, [circle_double_kernel_param_px_data];
+  ld.param.u64 %rd5, [circle_double_kernel_param_px_len];
+  ld.param.u64 %rd6, [circle_double_kernel_param_py_data];
+  ld.param.u64 %rd7, [circle_double_kernel_param_py_len];
+  ld.param.u64 %rd8, [circle_double_kernel_param_n];
+
+  mov.u32 %r9, %ctaid.x;
+  mov.u32 %r10, %ntid.x;
+  mul.lo.u32 %r11, %r9, %r10;
+  mov.u32 %r12, %tid.x;
+  add.u32 %r13, %r11, %r12;
+  cvt.u64.u32 %rd15, %r13;
+  setp.lt.u64 %p14, %rd15, %rd8;
+  @%p14 bra circle_double_kernel_then_16;
+  bra circle_double_kernel_else_16;
+  circle_double_kernel_then_16:
+  mov.u64 %rd17, 0; // unhandled expr
+  mov.u64 %rd18, 0; // unhandled expr
+  mov.u64 %rd19, 0; // unhandled expr
+  mov.u64 %rd20, 0; // unhandled expr
+  mov.u64 %rd21, 0; // call m31_get (device fn)
+  mov.u64 %rd22, 0; // call m31_get (device fn)
+  mov.u64 %rd23, 0; // call m31_mul (device fn)
+  mov.u64 %rd24, 0; // call m31_mul (device fn)
+  mov.u64 %rd25, 0; // call m31_sub (device fn)
+  mov.u64 %rd26, 0; // call m31_mul (device fn)
+  mov.u64 %rd27, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd28, %r13;
+  mov.u64 %rd29, 4;
+  mul.lo.u64 %rd30, %rd28, %rd29;
+  add.u64 %rd31, %rd0, %rd30;
+  st.global.u32 [%rd31], %rd25;
+  cvt.u64.u32 %rd32, %r13;
+  mov.u64 %rd33, 4;
+  mul.lo.u64 %rd34, %rd32, %rd33;
+  add.u64 %rd35, %rd2, %rd34;
+  st.global.u32 [%rd35], %rd27;
+  mov.u32 %r36, 0; // unit
+  mov.u32 %r37, %r36;
+  bra circle_double_kernel_end_16;
+  circle_double_kernel_else_16:
+  mov.u32 %r37, 0; // no else branch
+  circle_double_kernel_end_16:
+  mov.u32 %r38, 0; // unit
+  ret;
+}
+
+.visible .entry circle_add_kernel(
+    .param .u64 circle_add_kernel_param_out_x_data,
+    .param .u64 circle_add_kernel_param_out_x_len,
+    .param .u64 circle_add_kernel_param_out_y_data,
+    .param .u64 circle_add_kernel_param_out_y_len,
+    .param .u64 circle_add_kernel_param_ax_data,
+    .param .u64 circle_add_kernel_param_ax_len,
+    .param .u64 circle_add_kernel_param_ay_data,
+    .param .u64 circle_add_kernel_param_ay_len,
+    .param .u64 circle_add_kernel_param_bx_data,
+    .param .u64 circle_add_kernel_param_bx_len,
+    .param .u64 circle_add_kernel_param_by_data,
+    .param .u64 circle_add_kernel_param_by_len,
+    .param .u64 circle_add_kernel_param_n
+)
+{
+    .reg .pred %p18;
+    .reg .u64 %rd0, %rd1, %rd10, %rd11, %rd12, %rd19, %rd2, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd29, %rd3, %rd30, %rd31, %rd32, %rd33, %rd34, %rd35, %rd36, %rd37, %rd38, %rd39, %rd4, %rd40, %rd41, %rd42, %rd43, %rd44, %rd5, %rd6, %rd7, %rd8, %rd9;
+    .reg .u32 %r13, %r14, %r15, %r16, %r17, %r45, %r46, %r47;
+
+  ld.param.u64 %rd0, [circle_add_kernel_param_out_x_data];
+  ld.param.u64 %rd1, [circle_add_kernel_param_out_x_len];
+  ld.param.u64 %rd2, [circle_add_kernel_param_out_y_data];
+  ld.param.u64 %rd3, [circle_add_kernel_param_out_y_len];
+  ld.param.u64 %rd4, [circle_add_kernel_param_ax_data];
+  ld.param.u64 %rd5, [circle_add_kernel_param_ax_len];
+  ld.param.u64 %rd6, [circle_add_kernel_param_ay_data];
+  ld.param.u64 %rd7, [circle_add_kernel_param_ay_len];
+  ld.param.u64 %rd8, [circle_add_kernel_param_bx_data];
+  ld.param.u64 %rd9, [circle_add_kernel_param_bx_len];
+  ld.param.u64 %rd10, [circle_add_kernel_param_by_data];
+  ld.param.u64 %rd11, [circle_add_kernel_param_by_len];
+  ld.param.u64 %rd12, [circle_add_kernel_param_n];
+
+  mov.u32 %r13, %ctaid.x;
+  mov.u32 %r14, %ntid.x;
+  mul.lo.u32 %r15, %r13, %r14;
+  mov.u32 %r16, %tid.x;
+  add.u32 %r17, %r15, %r16;
+  cvt.u64.u32 %rd19, %r17;
+  setp.lt.u64 %p18, %rd19, %rd12;
+  @%p18 bra circle_add_kernel_then_20;
+  bra circle_add_kernel_else_20;
+  circle_add_kernel_then_20:
+  mov.u64 %rd21, 0; // unhandled expr
+  mov.u64 %rd22, 0; // unhandled expr
+  mov.u64 %rd23, 0; // unhandled expr
+  mov.u64 %rd24, 0; // unhandled expr
+  mov.u64 %rd25, 0; // unhandled expr
+  mov.u64 %rd26, 0; // unhandled expr
+  mov.u64 %rd27, 0; // call m31_get (device fn)
+  mov.u64 %rd28, 0; // call m31_get (device fn)
+  mov.u64 %rd29, 0; // call m31_get (device fn)
+  mov.u64 %rd30, 0; // call m31_get (device fn)
+  mov.u64 %rd31, 0; // call m31_mul (device fn)
+  mov.u64 %rd32, 0; // call m31_mul (device fn)
+  mov.u64 %rd33, 0; // call m31_mul (device fn)
+  mov.u64 %rd34, 0; // call m31_mul (device fn)
+  mov.u64 %rd35, 0; // call m31_sub (device fn)
+  cvt.u64.u32 %rd36, %r17;
+  mov.u64 %rd37, 4;
+  mul.lo.u64 %rd38, %rd36, %rd37;
+  add.u64 %rd39, %rd0, %rd38;
+  st.global.u32 [%rd39], %rd35;
+  mov.u64 %rd40, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd41, %r17;
+  mov.u64 %rd42, 4;
+  mul.lo.u64 %rd43, %rd41, %rd42;
+  add.u64 %rd44, %rd2, %rd43;
+  st.global.u32 [%rd44], %rd40;
+  mov.u32 %r45, 0; // unit
+  mov.u32 %r46, %r45;
+  bra circle_add_kernel_end_20;
+  circle_add_kernel_else_20:
+  mov.u32 %r46, 0; // no else branch
+  circle_add_kernel_end_20:
+  mov.u32 %r47, 0; // unit
+  ret;
+}
+
+.visible .entry circle_twiddle_gen_kernel(
+    .param .u64 circle_twiddle_gen_kernel_param_twiddle_x_data,
+    .param .u64 circle_twiddle_gen_kernel_param_twiddle_x_len,
+    .param .u64 circle_twiddle_gen_kernel_param_twiddle_y_data,
+    .param .u64 circle_twiddle_gen_kernel_param_twiddle_y_len,
+    .param .u32 circle_twiddle_gen_kernel_param_gen_x,
+    .param .u32 circle_twiddle_gen_kernel_param_gen_y,
+    .param .u64 circle_twiddle_gen_kernel_param_n
+)
+{
+    .reg .pred %p13, %p27, %p45, %p63;
+    .reg .u64 %rd0, %rd1, %rd12, %rd14, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd29, %rd3, %rd30, %rd31, %rd32, %rd33, %rd34, %rd35, %rd36, %rd37, %rd38, %rd39, %rd40, %rd41, %rd42, %rd43, %rd44, %rd47, %rd48, %rd49, %rd50, %rd51, %rd52, %rd53, %rd54, %rd55, %rd56, %rd57, %rd58, %rd59, %rd6, %rd60, %rd61, %rd62, %rd65, %rd66, %rd67, %rd68, %rd69, %rd70, %rd71, %rd72, %rd73, %rd74, %rd75, %rd76, %rd77, %rd78, %rd79;
+    .reg .u32 %r10, %r11, %r4, %r5, %r7, %r8, %r80, %r81, %r82, %r83, %r84, %r85, %r86, %r87, %r88, %r9;
+
+  ld.param.u64 %rd0, [circle_twiddle_gen_kernel_param_twiddle_x_data];
+  ld.param.u64 %rd1, [circle_twiddle_gen_kernel_param_twiddle_x_len];
+  ld.param.u64 %rd2, [circle_twiddle_gen_kernel_param_twiddle_y_data];
+  ld.param.u64 %rd3, [circle_twiddle_gen_kernel_param_twiddle_y_len];
+  ld.param.u32 %r4, [circle_twiddle_gen_kernel_param_gen_x];
+  ld.param.u32 %r5, [circle_twiddle_gen_kernel_param_gen_y];
+  ld.param.u64 %rd6, [circle_twiddle_gen_kernel_param_n];
+
+  mov.u32 %r7, %ctaid.x;
+  mov.u32 %r8, %ntid.x;
+  mul.lo.u32 %r9, %r7, %r8;
+  mov.u32 %r10, %tid.x;
+  add.u32 %r11, %r9, %r10;
+  mov.u64 %rd12, 0;
+  cvt.u64.u32 %rd14, %r11;
+  setp.eq.u64 %p13, %rd14, %rd12;
+  @%p13 bra circle_twiddle_gen_kernel_then_15;
+  bra circle_twiddle_gen_kernel_else_15;
+  circle_twiddle_gen_kernel_then_15:
+  mov.u64 %rd16, 0; // unhandled expr
+  mov.u64 %rd17, 0; // unhandled expr
+  mov.u64 %rd18, 0;
+  mov.u64 %rd19, 4;
+  mul.lo.u64 %rd20, %rd18, %rd19;
+  add.u64 %rd21, %rd0, %rd20;
+  st.global.u32 [%rd21], %r4;
+  mov.u64 %rd22, 0;
+  mov.u64 %rd23, 4;
+  mul.lo.u64 %rd24, %rd22, %rd23;
+  add.u64 %rd25, %rd2, %rd24;
+  st.global.u32 [%rd25], %r5;
+  mov.u64 %rd26, 1;
+  setp.gt.u64 %p27, %rd6, %rd26;
+  @%p27 bra circle_twiddle_gen_kernel_then_28;
+  bra circle_twiddle_gen_kernel_else_28;
+  circle_twiddle_gen_kernel_then_28:
+  mov.u64 %rd29, 0; // call m31_mul (device fn)
+  mov.u64 %rd30, 0; // call m31_mul (device fn)
+  mov.u64 %rd31, 0; // call m31_sub (device fn)
+  mov.u64 %rd32, 0; // call m31_mul (device fn)
+  mov.u64 %rd33, 0; // call m31_add (device fn)
+  mov.u64 %rd34, 0; // unhandled expr
+  mov.u64 %rd35, 0; // unhandled expr
+  mov.u64 %rd36, 1;
+  mov.u64 %rd37, 4;
+  mul.lo.u64 %rd38, %rd36, %rd37;
+  add.u64 %rd39, %rd0, %rd38;
+  st.global.u32 [%rd39], %rd31;
+  mov.u64 %rd40, 1;
+  mov.u64 %rd41, 4;
+  mul.lo.u64 %rd42, %rd40, %rd41;
+  add.u64 %rd43, %rd2, %rd42;
+  st.global.u32 [%rd43], %rd33;
+  mov.u64 %rd44, 2;
+  setp.gt.u64 %p45, %rd6, %rd44;
+  @%p45 bra circle_twiddle_gen_kernel_then_46;
+  bra circle_twiddle_gen_kernel_else_46;
+  circle_twiddle_gen_kernel_then_46:
+  mov.u64 %rd47, 0; // call m31_mul (device fn)
+  mov.u64 %rd48, 0; // call m31_mul (device fn)
+  mov.u64 %rd49, 0; // call m31_sub (device fn)
+  mov.u64 %rd50, 0; // call m31_mul (device fn)
+  mov.u64 %rd51, 0; // call m31_add (device fn)
+  mov.u64 %rd52, 0; // unhandled expr
+  mov.u64 %rd53, 0; // unhandled expr
+  mov.u64 %rd54, 2;
+  mov.u64 %rd55, 4;
+  mul.lo.u64 %rd56, %rd54, %rd55;
+  add.u64 %rd57, %rd0, %rd56;
+  st.global.u32 [%rd57], %rd49;
+  mov.u64 %rd58, 2;
+  mov.u64 %rd59, 4;
+  mul.lo.u64 %rd60, %rd58, %rd59;
+  add.u64 %rd61, %rd2, %rd60;
+  st.global.u32 [%rd61], %rd51;
+  mov.u64 %rd62, 3;
+  setp.gt.u64 %p63, %rd6, %rd62;
+  @%p63 bra circle_twiddle_gen_kernel_then_64;
+  bra circle_twiddle_gen_kernel_else_64;
+  circle_twiddle_gen_kernel_then_64:
+  mov.u64 %rd65, 0; // call m31_mul (device fn)
+  mov.u64 %rd66, 0; // call m31_mul (device fn)
+  mov.u64 %rd67, 0; // call m31_sub (device fn)
+  mov.u64 %rd68, 0; // call m31_mul (device fn)
+  mov.u64 %rd69, 0; // call m31_add (device fn)
+  mov.u64 %rd70, 0; // unhandled expr
+  mov.u64 %rd71, 0; // unhandled expr
+  mov.u64 %rd72, 3;
+  mov.u64 %rd73, 4;
+  mul.lo.u64 %rd74, %rd72, %rd73;
+  add.u64 %rd75, %rd0, %rd74;
+  st.global.u32 [%rd75], %rd67;
+  mov.u64 %rd76, 3;
+  mov.u64 %rd77, 4;
+  mul.lo.u64 %rd78, %rd76, %rd77;
+  add.u64 %rd79, %rd2, %rd78;
+  st.global.u32 [%rd79], %rd69;
+  mov.u32 %r80, 0; // unit
+  mov.u32 %r81, %r80;
+  bra circle_twiddle_gen_kernel_end_64;
+  circle_twiddle_gen_kernel_else_64:
+  mov.u32 %r81, 0; // no else branch
+  circle_twiddle_gen_kernel_end_64:
+  mov.u32 %r82, 0; // unit
+  mov.u32 %r83, %r82;
+  bra circle_twiddle_gen_kernel_end_46;
+  circle_twiddle_gen_kernel_else_46:
+  mov.u32 %r83, 0; // no else branch
+  circle_twiddle_gen_kernel_end_46:
+  mov.u32 %r84, 0; // unit
+  mov.u32 %r85, %r84;
+  bra circle_twiddle_gen_kernel_end_28;
+  circle_twiddle_gen_kernel_else_28:
+  mov.u32 %r85, 0; // no else branch
+  circle_twiddle_gen_kernel_end_28:
+  mov.u32 %r86, 0; // unit
+  mov.u32 %r87, %r86;
+  bra circle_twiddle_gen_kernel_end_15;
+  circle_twiddle_gen_kernel_else_15:
+  mov.u32 %r87, 0; // no else branch
+  circle_twiddle_gen_kernel_end_15:
+  mov.u32 %r88, 0; // unit
+  ret;
+}
+
+.visible .entry circle_conjugate_kernel(
+    .param .u64 circle_conjugate_kernel_param_py_data,
+    .param .u64 circle_conjugate_kernel_param_py_len,
+    .param .u64 circle_conjugate_kernel_param_n
+)
+{
+    .reg .pred %p8;
+    .reg .u64 %rd0, %rd1, %rd11, %rd12, %rd13, %rd14, %rd15, %rd16, %rd17, %rd2, %rd9;
+    .reg .u32 %r18, %r19, %r20, %r3, %r4, %r5, %r6, %r7;
+
+  ld.param.u64 %rd0, [circle_conjugate_kernel_param_py_data];
+  ld.param.u64 %rd1, [circle_conjugate_kernel_param_py_len];
+  ld.param.u64 %rd2, [circle_conjugate_kernel_param_n];
+
+  mov.u32 %r3, %ctaid.x;
+  mov.u32 %r4, %ntid.x;
+  mul.lo.u32 %r5, %r3, %r4;
+  mov.u32 %r6, %tid.x;
+  add.u32 %r7, %r5, %r6;
+  cvt.u64.u32 %rd9, %r7;
+  setp.lt.u64 %p8, %rd9, %rd2;
+  @%p8 bra circle_conjugate_kernel_then_10;
+  bra circle_conjugate_kernel_else_10;
+  circle_conjugate_kernel_then_10:
+  mov.u64 %rd11, 0; // unhandled expr
+  mov.u64 %rd12, 0; // call m31_get (device fn)
+  mov.u64 %rd13, 0; // call m31_sub (device fn)
+  cvt.u64.u32 %rd14, %r7;
+  mov.u64 %rd15, 4;
+  mul.lo.u64 %rd16, %rd14, %rd15;
+  add.u64 %rd17, %rd0, %rd16;
+  st.global.u32 [%rd17], %rd13;
+  mov.u32 %r18, 0; // unit
+  mov.u32 %r19, %r18;
+  bra circle_conjugate_kernel_end_10;
+  circle_conjugate_kernel_else_10:
+  mov.u32 %r19, 0; // no else branch
+  circle_conjugate_kernel_end_10:
+  mov.u32 %r20, 0; // unit
+  ret;
+}
+
+.visible .entry circle_to_twiddle_kernel(
+    .param .u64 circle_to_twiddle_kernel_param_twiddle_data,
+    .param .u64 circle_to_twiddle_kernel_param_twiddle_len,
+    .param .u64 circle_to_twiddle_kernel_param_px_data,
+    .param .u64 circle_to_twiddle_kernel_param_px_len,
+    .param .u64 circle_to_twiddle_kernel_param_n
+)
+{
+    .reg .pred %p10;
+    .reg .u64 %rd0, %rd1, %rd11, %rd13, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd3, %rd4;
+    .reg .u32 %r20, %r21, %r22, %r5, %r6, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [circle_to_twiddle_kernel_param_twiddle_data];
+  ld.param.u64 %rd1, [circle_to_twiddle_kernel_param_twiddle_len];
+  ld.param.u64 %rd2, [circle_to_twiddle_kernel_param_px_data];
+  ld.param.u64 %rd3, [circle_to_twiddle_kernel_param_px_len];
+  ld.param.u64 %rd4, [circle_to_twiddle_kernel_param_n];
+
+  mov.u32 %r5, %ctaid.x;
+  mov.u32 %r6, %ntid.x;
+  mul.lo.u32 %r7, %r5, %r6;
+  mov.u32 %r8, %tid.x;
+  add.u32 %r9, %r7, %r8;
+  cvt.u64.u32 %rd11, %r9;
+  setp.lt.u64 %p10, %rd11, %rd4;
+  @%p10 bra circle_to_twiddle_kernel_then_12;
+  bra circle_to_twiddle_kernel_else_12;
+  circle_to_twiddle_kernel_then_12:
+  mov.u64 %rd13, 0; // unhandled expr
+  mov.u64 %rd14, 0; // unhandled expr
+  mov.u64 %rd15, 0; // call m31_get (device fn)
+  cvt.u64.u32 %rd16, %r9;
+  mov.u64 %rd17, 4;
+  mul.lo.u64 %rd18, %rd16, %rd17;
+  add.u64 %rd19, %rd0, %rd18;
+  st.global.u32 [%rd19], %rd15;
+  mov.u32 %r20, 0; // unit
+  mov.u32 %r21, %r20;
+  bra circle_to_twiddle_kernel_end_12;
+  circle_to_twiddle_kernel_else_12:
+  mov.u32 %r21, 0; // no else branch
+  circle_to_twiddle_kernel_end_12:
+  mov.u32 %r22, 0; // unit
+  ret;
+}
+

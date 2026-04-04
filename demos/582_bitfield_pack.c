@@ -24,7 +24,7 @@ uint64_t pack2(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unu
 }
 
 uint64_t unpack_lo(uint64_t word __attribute__((unused)), uint64_t a_bits __attribute__((unused))) {
-  return (word % (1 << a_bits));
+  return (word % (1ULL << a_bits));
 }
 
 uint64_t unpack_hi(uint64_t word __attribute__((unused)), uint64_t a_bits __attribute__((unused))) {
@@ -32,28 +32,28 @@ uint64_t unpack_hi(uint64_t word __attribute__((unused)), uint64_t a_bits __attr
 }
 
 uint64_t pack_rgb(uint64_t r __attribute__((unused)), uint64_t g __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  return (((r << 16) | (g << 8)) | b);
+  return (((r << 16ULL) | (g << 8ULL)) | b);
 }
 
 uint64_t unpack_r(uint64_t rgb __attribute__((unused))) {
-  return ((rgb >> 16) % 256);
+  return ((rgb >> 16ULL) % 256ULL);
 }
 
 uint64_t unpack_g(uint64_t rgb __attribute__((unused))) {
-  return ((rgb >> 8) % 256);
+  return ((rgb >> 8ULL) % 256ULL);
 }
 
 uint64_t unpack_b(uint64_t rgb __attribute__((unused))) {
-  return (rgb % 256);
+  return (rgb % 256ULL);
 }
 
 uint64_t check_pack_unpack_b() {
-  uint64_t packed __attribute__((unused)) = pack_rgb(0, 0, 42);
+  uint64_t packed __attribute__((unused)) = pack_rgb(0ULL, 0ULL, 42ULL);
   return unpack_b(packed);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

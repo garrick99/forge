@@ -16,35 +16,35 @@ void degree_hist(forge_span_u64_t edges __attribute__((unused)), uint64_t m __at
 int main();
 
 void degree_hist(forge_span_u64_t edges __attribute__((unused)), uint64_t m __attribute__((unused)), forge_span_u64_t hist __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < n)) {
-      hist.data[j] = 0;
-      j = (j + 1);
+      hist.data[j] = 0ULL;
+      j = (j + 1ULL);
     }
 
   }
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < m)) {
-      uint64_t u __attribute__((unused)) = edges.data[(2 * i)];
-      uint64_t v __attribute__((unused)) = edges.data[((2 * i) + 1)];
+      uint64_t u __attribute__((unused)) = edges.data[(2ULL * i)];
+      uint64_t v __attribute__((unused)) = edges.data[((2ULL * i) + 1ULL)];
       if ((u < n)) {
-        hist.data[u] = (hist.data[u] + 1);
+        hist.data[u] = (hist.data[u] + 1ULL);
 
       }
       if ((v < n)) {
-        hist.data[v] = (hist.data[v] + 1);
+        hist.data[v] = (hist.data[v] + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

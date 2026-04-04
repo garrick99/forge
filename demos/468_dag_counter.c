@@ -26,42 +26,42 @@ uint64_t edges_removed();
 int main();
 
 DAGCounter dag_new(uint64_t nodes __attribute__((unused)), uint64_t initial_ready __attribute__((unused))) {
-  return (DAGCounter){ .total_nodes = nodes, .total_ready = initial_ready, .total_waiting = (nodes - initial_ready), .total_done = 0, .edges_removed = 0 };
+  return (DAGCounter){ .total_nodes = nodes, .total_ready = initial_ready, .total_waiting = (nodes - initial_ready), .total_done = 0ULL, .edges_removed = 0ULL };
 }
 
 void dag_process(DAGCounter* d __attribute__((unused)), uint64_t newly_ready __attribute__((unused))) {
-  (*d).total_done = ((*d).total_done + 1);
-  (*d).total_ready = (((*d).total_ready - 1) + newly_ready);
+  (*d).total_done = ((*d).total_done + 1ULL);
+  (*d).total_ready = (((*d).total_ready - 1ULL) + newly_ready);
   (*d).total_waiting = ((*d).total_waiting - newly_ready);
   (*d).edges_removed = ((*d).edges_removed + newly_ready);
 }
 
 uint64_t process_unlocks() {
-  DAGCounter d __attribute__((unused)) = dag_new(5, 1);
-  dag_process((&d), 2);
+  DAGCounter d __attribute__((unused)) = dag_new(5ULL, 1ULL);
+  dag_process((&d), 2ULL);
   return d.total_ready;
 }
 
 uint64_t done_count() {
-  DAGCounter d __attribute__((unused)) = dag_new(5, 1);
-  dag_process((&d), 2);
+  DAGCounter d __attribute__((unused)) = dag_new(5ULL, 1ULL);
+  dag_process((&d), 2ULL);
   return d.total_done;
 }
 
 uint64_t conservation() {
-  DAGCounter d __attribute__((unused)) = dag_new(5, 1);
-  dag_process((&d), 2);
+  DAGCounter d __attribute__((unused)) = dag_new(5ULL, 1ULL);
+  dag_process((&d), 2ULL);
   return ((d.total_ready + d.total_waiting) + d.total_done);
 }
 
 uint64_t edges_removed() {
-  DAGCounter d __attribute__((unused)) = dag_new(5, 1);
-  dag_process((&d), 2);
+  DAGCounter d __attribute__((unused)) = dag_new(5ULL, 1ULL);
+  dag_process((&d), 2ULL);
   return d.edges_removed;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -18,15 +18,15 @@ _Bool all_same(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribut
 int main();
 
 uint64_t count_runs(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t runs __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t runs __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      if ((s.data[i] != s.data[(i - 1)])) {
-        runs = (runs + 1);
+      if ((s.data[i] != s.data[(i - 1ULL)])) {
+        runs = (runs + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -34,23 +34,23 @@ uint64_t count_runs(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 }
 
 uint64_t max_run_length(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t best __attribute__((unused)) = 1;
-  uint64_t cur __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t best __attribute__((unused)) = 1ULL;
+  uint64_t cur __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      if ((s.data[i] == s.data[(i - 1)])) {
-        cur = (cur + 1);
+      if ((s.data[i] == s.data[(i - 1ULL)])) {
+        cur = (cur + 1ULL);
         if ((cur > best)) {
           best = cur;
 
         }
 
       } else {
-        cur = 1;
+        cur = 1ULL;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -58,15 +58,15 @@ uint64_t max_run_length(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 }
 
 _Bool all_same(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t i __attribute__((unused)) = 1ULL;
   _Bool ok __attribute__((unused)) = 1;
   {
     while ((i < n)) {
-      if ((s.data[i] != s.data[0])) {
+      if ((s.data[i] != s.data[0ULL])) {
         ok = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -74,7 +74,7 @@ _Bool all_same(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribut
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

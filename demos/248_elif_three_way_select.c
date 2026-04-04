@@ -25,7 +25,7 @@ uint64_t minimum3(uint64_t a __attribute__((unused)), uint64_t b __attribute__((
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

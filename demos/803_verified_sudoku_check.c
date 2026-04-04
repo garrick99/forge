@@ -18,31 +18,31 @@ _Bool check_all_rows(forge_span_u64_t board __attribute__((unused)), forge_span_
 int main();
 
 _Bool check_row(forge_span_u64_t board __attribute__((unused)), uint64_t row __attribute__((unused)), forge_span_u64_t seen __attribute__((unused))) {
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
-    while ((j < 9)) {
-      seen.data[j] = 0;
-      j = (j + 1);
+    while ((j < 9ULL)) {
+      seen.data[j] = 0ULL;
+      j = (j + 1ULL);
     }
 
   }
   _Bool ok __attribute__((unused)) = 1;
-  uint64_t c __attribute__((unused)) = 0;
+  uint64_t c __attribute__((unused)) = 0ULL;
   {
-    while ((c < 9)) {
-      uint64_t val __attribute__((unused)) = board.data[((row * 9) + c)];
-      if (((val >= 1) && (val <= 9))) {
-        if ((seen.data[(val - 1)] != 0)) {
+    while ((c < 9ULL)) {
+      uint64_t val __attribute__((unused)) = board.data[((row * 9ULL) + c)];
+      if (((val >= 1ULL) && (val <= 9ULL))) {
+        if ((seen.data[(val - 1ULL)] != 0ULL)) {
           ok = 0;
 
         }
-        seen.data[(val - 1)] = 1;
+        seen.data[(val - 1ULL)] = 1ULL;
 
       } else {
         ok = 0;
 
       }
-      c = (c + 1);
+      c = (c + 1ULL);
     }
 
   }
@@ -50,31 +50,31 @@ _Bool check_row(forge_span_u64_t board __attribute__((unused)), uint64_t row __a
 }
 
 _Bool check_col(forge_span_u64_t board __attribute__((unused)), uint64_t col __attribute__((unused)), forge_span_u64_t seen __attribute__((unused))) {
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
-    while ((j < 9)) {
-      seen.data[j] = 0;
-      j = (j + 1);
+    while ((j < 9ULL)) {
+      seen.data[j] = 0ULL;
+      j = (j + 1ULL);
     }
 
   }
   _Bool ok __attribute__((unused)) = 1;
-  uint64_t r __attribute__((unused)) = 0;
+  uint64_t r __attribute__((unused)) = 0ULL;
   {
-    while ((r < 9)) {
-      uint64_t val __attribute__((unused)) = board.data[((r * 9) + col)];
-      if (((val >= 1) && (val <= 9))) {
-        if ((seen.data[(val - 1)] != 0)) {
+    while ((r < 9ULL)) {
+      uint64_t val __attribute__((unused)) = board.data[((r * 9ULL) + col)];
+      if (((val >= 1ULL) && (val <= 9ULL))) {
+        if ((seen.data[(val - 1ULL)] != 0ULL)) {
           ok = 0;
 
         }
-        seen.data[(val - 1)] = 1;
+        seen.data[(val - 1ULL)] = 1ULL;
 
       } else {
         ok = 0;
 
       }
-      r = (r + 1);
+      r = (r + 1ULL);
     }
 
   }
@@ -83,14 +83,14 @@ _Bool check_col(forge_span_u64_t board __attribute__((unused)), uint64_t col __a
 
 _Bool check_all_rows(forge_span_u64_t board __attribute__((unused)), forge_span_u64_t seen __attribute__((unused))) {
   _Bool ok __attribute__((unused)) = 1;
-  uint64_t r __attribute__((unused)) = 0;
+  uint64_t r __attribute__((unused)) = 0ULL;
   {
-    while ((r < 9)) {
+    while ((r < 9ULL)) {
       if ((!check_row(board, r, seen))) {
         ok = 0;
 
       }
-      r = (r + 1);
+      r = (r + 1ULL);
     }
 
   }
@@ -98,7 +98,7 @@ _Bool check_all_rows(forge_span_u64_t board __attribute__((unused)), forge_span_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

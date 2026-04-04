@@ -21,48 +21,48 @@ uint64_t count_ones_in_array(forge_span_u64_t s __attribute__((unused)), uint64_
 int main();
 
 uint64_t bit_set(uint64_t x __attribute__((unused)), uint64_t pos __attribute__((unused))) {
-  return (x + ((1 - ((x / (1 + pos)) % 2)) * (1 + pos)));
+  return (x + ((1ULL - ((x / (1ULL + pos)) % 2ULL)) * (1ULL + pos)));
 }
 
 uint64_t bit_get(uint64_t x __attribute__((unused)), uint64_t pos __attribute__((unused))) {
-  return ((x / ((2 * pos) + 2)) % 2);
+  return ((x / ((2ULL * pos) + 2ULL)) % 2ULL);
 }
 
 uint64_t mask_low(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return 0;
+  if ((n == 0ULL)) {
+    return 0ULL;
   } else {
-    return (((1 + n) / 1) - 1);
+    return (((1ULL + n) / 1ULL) - 1ULL);
   }
 }
 
 uint64_t extract_byte(uint64_t x __attribute__((unused)), uint64_t byte_idx __attribute__((unused))) {
-  uint64_t shift __attribute__((unused)) = (byte_idx * 8);
+  uint64_t shift __attribute__((unused)) = (byte_idx * 8ULL);
   uint64_t n __attribute__((unused)) = x;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < shift)) {
-      n = (n / 2);
-      i = (i + 1);
+      n = (n / 2ULL);
+      i = (i + 1ULL);
     }
 
   }
-  return (n % 256);
+  return (n % 256ULL);
 }
 
 uint64_t pack_bytes(uint64_t b0 __attribute__((unused)), uint64_t b1 __attribute__((unused)), uint64_t b2 __attribute__((unused)), uint64_t b3 __attribute__((unused))) {
-  return (((b0 + (b1 * 256)) + (b2 * 65536)) + (b3 * 16777216));
+  return (((b0 + (b1 * 256ULL)) + (b2 * 65536ULL)) + (b3 * 16777216ULL));
 }
 
 uint64_t count_ones_in_array(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t v __attribute__((unused)) = (s.data[i] % 256);
-      uint64_t cnt __attribute__((unused)) = ((((((((v % 2) + ((v / 2) % 2)) + ((v / 4) % 2)) + ((v / 8) % 2)) + ((v / 16) % 2)) + ((v / 32) % 2)) + ((v / 64) % 2)) + ((v / 128) % 2));
+      uint64_t v __attribute__((unused)) = (s.data[i] % 256ULL);
+      uint64_t cnt __attribute__((unused)) = ((((((((v % 2ULL) + ((v / 2ULL) % 2ULL)) + ((v / 4ULL) % 2ULL)) + ((v / 8ULL) % 2ULL)) + ((v / 16ULL) % 2ULL)) + ((v / 32ULL) % 2ULL)) + ((v / 64ULL) % 2ULL)) + ((v / 128ULL) % 2ULL));
       acc = (acc + cnt);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -70,7 +70,7 @@ uint64_t count_ones_in_array(forge_span_u64_t s __attribute__((unused)), uint64_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

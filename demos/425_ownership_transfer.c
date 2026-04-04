@@ -27,65 +27,65 @@ uint64_t release_count();
 int main();
 
 Owned own_new() {
-  return (Owned){ .owner_id = 0, .transfer_count = 0, .releases = 0 };
+  return (Owned){ .owner_id = 0ULL, .transfer_count = 0ULL, .releases = 0ULL };
 }
 
 void own_claim(Owned* o __attribute__((unused)), uint64_t new_owner __attribute__((unused))) {
   (*o).owner_id = new_owner;
-  (*o).transfer_count = ((*o).transfer_count + 1);
+  (*o).transfer_count = ((*o).transfer_count + 1ULL);
 }
 
 void own_transfer(Owned* o __attribute__((unused)), uint64_t new_owner __attribute__((unused))) {
   (*o).owner_id = new_owner;
-  (*o).transfer_count = ((*o).transfer_count + 1);
+  (*o).transfer_count = ((*o).transfer_count + 1ULL);
 }
 
 void own_release(Owned* o __attribute__((unused))) {
-  (*o).owner_id = 0;
-  (*o).releases = ((*o).releases + 1);
+  (*o).owner_id = 0ULL;
+  (*o).releases = ((*o).releases + 1ULL);
 }
 
 uint64_t claim_owner1() {
   Owned o __attribute__((unused)) = own_new();
-  own_claim((&o), 1);
+  own_claim((&o), 1ULL);
   return o.owner_id;
 }
 
 uint64_t transfer_chain() {
   Owned o __attribute__((unused)) = own_new();
-  own_claim((&o), 1);
-  own_transfer((&o), 2);
-  own_transfer((&o), 3);
+  own_claim((&o), 1ULL);
+  own_transfer((&o), 2ULL);
+  own_transfer((&o), 3ULL);
   return o.owner_id;
 }
 
 uint64_t transfer_count() {
   Owned o __attribute__((unused)) = own_new();
-  own_claim((&o), 1);
-  own_transfer((&o), 2);
-  own_transfer((&o), 3);
+  own_claim((&o), 1ULL);
+  own_transfer((&o), 2ULL);
+  own_transfer((&o), 3ULL);
   return o.transfer_count;
 }
 
 uint64_t release_unowned() {
   Owned o __attribute__((unused)) = own_new();
-  own_claim((&o), 5);
-  own_transfer((&o), 7);
+  own_claim((&o), 5ULL);
+  own_transfer((&o), 7ULL);
   own_release((&o));
   return o.owner_id;
 }
 
 uint64_t release_count() {
   Owned o __attribute__((unused)) = own_new();
-  own_claim((&o), 1);
+  own_claim((&o), 1ULL);
   own_release((&o));
-  own_claim((&o), 2);
+  own_claim((&o), 2ULL);
   own_release((&o));
   return o.releases;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

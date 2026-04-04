@@ -22,11 +22,11 @@ uint64_t reservoir_select(forge_span_u64_t stream __attribute__((unused)), uint6
   } else {
     fill = n;
   }
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < fill)) {
       out.data[i] = stream.data[i];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -35,7 +35,7 @@ uint64_t reservoir_select(forge_span_u64_t stream __attribute__((unused)), uint6
     while ((j < n)) {
       uint64_t slot __attribute__((unused)) = (j % k);
       out.data[slot] = stream.data[j];
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
@@ -43,7 +43,7 @@ uint64_t reservoir_select(forge_span_u64_t stream __attribute__((unused)), uint6
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

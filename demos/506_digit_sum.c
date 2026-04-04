@@ -19,11 +19,11 @@ int main();
 
 uint64_t digit_sum(uint64_t n __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = n;
-  uint64_t s __attribute__((unused)) = 0;
+  uint64_t s __attribute__((unused)) = 0ULL;
   {
-    while ((v > 0)) {
-      s = (s + (v % 10));
-      v = (v / 10);
+    while ((v > 0ULL)) {
+      s = (s + (v % 10ULL));
+      v = (v / 10ULL);
     }
 
   }
@@ -32,11 +32,11 @@ uint64_t digit_sum(uint64_t n __attribute__((unused))) {
 
 uint64_t count_digits(uint64_t n __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = n;
-  uint64_t d __attribute__((unused)) = 0;
+  uint64_t d __attribute__((unused)) = 0ULL;
   {
-    while ((v > 0)) {
-      d = (d + 1);
-      v = (v / 10);
+    while ((v > 0ULL)) {
+      d = (d + 1ULL);
+      v = (v / 10ULL);
     }
 
   }
@@ -45,11 +45,11 @@ uint64_t count_digits(uint64_t n __attribute__((unused))) {
 
 uint64_t reverse_digits(uint64_t n __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = n;
-  uint64_t r __attribute__((unused)) = 0;
+  uint64_t r __attribute__((unused)) = 0ULL;
   {
-    while ((v > 0)) {
-      r = ((r * 10) + (v % 10));
-      v = (v / 10);
+    while ((v > 0ULL)) {
+      r = ((r * 10ULL) + (v % 10ULL));
+      v = (v / 10ULL);
     }
 
   }
@@ -57,19 +57,19 @@ uint64_t reverse_digits(uint64_t n __attribute__((unused))) {
 }
 
 _Bool is_single_digit(uint64_t n __attribute__((unused))) {
-  return (n <= 9);
+  return (n <= 9ULL);
 }
 
 uint64_t tens_digit(uint64_t n __attribute__((unused))) {
-  return ((n / 10) % 10);
+  return ((n / 10ULL) % 10ULL);
 }
 
 uint64_t units_digit(uint64_t n __attribute__((unused))) {
-  return (n % 10);
+  return (n % 10ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

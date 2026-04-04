@@ -63,10 +63,10 @@ uint64_t option_unwrap_or(Option_u64 opt __attribute__((unused)), uint64_t forge
 }
 
 Option_u64 safe_sqrt(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return (Option_u64){ .tag = Option_u64_tag_Some, .data.Some = { ._v0 = 0 } };
+  if ((n == 0ULL)) {
+    return (Option_u64){ .tag = Option_u64_tag_Some, .data.Some = { ._v0 = 0ULL } };
   } else {
-    uint64_t r __attribute__((unused)) = ((n / 2) + 1);
+    uint64_t r __attribute__((unused)) = ((n / 2ULL) + 1ULL);
     if (((r * r) <= n)) {
       return (Option_u64){ .tag = Option_u64_tag_Some, .data.Some = { ._v0 = r } };
     } else {
@@ -110,11 +110,11 @@ Result_u64_u64 div_chain(uint64_t a __attribute__((unused)), uint64_t b __attrib
 }
 
 int main() {
-  Option_u64 sq __attribute__((unused)) = safe_sqrt(16);
-  uint64_t sv __attribute__((unused)) = option_unwrap_or(sq, 0);
-  Option_u64 sq2 __attribute__((unused)) = safe_sqrt(3);
-  uint64_t sv2 __attribute__((unused)) = option_unwrap_or(sq2, 99);
-  Result_u64_u64 r __attribute__((unused)) = div_chain(200, 10, 4);
+  Option_u64 sq __attribute__((unused)) = safe_sqrt(16ULL);
+  uint64_t sv __attribute__((unused)) = option_unwrap_or(sq, 0ULL);
+  Option_u64 sq2 __attribute__((unused)) = safe_sqrt(3ULL);
+  uint64_t sv2 __attribute__((unused)) = option_unwrap_or(sq2, 99ULL);
+  Result_u64_u64 r __attribute__((unused)) = div_chain(200ULL, 10ULL, 4ULL);
   uint64_t rv;
   switch (r.tag) {
     case Result_u64_u64_tag_Ok: {
@@ -123,7 +123,7 @@ int main() {
       break;
     }
     case Result_u64_u64_tag_Err: {
-      rv = 0;
+      rv = 0ULL;
       break;
     }
   }

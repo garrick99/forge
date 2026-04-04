@@ -16,32 +16,32 @@ uint64_t ternary_search_max(forge_span_u64_t table __attribute__((unused)), uint
 int main();
 
 uint64_t ternary_search_max(forge_span_u64_t table __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
-  uint64_t hi __attribute__((unused)) = (n - 1);
+  uint64_t lo __attribute__((unused)) = 0ULL;
+  uint64_t hi __attribute__((unused)) = (n - 1ULL);
   {
-    while (((lo + 2) < hi)) {
-      uint64_t third __attribute__((unused)) = ((hi - lo) / 3);
+    while (((lo + 2ULL) < hi)) {
+      uint64_t third __attribute__((unused)) = ((hi - lo) / 3ULL);
       uint64_t m1 __attribute__((unused)) = (lo + third);
       uint64_t m2 __attribute__((unused)) = (hi - third);
       if ((table.data[m1] < table.data[m2])) {
-        lo = (m1 + 1);
+        lo = (m1 + 1ULL);
 
       } else {
-        hi = (m2 - 1);
+        hi = (m2 - 1ULL);
 
       }
     }
 
   }
   uint64_t best __attribute__((unused)) = lo;
-  uint64_t i __attribute__((unused)) = (lo + 1);
+  uint64_t i __attribute__((unused)) = (lo + 1ULL);
   {
     while ((i <= hi)) {
       if ((table.data[i] > table.data[best])) {
         best = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -49,7 +49,7 @@ uint64_t ternary_search_max(forge_span_u64_t table __attribute__((unused)), uint
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

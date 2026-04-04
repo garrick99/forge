@@ -28,7 +28,7 @@ uint64_t spend_earn();
 int main();
 
 Budget budget_new(uint64_t limit __attribute__((unused))) {
-  return (Budget){ .remaining = limit, .limit = limit, .period = 0, .spent = 0 };
+  return (Budget){ .remaining = limit, .limit = limit, .period = 0ULL, .spent = 0ULL };
 }
 
 void budget_spend(Budget* b __attribute__((unused)), uint64_t amount __attribute__((unused))) {
@@ -42,48 +42,48 @@ void budget_earn(Budget* b __attribute__((unused)), uint64_t amount __attribute_
 
 void budget_next_period(Budget* b __attribute__((unused))) {
   (*b).remaining = (*b).limit;
-  (*b).period = ((*b).period + 1);
+  (*b).period = ((*b).period + 1ULL);
 }
 
 uint64_t spend_30() {
-  Budget b __attribute__((unused)) = budget_new(100);
-  budget_spend((&b), 30);
+  Budget b __attribute__((unused)) = budget_new(100ULL);
+  budget_spend((&b), 30ULL);
   return b.remaining;
 }
 
 uint64_t reset_after_period() {
-  Budget b __attribute__((unused)) = budget_new(100);
-  budget_spend((&b), 30);
+  Budget b __attribute__((unused)) = budget_new(100ULL);
+  budget_spend((&b), 30ULL);
   budget_next_period((&b));
   return b.remaining;
 }
 
 uint64_t two_periods() {
-  Budget b __attribute__((unused)) = budget_new(50);
-  budget_spend((&b), 10);
+  Budget b __attribute__((unused)) = budget_new(50ULL);
+  budget_spend((&b), 10ULL);
   budget_next_period((&b));
-  budget_spend((&b), 20);
+  budget_spend((&b), 20ULL);
   budget_next_period((&b));
   return b.period;
 }
 
 uint64_t cumulative_spent() {
-  Budget b __attribute__((unused)) = budget_new(50);
-  budget_spend((&b), 10);
+  Budget b __attribute__((unused)) = budget_new(50ULL);
+  budget_spend((&b), 10ULL);
   budget_next_period((&b));
-  budget_spend((&b), 20);
+  budget_spend((&b), 20ULL);
   return b.spent;
 }
 
 uint64_t spend_earn() {
-  Budget b __attribute__((unused)) = budget_new(100);
-  budget_spend((&b), 50);
-  budget_earn((&b), 30);
+  Budget b __attribute__((unused)) = budget_new(100ULL);
+  budget_spend((&b), 50ULL);
+  budget_earn((&b), 30ULL);
   return b.remaining;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

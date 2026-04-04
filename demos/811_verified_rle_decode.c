@@ -16,22 +16,22 @@ uint64_t rle_decode(forge_span_u64_t vals __attribute__((unused)), forge_span_u6
 int main();
 
 uint64_t rle_decode(forge_span_u64_t vals __attribute__((unused)), forge_span_u64_t counts __attribute__((unused)), uint64_t n_runs __attribute__((unused)), forge_span_u64_t output __attribute__((unused)), uint64_t out_cap __attribute__((unused))) {
-  uint64_t out_idx __attribute__((unused)) = 0;
-  uint64_t r __attribute__((unused)) = 0;
+  uint64_t out_idx __attribute__((unused)) = 0ULL;
+  uint64_t r __attribute__((unused)) = 0ULL;
   {
     while ((r < n_runs)) {
       uint64_t val __attribute__((unused)) = vals.data[r];
       uint64_t cnt __attribute__((unused)) = counts.data[r];
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while (((j < cnt) && (out_idx < out_cap))) {
           output.data[out_idx] = val;
-          out_idx = (out_idx + 1);
-          j = (j + 1);
+          out_idx = (out_idx + 1ULL);
+          j = (j + 1ULL);
         }
 
       }
-      r = (r + 1);
+      r = (r + 1ULL);
     }
 
   }
@@ -39,7 +39,7 @@ uint64_t rle_decode(forge_span_u64_t vals __attribute__((unused)), forge_span_u6
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -23,20 +23,20 @@ uint64_t sum_bytes(uint8_t a __attribute__((unused)), uint8_t b __attribute__((u
 
 uint64_t byte_scale4(uint8_t b __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = ((uint64_t)b);
-  return (v * 4);
+  return (v * 4ULL);
 }
 
 uint64_t nibble_shift(uint64_t x __attribute__((unused))) {
-  uint64_t n __attribute__((unused)) = (x % 16);
-  return (n * 16);
+  uint64_t n __attribute__((unused)) = (x % 16ULL);
+  return (n * 16ULL);
 }
 
 uint64_t be_encode(uint64_t nibble_hi __attribute__((unused)), uint64_t nibble_lo __attribute__((unused))) {
-  return ((nibble_hi * 16) + nibble_lo);
+  return ((nibble_hi * 16ULL) + nibble_lo);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -15,12 +15,12 @@ uint64_t count_down(uint64_t start __attribute__((unused)));
 int main();
 
 uint64_t sum_n(uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i <= n)) {
       acc = (acc + i);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -28,12 +28,12 @@ uint64_t sum_n(uint64_t n __attribute__((unused))) {
 }
 
 uint64_t factorial(uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t acc __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i <= n)) {
       acc = (acc * i);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -41,12 +41,12 @@ uint64_t factorial(uint64_t n __attribute__((unused))) {
 }
 
 uint64_t count_down(uint64_t start __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
   uint64_t i __attribute__((unused)) = start;
   {
-    while ((i > 0)) {
-      i = (i - 1);
-      count = (count + 1);
+    while ((i > 0ULL)) {
+      i = (i - 1ULL);
+      count = (count + 1ULL);
     }
 
   }
@@ -54,11 +54,11 @@ uint64_t count_down(uint64_t start __attribute__((unused))) {
 }
 
 int main() {
-  uint64_t s5 __attribute__((unused)) = sum_n(5);
-  uint64_t s10 __attribute__((unused)) = sum_n(10);
-  uint64_t f5 __attribute__((unused)) = factorial(5);
-  uint64_t f6 __attribute__((unused)) = factorial(6);
-  uint64_t cd7 __attribute__((unused)) = count_down(7);
+  uint64_t s5 __attribute__((unused)) = sum_n(5ULL);
+  uint64_t s10 __attribute__((unused)) = sum_n(10ULL);
+  uint64_t f5 __attribute__((unused)) = factorial(5ULL);
+  uint64_t f6 __attribute__((unused)) = factorial(6ULL);
+  uint64_t cd7 __attribute__((unused)) = count_down(7ULL);
   return (int)((((s5 + s10) + f5) + cd7));
 
 }

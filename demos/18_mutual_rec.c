@@ -15,34 +15,34 @@ uint64_t ack_a(uint64_t n __attribute__((unused)));
 uint64_t ack_b(uint64_t n __attribute__((unused)));
 
 _Bool is_even(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
+  if ((n == 0ULL)) {
     return 1;
   } else {
-    return is_odd((n - 1));
+    return is_odd((n - 1ULL));
   }
 }
 
 _Bool is_odd(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
+  if ((n == 0ULL)) {
     return 0;
   } else {
-    return is_even((n - 1));
+    return is_even((n - 1ULL));
   }
 }
 
 uint64_t ack_a(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return 1;
+  if ((n == 0ULL)) {
+    return 1ULL;
   } else {
-    return (ack_b((n - 1)) + 1);
+    return (ack_b((n - 1ULL)) + 1ULL);
   }
 }
 
 uint64_t ack_b(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return 2;
+  if ((n == 0ULL)) {
+    return 2ULL;
   } else {
-    return (ack_a((n - 1)) + 1);
+    return (ack_a((n - 1ULL)) + 1ULL);
   }
 }
 

@@ -16,20 +16,20 @@ void coo_transpose(forge_span_u64_t rows __attribute__((unused)), forge_span_u64
 int main();
 
 void coo_transpose(forge_span_u64_t rows __attribute__((unused)), forge_span_u64_t cols __attribute__((unused)), forge_span_u64_t vals __attribute__((unused)), forge_span_u64_t out_rows __attribute__((unused)), forge_span_u64_t out_cols __attribute__((unused)), forge_span_u64_t out_vals __attribute__((unused)), uint64_t nnz __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nnz)) {
       out_rows.data[i] = cols.data[i];
       out_cols.data[i] = rows.data[i];
       out_vals.data[i] = vals.data[i];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

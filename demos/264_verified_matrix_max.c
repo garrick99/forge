@@ -17,14 +17,14 @@ int main();
 
 uint64_t row_max(forge_span_u64_t s __attribute__((unused)), uint64_t rows __attribute__((unused)), uint64_t cols __attribute__((unused)), uint64_t r __attribute__((unused))) {
   uint64_t best __attribute__((unused)) = s.data[(r * cols)];
-  uint64_t c __attribute__((unused)) = 1;
+  uint64_t c __attribute__((unused)) = 1ULL;
   {
     while ((c < cols)) {
       if ((s.data[((r * cols) + c)] > best)) {
         best = s.data[((r * cols) + c)];
 
       }
-      c = (c + 1);
+      c = (c + 1ULL);
     }
 
   }
@@ -32,7 +32,7 @@ uint64_t row_max(forge_span_u64_t s __attribute__((unused)), uint64_t rows __att
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

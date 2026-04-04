@@ -17,8 +17,8 @@ int main();
 
 uint64_t token_bucket(forge_span_u64_t arrivals __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t rate __attribute__((unused)), uint64_t burst __attribute__((unused))) {
   uint64_t tokens __attribute__((unused)) = burst;
-  uint64_t accepted __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t accepted __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if (((tokens + rate) <= burst)) {
@@ -28,12 +28,12 @@ uint64_t token_bucket(forge_span_u64_t arrivals __attribute__((unused)), uint64_
         tokens = burst;
 
       }
-      if (((arrivals.data[i] > 0) && (tokens > 0))) {
-        tokens = (tokens - 1);
-        accepted = (accepted + 1);
+      if (((arrivals.data[i] > 0ULL) && (tokens > 0ULL))) {
+        tokens = (tokens - 1ULL);
+        accepted = (accepted + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -41,7 +41,7 @@ uint64_t token_bucket(forge_span_u64_t arrivals __attribute__((unused)), uint64_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

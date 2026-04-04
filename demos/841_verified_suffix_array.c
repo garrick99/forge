@@ -18,18 +18,18 @@ uint64_t count_inversions(forge_span_u64_t text __attribute__((unused)), uint64_
 int main();
 
 uint64_t suffix_compare(forge_span_u64_t text __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t i __attribute__((unused)), uint64_t j __attribute__((unused)), uint64_t max_len __attribute__((unused))) {
-  uint64_t k __attribute__((unused)) = 0;
-  uint64_t res __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
+  uint64_t res __attribute__((unused)) = 0ULL;
   {
-    while (((((k < max_len) && ((i + k) < n)) && ((j + k) < n)) && (res == 0))) {
+    while (((((k < max_len) && ((i + k) < n)) && ((j + k) < n)) && (res == 0ULL))) {
       if ((text.data[(i + k)] < text.data[(j + k)])) {
-        res = 1;
+        res = 1ULL;
 
       } else if ((text.data[(i + k)] > text.data[(j + k)])) {
-        res = 2;
+        res = 2ULL;
 
       }
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
@@ -37,33 +37,33 @@ uint64_t suffix_compare(forge_span_u64_t text __attribute__((unused)), uint64_t 
 }
 
 void rank_by_first(forge_span_u64_t text __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t ranks __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       ranks.data[i] = text.data[i];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t count_inversions(forge_span_u64_t text __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t j __attribute__((unused)) = (i + 1);
+      uint64_t j __attribute__((unused)) = (i + 1ULL);
       {
         while ((j < n)) {
           if ((text.data[i] > text.data[j])) {
-            count = (count + 1);
+            count = (count + 1ULL);
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -71,7 +71,7 @@ uint64_t count_inversions(forge_span_u64_t text __attribute__((unused)), uint64_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

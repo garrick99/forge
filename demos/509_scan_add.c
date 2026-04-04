@@ -18,23 +18,23 @@ void scan_or(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst 
 int main();
 
 void scan_add(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  dst.data[0] = src.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  dst.data[0ULL] = src.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      dst.data[i] = (dst.data[(i - 1)] + src.data[i]);
-      i = (i + 1);
+      dst.data[i] = (dst.data[(i - 1ULL)] + src.data[i]);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void scan_max(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  dst.data[0] = src.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  dst.data[0ULL] = src.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      uint64_t prev __attribute__((unused)) = dst.data[(i - 1)];
+      uint64_t prev __attribute__((unused)) = dst.data[(i - 1ULL)];
       if ((src.data[i] > prev)) {
         dst.data[i] = src.data[i];
 
@@ -42,26 +42,26 @@ void scan_max(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst
         dst.data[i] = prev;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void scan_or(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  dst.data[0] = src.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  dst.data[0ULL] = src.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      dst.data[i] = (dst.data[(i - 1)] | src.data[i]);
-      i = (i + 1);
+      dst.data[i] = (dst.data[(i - 1ULL)] | src.data[i]);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

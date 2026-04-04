@@ -18,32 +18,32 @@ uint64_t sparse_dot(forge_span_u64_t indices __attribute__((unused)), forge_span
 int main();
 
 void sparse_to_dense(forge_span_u64_t indices __attribute__((unused)), forge_span_u64_t values __attribute__((unused)), uint64_t nnz __attribute__((unused)), forge_span_u64_t dense __attribute__((unused)), uint64_t dense_len __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < dense_len)) {
-      dense.data[i] = 0;
-      i = (i + 1);
+      dense.data[i] = 0ULL;
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < nnz)) {
       uint64_t idx __attribute__((unused)) = indices.data[j];
       dense.data[idx] = (dense.data[idx] + values.data[j]);
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
 }
 
 uint64_t dense_dot(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + (a.data[i] * b.data[i]));
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -51,12 +51,12 @@ uint64_t dense_dot(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t 
 }
 
 uint64_t sparse_dot(forge_span_u64_t indices __attribute__((unused)), forge_span_u64_t a_vals __attribute__((unused)), forge_span_u64_t b_vals __attribute__((unused)), uint64_t nnz __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nnz)) {
       acc = (acc + (a_vals.data[i] * b_vals.data[i]));
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -64,7 +64,7 @@ uint64_t sparse_dot(forge_span_u64_t indices __attribute__((unused)), forge_span
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -27,7 +27,7 @@ MinMax span_minmax(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 int main();
 
 MinMax minmax_new(uint64_t first __attribute__((unused))) {
-  return (MinMax){ .min = first, .max = first, .count = 1 };
+  return (MinMax){ .min = first, .max = first, .count = 1ULL };
 }
 
 void minmax_update(MinMax* mm __attribute__((unused)), uint64_t v __attribute__((unused))) {
@@ -39,7 +39,7 @@ void minmax_update(MinMax* mm __attribute__((unused)), uint64_t v __attribute__(
     (*mm).max = v;
 
   }
-  (*mm).count = ((*mm).count + 1);
+  (*mm).count = ((*mm).count + 1ULL);
 }
 
 uint64_t minmax_range(const MinMax* mm __attribute__((unused))) {
@@ -55,12 +55,12 @@ uint64_t minmax_max(const MinMax* mm __attribute__((unused))) {
 }
 
 MinMax span_minmax(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  MinMax mm __attribute__((unused)) = minmax_new(s.data[0]);
-  uint64_t i __attribute__((unused)) = 1;
+  MinMax mm __attribute__((unused)) = minmax_new(s.data[0ULL]);
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       minmax_update((&mm), s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -68,7 +68,7 @@ MinMax span_minmax(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

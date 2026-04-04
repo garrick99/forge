@@ -52,11 +52,11 @@ Sorted4 sort4(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unus
 }
 
 int main() {
-  Sorted4 s1 __attribute__((unused)) = sort4(4, 2, 7, 1);
+  Sorted4 s1 __attribute__((unused)) = sort4(4ULL, 2ULL, 7ULL, 1ULL);
   uint64_t sum1 __attribute__((unused)) = (((s1.v0 + s1.v1) + s1.v2) + s1.v3);
-  Sorted4 s2 __attribute__((unused)) = sort4(10, 10, 5, 3);
+  Sorted4 s2 __attribute__((unused)) = sort4(10ULL, 10ULL, 5ULL, 3ULL);
   uint64_t sum2 __attribute__((unused)) = (((s2.v0 + s2.v1) + s2.v2) + s2.v3);
-  Sorted4 s3 __attribute__((unused)) = sort4(1, 2, 3, 4);
+  Sorted4 s3 __attribute__((unused)) = sort4(1ULL, 2ULL, 3ULL, 4ULL);
   uint64_t min3 __attribute__((unused)) = s3.v0;
   return (int)(((sum1 + sum2) + min3));
 

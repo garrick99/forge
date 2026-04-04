@@ -27,17 +27,17 @@ uint64_t two_spills();
 int main();
 
 SparseCounter sc_new(uint64_t threshold __attribute__((unused))) {
-  return (SparseCounter){ .bucket_small = 0, .bucket_large = 0, .threshold = threshold, .spills = 0 };
+  return (SparseCounter){ .bucket_small = 0ULL, .bucket_large = 0ULL, .threshold = threshold, .spills = 0ULL };
 }
 
 void sc_inc_small(SparseCounter* s __attribute__((unused))) {
-  (*s).bucket_small = ((*s).bucket_small + 1);
+  (*s).bucket_small = ((*s).bucket_small + 1ULL);
 }
 
 void sc_spill(SparseCounter* s __attribute__((unused))) {
   (*s).bucket_large = ((*s).bucket_large + (*s).threshold);
-  (*s).bucket_small = 0;
-  (*s).spills = ((*s).spills + 1);
+  (*s).bucket_small = 0ULL;
+  (*s).spills = ((*s).spills + 1ULL);
 }
 
 void sc_inc_large(SparseCounter* s __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -45,7 +45,7 @@ void sc_inc_large(SparseCounter* s __attribute__((unused)), uint64_t n __attribu
 }
 
 uint64_t small_four() {
-  SparseCounter s __attribute__((unused)) = sc_new(5);
+  SparseCounter s __attribute__((unused)) = sc_new(5ULL);
   sc_inc_small((&s));
   sc_inc_small((&s));
   sc_inc_small((&s));
@@ -54,7 +54,7 @@ uint64_t small_four() {
 }
 
 uint64_t spill_large() {
-  SparseCounter s __attribute__((unused)) = sc_new(5);
+  SparseCounter s __attribute__((unused)) = sc_new(5ULL);
   sc_inc_small((&s));
   sc_inc_small((&s));
   sc_inc_small((&s));
@@ -64,7 +64,7 @@ uint64_t spill_large() {
 }
 
 uint64_t spill_resets_small() {
-  SparseCounter s __attribute__((unused)) = sc_new(5);
+  SparseCounter s __attribute__((unused)) = sc_new(5ULL);
   sc_inc_small((&s));
   sc_inc_small((&s));
   sc_inc_small((&s));
@@ -74,7 +74,7 @@ uint64_t spill_resets_small() {
 }
 
 uint64_t two_spills() {
-  SparseCounter s __attribute__((unused)) = sc_new(5);
+  SparseCounter s __attribute__((unused)) = sc_new(5ULL);
   sc_inc_small((&s));
   sc_inc_small((&s));
   sc_inc_small((&s));
@@ -89,7 +89,7 @@ uint64_t two_spills() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

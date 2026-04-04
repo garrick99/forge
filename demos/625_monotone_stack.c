@@ -19,26 +19,26 @@ uint64_t count_visible(forge_span_u64_t heights __attribute__((unused)), uint64_
 int main();
 
 void next_greater(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       out.data[i] = n;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t max_height(forge_span_u64_t heights __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t best __attribute__((unused)) = heights.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t best __attribute__((unused)) = heights.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((heights.data[i] > best)) {
         best = heights.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -46,15 +46,15 @@ uint64_t max_height(forge_span_u64_t heights __attribute__((unused)), uint64_t n
 }
 
 uint64_t count_ge_height(forge_span_u64_t heights __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t h __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((heights.data[i] >= h)) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -62,17 +62,17 @@ uint64_t count_ge_height(forge_span_u64_t heights __attribute__((unused)), uint6
 }
 
 uint64_t count_visible(forge_span_u64_t heights __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 1;
-  uint64_t peak __attribute__((unused)) = heights.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t cnt __attribute__((unused)) = 1ULL;
+  uint64_t peak __attribute__((unused)) = heights.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((heights.data[i] > peak)) {
         peak = heights.data[i];
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -80,7 +80,7 @@ uint64_t count_visible(forge_span_u64_t heights __attribute__((unused)), uint64_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

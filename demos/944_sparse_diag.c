@@ -16,33 +16,33 @@ void extract_sparse_diag(forge_span_u64_t row_ptr __attribute__((unused)), forge
 int main();
 
 void extract_sparse_diag(forge_span_u64_t row_ptr __attribute__((unused)), forge_span_u64_t col_idx __attribute__((unused)), forge_span_u64_t vals __attribute__((unused)), forge_span_u64_t diag __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t nnz __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      diag.data[i] = 0;
+      diag.data[i] = 0ULL;
       uint64_t start __attribute__((unused)) = row_ptr.data[i];
-      uint64_t stop __attribute__((unused)) = row_ptr.data[(i + 1)];
+      uint64_t stop __attribute__((unused)) = row_ptr.data[(i + 1ULL)];
       uint64_t j __attribute__((unused)) = start;
-      uint64_t steps __attribute__((unused)) = 0;
+      uint64_t steps __attribute__((unused)) = 0ULL;
       {
         while (((j < stop) && (steps < nnz))) {
           if (((j < nnz) && (col_idx.data[j] == i))) {
             diag.data[i] = vals.data[j];
 
           }
-          j = (j + 1);
-          steps = (steps + 1);
+          j = (j + 1ULL);
+          steps = (steps + 1ULL);
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

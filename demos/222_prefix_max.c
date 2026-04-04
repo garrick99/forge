@@ -17,9 +17,9 @@ int main();
 
 void prefix_max(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
   {
-    for (uint64_t i = (uint64_t)(1); i < (uint64_t)(n); i++) {
-      if ((s.data[i] < s.data[(i - 1)])) {
-        s.data[i] = s.data[(i - 1)];
+    for (uint64_t i = (uint64_t)(1ULL); i < (uint64_t)(n); i++) {
+      if ((s.data[i] < s.data[(i - 1ULL)])) {
+        s.data[i] = s.data[(i - 1ULL)];
 
       }
     }
@@ -28,7 +28,7 @@ void prefix_max(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

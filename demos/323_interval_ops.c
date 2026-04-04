@@ -34,14 +34,14 @@ uint64_t interval_width(Interval iv __attribute__((unused))) {
 
 uint64_t interval_contains(Interval iv __attribute__((unused)), uint64_t x __attribute__((unused))) {
   if (((iv.lo <= x) && (x <= iv.hi))) {
-    return 1;
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t interval_midpoint(Interval iv __attribute__((unused))) {
-  return (iv.lo + ((iv.hi - iv.lo) / 2));
+  return (iv.lo + ((iv.hi - iv.lo) / 2ULL));
 }
 
 uint64_t interval_lo_max(Interval a __attribute__((unused)), Interval b __attribute__((unused))) {
@@ -74,9 +74,9 @@ uint64_t intervals_overlap(Interval a __attribute__((unused)), Interval b __attr
     min_hi = b.hi;
   }
   if ((max_lo <= min_hi)) {
-    return 1;
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
@@ -95,7 +95,7 @@ uint64_t interval_clamp(Interval iv __attribute__((unused)), uint64_t x __attrib
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -16,68 +16,68 @@ _Bool nfa_match(forge_span_u64_t pattern __attribute__((unused)), uint64_t n_sta
 int main();
 
 _Bool nfa_match(forge_span_u64_t pattern __attribute__((unused)), uint64_t n_states __attribute__((unused)), uint64_t n_trans __attribute__((unused)), forge_span_u64_t text __attribute__((unused)), uint64_t text_len __attribute__((unused)), forge_span_u64_t current __attribute__((unused)), forge_span_u64_t next __attribute__((unused))) {
-  uint64_t s __attribute__((unused)) = 0;
+  uint64_t s __attribute__((unused)) = 0ULL;
   {
     while ((s < n_states)) {
-      current.data[s] = 0;
-      s = (s + 1);
+      current.data[s] = 0ULL;
+      s = (s + 1ULL);
     }
 
   }
-  current.data[0] = 1;
-  uint64_t t __attribute__((unused)) = 0;
+  current.data[0ULL] = 1ULL;
+  uint64_t t __attribute__((unused)) = 0ULL;
   {
     while ((t < text_len)) {
-      uint64_t s2 __attribute__((unused)) = 0;
+      uint64_t s2 __attribute__((unused)) = 0ULL;
       {
         while ((s2 < n_states)) {
-          next.data[s2] = 0;
-          s2 = (s2 + 1);
+          next.data[s2] = 0ULL;
+          s2 = (s2 + 1ULL);
         }
 
       }
-      uint64_t state __attribute__((unused)) = 0;
+      uint64_t state __attribute__((unused)) = 0ULL;
       {
         while ((state < n_states)) {
-          if ((current.data[state] == 1)) {
-            uint64_t e __attribute__((unused)) = 0;
+          if ((current.data[state] == 1ULL)) {
+            uint64_t e __attribute__((unused)) = 0ULL;
             {
-              while (((e + 2) < n_trans)) {
-                if (((pattern.data[e] == state) && (pattern.data[(e + 1)] == text.data[t]))) {
-                  uint64_t nxt __attribute__((unused)) = pattern.data[(e + 2)];
+              while (((e + 2ULL) < n_trans)) {
+                if (((pattern.data[e] == state) && (pattern.data[(e + 1ULL)] == text.data[t]))) {
+                  uint64_t nxt __attribute__((unused)) = pattern.data[(e + 2ULL)];
                   if ((nxt < n_states)) {
-                    next.data[nxt] = 1;
+                    next.data[nxt] = 1ULL;
 
                   }
 
                 }
-                e = (e + 3);
+                e = (e + 3ULL);
               }
 
             }
 
           }
-          state = (state + 1);
+          state = (state + 1ULL);
         }
 
       }
-      uint64_t s3 __attribute__((unused)) = 0;
+      uint64_t s3 __attribute__((unused)) = 0ULL;
       {
         while ((s3 < n_states)) {
           current.data[s3] = next.data[s3];
-          s3 = (s3 + 1);
+          s3 = (s3 + 1ULL);
         }
 
       }
-      t = (t + 1);
+      t = (t + 1ULL);
     }
 
   }
-  return (current.data[(n_states - 1)] == 1);
+  return (current.data[(n_states - 1ULL)] == 1ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

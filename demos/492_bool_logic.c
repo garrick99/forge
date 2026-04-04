@@ -87,7 +87,7 @@ _Bool check_majority_1true() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -19,90 +19,90 @@ uint64_t gcd(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unuse
   uint64_t s0a __attribute__((unused)) = a;
   uint64_t s0b __attribute__((unused)) = b;
   uint64_t s1a;
-  if ((s0b == 0)) {
+  if ((s0b == 0ULL)) {
     s1a = s0a;
   } else {
     s1a = s0b;
   }
   uint64_t s1b;
-  if ((s0b == 0)) {
-    s1b = 0;
+  if ((s0b == 0ULL)) {
+    s1b = 0ULL;
   } else {
     s1b = (s0a % s0b);
   }
   uint64_t s2a;
-  if ((s1b == 0)) {
+  if ((s1b == 0ULL)) {
     s2a = s1a;
   } else {
     s2a = s1b;
   }
   uint64_t s2b;
-  if ((s1b == 0)) {
-    s2b = 0;
+  if ((s1b == 0ULL)) {
+    s2b = 0ULL;
   } else {
     s2b = (s1a % s1b);
   }
   uint64_t s3a;
-  if ((s2b == 0)) {
+  if ((s2b == 0ULL)) {
     s3a = s2a;
   } else {
     s3a = s2b;
   }
   uint64_t s3b;
-  if ((s2b == 0)) {
-    s3b = 0;
+  if ((s2b == 0ULL)) {
+    s3b = 0ULL;
   } else {
     s3b = (s2a % s2b);
   }
   uint64_t s4a;
-  if ((s3b == 0)) {
+  if ((s3b == 0ULL)) {
     s4a = s3a;
   } else {
     s4a = s3b;
   }
   uint64_t s4b;
-  if ((s3b == 0)) {
-    s4b = 0;
+  if ((s3b == 0ULL)) {
+    s4b = 0ULL;
   } else {
     s4b = (s3a % s3b);
   }
   uint64_t s5a;
-  if ((s4b == 0)) {
+  if ((s4b == 0ULL)) {
     s5a = s4a;
   } else {
     s5a = s4b;
   }
   uint64_t s5b;
-  if ((s4b == 0)) {
-    s5b = 0;
+  if ((s4b == 0ULL)) {
+    s5b = 0ULL;
   } else {
     s5b = (s4a % s4b);
   }
   uint64_t s6a;
-  if ((s5b == 0)) {
+  if ((s5b == 0ULL)) {
     s6a = s5a;
   } else {
     s6a = s5b;
   }
   uint64_t s6b;
-  if ((s5b == 0)) {
-    s6b = 0;
+  if ((s5b == 0ULL)) {
+    s6b = 0ULL;
   } else {
     s6b = (s5a % s5b);
   }
   uint64_t s7a;
-  if ((s6b == 0)) {
+  if ((s6b == 0ULL)) {
     s7a = s6a;
   } else {
     s7a = s6b;
   }
   uint64_t s7b;
-  if ((s6b == 0)) {
-    s7b = 0;
+  if ((s6b == 0ULL)) {
+    s7b = 0ULL;
   } else {
     s7b = (s6a % s6b);
   }
-  if ((s7b == 0)) {
+  if ((s7b == 0ULL)) {
     return s7a;
   } else {
     return s7b;
@@ -132,13 +132,13 @@ uint64_t median3(uint64_t a __attribute__((unused)), uint64_t b __attribute__((u
 }
 
 int main() {
-  uint64_t g12_8 __attribute__((unused)) = gcd(12, 8);
-  uint64_t g100_75 __attribute__((unused)) = gcd(100, 75);
-  uint64_t g17_13 __attribute__((unused)) = gcd(17, 13);
-  uint64_t g48_36 __attribute__((unused)) = gcd(48, 36);
-  uint64_t mn __attribute__((unused)) = min2(7, 3);
-  uint64_t mx __attribute__((unused)) = max2(7, 3);
-  uint64_t med __attribute__((unused)) = median3(4, 7, 2);
+  uint64_t g12_8 __attribute__((unused)) = gcd(12ULL, 8ULL);
+  uint64_t g100_75 __attribute__((unused)) = gcd(100ULL, 75ULL);
+  uint64_t g17_13 __attribute__((unused)) = gcd(17ULL, 13ULL);
+  uint64_t g48_36 __attribute__((unused)) = gcd(48ULL, 36ULL);
+  uint64_t mn __attribute__((unused)) = min2(7ULL, 3ULL);
+  uint64_t mx __attribute__((unused)) = max2(7ULL, 3ULL);
+  uint64_t med __attribute__((unused)) = median3(4ULL, 7ULL, 2ULL);
   return (int)(((((((g12_8 + g100_75) + g17_13) + g48_36) + mn) + mx) + med));
 
 }

@@ -17,20 +17,20 @@ int main();
 
 uint64_t find_max(forge_span_u64_t s __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = s.len;
-  uint64_t cur_max __attribute__((unused)) = s.data[0];
-
-  uint64_t k __attribute__((unused)) = 1;
+  uint64_t cur_max __attribute__((unused)) = s.data[0ULL];
+  uint64_t gmax __attribute__((unused)) = s.data[0ULL];
+  uint64_t k __attribute__((unused)) = 1ULL;
   {
     while ((k < n)) {
       if ((s.data[k] > cur_max)) {
         cur_max = s.data[k];
-
+        gmax = s.data[k];
 
       } else {
-
+        gmax = gmax;
 
       }
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
@@ -38,7 +38,7 @@ uint64_t find_max(forge_span_u64_t s __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

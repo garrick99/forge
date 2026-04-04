@@ -17,7 +17,7 @@ int main();
 
 uint64_t linear_search(forge_span_u64_t s __attribute__((unused)), uint64_t target __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = s.len;
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
   uint64_t found_idx __attribute__((unused)) = n;
   {
     while ((k < n)) {
@@ -25,7 +25,7 @@ uint64_t linear_search(forge_span_u64_t s __attribute__((unused)), uint64_t targ
         found_idx = k;
 
       }
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
@@ -33,7 +33,7 @@ uint64_t linear_search(forge_span_u64_t s __attribute__((unused)), uint64_t targ
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

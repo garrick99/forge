@@ -20,17 +20,17 @@ uint64_t fib(uint64_t n __attribute__((unused)));
 int main();
 
 FibState fib_step(FibState s __attribute__((unused))) {
-  return (FibState){ .a = s.b, .b = (s.a + s.b), .n = (s.n + 1) };
+  return (FibState){ .a = s.b, .b = (s.a + s.b), .n = (s.n + 1ULL) };
 }
 
 uint64_t fib(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return 0;
+  if ((n == 0ULL)) {
+    return 0ULL;
   } else {
-    if ((n == 1)) {
-      return 1;
+    if ((n == 1ULL)) {
+      return 1ULL;
     } else {
-      FibState s0 __attribute__((unused)) = (FibState){ .a = 0, .b = 1, .n = 2 };
+      FibState s0 __attribute__((unused)) = (FibState){ .a = 0ULL, .b = 1ULL, .n = 2ULL };
       FibState s1 __attribute__((unused)) = fib_step(s0);
       FibState s2 __attribute__((unused)) = fib_step(s1);
       FibState s3 __attribute__((unused)) = fib_step(s2);
@@ -49,58 +49,58 @@ uint64_t fib(uint64_t n __attribute__((unused))) {
       FibState s16 __attribute__((unused)) = fib_step(s15);
       FibState s17 __attribute__((unused)) = fib_step(s16);
       FibState s18 __attribute__((unused)) = fib_step(s17);
-      if ((n == 2)) {
+      if ((n == 2ULL)) {
         return s1.b;
       } else {
-        if ((n == 3)) {
+        if ((n == 3ULL)) {
           return s2.b;
         } else {
-          if ((n == 4)) {
+          if ((n == 4ULL)) {
             return s3.b;
           } else {
-            if ((n == 5)) {
+            if ((n == 5ULL)) {
               return s4.b;
             } else {
-              if ((n == 6)) {
+              if ((n == 6ULL)) {
                 return s5.b;
               } else {
-                if ((n == 7)) {
+                if ((n == 7ULL)) {
                   return s6.b;
                 } else {
-                  if ((n == 8)) {
+                  if ((n == 8ULL)) {
                     return s7.b;
                   } else {
-                    if ((n == 9)) {
+                    if ((n == 9ULL)) {
                       return s8.b;
                     } else {
-                      if ((n == 10)) {
+                      if ((n == 10ULL)) {
                         return s9.b;
                       } else {
-                        if ((n == 11)) {
+                        if ((n == 11ULL)) {
                           return s10.b;
                         } else {
-                          if ((n == 12)) {
+                          if ((n == 12ULL)) {
                             return s11.b;
                           } else {
-                            if ((n == 13)) {
+                            if ((n == 13ULL)) {
                               return s12.b;
                             } else {
-                              if ((n == 14)) {
+                              if ((n == 14ULL)) {
                                 return s13.b;
                               } else {
-                                if ((n == 15)) {
+                                if ((n == 15ULL)) {
                                   return s14.b;
                                 } else {
-                                  if ((n == 16)) {
+                                  if ((n == 16ULL)) {
                                     return s15.b;
                                   } else {
-                                    if ((n == 17)) {
+                                    if ((n == 17ULL)) {
                                       return s16.b;
                                     } else {
-                                      if ((n == 18)) {
+                                      if ((n == 18ULL)) {
                                         return s17.b;
                                       } else {
-                                        if ((n == 19)) {
+                                        if ((n == 19ULL)) {
                                           return s18.b;
                                         } else {
                                           return fib_step(s18).b;
@@ -127,12 +127,12 @@ uint64_t fib(uint64_t n __attribute__((unused))) {
 }
 
 int main() {
-  uint64_t f0 __attribute__((unused)) = fib(0);
-  uint64_t f1 __attribute__((unused)) = fib(1);
-  uint64_t f2 __attribute__((unused)) = fib(2);
-  uint64_t f5 __attribute__((unused)) = fib(5);
-  uint64_t f10 __attribute__((unused)) = fib(10);
-  uint64_t f12 __attribute__((unused)) = fib(12);
+  uint64_t f0 __attribute__((unused)) = fib(0ULL);
+  uint64_t f1 __attribute__((unused)) = fib(1ULL);
+  uint64_t f2 __attribute__((unused)) = fib(2ULL);
+  uint64_t f5 __attribute__((unused)) = fib(5ULL);
+  uint64_t f10 __attribute__((unused)) = fib(10ULL);
+  uint64_t f12 __attribute__((unused)) = fib(12ULL);
   return (int)((((((f0 + f1) + f2) + f5) + f10) + f12));
 
 }

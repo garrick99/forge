@@ -17,42 +17,42 @@ uint64_t protocol_run(forge_span_u64_t events __attribute__((unused)), uint64_t 
 int main();
 
 uint64_t protocol_step(uint64_t state __attribute__((unused)), uint64_t event __attribute__((unused))) {
-  if ((state == 0)) {
-    if ((event == 0)) {
-      return 1;
+  if ((state == 0ULL)) {
+    if ((event == 0ULL)) {
+      return 1ULL;
     } else {
-      return 0;
+      return 0ULL;
     }
   } else {
-    if ((state == 1)) {
-      if ((event == 1)) {
-        return 2;
+    if ((state == 1ULL)) {
+      if ((event == 1ULL)) {
+        return 2ULL;
       } else {
-        return 0;
+        return 0ULL;
       }
     } else {
-      if ((state == 2)) {
-        if ((event == 2)) {
-          return 3;
+      if ((state == 2ULL)) {
+        if ((event == 2ULL)) {
+          return 3ULL;
         } else {
-          return 0;
+          return 0ULL;
         }
       } else {
-        if ((state == 3)) {
-          if ((event == 3)) {
-            return 4;
+        if ((state == 3ULL)) {
+          if ((event == 3ULL)) {
+            return 4ULL;
           } else {
-            return 3;
+            return 3ULL;
           }
         } else {
-          if ((state == 4)) {
-            if ((event == 4)) {
-              return 5;
+          if ((state == 4ULL)) {
+            if ((event == 4ULL)) {
+              return 5ULL;
             } else {
-              return 4;
+              return 4ULL;
             }
           } else {
-            return 5;
+            return 5ULL;
           }
         }
       }
@@ -61,12 +61,12 @@ uint64_t protocol_step(uint64_t state __attribute__((unused)), uint64_t event __
 }
 
 uint64_t protocol_run(forge_span_u64_t events __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t state __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t state __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       state = protocol_step(state, events.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -74,7 +74,7 @@ uint64_t protocol_run(forge_span_u64_t events __attribute__((unused)), uint64_t 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

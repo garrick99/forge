@@ -62,24 +62,24 @@ _Bool vec2_eq(Vec2 a __attribute__((unused)), Vec2 b __attribute__((unused))) {
 }
 
 Vec2 vec2_zero() {
-  return (Vec2){ .x = 0, .y = 0 };
+  return (Vec2){ .x = 0ULL, .y = 0ULL };
 }
 
 uint64_t check_vec2_add() {
-  Vec2 a __attribute__((unused)) = vec2_new(2, 3);
-  Vec2 b __attribute__((unused)) = vec2_new(3, 4);
+  Vec2 a __attribute__((unused)) = vec2_new(2ULL, 3ULL);
+  Vec2 b __attribute__((unused)) = vec2_new(3ULL, 4ULL);
   Vec2 c __attribute__((unused)) = vec2_add(a, b);
   return c.x;
 }
 
 uint64_t check_vec2_dot() {
-  Vec2 a __attribute__((unused)) = vec2_new(1, 2);
-  Vec2 b __attribute__((unused)) = vec2_new(3, 4);
+  Vec2 a __attribute__((unused)) = vec2_new(1ULL, 2ULL);
+  Vec2 b __attribute__((unused)) = vec2_new(3ULL, 4ULL);
   return vec2_dot(a, b);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

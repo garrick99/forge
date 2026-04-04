@@ -18,22 +18,22 @@ uint64_t set_difference(forge_span_u64_t a __attribute__((unused)), uint64_t na 
 int main();
 
 uint64_t set_intersect(forge_span_u64_t a __attribute__((unused)), uint64_t na __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t nb __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t ia __attribute__((unused)) = 0;
-  uint64_t ib __attribute__((unused)) = 0;
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t ia __attribute__((unused)) = 0ULL;
+  uint64_t ib __attribute__((unused)) = 0ULL;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while (((ia < na) && (ib < nb))) {
       if ((a.data[ia] == b.data[ib])) {
         out.data[k] = a.data[ia];
-        k = (k + 1);
-        ia = (ia + 1);
-        ib = (ib + 1);
+        k = (k + 1ULL);
+        ia = (ia + 1ULL);
+        ib = (ib + 1ULL);
 
       } else if ((a.data[ia] < b.data[ib])) {
-        ia = (ia + 1);
+        ia = (ia + 1ULL);
 
       } else {
-        ib = (ib + 1);
+        ib = (ib + 1ULL);
 
       }
     }
@@ -43,36 +43,36 @@ uint64_t set_intersect(forge_span_u64_t a __attribute__((unused)), uint64_t na _
 }
 
 uint64_t set_union(forge_span_u64_t a __attribute__((unused)), uint64_t na __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t nb __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t ia __attribute__((unused)) = 0;
-  uint64_t ib __attribute__((unused)) = 0;
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t ia __attribute__((unused)) = 0ULL;
+  uint64_t ib __attribute__((unused)) = 0ULL;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while (((ia < na) || (ib < nb))) {
       if ((ia >= na)) {
         out.data[k] = b.data[ib];
-        ib = (ib + 1);
-        k = (k + 1);
+        ib = (ib + 1ULL);
+        k = (k + 1ULL);
 
       } else if ((ib >= nb)) {
         out.data[k] = a.data[ia];
-        ia = (ia + 1);
-        k = (k + 1);
+        ia = (ia + 1ULL);
+        k = (k + 1ULL);
 
       } else if ((a.data[ia] == b.data[ib])) {
         out.data[k] = a.data[ia];
-        ia = (ia + 1);
-        ib = (ib + 1);
-        k = (k + 1);
+        ia = (ia + 1ULL);
+        ib = (ib + 1ULL);
+        k = (k + 1ULL);
 
       } else if ((a.data[ia] < b.data[ib])) {
         out.data[k] = a.data[ia];
-        ia = (ia + 1);
-        k = (k + 1);
+        ia = (ia + 1ULL);
+        k = (k + 1ULL);
 
       } else {
         out.data[k] = b.data[ib];
-        ib = (ib + 1);
-        k = (k + 1);
+        ib = (ib + 1ULL);
+        k = (k + 1ULL);
 
       }
     }
@@ -82,16 +82,16 @@ uint64_t set_union(forge_span_u64_t a __attribute__((unused)), uint64_t na __att
 }
 
 uint64_t set_difference(forge_span_u64_t a __attribute__((unused)), uint64_t na __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t nb __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t ia __attribute__((unused)) = 0;
-  uint64_t ib __attribute__((unused)) = 0;
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t ia __attribute__((unused)) = 0ULL;
+  uint64_t ib __attribute__((unused)) = 0ULL;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while ((ia < na)) {
       _Bool skip __attribute__((unused)) = 0;
       {
         while (((ib < nb) && (!skip))) {
           if ((b.data[ib] < a.data[ia])) {
-            ib = (ib + 1);
+            ib = (ib + 1ULL);
 
           } else {
             skip = 1;
@@ -102,14 +102,14 @@ uint64_t set_difference(forge_span_u64_t a __attribute__((unused)), uint64_t na 
       }
       if ((ib >= nb)) {
         out.data[k] = a.data[ia];
-        k = (k + 1);
+        k = (k + 1ULL);
 
       } else if ((b.data[ib] != a.data[ia])) {
         out.data[k] = a.data[ia];
-        k = (k + 1);
+        k = (k + 1ULL);
 
       }
-      ia = (ia + 1);
+      ia = (ia + 1ULL);
     }
 
   }
@@ -117,7 +117,7 @@ uint64_t set_difference(forge_span_u64_t a __attribute__((unused)), uint64_t na 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

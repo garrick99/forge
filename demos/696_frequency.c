@@ -19,15 +19,15 @@ _Bool freq_all_equal(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 int main();
 
 uint64_t freq_count_val(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((s.data[i] == val)) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -35,18 +35,18 @@ uint64_t freq_count_val(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 }
 
 uint64_t freq_mode(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t hist __attribute__((unused)), uint64_t bins __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t b __attribute__((unused)) = (s.data[i] % bins);
-      hist.data[b] = (hist.data[b] + 1);
-      i = (i + 1);
+      hist.data[b] = (hist.data[b] + 1ULL);
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t best __attribute__((unused)) = 0;
-  uint64_t best_cnt __attribute__((unused)) = hist.data[0];
-  uint64_t j __attribute__((unused)) = 1;
+  uint64_t best __attribute__((unused)) = 0ULL;
+  uint64_t best_cnt __attribute__((unused)) = hist.data[0ULL];
+  uint64_t j __attribute__((unused)) = 1ULL;
   {
     while ((j < bins)) {
       if ((hist.data[j] > best_cnt)) {
@@ -54,7 +54,7 @@ uint64_t freq_mode(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
         best_cnt = hist.data[j];
 
       }
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
@@ -63,14 +63,14 @@ uint64_t freq_mode(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 
 _Bool freq_any_equal(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
   _Bool found __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while (((i < n) && (!found))) {
       if ((s.data[i] == val)) {
         found = 1;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -79,14 +79,14 @@ _Bool freq_any_equal(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 
 _Bool freq_all_equal(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
   _Bool ok __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while (((i < n) && ok)) {
       if ((s.data[i] != val)) {
         ok = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -94,7 +94,7 @@ _Bool freq_all_equal(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

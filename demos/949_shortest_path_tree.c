@@ -16,15 +16,15 @@ void spt_extract(forge_span_u64_t adj __attribute__((unused)), forge_span_u64_t 
 int main();
 
 void spt_extract(forge_span_u64_t adj __attribute__((unused)), forge_span_u64_t dist __attribute__((unused)), forge_span_u64_t parent __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t v __attribute__((unused)) = 0;
+  uint64_t v __attribute__((unused)) = 0ULL;
   {
     while ((v < n)) {
       parent.data[v] = n;
       uint64_t best __attribute__((unused)) = dist.data[v];
-      uint64_t u __attribute__((unused)) = 0;
+      uint64_t u __attribute__((unused)) = 0ULL;
       {
         while ((u < n)) {
-          if (((((u * n) + v) < (n * n)) && (adj.data[((u * n) + v)] > 0))) {
+          if (((((u * n) + v) < (n * n)) && (adj.data[((u * n) + v)] > 0ULL))) {
             uint64_t cost __attribute__((unused)) = (dist.data[u] + adj.data[((u * n) + v)]);
             if ((cost < best)) {
               best = cost;
@@ -33,18 +33,18 @@ void spt_extract(forge_span_u64_t adj __attribute__((unused)), forge_span_u64_t 
             }
 
           }
-          u = (u + 1);
+          u = (u + 1ULL);
         }
 
       }
-      v = (v + 1);
+      v = (v + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

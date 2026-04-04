@@ -26,57 +26,57 @@ uint64_t init_xor_zero();
 int main();
 
 CRCState crc_new(uint64_t init __attribute__((unused))) {
-  return (CRCState){ .crc = init, .bytes_seen = 0, .finalized = 0 };
+  return (CRCState){ .crc = init, .bytes_seen = 0ULL, .finalized = 0ULL };
 }
 
 void crc_feed(CRCState* c __attribute__((unused)), uint64_t byte __attribute__((unused))) {
   (*c).crc = ((*c).crc ^ byte);
-  (*c).bytes_seen = ((*c).bytes_seen + 1);
+  (*c).bytes_seen = ((*c).bytes_seen + 1ULL);
 }
 
 void crc_finalize(CRCState* c __attribute__((unused))) {
-  (*c).finalized = 1;
+  (*c).finalized = 1ULL;
 }
 
 uint64_t xor_two_bytes() {
-  CRCState c __attribute__((unused)) = crc_new(0);
-  crc_feed((&c), 255);
-  crc_feed((&c), 15);
+  CRCState c __attribute__((unused)) = crc_new(0ULL);
+  crc_feed((&c), 255ULL);
+  crc_feed((&c), 15ULL);
   return c.crc;
 }
 
 uint64_t xor_inverse() {
-  CRCState c __attribute__((unused)) = crc_new(0);
-  crc_feed((&c), 255);
-  crc_feed((&c), 15);
-  crc_feed((&c), 15);
+  CRCState c __attribute__((unused)) = crc_new(0ULL);
+  crc_feed((&c), 255ULL);
+  crc_feed((&c), 15ULL);
+  crc_feed((&c), 15ULL);
   return c.crc;
 }
 
 uint64_t byte_count() {
-  CRCState c __attribute__((unused)) = crc_new(0);
-  crc_feed((&c), 1);
-  crc_feed((&c), 2);
-  crc_feed((&c), 3);
-  crc_feed((&c), 4);
+  CRCState c __attribute__((unused)) = crc_new(0ULL);
+  crc_feed((&c), 1ULL);
+  crc_feed((&c), 2ULL);
+  crc_feed((&c), 3ULL);
+  crc_feed((&c), 4ULL);
   return c.bytes_seen;
 }
 
 uint64_t finalize_flag() {
-  CRCState c __attribute__((unused)) = crc_new(4294967295);
-  crc_feed((&c), 0);
+  CRCState c __attribute__((unused)) = crc_new(4294967295ULL);
+  crc_feed((&c), 0ULL);
   crc_finalize((&c));
   return c.finalized;
 }
 
 uint64_t init_xor_zero() {
-  CRCState c __attribute__((unused)) = crc_new(42);
-  crc_feed((&c), 0);
+  CRCState c __attribute__((unused)) = crc_new(42ULL);
+  crc_feed((&c), 0ULL);
   return c.crc;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

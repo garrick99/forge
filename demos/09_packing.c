@@ -14,14 +14,14 @@ uint32_t unpack_lo(uint32_t word __attribute__((unused)));
 uint32_t unpack_hi(uint32_t word __attribute__((unused)));
 
 uint32_t pack_u32(uint32_t hi __attribute__((unused)), uint32_t lo __attribute__((unused))) {
-  return ((hi * 65536) + lo);
+  return ((hi * 65536ULL) + lo);
 }
 
 uint32_t unpack_lo(uint32_t word __attribute__((unused))) {
-  return (word - ((word / 65536) * 65536));
+  return (word - ((word / 65536ULL) * 65536ULL));
 }
 
 uint32_t unpack_hi(uint32_t word __attribute__((unused))) {
-  return (word / 65536);
+  return (word / 65536ULL);
 }
 

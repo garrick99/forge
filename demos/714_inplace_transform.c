@@ -19,51 +19,51 @@ void array_copy_preserve(forge_span_u64_t dst __attribute__((unused)), forge_spa
 int main();
 
 void array_add_offset(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t offset __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = (s.data[i] + offset);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void array_scale(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t factor __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = (s.data[i] * factor);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void array_clear(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      s.data[i] = 0;
-      i = (i + 1);
+      s.data[i] = 0ULL;
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void array_copy_preserve(forge_span_u64_t dst __attribute__((unused)), forge_span_u64_t src __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       dst.data[i] = src.data[i];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

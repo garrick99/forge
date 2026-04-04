@@ -29,36 +29,36 @@ uint64_t successes_tracked();
 int main();
 
 CircuitBreaker cb_new(uint64_t threshold __attribute__((unused))) {
-  return (CircuitBreaker){ .failures = 0, .successes = 0, .threshold = threshold, .trips = 0, .resets = 0 };
+  return (CircuitBreaker){ .failures = 0ULL, .successes = 0ULL, .threshold = threshold, .trips = 0ULL, .resets = 0ULL };
 }
 
 void cb_fail(CircuitBreaker* c __attribute__((unused))) {
-  (*c).failures = ((*c).failures + 1);
+  (*c).failures = ((*c).failures + 1ULL);
 }
 
 void cb_trip(CircuitBreaker* c __attribute__((unused))) {
-  (*c).failures = ((*c).failures + 1);
-  (*c).trips = ((*c).trips + 1);
+  (*c).failures = ((*c).failures + 1ULL);
+  (*c).trips = ((*c).trips + 1ULL);
 }
 
 void cb_reset(CircuitBreaker* c __attribute__((unused))) {
-  (*c).resets = ((*c).resets + 1);
-  (*c).failures = 0;
+  (*c).resets = ((*c).resets + 1ULL);
+  (*c).failures = 0ULL;
 }
 
 void cb_success(CircuitBreaker* c __attribute__((unused))) {
-  (*c).successes = ((*c).successes + 1);
+  (*c).successes = ((*c).successes + 1ULL);
 }
 
 uint64_t two_fails() {
-  CircuitBreaker c __attribute__((unused)) = cb_new(3);
+  CircuitBreaker c __attribute__((unused)) = cb_new(3ULL);
   cb_fail((&c));
   cb_fail((&c));
   return c.failures;
 }
 
 uint64_t trip_fires() {
-  CircuitBreaker c __attribute__((unused)) = cb_new(3);
+  CircuitBreaker c __attribute__((unused)) = cb_new(3ULL);
   cb_fail((&c));
   cb_fail((&c));
   cb_trip((&c));
@@ -66,7 +66,7 @@ uint64_t trip_fires() {
 }
 
 uint64_t reset_clears() {
-  CircuitBreaker c __attribute__((unused)) = cb_new(3);
+  CircuitBreaker c __attribute__((unused)) = cb_new(3ULL);
   cb_fail((&c));
   cb_fail((&c));
   cb_trip((&c));
@@ -75,7 +75,7 @@ uint64_t reset_clears() {
 }
 
 uint64_t successes_tracked() {
-  CircuitBreaker c __attribute__((unused)) = cb_new(5);
+  CircuitBreaker c __attribute__((unused)) = cb_new(5ULL);
   cb_success((&c));
   cb_success((&c));
   cb_success((&c));
@@ -83,7 +83,7 @@ uint64_t successes_tracked() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

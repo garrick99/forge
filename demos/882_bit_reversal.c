@@ -18,13 +18,13 @@ int main();
 
 uint64_t reverse_bits(uint64_t val __attribute__((unused)), uint64_t nbits __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
-  uint64_t rev __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t rev __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nbits)) {
-      rev = ((rev * 2) + (v % 2));
-      v = (v / 2);
-      i = (i + 1);
+      rev = ((rev * 2ULL) + (v % 2ULL));
+      v = (v / 2ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -32,7 +32,7 @@ uint64_t reverse_bits(uint64_t val __attribute__((unused)), uint64_t nbits __att
 }
 
 void bit_reversal_permute(forge_span_u64_t s __attribute__((unused)), forge_span_u64_t tmp __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t nbits __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t j __attribute__((unused)) = reverse_bits(i, nbits);
@@ -40,17 +40,17 @@ void bit_reversal_permute(forge_span_u64_t s __attribute__((unused)), forge_span
         tmp.data[i] = s.data[j];
 
       } else {
-        tmp.data[i] = 0;
+        tmp.data[i] = 0ULL;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

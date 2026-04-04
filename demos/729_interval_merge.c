@@ -16,10 +16,10 @@ uint64_t merge_intervals(forge_span_u64_t starts __attribute__((unused)), forge_
 int main();
 
 uint64_t merge_intervals(forge_span_u64_t starts __attribute__((unused)), forge_span_u64_t ends __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t out_s __attribute__((unused)), forge_span_u64_t out_e __attribute__((unused))) {
-  out_s.data[0] = starts.data[0];
-  out_e.data[0] = ends.data[0];
-  uint64_t write __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 1;
+  out_s.data[0ULL] = starts.data[0ULL];
+  out_e.data[0ULL] = ends.data[0ULL];
+  uint64_t write __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((starts.data[i] <= out_e.data[write])) {
@@ -29,20 +29,20 @@ uint64_t merge_intervals(forge_span_u64_t starts __attribute__((unused)), forge_
         }
 
       } else {
-        write = (write + 1);
+        write = (write + 1ULL);
         out_s.data[write] = starts.data[i];
         out_e.data[write] = ends.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
-  return (write + 1);
+  return (write + 1ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

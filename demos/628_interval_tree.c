@@ -33,15 +33,15 @@ uint64_t interval_length(uint64_t lo __attribute__((unused)), uint64_t hi __attr
 }
 
 uint64_t count_covering(forge_span_u64_t lo_arr __attribute__((unused)), forge_span_u64_t hi_arr __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t point __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if (((lo_arr.data[i] <= point) && (point <= hi_arr.data[i]))) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -49,15 +49,15 @@ uint64_t count_covering(forge_span_u64_t lo_arr __attribute__((unused)), forge_s
 }
 
 uint64_t total_coverage(forge_span_u64_t lo_arr __attribute__((unused)), forge_span_u64_t hi_arr __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t total __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t total __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((hi_arr.data[i] >= lo_arr.data[i])) {
         total = (total + (hi_arr.data[i] - lo_arr.data[i]));
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -70,7 +70,7 @@ void merge_interval(uint64_t a_lo __attribute__((unused)), uint64_t a_hi __attri
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -22,7 +22,7 @@ void sha_compress(forge_span_u64_t state __attribute__((unused)), forge_span_u64
 int main();
 
 uint64_t sha_ch(uint64_t x __attribute__((unused)), uint64_t y __attribute__((unused)), uint64_t z __attribute__((unused))) {
-  return ((x & y) ^ ((!x) & z));
+  return ((x & y) ^ ((~x) & z));
 }
 
 uint64_t sha_maj(uint64_t x __attribute__((unused)), uint64_t y __attribute__((unused)), uint64_t z __attribute__((unused))) {
@@ -30,51 +30,51 @@ uint64_t sha_maj(uint64_t x __attribute__((unused)), uint64_t y __attribute__((u
 }
 
 uint64_t rotr(uint64_t x __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  return ((x >> n) | (x << (64 - n)));
+  return ((x >> n) | (x << (64ULL - n)));
 }
 
 uint64_t sha_sigma0(uint64_t x __attribute__((unused))) {
-  return ((rotr(x, 2) ^ rotr(x, 13)) ^ rotr(x, 22));
+  return ((rotr(x, 2ULL) ^ rotr(x, 13ULL)) ^ rotr(x, 22ULL));
 }
 
 uint64_t sha_sigma1(uint64_t x __attribute__((unused))) {
-  return ((rotr(x, 6) ^ rotr(x, 11)) ^ rotr(x, 25));
+  return ((rotr(x, 6ULL) ^ rotr(x, 11ULL)) ^ rotr(x, 25ULL));
 }
 
 void sha_round(forge_span_u64_t state __attribute__((unused)), uint64_t k __attribute__((unused)), uint64_t w __attribute__((unused))) {
-  uint64_t a __attribute__((unused)) = state.data[0];
-  uint64_t b __attribute__((unused)) = state.data[1];
-  uint64_t c __attribute__((unused)) = state.data[2];
-  uint64_t d __attribute__((unused)) = state.data[3];
-  uint64_t e __attribute__((unused)) = state.data[4];
-  uint64_t f __attribute__((unused)) = state.data[5];
-  uint64_t g __attribute__((unused)) = state.data[6];
-  uint64_t h __attribute__((unused)) = state.data[7];
+  uint64_t a __attribute__((unused)) = state.data[0ULL];
+  uint64_t b __attribute__((unused)) = state.data[1ULL];
+  uint64_t c __attribute__((unused)) = state.data[2ULL];
+  uint64_t d __attribute__((unused)) = state.data[3ULL];
+  uint64_t e __attribute__((unused)) = state.data[4ULL];
+  uint64_t f __attribute__((unused)) = state.data[5ULL];
+  uint64_t g __attribute__((unused)) = state.data[6ULL];
+  uint64_t h __attribute__((unused)) = state.data[7ULL];
   uint64_t t1 __attribute__((unused)) = ((((h + sha_sigma1(e)) + sha_ch(e, f, g)) + k) + w);
   uint64_t t2 __attribute__((unused)) = (sha_sigma0(a) + sha_maj(a, b, c));
-  state.data[7] = g;
-  state.data[6] = f;
-  state.data[5] = e;
-  state.data[4] = (d + t1);
-  state.data[3] = c;
-  state.data[2] = b;
-  state.data[1] = a;
-  state.data[0] = (t1 + t2);
+  state.data[7ULL] = g;
+  state.data[6ULL] = f;
+  state.data[5ULL] = e;
+  state.data[4ULL] = (d + t1);
+  state.data[3ULL] = c;
+  state.data[2ULL] = b;
+  state.data[1ULL] = a;
+  state.data[0ULL] = (t1 + t2);
 }
 
 void sha_compress(forge_span_u64_t state __attribute__((unused)), forge_span_u64_t w __attribute__((unused)), forge_span_u64_t k __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < 64)) {
+    while ((i < 64ULL)) {
       sha_round(state, k.data[i], w.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -16,36 +16,36 @@ void downsample(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t d
 int main();
 
 void downsample(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t w __attribute__((unused)), uint64_t h __attribute__((unused))) {
-  uint64_t hw __attribute__((unused)) = (w / 2);
-  uint64_t hh __attribute__((unused)) = (h / 2);
-  uint64_t r __attribute__((unused)) = 0;
+  uint64_t hw __attribute__((unused)) = (w / 2ULL);
+  uint64_t hh __attribute__((unused)) = (h / 2ULL);
+  uint64_t r __attribute__((unused)) = 0ULL;
   {
     while ((r < hh)) {
-      uint64_t c __attribute__((unused)) = 0;
+      uint64_t c __attribute__((unused)) = 0ULL;
       {
         while ((c < hw)) {
-          uint64_t r2 __attribute__((unused)) = (r * 2);
-          uint64_t c2 __attribute__((unused)) = (c * 2);
-          if ((((((r2 * w) + c2) + w) + 1) < (w * h))) {
-            uint64_t avg __attribute__((unused)) = ((((src.data[((r2 * w) + c2)] + src.data[(((r2 * w) + c2) + 1)]) + src.data[(((r2 + 1) * w) + c2)]) + src.data[((((r2 + 1) * w) + c2) + 1)]) / 4);
+          uint64_t r2 __attribute__((unused)) = (r * 2ULL);
+          uint64_t c2 __attribute__((unused)) = (c * 2ULL);
+          if ((((((r2 * w) + c2) + w) + 1ULL) < (w * h))) {
+            uint64_t avg __attribute__((unused)) = ((((src.data[((r2 * w) + c2)] + src.data[(((r2 * w) + c2) + 1ULL)]) + src.data[(((r2 + 1ULL) * w) + c2)]) + src.data[((((r2 + 1ULL) * w) + c2) + 1ULL)]) / 4ULL);
             if ((((r * hw) + c) < (hw * hh))) {
               dst.data[((r * hw) + c)] = avg;
 
             }
 
           }
-          c = (c + 1);
+          c = (c + 1ULL);
         }
 
       }
-      r = (r + 1);
+      r = (r + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

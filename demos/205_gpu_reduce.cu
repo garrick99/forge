@@ -32,18 +32,18 @@ __global__ void reduce_step(forge_span_u64_t s __attribute__((unused)), uint64_t
 int main();
 
 __global__ void reduce_step(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t stride __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while (((i + stride) < n)) {
       s.data[i] = (s.data[i] + s.data[(i + stride)]);
-      i = (i + (stride * 2));
+      i = (i + (stride * 2ULL));
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

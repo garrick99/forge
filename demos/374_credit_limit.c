@@ -27,55 +27,55 @@ uint64_t pay_off();
 int main();
 
 CreditAccount ca_new(uint64_t limit __attribute__((unused))) {
-  return (CreditAccount){ .limit = limit, .debt = 0, .payments = 0, .purchases = 0 };
+  return (CreditAccount){ .limit = limit, .debt = 0ULL, .payments = 0ULL, .purchases = 0ULL };
 }
 
 void ca_purchase(CreditAccount* c __attribute__((unused)), uint64_t amount __attribute__((unused))) {
   (*c).debt = ((*c).debt + amount);
-  (*c).purchases = ((*c).purchases + 1);
+  (*c).purchases = ((*c).purchases + 1ULL);
 }
 
 void ca_pay(CreditAccount* c __attribute__((unused)), uint64_t amount __attribute__((unused))) {
   (*c).debt = ((*c).debt - amount);
-  (*c).payments = ((*c).payments + 1);
+  (*c).payments = ((*c).payments + 1ULL);
 }
 
 uint64_t purchase_200() {
-  CreditAccount c __attribute__((unused)) = ca_new(500);
-  ca_purchase((&c), 200);
+  CreditAccount c __attribute__((unused)) = ca_new(500ULL);
+  ca_purchase((&c), 200ULL);
   return c.debt;
 }
 
 uint64_t available_credit() {
-  CreditAccount c __attribute__((unused)) = ca_new(500);
-  ca_purchase((&c), 200);
+  CreditAccount c __attribute__((unused)) = ca_new(500ULL);
+  ca_purchase((&c), 200ULL);
   return (c.limit - c.debt);
 }
 
 uint64_t purchase_pay() {
-  CreditAccount c __attribute__((unused)) = ca_new(500);
-  ca_purchase((&c), 300);
-  ca_pay((&c), 100);
+  CreditAccount c __attribute__((unused)) = ca_new(500ULL);
+  ca_purchase((&c), 300ULL);
+  ca_pay((&c), 100ULL);
   return c.debt;
 }
 
 uint64_t purchase_count() {
-  CreditAccount c __attribute__((unused)) = ca_new(500);
-  ca_purchase((&c), 100);
-  ca_purchase((&c), 50);
-  ca_purchase((&c), 75);
+  CreditAccount c __attribute__((unused)) = ca_new(500ULL);
+  ca_purchase((&c), 100ULL);
+  ca_purchase((&c), 50ULL);
+  ca_purchase((&c), 75ULL);
   return c.purchases;
 }
 
 uint64_t pay_off() {
-  CreditAccount c __attribute__((unused)) = ca_new(500);
-  ca_purchase((&c), 300);
-  ca_pay((&c), 300);
+  CreditAccount c __attribute__((unused)) = ca_new(500ULL);
+  ca_purchase((&c), 300ULL);
+  ca_pay((&c), 300ULL);
   return (c.limit - c.debt);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

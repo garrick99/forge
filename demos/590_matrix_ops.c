@@ -23,12 +23,12 @@ uint64_t mat_get(forge_span_u64_t m __attribute__((unused)), uint64_t rows __att
 }
 
 void mat_fill(forge_span_u64_t m __attribute__((unused)), uint64_t rows __attribute__((unused)), uint64_t cols __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   uint64_t total __attribute__((unused)) = (rows * cols);
   {
     while ((i < total)) {
       m.data[i] = val;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -36,12 +36,12 @@ void mat_fill(forge_span_u64_t m __attribute__((unused)), uint64_t rows __attrib
 
 uint64_t mat_row_sum(forge_span_u64_t m __attribute__((unused)), uint64_t cols __attribute__((unused)), uint64_t row __attribute__((unused))) {
   uint64_t base __attribute__((unused)) = (row * cols);
-  uint64_t s __attribute__((unused)) = 0;
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t s __attribute__((unused)) = 0ULL;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < cols)) {
       s = (s + m.data[(base + j)]);
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
@@ -49,12 +49,12 @@ uint64_t mat_row_sum(forge_span_u64_t m __attribute__((unused)), uint64_t cols _
 }
 
 uint64_t mat_col_sum(forge_span_u64_t m __attribute__((unused)), uint64_t rows __attribute__((unused)), uint64_t cols __attribute__((unused)), uint64_t col __attribute__((unused))) {
-  uint64_t s __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t s __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < rows)) {
       s = (s + m.data[((i * cols) + col)]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -62,7 +62,7 @@ uint64_t mat_col_sum(forge_span_u64_t m __attribute__((unused)), uint64_t rows _
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

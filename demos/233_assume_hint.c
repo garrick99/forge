@@ -16,9 +16,9 @@ uint64_t sum_with_hint(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 int main();
 
 uint64_t sum_with_hint(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = s.data[0];
+  uint64_t acc __attribute__((unused)) = s.data[0ULL];
   {
-    for (uint64_t i = (uint64_t)(1); i < (uint64_t)(n); i++) {
+    for (uint64_t i = (uint64_t)(1ULL); i < (uint64_t)(n); i++) {
       acc = (acc + s.data[i]);
     }
 
@@ -27,7 +27,7 @@ uint64_t sum_with_hint(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

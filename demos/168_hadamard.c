@@ -17,18 +17,18 @@ int main();
 
 void hadamard(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t max_prod __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = a.len;
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while ((k < n)) {
       out.data[k] = (a.data[k] * b.data[k]);
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

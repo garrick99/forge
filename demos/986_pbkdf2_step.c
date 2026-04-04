@@ -16,33 +16,33 @@ void pbkdf2_iterate(forge_span_u64_t state __attribute__((unused)), forge_span_u
 int main();
 
 void pbkdf2_iterate(forge_span_u64_t state __attribute__((unused)), forge_span_u64_t salt __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t iterations __attribute__((unused)), uint64_t modulus __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       state.data[i] = (salt.data[i] % modulus);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t iter __attribute__((unused)) = 0;
+  uint64_t iter __attribute__((unused)) = 0ULL;
   {
     while ((iter < iterations)) {
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < n)) {
-          state.data[j] = (((state.data[j] * 31) + 17) % modulus);
-          j = (j + 1);
+          state.data[j] = (((state.data[j] * 31ULL) + 17ULL) % modulus);
+          j = (j + 1ULL);
         }
 
       }
-      iter = (iter + 1);
+      iter = (iter + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

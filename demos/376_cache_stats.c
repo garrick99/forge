@@ -25,15 +25,15 @@ uint64_t all_misses();
 int main();
 
 CacheStats cs_new() {
-  return (CacheStats){ .hits = 0, .misses = 0 };
+  return (CacheStats){ .hits = 0ULL, .misses = 0ULL };
 }
 
 void cs_hit(CacheStats* c __attribute__((unused))) {
-  (*c).hits = ((*c).hits + 1);
+  (*c).hits = ((*c).hits + 1ULL);
 }
 
 void cs_miss(CacheStats* c __attribute__((unused))) {
-  (*c).misses = ((*c).misses + 1);
+  (*c).misses = ((*c).misses + 1ULL);
 }
 
 uint64_t five_hits() {
@@ -85,7 +85,7 @@ uint64_t all_misses() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

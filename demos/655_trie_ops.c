@@ -19,28 +19,28 @@ uint64_t count_keys_in_range(forge_span_u64_t keys __attribute__((unused)), uint
 int main();
 
 uint64_t trie_prefix_count(forge_span_u64_t keys __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t prefix __attribute__((unused)), uint64_t prefix_bits __attribute__((unused))) {
-  uint64_t shift __attribute__((unused)) = (64 - prefix_bits);
+  uint64_t shift __attribute__((unused)) = (64ULL - prefix_bits);
   uint64_t mask;
-  if ((prefix_bits == 0)) {
-    mask = 0;
+  if ((prefix_bits == 0ULL)) {
+    mask = 0ULL;
   } else {
     mask = prefix;
   }
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t key_prefix;
-      if ((prefix_bits == 0)) {
-        key_prefix = 0;
+      if ((prefix_bits == 0ULL)) {
+        key_prefix = 0ULL;
       } else {
         key_prefix = (keys.data[i] >> shift);
       }
       if ((key_prefix == mask)) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -48,17 +48,17 @@ uint64_t trie_prefix_count(forge_span_u64_t keys __attribute__((unused)), uint64
 }
 
 _Bool key_in_sorted(forge_span_u64_t keys __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
   uint64_t hi __attribute__((unused)) = n;
   _Bool found __attribute__((unused)) = 0;
   {
     while (((lo < hi) && (!found))) {
-      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2));
+      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2ULL));
       if ((keys.data[mid] == target)) {
         found = 1;
 
       } else if ((keys.data[mid] < target)) {
-        lo = (mid + 1);
+        lo = (mid + 1ULL);
 
       } else {
         hi = mid;
@@ -72,14 +72,14 @@ _Bool key_in_sorted(forge_span_u64_t keys __attribute__((unused)), uint64_t n __
 
 _Bool keys_all_unique(forge_span_u64_t keys __attribute__((unused)), uint64_t n __attribute__((unused))) {
   _Bool ok __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((((i + 1) < n) && ok)) {
-      if ((keys.data[i] == keys.data[(i + 1)])) {
+    while ((((i + 1ULL) < n) && ok)) {
+      if ((keys.data[i] == keys.data[(i + 1ULL)])) {
         ok = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -87,15 +87,15 @@ _Bool keys_all_unique(forge_span_u64_t keys __attribute__((unused)), uint64_t n 
 }
 
 uint64_t count_keys_in_range(forge_span_u64_t keys __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if (((keys.data[i] >= lo) && (keys.data[i] <= hi))) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -103,7 +103,7 @@ uint64_t count_keys_in_range(forge_span_u64_t keys __attribute__((unused)), uint
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

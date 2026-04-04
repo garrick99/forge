@@ -31,36 +31,36 @@ uint64_t multi_bound(const void* x __attribute__((unused)));
 int main();
 
 uint64_t Color__Hashable__hash(const Color* self __attribute__((unused))) {
-  return ((((*self).r * 1009) + ((*self).g * 97)) + (*self).b);
+  return ((((*self).r * 1009ULL) + ((*self).g * 97ULL)) + (*self).b);
 }
 
 uint64_t Color__Printable__label(const Color* self __attribute__((unused))) {
-  return 3;
+  return 3ULL;
 }
 
 uint64_t Tag__Hashable__hash(const Tag* self __attribute__((unused))) {
-  return ((*self).id * 31);
+  return ((*self).id * 31ULL);
 }
 
 uint64_t Tag__Printable__label(const Tag* self __attribute__((unused))) {
-  return 7;
+  return 7ULL;
 }
 
 uint64_t hash_inline(const void* x __attribute__((unused))) {
-  return 0;
+  return 0ULL;
 }
 
 uint64_t hash_where(const void* x __attribute__((unused))) {
-  return 0;
+  return 0ULL;
 }
 
 uint64_t multi_bound(const void* x __attribute__((unused))) {
-  return 0;
+  return 0ULL;
 }
 
 int main() {
-  Color c __attribute__((unused)) = (Color){ .r = 10, .g = 20, .b = 30 };
-  Tag t __attribute__((unused)) = (Tag){ .id = 5 };
+  Color c __attribute__((unused)) = (Color){ .r = 10ULL, .g = 20ULL, .b = 30ULL };
+  Tag t __attribute__((unused)) = (Tag){ .id = 5ULL };
   uint64_t _a __attribute__((unused)) = hash_inline((&c));
   uint64_t _b __attribute__((unused)) = hash_where((&t));
   uint64_t _c __attribute__((unused)) = multi_bound((&c));

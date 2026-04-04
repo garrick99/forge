@@ -28,16 +28,16 @@ uint64_t outstanding();
 int main();
 
 PacketWindow pw_new() {
-  return (PacketWindow){ .next_seq = 0, .acked_upto = 0, .new_sends = 0, .retransmits = 0, .total_acked = 0 };
+  return (PacketWindow){ .next_seq = 0ULL, .acked_upto = 0ULL, .new_sends = 0ULL, .retransmits = 0ULL, .total_acked = 0ULL };
 }
 
 void pw_send(PacketWindow* p __attribute__((unused))) {
-  (*p).next_seq = ((*p).next_seq + 1);
-  (*p).new_sends = ((*p).new_sends + 1);
+  (*p).next_seq = ((*p).next_seq + 1ULL);
+  (*p).new_sends = ((*p).new_sends + 1ULL);
 }
 
 void pw_retransmit(PacketWindow* p __attribute__((unused))) {
-  (*p).retransmits = ((*p).retransmits + 1);
+  (*p).retransmits = ((*p).retransmits + 1ULL);
 }
 
 void pw_ack(PacketWindow* p __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -68,7 +68,7 @@ uint64_t ack_advances() {
   pw_send((&p));
   pw_send((&p));
   pw_send((&p));
-  pw_ack((&p), 2);
+  pw_ack((&p), 2ULL);
   return p.acked_upto;
 }
 
@@ -77,12 +77,12 @@ uint64_t outstanding() {
   pw_send((&p));
   pw_send((&p));
   pw_send((&p));
-  pw_ack((&p), 2);
+  pw_ack((&p), 2ULL);
   return (p.next_seq - p.acked_upto);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

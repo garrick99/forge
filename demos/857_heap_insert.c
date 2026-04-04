@@ -19,8 +19,8 @@ int main();
 uint64_t heap_sift_up(forge_span_u64_t heap __attribute__((unused)), uint64_t sz __attribute__((unused))) {
   uint64_t i __attribute__((unused)) = sz;
   {
-    while ((i > 0)) {
-      uint64_t parent __attribute__((unused)) = ((i - 1) / 2);
+    while ((i > 0ULL)) {
+      uint64_t parent __attribute__((unused)) = ((i - 1ULL) / 2ULL);
       if (((parent < sz) && (heap.data[i] < heap.data[parent]))) {
         uint64_t tmp __attribute__((unused)) = heap.data[i];
         heap.data[i] = heap.data[parent];
@@ -28,7 +28,7 @@ uint64_t heap_sift_up(forge_span_u64_t heap __attribute__((unused)), uint64_t sz
         i = parent;
 
       } else {
-        i = 0;
+        i = 0ULL;
 
       }
     }
@@ -40,11 +40,11 @@ uint64_t heap_sift_up(forge_span_u64_t heap __attribute__((unused)), uint64_t sz
 uint64_t heap_insert(forge_span_u64_t heap __attribute__((unused)), uint64_t sz __attribute__((unused)), uint64_t val __attribute__((unused))) {
   heap.data[sz] = val;
   uint64_t _pos __attribute__((unused)) = heap_sift_up(heap, sz);
-  return (sz + 1);
+  return (sz + 1ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

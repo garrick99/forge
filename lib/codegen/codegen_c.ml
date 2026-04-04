@@ -257,6 +257,14 @@ let collect_fn_ptr_types items =
 
 let enum_ctors : (string * (string * int * ty list)) list ref = ref []
 
+(* Set of type names that are unions (not structs).
+   Used by EStruct emission to emit only one field initializer. *)
+let union_types : string list ref = ref []
+
+(* Set of function names declared as system externs (from <header.h>).
+   These must NOT be mangled by c_safe_name at call sites. *)
+let system_extern_names : string list ref = ref []
+
 (* Maps enum_cname -> variant_names in tag order.
    Used by or_return / or_fail to identify Ok/Err variants. *)
 let enum_order : (string * string list) list ref = ref []
@@ -266,7 +274,9 @@ let enum_order : (string * string list) list ref = ref []
    that never calls emit_program / build_enum_registry). *)
 let reset_codegen_state () =
   enum_ctors := [];
-  enum_order := []
+  enum_order := [];
+  union_types := [];
+  system_extern_names := []
 
 let build_enum_registry items =
   enum_ctors := [];
@@ -446,11 +456,18 @@ let c_keywords = [
   (* Common extensions / C23 keywords used in FORGE-generated headers *)
   "alignas"; "alignof"; "bool"; "noreturn"; "static_assert"; "thread_local";
   (* CUDA extensions that FORGE emits *)
-  "__global__"; "__device__"; "__host__"; "__shared__"; "__restrict__"
+  "__global__"; "__device__"; "__host__"; "__shared__"; "__restrict__";
+  (* C standard library builtins — GCC has built-in prototypes for these *)
+  "pow"; "powf"; "sqrt"; "sqrtf"; "sin"; "cos"; "exp"; "log"; "fabs";
+  "memcpy"; "memset"; "memcmp"; "memmove"; "calloc"; "malloc"; "realloc";
+  "free"; "abort"; "exit"; "strlen"; "strcpy"; "strcat"; "strcmp"
 ]
 
 let c_safe_name name =
-  if List.mem name c_keywords then "forge_" ^ name else name
+  (* Don't mangle names that are system externs (e.g. sqrt from <math.h>) —
+     they must keep their original C names for the linker. *)
+  if List.mem name !system_extern_names then name
+  else if List.mem name c_keywords then "forge_" ^ name else name
 
 (* Counter for unique loop-result variable names *)
 let loop_result_counter : int ref = ref 0
@@ -465,7 +482,28 @@ let fn_first_param_is_ref : (string, bool) Hashtbl.t = Hashtbl.create 64
 
 let rec emit_expr depth e =
   match e.expr_desc with
-  | ELit (LInt (n, _))    -> Int64.to_string n
+  | ELit (LInt (n, hint))    ->
+      (* Emit integer literals with proper C suffixes to avoid overflow warnings.
+         OCaml int64 is signed, but Forge u64 values above INT64_MAX wrap negative.
+         Detect unsigned types and emit the unsigned representation. *)
+      let is_unsigned = match hint with
+        | Some (TUint _) -> true
+        | _ -> match e.expr_ty with
+          | Some (TPrim (TUint _)) | Some (TRefined (TUint _, _, _)) -> true
+          | _ -> false
+      in
+      if is_unsigned && Int64.compare n 0L < 0 then
+        (* Negative int64 representing a large u64 value — emit as hex ULL *)
+        Printf.sprintf "0x%LxULL" n
+      else if not is_unsigned && n = Int64.min_int then
+        (* INT64_MIN can't be written as -9223372036854775808 in C *)
+        "(-9223372036854775807LL - 1LL)"
+      else if is_unsigned then
+        (* All unsigned literals get ULL suffix to prevent int-arithmetic overflow
+           when used in expressions like 65536 * 65536 (would overflow int without suffix) *)
+        Int64.to_string n ^ "ULL"
+      else
+        Int64.to_string n
   | ELit (LFloat (f, _))  -> Printf.sprintf "%g" f
   | ELit (LBool true)     -> "1"
   | ELit (LBool false)    -> "0"
@@ -498,6 +536,22 @@ let rec emit_expr depth e =
       else
         id.name   (* has fields but used as var — unusual, just fall through *)
   | EVar id               -> c_safe_name id.name
+  (* Self-comparison tautology: x == x → 1, x != x → 0.
+     FORGE uses these idioms as proven-true/false values; GCC rejects them
+     under -Wtautological-compare.
+     Also catches commutative tautologies: (a+b)==(b+a), (a*b)==(b*a). *)
+  | EBinop (Eq, l, r) when emit_expr depth l = emit_expr depth r -> "1"
+  | EBinop (Ne, l, r) when emit_expr depth l = emit_expr depth r -> "0"
+  | EBinop (Eq, l, r) when (match l.expr_desc, r.expr_desc with
+      | EBinop (op1, a, b), EBinop (op2, c, d)
+        when op1 = op2 && (op1 = Add || op1 = Mul || op1 = BitAnd || op1 = BitOr || op1 = BitXor) ->
+          emit_expr depth a = emit_expr depth d && emit_expr depth b = emit_expr depth c
+      | _ -> false) -> "1"
+  | EBinop (Ne, l, r) when (match l.expr_desc, r.expr_desc with
+      | EBinop (op1, a, b), EBinop (op2, c, d)
+        when op1 = op2 && (op1 = Add || op1 = Mul || op1 = BitAnd || op1 = BitOr || op1 = BitXor) ->
+          emit_expr depth a = emit_expr depth d && emit_expr depth b = emit_expr depth c
+      | _ -> false) -> "0"
   | EBinop (Implies, l, r) ->
       (* a ==> b  ≡  !a || b  (correct C for implication) *)
       Printf.sprintf "(!%s || %s)" (emit_expr depth l) (emit_expr depth r)
@@ -511,6 +565,16 @@ let rec emit_expr depth e =
   | EBinop (op, l, r)     ->
       Printf.sprintf "(%s %s %s)"
         (emit_expr depth l) (binop_str op) (emit_expr depth r)
+  | EUnop (Not, inner) ->
+      (* Forge '!' on integer types is bitwise NOT (~), on bool it's logical NOT (!) *)
+      let is_bool = match inner.expr_ty with
+        | Some (TPrim TBool) | Some (TRefined (TBool, _, _)) -> true
+        | _ -> false
+      in
+      if is_bool then
+        Printf.sprintf "(!%s)" (emit_expr depth inner)
+      else
+        Printf.sprintf "(~%s)" (emit_expr depth inner)
   | EUnop (op, e)         ->
       Printf.sprintf "(%s%s)" (unop_str op) (emit_expr depth e)
   | ECall ({ expr_desc = EVar ctor_id; _ }, args)
@@ -701,7 +765,18 @@ let rec emit_expr depth e =
           | Some resolved -> resolved
           | None          -> base_mangled
       in
-      if mangled <> "" then
+      (* Check if this is a real method (registered function) or a field of fn-ptr type.
+         If the mangled name isn't in fn_first_param_is_ref or method_map,
+         it's a struct field holding a function pointer — emit as obj.field(args). *)
+      let is_known_method =
+        mangled <> "" && (
+          Hashtbl.mem fn_first_param_is_ref mangled ||
+          List.mem_assoc base_mangled !method_map ||
+          (let resolved = match List.assoc_opt mangled !method_map with
+             | Some r -> r | None -> mangled
+           in Hashtbl.mem fn_first_param_is_ref resolved))
+      in
+      if is_known_method then
         let obj_str = emit_expr depth obj in
         (* Determine if the resolved function expects ref<T> or refmut<T> as first param. *)
         let resolved_name = match List.assoc_opt mangled !method_map with
@@ -822,10 +897,15 @@ let rec emit_expr depth e =
   | EMatch (e, arms) ->
       emit_match depth e arms
   | EStruct (name, fields) ->
-      (* Emit C designated initializer: (TypeName){ .field = val, ... } *)
+      (* Emit C designated initializer: (TypeName){ .field = val, ... }
+         For unions, emit only the first field to avoid -Woverride-init. *)
+      let is_union = List.mem name.name !union_types in
+      let init_fields = if is_union then
+        (match fields with f :: _ -> [f] | [] -> [])
+      else fields in
       let field_strs = List.map (fun (fname, fexpr) ->
         Printf.sprintf ".%s = %s" fname.name (emit_expr depth fexpr)
-      ) fields in
+      ) init_fields in
       Printf.sprintf "(%s){ %s }" name.name (String.concat ", " field_strs)
   | EProof _  -> "/* proof erased */"
   | ERaw rb   ->
@@ -1387,9 +1467,20 @@ and emit_match_as_assign lhs depth scrut arms =
 
 and emit_stmt depth s =
   match s.stmt_desc with
-  | SGhost _ | SGhostAssign _ ->
-      (* Ghost bindings and ghost assignments exist only in the proof context — erased from C. *)
-      ""
+  | SGhost (id, ty_opt, e) ->
+      (* Ghost bindings may be referenced by non-ghost code (e.g. ghost min tracking).
+         Emit as regular C variable declaration so the variable is available. *)
+      let ann_ty = match ty_opt with Some t -> Some t | None -> e.expr_ty in
+      let ty_str = match ann_ty with
+        | Some t -> emit_ty t
+        | None   -> Printf.sprintf "__typeof__(%s)" (emit_expr depth e)
+      in
+      Printf.sprintf "%s%s %s __attribute__((unused)) = %s;"
+        (indent depth) ty_str (c_safe_name id.name) (emit_expr depth e)
+  | SGhostAssign (id, e) ->
+      (* Ghost assignments — emit as regular C assignment *)
+      Printf.sprintf "%s%s = %s;"
+        (indent depth) (c_safe_name id.name) (emit_expr depth e)
   | SLet (id, ty, e, _lin) ->
       let ann_ty = match ty with Some t -> Some t | None -> e.expr_ty in
       (match ann_ty with
@@ -1405,7 +1496,7 @@ and emit_stmt depth s =
            (* Stack-allocated fixed array: T name[N] = init; *)
            let n_str   = emit_expr depth n_expr in
            let init_str = emit_expr depth e in
-           Printf.sprintf "%s%s %s[%s] = %s;"
+           Printf.sprintf "%s%s %s[%s] __attribute__((unused)) = %s;"
              (indent depth) (emit_ty elem_ty) (c_safe_name id.name) n_str init_str
        | _ ->
            (* '_' is a throwaway — emit as (void) cast to suppress unused warnings
@@ -1745,13 +1836,13 @@ let emit_struct sd =
   if has_type_params then "" else begin
     let buf = Buffer.create 256 in
     let keyword = if sd.sd_is_union then "union" else "struct" in
-    Buffer.add_string buf (Printf.sprintf "typedef %s %s {\n" keyword sd.sd_name.name);
+    let packed_attr = if sd.sd_is_packed then " __attribute__((packed))" else "" in
+    Buffer.add_string buf (Printf.sprintf "typedef %s%s %s {\n" keyword packed_attr sd.sd_name.name);
     List.iter (fun (id, ty) ->
       Buffer.add_string buf
         (Printf.sprintf "  %s %s;\n" (emit_ty ty) id.name)
     ) sd.sd_fields;
-    let packed_attr = if sd.sd_is_packed then " __attribute__((packed))" else "" in
-    Buffer.add_string buf (Printf.sprintf "} %s%s;\n" sd.sd_name.name packed_attr);
+    Buffer.add_string buf (Printf.sprintf "} %s;\n" sd.sd_name.name);
     Buffer.contents buf
   end
 
@@ -2019,6 +2110,18 @@ let emit_program prog =
   compute_device_fns prog.prog_items;
   (* Build enum constructor registry before any emission *)
   build_enum_registry prog.prog_items;
+  (* Build union type registry *)
+  union_types := List.filter_map (fun item ->
+    match item.item_desc with
+    | IStruct sd when sd.sd_is_union -> Some sd.sd_name.name
+    | _ -> None
+  ) prog.prog_items;
+  (* Build system extern name registry — these must NOT be mangled *)
+  system_extern_names := List.filter_map (fun item ->
+    match item.item_desc with
+    | IExtern ex when is_system_extern ex -> Some ex.ex_name.name
+    | _ -> None
+  ) prog.prog_items;
   (* Build fn_first_param_is_ref: true if first param is ref<T> or refmut<T> *)
   Hashtbl.clear fn_first_param_is_ref;
   let register_fn_params prefix (fn : fn_def) =
@@ -2143,6 +2246,22 @@ let emit_program prog =
     ) (List.rev generic_instances);
     Buffer.add_char buf '\n'
   end;
+  (* Emit function pointer typedefs BEFORE struct defs, because structs may
+     contain fn-ptr-typed fields (e.g. forge_fn_u64_ret_u64_t). *)
+  let fn_ptr_types = collect_fn_ptr_types prog.prog_items in
+  if fn_ptr_types <> [] then begin
+    Buffer.add_string buf "/* Function pointer typedefs */\n";
+    List.iter (fun (key, fty) ->
+      let ret_str = emit_ty fty.ret in
+      let params_str =
+        if fty.params = [] then "void"
+        else String.concat ", " (List.map (fun (_, t) -> emit_ty t) fty.params)
+      in
+      Buffer.add_string buf
+        (Printf.sprintf "typedef %s (*forge_%s_t)(%s);\n" ret_str key params_str)
+    ) (List.rev fn_ptr_types);
+    Buffer.add_char buf '\n'
+  end;
   (* Emit type definitions (struct, enum, typedef, extern) — after span typedefs
      so structs that contain span<T> fields can reference forge_span_T_t.
      Generic enums are skipped here (already emitted above after monomorphization).
@@ -2169,21 +2288,6 @@ let emit_program prog =
         (Printf.sprintf "typedef struct { %s } %s;\n"
            (String.concat " " fields) (emit_ty tup_ty))
     ) (List.rev tuple_types);
-    Buffer.add_char buf '\n'
-  end;
-  (* Emit function pointer typedefs for each unique fn(...)->T type used *)
-  let fn_ptr_types = collect_fn_ptr_types prog.prog_items in
-  if fn_ptr_types <> [] then begin
-    Buffer.add_string buf "/* Function pointer typedefs */\n";
-    List.iter (fun (key, fty) ->
-      let ret_str = emit_ty fty.ret in
-      let params_str =
-        if fty.params = [] then "void"
-        else String.concat ", " (List.map (fun (_, t) -> emit_ty t) fty.params)
-      in
-      Buffer.add_string buf
-        (Printf.sprintf "typedef %s (*forge_%s_t)(%s);\n" ret_str key params_str)
-    ) (List.rev fn_ptr_types);
     Buffer.add_char buf '\n'
   end;
   (* Emit own<T> heap helpers for each unique element type.

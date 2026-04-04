@@ -26,22 +26,22 @@ uint64_t total_ticks();
 int main();
 
 RingCounter rc_new(uint64_t modulus __attribute__((unused))) {
-  return (RingCounter){ .value = 0, .modulus = modulus, .laps = 0, .ticks = 0 };
+  return (RingCounter){ .value = 0ULL, .modulus = modulus, .laps = 0ULL, .ticks = 0ULL };
 }
 
 void rc_tick(RingCounter* r __attribute__((unused))) {
-  (*r).value = ((*r).value + 1);
-  (*r).ticks = ((*r).ticks + 1);
+  (*r).value = ((*r).value + 1ULL);
+  (*r).ticks = ((*r).ticks + 1ULL);
 }
 
 void rc_tick_wrap(RingCounter* r __attribute__((unused))) {
-  (*r).value = 0;
-  (*r).laps = ((*r).laps + 1);
-  (*r).ticks = ((*r).ticks + 1);
+  (*r).value = 0ULL;
+  (*r).laps = ((*r).laps + 1ULL);
+  (*r).ticks = ((*r).ticks + 1ULL);
 }
 
 uint64_t three_ticks() {
-  RingCounter r __attribute__((unused)) = rc_new(5);
+  RingCounter r __attribute__((unused)) = rc_new(5ULL);
   rc_tick((&r));
   rc_tick((&r));
   rc_tick((&r));
@@ -49,7 +49,7 @@ uint64_t three_ticks() {
 }
 
 uint64_t wrap_resets() {
-  RingCounter r __attribute__((unused)) = rc_new(4);
+  RingCounter r __attribute__((unused)) = rc_new(4ULL);
   rc_tick((&r));
   rc_tick((&r));
   rc_tick((&r));
@@ -58,7 +58,7 @@ uint64_t wrap_resets() {
 }
 
 uint64_t two_laps() {
-  RingCounter r __attribute__((unused)) = rc_new(3);
+  RingCounter r __attribute__((unused)) = rc_new(3ULL);
   rc_tick((&r));
   rc_tick((&r));
   rc_tick_wrap((&r));
@@ -69,7 +69,7 @@ uint64_t two_laps() {
 }
 
 uint64_t total_ticks() {
-  RingCounter r __attribute__((unused)) = rc_new(3);
+  RingCounter r __attribute__((unused)) = rc_new(3ULL);
   rc_tick((&r));
   rc_tick((&r));
   rc_tick_wrap((&r));
@@ -80,7 +80,7 @@ uint64_t total_ticks() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

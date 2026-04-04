@@ -17,23 +17,23 @@ uint64_t hmac_combine(forge_span_u64_t inner __attribute__((unused)), forge_span
 int main();
 
 void xor_pad(forge_span_u64_t key __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t pad __attribute__((unused)), uint64_t modulus __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       out.data[i] = ((key.data[i] ^ pad) % modulus);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t hmac_combine(forge_span_u64_t inner __attribute__((unused)), forge_span_u64_t outer __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t modulus __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (((acc ^ inner.data[i]) ^ outer.data[i]) % modulus);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -41,7 +41,7 @@ uint64_t hmac_combine(forge_span_u64_t inner __attribute__((unused)), forge_span
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

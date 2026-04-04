@@ -51,7 +51,7 @@ Interval interval_intersect(const Interval* a __attribute__((unused)), const Int
   if ((lo <= hi)) {
     return (Interval){ .lo = lo, .hi = hi };
   } else {
-    return (Interval){ .lo = 1, .hi = 0 };
+    return (Interval){ .lo = 1ULL, .hi = 0ULL };
   }
 }
 
@@ -76,11 +76,11 @@ _Bool interval_is_empty(const Interval* iv __attribute__((unused))) {
 }
 
 uint64_t interval_midpoint(const Interval* iv __attribute__((unused))) {
-  return ((*iv).lo + (((*iv).hi - (*iv).lo) / 2));
+  return ((*iv).lo + (((*iv).hi - (*iv).lo) / 2ULL));
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

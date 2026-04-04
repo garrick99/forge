@@ -33,11 +33,11 @@ double dot_product(const Point* a __attribute__((unused)), const Point* b __attr
 }
 
 void increment(uint64_t* x __attribute__((unused))) {
-  (*x) = ((*x) + 1);
+  (*x) = ((*x) + 1ULL);
 }
 
 void double_val(uint64_t* x __attribute__((unused))) {
-  (*x) = ((*x) * 2);
+  (*x) = ((*x) * 2ULL);
 }
 
 void set_to(uint64_t* x __attribute__((unused)), uint64_t val __attribute__((unused))) {

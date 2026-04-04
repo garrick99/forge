@@ -16,12 +16,12 @@ uint64_t gershgorin_max(forge_span_u64_t mat __attribute__((unused)), forge_span
 int main();
 
 uint64_t gershgorin_max(forge_span_u64_t mat __attribute__((unused)), forge_span_u64_t diag __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t max_bound __attribute__((unused)) = diag.data[0];
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t max_bound __attribute__((unused)) = diag.data[0ULL];
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t radius __attribute__((unused)) = 0;
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t radius __attribute__((unused)) = 0ULL;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < n)) {
           if ((j != i)) {
@@ -32,7 +32,7 @@ uint64_t gershgorin_max(forge_span_u64_t mat __attribute__((unused)), forge_span
             }
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
@@ -41,7 +41,7 @@ uint64_t gershgorin_max(forge_span_u64_t mat __attribute__((unused)), forge_span
         max_bound = bound;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -49,7 +49,7 @@ uint64_t gershgorin_max(forge_span_u64_t mat __attribute__((unused)), forge_span
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

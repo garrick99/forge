@@ -42,7 +42,7 @@ uint8_t check_to_upper();
 int main();
 
 Str str_new(forge_span_u8_t data __attribute__((unused))) {
-  return (Str){ .data = data, .len = 0 };
+  return (Str){ .data = data, .len = 0ULL };
 }
 
 uint64_t str_len(const Str* s __attribute__((unused))) {
@@ -54,7 +54,7 @@ uint64_t str_capacity(const Str* s __attribute__((unused))) {
 }
 
 _Bool str_is_empty(const Str* s __attribute__((unused))) {
-  return ((*s).len == 0);
+  return ((*s).len == 0ULL);
 }
 
 uint8_t str_at(const Str* s __attribute__((unused)), uint64_t i __attribute__((unused))) {
@@ -63,11 +63,11 @@ uint8_t str_at(const Str* s __attribute__((unused)), uint64_t i __attribute__((u
 
 void str_push(Str* s __attribute__((unused)), uint8_t b __attribute__((unused))) {
   (*s).data.data[(*s).len] = b;
-  (*s).len = ((*s).len + 1);
+  (*s).len = ((*s).len + 1ULL);
 }
 
 void str_clear(Str* s __attribute__((unused))) {
-  (*s).len = 0;
+  (*s).len = 0ULL;
 }
 
 _Bool byte_eq(uint8_t a __attribute__((unused)), uint8_t b __attribute__((unused))) {
@@ -75,36 +75,36 @@ _Bool byte_eq(uint8_t a __attribute__((unused)), uint8_t b __attribute__((unused
 }
 
 _Bool str_starts_with_byte(const Str* s __attribute__((unused)), uint8_t b __attribute__((unused))) {
-  if (((*s).len > 0)) {
-    return ((*s).data.data[0] == b);
+  if (((*s).len > 0ULL)) {
+    return ((*s).data.data[0ULL] == b);
   } else {
     return 0;
   }
 }
 
 _Bool is_ascii_digit(uint8_t b __attribute__((unused))) {
-  return ((b >= 48) && (b <= 57));
+  return ((b >= 48ULL) && (b <= 57ULL));
 }
 
 _Bool is_ascii_lower(uint8_t b __attribute__((unused))) {
-  return ((b >= 97) && (b <= 122));
+  return ((b >= 97ULL) && (b <= 122ULL));
 }
 
 _Bool is_ascii_upper(uint8_t b __attribute__((unused))) {
-  return ((b >= 65) && (b <= 90));
+  return ((b >= 65ULL) && (b <= 90ULL));
 }
 
 uint8_t to_ascii_lower(uint8_t b __attribute__((unused))) {
-  if (((b >= 65) && (b <= 90))) {
-    return (b + 32);
+  if (((b >= 65ULL) && (b <= 90ULL))) {
+    return (b + 32ULL);
   } else {
     return b;
   }
 }
 
 uint8_t to_ascii_upper(uint8_t b __attribute__((unused))) {
-  if (((b >= 97) && (b <= 122))) {
-    return (b - 32);
+  if (((b >= 97ULL) && (b <= 122ULL))) {
+    return (b - 32ULL);
   } else {
     return b;
   }
@@ -117,38 +117,38 @@ uint64_t check_new_len(forge_span_u8_t data __attribute__((unused))) {
 
 uint64_t check_push_len(forge_span_u8_t data __attribute__((unused))) {
   Str s __attribute__((unused)) = str_new(data);
-  str_push((&s), 72);
-  str_push((&s), 105);
-  str_push((&s), 33);
+  str_push((&s), 72ULL);
+  str_push((&s), 105ULL);
+  str_push((&s), 33ULL);
   return str_len((&s));
 }
 
 _Bool check_is_digit() {
-  return is_ascii_digit(57);
+  return is_ascii_digit(57ULL);
 }
 
 _Bool check_not_digit() {
-  return is_ascii_digit(65);
+  return is_ascii_digit(65ULL);
 }
 
 _Bool check_is_lower() {
-  return is_ascii_lower(97);
+  return is_ascii_lower(97ULL);
 }
 
 _Bool check_is_upper() {
-  return is_ascii_upper(90);
+  return is_ascii_upper(90ULL);
 }
 
 uint8_t check_to_lower() {
-  return to_ascii_lower(65);
+  return to_ascii_lower(65ULL);
 }
 
 uint8_t check_to_upper() {
-  return to_ascii_upper(97);
+  return to_ascii_upper(97ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

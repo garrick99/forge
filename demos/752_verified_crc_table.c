@@ -17,47 +17,47 @@ void build_crc_table(forge_span_u64_t table __attribute__((unused)));
 int main();
 
 uint64_t crc_hash(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t table __attribute__((unused))) {
-  uint64_t crc __attribute__((unused)) = -1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t crc __attribute__((unused)) = 0xffffffffffffffffULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t idx __attribute__((unused)) = ((crc ^ data.data[i]) % 256);
-      crc = (table.data[idx] ^ (crc / 256));
-      i = (i + 1);
+      uint64_t idx __attribute__((unused)) = ((crc ^ data.data[i]) % 256ULL);
+      crc = (table.data[idx] ^ (crc / 256ULL));
+      i = (i + 1ULL);
     }
 
   }
-  return (crc ^ -1);
+  return (crc ^ 0xffffffffffffffffULL);
 }
 
 void build_crc_table(forge_span_u64_t table __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < 256)) {
+    while ((i < 256ULL)) {
       uint64_t crc __attribute__((unused)) = i;
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
-        while ((j < 8)) {
-          if (((crc % 2) == 1)) {
-            crc = ((crc / 2) ^ 3988292384);
+        while ((j < 8ULL)) {
+          if (((crc % 2ULL) == 1ULL)) {
+            crc = ((crc / 2ULL) ^ 3988292384ULL);
 
           } else {
-            crc = (crc / 2);
+            crc = (crc / 2ULL);
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
       table.data[i] = crc;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

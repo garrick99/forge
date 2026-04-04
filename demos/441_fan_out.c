@@ -26,20 +26,20 @@ uint64_t sum_invariant();
 int main();
 
 FanOut fo_new() {
-  return (FanOut){ .dispatched = 0, .sub_a = 0, .sub_b = 0, .sub_c = 0 };
+  return (FanOut){ .dispatched = 0ULL, .sub_a = 0ULL, .sub_b = 0ULL, .sub_c = 0ULL };
 }
 
 void fo_dispatch(FanOut* f __attribute__((unused))) {
-  (*f).dispatched = ((*f).dispatched + 3);
-  (*f).sub_a = ((*f).sub_a + 1);
-  (*f).sub_b = ((*f).sub_b + 1);
-  (*f).sub_c = ((*f).sub_c + 1);
+  (*f).dispatched = ((*f).dispatched + 3ULL);
+  (*f).sub_a = ((*f).sub_a + 1ULL);
+  (*f).sub_b = ((*f).sub_b + 1ULL);
+  (*f).sub_c = ((*f).sub_c + 1ULL);
 }
 
 void fo_dispatch_ab(FanOut* f __attribute__((unused))) {
-  (*f).dispatched = ((*f).dispatched + 2);
-  (*f).sub_a = ((*f).sub_a + 1);
-  (*f).sub_b = ((*f).sub_b + 1);
+  (*f).dispatched = ((*f).dispatched + 2ULL);
+  (*f).sub_a = ((*f).sub_a + 1ULL);
+  (*f).sub_b = ((*f).sub_b + 1ULL);
 }
 
 uint64_t two_dispatches() {
@@ -72,7 +72,7 @@ uint64_t sum_invariant() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

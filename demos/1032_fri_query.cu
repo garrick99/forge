@@ -28,6 +28,12 @@
 typedef struct { uint32_t* data; uintptr_t len; } forge_span_u32_t;
 typedef struct { uint64_t* data; uintptr_t len; } forge_span_u64_t;
 
+/* Function pointer typedefs */
+typedef uint64_t (*forge_fn_u64_u64_u64_ret_u64_t)(uint64_t, uint64_t, uint64_t);
+typedef uint64_t (*forge_fn_ptr_u64_u64_ret_u64_t)(uint64_t*, uint64_t);
+typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
+typedef uint64_t (*forge_fn__ret_u64_t)(void);
+
 uint64_t shfl_down_sync(uint64_t val, uint64_t delta, uint64_t width);  /* extern: forge_gpu */
 
 uint64_t shfl_xor_sync(uint64_t val, uint64_t mask, uint64_t width);  /* extern: forge_gpu */
@@ -46,13 +52,7 @@ uint64_t lane_id(void);  /* extern: forge_gpu */
 
 uint64_t warp_id(void);  /* extern: forge_gpu */
 
-static const uint32_t M31_P = 2147483647;
-
-/* Function pointer typedefs */
-typedef uint64_t (*forge_fn_u64_u64_u64_ret_u64_t)(uint64_t, uint64_t, uint64_t);
-typedef uint64_t (*forge_fn_ptr_u64_u64_ret_u64_t)(uint64_t*, uint64_t);
-typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
-typedef uint64_t (*forge_fn__ret_u64_t)(void);
+static const uint32_t M31_P = 2147483647ULL;
 
 /* Forward declarations */
 uint64_t warp_reduce_sum(uint64_t val __attribute__((unused)));
@@ -93,37 +93,37 @@ int main();
 
 uint64_t warp_reduce_sum(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
-  v = (v + __shfl_xor_sync(0xffffffff, v, 16, 32));
-  v = (v + __shfl_xor_sync(0xffffffff, v, 8, 32));
-  v = (v + __shfl_xor_sync(0xffffffff, v, 4, 32));
-  v = (v + __shfl_xor_sync(0xffffffff, v, 2, 32));
-  v = (v + __shfl_xor_sync(0xffffffff, v, 1, 32));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 8ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 4ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 2ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 1ULL, 32ULL));
   return v;
 }
 
 uint64_t warp_reduce_max(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
-  uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16, 32);
+  uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 8, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 8ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 4, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 4ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 2, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 2ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 1, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 1ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
@@ -133,27 +133,27 @@ uint64_t warp_reduce_max(uint64_t val __attribute__((unused))) {
 
 uint64_t warp_reduce_min(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
-  uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16, 32);
+  uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 8, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 8ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 4, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 4ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 2, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 2ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 1, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 1ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
@@ -170,7 +170,7 @@ uint64_t grid_stride_step(uint64_t block_dim __attribute__((unused)), uint64_t g
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 
@@ -207,8 +207,8 @@ uint32_t m31_mul(uint32_t a __attribute__((unused)), uint32_t b __attribute__((u
 }
 
 uint32_t m31_neg(uint32_t a __attribute__((unused))) {
-  if ((a == 0)) {
-    return 0;
+  if ((a == 0ULL)) {
+    return 0ULL;
   } else {
     return (M31_P - a);
   }
@@ -307,7 +307,7 @@ uint32_t qm31_sub_im_im(uint32_t a __attribute__((unused)), uint32_t b __attribu
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 
@@ -333,7 +333,7 @@ __global__ void fri_fold_index_kernel(forge_span_u64_t query_indices __attribute
     /* assert erased */;
     uint64_t q __attribute__((unused)) = query_indices.data[tid];
     /* assert erased */;
-    uint64_t q_fold __attribute__((unused)) = (q / 2);
+    uint64_t q_fold __attribute__((unused)) = (q / 2ULL);
     /* assert erased */;
     /* assert erased */;
     /* assert erased */;
@@ -348,7 +348,7 @@ __global__ void fri_layer_verify_kernel(forge_span_u32_t out __attribute__((unus
     /* assert erased */;
     uint64_t q __attribute__((unused)) = query_indices.data[tid];
     /* assert erased */;
-    uint64_t q_fold __attribute__((unused)) = (q / 2);
+    uint64_t q_fold __attribute__((unused)) = (q / 2ULL);
     /* assert erased */;
     /* assert erased */;
     uint32_t v __attribute__((unused)) = m31_get(out, q_fold);
@@ -358,7 +358,7 @@ __global__ void fri_layer_verify_kernel(forge_span_u32_t out __attribute__((unus
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

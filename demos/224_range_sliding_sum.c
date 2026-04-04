@@ -16,7 +16,7 @@ uint64_t sum_range(forge_span_u64_t s __attribute__((unused)), uint64_t lo __att
 int main();
 
 uint64_t sum_range(forge_span_u64_t s __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
   {
     for (uint64_t i = (uint64_t)(lo); i < (uint64_t)(hi); i++) {
       acc = (acc + s.data[i]);
@@ -27,7 +27,7 @@ uint64_t sum_range(forge_span_u64_t s __attribute__((unused)), uint64_t lo __att
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

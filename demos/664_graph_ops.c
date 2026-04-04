@@ -19,15 +19,15 @@ uint64_t count_edges(forge_span_u64_t adj __attribute__((unused)), uint64_t n __
 int main();
 
 uint64_t out_degree(forge_span_u64_t adj __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t node __attribute__((unused))) {
-  uint64_t deg __attribute__((unused)) = 0;
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t deg __attribute__((unused)) = 0ULL;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < n)) {
-      if ((adj.data[((node * n) + j)] > 0)) {
-        deg = (deg + 1);
+      if ((adj.data[((node * n) + j)] > 0ULL)) {
+        deg = (deg + 1ULL);
 
       }
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
@@ -35,15 +35,15 @@ uint64_t out_degree(forge_span_u64_t adj __attribute__((unused)), uint64_t n __a
 }
 
 uint64_t in_degree(forge_span_u64_t adj __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t node __attribute__((unused))) {
-  uint64_t deg __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t deg __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((adj.data[((i * n) + node)] > 0)) {
-        deg = (deg + 1);
+      if ((adj.data[((i * n) + node)] > 0ULL)) {
+        deg = (deg + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -52,21 +52,21 @@ uint64_t in_degree(forge_span_u64_t adj __attribute__((unused)), uint64_t n __at
 
 _Bool is_symmetric(forge_span_u64_t adj __attribute__((unused)), uint64_t n __attribute__((unused))) {
   _Bool ok __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while (((i < n) && ok)) {
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while (((j < n) && ok)) {
           if ((adj.data[((i * n) + j)] != adj.data[((j * n) + i)])) {
             ok = 0;
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -75,15 +75,15 @@ _Bool is_symmetric(forge_span_u64_t adj __attribute__((unused)), uint64_t n __at
 
 uint64_t count_edges(forge_span_u64_t adj __attribute__((unused)), uint64_t n __attribute__((unused))) {
   uint64_t total __attribute__((unused)) = (n * n);
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < total)) {
-      if ((adj.data[i] > 0)) {
-        cnt = (cnt + 1);
+      if ((adj.data[i] > 0ULL)) {
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -91,7 +91,7 @@ uint64_t count_edges(forge_span_u64_t adj __attribute__((unused)), uint64_t n __
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

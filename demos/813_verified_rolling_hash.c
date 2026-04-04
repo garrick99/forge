@@ -17,12 +17,12 @@ uint64_t rolling_hash_search(forge_span_u64_t text __attribute__((unused)), uint
 int main();
 
 uint64_t rolling_hash_init(forge_span_u64_t text __attribute__((unused)), uint64_t w __attribute__((unused)), uint64_t base __attribute__((unused)), uint64_t modulus __attribute__((unused))) {
-  uint64_t hash __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t hash __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < w)) {
       hash = (((hash * base) + text.data[i]) % modulus);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -33,21 +33,21 @@ uint64_t rolling_hash_search(forge_span_u64_t text __attribute__((unused)), uint
   uint64_t hash __attribute__((unused)) = rolling_hash_init(text, w, base, modulus);
   uint64_t found __attribute__((unused)) = n;
   if ((hash == pattern_hash)) {
-    found = 0;
+    found = 0ULL;
 
   }
-  uint64_t i __attribute__((unused)) = 1;
-  uint64_t limit __attribute__((unused)) = ((n - w) + 1);
+  uint64_t i __attribute__((unused)) = 1ULL;
+  uint64_t limit __attribute__((unused)) = ((n - w) + 1ULL);
   {
     while ((i < limit)) {
-      uint64_t remove __attribute__((unused)) = ((text.data[(i - 1)] * base_pow) % modulus);
+      uint64_t remove __attribute__((unused)) = ((text.data[(i - 1ULL)] * base_pow) % modulus);
       hash = (((hash + modulus) - remove) % modulus);
-      hash = (((hash * base) + text.data[((i + w) - 1)]) % modulus);
+      hash = (((hash * base) + text.data[((i + w) - 1ULL)]) % modulus);
       if (((hash == pattern_hash) && (found == n))) {
         found = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -55,7 +55,7 @@ uint64_t rolling_hash_search(forge_span_u64_t text __attribute__((unused)), uint
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

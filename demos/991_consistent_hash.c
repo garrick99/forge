@@ -16,13 +16,13 @@ void assign_keys(forge_span_u64_t keys __attribute__((unused)), forge_span_u64_t
 int main();
 
 void assign_keys(forge_span_u64_t keys __attribute__((unused)), forge_span_u64_t assignments __attribute__((unused)), forge_span_u64_t nodes __attribute__((unused)), uint64_t n_keys __attribute__((unused)), uint64_t n_nodes __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n_keys)) {
       uint64_t h __attribute__((unused)) = keys.data[i];
-      uint64_t best __attribute__((unused)) = 0;
-      uint64_t best_dist __attribute__((unused)) = (h ^ nodes.data[0]);
-      uint64_t j __attribute__((unused)) = 1;
+      uint64_t best __attribute__((unused)) = 0ULL;
+      uint64_t best_dist __attribute__((unused)) = (h ^ nodes.data[0ULL]);
+      uint64_t j __attribute__((unused)) = 1ULL;
       {
         while ((j < n_nodes)) {
           uint64_t d __attribute__((unused)) = (h ^ nodes.data[j]);
@@ -31,19 +31,19 @@ void assign_keys(forge_span_u64_t keys __attribute__((unused)), forge_span_u64_t
             best = j;
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
       assignments.data[i] = best;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

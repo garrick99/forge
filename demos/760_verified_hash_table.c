@@ -24,26 +24,26 @@ uint64_t hash_key(uint64_t key __attribute__((unused)), uint64_t cap __attribute
 uint64_t ht_insert(forge_span_u64_t keys __attribute__((unused)), forge_span_u64_t vals __attribute__((unused)), forge_span_u64_t used __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t key __attribute__((unused)), uint64_t val __attribute__((unused))) {
   uint64_t start __attribute__((unused)) = hash_key(key, cap);
   uint64_t idx __attribute__((unused)) = start;
-  uint64_t probes __attribute__((unused)) = 0;
-  uint64_t inserted __attribute__((unused)) = 0;
+  uint64_t probes __attribute__((unused)) = 0ULL;
+  uint64_t inserted __attribute__((unused)) = 0ULL;
   {
     while ((probes < cap)) {
-      if ((inserted == 0)) {
-        if ((used.data[idx] == 0)) {
+      if ((inserted == 0ULL)) {
+        if ((used.data[idx] == 0ULL)) {
           keys.data[idx] = key;
           vals.data[idx] = val;
-          used.data[idx] = 1;
-          inserted = 1;
+          used.data[idx] = 1ULL;
+          inserted = 1ULL;
 
         } else if ((keys.data[idx] == key)) {
           vals.data[idx] = val;
-          inserted = 1;
+          inserted = 1ULL;
 
         }
 
       }
-      idx = (((idx + 1) == cap) ? 0 : (idx + 1));
-      probes = (probes + 1);
+      idx = (((idx + 1ULL) == cap) ? 0ULL : (idx + 1ULL));
+      probes = (probes + 1ULL);
     }
 
   }
@@ -53,13 +53,13 @@ uint64_t ht_insert(forge_span_u64_t keys __attribute__((unused)), forge_span_u64
 uint64_t ht_lookup(forge_span_u64_t keys __attribute__((unused)), forge_span_u64_t vals __attribute__((unused)), forge_span_u64_t used __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t key __attribute__((unused)), uint64_t default_val __attribute__((unused))) {
   uint64_t start __attribute__((unused)) = hash_key(key, cap);
   uint64_t idx __attribute__((unused)) = start;
-  uint64_t probes __attribute__((unused)) = 0;
+  uint64_t probes __attribute__((unused)) = 0ULL;
   uint64_t res __attribute__((unused)) = default_val;
   _Bool found __attribute__((unused)) = 0;
   {
     while ((probes < cap)) {
       if ((!found)) {
-        if ((used.data[idx] == 0)) {
+        if ((used.data[idx] == 0ULL)) {
           probes = cap;
 
         } else if ((keys.data[idx] == key)) {
@@ -69,8 +69,8 @@ uint64_t ht_lookup(forge_span_u64_t keys __attribute__((unused)), forge_span_u64
         }
 
       }
-      idx = (((idx + 1) == cap) ? 0 : (idx + 1));
-      probes = (probes + 1);
+      idx = (((idx + 1ULL) == cap) ? 0ULL : (idx + 1ULL));
+      probes = (probes + 1ULL);
     }
 
   }
@@ -78,7 +78,7 @@ uint64_t ht_lookup(forge_span_u64_t keys __attribute__((unused)), forge_span_u64
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

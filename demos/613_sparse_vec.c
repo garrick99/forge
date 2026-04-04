@@ -19,21 +19,21 @@ void sparse_scale(forge_span_u64_t vals __attribute__((unused)), uint64_t n __at
 int main();
 
 uint64_t sparse_dot(forge_span_u64_t idx_a __attribute__((unused)), forge_span_u64_t val_a __attribute__((unused)), uint64_t na __attribute__((unused)), forge_span_u64_t idx_b __attribute__((unused)), forge_span_u64_t val_b __attribute__((unused)), uint64_t nb __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t ia __attribute__((unused)) = 0;
-  uint64_t ib __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t ia __attribute__((unused)) = 0ULL;
+  uint64_t ib __attribute__((unused)) = 0ULL;
   {
     while (((ia < na) && (ib < nb))) {
       if ((idx_a.data[ia] == idx_b.data[ib])) {
         acc = (acc + (val_a.data[ia] * val_b.data[ib]));
-        ia = (ia + 1);
-        ib = (ib + 1);
+        ia = (ia + 1ULL);
+        ib = (ib + 1ULL);
 
       } else if ((idx_a.data[ia] < idx_b.data[ib])) {
-        ia = (ia + 1);
+        ia = (ia + 1ULL);
 
       } else {
-        ib = (ib + 1);
+        ib = (ib + 1ULL);
 
       }
     }
@@ -43,12 +43,12 @@ uint64_t sparse_dot(forge_span_u64_t idx_a __attribute__((unused)), forge_span_u
 }
 
 uint64_t sparse_norm_sq(forge_span_u64_t vals __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + (vals.data[i] * vals.data[i]));
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -56,12 +56,12 @@ uint64_t sparse_norm_sq(forge_span_u64_t vals __attribute__((unused)), uint64_t 
 }
 
 uint64_t sparse_sum(forge_span_u64_t vals __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + vals.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -69,18 +69,18 @@ uint64_t sparse_sum(forge_span_u64_t vals __attribute__((unused)), uint64_t n __
 }
 
 void sparse_scale(forge_span_u64_t vals __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t factor __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       vals.data[i] = (vals.data[i] * factor);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

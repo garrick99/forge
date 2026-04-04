@@ -27,26 +27,26 @@ uint64_t retry_cycle();
 int main();
 
 Txn txn_new() {
-  return (Txn){ .state = 0, .ops = 0, .version = 0 };
+  return (Txn){ .state = 0ULL, .ops = 0ULL, .version = 0ULL };
 }
 
 void txn_begin(Txn* t __attribute__((unused))) {
-  (*t).state = 1;
-  (*t).ops = 0;
+  (*t).state = 1ULL;
+  (*t).ops = 0ULL;
 }
 
 void txn_write(Txn* t __attribute__((unused))) {
-  (*t).ops = ((*t).ops + 1);
+  (*t).ops = ((*t).ops + 1ULL);
 }
 
 void txn_commit(Txn* t __attribute__((unused))) {
-  (*t).state = 0;
-  (*t).version = ((*t).version + 1);
+  (*t).state = 0ULL;
+  (*t).version = ((*t).version + 1ULL);
 }
 
 void txn_rollback(Txn* t __attribute__((unused))) {
-  (*t).state = 0;
-  (*t).ops = 0;
+  (*t).state = 0ULL;
+  (*t).ops = 0ULL;
 }
 
 uint64_t commit_cycle() {
@@ -87,7 +87,7 @@ uint64_t retry_cycle() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

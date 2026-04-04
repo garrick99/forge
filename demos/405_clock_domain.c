@@ -25,16 +25,16 @@ uint64_t sync_count();
 int main();
 
 ClockDomain cd_new() {
-  return (ClockDomain){ .a_written = 0, .b_visible = 0, .syncs = 0 };
+  return (ClockDomain){ .a_written = 0ULL, .b_visible = 0ULL, .syncs = 0ULL };
 }
 
 void cd_write_a(ClockDomain* c __attribute__((unused))) {
-  (*c).a_written = ((*c).a_written + 1);
+  (*c).a_written = ((*c).a_written + 1ULL);
 }
 
 void cd_sync(ClockDomain* c __attribute__((unused))) {
-  (*c).b_visible = ((*c).b_visible + 1);
-  (*c).syncs = ((*c).syncs + 1);
+  (*c).b_visible = ((*c).b_visible + 1ULL);
+  (*c).syncs = ((*c).syncs + 1ULL);
 }
 
 uint64_t write_four() {
@@ -80,7 +80,7 @@ uint64_t sync_count() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

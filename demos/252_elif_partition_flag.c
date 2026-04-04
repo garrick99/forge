@@ -20,15 +20,15 @@ void classify_elements(forge_span_u64_t s __attribute__((unused)), uint64_t n __
     for (uint64_t i = 0; i < (uint64_t)(n); i++) {
       if ((s.data[i] < pivot)) {
         lo.data[i] = s.data[i];
-        hi.data[i] = 0;
+        hi.data[i] = 0ULL;
 
       } else if ((s.data[i] > pivot)) {
-        lo.data[i] = 0;
+        lo.data[i] = 0ULL;
         hi.data[i] = s.data[i];
 
       } else {
-        lo.data[i] = 0;
-        hi.data[i] = 0;
+        lo.data[i] = 0ULL;
+        hi.data[i] = 0ULL;
 
       }
     }
@@ -37,7 +37,7 @@ void classify_elements(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

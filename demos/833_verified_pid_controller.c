@@ -39,9 +39,9 @@ __forge_tuple_u64_u64_u64_t pid_step(uint64_t setpoint __attribute__((unused)), 
   } else {
     derivative = (prev_error - error);
   }
-  uint64_t p_term __attribute__((unused)) = ((kp * error) / 1024);
-  uint64_t i_term __attribute__((unused)) = ((ki * clamped_integral) / 1024);
-  uint64_t d_term __attribute__((unused)) = ((kd * derivative) / 1024);
+  uint64_t p_term __attribute__((unused)) = ((kp * error) / 1024ULL);
+  uint64_t i_term __attribute__((unused)) = ((ki * clamped_integral) / 1024ULL);
+  uint64_t d_term __attribute__((unused)) = ((kd * derivative) / 1024ULL);
   uint64_t raw_output __attribute__((unused)) = ((p_term + i_term) + d_term);
   uint64_t output;
   if ((raw_output > max_output)) {
@@ -53,23 +53,23 @@ __forge_tuple_u64_u64_u64_t pid_step(uint64_t setpoint __attribute__((unused)), 
 }
 
 void pid_run(forge_span_u64_t setpoints __attribute__((unused)), forge_span_u64_t measurements __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t outputs __attribute__((unused)), uint64_t kp __attribute__((unused)), uint64_t ki __attribute__((unused)), uint64_t kd __attribute__((unused)), uint64_t max_integral __attribute__((unused)), uint64_t max_output __attribute__((unused))) {
-  uint64_t prev_err __attribute__((unused)) = 0;
-  uint64_t integral __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t prev_err __attribute__((unused)) = 0ULL;
+  uint64_t integral __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       __forge_tuple_u64_u64_u64_t step __attribute__((unused)) = pid_step(setpoints.data[i], measurements.data[i], kp, ki, kd, prev_err, integral, max_integral, max_output);
       prev_err = (step)._0;
       integral = (step)._1;
       outputs.data[i] = (step)._2;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -17,16 +17,16 @@ uint64_t remove_sorted_dups(forge_span_u64_t s __attribute__((unused)), uint64_t
 int main();
 
 uint64_t remove_element(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t write __attribute__((unused)) = 0;
-  uint64_t read __attribute__((unused)) = 0;
+  uint64_t write __attribute__((unused)) = 0ULL;
+  uint64_t read __attribute__((unused)) = 0ULL;
   {
     while ((read < n)) {
       if ((s.data[read] != target)) {
         s.data[write] = s.data[read];
-        write = (write + 1);
+        write = (write + 1ULL);
 
       }
-      read = (read + 1);
+      read = (read + 1ULL);
     }
 
   }
@@ -34,16 +34,16 @@ uint64_t remove_element(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 }
 
 uint64_t remove_sorted_dups(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t write __attribute__((unused)) = 1;
-  uint64_t read __attribute__((unused)) = 1;
+  uint64_t write __attribute__((unused)) = 1ULL;
+  uint64_t read __attribute__((unused)) = 1ULL;
   {
     while ((read < n)) {
-      if ((s.data[read] != s.data[(write - 1)])) {
+      if ((s.data[read] != s.data[(write - 1ULL)])) {
         s.data[write] = s.data[read];
-        write = (write + 1);
+        write = (write + 1ULL);
 
       }
-      read = (read + 1);
+      read = (read + 1ULL);
     }
 
   }
@@ -51,7 +51,7 @@ uint64_t remove_sorted_dups(forge_span_u64_t s __attribute__((unused)), uint64_t
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

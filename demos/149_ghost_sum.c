@@ -17,13 +17,13 @@ int main();
 
 uint64_t bounded_sum(forge_span_u64_t s __attribute__((unused)), uint64_t max_elem __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = s.len;
-
-  uint64_t k __attribute__((unused)) = 0;
-  uint64_t acc __attribute__((unused)) = 0;
+  uint64_t bound __attribute__((unused)) = (n * max_elem);
+  uint64_t k __attribute__((unused)) = 0ULL;
+  uint64_t acc __attribute__((unused)) = 0ULL;
   {
     while ((k < n)) {
       acc = (acc + s.data[k]);
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
@@ -31,7 +31,7 @@ uint64_t bounded_sum(forge_span_u64_t s __attribute__((unused)), uint64_t max_el
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

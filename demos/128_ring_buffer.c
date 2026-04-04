@@ -35,105 +35,105 @@ uint64_t push_size(Ring8 r __attribute__((unused)), uint64_t v __attribute__((un
 int main();
 
 Ring8 ring_empty() {
-  return (Ring8){ .head = 0, .tail = 0, .size = 0, .d0 = 0, .d1 = 0, .d2 = 0, .d3 = 0, .d4 = 0, .d5 = 0, .d6 = 0, .d7 = 0 };
+  return (Ring8){ .head = 0ULL, .tail = 0ULL, .size = 0ULL, .d0 = 0ULL, .d1 = 0ULL, .d2 = 0ULL, .d3 = 0ULL, .d4 = 0ULL, .d5 = 0ULL, .d6 = 0ULL, .d7 = 0ULL };
 }
 
 uint64_t ring_is_empty(Ring8 r __attribute__((unused))) {
-  if ((r.size == 0)) {
-    return 1;
+  if ((r.size == 0ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t ring_is_full(Ring8 r __attribute__((unused))) {
-  if ((r.size == 8)) {
-    return 1;
+  if ((r.size == 8ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 Ring8 ring_push(Ring8 r __attribute__((unused)), uint64_t v __attribute__((unused))) {
-  uint64_t slot __attribute__((unused)) = (r.tail % 8);
-  uint64_t nt __attribute__((unused)) = ((r.tail + 1) % 8);
+  uint64_t slot __attribute__((unused)) = (r.tail % 8ULL);
+  uint64_t nt __attribute__((unused)) = ((r.tail + 1ULL) % 8ULL);
   uint64_t nd0;
-  if ((slot == 0)) {
+  if ((slot == 0ULL)) {
     nd0 = v;
   } else {
     nd0 = r.d0;
   }
   uint64_t nd1;
-  if ((slot == 1)) {
+  if ((slot == 1ULL)) {
     nd1 = v;
   } else {
     nd1 = r.d1;
   }
   uint64_t nd2;
-  if ((slot == 2)) {
+  if ((slot == 2ULL)) {
     nd2 = v;
   } else {
     nd2 = r.d2;
   }
   uint64_t nd3;
-  if ((slot == 3)) {
+  if ((slot == 3ULL)) {
     nd3 = v;
   } else {
     nd3 = r.d3;
   }
   uint64_t nd4;
-  if ((slot == 4)) {
+  if ((slot == 4ULL)) {
     nd4 = v;
   } else {
     nd4 = r.d4;
   }
   uint64_t nd5;
-  if ((slot == 5)) {
+  if ((slot == 5ULL)) {
     nd5 = v;
   } else {
     nd5 = r.d5;
   }
   uint64_t nd6;
-  if ((slot == 6)) {
+  if ((slot == 6ULL)) {
     nd6 = v;
   } else {
     nd6 = r.d6;
   }
   uint64_t nd7;
-  if ((slot == 7)) {
+  if ((slot == 7ULL)) {
     nd7 = v;
   } else {
     nd7 = r.d7;
   }
-  return (Ring8){ .head = r.head, .tail = nt, .size = (r.size + 1), .d0 = nd0, .d1 = nd1, .d2 = nd2, .d3 = nd3, .d4 = nd4, .d5 = nd5, .d6 = nd6, .d7 = nd7 };
+  return (Ring8){ .head = r.head, .tail = nt, .size = (r.size + 1ULL), .d0 = nd0, .d1 = nd1, .d2 = nd2, .d3 = nd3, .d4 = nd4, .d5 = nd5, .d6 = nd6, .d7 = nd7 };
 }
 
 Ring8 ring_pop(Ring8 r __attribute__((unused))) {
-  uint64_t nh __attribute__((unused)) = ((r.head + 1) % 8);
-  return (Ring8){ .head = nh, .tail = r.tail, .size = (r.size - 1), .d0 = r.d0, .d1 = r.d1, .d2 = r.d2, .d3 = r.d3, .d4 = r.d4, .d5 = r.d5, .d6 = r.d6, .d7 = r.d7 };
+  uint64_t nh __attribute__((unused)) = ((r.head + 1ULL) % 8ULL);
+  return (Ring8){ .head = nh, .tail = r.tail, .size = (r.size - 1ULL), .d0 = r.d0, .d1 = r.d1, .d2 = r.d2, .d3 = r.d3, .d4 = r.d4, .d5 = r.d5, .d6 = r.d6, .d7 = r.d7 };
 }
 
 uint64_t ring_peek(Ring8 r __attribute__((unused))) {
-  uint64_t slot __attribute__((unused)) = (r.head % 8);
-  if ((slot == 0)) {
+  uint64_t slot __attribute__((unused)) = (r.head % 8ULL);
+  if ((slot == 0ULL)) {
     return r.d0;
   } else {
-    if ((slot == 1)) {
+    if ((slot == 1ULL)) {
       return r.d1;
     } else {
-      if ((slot == 2)) {
+      if ((slot == 2ULL)) {
         return r.d2;
       } else {
-        if ((slot == 3)) {
+        if ((slot == 3ULL)) {
           return r.d3;
         } else {
-          if ((slot == 4)) {
+          if ((slot == 4ULL)) {
             return r.d4;
           } else {
-            if ((slot == 5)) {
+            if ((slot == 5ULL)) {
               return r.d5;
             } else {
-              if ((slot == 6)) {
+              if ((slot == 6ULL)) {
                 return r.d6;
               } else {
                 return r.d7;
@@ -165,23 +165,23 @@ uint64_t push_size(Ring8 r __attribute__((unused)), uint64_t v __attribute__((un
 int main() {
   Ring8 empty __attribute__((unused)) = ring_empty();
   uint64_t ie __attribute__((unused)) = ring_is_empty(empty);
-  Ring8 r1 __attribute__((unused)) = ring_push(empty, 10);
-  Ring8 r2 __attribute__((unused)) = ring_push(r1, 20);
-  Ring8 r3 __attribute__((unused)) = ring_push(r2, 30);
+  Ring8 r1 __attribute__((unused)) = ring_push(empty, 10ULL);
+  Ring8 r2 __attribute__((unused)) = ring_push(r1, 20ULL);
+  Ring8 r3 __attribute__((unused)) = ring_push(r2, 30ULL);
   uint64_t sz3 __attribute__((unused)) = r3.size;
   uint64_t full3 __attribute__((unused)) = ring_is_full(r3);
   Ring8 r4 __attribute__((unused)) = ring_pop(r3);
   uint64_t sz4 __attribute__((unused)) = r4.size;
-  uint64_t pps __attribute__((unused)) = push_pop_size(r3, 99);
-  uint64_t ps __attribute__((unused)) = push_size(r2, 40);
-  Ring8 ra __attribute__((unused)) = ring_push(empty, 1);
-  Ring8 rb __attribute__((unused)) = ring_push(ra, 2);
-  Ring8 rc __attribute__((unused)) = ring_push(rb, 3);
-  Ring8 rd __attribute__((unused)) = ring_push(rc, 4);
-  Ring8 re __attribute__((unused)) = ring_push(rd, 5);
-  Ring8 rf __attribute__((unused)) = ring_push(re, 6);
-  Ring8 rg __attribute__((unused)) = ring_push(rf, 7);
-  Ring8 rh __attribute__((unused)) = ring_push(rg, 8);
+  uint64_t pps __attribute__((unused)) = push_pop_size(r3, 99ULL);
+  uint64_t ps __attribute__((unused)) = push_size(r2, 40ULL);
+  Ring8 ra __attribute__((unused)) = ring_push(empty, 1ULL);
+  Ring8 rb __attribute__((unused)) = ring_push(ra, 2ULL);
+  Ring8 rc __attribute__((unused)) = ring_push(rb, 3ULL);
+  Ring8 rd __attribute__((unused)) = ring_push(rc, 4ULL);
+  Ring8 re __attribute__((unused)) = ring_push(rd, 5ULL);
+  Ring8 rf __attribute__((unused)) = ring_push(re, 6ULL);
+  Ring8 rg __attribute__((unused)) = ring_push(rf, 7ULL);
+  Ring8 rh __attribute__((unused)) = ring_push(rg, 8ULL);
   uint64_t tailw __attribute__((unused)) = rh.tail;
   uint64_t fullf __attribute__((unused)) = ring_is_full(rh);
   return (int)((((((((ie + sz3) + full3) + sz4) + pps) + ps) + tailw) + fullf));

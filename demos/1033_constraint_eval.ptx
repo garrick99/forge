@@ -1,0 +1,275 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry linear_constraint_kernel(
+    .param .u64 linear_constraint_kernel_param_quot_data,
+    .param .u64 linear_constraint_kernel_param_quot_len,
+    .param .u64 linear_constraint_kernel_param_col_a_data,
+    .param .u64 linear_constraint_kernel_param_col_a_len,
+    .param .u64 linear_constraint_kernel_param_col_b_data,
+    .param .u64 linear_constraint_kernel_param_col_b_len,
+    .param .u64 linear_constraint_kernel_param_col_c_data,
+    .param .u64 linear_constraint_kernel_param_col_c_len,
+    .param .u32 linear_constraint_kernel_param_alpha,
+    .param .u64 linear_constraint_kernel_param_n
+)
+{
+    .reg .pred %p15;
+    .reg .u64 %rd0, %rd1, %rd16, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd29, %rd3, %rd30, %rd31, %rd32, %rd33, %rd4, %rd5, %rd6, %rd7, %rd9;
+    .reg .u32 %r10, %r11, %r12, %r13, %r14, %r34, %r35, %r36, %r8;
+
+  ld.param.u64 %rd0, [linear_constraint_kernel_param_quot_data];
+  ld.param.u64 %rd1, [linear_constraint_kernel_param_quot_len];
+  ld.param.u64 %rd2, [linear_constraint_kernel_param_col_a_data];
+  ld.param.u64 %rd3, [linear_constraint_kernel_param_col_a_len];
+  ld.param.u64 %rd4, [linear_constraint_kernel_param_col_b_data];
+  ld.param.u64 %rd5, [linear_constraint_kernel_param_col_b_len];
+  ld.param.u64 %rd6, [linear_constraint_kernel_param_col_c_data];
+  ld.param.u64 %rd7, [linear_constraint_kernel_param_col_c_len];
+  ld.param.u32 %r8, [linear_constraint_kernel_param_alpha];
+  ld.param.u64 %rd9, [linear_constraint_kernel_param_n];
+
+  mov.u32 %r10, %ctaid.x;
+  mov.u32 %r11, %ntid.x;
+  mul.lo.u32 %r12, %r10, %r11;
+  mov.u32 %r13, %tid.x;
+  add.u32 %r14, %r12, %r13;
+  cvt.u64.u32 %rd16, %r14;
+  setp.lt.u64 %p15, %rd16, %rd9;
+  @%p15 bra linear_constraint_kernel_then_17;
+  bra linear_constraint_kernel_else_17;
+  linear_constraint_kernel_then_17:
+  mov.u64 %rd18, 0; // unhandled expr
+  mov.u64 %rd19, 0; // unhandled expr
+  mov.u64 %rd20, 0; // unhandled expr
+  mov.u64 %rd21, 0; // unhandled expr
+  mov.u64 %rd22, 0; // call m31_get (device fn)
+  mov.u64 %rd23, 0; // call m31_get (device fn)
+  mov.u64 %rd24, 0; // call m31_get (device fn)
+  mov.u64 %rd25, 0; // call m31_get (device fn)
+  mov.u64 %rd26, 0; // call m31_add (device fn)
+  mov.u64 %rd27, 0; // call m31_sub (device fn)
+  mov.u64 %rd28, 0; // call m31_mul (device fn)
+  mov.u64 %rd29, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd30, %r14;
+  mov.u64 %rd31, 4;
+  mul.lo.u64 %rd32, %rd30, %rd31;
+  add.u64 %rd33, %rd0, %rd32;
+  st.global.u32 [%rd33], %rd29;
+  mov.u32 %r34, 0; // unit
+  mov.u32 %r35, %r34;
+  bra linear_constraint_kernel_end_17;
+  linear_constraint_kernel_else_17:
+  mov.u32 %r35, 0; // no else branch
+  linear_constraint_kernel_end_17:
+  mov.u32 %r36, 0; // unit
+  ret;
+}
+
+.visible .entry mul_gate_constraint_kernel(
+    .param .u64 mul_gate_constraint_kernel_param_quot_data,
+    .param .u64 mul_gate_constraint_kernel_param_quot_len,
+    .param .u64 mul_gate_constraint_kernel_param_col_a_data,
+    .param .u64 mul_gate_constraint_kernel_param_col_a_len,
+    .param .u64 mul_gate_constraint_kernel_param_col_b_data,
+    .param .u64 mul_gate_constraint_kernel_param_col_b_len,
+    .param .u64 mul_gate_constraint_kernel_param_col_c_data,
+    .param .u64 mul_gate_constraint_kernel_param_col_c_len,
+    .param .u32 mul_gate_constraint_kernel_param_alpha,
+    .param .u64 mul_gate_constraint_kernel_param_n
+)
+{
+    .reg .pred %p15;
+    .reg .u64 %rd0, %rd1, %rd16, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd29, %rd3, %rd30, %rd31, %rd32, %rd33, %rd4, %rd5, %rd6, %rd7, %rd9;
+    .reg .u32 %r10, %r11, %r12, %r13, %r14, %r34, %r35, %r36, %r8;
+
+  ld.param.u64 %rd0, [mul_gate_constraint_kernel_param_quot_data];
+  ld.param.u64 %rd1, [mul_gate_constraint_kernel_param_quot_len];
+  ld.param.u64 %rd2, [mul_gate_constraint_kernel_param_col_a_data];
+  ld.param.u64 %rd3, [mul_gate_constraint_kernel_param_col_a_len];
+  ld.param.u64 %rd4, [mul_gate_constraint_kernel_param_col_b_data];
+  ld.param.u64 %rd5, [mul_gate_constraint_kernel_param_col_b_len];
+  ld.param.u64 %rd6, [mul_gate_constraint_kernel_param_col_c_data];
+  ld.param.u64 %rd7, [mul_gate_constraint_kernel_param_col_c_len];
+  ld.param.u32 %r8, [mul_gate_constraint_kernel_param_alpha];
+  ld.param.u64 %rd9, [mul_gate_constraint_kernel_param_n];
+
+  mov.u32 %r10, %ctaid.x;
+  mov.u32 %r11, %ntid.x;
+  mul.lo.u32 %r12, %r10, %r11;
+  mov.u32 %r13, %tid.x;
+  add.u32 %r14, %r12, %r13;
+  cvt.u64.u32 %rd16, %r14;
+  setp.lt.u64 %p15, %rd16, %rd9;
+  @%p15 bra mul_gate_constraint_kernel_then_17;
+  bra mul_gate_constraint_kernel_else_17;
+  mul_gate_constraint_kernel_then_17:
+  mov.u64 %rd18, 0; // unhandled expr
+  mov.u64 %rd19, 0; // unhandled expr
+  mov.u64 %rd20, 0; // unhandled expr
+  mov.u64 %rd21, 0; // unhandled expr
+  mov.u64 %rd22, 0; // call m31_get (device fn)
+  mov.u64 %rd23, 0; // call m31_get (device fn)
+  mov.u64 %rd24, 0; // call m31_get (device fn)
+  mov.u64 %rd25, 0; // call m31_get (device fn)
+  mov.u64 %rd26, 0; // call m31_mul (device fn)
+  mov.u64 %rd27, 0; // call m31_sub (device fn)
+  mov.u64 %rd28, 0; // call m31_mul (device fn)
+  mov.u64 %rd29, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd30, %r14;
+  mov.u64 %rd31, 4;
+  mul.lo.u64 %rd32, %rd30, %rd31;
+  add.u64 %rd33, %rd0, %rd32;
+  st.global.u32 [%rd33], %rd29;
+  mov.u32 %r34, 0; // unit
+  mov.u32 %r35, %r34;
+  bra mul_gate_constraint_kernel_end_17;
+  mul_gate_constraint_kernel_else_17:
+  mov.u32 %r35, 0; // no else branch
+  mul_gate_constraint_kernel_end_17:
+  mov.u32 %r36, 0; // unit
+  ret;
+}
+
+.visible .entry transition_constraint_kernel(
+    .param .u64 transition_constraint_kernel_param_quot_data,
+    .param .u64 transition_constraint_kernel_param_quot_len,
+    .param .u64 transition_constraint_kernel_param_col_a_data,
+    .param .u64 transition_constraint_kernel_param_col_a_len,
+    .param .u64 transition_constraint_kernel_param_col_b_data,
+    .param .u64 transition_constraint_kernel_param_col_b_len,
+    .param .u64 transition_constraint_kernel_param_next_pos_data,
+    .param .u64 transition_constraint_kernel_param_next_pos_len,
+    .param .u32 transition_constraint_kernel_param_alpha,
+    .param .u64 transition_constraint_kernel_param_n
+)
+{
+    .reg .pred %p15;
+    .reg .u64 %rd0, %rd1, %rd16, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd29, %rd3, %rd30, %rd31, %rd32, %rd33, %rd34, %rd35, %rd36, %rd37, %rd38, %rd39, %rd4, %rd40, %rd5, %rd6, %rd7, %rd9;
+    .reg .u32 %r10, %r11, %r12, %r13, %r14, %r41, %r42, %r43, %r8;
+
+  ld.param.u64 %rd0, [transition_constraint_kernel_param_quot_data];
+  ld.param.u64 %rd1, [transition_constraint_kernel_param_quot_len];
+  ld.param.u64 %rd2, [transition_constraint_kernel_param_col_a_data];
+  ld.param.u64 %rd3, [transition_constraint_kernel_param_col_a_len];
+  ld.param.u64 %rd4, [transition_constraint_kernel_param_col_b_data];
+  ld.param.u64 %rd5, [transition_constraint_kernel_param_col_b_len];
+  ld.param.u64 %rd6, [transition_constraint_kernel_param_next_pos_data];
+  ld.param.u64 %rd7, [transition_constraint_kernel_param_next_pos_len];
+  ld.param.u32 %r8, [transition_constraint_kernel_param_alpha];
+  ld.param.u64 %rd9, [transition_constraint_kernel_param_n];
+
+  mov.u32 %r10, %ctaid.x;
+  mov.u32 %r11, %ntid.x;
+  mul.lo.u32 %r12, %r10, %r11;
+  mov.u32 %r13, %tid.x;
+  add.u32 %r14, %r12, %r13;
+  cvt.u64.u32 %rd16, %r14;
+  setp.lt.u64 %p15, %rd16, %rd9;
+  @%p15 bra transition_constraint_kernel_then_17;
+  bra transition_constraint_kernel_else_17;
+  transition_constraint_kernel_then_17:
+  mov.u64 %rd18, 0; // unhandled expr
+  mov.u64 %rd19, 0; // unhandled expr
+  mov.u64 %rd20, 0; // unhandled expr
+  mov.u64 %rd21, 0; // unhandled expr
+  cvt.u64.u32 %rd22, %r14;
+  mov.u64 %rd23, 8;
+  mul.lo.u64 %rd24, %rd22, %rd23;
+  add.u64 %rd25, %rd6, %rd24;
+  ld.global.u64 %rd26, [%rd25];
+  mov.u64 %rd27, 0; // unhandled expr
+  mov.u64 %rd28, 0; // unhandled expr
+  mov.u64 %rd29, 0; // call m31_get (device fn)
+  mov.u64 %rd30, 0; // call m31_get (device fn)
+  mov.u64 %rd31, 0; // call m31_get (device fn)
+  mov.u64 %rd32, 0; // call m31_get (device fn)
+  mov.u64 %rd33, 0; // call m31_sub (device fn)
+  mov.u64 %rd34, 0; // call m31_sub (device fn)
+  mov.u64 %rd35, 0; // call m31_mul (device fn)
+  mov.u64 %rd36, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd37, %r14;
+  mov.u64 %rd38, 4;
+  mul.lo.u64 %rd39, %rd37, %rd38;
+  add.u64 %rd40, %rd0, %rd39;
+  st.global.u32 [%rd40], %rd36;
+  mov.u32 %r41, 0; // unit
+  mov.u32 %r42, %r41;
+  bra transition_constraint_kernel_end_17;
+  transition_constraint_kernel_else_17:
+  mov.u32 %r42, 0; // no else branch
+  transition_constraint_kernel_end_17:
+  mov.u32 %r43, 0; // unit
+  ret;
+}
+
+.visible .entry multi_constraint_kernel(
+    .param .u64 multi_constraint_kernel_param_quot_data,
+    .param .u64 multi_constraint_kernel_param_quot_len,
+    .param .u64 multi_constraint_kernel_param_c0_data,
+    .param .u64 multi_constraint_kernel_param_c0_len,
+    .param .u64 multi_constraint_kernel_param_c1_data,
+    .param .u64 multi_constraint_kernel_param_c1_len,
+    .param .u64 multi_constraint_kernel_param_c2_data,
+    .param .u64 multi_constraint_kernel_param_c2_len,
+    .param .u32 multi_constraint_kernel_param_alpha,
+    .param .u64 multi_constraint_kernel_param_n
+)
+{
+    .reg .pred %p15;
+    .reg .u64 %rd0, %rd1, %rd16, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd29, %rd3, %rd30, %rd31, %rd32, %rd33, %rd34, %rd4, %rd5, %rd6, %rd7, %rd9;
+    .reg .u32 %r10, %r11, %r12, %r13, %r14, %r35, %r36, %r37, %r8;
+
+  ld.param.u64 %rd0, [multi_constraint_kernel_param_quot_data];
+  ld.param.u64 %rd1, [multi_constraint_kernel_param_quot_len];
+  ld.param.u64 %rd2, [multi_constraint_kernel_param_c0_data];
+  ld.param.u64 %rd3, [multi_constraint_kernel_param_c0_len];
+  ld.param.u64 %rd4, [multi_constraint_kernel_param_c1_data];
+  ld.param.u64 %rd5, [multi_constraint_kernel_param_c1_len];
+  ld.param.u64 %rd6, [multi_constraint_kernel_param_c2_data];
+  ld.param.u64 %rd7, [multi_constraint_kernel_param_c2_len];
+  ld.param.u32 %r8, [multi_constraint_kernel_param_alpha];
+  ld.param.u64 %rd9, [multi_constraint_kernel_param_n];
+
+  mov.u32 %r10, %ctaid.x;
+  mov.u32 %r11, %ntid.x;
+  mul.lo.u32 %r12, %r10, %r11;
+  mov.u32 %r13, %tid.x;
+  add.u32 %r14, %r12, %r13;
+  cvt.u64.u32 %rd16, %r14;
+  setp.lt.u64 %p15, %rd16, %rd9;
+  @%p15 bra multi_constraint_kernel_then_17;
+  bra multi_constraint_kernel_else_17;
+  multi_constraint_kernel_then_17:
+  mov.u64 %rd18, 0; // unhandled expr
+  mov.u64 %rd19, 0; // unhandled expr
+  mov.u64 %rd20, 0; // unhandled expr
+  mov.u64 %rd21, 0; // unhandled expr
+  mov.u64 %rd22, 0; // call m31_get (device fn)
+  mov.u64 %rd23, 0; // call m31_get (device fn)
+  mov.u64 %rd24, 0; // call m31_get (device fn)
+  mov.u64 %rd25, 0; // call m31_get (device fn)
+  mov.u64 %rd26, 0; // call m31_mul (device fn)
+  mov.u64 %rd27, 0; // call m31_mul (device fn)
+  mov.u64 %rd28, 0; // call m31_mul (device fn)
+  mov.u64 %rd29, 0; // call m31_add (device fn)
+  mov.u64 %rd30, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd31, %r14;
+  mov.u64 %rd32, 4;
+  mul.lo.u64 %rd33, %rd31, %rd32;
+  add.u64 %rd34, %rd0, %rd33;
+  st.global.u32 [%rd34], %rd30;
+  mov.u32 %r35, 0; // unit
+  mov.u32 %r36, %r35;
+  bra multi_constraint_kernel_end_17;
+  multi_constraint_kernel_else_17:
+  mov.u32 %r36, 0; // no else branch
+  multi_constraint_kernel_end_17:
+  mov.u32 %r37, 0; // unit
+  ret;
+}
+

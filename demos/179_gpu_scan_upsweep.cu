@@ -32,20 +32,20 @@ __global__ void scan_upsweep(forge_span_u64_t smem __attribute__((unused)));
 int main();
 
 __global__ void scan_upsweep(forge_span_u64_t smem __attribute__((unused))) {
-  uint64_t stride __attribute__((unused)) = 1;
+  uint64_t stride __attribute__((unused)) = 1ULL;
   {
-    while ((stride <= 128)) {
-      uint64_t left __attribute__((unused)) = (stride - 1);
-      uint64_t right __attribute__((unused)) = ((stride * 2) - 1);
+    while ((stride <= 128ULL)) {
+      uint64_t left __attribute__((unused)) = (stride - 1ULL);
+      uint64_t right __attribute__((unused)) = ((stride * 2ULL) - 1ULL);
       smem.data[right] = (smem.data[left] + smem.data[right]);
-      stride = (stride * 2);
+      stride = (stride * 2ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

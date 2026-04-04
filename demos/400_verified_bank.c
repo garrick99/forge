@@ -29,72 +29,72 @@ uint64_t reserve_drain();
 int main();
 
 Bank bank_new(uint64_t checking __attribute__((unused)), uint64_t savings __attribute__((unused)), uint64_t reserve __attribute__((unused))) {
-  return (Bank){ .checking = checking, .savings = savings, .reserve = reserve, .txns = 0 };
+  return (Bank){ .checking = checking, .savings = savings, .reserve = reserve, .txns = 0ULL };
 }
 
 void bank_checking_to_savings(Bank* b __attribute__((unused)), uint64_t amount __attribute__((unused))) {
   (*b).checking = ((*b).checking - amount);
   (*b).savings = ((*b).savings + amount);
-  (*b).txns = ((*b).txns + 1);
+  (*b).txns = ((*b).txns + 1ULL);
 }
 
 void bank_savings_to_checking(Bank* b __attribute__((unused)), uint64_t amount __attribute__((unused))) {
   (*b).savings = ((*b).savings - amount);
   (*b).checking = ((*b).checking + amount);
-  (*b).txns = ((*b).txns + 1);
+  (*b).txns = ((*b).txns + 1ULL);
 }
 
 void bank_checking_to_reserve(Bank* b __attribute__((unused)), uint64_t amount __attribute__((unused))) {
   (*b).checking = ((*b).checking - amount);
   (*b).reserve = ((*b).reserve + amount);
-  (*b).txns = ((*b).txns + 1);
+  (*b).txns = ((*b).txns + 1ULL);
 }
 
 void bank_reserve_to_checking(Bank* b __attribute__((unused)), uint64_t amount __attribute__((unused))) {
   (*b).reserve = ((*b).reserve - amount);
   (*b).checking = ((*b).checking + amount);
-  (*b).txns = ((*b).txns + 1);
+  (*b).txns = ((*b).txns + 1ULL);
 }
 
 uint64_t transfer_to_savings() {
-  Bank b __attribute__((unused)) = bank_new(500, 500, 500);
-  bank_checking_to_savings((&b), 200);
+  Bank b __attribute__((unused)) = bank_new(500ULL, 500ULL, 500ULL);
+  bank_checking_to_savings((&b), 200ULL);
   return b.savings;
 }
 
 uint64_t conservation_after_transfers() {
-  Bank b __attribute__((unused)) = bank_new(500, 500, 500);
-  bank_checking_to_savings((&b), 200);
-  bank_savings_to_checking((&b), 100);
-  bank_checking_to_reserve((&b), 300);
-  bank_reserve_to_checking((&b), 50);
+  Bank b __attribute__((unused)) = bank_new(500ULL, 500ULL, 500ULL);
+  bank_checking_to_savings((&b), 200ULL);
+  bank_savings_to_checking((&b), 100ULL);
+  bank_checking_to_reserve((&b), 300ULL);
+  bank_reserve_to_checking((&b), 50ULL);
   return ((b.checking + b.savings) + b.reserve);
 }
 
 uint64_t txn_count() {
-  Bank b __attribute__((unused)) = bank_new(500, 500, 500);
-  bank_checking_to_savings((&b), 200);
-  bank_savings_to_checking((&b), 100);
-  bank_checking_to_reserve((&b), 300);
-  bank_reserve_to_checking((&b), 50);
+  Bank b __attribute__((unused)) = bank_new(500ULL, 500ULL, 500ULL);
+  bank_checking_to_savings((&b), 200ULL);
+  bank_savings_to_checking((&b), 100ULL);
+  bank_checking_to_reserve((&b), 300ULL);
+  bank_reserve_to_checking((&b), 50ULL);
   return b.txns;
 }
 
 uint64_t round_trip() {
-  Bank b __attribute__((unused)) = bank_new(500, 500, 500);
-  bank_checking_to_savings((&b), 300);
-  bank_savings_to_checking((&b), 300);
+  Bank b __attribute__((unused)) = bank_new(500ULL, 500ULL, 500ULL);
+  bank_checking_to_savings((&b), 300ULL);
+  bank_savings_to_checking((&b), 300ULL);
   return b.checking;
 }
 
 uint64_t reserve_drain() {
-  Bank b __attribute__((unused)) = bank_new(500, 500, 500);
-  bank_reserve_to_checking((&b), 400);
+  Bank b __attribute__((unused)) = bank_new(500ULL, 500ULL, 500ULL);
+  bank_reserve_to_checking((&b), 400ULL);
   return b.reserve;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

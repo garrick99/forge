@@ -17,37 +17,37 @@ void sort3(forge_span_u64_t s __attribute__((unused)));
 int main();
 
 void sort2(forge_span_u64_t s __attribute__((unused))) {
-  if ((s.data[0] > s.data[1])) {
-    uint64_t tmp __attribute__((unused)) = s.data[0];
-    s.data[0] = s.data[1];
-    s.data[1] = tmp;
+  if ((s.data[0ULL] > s.data[1ULL])) {
+    uint64_t tmp __attribute__((unused)) = s.data[0ULL];
+    s.data[0ULL] = s.data[1ULL];
+    s.data[1ULL] = tmp;
 
   }
 }
 
 void sort3(forge_span_u64_t s __attribute__((unused))) {
-  if ((s.data[0] > s.data[1])) {
-    uint64_t tmp __attribute__((unused)) = s.data[0];
-    s.data[0] = s.data[1];
-    s.data[1] = tmp;
+  if ((s.data[0ULL] > s.data[1ULL])) {
+    uint64_t tmp __attribute__((unused)) = s.data[0ULL];
+    s.data[0ULL] = s.data[1ULL];
+    s.data[1ULL] = tmp;
 
   }
-  if ((s.data[1] > s.data[2])) {
-    uint64_t tmp __attribute__((unused)) = s.data[1];
-    s.data[1] = s.data[2];
-    s.data[2] = tmp;
+  if ((s.data[1ULL] > s.data[2ULL])) {
+    uint64_t tmp __attribute__((unused)) = s.data[1ULL];
+    s.data[1ULL] = s.data[2ULL];
+    s.data[2ULL] = tmp;
 
   }
-  if ((s.data[0] > s.data[1])) {
-    uint64_t tmp __attribute__((unused)) = s.data[0];
-    s.data[0] = s.data[1];
-    s.data[1] = tmp;
+  if ((s.data[0ULL] > s.data[1ULL])) {
+    uint64_t tmp __attribute__((unused)) = s.data[0ULL];
+    s.data[0ULL] = s.data[1ULL];
+    s.data[1ULL] = tmp;
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

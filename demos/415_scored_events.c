@@ -28,68 +28,68 @@ uint64_t event_count();
 int main();
 
 ScoredEvents se_new() {
-  return (ScoredEvents){ .total_score = 0, .max_score = 0, .count = 0, .has_data = 0 };
+  return (ScoredEvents){ .total_score = 0ULL, .max_score = 0ULL, .count = 0ULL, .has_data = 0ULL };
 }
 
 void se_add_first(ScoredEvents* s __attribute__((unused)), uint64_t score __attribute__((unused))) {
   (*s).total_score = score;
   (*s).max_score = score;
-  (*s).count = 1;
-  (*s).has_data = 1;
+  (*s).count = 1ULL;
+  (*s).has_data = 1ULL;
 }
 
 void se_add_higher(ScoredEvents* s __attribute__((unused)), uint64_t score __attribute__((unused))) {
   (*s).total_score = ((*s).total_score + score);
   (*s).max_score = score;
-  (*s).count = ((*s).count + 1);
+  (*s).count = ((*s).count + 1ULL);
 }
 
 void se_add_lower(ScoredEvents* s __attribute__((unused)), uint64_t score __attribute__((unused))) {
   (*s).total_score = ((*s).total_score + score);
-  (*s).count = ((*s).count + 1);
+  (*s).count = ((*s).count + 1ULL);
 }
 
 uint64_t first_event_total() {
   ScoredEvents s __attribute__((unused)) = se_new();
-  se_add_first((&s), 50);
+  se_add_first((&s), 50ULL);
   return s.total_score;
 }
 
 uint64_t rising_max() {
   ScoredEvents s __attribute__((unused)) = se_new();
-  se_add_first((&s), 30);
-  se_add_higher((&s), 60);
-  se_add_higher((&s), 90);
+  se_add_first((&s), 30ULL);
+  se_add_higher((&s), 60ULL);
+  se_add_higher((&s), 90ULL);
   return s.max_score;
 }
 
 uint64_t total_three() {
   ScoredEvents s __attribute__((unused)) = se_new();
-  se_add_first((&s), 30);
-  se_add_higher((&s), 60);
-  se_add_higher((&s), 90);
+  se_add_first((&s), 30ULL);
+  se_add_higher((&s), 60ULL);
+  se_add_higher((&s), 90ULL);
   return s.total_score;
 }
 
 uint64_t lower_no_max_change() {
   ScoredEvents s __attribute__((unused)) = se_new();
-  se_add_first((&s), 90);
-  se_add_lower((&s), 20);
-  se_add_lower((&s), 45);
+  se_add_first((&s), 90ULL);
+  se_add_lower((&s), 20ULL);
+  se_add_lower((&s), 45ULL);
   return s.max_score;
 }
 
 uint64_t event_count() {
   ScoredEvents s __attribute__((unused)) = se_new();
-  se_add_first((&s), 10);
-  se_add_higher((&s), 20);
-  se_add_lower((&s), 5);
-  se_add_lower((&s), 8);
+  se_add_first((&s), 10ULL);
+  se_add_higher((&s), 20ULL);
+  se_add_lower((&s), 5ULL);
+  se_add_lower((&s), 8ULL);
   return s.count;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -21,10 +21,10 @@ int main();
 void bf_set(forge_span_u64_t bits __attribute__((unused)), uint64_t hash __attribute__((unused)), uint64_t nbits __attribute__((unused))) {
   uint64_t idx __attribute__((unused)) = (hash % nbits);
   if ((idx < bits.len)) {
-    uint64_t word_idx __attribute__((unused)) = (idx / 64);
-    uint64_t bit_pos __attribute__((unused)) = (idx % 64);
+    uint64_t word_idx __attribute__((unused)) = (idx / 64ULL);
+    uint64_t bit_pos __attribute__((unused)) = (idx % 64ULL);
     if ((word_idx < bits.len)) {
-      bits.data[word_idx] = (bits.data[word_idx] | (1 << bit_pos));
+      bits.data[word_idx] = (bits.data[word_idx] | (1ULL << bit_pos));
 
     }
 
@@ -34,10 +34,10 @@ void bf_set(forge_span_u64_t bits __attribute__((unused)), uint64_t hash __attri
 _Bool bf_test(forge_span_u64_t bits __attribute__((unused)), uint64_t hash __attribute__((unused)), uint64_t nbits __attribute__((unused))) {
   uint64_t idx __attribute__((unused)) = (hash % nbits);
   if ((idx < bits.len)) {
-    uint64_t word_idx __attribute__((unused)) = (idx / 64);
-    uint64_t bit_pos __attribute__((unused)) = (idx % 64);
+    uint64_t word_idx __attribute__((unused)) = (idx / 64ULL);
+    uint64_t bit_pos __attribute__((unused)) = (idx % 64ULL);
     if ((word_idx < bits.len)) {
-      return (((bits.data[word_idx] >> bit_pos) & 1) == 1);
+      return (((bits.data[word_idx] >> bit_pos) & 1ULL) == 1ULL);
     } else {
       return 0;
     }
@@ -47,26 +47,26 @@ _Bool bf_test(forge_span_u64_t bits __attribute__((unused)), uint64_t hash __att
 }
 
 void bf_clear_all(forge_span_u64_t bits __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      bits.data[i] = 0;
-      i = (i + 1);
+      bits.data[i] = 0ULL;
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t bf_count_set(forge_span_u64_t bits __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((bits.data[i] != 0)) {
-        count = (count + 1);
+      if ((bits.data[i] != 0ULL)) {
+        count = (count + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -74,7 +74,7 @@ uint64_t bf_count_set(forge_span_u64_t bits __attribute__((unused)), uint64_t n 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

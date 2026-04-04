@@ -20,12 +20,12 @@ uint64_t fnv1a_hash(forge_span_u64_t data __attribute__((unused)), uint64_t n __
 int main();
 
 uint64_t sum_checksum(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + data.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -33,12 +33,12 @@ uint64_t sum_checksum(forge_span_u64_t data __attribute__((unused)), uint64_t n 
 }
 
 uint64_t xor_checksum(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc ^ data.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -46,27 +46,27 @@ uint64_t xor_checksum(forge_span_u64_t data __attribute__((unused)), uint64_t n 
 }
 
 uint64_t fletcher16(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t s1 __attribute__((unused)) = 0;
-  uint64_t s2 __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t s1 __attribute__((unused)) = 0ULL;
+  uint64_t s2 __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      s1 = ((s1 + (data.data[i] % 255)) % 255);
-      s2 = ((s2 + s1) % 65025);
-      i = (i + 1);
+      s1 = ((s1 + (data.data[i] % 255ULL)) % 255ULL);
+      s2 = ((s2 + s1) % 65025ULL);
+      i = (i + 1ULL);
     }
 
   }
-  return ((s1 * 256) + s2);
+  return ((s1 * 256ULL) + s2);
 }
 
 uint64_t djb2_hash(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t h __attribute__((unused)) = 5381;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t h __attribute__((unused)) = 5381ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      h = ((h * 33) + data.data[i]);
-      i = (i + 1);
+      h = ((h * 33ULL) + data.data[i]);
+      i = (i + 1ULL);
     }
 
   }
@@ -74,12 +74,12 @@ uint64_t djb2_hash(forge_span_u64_t data __attribute__((unused)), uint64_t n __a
 }
 
 uint64_t fnv1a_hash(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t h __attribute__((unused)) = -3750763034362895579;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t h __attribute__((unused)) = 0xcbf29ce484222325ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      h = ((h ^ data.data[i]) * 1099511628211);
-      i = (i + 1);
+      h = ((h ^ data.data[i]) * 1099511628211ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -87,7 +87,7 @@ uint64_t fnv1a_hash(forge_span_u64_t data __attribute__((unused)), uint64_t n __
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -17,35 +17,35 @@ uint64_t bucket_total(forge_span_u64_t buckets __attribute__((unused)), uint64_t
 int main();
 
 void histogram(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t buckets __attribute__((unused)), uint64_t nbuckets __attribute__((unused)), uint64_t max_val __attribute__((unused))) {
-  uint64_t b __attribute__((unused)) = 0;
+  uint64_t b __attribute__((unused)) = 0ULL;
   {
     while ((b < nbuckets)) {
-      buckets.data[b] = 0;
-      b = (b + 1);
+      buckets.data[b] = 0ULL;
+      b = (b + 1ULL);
     }
 
   }
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t bucket __attribute__((unused)) = ((data.data[i] * nbuckets) / max_val);
       if ((bucket < nbuckets)) {
-        buckets.data[bucket] = (buckets.data[bucket] + 1);
+        buckets.data[bucket] = (buckets.data[bucket] + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t bucket_total(forge_span_u64_t buckets __attribute__((unused)), uint64_t nbuckets __attribute__((unused))) {
-  uint64_t total __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t total __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nbuckets)) {
       total = (total + buckets.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -53,7 +53,7 @@ uint64_t bucket_total(forge_span_u64_t buckets __attribute__((unused)), uint64_t
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -27,67 +27,67 @@ uint64_t two_windows_flushes();
 int main();
 
 WindowSum ws_new(uint64_t window_sz __attribute__((unused))) {
-  return (WindowSum){ .sum = 0, .count = 0, .window_sz = window_sz, .flushes = 0 };
+  return (WindowSum){ .sum = 0ULL, .count = 0ULL, .window_sz = window_sz, .flushes = 0ULL };
 }
 
 void ws_add(WindowSum* w __attribute__((unused)), uint64_t v __attribute__((unused))) {
   (*w).sum = ((*w).sum + v);
-  (*w).count = ((*w).count + 1);
+  (*w).count = ((*w).count + 1ULL);
 }
 
 void ws_flush(WindowSum* w __attribute__((unused))) {
-  (*w).sum = 0;
-  (*w).count = 0;
-  (*w).flushes = ((*w).flushes + 1);
+  (*w).sum = 0ULL;
+  (*w).count = 0ULL;
+  (*w).flushes = ((*w).flushes + 1ULL);
 }
 
 uint64_t three_samples() {
-  WindowSum w __attribute__((unused)) = ws_new(5);
-  ws_add((&w), 10);
-  ws_add((&w), 20);
-  ws_add((&w), 30);
+  WindowSum w __attribute__((unused)) = ws_new(5ULL);
+  ws_add((&w), 10ULL);
+  ws_add((&w), 20ULL);
+  ws_add((&w), 30ULL);
   return w.sum;
 }
 
 uint64_t sample_count() {
-  WindowSum w __attribute__((unused)) = ws_new(5);
-  ws_add((&w), 10);
-  ws_add((&w), 20);
-  ws_add((&w), 30);
+  WindowSum w __attribute__((unused)) = ws_new(5ULL);
+  ws_add((&w), 10ULL);
+  ws_add((&w), 20ULL);
+  ws_add((&w), 30ULL);
   return w.count;
 }
 
 uint64_t flush_resets_sum() {
-  WindowSum w __attribute__((unused)) = ws_new(5);
-  ws_add((&w), 10);
-  ws_add((&w), 20);
+  WindowSum w __attribute__((unused)) = ws_new(5ULL);
+  ws_add((&w), 10ULL);
+  ws_add((&w), 20ULL);
   ws_flush((&w));
   return w.sum;
 }
 
 uint64_t flush_count() {
-  WindowSum w __attribute__((unused)) = ws_new(5);
-  ws_add((&w), 10);
-  ws_add((&w), 20);
+  WindowSum w __attribute__((unused)) = ws_new(5ULL);
+  ws_add((&w), 10ULL);
+  ws_add((&w), 20ULL);
   ws_flush((&w));
   return w.flushes;
 }
 
 uint64_t two_windows_flushes() {
-  WindowSum w __attribute__((unused)) = ws_new(3);
-  ws_add((&w), 1);
-  ws_add((&w), 2);
-  ws_add((&w), 3);
+  WindowSum w __attribute__((unused)) = ws_new(3ULL);
+  ws_add((&w), 1ULL);
+  ws_add((&w), 2ULL);
+  ws_add((&w), 3ULL);
   ws_flush((&w));
-  ws_add((&w), 4);
-  ws_add((&w), 5);
-  ws_add((&w), 6);
+  ws_add((&w), 4ULL);
+  ws_add((&w), 5ULL);
+  ws_add((&w), 6ULL);
   ws_flush((&w));
   return w.flushes;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

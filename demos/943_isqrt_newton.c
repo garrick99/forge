@@ -14,35 +14,35 @@ int main();
 
 uint64_t isqrt(uint64_t n __attribute__((unused))) {
   uint64_t x __attribute__((unused)) = n;
-  uint64_t steps __attribute__((unused)) = 0;
-  uint64_t max_steps __attribute__((unused)) = 40;
+  uint64_t steps __attribute__((unused)) = 0ULL;
+  uint64_t max_steps __attribute__((unused)) = 40ULL;
   {
     while ((steps < max_steps)) {
-      uint64_t nx __attribute__((unused)) = ((x + (n / x)) / 2);
+      uint64_t nx __attribute__((unused)) = ((x + (n / x)) / 2ULL);
       if ((nx >= x)) {
         steps = max_steps;
 
       } else {
         x = nx;
-        if ((x == 0)) {
-          x = 1;
+        if ((x == 0ULL)) {
+          x = 1ULL;
 
         }
-        steps = (steps + 1);
+        steps = (steps + 1ULL);
 
       }
     }
 
   }
   if (((x * x) > n)) {
-    x = (x - 1);
+    x = (x - 1ULL);
 
   }
   return x;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

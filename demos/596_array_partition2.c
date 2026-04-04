@@ -18,18 +18,18 @@ uint64_t partition_even(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 int main();
 
 uint64_t partition_by_zero(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((s.data[i] == 0)) {
+      if ((s.data[i] == 0ULL)) {
         uint64_t tmp __attribute__((unused)) = s.data[lo];
         s.data[lo] = s.data[i];
         s.data[i] = tmp;
-        lo = (lo + 1);
+        lo = (lo + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -37,18 +37,18 @@ uint64_t partition_by_zero(forge_span_u64_t s __attribute__((unused)), uint64_t 
 }
 
 uint64_t partition_lt(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t thresh __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((s.data[i] < thresh)) {
         uint64_t tmp __attribute__((unused)) = s.data[lo];
         s.data[lo] = s.data[i];
         s.data[i] = tmp;
-        lo = (lo + 1);
+        lo = (lo + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -56,18 +56,18 @@ uint64_t partition_lt(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
 }
 
 uint64_t partition_even(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if (((s.data[i] % 2) == 0)) {
+      if (((s.data[i] % 2ULL) == 0ULL)) {
         uint64_t tmp __attribute__((unused)) = s.data[lo];
         s.data[lo] = s.data[i];
         s.data[i] = tmp;
-        lo = (lo + 1);
+        lo = (lo + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -75,7 +75,7 @@ uint64_t partition_even(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

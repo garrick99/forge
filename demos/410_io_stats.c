@@ -27,63 +27,63 @@ uint64_t write_no_read_effect();
 int main();
 
 IOStats io_new() {
-  return (IOStats){ .read_bytes = 0, .write_bytes = 0, .read_ops = 0, .write_ops = 0 };
+  return (IOStats){ .read_bytes = 0ULL, .write_bytes = 0ULL, .read_ops = 0ULL, .write_ops = 0ULL };
 }
 
 void io_read(IOStats* s __attribute__((unused)), uint64_t bytes __attribute__((unused))) {
   (*s).read_bytes = ((*s).read_bytes + bytes);
-  (*s).read_ops = ((*s).read_ops + 1);
+  (*s).read_ops = ((*s).read_ops + 1ULL);
 }
 
 void io_write(IOStats* s __attribute__((unused)), uint64_t bytes __attribute__((unused))) {
   (*s).write_bytes = ((*s).write_bytes + bytes);
-  (*s).write_ops = ((*s).write_ops + 1);
+  (*s).write_ops = ((*s).write_ops + 1ULL);
 }
 
 uint64_t three_reads() {
   IOStats s __attribute__((unused)) = io_new();
-  io_read((&s), 512);
-  io_read((&s), 512);
-  io_read((&s), 512);
+  io_read((&s), 512ULL);
+  io_read((&s), 512ULL);
+  io_read((&s), 512ULL);
   return s.read_bytes;
 }
 
 uint64_t mixed_total_bytes() {
   IOStats s __attribute__((unused)) = io_new();
-  io_read((&s), 512);
-  io_read((&s), 1024);
-  io_write((&s), 512);
-  io_write((&s), 512);
+  io_read((&s), 512ULL);
+  io_read((&s), 1024ULL);
+  io_write((&s), 512ULL);
+  io_write((&s), 512ULL);
   return (s.read_bytes + s.write_bytes);
 }
 
 uint64_t read_op_count() {
   IOStats s __attribute__((unused)) = io_new();
-  io_read((&s), 512);
-  io_read((&s), 1024);
-  io_write((&s), 512);
+  io_read((&s), 512ULL);
+  io_read((&s), 1024ULL);
+  io_write((&s), 512ULL);
   return s.read_ops;
 }
 
 uint64_t write_op_count() {
   IOStats s __attribute__((unused)) = io_new();
-  io_read((&s), 512);
-  io_write((&s), 256);
-  io_write((&s), 256);
-  io_write((&s), 512);
+  io_read((&s), 512ULL);
+  io_write((&s), 256ULL);
+  io_write((&s), 256ULL);
+  io_write((&s), 512ULL);
   return s.write_ops;
 }
 
 uint64_t write_no_read_effect() {
   IOStats s __attribute__((unused)) = io_new();
-  io_read((&s), 512);
-  io_write((&s), 1024);
-  io_write((&s), 2048);
+  io_read((&s), 512ULL);
+  io_write((&s), 1024ULL);
+  io_write((&s), 2048ULL);
   return s.read_bytes;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

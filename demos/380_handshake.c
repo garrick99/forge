@@ -27,24 +27,24 @@ uint64_t retry_then_establish_state();
 int main();
 
 Handshake hs_new() {
-  return (Handshake){ .state = 0, .retries = 0 };
+  return (Handshake){ .state = 0ULL, .retries = 0ULL };
 }
 
 void hs_send_syn(Handshake* h __attribute__((unused))) {
-  (*h).state = 1;
+  (*h).state = 1ULL;
 }
 
 void hs_recv_syn_ack(Handshake* h __attribute__((unused))) {
-  (*h).state = 2;
+  (*h).state = 2ULL;
 }
 
 void hs_send_ack(Handshake* h __attribute__((unused))) {
-  (*h).state = 3;
+  (*h).state = 3ULL;
 }
 
 void hs_retry(Handshake* h __attribute__((unused))) {
-  (*h).state = 0;
-  (*h).retries = ((*h).retries + 1);
+  (*h).state = 0ULL;
+  (*h).retries = ((*h).retries + 1ULL);
 }
 
 uint64_t after_syn() {
@@ -89,7 +89,7 @@ uint64_t retry_then_establish_state() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

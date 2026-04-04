@@ -24,20 +24,20 @@ uint64_t pool_alloc(forge_span_u64_t free_list __attribute__((unused)), uint64_t
   if ((head >= n)) {
     return n;
   } else {
-    return (head + 1);
+    return (head + 1ULL);
   }
 }
 
 uint64_t pool_free_count(forge_span_u64_t free_bitmap __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((free_bitmap.data[i] == 1)) {
-        cnt = (cnt + 1);
+      if ((free_bitmap.data[i] == 1ULL)) {
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -45,17 +45,17 @@ uint64_t pool_free_count(forge_span_u64_t free_bitmap __attribute__((unused)), u
 }
 
 uint64_t pool_find_free(forge_span_u64_t free_bitmap __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   uint64_t found __attribute__((unused)) = n;
   _Bool done __attribute__((unused)) = 0;
   {
     while (((i < n) && (!done))) {
-      if ((free_bitmap.data[i] == 1)) {
+      if ((free_bitmap.data[i] == 1ULL)) {
         found = i;
         done = 1;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -63,26 +63,26 @@ uint64_t pool_find_free(forge_span_u64_t free_bitmap __attribute__((unused)), ui
 }
 
 void pool_mark_used(forge_span_u64_t free_bitmap __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t idx __attribute__((unused))) {
-  free_bitmap.data[idx] = 0;
+  free_bitmap.data[idx] = 0ULL;
 }
 
 void pool_mark_free(forge_span_u64_t free_bitmap __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t idx __attribute__((unused))) {
-  free_bitmap.data[idx] = 1;
+  free_bitmap.data[idx] = 1ULL;
 }
 
 void pool_init(forge_span_u64_t free_bitmap __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      free_bitmap.data[i] = 1;
-      i = (i + 1);
+      free_bitmap.data[i] = 1ULL;
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

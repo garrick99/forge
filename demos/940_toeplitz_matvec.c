@@ -16,11 +16,11 @@ void toeplitz_matvec(forge_span_u64_t row __attribute__((unused)), forge_span_u6
 int main();
 
 void toeplitz_matvec(forge_span_u64_t row __attribute__((unused)), forge_span_u64_t col __attribute__((unused)), forge_span_u64_t x __attribute__((unused)), forge_span_u64_t y __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t acc __attribute__((unused)) = 0;
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t acc __attribute__((unused)) = 0ULL;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < n)) {
           uint64_t coeff;
@@ -30,19 +30,19 @@ void toeplitz_matvec(forge_span_u64_t row __attribute__((unused)), forge_span_u6
             coeff = col.data[(i - j)];
           }
           acc = (acc + (coeff * x.data[j]));
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
       y.data[i] = acc;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

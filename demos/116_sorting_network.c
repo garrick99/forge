@@ -79,22 +79,22 @@ uint64_t min_le_max(uint64_t a __attribute__((unused)), uint64_t b __attribute__
   uint64_t mn __attribute__((unused)) = sort4_min(a, b, c, d);
   uint64_t mx __attribute__((unused)) = sort4_max(a, b, c, d);
   if ((mn <= mx)) {
-    return 1;
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 int main() {
-  uint64_t lo1 __attribute__((unused)) = cmp_lo(7, 3);
-  uint64_t hi1 __attribute__((unused)) = cmp_hi(7, 3);
-  uint64_t lo2 __attribute__((unused)) = cmp_lo(5, 5);
-  uint64_t hi2 __attribute__((unused)) = cmp_hi(5, 5);
-  uint64_t mn1 __attribute__((unused)) = min2(10, 20);
-  uint64_t mx1 __attribute__((unused)) = max2(10, 20);
-  uint64_t s_min __attribute__((unused)) = sort4_min(8, 3, 6, 1);
-  uint64_t s_max __attribute__((unused)) = sort4_max(8, 3, 6, 1);
-  uint64_t prop __attribute__((unused)) = min_le_max(8, 3, 6, 1);
+  uint64_t lo1 __attribute__((unused)) = cmp_lo(7ULL, 3ULL);
+  uint64_t hi1 __attribute__((unused)) = cmp_hi(7ULL, 3ULL);
+  uint64_t lo2 __attribute__((unused)) = cmp_lo(5ULL, 5ULL);
+  uint64_t hi2 __attribute__((unused)) = cmp_hi(5ULL, 5ULL);
+  uint64_t mn1 __attribute__((unused)) = min2(10ULL, 20ULL);
+  uint64_t mx1 __attribute__((unused)) = max2(10ULL, 20ULL);
+  uint64_t s_min __attribute__((unused)) = sort4_min(8ULL, 3ULL, 6ULL, 1ULL);
+  uint64_t s_max __attribute__((unused)) = sort4_max(8ULL, 3ULL, 6ULL, 1ULL);
+  uint64_t prop __attribute__((unused)) = min_le_max(8ULL, 3ULL, 6ULL, 1ULL);
   return (int)(((((((((lo1 + hi1) + lo2) + hi2) + mn1) + mx1) + s_min) + s_max) + prop));
 
 }

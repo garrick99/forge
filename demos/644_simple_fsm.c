@@ -24,30 +24,30 @@ uint64_t fsm_transition(uint64_t state __attribute__((unused)), uint64_t input _
 }
 
 void fsm_run(forge_span_u64_t states_out __attribute__((unused)), forge_span_u64_t inputs __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t table __attribute__((unused)), uint64_t nstates __attribute__((unused)), uint64_t ninputs __attribute__((unused)), uint64_t init_state __attribute__((unused))) {
-  states_out.data[0] = init_state;
+  states_out.data[0ULL] = init_state;
   uint64_t s __attribute__((unused)) = init_state;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t ns __attribute__((unused)) = fsm_transition(s, inputs.data[i], table, nstates, ninputs);
       s = ns;
-      states_out.data[(i + 1)] = s;
-      i = (i + 1);
+      states_out.data[(i + 1ULL)] = s;
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t fsm_count_state(forge_span_u64_t states __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((states.data[i] == target)) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -55,7 +55,7 @@ uint64_t fsm_count_state(forge_span_u64_t states __attribute__((unused)), uint64
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

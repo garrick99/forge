@@ -25,7 +25,7 @@ void add_spans(forge_span_u64_t out __attribute__((unused)), forge_span_u64_t a 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -16,11 +16,11 @@ void fps_multiply(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b
 int main();
 
 void fps_multiply(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t c __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t p __attribute__((unused))) {
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while ((k < n)) {
-      uint64_t acc __attribute__((unused)) = 0;
-      uint64_t i __attribute__((unused)) = 0;
+      uint64_t acc __attribute__((unused)) = 0ULL;
+      uint64_t i __attribute__((unused)) = 0ULL;
       {
         while ((i <= k)) {
           uint64_t j __attribute__((unused)) = (k - i);
@@ -28,19 +28,19 @@ void fps_multiply(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b
             acc = ((acc + (a.data[i] * b.data[j])) % p);
 
           }
-          i = (i + 1);
+          i = (i + 1ULL);
         }
 
       }
       c.data[k] = acc;
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -26,7 +26,7 @@ uint64_t refill_count();
 int main();
 
 TokenBucket tb_new(uint64_t cap __attribute__((unused))) {
-  return (TokenBucket){ .tokens = cap, .capacity = cap, .consumed = 0, .refills = 0 };
+  return (TokenBucket){ .tokens = cap, .capacity = cap, .consumed = 0ULL, .refills = 0ULL };
 }
 
 void tb_consume(TokenBucket* b __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -36,41 +36,41 @@ void tb_consume(TokenBucket* b __attribute__((unused)), uint64_t n __attribute__
 
 void tb_refill(TokenBucket* b __attribute__((unused)), uint64_t n __attribute__((unused))) {
   (*b).tokens = ((*b).tokens + n);
-  (*b).refills = ((*b).refills + 1);
+  (*b).refills = ((*b).refills + 1ULL);
 }
 
 uint64_t consume_3() {
-  TokenBucket b __attribute__((unused)) = tb_new(10);
-  tb_consume((&b), 3);
+  TokenBucket b __attribute__((unused)) = tb_new(10ULL);
+  tb_consume((&b), 3ULL);
   return b.tokens;
 }
 
 uint64_t consume_refill() {
-  TokenBucket b __attribute__((unused)) = tb_new(10);
-  tb_consume((&b), 5);
-  tb_refill((&b), 3);
+  TokenBucket b __attribute__((unused)) = tb_new(10ULL);
+  tb_consume((&b), 5ULL);
+  tb_refill((&b), 3ULL);
   return b.tokens;
 }
 
 uint64_t total_consumed() {
-  TokenBucket b __attribute__((unused)) = tb_new(10);
-  tb_consume((&b), 4);
-  tb_refill((&b), 4);
-  tb_consume((&b), 3);
+  TokenBucket b __attribute__((unused)) = tb_new(10ULL);
+  tb_consume((&b), 4ULL);
+  tb_refill((&b), 4ULL);
+  tb_consume((&b), 3ULL);
   return b.consumed;
 }
 
 uint64_t refill_count() {
-  TokenBucket b __attribute__((unused)) = tb_new(8);
-  tb_consume((&b), 4);
-  tb_refill((&b), 2);
-  tb_consume((&b), 2);
-  tb_refill((&b), 4);
+  TokenBucket b __attribute__((unused)) = tb_new(8ULL);
+  tb_consume((&b), 4ULL);
+  tb_refill((&b), 2ULL);
+  tb_consume((&b), 2ULL);
+  tb_refill((&b), 4ULL);
   return b.refills;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

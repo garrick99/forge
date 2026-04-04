@@ -81,12 +81,12 @@ void poly_scalar_mul(forge_span_u64_t a __attribute__((unused)), uint64_t s __at
 }
 
 uint64_t poly_inner_product(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t q __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = ((acc + ((a.data[i] * b.data[i]) % q)) % q);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -103,15 +103,15 @@ void poly_ntt_pointwise(forge_span_u64_t a __attribute__((unused)), forge_span_u
 }
 
 uint64_t run() {
-  uint64_t a0 __attribute__((unused)) = 1;
-  uint64_t a1 __attribute__((unused)) = 2;
-  uint64_t a2 __attribute__((unused)) = 3;
-  uint64_t a3 __attribute__((unused)) = 4;
-  uint64_t b0 __attribute__((unused)) = 4;
-  uint64_t b1 __attribute__((unused)) = 3;
-  uint64_t b2 __attribute__((unused)) = 2;
-  uint64_t b3 __attribute__((unused)) = 1;
-  uint64_t q __attribute__((unused)) = 3329;
+  uint64_t a0 __attribute__((unused)) = 1ULL;
+  uint64_t a1 __attribute__((unused)) = 2ULL;
+  uint64_t a2 __attribute__((unused)) = 3ULL;
+  uint64_t a3 __attribute__((unused)) = 4ULL;
+  uint64_t b0 __attribute__((unused)) = 4ULL;
+  uint64_t b1 __attribute__((unused)) = 3ULL;
+  uint64_t b2 __attribute__((unused)) = 2ULL;
+  uint64_t b3 __attribute__((unused)) = 1ULL;
+  uint64_t q __attribute__((unused)) = 3329ULL;
   uint64_t r __attribute__((unused)) = ((((((a0 * b0) % q) + ((a1 * b1) % q)) + ((a2 * b2) % q)) + ((a3 * b3) % q)) % q);
   return r;
 }

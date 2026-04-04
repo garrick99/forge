@@ -29,12 +29,12 @@ void bmat_set(forge_span_u64_t m __attribute__((unused)), uint64_t cols __attrib
 }
 
 uint64_t bmat_row_sum(forge_span_u64_t m __attribute__((unused)), uint64_t cols __attribute__((unused)), uint64_t row __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < cols)) {
       acc = (acc + m.data[((row * cols) + j)]);
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
@@ -42,12 +42,12 @@ uint64_t bmat_row_sum(forge_span_u64_t m __attribute__((unused)), uint64_t cols 
 }
 
 uint64_t bmat_col_sum(forge_span_u64_t m __attribute__((unused)), uint64_t rows __attribute__((unused)), uint64_t cols __attribute__((unused)), uint64_t col __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < rows)) {
       acc = (acc + m.data[((i * cols) + col)]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -55,23 +55,23 @@ uint64_t bmat_col_sum(forge_span_u64_t m __attribute__((unused)), uint64_t rows 
 }
 
 void bmat_fill_row(forge_span_u64_t m __attribute__((unused)), uint64_t cols __attribute__((unused)), uint64_t row __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < cols)) {
       m.data[((row * cols) + j)] = val;
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
 }
 
 uint64_t bmat_trace(forge_span_u64_t m __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + m.data[((i * n) + i)]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -79,7 +79,7 @@ uint64_t bmat_trace(forge_span_u64_t m __attribute__((unused)), uint64_t n __att
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

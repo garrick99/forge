@@ -16,10 +16,10 @@ uint64_t merge_dedup(forge_span_u64_t a __attribute__((unused)), uint64_t na __a
 int main();
 
 uint64_t merge_dedup(forge_span_u64_t a __attribute__((unused)), uint64_t na __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t nb __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t cap __attribute__((unused))) {
-  uint64_t ia __attribute__((unused)) = 0;
-  uint64_t ib __attribute__((unused)) = 0;
-  uint64_t oc __attribute__((unused)) = 0;
-  uint64_t last __attribute__((unused)) = 0;
+  uint64_t ia __attribute__((unused)) = 0ULL;
+  uint64_t ib __attribute__((unused)) = 0ULL;
+  uint64_t oc __attribute__((unused)) = 0ULL;
+  uint64_t last __attribute__((unused)) = 0ULL;
   _Bool has_last __attribute__((unused)) = 0;
   {
     while (((ia < na) || (ib < nb))) {
@@ -44,16 +44,16 @@ uint64_t merge_dedup(forge_span_u64_t a __attribute__((unused)), uint64_t na __a
           out.data[oc] = val;
 
         }
-        oc = (oc + 1);
+        oc = (oc + 1ULL);
         last = val;
         has_last = 1;
 
       }
       if (pick_a) {
-        ia = (ia + 1);
+        ia = (ia + 1ULL);
 
       } else {
-        ib = (ib + 1);
+        ib = (ib + 1ULL);
 
       }
     }
@@ -63,7 +63,7 @@ uint64_t merge_dedup(forge_span_u64_t a __attribute__((unused)), uint64_t na __a
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

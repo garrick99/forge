@@ -32,7 +32,7 @@ void sat_add(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __at
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

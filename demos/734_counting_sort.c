@@ -16,43 +16,43 @@ uint64_t counting_sort(forge_span_u64_t input __attribute__((unused)), uint64_t 
 int main();
 
 uint64_t counting_sort(forge_span_u64_t input __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t counts __attribute__((unused)), uint64_t max_val __attribute__((unused)), forge_span_u64_t output __attribute__((unused))) {
-  uint64_t c __attribute__((unused)) = 0;
+  uint64_t c __attribute__((unused)) = 0ULL;
   {
     while ((c < max_val)) {
-      counts.data[c] = 0;
-      c = (c + 1);
+      counts.data[c] = 0ULL;
+      c = (c + 1ULL);
     }
 
   }
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t v __attribute__((unused)) = input.data[i];
       if ((v < max_val)) {
-        counts.data[v] = (counts.data[v] + 1);
+        counts.data[v] = (counts.data[v] + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t out_idx __attribute__((unused)) = 0;
-  uint64_t val __attribute__((unused)) = 0;
+  uint64_t out_idx __attribute__((unused)) = 0ULL;
+  uint64_t val __attribute__((unused)) = 0ULL;
   {
     while ((val < max_val)) {
-      uint64_t rep __attribute__((unused)) = 0;
+      uint64_t rep __attribute__((unused)) = 0ULL;
       {
         while ((rep < counts.data[val])) {
           if ((out_idx < n)) {
             output.data[out_idx] = val;
-            out_idx = (out_idx + 1);
+            out_idx = (out_idx + 1ULL);
 
           }
-          rep = (rep + 1);
+          rep = (rep + 1ULL);
         }
 
       }
-      val = (val + 1);
+      val = (val + 1ULL);
     }
 
   }
@@ -60,7 +60,7 @@ uint64_t counting_sort(forge_span_u64_t input __attribute__((unused)), uint64_t 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

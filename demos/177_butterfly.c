@@ -23,7 +23,7 @@ void butterfly(forge_span_u64_t a __attribute__((unused)), uint64_t i __attribut
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

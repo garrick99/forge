@@ -16,8 +16,8 @@ uint64_t hist_diff_sum(forge_span_u64_t h1 __attribute__((unused)), forge_span_u
 int main();
 
 uint64_t hist_diff_sum(forge_span_u64_t h1 __attribute__((unused)), forge_span_u64_t h2 __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t d;
@@ -27,11 +27,11 @@ uint64_t hist_diff_sum(forge_span_u64_t h1 __attribute__((unused)), forge_span_u
         d = (h2.data[i] - h1.data[i]);
       }
       uint64_t denom __attribute__((unused)) = (h1.data[i] + h2.data[i]);
-      if ((denom > 0)) {
+      if ((denom > 0ULL)) {
         acc = (acc + ((d * d) / denom));
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -39,7 +39,7 @@ uint64_t hist_diff_sum(forge_span_u64_t h1 __attribute__((unused)), forge_span_u
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

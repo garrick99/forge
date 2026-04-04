@@ -19,8 +19,8 @@ void normalize_inplace(forge_span_u64_t s __attribute__((unused)), uint64_t n __
   {
     for (uint64_t i = 0; i < (uint64_t)(n); i++) {
       uint64_t shifted __attribute__((unused)) = (s.data[i] - min_val);
-      if ((shifted > 255)) {
-        s.data[i] = 255;
+      if ((shifted > 255ULL)) {
+        s.data[i] = 255ULL;
 
       } else {
         s.data[i] = shifted;
@@ -32,7 +32,7 @@ void normalize_inplace(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

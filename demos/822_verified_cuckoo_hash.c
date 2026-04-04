@@ -22,19 +22,19 @@ uint64_t cuckoo_hash1(uint64_t key __attribute__((unused)), uint64_t cap __attri
 }
 
 uint64_t cuckoo_hash2(uint64_t key __attribute__((unused)), uint64_t cap __attribute__((unused))) {
-  return (((key * 2654435761) + 1) % cap);
+  return (((key * 2654435761ULL) + 1ULL) % cap);
 }
 
 _Bool cuckoo_insert(forge_span_u64_t table1 __attribute__((unused)), forge_span_u64_t used1 __attribute__((unused)), forge_span_u64_t table2 __attribute__((unused)), forge_span_u64_t used2 __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t key __attribute__((unused)), uint64_t max_kicks __attribute__((unused))) {
   uint64_t cur __attribute__((unused)) = key;
-  uint64_t kicks __attribute__((unused)) = 0;
+  uint64_t kicks __attribute__((unused)) = 0ULL;
   _Bool placed __attribute__((unused)) = 0;
   {
     while (((kicks < max_kicks) && (!placed))) {
       uint64_t h1 __attribute__((unused)) = cuckoo_hash1(cur, cap);
-      if ((used1.data[h1] == 0)) {
+      if ((used1.data[h1] == 0ULL)) {
         table1.data[h1] = cur;
-        used1.data[h1] = 1;
+        used1.data[h1] = 1ULL;
         placed = 1;
 
       } else {
@@ -42,9 +42,9 @@ _Bool cuckoo_insert(forge_span_u64_t table1 __attribute__((unused)), forge_span_
         table1.data[h1] = cur;
         cur = evicted;
         uint64_t h2 __attribute__((unused)) = cuckoo_hash2(cur, cap);
-        if ((used2.data[h2] == 0)) {
+        if ((used2.data[h2] == 0ULL)) {
           table2.data[h2] = cur;
-          used2.data[h2] = 1;
+          used2.data[h2] = 1ULL;
           placed = 1;
 
         } else {
@@ -55,7 +55,7 @@ _Bool cuckoo_insert(forge_span_u64_t table1 __attribute__((unused)), forge_span_
         }
 
       }
-      kicks = (kicks + 1);
+      kicks = (kicks + 1ULL);
     }
 
   }
@@ -63,7 +63,7 @@ _Bool cuckoo_insert(forge_span_u64_t table1 __attribute__((unused)), forge_span_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

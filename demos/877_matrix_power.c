@@ -13,21 +13,21 @@ typedef struct { uint64_t* data; uintptr_t len; } forge_span_u64_t;
 
 /* Forward declarations */
 void mat_mul_2x2(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t out __attribute__((unused)));
-uint64_t mat_pow_iters(uint64_t exp __attribute__((unused)));
+uint64_t mat_pow_iters(uint64_t forge_exp __attribute__((unused)));
 int main();
 
 void mat_mul_2x2(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  out.data[0] = ((a.data[0] * b.data[0]) + (a.data[1] * b.data[2]));
-  out.data[1] = ((a.data[0] * b.data[1]) + (a.data[1] * b.data[3]));
-  out.data[2] = ((a.data[2] * b.data[0]) + (a.data[3] * b.data[2]));
-  out.data[3] = ((a.data[2] * b.data[1]) + (a.data[3] * b.data[3]));
+  out.data[0ULL] = ((a.data[0ULL] * b.data[0ULL]) + (a.data[1ULL] * b.data[2ULL]));
+  out.data[1ULL] = ((a.data[0ULL] * b.data[1ULL]) + (a.data[1ULL] * b.data[3ULL]));
+  out.data[2ULL] = ((a.data[2ULL] * b.data[0ULL]) + (a.data[3ULL] * b.data[2ULL]));
+  out.data[3ULL] = ((a.data[2ULL] * b.data[1ULL]) + (a.data[3ULL] * b.data[3ULL]));
 }
 
-uint64_t mat_pow_iters(uint64_t exp __attribute__((unused))) {
-  uint64_t e __attribute__((unused)) = exp;
+uint64_t mat_pow_iters(uint64_t forge_exp __attribute__((unused))) {
+  uint64_t e __attribute__((unused)) = forge_exp;
   {
-    while ((e > 0)) {
-      e = (e / 2);
+    while ((e > 0ULL)) {
+      e = (e / 2ULL);
     }
 
   }
@@ -35,7 +35,7 @@ uint64_t mat_pow_iters(uint64_t exp __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -17,7 +17,7 @@ int main();
 
 uint64_t skip_delete(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
   uint64_t pos __attribute__((unused)) = n;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((data.data[i] == val)) {
@@ -27,27 +27,27 @@ uint64_t skip_delete(forge_span_u64_t data __attribute__((unused)), uint64_t n _
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
   if ((pos < n)) {
     uint64_t j __attribute__((unused)) = pos;
     {
-      while (((j + 1) < n)) {
-        data.data[j] = data.data[(j + 1)];
-        j = (j + 1);
+      while (((j + 1ULL) < n)) {
+        data.data[j] = data.data[(j + 1ULL)];
+        j = (j + 1ULL);
       }
 
     }
-    return (n - 1);
+    return (n - 1ULL);
   } else {
     return n;
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -16,14 +16,14 @@ uint64_t skip_insert(forge_span_u64_t data __attribute__((unused)), uint64_t n _
 int main();
 
 uint64_t skip_insert(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t pos __attribute__((unused)) = 0;
+  uint64_t pos __attribute__((unused)) = 0ULL;
   {
     while ((pos < n)) {
       if ((data.data[pos] >= val)) {
         pos = n;
 
       } else {
-        pos = (pos + 1);
+        pos = (pos + 1ULL);
 
       }
     }
@@ -39,10 +39,10 @@ uint64_t skip_insert(forge_span_u64_t data __attribute__((unused)), uint64_t n _
   {
     while ((j > insert_at)) {
       if ((j < cap)) {
-        data.data[j] = data.data[(j - 1)];
+        data.data[j] = data.data[(j - 1ULL)];
 
       }
-      j = (j - 1);
+      j = (j - 1ULL);
     }
 
   }
@@ -50,11 +50,11 @@ uint64_t skip_insert(forge_span_u64_t data __attribute__((unused)), uint64_t n _
     data.data[insert_at] = val;
 
   }
-  return (n + 1);
+  return (n + 1ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

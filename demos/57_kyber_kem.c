@@ -39,18 +39,18 @@ uint64_t count_low_half(uint64_t seed __attribute__((unused)));
 int main();
 
 uint64_t barrett_reduce(uint64_t x __attribute__((unused))) {
-  return (x % 3329);
+  return (x % 3329ULL);
 }
 
 uint64_t coeff_class(uint64_t c __attribute__((unused))) {
   if ((c <= 1664)) {
-    return 0;
+    return 0ULL;
   }
   else if ((c >= 1665 && c <= 3328)) {
-    return 1;
+    return 1ULL;
   }
   else if (1) {
-    return 2;
+    return 2ULL;
   }
 
 }
@@ -94,19 +94,19 @@ uint64_t poly_dot2(uint64_t a0 __attribute__((unused)), uint64_t a1 __attribute_
 }
 
 uint64_t kyber_keygen(uint64_t seed __attribute__((unused))) {
-  uint64_t s0 __attribute__((unused)) = barrett_reduce(((seed % 3) + 1));
-  uint64_t s1 __attribute__((unused)) = barrett_reduce((((seed / 4) % 3) + 1));
-  return barrett_reduce((((5 * s0) + (3 * s1)) + 1));
+  uint64_t s0 __attribute__((unused)) = barrett_reduce(((seed % 3ULL) + 1ULL));
+  uint64_t s1 __attribute__((unused)) = barrett_reduce((((seed / 4ULL) % 3ULL) + 1ULL));
+  return barrett_reduce((((5ULL * s0) + (3ULL * s1)) + 1ULL));
 }
 
 uint64_t kyber_encaps(uint64_t t0 __attribute__((unused)), uint64_t t1 __attribute__((unused)), uint64_t msg __attribute__((unused))) {
-  uint64_t v __attribute__((unused)) = barrett_reduce((((t0 + t1) + 1) + msg));
+  uint64_t v __attribute__((unused)) = barrett_reduce((((t0 + t1) + 1ULL) + msg));
   return v;
 }
 
 uint64_t kyber_decaps(uint64_t s0 __attribute__((unused)), uint64_t s1 __attribute__((unused)), uint64_t u0 __attribute__((unused)), uint64_t u1 __attribute__((unused)), uint64_t v __attribute__((unused))) {
   uint64_t su __attribute__((unused)) = barrett_reduce(((s0 * u0) + (s1 * u1)));
-  uint64_t q __attribute__((unused)) = 3329;
+  uint64_t q __attribute__((unused)) = 3329ULL;
   uint64_t raw;
   if ((v >= su)) {
     raw = (v - su);
@@ -119,20 +119,20 @@ uint64_t kyber_decaps(uint64_t s0 __attribute__((unused)), uint64_t s1 __attribu
 uint64_t count_low_half(uint64_t seed __attribute__((unused))) {
   uint64_t cnt __attribute__((unused)) = ({ uint64_t __loop_result_0;
     for(;;) {
-      uint64_t acc __attribute__((unused)) = 0;
-      uint64_t i __attribute__((unused)) = 0;
+      uint64_t acc __attribute__((unused)) = 0ULL;
+      uint64_t i __attribute__((unused)) = 0ULL;
       {
-        while ((i < 8)) {
-          uint64_t c __attribute__((unused)) = barrett_reduce((((seed * i) + i) + 1));
+        while ((i < 8ULL)) {
+          uint64_t c __attribute__((unused)) = barrett_reduce((((seed * i) + i) + 1ULL));
           uint64_t cls __attribute__((unused)) = coeff_class(c);
           uint64_t one;
-          if ((cls == 0)) {
-            one = 1;
+          if ((cls == 0ULL)) {
+            one = 1ULL;
           } else {
-            one = 0;
+            one = 0ULL;
           }
           acc = (acc + one);
-          i = (i + 1);
+          i = (i + 1ULL);
         }
 
       }
@@ -143,9 +143,9 @@ uint64_t count_low_half(uint64_t seed __attribute__((unused))) {
 }
 
 int main() {
-  uint64_t t0 __attribute__((unused)) = kyber_keygen(3);
+  uint64_t t0 __attribute__((unused)) = kyber_keygen(3ULL);
   uint64_t cls __attribute__((unused)) = coeff_class(t0);
-  Result_u64_u64 r __attribute__((unused)) = chain_div(1000, 10, 5);
+  Result_u64_u64 r __attribute__((unused)) = chain_div(1000ULL, 10ULL, 5ULL);
   uint64_t quot;
   switch (r.tag) {
     case Result_u64_u64_tag_Ok: {
@@ -154,11 +154,11 @@ int main() {
       break;
     }
     case Result_u64_u64_tag_Err: {
-      quot = 0;
+      quot = 0ULL;
       break;
     }
   }
-  uint64_t low __attribute__((unused)) = count_low_half(3);
+  uint64_t low __attribute__((unused)) = count_low_half(3ULL);
   return (int)(((cls + quot) + low));
 
 }

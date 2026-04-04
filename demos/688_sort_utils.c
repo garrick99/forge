@@ -18,20 +18,20 @@ uint64_t find_upper_bound(forge_span_u64_t s __attribute__((unused)), uint64_t n
 int main();
 
 void merge_sorted(forge_span_u64_t a __attribute__((unused)), uint64_t na __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t nb __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
-  uint64_t j __attribute__((unused)) = 0;
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
+  uint64_t j __attribute__((unused)) = 0ULL;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while (((i < na) && (j < nb))) {
       if ((a.data[i] <= b.data[j])) {
         out.data[k] = a.data[i];
-        i = (i + 1);
-        k = (k + 1);
+        i = (i + 1ULL);
+        k = (k + 1ULL);
 
       } else {
         out.data[k] = b.data[j];
-        j = (j + 1);
-        k = (k + 1);
+        j = (j + 1ULL);
+        k = (k + 1ULL);
 
       }
     }
@@ -40,29 +40,29 @@ void merge_sorted(forge_span_u64_t a __attribute__((unused)), uint64_t na __attr
   {
     while ((i < na)) {
       out.data[k] = a.data[i];
-      i = (i + 1);
-      k = (k + 1);
+      i = (i + 1ULL);
+      k = (k + 1ULL);
     }
 
   }
   {
     while ((j < nb)) {
       out.data[k] = b.data[j];
-      j = (j + 1);
-      k = (k + 1);
+      j = (j + 1ULL);
+      k = (k + 1ULL);
     }
 
   }
 }
 
 uint64_t find_lower_bound(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
   uint64_t hi __attribute__((unused)) = n;
   {
     while ((lo < hi)) {
-      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2));
+      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2ULL));
       if ((s.data[mid] < val)) {
-        lo = (mid + 1);
+        lo = (mid + 1ULL);
 
       } else {
         hi = mid;
@@ -75,13 +75,13 @@ uint64_t find_lower_bound(forge_span_u64_t s __attribute__((unused)), uint64_t n
 }
 
 uint64_t find_upper_bound(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
   uint64_t hi __attribute__((unused)) = n;
   {
     while ((lo < hi)) {
-      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2));
+      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2ULL));
       if ((s.data[mid] <= val)) {
-        lo = (mid + 1);
+        lo = (mid + 1ULL);
 
       } else {
         hi = mid;
@@ -94,7 +94,7 @@ uint64_t find_upper_bound(forge_span_u64_t s __attribute__((unused)), uint64_t n
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

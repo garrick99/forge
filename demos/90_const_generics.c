@@ -25,9 +25,9 @@ uint64_t scale_up(uint64_t FACTOR __attribute__((unused)), uint64_t x __attribut
 
 uint64_t threshold_check(uint64_t LIMIT __attribute__((unused)), uint64_t x __attribute__((unused))) {
   if ((x <= LIMIT)) {
-    return 1;
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
@@ -36,14 +36,14 @@ uint64_t fixed_sum(uint64_t A __attribute__((unused)), uint64_t B __attribute__(
 }
 
 int main() {
-  uint64_t r1 __attribute__((unused)) = replicate(3, 7);
-  uint64_t r2 __attribute__((unused)) = replicate(5, 4);
-  uint64_t s1 __attribute__((unused)) = scale_up(10, 8);
-  uint64_t s2 __attribute__((unused)) = scale_up(100, 2);
-  uint64_t t1 __attribute__((unused)) = threshold_check(50, 30);
-  uint64_t t2 __attribute__((unused)) = threshold_check(50, 60);
-  uint64_t f1 __attribute__((unused)) = fixed_sum(10, 20);
-  uint64_t f2 __attribute__((unused)) = fixed_sum(7, 8);
+  uint64_t r1 __attribute__((unused)) = replicate(3ULL, 7ULL);
+  uint64_t r2 __attribute__((unused)) = replicate(5ULL, 4ULL);
+  uint64_t s1 __attribute__((unused)) = scale_up(10ULL, 8ULL);
+  uint64_t s2 __attribute__((unused)) = scale_up(100ULL, 2ULL);
+  uint64_t t1 __attribute__((unused)) = threshold_check(50ULL, 30ULL);
+  uint64_t t2 __attribute__((unused)) = threshold_check(50ULL, 60ULL);
+  uint64_t f1 __attribute__((unused)) = fixed_sum(10ULL, 20ULL);
+  uint64_t f2 __attribute__((unused)) = fixed_sum(7ULL, 8ULL);
   return (int)((((((((r1 + r2) + s1) + s2) + t1) + t2) + f1) + f2));
 
 }

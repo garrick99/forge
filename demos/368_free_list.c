@@ -25,21 +25,21 @@ uint64_t invariant_holds(uint64_t cap __attribute__((unused)));
 int main();
 
 FreeList fl_new(uint64_t cap __attribute__((unused))) {
-  return (FreeList){ .free = cap, .allocated = 0, .capacity = cap };
+  return (FreeList){ .free = cap, .allocated = 0ULL, .capacity = cap };
 }
 
 void fl_alloc(FreeList* f __attribute__((unused))) {
-  (*f).free = ((*f).free - 1);
-  (*f).allocated = ((*f).allocated + 1);
+  (*f).free = ((*f).free - 1ULL);
+  (*f).allocated = ((*f).allocated + 1ULL);
 }
 
 void fl_dealloc(FreeList* f __attribute__((unused))) {
-  (*f).allocated = ((*f).allocated - 1);
-  (*f).free = ((*f).free + 1);
+  (*f).allocated = ((*f).allocated - 1ULL);
+  (*f).free = ((*f).free + 1ULL);
 }
 
 uint64_t alloc_four() {
-  FreeList f __attribute__((unused)) = fl_new(8);
+  FreeList f __attribute__((unused)) = fl_new(8ULL);
   fl_alloc((&f));
   fl_alloc((&f));
   fl_alloc((&f));
@@ -48,7 +48,7 @@ uint64_t alloc_four() {
 }
 
 uint64_t alloc_four_free() {
-  FreeList f __attribute__((unused)) = fl_new(8);
+  FreeList f __attribute__((unused)) = fl_new(8ULL);
   fl_alloc((&f));
   fl_alloc((&f));
   fl_alloc((&f));
@@ -57,7 +57,7 @@ uint64_t alloc_four_free() {
 }
 
 uint64_t alloc3_dealloc2() {
-  FreeList f __attribute__((unused)) = fl_new(8);
+  FreeList f __attribute__((unused)) = fl_new(8ULL);
   fl_alloc((&f));
   fl_alloc((&f));
   fl_alloc((&f));
@@ -76,7 +76,7 @@ uint64_t invariant_holds(uint64_t cap __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

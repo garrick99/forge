@@ -25,14 +25,14 @@ uint64_t tbl_get(forge_span_u64_t t __attribute__((unused)), uint64_t rows __att
 
 uint64_t tbl_row_max(forge_span_u64_t t __attribute__((unused)), uint64_t cols __attribute__((unused)), uint64_t row __attribute__((unused))) {
   uint64_t mx __attribute__((unused)) = t.data[(row * cols)];
-  uint64_t j __attribute__((unused)) = 1;
+  uint64_t j __attribute__((unused)) = 1ULL;
   {
     while ((j < cols)) {
       if ((t.data[((row * cols) + j)] > mx)) {
         mx = t.data[((row * cols) + j)];
 
       }
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
@@ -41,14 +41,14 @@ uint64_t tbl_row_max(forge_span_u64_t t __attribute__((unused)), uint64_t cols _
 
 uint64_t tbl_row_min(forge_span_u64_t t __attribute__((unused)), uint64_t cols __attribute__((unused)), uint64_t row __attribute__((unused))) {
   uint64_t mn __attribute__((unused)) = t.data[(row * cols)];
-  uint64_t j __attribute__((unused)) = 1;
+  uint64_t j __attribute__((unused)) = 1ULL;
   {
     while ((j < cols)) {
       if ((t.data[((row * cols) + j)] < mn)) {
         mn = t.data[((row * cols) + j)];
 
       }
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
@@ -56,16 +56,16 @@ uint64_t tbl_row_min(forge_span_u64_t t __attribute__((unused)), uint64_t cols _
 }
 
 uint64_t tbl_global_max(forge_span_u64_t t __attribute__((unused)), uint64_t rows __attribute__((unused)), uint64_t cols __attribute__((unused))) {
-  uint64_t mx __attribute__((unused)) = t.data[0];
+  uint64_t mx __attribute__((unused)) = t.data[0ULL];
   uint64_t total __attribute__((unused)) = (rows * cols);
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < total)) {
       if ((t.data[i] > mx)) {
         mx = t.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -74,18 +74,18 @@ uint64_t tbl_global_max(forge_span_u64_t t __attribute__((unused)), uint64_t row
 
 void tbl_fill(forge_span_u64_t t __attribute__((unused)), uint64_t rows __attribute__((unused)), uint64_t cols __attribute__((unused)), uint64_t val __attribute__((unused))) {
   uint64_t total __attribute__((unused)) = (rows * cols);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < total)) {
       t.data[i] = val;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

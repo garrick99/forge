@@ -18,28 +18,28 @@ uint64_t rmq_query(uint64_t a __attribute__((unused)), uint64_t b __attribute__(
 int main();
 
 void build_base(forge_span_u64_t data __attribute__((unused)), forge_span_u64_t table __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       table.data[i] = data.data[i];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void build_level2(forge_span_u64_t table __attribute__((unused)), forge_span_u64_t table2 __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < (n - 1))) {
-      if ((table.data[i] <= table.data[(i + 1)])) {
+    while ((i < (n - 1ULL))) {
+      if ((table.data[i] <= table.data[(i + 1ULL)])) {
         table2.data[i] = table.data[i];
 
       } else {
-        table2.data[i] = table.data[(i + 1)];
+        table2.data[i] = table.data[(i + 1ULL)];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -54,7 +54,7 @@ uint64_t rmq_query(uint64_t a __attribute__((unused)), uint64_t b __attribute__(
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

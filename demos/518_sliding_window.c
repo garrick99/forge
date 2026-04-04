@@ -18,37 +18,37 @@ uint64_t window_count_ge(forge_span_u64_t s __attribute__((unused)), uint64_t n 
 int main();
 
 void window_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t w __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t wsum __attribute__((unused)) = 0;
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t wsum __attribute__((unused)) = 0ULL;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while ((k < w)) {
       wsum = (wsum + s.data[k]);
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
-  out.data[0] = wsum;
-  uint64_t i __attribute__((unused)) = 1;
+  out.data[0ULL] = wsum;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
-    while ((((i + w) - 1) < n)) {
-      wsum = ((wsum + s.data[((i + w) - 1)]) - s.data[(i - 1)]);
+    while ((((i + w) - 1ULL) < n)) {
+      wsum = ((wsum + s.data[((i + w) - 1ULL)]) - s.data[(i - 1ULL)]);
       out.data[i] = wsum;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t window_max(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t w __attribute__((unused))) {
-  uint64_t m __attribute__((unused)) = s.data[0];
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t m __attribute__((unused)) = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < w)) {
       if ((s.data[i] > m)) {
         m = s.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -56,15 +56,15 @@ uint64_t window_max(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 }
 
 uint64_t window_count_ge(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t w __attribute__((unused)), uint64_t start __attribute__((unused)), uint64_t threshold __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
   uint64_t i __attribute__((unused)) = start;
   {
     while ((i < (start + w))) {
       if ((s.data[i] >= threshold)) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -72,7 +72,7 @@ uint64_t window_count_ge(forge_span_u64_t s __attribute__((unused)), uint64_t n 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

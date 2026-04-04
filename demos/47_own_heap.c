@@ -26,7 +26,7 @@ uint64_t round_trip(uint64_t n __attribute__((unused))) {
 uint64_t allocate_and_discard(uint64_t n __attribute__((unused))) {
   uint64_t* p __attribute__((unused)) = __forge_own_alloc_u64(n);
   (free(p), (void)0);
-  return 0;
+  return 0ULL;
 }
 
 uint64_t alloc_two(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
@@ -38,9 +38,9 @@ uint64_t alloc_two(uint64_t a __attribute__((unused)), uint64_t b __attribute__(
 }
 
 uint64_t run() {
-  uint64_t x __attribute__((unused)) = round_trip(42);
-  uint64_t y __attribute__((unused)) = allocate_and_discard(99);
-  uint64_t z __attribute__((unused)) = alloc_two(10, 32);
+  uint64_t x __attribute__((unused)) = round_trip(42ULL);
+  uint64_t y __attribute__((unused)) = allocate_and_discard(99ULL);
+  uint64_t z __attribute__((unused)) = alloc_two(10ULL, 32ULL);
   return ((x + y) + z);
 }
 

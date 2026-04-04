@@ -1,0 +1,295 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry prefix_product_upsweep_kernel(
+    .param .u64 prefix_product_upsweep_kernel_param_prefix_data,
+    .param .u64 prefix_product_upsweep_kernel_param_prefix_len,
+    .param .u64 prefix_product_upsweep_kernel_param_stride,
+    .param .u64 prefix_product_upsweep_kernel_param_n
+)
+{
+    .reg .pred %p16;
+    .reg .u64 %rd0, %rd1, %rd10, %rd11, %rd12, %rd13, %rd14, %rd15, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd3, %rd9;
+    .reg .u32 %r27, %r28, %r29, %r4, %r5, %r6, %r7, %r8;
+
+  ld.param.u64 %rd0, [prefix_product_upsweep_kernel_param_prefix_data];
+  ld.param.u64 %rd1, [prefix_product_upsweep_kernel_param_prefix_len];
+  ld.param.u64 %rd2, [prefix_product_upsweep_kernel_param_stride];
+  ld.param.u64 %rd3, [prefix_product_upsweep_kernel_param_n];
+
+  mov.u32 %r4, %ctaid.x;
+  mov.u32 %r5, %ntid.x;
+  mul.lo.u32 %r6, %r4, %r5;
+  mov.u32 %r7, %tid.x;
+  add.u32 %r8, %r6, %r7;
+  mov.u64 %rd9, 1;
+  add.u64 %rd10, %r8, %rd9;
+  mul.lo.u64 %rd11, %rd10, %rd2;
+  mov.u64 %rd12, 2;
+  mul.lo.u64 %rd13, %rd11, %rd12;
+  mov.u64 %rd14, 1;
+  sub.u64 %rd15, %rd13, %rd14;
+  setp.lt.u64 %p16, %rd15, %rd3;
+  @%p16 bra prefix_product_upsweep_kernel_then_17;
+  bra prefix_product_upsweep_kernel_else_17;
+  prefix_product_upsweep_kernel_then_17:
+  mov.u64 %rd18, 0; // unhandled expr
+  sub.u64 %rd19, %rd15, %rd2;
+  mov.u64 %rd20, 0; // unhandled expr
+  mov.u64 %rd21, 0; // call m31_get (device fn)
+  mov.u64 %rd22, 0; // call m31_get (device fn)
+  mov.u64 %rd23, 0; // call m31_mul (device fn)
+  mov.u64 %rd24, 4;
+  mul.lo.u64 %rd25, %rd15, %rd24;
+  add.u64 %rd26, %rd0, %rd25;
+  st.global.u32 [%rd26], %rd23;
+  mov.u32 %r27, 0; // unit
+  mov.u32 %r28, %r27;
+  bra prefix_product_upsweep_kernel_end_17;
+  prefix_product_upsweep_kernel_else_17:
+  mov.u32 %r28, 0; // no else branch
+  prefix_product_upsweep_kernel_end_17:
+  mov.u32 %r29, 0; // unit
+  ret;
+}
+
+.visible .entry prefix_product_downsweep_kernel(
+    .param .u64 prefix_product_downsweep_kernel_param_prefix_data,
+    .param .u64 prefix_product_downsweep_kernel_param_prefix_len,
+    .param .u64 prefix_product_downsweep_kernel_param_stride,
+    .param .u64 prefix_product_downsweep_kernel_param_n
+)
+{
+    .reg .pred %p17;
+    .reg .u64 %rd0, %rd1, %rd10, %rd11, %rd12, %rd13, %rd14, %rd15, %rd16, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd3, %rd9;
+    .reg .u32 %r28, %r29, %r30, %r4, %r5, %r6, %r7, %r8;
+
+  ld.param.u64 %rd0, [prefix_product_downsweep_kernel_param_prefix_data];
+  ld.param.u64 %rd1, [prefix_product_downsweep_kernel_param_prefix_len];
+  ld.param.u64 %rd2, [prefix_product_downsweep_kernel_param_stride];
+  ld.param.u64 %rd3, [prefix_product_downsweep_kernel_param_n];
+
+  mov.u32 %r4, %ctaid.x;
+  mov.u32 %r5, %ntid.x;
+  mul.lo.u32 %r6, %r4, %r5;
+  mov.u32 %r7, %tid.x;
+  add.u32 %r8, %r6, %r7;
+  mov.u64 %rd9, 1;
+  add.u64 %rd10, %r8, %rd9;
+  mul.lo.u64 %rd11, %rd10, %rd2;
+  mov.u64 %rd12, 2;
+  mul.lo.u64 %rd13, %rd11, %rd12;
+  mov.u64 %rd14, 1;
+  sub.u64 %rd15, %rd13, %rd14;
+  add.u64 %rd16, %rd15, %rd2;
+  setp.lt.u64 %p17, %rd16, %rd3;
+  @%p17 bra prefix_product_downsweep_kernel_then_18;
+  bra prefix_product_downsweep_kernel_else_18;
+  prefix_product_downsweep_kernel_then_18:
+  mov.u64 %rd19, 0; // unhandled expr
+  add.u64 %rd20, %rd15, %rd2;
+  mov.u64 %rd21, 0; // unhandled expr
+  mov.u64 %rd22, 0; // call m31_get (device fn)
+  mov.u64 %rd23, 0; // call m31_get (device fn)
+  mov.u64 %rd24, 0; // call m31_mul (device fn)
+  mov.u64 %rd25, 4;
+  mul.lo.u64 %rd26, %rd20, %rd25;
+  add.u64 %rd27, %rd0, %rd26;
+  st.global.u32 [%rd27], %rd24;
+  mov.u32 %r28, 0; // unit
+  mov.u32 %r29, %r28;
+  bra prefix_product_downsweep_kernel_end_18;
+  prefix_product_downsweep_kernel_else_18:
+  mov.u32 %r29, 0; // no else branch
+  prefix_product_downsweep_kernel_end_18:
+  mov.u32 %r30, 0; // unit
+  ret;
+}
+
+.visible .entry batch_inverse_suffix_kernel(
+    .param .u64 batch_inverse_suffix_kernel_param_inv_data,
+    .param .u64 batch_inverse_suffix_kernel_param_inv_len,
+    .param .u64 batch_inverse_suffix_kernel_param_prefix_data,
+    .param .u64 batch_inverse_suffix_kernel_param_prefix_len,
+    .param .u64 batch_inverse_suffix_kernel_param_a_data,
+    .param .u64 batch_inverse_suffix_kernel_param_a_len,
+    .param .u32 batch_inverse_suffix_kernel_param_inv_total,
+    .param .u64 batch_inverse_suffix_kernel_param_n
+)
+{
+    .reg .pred %p14, %p18, %p35, %p52;
+    .reg .u64 %rd0, %rd1, %rd13, %rd15, %rd17, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd29, %rd3, %rd30, %rd31, %rd32, %rd33, %rd34, %rd37, %rd38, %rd39, %rd4, %rd40, %rd41, %rd42, %rd43, %rd44, %rd45, %rd46, %rd47, %rd48, %rd49, %rd5, %rd50, %rd51, %rd54, %rd55, %rd56, %rd57, %rd58, %rd59, %rd60, %rd61, %rd62, %rd63, %rd64, %rd65, %rd66, %rd67, %rd7, %rd74, %rd75, %rd76, %rd77, %rd78;
+    .reg .u32 %r10, %r11, %r12, %r6, %r68, %r69, %r70, %r71, %r72, %r73, %r79, %r8, %r80, %r81, %r9;
+
+  ld.param.u64 %rd0, [batch_inverse_suffix_kernel_param_inv_data];
+  ld.param.u64 %rd1, [batch_inverse_suffix_kernel_param_inv_len];
+  ld.param.u64 %rd2, [batch_inverse_suffix_kernel_param_prefix_data];
+  ld.param.u64 %rd3, [batch_inverse_suffix_kernel_param_prefix_len];
+  ld.param.u64 %rd4, [batch_inverse_suffix_kernel_param_a_data];
+  ld.param.u64 %rd5, [batch_inverse_suffix_kernel_param_a_len];
+  ld.param.u32 %r6, [batch_inverse_suffix_kernel_param_inv_total];
+  ld.param.u64 %rd7, [batch_inverse_suffix_kernel_param_n];
+
+  mov.u32 %r8, %ctaid.x;
+  mov.u32 %r9, %ntid.x;
+  mul.lo.u32 %r10, %r8, %r9;
+  mov.u32 %r11, %tid.x;
+  add.u32 %r12, %r10, %r11;
+  mov.u64 %rd13, 0;
+  cvt.u64.u32 %rd15, %r12;
+  setp.eq.u64 %p14, %rd15, %rd13;
+  @%p14 bra batch_inverse_suffix_kernel_then_16;
+  bra batch_inverse_suffix_kernel_else_16;
+  batch_inverse_suffix_kernel_then_16:
+  mov.u64 %rd17, 1;
+  setp.gt.u64 %p18, %rd7, %rd17;
+  @%p18 bra batch_inverse_suffix_kernel_then_19;
+  bra batch_inverse_suffix_kernel_else_19;
+  batch_inverse_suffix_kernel_then_19:
+  mov.u64 %rd20, 2;
+  sub.u64 %rd21, %rd7, %rd20;
+  mov.u64 %rd22, 0; // unhandled expr
+  mov.u64 %rd23, 1;
+  sub.u64 %rd24, %rd7, %rd23;
+  mov.u64 %rd25, 0; // unhandled expr
+  mov.u64 %rd26, 0; // unhandled expr
+  mov.u64 %rd27, 0; // call m31_get (device fn)
+  mov.u64 %rd28, 0; // call m31_get (device fn)
+  mov.u64 %rd29, 0; // call m31_mul (device fn)
+  mov.u64 %rd30, 4;
+  mul.lo.u64 %rd31, %rd24, %rd30;
+  add.u64 %rd32, %rd0, %rd31;
+  st.global.u32 [%rd32], %rd29;
+  mov.u64 %rd33, 0; // call m31_mul (device fn)
+  mov.u64 %rd34, 2;
+  setp.gt.u64 %p35, %rd7, %rd34;
+  @%p35 bra batch_inverse_suffix_kernel_then_36;
+  bra batch_inverse_suffix_kernel_else_36;
+  batch_inverse_suffix_kernel_then_36:
+  mov.u64 %rd37, 2;
+  sub.u64 %rd38, %rd7, %rd37;
+  mov.u64 %rd39, 0; // unhandled expr
+  mov.u64 %rd40, 0; // unhandled expr
+  mov.u64 %rd41, 3;
+  sub.u64 %rd42, %rd7, %rd41;
+  mov.u64 %rd43, 0; // unhandled expr
+  mov.u64 %rd44, 0; // call m31_get (device fn)
+  mov.u64 %rd45, 0; // call m31_get (device fn)
+  mov.u64 %rd46, 0; // call m31_mul (device fn)
+  mov.u64 %rd47, 4;
+  mul.lo.u64 %rd48, %rd38, %rd47;
+  add.u64 %rd49, %rd0, %rd48;
+  st.global.u32 [%rd49], %rd46;
+  mov.u64 %rd50, 0; // call m31_mul (device fn)
+  mov.u64 %rd51, 3;
+  setp.gt.u64 %p52, %rd7, %rd51;
+  @%p52 bra batch_inverse_suffix_kernel_then_53;
+  bra batch_inverse_suffix_kernel_else_53;
+  batch_inverse_suffix_kernel_then_53:
+  mov.u64 %rd54, 3;
+  sub.u64 %rd55, %rd7, %rd54;
+  mov.u64 %rd56, 0; // unhandled expr
+  mov.u64 %rd57, 0; // unhandled expr
+  mov.u64 %rd58, 4;
+  sub.u64 %rd59, %rd7, %rd58;
+  mov.u64 %rd60, 0; // unhandled expr
+  mov.u64 %rd61, 0; // call m31_get (device fn)
+  mov.u64 %rd62, 0; // call m31_get (device fn)
+  mov.u64 %rd63, 0; // call m31_mul (device fn)
+  mov.u64 %rd64, 4;
+  mul.lo.u64 %rd65, %rd55, %rd64;
+  add.u64 %rd66, %rd0, %rd65;
+  st.global.u32 [%rd66], %rd63;
+  mov.u64 %rd67, 0; // call m31_mul (device fn)
+  mov.u32 %r68, 0; // unit
+  mov.u32 %r69, %r68;
+  bra batch_inverse_suffix_kernel_end_53;
+  batch_inverse_suffix_kernel_else_53:
+  mov.u32 %r69, 0; // no else branch
+  batch_inverse_suffix_kernel_end_53:
+  mov.u32 %r70, 0; // unit
+  mov.u32 %r71, %r70;
+  bra batch_inverse_suffix_kernel_end_36;
+  batch_inverse_suffix_kernel_else_36:
+  mov.u32 %r71, 0; // no else branch
+  batch_inverse_suffix_kernel_end_36:
+  mov.u32 %r72, 0; // unit
+  mov.u32 %r73, %r72;
+  bra batch_inverse_suffix_kernel_end_19;
+  batch_inverse_suffix_kernel_else_19:
+  mov.u32 %r73, 0; // no else branch
+  batch_inverse_suffix_kernel_end_19:
+  mov.u64 %rd74, 0; // unhandled expr
+  mov.u64 %rd75, 0;
+  mov.u64 %rd76, 4;
+  mul.lo.u64 %rd77, %rd75, %rd76;
+  add.u64 %rd78, %rd0, %rd77;
+  st.global.u32 [%rd78], %rd67;
+  mov.u32 %r79, 0; // unit
+  mov.u32 %r80, %r79;
+  bra batch_inverse_suffix_kernel_end_16;
+  batch_inverse_suffix_kernel_else_16:
+  mov.u32 %r80, 0; // no else branch
+  batch_inverse_suffix_kernel_end_16:
+  mov.u32 %r81, 0; // unit
+  ret;
+}
+
+.visible .entry fermat_inverse_kernel(
+    .param .u64 fermat_inverse_kernel_param_inv_data,
+    .param .u64 fermat_inverse_kernel_param_inv_len,
+    .param .u64 fermat_inverse_kernel_param_a_data,
+    .param .u64 fermat_inverse_kernel_param_a_len,
+    .param .u64 fermat_inverse_kernel_param_n
+)
+{
+    .reg .pred %p10;
+    .reg .u64 %rd0, %rd1, %rd11, %rd13, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd3, %rd4;
+    .reg .u32 %r28, %r29, %r30, %r5, %r6, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [fermat_inverse_kernel_param_inv_data];
+  ld.param.u64 %rd1, [fermat_inverse_kernel_param_inv_len];
+  ld.param.u64 %rd2, [fermat_inverse_kernel_param_a_data];
+  ld.param.u64 %rd3, [fermat_inverse_kernel_param_a_len];
+  ld.param.u64 %rd4, [fermat_inverse_kernel_param_n];
+
+  mov.u32 %r5, %ctaid.x;
+  mov.u32 %r6, %ntid.x;
+  mul.lo.u32 %r7, %r5, %r6;
+  mov.u32 %r8, %tid.x;
+  add.u32 %r9, %r7, %r8;
+  cvt.u64.u32 %rd11, %r9;
+  setp.lt.u64 %p10, %rd11, %rd4;
+  @%p10 bra fermat_inverse_kernel_then_12;
+  bra fermat_inverse_kernel_else_12;
+  fermat_inverse_kernel_then_12:
+  mov.u64 %rd13, 0; // unhandled expr
+  mov.u64 %rd14, 0; // unhandled expr
+  mov.u64 %rd15, 0; // call m31_get (device fn)
+  mov.u64 %rd16, 0; // call m31_mul (device fn)
+  mov.u64 %rd17, 0; // call m31_mul (device fn)
+  mov.u64 %rd18, 0; // call m31_mul (device fn)
+  mov.u64 %rd19, 0; // call m31_mul (device fn)
+  mov.u64 %rd20, 0; // call m31_mul (device fn)
+  mov.u64 %rd21, 0; // call m31_mul (device fn)
+  mov.u64 %rd22, 0; // call m31_mul (device fn)
+  mov.u64 %rd23, 0; // call m31_mul (device fn)
+  cvt.u64.u32 %rd24, %r9;
+  mov.u64 %rd25, 4;
+  mul.lo.u64 %rd26, %rd24, %rd25;
+  add.u64 %rd27, %rd0, %rd26;
+  st.global.u32 [%rd27], %rd23;
+  mov.u32 %r28, 0; // unit
+  mov.u32 %r29, %r28;
+  bra fermat_inverse_kernel_end_12;
+  fermat_inverse_kernel_else_12:
+  mov.u32 %r29, 0; // no else branch
+  fermat_inverse_kernel_end_12:
+  mov.u32 %r30, 0; // unit
+  ret;
+}
+

@@ -22,33 +22,33 @@ _Bool packet_is_valid_len(forge_span_u64_t buf __attribute__((unused)), uint64_t
 int main();
 
 uint64_t read_u8(forge_span_u64_t buf __attribute__((unused)), uint64_t offset __attribute__((unused))) {
-  return (buf.data[offset] & 255);
+  return (buf.data[offset] & 255ULL);
 }
 
 uint64_t read_u16_be(forge_span_u64_t buf __attribute__((unused)), uint64_t offset __attribute__((unused))) {
-  uint64_t hi __attribute__((unused)) = (buf.data[offset] & 255);
-  uint64_t lo __attribute__((unused)) = (buf.data[(offset + 1)] & 255);
-  return ((hi << 8) | lo);
+  uint64_t hi __attribute__((unused)) = (buf.data[offset] & 255ULL);
+  uint64_t lo __attribute__((unused)) = (buf.data[(offset + 1ULL)] & 255ULL);
+  return ((hi << 8ULL) | lo);
 }
 
 uint64_t read_u32_be(forge_span_u64_t buf __attribute__((unused)), uint64_t offset __attribute__((unused))) {
-  uint64_t b0 __attribute__((unused)) = (buf.data[offset] & 255);
-  uint64_t b1 __attribute__((unused)) = (buf.data[(offset + 1)] & 255);
-  uint64_t b2 __attribute__((unused)) = (buf.data[(offset + 2)] & 255);
-  uint64_t b3 __attribute__((unused)) = (buf.data[(offset + 3)] & 255);
-  return ((((b0 << 24) | (b1 << 16)) | (b2 << 8)) | b3);
+  uint64_t b0 __attribute__((unused)) = (buf.data[offset] & 255ULL);
+  uint64_t b1 __attribute__((unused)) = (buf.data[(offset + 1ULL)] & 255ULL);
+  uint64_t b2 __attribute__((unused)) = (buf.data[(offset + 2ULL)] & 255ULL);
+  uint64_t b3 __attribute__((unused)) = (buf.data[(offset + 3ULL)] & 255ULL);
+  return ((((b0 << 24ULL) | (b1 << 16ULL)) | (b2 << 8ULL)) | b3);
 }
 
 uint64_t packet_version(forge_span_u64_t buf __attribute__((unused))) {
-  return (buf.data[0] >> 4);
+  return (buf.data[0ULL] >> 4ULL);
 }
 
 uint64_t packet_ihl(forge_span_u64_t buf __attribute__((unused))) {
-  return (buf.data[0] & 15);
+  return (buf.data[0ULL] & 15ULL);
 }
 
 uint64_t packet_total_len(forge_span_u64_t buf __attribute__((unused))) {
-  return read_u16_be(buf, 2);
+  return read_u16_be(buf, 2ULL);
 }
 
 _Bool packet_is_valid_len(forge_span_u64_t buf __attribute__((unused)), uint64_t pkt_len __attribute__((unused))) {
@@ -57,7 +57,7 @@ _Bool packet_is_valid_len(forge_span_u64_t buf __attribute__((unused)), uint64_t
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

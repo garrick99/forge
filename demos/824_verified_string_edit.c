@@ -19,36 +19,36 @@ uint64_t char_count(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 int main();
 
 void str_reverse(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t l __attribute__((unused)) = 0;
+  uint64_t l __attribute__((unused)) = 0ULL;
   uint64_t r __attribute__((unused)) = n;
   {
-    while (((l + 1) < r)) {
-      r = (r - 1);
+    while (((l + 1ULL) < r)) {
+      r = (r - 1ULL);
       uint64_t tmp __attribute__((unused)) = s.data[l];
       s.data[l] = s.data[r];
       s.data[r] = tmp;
-      l = (l + 1);
+      l = (l + 1ULL);
     }
 
   }
 }
 
 void to_upper(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if (((s.data[i] >= 97) && (s.data[i] <= 122))) {
-        s.data[i] = (s.data[i] - 32);
+      if (((s.data[i] >= 97ULL) && (s.data[i] <= 122ULL))) {
+        s.data[i] = (s.data[i] - 32ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t trim_leading(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t ch __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   _Bool found __attribute__((unused)) = 0;
   {
     while (((i < n) && (!found))) {
@@ -56,7 +56,7 @@ uint64_t trim_leading(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
         found = 1;
 
       } else {
-        i = (i + 1);
+        i = (i + 1ULL);
 
       }
     }
@@ -66,15 +66,15 @@ uint64_t trim_leading(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
 }
 
 uint64_t char_count(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t ch __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((s.data[i] == ch)) {
-        count = (count + 1);
+        count = (count + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -82,7 +82,7 @@ uint64_t char_count(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

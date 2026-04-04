@@ -16,20 +16,20 @@ void rotate_left1(forge_span_u64_t s __attribute__((unused)), uint64_t n __attri
 int main();
 
 void rotate_left1(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t first __attribute__((unused)) = s.data[0];
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t first __attribute__((unused)) = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < (n - 1))) {
-      s.data[i] = s.data[(i + 1)];
-      i = (i + 1);
+    while ((i < (n - 1ULL))) {
+      s.data[i] = s.data[(i + 1ULL)];
+      i = (i + 1ULL);
     }
 
   }
-  s.data[(n - 1)] = first;
+  s.data[(n - 1ULL)] = first;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

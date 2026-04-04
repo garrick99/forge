@@ -24,11 +24,11 @@ uint64_t poly_eval(forge_span_u64_t coeffs __attribute__((unused)), uint64_t deg
   _Bool done __attribute__((unused)) = 0;
   {
     while ((!done)) {
-      if ((i == 0)) {
+      if ((i == 0ULL)) {
         done = 1;
 
       } else {
-        i = (i - 1);
+        i = (i - 1ULL);
         acc = ((acc * x) + coeffs.data[i]);
 
       }
@@ -44,11 +44,11 @@ uint64_t poly_eval_mod(forge_span_u64_t coeffs __attribute__((unused)), uint64_t
   _Bool done __attribute__((unused)) = 0;
   {
     while ((!done)) {
-      if ((i == 0)) {
+      if ((i == 0ULL)) {
         done = 1;
 
       } else {
-        i = (i - 1);
+        i = (i - 1ULL);
         acc = (((acc * (x % m)) + (coeffs.data[i] % m)) % m);
 
       }
@@ -59,29 +59,29 @@ uint64_t poly_eval_mod(forge_span_u64_t coeffs __attribute__((unused)), uint64_t
 }
 
 void poly_add(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       out.data[i] = (a.data[i] + b.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void poly_scale(forge_span_u64_t coeffs __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t s __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       coeffs.data[i] = (coeffs.data[i] * s);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

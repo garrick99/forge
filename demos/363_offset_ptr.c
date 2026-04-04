@@ -25,7 +25,7 @@ uint64_t size_preserved(uint64_t size __attribute__((unused)));
 int main();
 
 OffsetPtr optr_new(uint64_t size __attribute__((unused))) {
-  return (OffsetPtr){ .offset = 0, .size = size };
+  return (OffsetPtr){ .offset = 0ULL, .size = size };
 }
 
 void optr_advance(OffsetPtr* p __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -37,39 +37,39 @@ void optr_rewind(OffsetPtr* p __attribute__((unused)), uint64_t n __attribute__(
 }
 
 void optr_reset(OffsetPtr* p __attribute__((unused))) {
-  (*p).offset = 0;
+  (*p).offset = 0ULL;
 }
 
 uint64_t advance_5(uint64_t size __attribute__((unused))) {
   OffsetPtr p __attribute__((unused)) = optr_new(size);
-  optr_advance((&p), 5);
+  optr_advance((&p), 5ULL);
   return p.offset;
 }
 
 uint64_t advance_rewind(uint64_t size __attribute__((unused))) {
   OffsetPtr p __attribute__((unused)) = optr_new(size);
-  optr_advance((&p), 10);
-  optr_rewind((&p), 3);
+  optr_advance((&p), 10ULL);
+  optr_rewind((&p), 3ULL);
   return p.offset;
 }
 
 uint64_t advance_reset(uint64_t size __attribute__((unused))) {
   OffsetPtr p __attribute__((unused)) = optr_new(size);
-  optr_advance((&p), 8);
+  optr_advance((&p), 8ULL);
   optr_reset((&p));
   return p.offset;
 }
 
 uint64_t size_preserved(uint64_t size __attribute__((unused))) {
   OffsetPtr p __attribute__((unused)) = optr_new(size);
-  optr_advance((&p), 5);
-  optr_rewind((&p), 2);
+  optr_advance((&p), 5ULL);
+  optr_rewind((&p), 2ULL);
   optr_reset((&p));
   return p.size;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

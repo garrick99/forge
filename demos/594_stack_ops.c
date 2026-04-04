@@ -21,25 +21,25 @@ int main();
 
 uint64_t stack_push(forge_span_u64_t s __attribute__((unused)), uint64_t top __attribute__((unused)), uint64_t val __attribute__((unused))) {
   s.data[top] = val;
-  return (top + 1);
+  return (top + 1ULL);
 }
 
 uint64_t stack_pop(forge_span_u64_t s __attribute__((unused)), uint64_t top __attribute__((unused))) {
-  return (top - 1);
+  return (top - 1ULL);
 }
 
 uint64_t stack_peek(forge_span_u64_t s __attribute__((unused)), uint64_t top __attribute__((unused))) {
-  return s.data[(top - 1)];
+  return s.data[(top - 1ULL)];
 }
 
 uint64_t stack_fill(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t top __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t top __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[top] = i;
-      top = (top + 1);
-      i = (i + 1);
+      top = (top + 1ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -47,12 +47,12 @@ uint64_t stack_fill(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 }
 
 uint64_t stack_sum(forge_span_u64_t s __attribute__((unused)), uint64_t top __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < top)) {
       acc = (acc + s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -60,7 +60,7 @@ uint64_t stack_sum(forge_span_u64_t s __attribute__((unused)), uint64_t top __at
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

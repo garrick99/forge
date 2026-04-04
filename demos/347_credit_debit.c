@@ -24,7 +24,7 @@ uint64_t net_zero();
 int main();
 
 Ledger ledger_new() {
-  return (Ledger){ .credits = 0, .debits = 0 };
+  return (Ledger){ .credits = 0ULL, .debits = 0ULL };
 }
 
 void ledger_credit(Ledger* l __attribute__((unused)), uint64_t amount __attribute__((unused))) {
@@ -37,36 +37,36 @@ void ledger_debit(Ledger* l __attribute__((unused)), uint64_t amount __attribute
 
 uint64_t credit_100() {
   Ledger l __attribute__((unused)) = ledger_new();
-  ledger_credit((&l), 100);
+  ledger_credit((&l), 100ULL);
   return l.credits;
 }
 
 uint64_t credit_debit_balance() {
   Ledger l __attribute__((unused)) = ledger_new();
-  ledger_credit((&l), 200);
-  ledger_debit((&l), 50);
+  ledger_credit((&l), 200ULL);
+  ledger_debit((&l), 50ULL);
   return (l.credits - l.debits);
 }
 
 uint64_t multi_ops() {
   Ledger l __attribute__((unused)) = ledger_new();
-  ledger_credit((&l), 100);
-  ledger_credit((&l), 100);
-  ledger_credit((&l), 100);
-  ledger_debit((&l), 80);
-  ledger_debit((&l), 60);
+  ledger_credit((&l), 100ULL);
+  ledger_credit((&l), 100ULL);
+  ledger_credit((&l), 100ULL);
+  ledger_debit((&l), 80ULL);
+  ledger_debit((&l), 60ULL);
   return (l.credits - l.debits);
 }
 
 uint64_t net_zero() {
   Ledger l __attribute__((unused)) = ledger_new();
-  ledger_credit((&l), 50);
-  ledger_debit((&l), 50);
+  ledger_credit((&l), 50ULL);
+  ledger_debit((&l), 50ULL);
   return (l.credits - l.debits);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

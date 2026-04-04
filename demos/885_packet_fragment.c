@@ -18,31 +18,31 @@ uint64_t fragment_size(uint64_t frag_idx __attribute__((unused)), uint64_t nfrag
 int main();
 
 uint64_t compute_num_fragments(uint64_t n __attribute__((unused)), uint64_t mtu __attribute__((unused))) {
-  uint64_t nf __attribute__((unused)) = (((n + mtu) - 1) / mtu);
-  if ((nf == 0)) {
-    return 1;
+  uint64_t nf __attribute__((unused)) = (((n + mtu) - 1ULL) / mtu);
+  if ((nf == 0ULL)) {
+    return 1ULL;
   } else {
     return nf;
   }
 }
 
 void write_fragment_offsets(forge_span_u64_t offsets __attribute__((unused)), uint64_t nfrags __attribute__((unused)), uint64_t mtu __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nfrags)) {
       offsets.data[i] = (i * mtu);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t fragment_size(uint64_t frag_idx __attribute__((unused)), uint64_t nfrags __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t mtu __attribute__((unused))) {
-  if ((frag_idx < (nfrags - 1))) {
+  if ((frag_idx < (nfrags - 1ULL))) {
     return mtu;
   } else {
     uint64_t rem __attribute__((unused)) = (n % mtu);
-    if ((rem == 0)) {
+    if ((rem == 0ULL)) {
       return mtu;
     } else {
       return rem;
@@ -51,7 +51,7 @@ uint64_t fragment_size(uint64_t frag_idx __attribute__((unused)), uint64_t nfrag
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

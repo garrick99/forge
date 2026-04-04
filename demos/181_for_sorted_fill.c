@@ -17,15 +17,15 @@ int main();
 
 void fill_even(forge_span_u64_t s __attribute__((unused))) {
   {
-    for (uint64_t i = 0; i < (uint64_t)(8); i++) {
-      s.data[i] = (i * 2);
+    for (uint64_t i = 0; i < (uint64_t)(8ULL); i++) {
+      s.data[i] = (i * 2ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

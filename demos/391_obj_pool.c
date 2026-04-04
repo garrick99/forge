@@ -27,18 +27,18 @@ uint64_t alloc_free_frees();
 int main();
 
 ObjPool op_new(uint64_t cap __attribute__((unused))) {
-  return (ObjPool){ .live = 0, .cap = cap, .generation = 0, .allocs = 0, .frees = 0 };
+  return (ObjPool){ .live = 0ULL, .cap = cap, .generation = 0ULL, .allocs = 0ULL, .frees = 0ULL };
 }
 
 void op_alloc(ObjPool* p __attribute__((unused))) {
-  (*p).live = ((*p).live + 1);
-  (*p).allocs = ((*p).allocs + 1);
+  (*p).live = ((*p).live + 1ULL);
+  (*p).allocs = ((*p).allocs + 1ULL);
 }
 
 void op_free(ObjPool* p __attribute__((unused))) {
-  (*p).live = ((*p).live - 1);
-  (*p).generation = ((*p).generation + 1);
-  (*p).frees = ((*p).frees + 1);
+  (*p).live = ((*p).live - 1ULL);
+  (*p).generation = ((*p).generation + 1ULL);
+  (*p).frees = ((*p).frees + 1ULL);
 }
 
 uint64_t alloc_three(uint64_t cap __attribute__((unused))) {
@@ -50,7 +50,7 @@ uint64_t alloc_three(uint64_t cap __attribute__((unused))) {
 }
 
 uint64_t generation_after_frees() {
-  ObjPool p __attribute__((unused)) = op_new(4);
+  ObjPool p __attribute__((unused)) = op_new(4ULL);
   op_alloc((&p));
   op_alloc((&p));
   op_free((&p));
@@ -59,7 +59,7 @@ uint64_t generation_after_frees() {
 }
 
 uint64_t alloc_free_allocs() {
-  ObjPool p __attribute__((unused)) = op_new(4);
+  ObjPool p __attribute__((unused)) = op_new(4ULL);
   op_alloc((&p));
   op_alloc((&p));
   op_alloc((&p));
@@ -72,7 +72,7 @@ uint64_t alloc_free_allocs() {
 }
 
 uint64_t alloc_free_frees() {
-  ObjPool p __attribute__((unused)) = op_new(4);
+  ObjPool p __attribute__((unused)) = op_new(4ULL);
   op_alloc((&p));
   op_alloc((&p));
   op_alloc((&p));
@@ -84,7 +84,7 @@ uint64_t alloc_free_frees() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

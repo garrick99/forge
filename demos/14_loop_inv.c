@@ -16,8 +16,8 @@ uint64_t count_down_to_zero(uint64_t x __attribute__((unused)));
 uint64_t count_down(uint64_t x __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = x;
   {
-    while ((v > 0)) {
-      v = (v - 1);
+    while ((v > 0ULL)) {
+      v = (v - 1ULL);
     }
 
   }
@@ -25,12 +25,12 @@ uint64_t count_down(uint64_t x __attribute__((unused))) {
 }
 
 uint64_t triangular(uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i <= n)) {
       acc = (acc + i);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -40,8 +40,8 @@ uint64_t triangular(uint64_t n __attribute__((unused))) {
 uint64_t count_down_to_zero(uint64_t x __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = x;
   {
-    while ((v > 0)) {
-      v = (v - 1);
+    while ((v > 0ULL)) {
+      v = (v - 1ULL);
     }
 
   }

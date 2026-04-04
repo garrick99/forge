@@ -26,24 +26,24 @@ uint64_t field_get(forge_span_u64_t pkt __attribute__((unused)), uint64_t offset
 }
 
 uint64_t hdr_version(forge_span_u64_t pkt __attribute__((unused))) {
-  return (pkt.data[0] % 16);
+  return (pkt.data[0ULL] % 16ULL);
 }
 
 uint64_t hdr_ihl(forge_span_u64_t pkt __attribute__((unused))) {
-  return ((pkt.data[0] / 16) % 16);
+  return ((pkt.data[0ULL] / 16ULL) % 16ULL);
 }
 
 uint64_t hdr_dscp(forge_span_u64_t pkt __attribute__((unused))) {
-  return (pkt.data[0] % 64);
+  return (pkt.data[0ULL] % 64ULL);
 }
 
 uint64_t pkt_sum_words(forge_span_u64_t pkt __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      acc = ((acc + (pkt.data[i] % 65536)) % 65536);
-      i = (i + 1);
+      acc = ((acc + (pkt.data[i] % 65536ULL)) % 65536ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -55,15 +55,15 @@ _Bool pkt_is_valid_len(forge_span_u64_t pkt __attribute__((unused)), uint64_t de
 }
 
 uint64_t count_valid_pkts(forge_span_u64_t lens __attribute__((unused)), uint64_t actual_len __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((lens.data[i] <= actual_len)) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -71,7 +71,7 @@ uint64_t count_valid_pkts(forge_span_u64_t lens __attribute__((unused)), uint64_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -16,15 +16,15 @@ uint64_t knapsack(forge_span_u64_t weights __attribute__((unused)), forge_span_u
 int main();
 
 uint64_t knapsack(forge_span_u64_t weights __attribute__((unused)), forge_span_u64_t values __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t dp __attribute__((unused)), uint64_t capacity __attribute__((unused))) {
-  uint64_t c __attribute__((unused)) = 0;
+  uint64_t c __attribute__((unused)) = 0ULL;
   {
     while ((c <= capacity)) {
-      dp.data[c] = 0;
-      c = (c + 1);
+      dp.data[c] = 0ULL;
+      c = (c + 1ULL);
     }
 
   }
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t w __attribute__((unused)) = weights.data[i];
@@ -39,16 +39,16 @@ uint64_t knapsack(forge_span_u64_t weights __attribute__((unused)), forge_span_u
 
           }
           if ((cap == w)) {
-            cap = 0;
+            cap = 0ULL;
 
           } else {
-            cap = (cap - 1);
+            cap = (cap - 1ULL);
 
           }
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -56,7 +56,7 @@ uint64_t knapsack(forge_span_u64_t weights __attribute__((unused)), forge_span_u
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

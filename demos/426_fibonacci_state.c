@@ -27,14 +27,14 @@ uint64_t fib_step_count();
 int main();
 
 FibState fib_new() {
-  return (FibState){ .a = 0, .b = 1, .steps = 0 };
+  return (FibState){ .a = 0ULL, .b = 1ULL, .steps = 0ULL };
 }
 
 void fib_next(FibState* f __attribute__((unused))) {
   uint64_t new_b __attribute__((unused)) = ((*f).a + (*f).b);
   (*f).a = (*f).b;
   (*f).b = new_b;
-  (*f).steps = ((*f).steps + 1);
+  (*f).steps = ((*f).steps + 1ULL);
 }
 
 uint64_t fib_initial_a() {
@@ -88,7 +88,7 @@ uint64_t fib_step_count() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

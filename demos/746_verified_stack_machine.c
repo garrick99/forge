@@ -16,53 +16,53 @@ uint64_t stack_eval(forge_span_u64_t program __attribute__((unused)), uint64_t p
 int main();
 
 uint64_t stack_eval(forge_span_u64_t program __attribute__((unused)), uint64_t prog_len __attribute__((unused)), forge_span_u64_t stack __attribute__((unused)), uint64_t stack_cap __attribute__((unused))) {
-  uint64_t sp __attribute__((unused)) = 0;
-  uint64_t pc __attribute__((unused)) = 0;
+  uint64_t sp __attribute__((unused)) = 0ULL;
+  uint64_t pc __attribute__((unused)) = 0ULL;
   {
     while ((pc < prog_len)) {
       uint64_t op __attribute__((unused)) = program.data[pc];
-      if ((op == 0)) {
-        if ((((pc + 1) < prog_len) && (sp < stack_cap))) {
-          stack.data[sp] = program.data[(pc + 1)];
-          sp = (sp + 1);
-          pc = (pc + 2);
+      if ((op == 0ULL)) {
+        if ((((pc + 1ULL) < prog_len) && (sp < stack_cap))) {
+          stack.data[sp] = program.data[(pc + 1ULL)];
+          sp = (sp + 1ULL);
+          pc = (pc + 2ULL);
 
         } else {
           pc = prog_len;
 
         }
 
-      } else if ((op == 1)) {
-        if ((sp >= 2)) {
-          uint64_t a __attribute__((unused)) = stack.data[(sp - 1)];
-          uint64_t b __attribute__((unused)) = stack.data[(sp - 2)];
-          sp = (sp - 1);
-          stack.data[(sp - 1)] = (a + b);
-          pc = (pc + 1);
+      } else if ((op == 1ULL)) {
+        if ((sp >= 2ULL)) {
+          uint64_t a __attribute__((unused)) = stack.data[(sp - 1ULL)];
+          uint64_t b __attribute__((unused)) = stack.data[(sp - 2ULL)];
+          sp = (sp - 1ULL);
+          stack.data[(sp - 1ULL)] = (a + b);
+          pc = (pc + 1ULL);
 
         } else {
           pc = prog_len;
 
         }
 
-      } else if ((op == 2)) {
-        if ((sp >= 2)) {
-          uint64_t a __attribute__((unused)) = stack.data[(sp - 1)];
-          uint64_t b __attribute__((unused)) = stack.data[(sp - 2)];
-          sp = (sp - 1);
-          stack.data[(sp - 1)] = (a * b);
-          pc = (pc + 1);
+      } else if ((op == 2ULL)) {
+        if ((sp >= 2ULL)) {
+          uint64_t a __attribute__((unused)) = stack.data[(sp - 1ULL)];
+          uint64_t b __attribute__((unused)) = stack.data[(sp - 2ULL)];
+          sp = (sp - 1ULL);
+          stack.data[(sp - 1ULL)] = (a * b);
+          pc = (pc + 1ULL);
 
         } else {
           pc = prog_len;
 
         }
 
-      } else if ((op == 3)) {
-        if (((sp >= 1) && (sp < stack_cap))) {
-          stack.data[sp] = stack.data[(sp - 1)];
-          sp = (sp + 1);
-          pc = (pc + 1);
+      } else if ((op == 3ULL)) {
+        if (((sp >= 1ULL) && (sp < stack_cap))) {
+          stack.data[sp] = stack.data[(sp - 1ULL)];
+          sp = (sp + 1ULL);
+          pc = (pc + 1ULL);
 
         } else {
           pc = prog_len;
@@ -80,7 +80,7 @@ uint64_t stack_eval(forge_span_u64_t program __attribute__((unused)), uint64_t p
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

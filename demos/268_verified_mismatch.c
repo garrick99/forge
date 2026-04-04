@@ -18,7 +18,7 @@ int main();
 uint64_t mismatch(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
   uint64_t idx __attribute__((unused)) = n;
   _Bool found __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if (((found == 0) && (a.data[i] != b.data[i]))) {
@@ -26,7 +26,7 @@ uint64_t mismatch(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b
         found = 1;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -34,7 +34,7 @@ uint64_t mismatch(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -25,15 +25,15 @@ uint64_t completed_count(uint64_t cap __attribute__((unused)));
 int main();
 
 WorkQueue wq_new(uint64_t cap __attribute__((unused))) {
-  return (WorkQueue){ .enqueued = 0, .completed = 0, .cap = cap };
+  return (WorkQueue){ .enqueued = 0ULL, .completed = 0ULL, .cap = cap };
 }
 
 void wq_enqueue(WorkQueue* w __attribute__((unused))) {
-  (*w).enqueued = ((*w).enqueued + 1);
+  (*w).enqueued = ((*w).enqueued + 1ULL);
 }
 
 void wq_complete(WorkQueue* w __attribute__((unused))) {
-  (*w).completed = ((*w).completed + 1);
+  (*w).completed = ((*w).completed + 1ULL);
 }
 
 uint64_t enqueue_four(uint64_t cap __attribute__((unused))) {
@@ -76,7 +76,7 @@ uint64_t completed_count(uint64_t cap __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

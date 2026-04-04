@@ -19,30 +19,30 @@ uint64_t mask_below(uint64_t bit __attribute__((unused)));
 int main();
 
 uint64_t flag_set(uint64_t flags __attribute__((unused)), uint64_t bit __attribute__((unused))) {
-  return (flags | (1 << bit));
+  return (flags | (1ULL << bit));
 }
 
 uint64_t flag_clear(uint64_t flags __attribute__((unused)), uint64_t bit __attribute__((unused))) {
-  return (flags & (!(1 << bit)));
+  return (flags & (~(1ULL << bit)));
 }
 
 _Bool flag_test(uint64_t flags __attribute__((unused)), uint64_t bit __attribute__((unused))) {
-  return (((flags >> bit) % 2) == 1);
+  return (((flags >> bit) % 2ULL) == 1ULL);
 }
 
 uint64_t flag_toggle(uint64_t flags __attribute__((unused)), uint64_t bit __attribute__((unused))) {
-  return (flags ^ (1 << bit));
+  return (flags ^ (1ULL << bit));
 }
 
 uint64_t count_set_bits(uint64_t x __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = x;
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < 64)) {
-      cnt = (cnt + (n % 2));
-      n = (n / 2);
-      i = (i + 1);
+    while ((i < 64ULL)) {
+      cnt = (cnt + (n % 2ULL));
+      n = (n / 2ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -50,19 +50,19 @@ uint64_t count_set_bits(uint64_t x __attribute__((unused))) {
 }
 
 uint64_t lowest_set_bit(uint64_t x __attribute__((unused))) {
-  return (x & (0 - x));
+  return (x & (0ULL - x));
 }
 
 uint64_t mask_below(uint64_t bit __attribute__((unused))) {
-  if ((bit == 0)) {
-    return 0;
+  if ((bit == 0ULL)) {
+    return 0ULL;
   } else {
-    return ((1 << bit) - 1);
+    return ((1ULL << bit) - 1ULL);
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

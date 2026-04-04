@@ -28,23 +28,23 @@ uint64_t no_votes();
 int main();
 
 VoteQuorum vq_new(uint64_t voters __attribute__((unused)), uint64_t quorum __attribute__((unused))) {
-  return (VoteQuorum){ .voters = voters, .quorum = quorum, .yes_votes = 0, .no_votes = 0, .abstentions = 0 };
+  return (VoteQuorum){ .voters = voters, .quorum = quorum, .yes_votes = 0ULL, .no_votes = 0ULL, .abstentions = 0ULL };
 }
 
 void vq_vote_yes(VoteQuorum* v __attribute__((unused))) {
-  (*v).yes_votes = ((*v).yes_votes + 1);
+  (*v).yes_votes = ((*v).yes_votes + 1ULL);
 }
 
 void vq_vote_no(VoteQuorum* v __attribute__((unused))) {
-  (*v).no_votes = ((*v).no_votes + 1);
+  (*v).no_votes = ((*v).no_votes + 1ULL);
 }
 
 void vq_abstain(VoteQuorum* v __attribute__((unused))) {
-  (*v).abstentions = ((*v).abstentions + 1);
+  (*v).abstentions = ((*v).abstentions + 1ULL);
 }
 
 uint64_t three_yes() {
-  VoteQuorum v __attribute__((unused)) = vq_new(5, 3);
+  VoteQuorum v __attribute__((unused)) = vq_new(5ULL, 3ULL);
   vq_vote_yes((&v));
   vq_vote_yes((&v));
   vq_vote_yes((&v));
@@ -52,7 +52,7 @@ uint64_t three_yes() {
 }
 
 uint64_t quorum_met() {
-  VoteQuorum v __attribute__((unused)) = vq_new(5, 3);
+  VoteQuorum v __attribute__((unused)) = vq_new(5ULL, 3ULL);
   vq_vote_yes((&v));
   vq_vote_yes((&v));
   vq_vote_yes((&v));
@@ -60,7 +60,7 @@ uint64_t quorum_met() {
 }
 
 uint64_t total_votes() {
-  VoteQuorum v __attribute__((unused)) = vq_new(5, 3);
+  VoteQuorum v __attribute__((unused)) = vq_new(5ULL, 3ULL);
   vq_vote_yes((&v));
   vq_vote_yes((&v));
   vq_vote_no((&v));
@@ -70,7 +70,7 @@ uint64_t total_votes() {
 }
 
 uint64_t no_votes() {
-  VoteQuorum v __attribute__((unused)) = vq_new(5, 3);
+  VoteQuorum v __attribute__((unused)) = vq_new(5ULL, 3ULL);
   vq_vote_yes((&v));
   vq_vote_no((&v));
   vq_vote_no((&v));
@@ -78,7 +78,7 @@ uint64_t no_votes() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -16,29 +16,29 @@ uint64_t rle_encode(forge_span_u64_t input __attribute__((unused)), uint64_t n _
 int main();
 
 uint64_t rle_encode(forge_span_u64_t input __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t vals __attribute__((unused)), forge_span_u64_t counts __attribute__((unused)), uint64_t cap __attribute__((unused))) {
-  uint64_t out_idx __attribute__((unused)) = 0;
-  uint64_t run_start __attribute__((unused)) = 0;
-  vals.data[0] = input.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t out_idx __attribute__((unused)) = 0ULL;
+  uint64_t run_start __attribute__((unused)) = 0ULL;
+  vals.data[0ULL] = input.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
-    while (((i < n) && (out_idx < (cap - 1)))) {
+    while (((i < n) && (out_idx < (cap - 1ULL)))) {
       if ((input.data[i] != input.data[run_start])) {
         counts.data[out_idx] = (i - run_start);
-        out_idx = (out_idx + 1);
+        out_idx = (out_idx + 1ULL);
         vals.data[out_idx] = input.data[i];
         run_start = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
   counts.data[out_idx] = (i - run_start);
-  return (out_idx + 1);
+  return (out_idx + 1ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

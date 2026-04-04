@@ -19,7 +19,7 @@ uint64_t cache_evict_insert(forge_span_u64_t keys __attribute__((unused)), forge
 int main();
 
 uint64_t cache_find(forge_span_u64_t keys __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t key __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   uint64_t found __attribute__((unused)) = n;
   _Bool done __attribute__((unused)) = 0;
   {
@@ -29,7 +29,7 @@ uint64_t cache_find(forge_span_u64_t keys __attribute__((unused)), uint64_t n __
         done = 1;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -37,9 +37,9 @@ uint64_t cache_find(forge_span_u64_t keys __attribute__((unused)), uint64_t n __
 }
 
 uint64_t cache_oldest(forge_span_u64_t ages __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t oldest __attribute__((unused)) = 0;
-  uint64_t max_age __attribute__((unused)) = ages.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t oldest __attribute__((unused)) = 0ULL;
+  uint64_t max_age __attribute__((unused)) = ages.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((ages.data[i] > max_age)) {
@@ -47,7 +47,7 @@ uint64_t cache_oldest(forge_span_u64_t ages __attribute__((unused)), uint64_t n 
         oldest = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -55,26 +55,26 @@ uint64_t cache_oldest(forge_span_u64_t ages __attribute__((unused)), uint64_t n 
 }
 
 void cache_update_ages(forge_span_u64_t ages __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t hit_idx __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      ages.data[i] = (ages.data[i] + 1);
-      i = (i + 1);
+      ages.data[i] = (ages.data[i] + 1ULL);
+      i = (i + 1ULL);
     }
 
   }
-  ages.data[hit_idx] = 0;
+  ages.data[hit_idx] = 0ULL;
 }
 
 uint64_t cache_evict_insert(forge_span_u64_t keys __attribute__((unused)), forge_span_u64_t ages __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t new_key __attribute__((unused))) {
   uint64_t slot __attribute__((unused)) = cache_oldest(ages, n);
   keys.data[slot] = new_key;
-  ages.data[slot] = 0;
+  ages.data[slot] = 0ULL;
   return slot;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

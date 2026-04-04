@@ -16,25 +16,25 @@ uint64_t utf8_byte_len(forge_span_u64_t codepoints __attribute__((unused)), uint
 int main();
 
 uint64_t utf8_byte_len(forge_span_u64_t codepoints __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t total __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t total __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t cp __attribute__((unused)) = codepoints.data[i];
-      if ((cp < 128)) {
-        total = (total + 1);
+      if ((cp < 128ULL)) {
+        total = (total + 1ULL);
 
-      } else if ((cp < 2048)) {
-        total = (total + 2);
+      } else if ((cp < 2048ULL)) {
+        total = (total + 2ULL);
 
-      } else if ((cp < 65536)) {
-        total = (total + 3);
+      } else if ((cp < 65536ULL)) {
+        total = (total + 3ULL);
 
       } else {
-        total = (total + 4);
+        total = (total + 4ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -42,7 +42,7 @@ uint64_t utf8_byte_len(forge_span_u64_t codepoints __attribute__((unused)), uint
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

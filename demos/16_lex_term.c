@@ -13,22 +13,22 @@ uint64_t ack_step(uint64_t m __attribute__((unused)), uint64_t n __attribute__((
 uint64_t div_sub(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 
 uint64_t ack_step(uint64_t m __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  if ((m == 0)) {
-    return (n + 1);
+  if ((m == 0ULL)) {
+    return (n + 1ULL);
   } else {
-    if ((n == 0)) {
-      return ack_step((m - 1), 1);
+    if ((n == 0ULL)) {
+      return ack_step((m - 1ULL), 1ULL);
     } else {
-      return ack_step((m - 1), ack_step(m, (n - 1)));
+      return ack_step((m - 1ULL), ack_step(m, (n - 1ULL)));
     }
   }
 }
 
 uint64_t div_sub(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
   if ((a < b)) {
-    return 0;
+    return 0ULL;
   } else {
-    return (1 + div_sub((a - b), b));
+    return (1ULL + div_sub((a - b), b));
   }
 }
 

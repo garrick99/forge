@@ -17,11 +17,11 @@ void poly_mul(forge_span_u64_t a __attribute__((unused)), uint64_t na __attribut
 int main();
 
 void poly_zero(forge_span_u64_t out __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      out.data[i] = 0;
-      i = (i + 1);
+      out.data[i] = 0ULL;
+      i = (i + 1ULL);
     }
 
   }
@@ -29,25 +29,25 @@ void poly_zero(forge_span_u64_t out __attribute__((unused)), uint64_t n __attrib
 
 void poly_mul(forge_span_u64_t a __attribute__((unused)), uint64_t na __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t nb __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
   poly_zero(out, (na + nb));
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < na)) {
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < nb)) {
           out.data[(i + j)] = (out.data[(i + j)] + (a.data[i] * b.data[j]));
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

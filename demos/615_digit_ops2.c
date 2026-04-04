@@ -18,11 +18,11 @@ int main();
 
 uint64_t digit_sum(uint64_t n __attribute__((unused))) {
   uint64_t x __attribute__((unused)) = n;
-  uint64_t s __attribute__((unused)) = 0;
+  uint64_t s __attribute__((unused)) = 0ULL;
   {
-    while ((x > 0)) {
-      s = (s + (x % 10));
-      x = (x / 10);
+    while ((x > 0ULL)) {
+      s = (s + (x % 10ULL));
+      x = (x / 10ULL);
     }
 
   }
@@ -30,12 +30,12 @@ uint64_t digit_sum(uint64_t n __attribute__((unused))) {
 }
 
 uint64_t digit_count(uint64_t n __attribute__((unused))) {
-  uint64_t v __attribute__((unused)) = (n / 10);
-  uint64_t d __attribute__((unused)) = 1;
+  uint64_t v __attribute__((unused)) = (n / 10ULL);
+  uint64_t d __attribute__((unused)) = 1ULL;
   {
-    while ((v > 0)) {
-      d = (d + 1);
-      v = (v / 10);
+    while ((v > 0ULL)) {
+      d = (d + 1ULL);
+      v = (v / 10ULL);
     }
 
   }
@@ -44,11 +44,11 @@ uint64_t digit_count(uint64_t n __attribute__((unused))) {
 
 uint64_t reverse_digits(uint64_t n __attribute__((unused))) {
   uint64_t x __attribute__((unused)) = n;
-  uint64_t rev __attribute__((unused)) = 0;
+  uint64_t rev __attribute__((unused)) = 0ULL;
   {
-    while ((x > 0)) {
-      rev = ((rev * 10) + (x % 10));
-      x = (x / 10);
+    while ((x > 0ULL)) {
+      rev = ((rev * 10ULL) + (x % 10ULL));
+      x = (x / 10ULL);
     }
 
   }
@@ -61,19 +61,19 @@ _Bool is_palindrome_num(uint64_t n __attribute__((unused))) {
 
 uint64_t nth_digit(uint64_t n __attribute__((unused)), uint64_t pos __attribute__((unused))) {
   uint64_t x __attribute__((unused)) = n;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < pos)) {
-      x = (x / 10);
-      i = (i + 1);
+      x = (x / 10ULL);
+      i = (i + 1ULL);
     }
 
   }
-  return (x % 10);
+  return (x % 10ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

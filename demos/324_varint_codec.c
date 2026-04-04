@@ -20,36 +20,36 @@ uint64_t encoded_size_1(uint64_t x __attribute__((unused)));
 int main();
 
 uint64_t low7(uint64_t x __attribute__((unused))) {
-  return (x % 128);
+  return (x % 128ULL);
 }
 
 uint64_t needs_more(uint64_t x __attribute__((unused))) {
-  if ((x >= 128)) {
-    return 1;
+  if ((x >= 128ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t encode_byte0(uint64_t x __attribute__((unused))) {
-  if ((x >= 128)) {
-    return ((x % 128) + 128);
+  if ((x >= 128ULL)) {
+    return ((x % 128ULL) + 128ULL);
   } else {
-    return (x % 128);
+    return (x % 128ULL);
   }
 }
 
 uint64_t encode_byte1(uint64_t x __attribute__((unused))) {
-  uint64_t shifted __attribute__((unused)) = (x / 128);
-  if ((shifted >= 128)) {
-    return ((shifted % 128) + 128);
+  uint64_t shifted __attribute__((unused)) = (x / 128ULL);
+  if ((shifted >= 128ULL)) {
+    return ((shifted % 128ULL) + 128ULL);
   } else {
-    return (shifted % 128);
+    return (shifted % 128ULL);
   }
 }
 
 uint64_t decode_byte0(uint64_t b __attribute__((unused))) {
-  return (b % 128);
+  return (b % 128ULL);
 }
 
 uint64_t decode_single(uint64_t b __attribute__((unused))) {
@@ -63,11 +63,11 @@ uint64_t roundtrip_small(uint64_t x __attribute__((unused))) {
 
 uint64_t encoded_size_1(uint64_t x __attribute__((unused))) {
   (void)(encode_byte0(x));
-  return 1;
+  return 1ULL;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

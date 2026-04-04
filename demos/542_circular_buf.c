@@ -22,18 +22,18 @@ void circ_write(forge_span_u64_t buf __attribute__((unused)), uint64_t tail __at
 int main();
 
 uint64_t circ_next(uint64_t idx __attribute__((unused)), uint64_t cap __attribute__((unused))) {
-  if (((idx + 1) < cap)) {
-    return (idx + 1);
+  if (((idx + 1ULL) < cap)) {
+    return (idx + 1ULL);
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t circ_prev(uint64_t idx __attribute__((unused)), uint64_t cap __attribute__((unused))) {
-  if ((idx > 0)) {
-    return (idx - 1);
+  if ((idx > 0ULL)) {
+    return (idx - 1ULL);
   } else {
-    return (cap - 1);
+    return (cap - 1ULL);
   }
 }
 
@@ -50,7 +50,7 @@ _Bool circ_is_full(uint64_t head __attribute__((unused)), uint64_t tail __attrib
 }
 
 _Bool circ_is_empty(uint64_t size __attribute__((unused))) {
-  return (size == 0);
+  return (size == 0ULL);
 }
 
 uint64_t circ_read(forge_span_u64_t buf __attribute__((unused)), uint64_t head __attribute__((unused)), uint64_t cap __attribute__((unused))) {
@@ -62,7 +62,7 @@ void circ_write(forge_span_u64_t buf __attribute__((unused)), uint64_t tail __at
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

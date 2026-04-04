@@ -17,8 +17,8 @@ uint64_t weighted_avg(uint64_t a __attribute__((unused)), uint64_t wa __attribut
 int main();
 
 uint64_t clamp_byte(uint64_t x __attribute__((unused))) {
-  if ((x > 255)) {
-    return 255;
+  if ((x > 255ULL)) {
+    return 255ULL;
   } else {
     return x;
   }
@@ -26,9 +26,9 @@ uint64_t clamp_byte(uint64_t x __attribute__((unused))) {
 
 uint64_t is_in_range(uint64_t x __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
   if (((x >= lo) && (x <= hi))) {
-    return 1;
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
@@ -49,15 +49,15 @@ uint64_t weighted_avg(uint64_t a __attribute__((unused)), uint64_t wa __attribut
 }
 
 int main() {
-  uint64_t c1 __attribute__((unused)) = clamp_byte(300);
-  uint64_t c2 __attribute__((unused)) = clamp_byte(100);
-  uint64_t r1 __attribute__((unused)) = is_in_range(5, 1, 10);
-  uint64_t r2 __attribute__((unused)) = is_in_range(15, 1, 10);
-  uint64_t s1 __attribute__((unused)) = saturating_add(200, 100, 255);
-  uint64_t s2 __attribute__((unused)) = saturating_add(50, 30, 255);
-  uint64_t n1 __attribute__((unused)) = normalize(17, 5);
-  uint64_t n2 __attribute__((unused)) = normalize(100, 7);
-  uint64_t wa __attribute__((unused)) = weighted_avg(10, 3, 20, 7);
+  uint64_t c1 __attribute__((unused)) = clamp_byte(300ULL);
+  uint64_t c2 __attribute__((unused)) = clamp_byte(100ULL);
+  uint64_t r1 __attribute__((unused)) = is_in_range(5ULL, 1ULL, 10ULL);
+  uint64_t r2 __attribute__((unused)) = is_in_range(15ULL, 1ULL, 10ULL);
+  uint64_t s1 __attribute__((unused)) = saturating_add(200ULL, 100ULL, 255ULL);
+  uint64_t s2 __attribute__((unused)) = saturating_add(50ULL, 30ULL, 255ULL);
+  uint64_t n1 __attribute__((unused)) = normalize(17ULL, 5ULL);
+  uint64_t n2 __attribute__((unused)) = normalize(100ULL, 7ULL);
+  uint64_t wa __attribute__((unused)) = weighted_avg(10ULL, 3ULL, 20ULL, 7ULL);
   return (int)(((((((((c1 + c2) + r1) + r2) + s1) + s2) + n1) + n2) + wa));
 
 }

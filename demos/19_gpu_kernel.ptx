@@ -15,9 +15,9 @@
 )
 {
     .reg .pred %p11;
-    .reg .u64 %rd0, %rd1, %rd12, %rd14, %rd15, %rd16, %rd18, %rd19, %rd2, %rd20, %rd23, %rd24, %rd25, %rd3, %rd4, %rd5;
-    .reg .f32 %f17, %f21, %f22;
-    .reg .u32 %r10, %r26, %r27, %r6, %r7, %r8, %r9;
+    .reg .u64 %rd0, %rd1, %rd12, %rd14, %rd15, %rd16, %rd17, %rd19, %rd2, %rd20, %rd21, %rd22, %rd25, %rd26, %rd27, %rd28, %rd3, %rd4, %rd5;
+    .reg .f32 %f18, %f23, %f24;
+    .reg .u32 %r10, %r29, %r30, %r6, %r7, %r8, %r9;
 
   ld.param.u64 %rd0, [vec_add_param_src_a_data];
   ld.param.u64 %rd1, [vec_add_param_src_a_len];
@@ -37,23 +37,26 @@
   bra vec_add_else_13;
   vec_add_then_13:
   cvt.u64.u32 %rd14, %r10;
-  mul.lo.u64 %rd15, %rd14, 4;
-  add.u64 %rd16, %rd0, %rd15;
-  ld.global.f32 %f17, [%rd16];
-  cvt.u64.u32 %rd18, %r10;
-  mul.lo.u64 %rd19, %rd18, 4;
-  add.u64 %rd20, %rd2, %rd19;
-  ld.global.f32 %f21, [%rd20];
-  add.f32 %f22, %f17, %f21;
-  cvt.u64.u32 %rd23, %r10;
-  mul.lo.u64 %rd24, %rd23, 4;
-  add.u64 %rd25, %rd4, %rd24;
-  st.global.f32 [%rd25], %f22;
-  mov.u32 %r26, 0; // unit
-  mov.u32 %r27, %r26;
+  mov.u64 %rd15, 4;
+  mul.lo.u64 %rd16, %rd14, %rd15;
+  add.u64 %rd17, %rd0, %rd16;
+  ld.global.f32 %f18, [%rd17];
+  cvt.u64.u32 %rd19, %r10;
+  mov.u64 %rd20, 4;
+  mul.lo.u64 %rd21, %rd19, %rd20;
+  add.u64 %rd22, %rd2, %rd21;
+  ld.global.f32 %f23, [%rd22];
+  add.f32 %f24, %f18, %f23;
+  cvt.u64.u32 %rd25, %r10;
+  mov.u64 %rd26, 4;
+  mul.lo.u64 %rd27, %rd25, %rd26;
+  add.u64 %rd28, %rd4, %rd27;
+  st.global.f32 [%rd28], %f24;
+  mov.u32 %r29, 0; // unit
+  mov.u32 %r30, %r29;
   bra vec_add_end_13;
   vec_add_else_13:
-  mov.u32 %r27, 0; // no else branch
+  mov.u32 %r30, 0; // no else branch
   vec_add_end_13:
   ret;
 }
@@ -67,9 +70,9 @@
 )
 {
     .reg .pred %p10;
-    .reg .s32 %r16;
-    .reg .u64 %rd0, %rd1, %rd11, %rd13, %rd14, %rd15, %rd17, %rd18, %rd19, %rd2, %rd3, %rd4;
-    .reg .u32 %r20, %r21, %r5, %r6, %r7, %r8, %r9;
+    .reg .s32 %r17;
+    .reg .u64 %rd0, %rd1, %rd11, %rd13, %rd14, %rd15, %rd16, %rd18, %rd19, %rd2, %rd20, %rd21, %rd3, %rd4;
+    .reg .u32 %r22, %r23, %r5, %r6, %r7, %r8, %r9;
 
   ld.param.u64 %rd0, [prefix_sum_step_param_src_data];
   ld.param.u64 %rd1, [prefix_sum_step_param_src_len];
@@ -88,18 +91,20 @@
   bra prefix_sum_step_else_12;
   prefix_sum_step_then_12:
   cvt.u64.u32 %rd13, %r9;
-  mul.lo.u64 %rd14, %rd13, 4;
-  add.u64 %rd15, %rd0, %rd14;
-  ld.global.s32 %r16, [%rd15];
-  cvt.u64.u32 %rd17, %r9;
-  mul.lo.u64 %rd18, %rd17, 4;
-  add.u64 %rd19, %rd2, %rd18;
-  st.global.s32 [%rd19], %r16;
-  mov.u32 %r20, 0; // unit
-  mov.u32 %r21, %r20;
+  mov.u64 %rd14, 4;
+  mul.lo.u64 %rd15, %rd13, %rd14;
+  add.u64 %rd16, %rd0, %rd15;
+  ld.global.s32 %r17, [%rd16];
+  cvt.u64.u32 %rd18, %r9;
+  mov.u64 %rd19, 4;
+  mul.lo.u64 %rd20, %rd18, %rd19;
+  add.u64 %rd21, %rd2, %rd20;
+  st.global.s32 [%rd21], %r17;
+  mov.u32 %r22, 0; // unit
+  mov.u32 %r23, %r22;
   bra prefix_sum_step_end_12;
   prefix_sum_step_else_12:
-  mov.u32 %r21, 0; // no else branch
+  mov.u32 %r23, 0; // no else branch
   prefix_sum_step_end_12:
   ret;
 }
@@ -110,8 +115,8 @@
 )
 {
     .reg .pred %p7;
-    .reg .u64 %rd0, %rd1, %rd10, %rd6, %rd9;
-    .reg .u32 %r11, %r12, %r2, %r3, %r4, %r5;
+    .reg .u64 %rd0, %rd1, %rd10, %rd11, %rd6, %rd9;
+    .reg .u32 %r12, %r13, %r2, %r3, %r4, %r5;
 
   ld.param.u64 %rd0, [block_offset_kernel_param_dst_data];
   ld.param.u64 %rd1, [block_offset_kernel_param_dst_len];
@@ -125,14 +130,15 @@
   @%p7 bra block_offset_kernel_then_8;
   bra block_offset_kernel_else_8;
   block_offset_kernel_then_8:
-  mul.lo.u64 %rd9, %rd6, 8;
-  add.u64 %rd10, %rd0, %rd9;
-  st.global.u64 [%rd10], %rd6;
-  mov.u32 %r11, 0; // unit
-  mov.u32 %r12, %r11;
+  mov.u64 %rd9, 8;
+  mul.lo.u64 %rd10, %rd6, %rd9;
+  add.u64 %rd11, %rd0, %rd10;
+  st.global.u64 [%rd11], %rd6;
+  mov.u32 %r12, 0; // unit
+  mov.u32 %r13, %r12;
   bra block_offset_kernel_end_8;
   block_offset_kernel_else_8:
-  mov.u32 %r12, 0; // no else branch
+  mov.u32 %r13, 0; // no else branch
   block_offset_kernel_end_8:
   ret;
 }

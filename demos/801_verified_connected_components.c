@@ -16,54 +16,54 @@ uint64_t label_propagate(forge_span_u64_t adj_ptr __attribute__((unused)), forge
 int main();
 
 uint64_t label_propagate(forge_span_u64_t adj_ptr __attribute__((unused)), forge_span_u64_t adj_list __attribute__((unused)), uint64_t n_verts __attribute__((unused)), uint64_t n_edges __attribute__((unused)), forge_span_u64_t labels __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n_verts)) {
       labels.data[i] = i;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t round __attribute__((unused)) = 0;
-  uint64_t changed __attribute__((unused)) = 1;
+  uint64_t round __attribute__((unused)) = 0ULL;
+  uint64_t changed __attribute__((unused)) = 1ULL;
   {
-    while (((round < n_verts) && (changed > 0))) {
-      changed = 0;
-      uint64_t v __attribute__((unused)) = 0;
+    while (((round < n_verts) && (changed > 0ULL))) {
+      changed = 0ULL;
+      uint64_t v __attribute__((unused)) = 0ULL;
       {
         while ((v < n_verts)) {
           uint64_t start __attribute__((unused)) = adj_ptr.data[v];
-          uint64_t end __attribute__((unused)) = adj_ptr.data[(v + 1)];
+          uint64_t end __attribute__((unused)) = adj_ptr.data[(v + 1ULL)];
           uint64_t e __attribute__((unused)) = start;
           {
             while ((e < end)) {
               uint64_t nb __attribute__((unused)) = adj_list.data[e];
               if ((labels.data[nb] < labels.data[v])) {
                 labels.data[v] = labels.data[nb];
-                changed = 1;
+                changed = 1ULL;
 
               }
-              e = (e + 1);
+              e = (e + 1ULL);
             }
 
           }
-          v = (v + 1);
+          v = (v + 1ULL);
         }
 
       }
-      round = (round + 1);
+      round = (round + 1ULL);
     }
 
   }
-  uint64_t count __attribute__((unused)) = 0;
-  uint64_t v2 __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
+  uint64_t v2 __attribute__((unused)) = 0ULL;
   {
     while ((v2 < n_verts)) {
       if ((labels.data[v2] == v2)) {
-        count = (count + 1);
+        count = (count + 1ULL);
 
       }
-      v2 = (v2 + 1);
+      v2 = (v2 + 1ULL);
     }
 
   }
@@ -71,7 +71,7 @@ uint64_t label_propagate(forge_span_u64_t adj_ptr __attribute__((unused)), forge
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

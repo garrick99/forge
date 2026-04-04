@@ -16,20 +16,20 @@ uint64_t push_step(forge_span_u64_t excess __attribute__((unused)), forge_span_u
 int main();
 
 uint64_t push_step(forge_span_u64_t excess __attribute__((unused)), forge_span_u64_t height __attribute__((unused)), forge_span_u64_t cap __attribute__((unused)), forge_span_u64_t flow __attribute__((unused)), forge_span_u64_t adj __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t u __attribute__((unused)), uint64_t deg __attribute__((unused))) {
-  uint64_t pushed __attribute__((unused)) = 0;
+  uint64_t pushed __attribute__((unused)) = 0ULL;
   uint64_t ex __attribute__((unused)) = excess.data[u];
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < deg)) {
-      if ((ex > 0)) {
+      if ((ex > 0ULL)) {
         uint64_t v __attribute__((unused)) = adj.data[i];
         if ((v < n)) {
           if ((height.data[u] > height.data[v])) {
             uint64_t send;
-            if ((ex < 1)) {
+            if ((ex < 1ULL)) {
               send = ex;
             } else {
-              send = 1;
+              send = 1ULL;
             }
             ex = (ex - send);
             pushed = (pushed + send);
@@ -39,7 +39,7 @@ uint64_t push_step(forge_span_u64_t excess __attribute__((unused)), forge_span_u
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -48,7 +48,7 @@ uint64_t push_step(forge_span_u64_t excess __attribute__((unused)), forge_span_u
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -48,7 +48,7 @@ Counter Counter__new(uint64_t start __attribute__((unused))) {
 }
 
 Counter Counter__inc(const Counter* self __attribute__((unused))) {
-  return (Counter){ .n = ((*self).n + 1) };
+  return (Counter){ .n = ((*self).n + 1ULL) };
 }
 
 uint64_t Counter__get(const Counter* self __attribute__((unused))) {
@@ -56,13 +56,13 @@ uint64_t Counter__get(const Counter* self __attribute__((unused))) {
 }
 
 int main() {
-  Vec2 v __attribute__((unused)) = (Vec2){ .x = 3, .y = 4 };
-  Vec2 w __attribute__((unused)) = (Vec2){ .x = 1, .y = 2 };
+  Vec2 v __attribute__((unused)) = (Vec2){ .x = 3ULL, .y = 4ULL };
+  Vec2 w __attribute__((unused)) = (Vec2){ .x = 1ULL, .y = 2ULL };
   uint64_t d __attribute__((unused)) = Vec2__dot((&v), (&w));
   uint64_t ls __attribute__((unused)) = Vec2__len_sq((&v));
-  Vec2 sc __attribute__((unused)) = Vec2__scale((&v), 2);
+  Vec2 sc __attribute__((unused)) = Vec2__scale((&v), 2ULL);
   uint64_t ss __attribute__((unused)) = Vec2__sum((&sc));
-  Counter c __attribute__((unused)) = Counter__new(10);
+  Counter c __attribute__((unused)) = Counter__new(10ULL);
   Counter c2 __attribute__((unused)) = Counter__inc((&c));
   Counter c3 __attribute__((unused)) = Counter__inc((&c2));
   uint64_t n __attribute__((unused)) = Counter__get((&c3));

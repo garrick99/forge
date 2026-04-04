@@ -54,9 +54,9 @@ uint64_t widen(uint32_t x __attribute__((unused))) {
 }
 
 uint32_t typed_lits() {
-  uint32_t a __attribute__((unused)) = 42;
-  uint64_t b __attribute__((unused)) = 255;
-  uint32_t c __attribute__((unused)) = 0;
+  uint32_t a __attribute__((unused)) = 42ULL;
+  uint64_t b __attribute__((unused)) = 255ULL;
+  uint32_t c __attribute__((unused)) = 0ULL;
   (void)(b);
   (void)(c);
   return a;

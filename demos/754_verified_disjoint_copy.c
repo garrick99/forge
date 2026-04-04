@@ -19,45 +19,45 @@ void iota(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((
 int main();
 
 void memcopy(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       dst.data[i] = src.data[i];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void memswap(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t tmp __attribute__((unused)) = a.data[i];
       a.data[i] = b.data[i];
       b.data[i] = tmp;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t memcompare(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
-  uint64_t res __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
+  uint64_t res __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((res == 0)) {
+      if ((res == 0ULL)) {
         if ((a.data[i] > b.data[i])) {
-          res = 1;
+          res = 1ULL;
 
         } else if ((a.data[i] < b.data[i])) {
-          res = 2;
+          res = 2ULL;
 
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -65,18 +65,18 @@ uint64_t memcompare(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t
 }
 
 void iota(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = i;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

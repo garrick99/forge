@@ -20,8 +20,8 @@ int main();
 
 __forge_tuple_u64_u64_t three_way_partition(forge_span_u64_t s __attribute__((unused)), uint64_t pivot __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = s.len;
-  uint64_t lo __attribute__((unused)) = 0;
-  uint64_t mid __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
+  uint64_t mid __attribute__((unused)) = 0ULL;
   uint64_t hi __attribute__((unused)) = n;
   {
     while ((mid < hi)) {
@@ -29,17 +29,17 @@ __forge_tuple_u64_u64_t three_way_partition(forge_span_u64_t s __attribute__((un
         uint64_t tmp __attribute__((unused)) = s.data[lo];
         s.data[lo] = s.data[mid];
         s.data[mid] = tmp;
-        lo = (lo + 1);
-        mid = (mid + 1);
+        lo = (lo + 1ULL);
+        mid = (mid + 1ULL);
 
       } else if ((s.data[mid] > pivot)) {
-        hi = (hi - 1);
+        hi = (hi - 1ULL);
         uint64_t tmp __attribute__((unused)) = s.data[mid];
         s.data[mid] = s.data[hi];
         s.data[hi] = tmp;
 
       } else {
-        mid = (mid + 1);
+        mid = (mid + 1ULL);
 
       }
     }
@@ -49,7 +49,7 @@ __forge_tuple_u64_u64_t three_way_partition(forge_span_u64_t s __attribute__((un
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

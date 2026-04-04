@@ -28,23 +28,23 @@ uint64_t arith_no_load_effect();
 int main();
 
 InstrCounter ic_new() {
-  return (InstrCounter){ .loads = 0, .stores = 0, .arith = 0, .branches = 0 };
+  return (InstrCounter){ .loads = 0ULL, .stores = 0ULL, .arith = 0ULL, .branches = 0ULL };
 }
 
 void ic_load(InstrCounter* c __attribute__((unused))) {
-  (*c).loads = ((*c).loads + 1);
+  (*c).loads = ((*c).loads + 1ULL);
 }
 
 void ic_store(InstrCounter* c __attribute__((unused))) {
-  (*c).stores = ((*c).stores + 1);
+  (*c).stores = ((*c).stores + 1ULL);
 }
 
 void ic_arith(InstrCounter* c __attribute__((unused))) {
-  (*c).arith = ((*c).arith + 1);
+  (*c).arith = ((*c).arith + 1ULL);
 }
 
 void ic_branch(InstrCounter* c __attribute__((unused))) {
-  (*c).branches = ((*c).branches + 1);
+  (*c).branches = ((*c).branches + 1ULL);
 }
 
 uint64_t mixed_total() {
@@ -96,7 +96,7 @@ uint64_t arith_no_load_effect() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

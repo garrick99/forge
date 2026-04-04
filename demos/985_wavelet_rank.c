@@ -17,15 +17,15 @@ uint64_t wavelet_rank_zero(forge_span_u64_t bits __attribute__((unused)), uint64
 int main();
 
 uint64_t wavelet_rank(forge_span_u64_t bits __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t pos __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < pos)) {
-      if ((bits.data[i] > 0)) {
-        count = (count + 1);
+      if ((bits.data[i] > 0ULL)) {
+        count = (count + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -38,7 +38,7 @@ uint64_t wavelet_rank_zero(forge_span_u64_t bits __attribute__((unused)), uint64
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

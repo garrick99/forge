@@ -31,18 +31,18 @@ uint64_t remap(uint64_t x __attribute__((unused)), uint64_t from_lo __attribute_
 }
 
 void fill_gradient(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = lerp_range(lo, hi, i, n);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

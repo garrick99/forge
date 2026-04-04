@@ -25,36 +25,36 @@ uint64_t describe_pair(const void* a __attribute__((unused)), const void* b __at
 int main();
 
 uint64_t Record__Hashable__hash(const Record* self __attribute__((unused))) {
-  return ((*self).key * 2654435761);
+  return ((*self).key * 2654435761ULL);
 }
 
 uint64_t Record__Comparable__compare(const Record* self __attribute__((unused)), const Record* other __attribute__((unused))) {
   if (((*self).key == (*other).key)) {
-    return 0;
+    return 0ULL;
   } else {
     if (((*self).key > (*other).key)) {
-      return 1;
+      return 1ULL;
     } else {
-      return 2;
+      return 2ULL;
     }
   }
 }
 
 uint64_t Record__Displayable__display_val(const Record* self __attribute__((unused))) {
-  return (((*self).key * 1000) + (*self).value);
+  return (((*self).key * 1000ULL) + (*self).value);
 }
 
 uint64_t process_pair(const void* a __attribute__((unused)), const void* b __attribute__((unused))) {
-  return 0;
+  return 0ULL;
 }
 
 uint64_t describe_pair(const void* a __attribute__((unused)), const void* b __attribute__((unused))) {
-  return 0;
+  return 0ULL;
 }
 
 int main() {
-  Record r1 __attribute__((unused)) = (Record){ .key = 10, .value = 5 };
-  Record r2 __attribute__((unused)) = (Record){ .key = 7, .value = 3 };
+  Record r1 __attribute__((unused)) = (Record){ .key = 10ULL, .value = 5ULL };
+  Record r2 __attribute__((unused)) = (Record){ .key = 7ULL, .value = 3ULL };
   uint64_t _p __attribute__((unused)) = process_pair((&r1), (&r2));
   uint64_t _d __attribute__((unused)) = describe_pair((&r1), (&r2));
   uint64_t h1 __attribute__((unused)) = Record__Hashable__hash((&r1));

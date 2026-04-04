@@ -66,64 +66,64 @@ uint64_t bounded_sub(uint64_t a __attribute__((unused)), uint64_t b __attribute_
   if ((a >= b)) {
     return (a - b);
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t select_range(uint64_t v __attribute__((unused))) {
-  if ((v < 10)) {
-    return 0;
+  if ((v < 10ULL)) {
+    return 0ULL;
   } else {
-    if ((v < 100)) {
-      return 1;
+    if ((v < 100ULL)) {
+      return 1ULL;
     } else {
-      return 2;
+      return 2ULL;
     }
   }
 }
 
 uint64_t check_max3_first() {
-  return max3(10, 5, 3);
+  return max3(10ULL, 5ULL, 3ULL);
 }
 
 uint64_t check_max3_middle() {
-  return max3(3, 10, 5);
+  return max3(3ULL, 10ULL, 5ULL);
 }
 
 uint64_t check_max3_last() {
-  return max3(3, 5, 10);
+  return max3(3ULL, 5ULL, 10ULL);
 }
 
 uint64_t check_min3() {
-  return min3(5, 1, 3);
+  return min3(5ULL, 1ULL, 3ULL);
 }
 
 uint64_t check_clamp_in() {
-  return clamp3(50, 10, 100);
+  return clamp3(50ULL, 10ULL, 100ULL);
 }
 
 uint64_t check_bounded_sub_ok() {
-  return bounded_sub(10, 5);
+  return bounded_sub(10ULL, 5ULL);
 }
 
 uint64_t check_bounded_sub_zero() {
-  return bounded_sub(3, 7);
+  return bounded_sub(3ULL, 7ULL);
 }
 
 uint64_t check_select_low() {
-  return select_range(5);
+  return select_range(5ULL);
 }
 
 uint64_t check_select_mid() {
-  return select_range(50);
+  return select_range(50ULL);
 }
 
 uint64_t check_select_high() {
-  return select_range(200);
+  return select_range(200ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -26,50 +26,50 @@ uint64_t buy_count();
 int main();
 
 StockLedger sl_new() {
-  return (StockLedger){ .shares = 0, .cost = 0, .buys = 0, .sells = 0 };
+  return (StockLedger){ .shares = 0ULL, .cost = 0ULL, .buys = 0ULL, .sells = 0ULL };
 }
 
 void sl_buy(StockLedger* s __attribute__((unused)), uint64_t qty __attribute__((unused)), uint64_t price __attribute__((unused))) {
   (*s).shares = ((*s).shares + qty);
   (*s).cost = ((*s).cost + price);
-  (*s).buys = ((*s).buys + 1);
+  (*s).buys = ((*s).buys + 1ULL);
 }
 
 void sl_sell(StockLedger* s __attribute__((unused)), uint64_t qty __attribute__((unused)), uint64_t cost_basis __attribute__((unused))) {
   (*s).shares = ((*s).shares - qty);
   (*s).cost = ((*s).cost - cost_basis);
-  (*s).sells = ((*s).sells + 1);
+  (*s).sells = ((*s).sells + 1ULL);
 }
 
 uint64_t buy_10() {
   StockLedger s __attribute__((unused)) = sl_new();
-  sl_buy((&s), 10, 500);
+  sl_buy((&s), 10ULL, 500ULL);
   return s.shares;
 }
 
 uint64_t sell_3() {
   StockLedger s __attribute__((unused)) = sl_new();
-  sl_buy((&s), 10, 500);
-  sl_sell((&s), 3, 150);
+  sl_buy((&s), 10ULL, 500ULL);
+  sl_sell((&s), 3ULL, 150ULL);
   return s.shares;
 }
 
 uint64_t cost_after_sell() {
   StockLedger s __attribute__((unused)) = sl_new();
-  sl_buy((&s), 10, 500);
-  sl_sell((&s), 3, 150);
+  sl_buy((&s), 10ULL, 500ULL);
+  sl_sell((&s), 3ULL, 150ULL);
   return s.cost;
 }
 
 uint64_t buy_count() {
   StockLedger s __attribute__((unused)) = sl_new();
-  sl_buy((&s), 5, 200);
-  sl_buy((&s), 5, 250);
+  sl_buy((&s), 5ULL, 200ULL);
+  sl_buy((&s), 5ULL, 250ULL);
   return s.buys;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

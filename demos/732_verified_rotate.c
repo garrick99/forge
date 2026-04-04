@@ -21,21 +21,21 @@ void reverse_range(forge_span_u64_t s __attribute__((unused)), uint64_t lo __att
   uint64_t l __attribute__((unused)) = lo;
   uint64_t r __attribute__((unused)) = hi;
   {
-    while (((l + 1) < r)) {
-      r = (r - 1);
+    while (((l + 1ULL) < r)) {
+      r = (r - 1ULL);
       uint64_t tmp __attribute__((unused)) = s.data[l];
       s.data[l] = s.data[r];
       s.data[r] = tmp;
-      l = (l + 1);
+      l = (l + 1ULL);
     }
 
   }
 }
 
 void rotate_left(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t k __attribute__((unused))) {
-  reverse_range(s, 0, k);
+  reverse_range(s, 0ULL, k);
   reverse_range(s, k, n);
-  reverse_range(s, 0, n);
+  reverse_range(s, 0ULL, n);
 }
 
 void rotate_right(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t k __attribute__((unused))) {
@@ -44,7 +44,7 @@ void rotate_right(forge_span_u64_t s __attribute__((unused)), uint64_t n __attri
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

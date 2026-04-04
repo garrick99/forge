@@ -26,11 +26,11 @@ uint64_t Stats__max(const Stats* self __attribute__((unused)));
 int main();
 
 Stats Stats__new() {
-  return (Stats){ .count = 0, .total = 0, .min = 9999999999, .max = 0 };
+  return (Stats){ .count = 0ULL, .total = 0ULL, .min = 9999999999ULL, .max = 0ULL };
 }
 
 Stats Stats__add(const Stats* self __attribute__((unused)), uint64_t v __attribute__((unused))) {
-  uint64_t new_count __attribute__((unused)) = ((*self).count + 1);
+  uint64_t new_count __attribute__((unused)) = ((*self).count + 1ULL);
   uint64_t new_total __attribute__((unused)) = ((*self).total + v);
   uint64_t new_min;
   if ((v < (*self).min)) {
@@ -48,8 +48,8 @@ Stats Stats__add(const Stats* self __attribute__((unused)), uint64_t v __attribu
 }
 
 uint64_t Stats__mean(const Stats* self __attribute__((unused))) {
-  if (((*self).count == 0)) {
-    return 0;
+  if (((*self).count == 0ULL)) {
+    return 0ULL;
   } else {
     return ((*self).total / (*self).count);
   }
@@ -73,10 +73,10 @@ uint64_t Stats__max(const Stats* self __attribute__((unused))) {
 
 int main() {
   Stats s0 __attribute__((unused)) = Stats__new();
-  Stats s1 __attribute__((unused)) = Stats__add((&s0), 10);
-  Stats s2 __attribute__((unused)) = Stats__add((&s1), 30);
-  Stats s3 __attribute__((unused)) = Stats__add((&s2), 20);
-  Stats s4 __attribute__((unused)) = Stats__add((&s3), 40);
+  Stats s1 __attribute__((unused)) = Stats__add((&s0), 10ULL);
+  Stats s2 __attribute__((unused)) = Stats__add((&s1), 30ULL);
+  Stats s3 __attribute__((unused)) = Stats__add((&s2), 20ULL);
+  Stats s4 __attribute__((unused)) = Stats__add((&s3), 40ULL);
   uint64_t cnt __attribute__((unused)) = Stats__count((&s4));
   uint64_t tot __attribute__((unused)) = Stats__total((&s4));
   uint64_t mn __attribute__((unused)) = Stats__min((&s4));

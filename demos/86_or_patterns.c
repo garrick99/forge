@@ -97,11 +97,11 @@ uint64_t is_weekend(Day d __attribute__((unused))) {
     case Day_tag_Sat:
     case Day_tag_Sun:
     {
-      return 1;
+      return 1ULL;
     }
     default: ;
     {
-      return 0;
+      return 0ULL;
     }
   }
 }
@@ -114,11 +114,11 @@ uint64_t is_weekday(Day d __attribute__((unused))) {
     case Day_tag_Thu:
     case Day_tag_Fri:
     {
-      return 1;
+      return 1ULL;
     }
     default: ;
     {
-      return 0;
+      return 0ULL;
     }
   }
 }
@@ -126,25 +126,25 @@ uint64_t is_weekday(Day d __attribute__((unused))) {
 uint64_t day_num(Day d __attribute__((unused))) {
   switch (d.tag) {
     case Day_tag_Mon: {
-      return 1;
+      return 1ULL;
     }
     case Day_tag_Tue: {
-      return 2;
+      return 2ULL;
     }
     case Day_tag_Wed: {
-      return 3;
+      return 3ULL;
     }
     case Day_tag_Thu: {
-      return 4;
+      return 4ULL;
     }
     case Day_tag_Fri: {
-      return 5;
+      return 5ULL;
     }
     case Day_tag_Sat: {
-      return 6;
+      return 6ULL;
     }
     case Day_tag_Sun: {
-      return 7;
+      return 7ULL;
     }
     default: __builtin_unreachable();
   }
@@ -157,11 +157,11 @@ uint64_t is_arith(Token t __attribute__((unused))) {
     case Token_tag_Star:
     case Token_tag_Slash:
     {
-      return 1;
+      return 1ULL;
     }
     default: ;
     {
-      return 0;
+      return 0ULL;
     }
   }
 }
@@ -173,11 +173,11 @@ uint64_t is_cmp(Token t __attribute__((unused))) {
     case Token_tag_Lt:
     case Token_tag_Gt:
     {
-      return 1;
+      return 1ULL;
     }
     default: ;
     {
-      return 0;
+      return 0ULL;
     }
   }
 }

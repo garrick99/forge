@@ -16,22 +16,22 @@ uint64_t shoelace_2x(forge_span_u64_t x __attribute__((unused)), forge_span_u64_
 int main();
 
 uint64_t shoelace_2x(forge_span_u64_t x __attribute__((unused)), forge_span_u64_t y __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t pos_sum __attribute__((unused)) = 0;
-  uint64_t neg_sum __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t pos_sum __attribute__((unused)) = 0ULL;
+  uint64_t neg_sum __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t j;
-      if (((i + 1) < n)) {
-        j = (i + 1);
+      if (((i + 1ULL) < n)) {
+        j = (i + 1ULL);
       } else {
-        j = 0;
+        j = 0ULL;
       }
       uint64_t cross_pos __attribute__((unused)) = (x.data[i] * y.data[j]);
       uint64_t cross_neg __attribute__((unused)) = (x.data[j] * y.data[i]);
       pos_sum = (pos_sum + cross_pos);
       neg_sum = (neg_sum + cross_neg);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -43,7 +43,7 @@ uint64_t shoelace_2x(forge_span_u64_t x __attribute__((unused)), forge_span_u64_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

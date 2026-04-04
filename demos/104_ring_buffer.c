@@ -28,50 +28,50 @@ RingBuf4 RingBuf4__pop(const RingBuf4* self __attribute__((unused)));
 int main();
 
 RingBuf4 RingBuf4__new() {
-  return (RingBuf4){ .d0 = 0, .d1 = 0, .d2 = 0, .d3 = 0, .head = 0, .len = 0 };
+  return (RingBuf4){ .d0 = 0ULL, .d1 = 0ULL, .d2 = 0ULL, .d3 = 0ULL, .head = 0ULL, .len = 0ULL };
 }
 
 uint64_t RingBuf4__size(const RingBuf4* self __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = (*self).len;
-  if ((n <= 4)) {
+  if ((n <= 4ULL)) {
     return n;
   } else {
-    return 4;
+    return 4ULL;
   }
 }
 
 uint64_t RingBuf4__is_full(const RingBuf4* self __attribute__((unused))) {
-  if (((*self).len >= 4)) {
-    return 1;
+  if (((*self).len >= 4ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t RingBuf4__is_empty(const RingBuf4* self __attribute__((unused))) {
-  if (((*self).len == 0)) {
-    return 1;
+  if (((*self).len == 0ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 RingBuf4 RingBuf4__push(const RingBuf4* self __attribute__((unused)), uint64_t val __attribute__((unused))) {
   RingBuf4 s __attribute__((unused)) = (*self);
-  if ((s.len >= 4)) {
+  if ((s.len >= 4ULL)) {
     return s;
   } else {
-    uint64_t tail __attribute__((unused)) = ((s.head + s.len) % 4);
-    if ((tail == 0)) {
-      return (RingBuf4){ .d0 = val, .d1 = s.d1, .d2 = s.d2, .d3 = s.d3, .head = s.head, .len = (s.len + 1) };
+    uint64_t tail __attribute__((unused)) = ((s.head + s.len) % 4ULL);
+    if ((tail == 0ULL)) {
+      return (RingBuf4){ .d0 = val, .d1 = s.d1, .d2 = s.d2, .d3 = s.d3, .head = s.head, .len = (s.len + 1ULL) };
     } else {
-      if ((tail == 1)) {
-        return (RingBuf4){ .d0 = s.d0, .d1 = val, .d2 = s.d2, .d3 = s.d3, .head = s.head, .len = (s.len + 1) };
+      if ((tail == 1ULL)) {
+        return (RingBuf4){ .d0 = s.d0, .d1 = val, .d2 = s.d2, .d3 = s.d3, .head = s.head, .len = (s.len + 1ULL) };
       } else {
-        if ((tail == 2)) {
-          return (RingBuf4){ .d0 = s.d0, .d1 = s.d1, .d2 = val, .d3 = s.d3, .head = s.head, .len = (s.len + 1) };
+        if ((tail == 2ULL)) {
+          return (RingBuf4){ .d0 = s.d0, .d1 = s.d1, .d2 = val, .d3 = s.d3, .head = s.head, .len = (s.len + 1ULL) };
         } else {
-          return (RingBuf4){ .d0 = s.d0, .d1 = s.d1, .d2 = s.d2, .d3 = val, .head = s.head, .len = (s.len + 1) };
+          return (RingBuf4){ .d0 = s.d0, .d1 = s.d1, .d2 = s.d2, .d3 = val, .head = s.head, .len = (s.len + 1ULL) };
         }
       }
     }
@@ -80,16 +80,16 @@ RingBuf4 RingBuf4__push(const RingBuf4* self __attribute__((unused)), uint64_t v
 
 uint64_t RingBuf4__peek(const RingBuf4* self __attribute__((unused))) {
   uint64_t h __attribute__((unused)) = (*self).head;
-  if (((*self).len == 0)) {
-    return 0;
+  if (((*self).len == 0ULL)) {
+    return 0ULL;
   } else {
-    if ((h == 0)) {
+    if ((h == 0ULL)) {
       return (*self).d0;
     } else {
-      if ((h == 1)) {
+      if ((h == 1ULL)) {
         return (*self).d1;
       } else {
-        if ((h == 2)) {
+        if ((h == 2ULL)) {
           return (*self).d2;
         } else {
           return (*self).d3;
@@ -101,10 +101,10 @@ uint64_t RingBuf4__peek(const RingBuf4* self __attribute__((unused))) {
 
 RingBuf4 RingBuf4__pop(const RingBuf4* self __attribute__((unused))) {
   RingBuf4 s __attribute__((unused)) = (*self);
-  if ((s.len == 0)) {
+  if ((s.len == 0ULL)) {
     return s;
   } else {
-    return (RingBuf4){ .d0 = s.d0, .d1 = s.d1, .d2 = s.d2, .d3 = s.d3, .head = ((s.head + 1) % 4), .len = (s.len - 1) };
+    return (RingBuf4){ .d0 = s.d0, .d1 = s.d1, .d2 = s.d2, .d3 = s.d3, .head = ((s.head + 1ULL) % 4ULL), .len = (s.len - 1ULL) };
   }
 }
 
@@ -112,12 +112,12 @@ int main() {
   RingBuf4 b0 __attribute__((unused)) = RingBuf4__new();
   uint64_t sz0 __attribute__((unused)) = RingBuf4__size((&b0));
   uint64_t emp __attribute__((unused)) = RingBuf4__is_empty((&b0));
-  RingBuf4 b1 __attribute__((unused)) = RingBuf4__push((&b0), 10);
-  RingBuf4 b2 __attribute__((unused)) = RingBuf4__push((&b1), 20);
-  RingBuf4 b3 __attribute__((unused)) = RingBuf4__push((&b2), 30);
+  RingBuf4 b1 __attribute__((unused)) = RingBuf4__push((&b0), 10ULL);
+  RingBuf4 b2 __attribute__((unused)) = RingBuf4__push((&b1), 20ULL);
+  RingBuf4 b3 __attribute__((unused)) = RingBuf4__push((&b2), 30ULL);
   uint64_t sz3 __attribute__((unused)) = RingBuf4__size((&b3));
   uint64_t full3 __attribute__((unused)) = RingBuf4__is_full((&b3));
-  RingBuf4 b4 __attribute__((unused)) = RingBuf4__push((&b3), 40);
+  RingBuf4 b4 __attribute__((unused)) = RingBuf4__push((&b3), 40ULL);
   uint64_t full4 __attribute__((unused)) = RingBuf4__is_full((&b4));
   uint64_t v0 __attribute__((unused)) = RingBuf4__peek((&b4));
   RingBuf4 b5 __attribute__((unused)) = RingBuf4__pop((&b4));

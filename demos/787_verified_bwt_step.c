@@ -17,48 +17,48 @@ void count_symbols(forge_span_u64_t bwt __attribute__((unused)), uint64_t n __at
 int main();
 
 void bwt_from_sa(forge_span_u64_t text __attribute__((unused)), forge_span_u64_t sa __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t bwt __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t idx __attribute__((unused)) = sa.data[i];
-      if ((idx == 0)) {
-        bwt.data[i] = text.data[(n - 1)];
+      if ((idx == 0ULL)) {
+        bwt.data[i] = text.data[(n - 1ULL)];
 
       } else {
-        bwt.data[i] = text.data[(idx - 1)];
+        bwt.data[i] = text.data[(idx - 1ULL)];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void count_symbols(forge_span_u64_t bwt __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t counts __attribute__((unused)), uint64_t alpha_size __attribute__((unused))) {
-  uint64_t c __attribute__((unused)) = 0;
+  uint64_t c __attribute__((unused)) = 0ULL;
   {
     while ((c < alpha_size)) {
-      counts.data[c] = 0;
-      c = (c + 1);
+      counts.data[c] = 0ULL;
+      c = (c + 1ULL);
     }
 
   }
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t sym __attribute__((unused)) = bwt.data[i];
       if ((sym < alpha_size)) {
-        counts.data[sym] = (counts.data[sym] + 1);
+        counts.data[sym] = (counts.data[sym] + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

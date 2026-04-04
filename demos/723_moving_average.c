@@ -16,30 +16,30 @@ void sliding_sum(forge_span_u64_t input __attribute__((unused)), uint64_t n __at
 int main();
 
 void sliding_sum(forge_span_u64_t input __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t w __attribute__((unused)), forge_span_u64_t output __attribute__((unused))) {
-  uint64_t sum __attribute__((unused)) = 0;
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t sum __attribute__((unused)) = 0ULL;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < w)) {
       sum = (sum + input.data[j]);
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
-  output.data[0] = sum;
-  uint64_t i __attribute__((unused)) = 1;
-  uint64_t out_len __attribute__((unused)) = ((n - w) + 1);
+  output.data[0ULL] = sum;
+  uint64_t i __attribute__((unused)) = 1ULL;
+  uint64_t out_len __attribute__((unused)) = ((n - w) + 1ULL);
   {
     while ((i < out_len)) {
-      sum = ((sum + input.data[((i + w) - 1)]) - input.data[(i - 1)]);
+      sum = ((sum + input.data[((i + w) - 1ULL)]) - input.data[(i - 1ULL)]);
       output.data[i] = sum;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

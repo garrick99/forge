@@ -26,30 +26,30 @@ uint64_t offset_third();
 int main();
 
 Nonce nonce_new(uint64_t start __attribute__((unused))) {
-  return (Nonce){ .current = start, .last = 0, .issued = 0 };
+  return (Nonce){ .current = start, .last = 0ULL, .issued = 0ULL };
 }
 
 void nonce_next(Nonce* n __attribute__((unused))) {
   (*n).last = (*n).current;
-  (*n).current = ((*n).current + 1);
-  (*n).issued = ((*n).issued + 1);
+  (*n).current = ((*n).current + 1ULL);
+  (*n).issued = ((*n).issued + 1ULL);
 }
 
 uint64_t first_nonce() {
-  Nonce n __attribute__((unused)) = nonce_new(0);
+  Nonce n __attribute__((unused)) = nonce_new(0ULL);
   nonce_next((&n));
   return n.last;
 }
 
 uint64_t second_nonce() {
-  Nonce n __attribute__((unused)) = nonce_new(0);
+  Nonce n __attribute__((unused)) = nonce_new(0ULL);
   nonce_next((&n));
   nonce_next((&n));
   return n.last;
 }
 
 uint64_t current_after_three() {
-  Nonce n __attribute__((unused)) = nonce_new(0);
+  Nonce n __attribute__((unused)) = nonce_new(0ULL);
   nonce_next((&n));
   nonce_next((&n));
   nonce_next((&n));
@@ -57,7 +57,7 @@ uint64_t current_after_three() {
 }
 
 uint64_t issued_count() {
-  Nonce n __attribute__((unused)) = nonce_new(0);
+  Nonce n __attribute__((unused)) = nonce_new(0ULL);
   nonce_next((&n));
   nonce_next((&n));
   nonce_next((&n));
@@ -66,13 +66,13 @@ uint64_t issued_count() {
 }
 
 uint64_t offset_nonce() {
-  Nonce n __attribute__((unused)) = nonce_new(100);
+  Nonce n __attribute__((unused)) = nonce_new(100ULL);
   nonce_next((&n));
   return n.last;
 }
 
 uint64_t offset_third() {
-  Nonce n __attribute__((unused)) = nonce_new(10);
+  Nonce n __attribute__((unused)) = nonce_new(10ULL);
   nonce_next((&n));
   nonce_next((&n));
   nonce_next((&n));
@@ -80,7 +80,7 @@ uint64_t offset_third() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

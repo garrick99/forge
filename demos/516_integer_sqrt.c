@@ -21,10 +21,10 @@ uint64_t check_sqrt_100();
 int main();
 
 uint64_t floor_sqrt(uint64_t n __attribute__((unused))) {
-  uint64_t r __attribute__((unused)) = 0;
+  uint64_t r __attribute__((unused)) = 0ULL;
   {
-    while ((((r + 1) * (r + 1)) <= n)) {
-      r = (r + 1);
+    while ((((r + 1ULL) * (r + 1ULL)) <= n)) {
+      r = (r + 1ULL);
     }
 
   }
@@ -37,10 +37,10 @@ _Bool is_perfect_square(uint64_t n __attribute__((unused))) {
 }
 
 uint64_t floor_sqrt_small(uint64_t n __attribute__((unused))) {
-  uint64_t r __attribute__((unused)) = 0;
+  uint64_t r __attribute__((unused)) = 0ULL;
   {
-    while ((((r + 1) * (r + 1)) <= n)) {
-      r = (r + 1);
+    while ((((r + 1ULL) * (r + 1ULL)) <= n)) {
+      r = (r + 1ULL);
     }
 
   }
@@ -48,31 +48,31 @@ uint64_t floor_sqrt_small(uint64_t n __attribute__((unused))) {
 }
 
 uint64_t check_sqrt_0() {
-  return floor_sqrt(0);
+  return floor_sqrt(0ULL);
 }
 
 uint64_t check_sqrt_1() {
-  return floor_sqrt(1);
+  return floor_sqrt(1ULL);
 }
 
 uint64_t check_sqrt_4() {
-  return floor_sqrt(4);
+  return floor_sqrt(4ULL);
 }
 
 uint64_t check_sqrt_9() {
-  return floor_sqrt(9);
+  return floor_sqrt(9ULL);
 }
 
 uint64_t check_sqrt_10() {
-  return floor_sqrt(10);
+  return floor_sqrt(10ULL);
 }
 
 uint64_t check_sqrt_100() {
-  return floor_sqrt(100);
+  return floor_sqrt(100ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

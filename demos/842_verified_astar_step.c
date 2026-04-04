@@ -18,7 +18,7 @@ int main();
 
 void astar_relax(forge_span_u64_t adj_ptr __attribute__((unused)), forge_span_u64_t adj_list __attribute__((unused)), forge_span_u64_t weights __attribute__((unused)), uint64_t n_verts __attribute__((unused)), uint64_t n_edges __attribute__((unused)), forge_span_u64_t g_score __attribute__((unused)), forge_span_u64_t f_score __attribute__((unused)), forge_span_u64_t heuristic __attribute__((unused)), forge_span_u64_t in_open __attribute__((unused)), uint64_t current __attribute__((unused))) {
   uint64_t start __attribute__((unused)) = adj_ptr.data[current];
-  uint64_t end __attribute__((unused)) = adj_ptr.data[(current + 1)];
+  uint64_t end __attribute__((unused)) = adj_ptr.data[(current + 1ULL)];
   uint64_t e __attribute__((unused)) = start;
   {
     while ((e < end)) {
@@ -27,10 +27,10 @@ void astar_relax(forge_span_u64_t adj_ptr __attribute__((unused)), forge_span_u6
       if ((tentative_g < g_score.data[nb])) {
         g_score.data[nb] = tentative_g;
         f_score.data[nb] = (tentative_g + heuristic.data[nb]);
-        in_open.data[nb] = 1;
+        in_open.data[nb] = 1ULL;
 
       }
-      e = (e + 1);
+      e = (e + 1ULL);
     }
 
   }
@@ -39,16 +39,16 @@ void astar_relax(forge_span_u64_t adj_ptr __attribute__((unused)), forge_span_u6
 uint64_t find_min_f(forge_span_u64_t f_score __attribute__((unused)), forge_span_u64_t in_open __attribute__((unused)), uint64_t n_verts __attribute__((unused))) {
   uint64_t sentinel __attribute__((unused)) = n_verts;
   uint64_t best __attribute__((unused)) = sentinel;
-  uint64_t best_f __attribute__((unused)) = -1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t best_f __attribute__((unused)) = 0xffffffffffffffffULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n_verts)) {
-      if (((in_open.data[i] == 1) && (f_score.data[i] < best_f))) {
+      if (((in_open.data[i] == 1ULL) && (f_score.data[i] < best_f))) {
         best = i;
         best_f = f_score.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -56,7 +56,7 @@ uint64_t find_min_f(forge_span_u64_t f_score __attribute__((unused)), forge_span
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

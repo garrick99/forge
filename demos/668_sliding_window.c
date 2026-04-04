@@ -19,79 +19,79 @@ uint64_t window_count(uint64_t n __attribute__((unused)), uint64_t w __attribute
 int main();
 
 void window_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t w __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t sum __attribute__((unused)) = 0;
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t sum __attribute__((unused)) = 0ULL;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < w)) {
       sum = (sum + s.data[j]);
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
-  out.data[0] = sum;
-  uint64_t i __attribute__((unused)) = 1;
+  out.data[0ULL] = sum;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while (((i + w) <= n)) {
-      sum = ((sum + s.data[((i + w) - 1)]) - s.data[(i - 1)]);
+      sum = ((sum + s.data[((i + w) - 1ULL)]) - s.data[(i - 1ULL)]);
       out.data[i] = sum;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void window_max(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t w __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while (((i + w) <= n)) {
       uint64_t mx __attribute__((unused)) = s.data[i];
-      uint64_t j __attribute__((unused)) = 1;
+      uint64_t j __attribute__((unused)) = 1ULL;
       {
         while ((j < w)) {
           if ((s.data[(i + j)] > mx)) {
             mx = s.data[(i + j)];
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
       out.data[i] = mx;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void window_min(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t w __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while (((i + w) <= n)) {
       uint64_t mn __attribute__((unused)) = s.data[i];
-      uint64_t j __attribute__((unused)) = 1;
+      uint64_t j __attribute__((unused)) = 1ULL;
       {
         while ((j < w)) {
           if ((s.data[(i + j)] < mn)) {
             mn = s.data[(i + j)];
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
       out.data[i] = mn;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t window_count(uint64_t n __attribute__((unused)), uint64_t w __attribute__((unused))) {
-  return ((n - w) + 1);
+  return ((n - w) + 1ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

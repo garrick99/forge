@@ -19,7 +19,7 @@ _Bool pointwise_le(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t 
 int main();
 
 _Bool array_lt(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   _Bool res __attribute__((unused)) = 0;
   _Bool done __attribute__((unused)) = 0;
   {
@@ -32,7 +32,7 @@ _Bool array_lt(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __
         done = 1;
 
       } else {
-        i = (i + 1);
+        i = (i + 1ULL);
 
       }
     }
@@ -43,14 +43,14 @@ _Bool array_lt(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __
 
 _Bool array_eq(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
   _Bool eq __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while (((i < n) && eq)) {
       if ((a.data[i] != b.data[i])) {
         eq = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -58,14 +58,14 @@ _Bool array_eq(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __
 }
 
 _Bool array_sum_lt(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t sa __attribute__((unused)) = 0;
-  uint64_t sb __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t sa __attribute__((unused)) = 0ULL;
+  uint64_t sb __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       sa = (sa + a.data[i]);
       sb = (sb + b.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -74,14 +74,14 @@ _Bool array_sum_lt(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t 
 
 _Bool pointwise_le(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
   _Bool ok __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while (((i < n) && ok)) {
       if ((a.data[i] > b.data[i])) {
         ok = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -89,7 +89,7 @@ _Bool pointwise_le(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

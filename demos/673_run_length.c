@@ -20,8 +20,8 @@ int main();
 
 uint64_t rle_count_run(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t start __attribute__((unused))) {
   uint64_t val __attribute__((unused)) = s.data[start];
-  uint64_t len __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = (start + 1);
+  uint64_t len __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = (start + 1ULL);
   _Bool done __attribute__((unused)) = 0;
   {
     while ((!done)) {
@@ -32,8 +32,8 @@ uint64_t rle_count_run(forge_span_u64_t s __attribute__((unused)), uint64_t n __
         done = 1;
 
       } else {
-        len = (len + 1);
-        i = (i + 1);
+        len = (len + 1ULL);
+        i = (i + 1ULL);
 
       }
     }
@@ -43,15 +43,15 @@ uint64_t rle_count_run(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 uint64_t rle_count_runs(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t runs __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t runs __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      if ((s.data[i] != s.data[(i - 1)])) {
-        runs = (runs + 1);
+      if ((s.data[i] != s.data[(i - 1ULL)])) {
+        runs = (runs + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -60,8 +60,8 @@ uint64_t rle_count_runs(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 
 uint64_t rle_run_length(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t start __attribute__((unused))) {
   uint64_t val __attribute__((unused)) = s.data[start];
-  uint64_t len __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = (start + 1);
+  uint64_t len __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = (start + 1ULL);
   _Bool done __attribute__((unused)) = 0;
   {
     while ((!done)) {
@@ -72,8 +72,8 @@ uint64_t rle_run_length(forge_span_u64_t s __attribute__((unused)), uint64_t n _
         done = 1;
 
       } else {
-        len = (len + 1);
-        i = (i + 1);
+        len = (len + 1ULL);
+        i = (i + 1ULL);
 
       }
     }
@@ -83,15 +83,15 @@ uint64_t rle_run_length(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 }
 
 uint64_t rle_total_runs(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t runs __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t runs __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      if ((s.data[i] != s.data[(i - 1)])) {
-        runs = (runs + 1);
+      if ((s.data[i] != s.data[(i - 1ULL)])) {
+        runs = (runs + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -99,7 +99,7 @@ uint64_t rle_total_runs(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -26,52 +26,52 @@ uint64_t op_count();
 int main();
 
 CapacityPlanner cp_new(uint64_t total __attribute__((unused))) {
-  return (CapacityPlanner){ .total = total, .reserved = 0, .available = total, .ops = 0 };
+  return (CapacityPlanner){ .total = total, .reserved = 0ULL, .available = total, .ops = 0ULL };
 }
 
 void cp_reserve(CapacityPlanner* c __attribute__((unused)), uint64_t n __attribute__((unused))) {
   (*c).reserved = ((*c).reserved + n);
   (*c).available = ((*c).available - n);
-  (*c).ops = ((*c).ops + 1);
+  (*c).ops = ((*c).ops + 1ULL);
 }
 
 void cp_release(CapacityPlanner* c __attribute__((unused)), uint64_t n __attribute__((unused))) {
   (*c).reserved = ((*c).reserved - n);
   (*c).available = ((*c).available + n);
-  (*c).ops = ((*c).ops + 1);
+  (*c).ops = ((*c).ops + 1ULL);
 }
 
 uint64_t reserve_30() {
-  CapacityPlanner c __attribute__((unused)) = cp_new(100);
-  cp_reserve((&c), 30);
+  CapacityPlanner c __attribute__((unused)) = cp_new(100ULL);
+  cp_reserve((&c), 30ULL);
   return c.available;
 }
 
 uint64_t partial_release() {
-  CapacityPlanner c __attribute__((unused)) = cp_new(100);
-  cp_reserve((&c), 40);
-  cp_release((&c), 10);
+  CapacityPlanner c __attribute__((unused)) = cp_new(100ULL);
+  cp_reserve((&c), 40ULL);
+  cp_release((&c), 10ULL);
   return c.reserved;
 }
 
 uint64_t conservation() {
-  CapacityPlanner c __attribute__((unused)) = cp_new(100);
-  cp_reserve((&c), 50);
-  cp_reserve((&c), 20);
-  cp_release((&c), 15);
+  CapacityPlanner c __attribute__((unused)) = cp_new(100ULL);
+  cp_reserve((&c), 50ULL);
+  cp_reserve((&c), 20ULL);
+  cp_release((&c), 15ULL);
   return (c.reserved + c.available);
 }
 
 uint64_t op_count() {
-  CapacityPlanner c __attribute__((unused)) = cp_new(100);
-  cp_reserve((&c), 30);
-  cp_reserve((&c), 20);
-  cp_release((&c), 10);
+  CapacityPlanner c __attribute__((unused)) = cp_new(100ULL);
+  cp_reserve((&c), 30ULL);
+  cp_reserve((&c), 20ULL);
+  cp_release((&c), 10ULL);
   return c.ops;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -67,13 +67,13 @@ int main();
 uint64_t Color__to_rgb(const Color* self __attribute__((unused))) {
   switch ((*self).tag) {
     case Color_tag_Red: {
-      return 16711680;
+      return 16711680ULL;
     }
     case Color_tag_Green: {
-      return 65280;
+      return 65280ULL;
     }
     case Color_tag_Blue: {
-      return 255;
+      return 255ULL;
     }
     case Color_tag_Custom: {
       uint64_t v __attribute__((unused)) = (*self).data.Custom._v0;
@@ -85,10 +85,10 @@ uint64_t Color__to_rgb(const Color* self __attribute__((unused))) {
 
 uint64_t Color__brightness(const Color* self __attribute__((unused))) {
   uint64_t rgb __attribute__((unused)) = Color__to_rgb((&(*self)));
-  uint64_t r __attribute__((unused)) = ((rgb >> 16) & 255);
-  uint64_t g __attribute__((unused)) = ((rgb >> 8) & 255);
-  uint64_t b __attribute__((unused)) = (rgb & 255);
-  return (((2 * r) + (4 * g)) + b);
+  uint64_t r __attribute__((unused)) = ((rgb >> 16ULL) & 255ULL);
+  uint64_t g __attribute__((unused)) = ((rgb >> 8ULL) & 255ULL);
+  uint64_t b __attribute__((unused)) = (rgb & 255ULL);
+  return (((2ULL * r) + (4ULL * g)) + b);
 }
 
 uint64_t Color__is_primary(const Color* self __attribute__((unused))) {
@@ -97,10 +97,10 @@ uint64_t Color__is_primary(const Color* self __attribute__((unused))) {
     case Color_tag_Green:
     case Color_tag_Blue:
     {
-      return 1;
+      return 1ULL;
     }
     case Color_tag_Custom: {
-      return 0;
+      return 0ULL;
     }
     default: __builtin_unreachable();
   }
@@ -127,14 +127,14 @@ Direction Direction__opposite(const Direction* self __attribute__((unused))) {
 uint64_t Direction__to_dx(const Direction* self __attribute__((unused))) {
   switch ((*self).tag) {
     case Direction_tag_East: {
-      return 1;
+      return 1ULL;
     }
     case Direction_tag_West: {
-      return 2;
+      return 2ULL;
     }
     default: ;
     {
-      return 0;
+      return 0ULL;
     }
   }
 }
@@ -142,7 +142,7 @@ uint64_t Direction__to_dx(const Direction* self __attribute__((unused))) {
 int main() {
   Color c1 __attribute__((unused)) = (Color){ .tag = Color_tag_Red, .data.Red = { ._dummy = 0 } };
   Color c2 __attribute__((unused)) = (Color){ .tag = Color_tag_Green, .data.Green = { ._dummy = 0 } };
-  Color c3 __attribute__((unused)) = (Color){ .tag = Color_tag_Custom, .data.Custom = { ._v0 = 8421504 } };
+  Color c3 __attribute__((unused)) = (Color){ .tag = Color_tag_Custom, .data.Custom = { ._v0 = 8421504ULL } };
   uint64_t rgb1 __attribute__((unused)) = Color__to_rgb((&c1));
   uint64_t rgb2 __attribute__((unused)) = Color__to_rgb((&c2));
   uint64_t br1 __attribute__((unused)) = Color__brightness((&c1));
@@ -153,10 +153,10 @@ int main() {
   Direction opp __attribute__((unused)) = Direction__opposite((&d));
   uint64_t dx;
   if (1) {
-    dx = 3;
+    dx = 3ULL;
   }
   else if (1) {
-    dx = 0;
+    dx = 0ULL;
   }
 
   return (int)(((((br1 + br2) + p1) + p3) + dx));

@@ -27,22 +27,22 @@ uint64_t b_no_a_effect();
 int main();
 
 Tally tally_new() {
-  return (Tally){ .votes_a = 0, .votes_b = 0, .votes_c = 0, .total = 0 };
+  return (Tally){ .votes_a = 0ULL, .votes_b = 0ULL, .votes_c = 0ULL, .total = 0ULL };
 }
 
 void tally_vote_a(Tally* t __attribute__((unused))) {
-  (*t).votes_a = ((*t).votes_a + 1);
-  (*t).total = ((*t).total + 1);
+  (*t).votes_a = ((*t).votes_a + 1ULL);
+  (*t).total = ((*t).total + 1ULL);
 }
 
 void tally_vote_b(Tally* t __attribute__((unused))) {
-  (*t).votes_b = ((*t).votes_b + 1);
-  (*t).total = ((*t).total + 1);
+  (*t).votes_b = ((*t).votes_b + 1ULL);
+  (*t).total = ((*t).total + 1ULL);
 }
 
 void tally_vote_c(Tally* t __attribute__((unused))) {
-  (*t).votes_c = ((*t).votes_c + 1);
-  (*t).total = ((*t).total + 1);
+  (*t).votes_c = ((*t).votes_c + 1ULL);
+  (*t).total = ((*t).total + 1ULL);
 }
 
 uint64_t a_wins() {
@@ -85,7 +85,7 @@ uint64_t b_no_a_effect() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

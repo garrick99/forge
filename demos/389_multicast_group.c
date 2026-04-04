@@ -26,19 +26,19 @@ uint64_t max_preserved(uint64_t max __attribute__((unused)));
 int main();
 
 MulticastGroup mg_new(uint64_t max_members __attribute__((unused))) {
-  return (MulticastGroup){ .members = 0, .max_members = max_members, .messages = 0 };
+  return (MulticastGroup){ .members = 0ULL, .max_members = max_members, .messages = 0ULL };
 }
 
 void mg_join(MulticastGroup* g __attribute__((unused))) {
-  (*g).members = ((*g).members + 1);
+  (*g).members = ((*g).members + 1ULL);
 }
 
 void mg_leave(MulticastGroup* g __attribute__((unused))) {
-  (*g).members = ((*g).members - 1);
+  (*g).members = ((*g).members - 1ULL);
 }
 
 void mg_send(MulticastGroup* g __attribute__((unused))) {
-  (*g).messages = ((*g).messages + 1);
+  (*g).messages = ((*g).messages + 1ULL);
 }
 
 uint64_t join_four(uint64_t max __attribute__((unused))) {
@@ -79,7 +79,7 @@ uint64_t max_preserved(uint64_t max __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

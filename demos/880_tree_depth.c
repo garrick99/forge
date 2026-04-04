@@ -17,28 +17,28 @@ uint64_t max_depth(forge_span_u64_t depths __attribute__((unused)), uint64_t n _
 int main();
 
 void compute_depths(forge_span_u64_t depths __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  depths.data[0] = 0;
-  uint64_t i __attribute__((unused)) = 1;
+  depths.data[0ULL] = 0ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      uint64_t parent __attribute__((unused)) = ((i - 1) / 2);
-      depths.data[i] = (depths.data[parent] + 1);
-      i = (i + 1);
+      uint64_t parent __attribute__((unused)) = ((i - 1ULL) / 2ULL);
+      depths.data[i] = (depths.data[parent] + 1ULL);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t max_depth(forge_span_u64_t depths __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t mx __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t mx __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((depths.data[i] > mx)) {
         mx = depths.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -46,7 +46,7 @@ uint64_t max_depth(forge_span_u64_t depths __attribute__((unused)), uint64_t n _
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -8,7 +8,7 @@
 #  define __attribute__(x)
 #endif
 
-typedef struct IpHeader {
+typedef struct __attribute__((packed)) IpHeader {
   uint64_t version_ihl;
   uint64_t tos;
   uint64_t total_length;
@@ -19,7 +19,7 @@ typedef struct IpHeader {
   uint64_t checksum;
   uint64_t src_ip;
   uint64_t dst_ip;
-} IpHeader __attribute__((packed));
+} IpHeader;
 
 /* Forward declarations */
 IpHeader make_ip_header(uint64_t src __attribute__((unused)), uint64_t dst __attribute__((unused)), uint64_t proto __attribute__((unused)), uint64_t length __attribute__((unused)));
@@ -27,7 +27,7 @@ uint64_t get_protocol(IpHeader hdr __attribute__((unused)));
 int main();
 
 IpHeader make_ip_header(uint64_t src __attribute__((unused)), uint64_t dst __attribute__((unused)), uint64_t proto __attribute__((unused)), uint64_t length __attribute__((unused))) {
-  return (IpHeader){ .version_ihl = 69, .tos = 0, .total_length = length, .identification = 0, .flags_fragment = 0, .ttl = 64, .protocol = proto, .checksum = 0, .src_ip = src, .dst_ip = dst };
+  return (IpHeader){ .version_ihl = 69ULL, .tos = 0ULL, .total_length = length, .identification = 0ULL, .flags_fragment = 0ULL, .ttl = 64ULL, .protocol = proto, .checksum = 0ULL, .src_ip = src, .dst_ip = dst };
 }
 
 uint64_t get_protocol(IpHeader hdr __attribute__((unused))) {
@@ -35,7 +35,7 @@ uint64_t get_protocol(IpHeader hdr __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

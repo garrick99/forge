@@ -27,7 +27,7 @@ uint64_t total_preserved(uint64_t total __attribute__((unused)));
 int main();
 
 QuotaMgr qm_new(uint64_t total __attribute__((unused))) {
-  return (QuotaMgr){ .total = total, .used_a = 0, .used_b = 0 };
+  return (QuotaMgr){ .total = total, .used_a = 0ULL, .used_b = 0ULL };
 }
 
 void qm_use_a(QuotaMgr* q __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -47,37 +47,37 @@ void qm_release_b(QuotaMgr* q __attribute__((unused)), uint64_t n __attribute__(
 }
 
 uint64_t two_tenants_free() {
-  QuotaMgr q __attribute__((unused)) = qm_new(100);
-  qm_use_a((&q), 30);
-  qm_use_b((&q), 40);
+  QuotaMgr q __attribute__((unused)) = qm_new(100ULL);
+  qm_use_a((&q), 30ULL);
+  qm_use_b((&q), 40ULL);
   return ((q.total - q.used_a) - q.used_b);
 }
 
 uint64_t use_release_a() {
-  QuotaMgr q __attribute__((unused)) = qm_new(100);
-  qm_use_a((&q), 50);
-  qm_release_a((&q), 20);
+  QuotaMgr q __attribute__((unused)) = qm_new(100ULL);
+  qm_use_a((&q), 50ULL);
+  qm_release_a((&q), 20ULL);
   return q.used_a;
 }
 
 uint64_t b_unaffected() {
-  QuotaMgr q __attribute__((unused)) = qm_new(100);
-  qm_use_b((&q), 25);
-  qm_use_a((&q), 30);
-  qm_release_a((&q), 10);
+  QuotaMgr q __attribute__((unused)) = qm_new(100ULL);
+  qm_use_b((&q), 25ULL);
+  qm_use_a((&q), 30ULL);
+  qm_release_a((&q), 10ULL);
   return q.used_b;
 }
 
 uint64_t total_preserved(uint64_t total __attribute__((unused))) {
   QuotaMgr q __attribute__((unused)) = qm_new(total);
-  qm_use_a((&q), 20);
-  qm_use_b((&q), 30);
-  qm_release_a((&q), 10);
+  qm_use_a((&q), 20ULL);
+  qm_use_b((&q), 30ULL);
+  qm_release_a((&q), 10ULL);
   return q.total;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

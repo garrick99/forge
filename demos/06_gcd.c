@@ -12,7 +12,7 @@
 uint64_t gcd(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 
 uint64_t gcd(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if ((b == 0)) {
+  if ((b == 0ULL)) {
     return a;
   } else {
     return gcd(b, (a % b));

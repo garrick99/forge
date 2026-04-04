@@ -35,28 +35,28 @@ uint64_t u32_to_u64(uint32_t b __attribute__((unused))) {
 
 uint64_t upper_nibble(uint8_t b __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = ((uint64_t)b);
-  return (v / 16);
+  return (v / 16ULL);
 }
 
 uint64_t lower_nibble(uint8_t b __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = ((uint64_t)b);
-  return (v % 16);
+  return (v % 16ULL);
 }
 
 uint64_t read_u16_be(uint8_t hi __attribute__((unused)), uint8_t lo __attribute__((unused))) {
   uint64_t h __attribute__((unused)) = ((uint64_t)hi);
   uint64_t l __attribute__((unused)) = ((uint64_t)lo);
-  return ((h * 256) + l);
+  return ((h * 256ULL) + l);
 }
 
 uint64_t byte_array_sum(forge_span_u8_t buf __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t sum __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t sum __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t b __attribute__((unused)) = ((uint64_t)buf.data[i]);
       sum = (sum + b);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -64,7 +64,7 @@ uint64_t byte_array_sum(forge_span_u8_t buf __attribute__((unused)), uint64_t n 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

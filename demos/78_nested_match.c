@@ -50,7 +50,7 @@ uint64_t classify_pair(uint64_t a __attribute__((unused)), uint64_t b __attribut
 int main();
 
 ParseResult parse_even(uint64_t n __attribute__((unused))) {
-  if (((n % 2) == 0)) {
+  if (((n % 2ULL) == 0ULL)) {
     return (ParseResult){ .tag = ParseResult_tag_Good, .data.Good = { ._v0 = n } };
   } else {
     return (ParseResult){ .tag = ParseResult_tag_Bad, .data.Bad = { ._dummy = 0 } };
@@ -61,10 +61,10 @@ uint64_t double_if_good(ParseResult r __attribute__((unused))) {
   switch (r.tag) {
     case ParseResult_tag_Good: {
       uint64_t v __attribute__((unused)) = r.data.Good._v0;
-      return (v * 2);
+      return (v * 2ULL);
     }
     case ParseResult_tag_Bad: {
-      return 0;
+      return 0ULL;
     }
     default: __builtin_unreachable();
   }
@@ -79,7 +79,7 @@ uint64_t handle_opt(Option_u64 o __attribute__((unused))) {
       break;
     }
     default: {
-      inner = 0;
+      inner = 0ULL;
       break;
     }
   }
@@ -111,7 +111,7 @@ uint64_t classify_pair(uint64_t a __attribute__((unused)), uint64_t b __attribut
           return y;
         }
         case ParseResult_tag_Bad: {
-          return 0;
+          return 0ULL;
         }
         default: __builtin_unreachable();
       }
@@ -121,16 +121,16 @@ uint64_t classify_pair(uint64_t a __attribute__((unused)), uint64_t b __attribut
 }
 
 int main() {
-  uint64_t r1 __attribute__((unused)) = double_if_good(parse_even(4));
-  uint64_t r2 __attribute__((unused)) = double_if_good(parse_even(7));
-  uint64_t r3 __attribute__((unused)) = handle_opt((Option_u64){ .tag = Option_u64_tag_Some, .data.Some = { ._v0 = 10 } });
-  uint64_t r4 __attribute__((unused)) = handle_opt((Option_u64){ .tag = Option_u64_tag_Some, .data.Some = { ._v0 = 3 } });
+  uint64_t r1 __attribute__((unused)) = double_if_good(parse_even(4ULL));
+  uint64_t r2 __attribute__((unused)) = double_if_good(parse_even(7ULL));
+  uint64_t r3 __attribute__((unused)) = handle_opt((Option_u64){ .tag = Option_u64_tag_Some, .data.Some = { ._v0 = 10ULL } });
+  uint64_t r4 __attribute__((unused)) = handle_opt((Option_u64){ .tag = Option_u64_tag_Some, .data.Some = { ._v0 = 3ULL } });
   Option_u64 none_val __attribute__((unused)) = (Option_u64){ .tag = Option_u64_tag_None, .data.None = { ._dummy = 0 } };
   uint64_t r5 __attribute__((unused)) = handle_opt(none_val);
-  uint64_t c1 __attribute__((unused)) = classify_pair(4, 6);
-  uint64_t c2 __attribute__((unused)) = classify_pair(4, 7);
-  uint64_t c3 __attribute__((unused)) = classify_pair(3, 6);
-  uint64_t c4 __attribute__((unused)) = classify_pair(3, 7);
+  uint64_t c1 __attribute__((unused)) = classify_pair(4ULL, 6ULL);
+  uint64_t c2 __attribute__((unused)) = classify_pair(4ULL, 7ULL);
+  uint64_t c3 __attribute__((unused)) = classify_pair(3ULL, 6ULL);
+  uint64_t c4 __attribute__((unused)) = classify_pair(3ULL, 7ULL);
   return (int)(((((((((r1 + r2) + r3) + r4) + r5) + c1) + c2) + c3) + c4));
 
 }

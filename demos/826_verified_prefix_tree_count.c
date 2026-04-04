@@ -16,12 +16,12 @@ uint64_t count_prefix_matches(forge_span_u64_t s __attribute__((unused)), uint64
 int main();
 
 uint64_t count_prefix_matches(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t k __attribute__((unused))) {
-  uint64_t matches __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
-  uint64_t limit __attribute__((unused)) = ((n - k) + 1);
+  uint64_t matches __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
+  uint64_t limit __attribute__((unused)) = ((n - k) + 1ULL);
   {
     while ((i < limit)) {
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t j __attribute__((unused)) = 0ULL;
       _Bool eq __attribute__((unused)) = 1;
       {
         while ((j < k)) {
@@ -29,15 +29,15 @@ uint64_t count_prefix_matches(forge_span_u64_t s __attribute__((unused)), uint64
             eq = 0;
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
       if (eq) {
-        matches = (matches + 1);
+        matches = (matches + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -45,7 +45,7 @@ uint64_t count_prefix_matches(forge_span_u64_t s __attribute__((unused)), uint64
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -18,7 +18,7 @@ int main();
 uint64_t upper_bound(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
   uint64_t idx __attribute__((unused)) = n;
   _Bool found __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if (((found == 0) && (s.data[i] > val))) {
@@ -26,7 +26,7 @@ uint64_t upper_bound(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
         found = 1;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -34,7 +34,7 @@ uint64_t upper_bound(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

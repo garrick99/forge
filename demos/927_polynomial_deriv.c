@@ -17,31 +17,31 @@ void poly_integral(forge_span_u64_t coeffs __attribute__((unused)), forge_span_u
 int main();
 
 void poly_deriv(forge_span_u64_t coeffs __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
-  uint64_t deg __attribute__((unused)) = (n - 1);
+  uint64_t i __attribute__((unused)) = 0ULL;
+  uint64_t deg __attribute__((unused)) = (n - 1ULL);
   {
     while ((i < deg)) {
-      out.data[i] = ((i + 1) * coeffs.data[(i + 1)]);
-      i = (i + 1);
+      out.data[i] = ((i + 1ULL) * coeffs.data[(i + 1ULL)]);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void poly_integral(forge_span_u64_t coeffs __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  out.data[0] = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  out.data[0ULL] = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      out.data[(i + 1)] = (coeffs.data[i] / (i + 1));
-      i = (i + 1);
+      out.data[(i + 1ULL)] = (coeffs.data[i] / (i + 1ULL));
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

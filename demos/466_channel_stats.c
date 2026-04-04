@@ -29,7 +29,7 @@ uint64_t retransmit_tracked();
 int main();
 
 ChannelStats cs_new() {
-  return (ChannelStats){ .sent_bytes = 0, .received_bytes = 0, .dropped_bytes = 0, .retransmit_bytes = 0, .total_attempted = 0 };
+  return (ChannelStats){ .sent_bytes = 0ULL, .received_bytes = 0ULL, .dropped_bytes = 0ULL, .retransmit_bytes = 0ULL, .total_attempted = 0ULL };
 }
 
 void cs_send(ChannelStats* c __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -53,33 +53,33 @@ void cs_retransmit(ChannelStats* c __attribute__((unused)), uint64_t n __attribu
 
 uint64_t send_100() {
   ChannelStats c __attribute__((unused)) = cs_new();
-  cs_send((&c), 100);
+  cs_send((&c), 100ULL);
   return c.sent_bytes;
 }
 
 uint64_t send_drop_total() {
   ChannelStats c __attribute__((unused)) = cs_new();
-  cs_send((&c), 100);
-  cs_drop((&c), 50);
+  cs_send((&c), 100ULL);
+  cs_drop((&c), 50ULL);
   return c.total_attempted;
 }
 
 uint64_t receive_independent() {
   ChannelStats c __attribute__((unused)) = cs_new();
-  cs_send((&c), 100);
-  cs_receive((&c), 80);
+  cs_send((&c), 100ULL);
+  cs_receive((&c), 80ULL);
   return c.received_bytes;
 }
 
 uint64_t retransmit_tracked() {
   ChannelStats c __attribute__((unused)) = cs_new();
-  cs_send((&c), 100);
-  cs_retransmit((&c), 30);
+  cs_send((&c), 100ULL);
+  cs_retransmit((&c), 30ULL);
   return c.retransmit_bytes;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

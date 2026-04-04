@@ -21,13 +21,13 @@ void insert_into_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t pos
   uint64_t key __attribute__((unused)) = s.data[pos];
   uint64_t j __attribute__((unused)) = pos;
   {
-    while ((j > 0)) {
-      if ((s.data[(j - 1)] > key)) {
-        s.data[j] = s.data[(j - 1)];
-        j = (j - 1);
+    while ((j > 0ULL)) {
+      if ((s.data[(j - 1ULL)] > key)) {
+        s.data[j] = s.data[(j - 1ULL)];
+        j = (j - 1ULL);
 
       } else {
-        j = 0;
+        j = 0ULL;
 
       }
     }
@@ -37,26 +37,26 @@ void insert_into_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t pos
 }
 
 void insertion_sort(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       insert_into_sorted(s, i);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 _Bool is_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   _Bool ok __attribute__((unused)) = 1;
   {
-    while (((i + 1) < n)) {
-      if ((s.data[i] > s.data[(i + 1)])) {
-        ok = (i != i);
+    while (((i + 1ULL) < n)) {
+      if ((s.data[i] > s.data[(i + 1ULL)])) {
+        ok = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -64,7 +64,7 @@ _Bool is_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

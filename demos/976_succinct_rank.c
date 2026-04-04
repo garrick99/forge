@@ -17,18 +17,18 @@ uint64_t query_rank(forge_span_u64_t rank_table __attribute__((unused)), uint64_
 int main();
 
 void build_rank(forge_span_u64_t bits __attribute__((unused)), forge_span_u64_t rank_table __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  rank_table.data[0] = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  rank_table.data[0ULL] = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((bits.data[i] > 0)) {
-        rank_table.data[(i + 1)] = (rank_table.data[i] + 1);
+      if ((bits.data[i] > 0ULL)) {
+        rank_table.data[(i + 1ULL)] = (rank_table.data[i] + 1ULL);
 
       } else {
-        rank_table.data[(i + 1)] = rank_table.data[i];
+        rank_table.data[(i + 1ULL)] = rank_table.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -39,7 +39,7 @@ uint64_t query_rank(forge_span_u64_t rank_table __attribute__((unused)), uint64_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

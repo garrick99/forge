@@ -31,37 +31,37 @@ uint64_t encode_total(uint64_t b0 __attribute__((unused)), uint64_t b1 __attribu
 int main();
 
 Rle4 rle_new() {
-  return (Rle4){ .c0 = 0, .v0 = 0, .c1 = 0, .v1 = 0, .c2 = 0, .v2 = 0, .c3 = 0, .v3 = 0, .nruns = 0 };
+  return (Rle4){ .c0 = 0ULL, .v0 = 0ULL, .c1 = 0ULL, .v1 = 0ULL, .c2 = 0ULL, .v2 = 0ULL, .c3 = 0ULL, .v3 = 0ULL, .nruns = 0ULL };
 }
 
 Rle4 rle_push(Rle4 r __attribute__((unused)), uint64_t count __attribute__((unused)), uint64_t value __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = r.nruns;
-  if ((n == 0)) {
-    return (Rle4){ .c0 = count, .v0 = value, .c1 = r.c1, .v1 = r.v1, .c2 = r.c2, .v2 = r.v2, .c3 = r.c3, .v3 = r.v3, .nruns = 1 };
+  if ((n == 0ULL)) {
+    return (Rle4){ .c0 = count, .v0 = value, .c1 = r.c1, .v1 = r.v1, .c2 = r.c2, .v2 = r.v2, .c3 = r.c3, .v3 = r.v3, .nruns = 1ULL };
   } else {
-    if ((n == 1)) {
-      return (Rle4){ .c0 = r.c0, .v0 = r.v0, .c1 = count, .v1 = value, .c2 = r.c2, .v2 = r.v2, .c3 = r.c3, .v3 = r.v3, .nruns = 2 };
+    if ((n == 1ULL)) {
+      return (Rle4){ .c0 = r.c0, .v0 = r.v0, .c1 = count, .v1 = value, .c2 = r.c2, .v2 = r.v2, .c3 = r.c3, .v3 = r.v3, .nruns = 2ULL };
     } else {
-      if ((n == 2)) {
-        return (Rle4){ .c0 = r.c0, .v0 = r.v0, .c1 = r.c1, .v1 = r.v1, .c2 = count, .v2 = value, .c3 = r.c3, .v3 = r.v3, .nruns = 3 };
+      if ((n == 2ULL)) {
+        return (Rle4){ .c0 = r.c0, .v0 = r.v0, .c1 = r.c1, .v1 = r.v1, .c2 = count, .v2 = value, .c3 = r.c3, .v3 = r.v3, .nruns = 3ULL };
       } else {
-        return (Rle4){ .c0 = r.c0, .v0 = r.v0, .c1 = r.c1, .v1 = r.v1, .c2 = r.c2, .v2 = r.v2, .c3 = count, .v3 = value, .nruns = 4 };
+        return (Rle4){ .c0 = r.c0, .v0 = r.v0, .c1 = r.c1, .v1 = r.v1, .c2 = r.c2, .v2 = r.v2, .c3 = count, .v3 = value, .nruns = 4ULL };
       }
     }
   }
 }
 
 uint64_t rle_total(Rle4 r __attribute__((unused))) {
-  if ((r.nruns == 0)) {
-    return 0;
+  if ((r.nruns == 0ULL)) {
+    return 0ULL;
   } else {
-    if ((r.nruns == 1)) {
+    if ((r.nruns == 1ULL)) {
       return r.c0;
     } else {
-      if ((r.nruns == 2)) {
+      if ((r.nruns == 2ULL)) {
         return (r.c0 + r.c1);
       } else {
-        if ((r.nruns == 3)) {
+        if ((r.nruns == 3ULL)) {
           return ((r.c0 + r.c1) + r.c2);
         } else {
           return (((r.c0 + r.c1) + r.c2) + r.c3);
@@ -72,13 +72,13 @@ uint64_t rle_total(Rle4 r __attribute__((unused))) {
 }
 
 uint64_t rle_count(Rle4 r __attribute__((unused)), uint64_t i __attribute__((unused))) {
-  if ((i == 0)) {
+  if ((i == 0ULL)) {
     return r.c0;
   } else {
-    if ((i == 1)) {
+    if ((i == 1ULL)) {
       return r.c1;
     } else {
-      if ((i == 2)) {
+      if ((i == 2ULL)) {
         return r.c2;
       } else {
         return r.c3;
@@ -88,13 +88,13 @@ uint64_t rle_count(Rle4 r __attribute__((unused)), uint64_t i __attribute__((unu
 }
 
 uint64_t rle_value(Rle4 r __attribute__((unused)), uint64_t i __attribute__((unused))) {
-  if ((i == 0)) {
+  if ((i == 0ULL)) {
     return r.v0;
   } else {
-    if ((i == 1)) {
+    if ((i == 1ULL)) {
       return r.v1;
     } else {
-      if ((i == 2)) {
+      if ((i == 2ULL)) {
         return r.v2;
       } else {
         return r.v3;
@@ -104,7 +104,7 @@ uint64_t rle_value(Rle4 r __attribute__((unused)), uint64_t i __attribute__((unu
 }
 
 Rle4 rle_encode4(uint64_t b0 __attribute__((unused)), uint64_t b1 __attribute__((unused)), uint64_t b2 __attribute__((unused)), uint64_t b3 __attribute__((unused))) {
-  return (Rle4){ .c0 = 1, .v0 = b0, .c1 = 1, .v1 = b1, .c2 = 1, .v2 = b2, .c3 = 1, .v3 = b3, .nruns = 4 };
+  return (Rle4){ .c0 = 1ULL, .v0 = b0, .c1 = 1ULL, .v1 = b1, .c2 = 1ULL, .v2 = b2, .c3 = 1ULL, .v3 = b3, .nruns = 4ULL };
 }
 
 uint64_t encode_total(uint64_t b0 __attribute__((unused)), uint64_t b1 __attribute__((unused)), uint64_t b2 __attribute__((unused)), uint64_t b3 __attribute__((unused))) {
@@ -114,16 +114,16 @@ uint64_t encode_total(uint64_t b0 __attribute__((unused)), uint64_t b1 __attribu
 
 int main() {
   Rle4 r0 __attribute__((unused)) = rle_new();
-  Rle4 r1 __attribute__((unused)) = rle_push(r0, 5, 65);
-  Rle4 r2 __attribute__((unused)) = rle_push(r1, 3, 66);
-  Rle4 r3 __attribute__((unused)) = rle_push(r2, 2, 67);
+  Rle4 r1 __attribute__((unused)) = rle_push(r0, 5ULL, 65ULL);
+  Rle4 r2 __attribute__((unused)) = rle_push(r1, 3ULL, 66ULL);
+  Rle4 r3 __attribute__((unused)) = rle_push(r2, 2ULL, 67ULL);
   uint64_t sz3 __attribute__((unused)) = r3.nruns;
   uint64_t tot3 __attribute__((unused)) = rle_total(r3);
-  Rle4 enc __attribute__((unused)) = rle_encode4(7, 8, 9, 10);
+  Rle4 enc __attribute__((unused)) = rle_encode4(7ULL, 8ULL, 9ULL, 10ULL);
   uint64_t enc_runs __attribute__((unused)) = enc.nruns;
-  uint64_t enc_tot __attribute__((unused)) = encode_total(7, 8, 9, 10);
-  uint64_t v0 __attribute__((unused)) = rle_value(enc, 0);
-  uint64_t v3 __attribute__((unused)) = rle_value(enc, 3);
+  uint64_t enc_tot __attribute__((unused)) = encode_total(7ULL, 8ULL, 9ULL, 10ULL);
+  uint64_t v0 __attribute__((unused)) = rle_value(enc, 0ULL);
+  uint64_t v3 __attribute__((unused)) = rle_value(enc, 3ULL);
   return (int)((((((sz3 + tot3) + enc_runs) + enc_tot) + v0) + v3));
 
 }

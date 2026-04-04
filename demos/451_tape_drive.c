@@ -29,43 +29,43 @@ uint64_t seek_count();
 int main();
 
 TapeDrive td_new(uint64_t length __attribute__((unused))) {
-  return (TapeDrive){ .position = 0, .length = length, .reads = 0, .writes = 0, .seeks = 0 };
+  return (TapeDrive){ .position = 0ULL, .length = length, .reads = 0ULL, .writes = 0ULL, .seeks = 0ULL };
 }
 
 void td_seek_fwd(TapeDrive* t __attribute__((unused)), uint64_t n __attribute__((unused))) {
   (*t).position = ((*t).position + n);
-  (*t).seeks = ((*t).seeks + 1);
+  (*t).seeks = ((*t).seeks + 1ULL);
 }
 
 void td_seek_bwd(TapeDrive* t __attribute__((unused)), uint64_t n __attribute__((unused))) {
   (*t).position = ((*t).position - n);
-  (*t).seeks = ((*t).seeks + 1);
+  (*t).seeks = ((*t).seeks + 1ULL);
 }
 
 void td_read(TapeDrive* t __attribute__((unused))) {
-  (*t).reads = ((*t).reads + 1);
+  (*t).reads = ((*t).reads + 1ULL);
 }
 
 void td_write(TapeDrive* t __attribute__((unused))) {
-  (*t).writes = ((*t).writes + 1);
+  (*t).writes = ((*t).writes + 1ULL);
 }
 
 uint64_t seek_fwd() {
-  TapeDrive t __attribute__((unused)) = td_new(100);
-  td_seek_fwd((&t), 30);
+  TapeDrive t __attribute__((unused)) = td_new(100ULL);
+  td_seek_fwd((&t), 30ULL);
   return t.position;
 }
 
 uint64_t seek_back() {
-  TapeDrive t __attribute__((unused)) = td_new(100);
-  td_seek_fwd((&t), 30);
-  td_seek_bwd((&t), 20);
+  TapeDrive t __attribute__((unused)) = td_new(100ULL);
+  td_seek_fwd((&t), 30ULL);
+  td_seek_bwd((&t), 20ULL);
   return t.position;
 }
 
 uint64_t reads_tracked() {
-  TapeDrive t __attribute__((unused)) = td_new(100);
-  td_seek_fwd((&t), 10);
+  TapeDrive t __attribute__((unused)) = td_new(100ULL);
+  td_seek_fwd((&t), 10ULL);
   td_read((&t));
   td_read((&t));
   td_read((&t));
@@ -73,15 +73,15 @@ uint64_t reads_tracked() {
 }
 
 uint64_t seek_count() {
-  TapeDrive t __attribute__((unused)) = td_new(100);
-  td_seek_fwd((&t), 20);
-  td_seek_fwd((&t), 10);
-  td_seek_bwd((&t), 5);
+  TapeDrive t __attribute__((unused)) = td_new(100ULL);
+  td_seek_fwd((&t), 20ULL);
+  td_seek_fwd((&t), 10ULL);
+  td_seek_bwd((&t), 5ULL);
   return t.seeks;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

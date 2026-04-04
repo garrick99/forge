@@ -16,25 +16,25 @@ uint64_t rle_decode(forge_span_u64_t encoded __attribute__((unused)), uint64_t e
 int main();
 
 uint64_t rle_decode(forge_span_u64_t encoded __attribute__((unused)), uint64_t enc_len __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t out_cap __attribute__((unused))) {
-  uint64_t ri __attribute__((unused)) = 0;
-  uint64_t wi __attribute__((unused)) = 0;
+  uint64_t ri __attribute__((unused)) = 0ULL;
+  uint64_t wi __attribute__((unused)) = 0ULL;
   {
-    while (((ri + 1) < enc_len)) {
+    while (((ri + 1ULL) < enc_len)) {
       uint64_t val __attribute__((unused)) = encoded.data[ri];
-      uint64_t cnt __attribute__((unused)) = encoded.data[(ri + 1)];
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t cnt __attribute__((unused)) = encoded.data[(ri + 1ULL)];
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < cnt)) {
           if ((wi < out_cap)) {
             out.data[wi] = val;
-            wi = (wi + 1);
+            wi = (wi + 1ULL);
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
-      ri = (ri + 2);
+      ri = (ri + 2ULL);
     }
 
   }
@@ -42,7 +42,7 @@ uint64_t rle_decode(forge_span_u64_t encoded __attribute__((unused)), uint64_t e
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

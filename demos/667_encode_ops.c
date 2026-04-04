@@ -23,18 +23,18 @@ uint64_t unpack_lo(uint64_t x __attribute__((unused)));
 int main();
 
 uint64_t nibble_lo(uint64_t x __attribute__((unused))) {
-  return (x % 16);
+  return (x % 16ULL);
 }
 
 uint64_t nibble_hi(uint64_t x __attribute__((unused))) {
-  return ((x / 16) % 16);
+  return ((x / 16ULL) % 16ULL);
 }
 
 uint64_t hex_digit(uint64_t n __attribute__((unused))) {
-  if ((n < 10)) {
-    return (n + 48);
+  if ((n < 10ULL)) {
+    return (n + 48ULL);
   } else {
-    return ((n - 10) + 65);
+    return ((n - 10ULL) + 65ULL);
   }
 }
 
@@ -42,21 +42,21 @@ uint64_t byte_to_hex(forge_span_u64_t buf __attribute__((unused)), uint64_t pos 
   uint64_t hi __attribute__((unused)) = nibble_hi(val);
   uint64_t lo __attribute__((unused)) = nibble_lo(val);
   buf.data[pos] = hex_digit(hi);
-  buf.data[(pos + 1)] = hex_digit(lo);
-  return (pos + 2);
+  buf.data[(pos + 1ULL)] = hex_digit(lo);
+  return (pos + 2ULL);
 }
 
 uint64_t encode_bytes(forge_span_u64_t src __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t dst __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
-  uint64_t out __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
+  uint64_t out __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t hi __attribute__((unused)) = nibble_hi(src.data[i]);
       uint64_t lo __attribute__((unused)) = nibble_lo(src.data[i]);
       dst.data[out] = hex_digit(hi);
-      dst.data[(out + 1)] = hex_digit(lo);
-      out = (out + 2);
-      i = (i + 1);
+      dst.data[(out + 1ULL)] = hex_digit(lo);
+      out = (out + 2ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -64,19 +64,19 @@ uint64_t encode_bytes(forge_span_u64_t src __attribute__((unused)), uint64_t n _
 }
 
 uint64_t pack_nibbles(uint64_t hi __attribute__((unused)), uint64_t lo __attribute__((unused))) {
-  return ((hi * 16) + lo);
+  return ((hi * 16ULL) + lo);
 }
 
 uint64_t unpack_hi(uint64_t x __attribute__((unused))) {
-  return ((x / 16) % 16);
+  return ((x / 16ULL) % 16ULL);
 }
 
 uint64_t unpack_lo(uint64_t x __attribute__((unused))) {
-  return (x % 16);
+  return (x % 16ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

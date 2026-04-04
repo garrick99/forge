@@ -17,31 +17,31 @@ void mix_column(forge_span_u64_t col __attribute__((unused)));
 int main();
 
 uint64_t xtime(uint64_t x __attribute__((unused))) {
-  uint64_t shifted __attribute__((unused)) = ((x * 2) % 256);
-  if ((x >= 128)) {
-    return ((shifted ^ 27) % 256);
+  uint64_t shifted __attribute__((unused)) = ((x * 2ULL) % 256ULL);
+  if ((x >= 128ULL)) {
+    return ((shifted ^ 27ULL) % 256ULL);
   } else {
     return shifted;
   }
 }
 
 void mix_column(forge_span_u64_t col __attribute__((unused))) {
-  uint64_t a0 __attribute__((unused)) = col.data[0];
-  uint64_t a1 __attribute__((unused)) = col.data[1];
-  uint64_t a2 __attribute__((unused)) = col.data[2];
-  uint64_t a3 __attribute__((unused)) = col.data[3];
+  uint64_t a0 __attribute__((unused)) = col.data[0ULL];
+  uint64_t a1 __attribute__((unused)) = col.data[1ULL];
+  uint64_t a2 __attribute__((unused)) = col.data[2ULL];
+  uint64_t a3 __attribute__((unused)) = col.data[3ULL];
   uint64_t x0 __attribute__((unused)) = xtime(a0);
   uint64_t x1 __attribute__((unused)) = xtime(a1);
   uint64_t x2 __attribute__((unused)) = xtime(a2);
   uint64_t x3 __attribute__((unused)) = xtime(a3);
-  col.data[0] = (((((x0 ^ x1) ^ a1) ^ a2) ^ a3) % 256);
-  col.data[1] = (((((a0 ^ x1) ^ x2) ^ a2) ^ a3) % 256);
-  col.data[2] = (((((a0 ^ a1) ^ x2) ^ x3) ^ a3) % 256);
-  col.data[3] = (((((x0 ^ a0) ^ a1) ^ a2) ^ x3) % 256);
+  col.data[0ULL] = (((((x0 ^ x1) ^ a1) ^ a2) ^ a3) % 256ULL);
+  col.data[1ULL] = (((((a0 ^ x1) ^ x2) ^ a2) ^ a3) % 256ULL);
+  col.data[2ULL] = (((((a0 ^ a1) ^ x2) ^ x3) ^ a3) % 256ULL);
+  col.data[3ULL] = (((((x0 ^ a0) ^ a1) ^ a2) ^ x3) % 256ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

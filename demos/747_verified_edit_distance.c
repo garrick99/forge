@@ -16,45 +16,45 @@ uint64_t edit_distance(forge_span_u64_t a __attribute__((unused)), uint64_t m __
 int main();
 
 uint64_t edit_distance(forge_span_u64_t a __attribute__((unused)), uint64_t m __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t row __attribute__((unused))) {
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j <= n)) {
       row.data[j] = j;
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < m)) {
-      uint64_t prev __attribute__((unused)) = row.data[0];
-      row.data[0] = (i + 1);
-      uint64_t j2 __attribute__((unused)) = 0;
+      uint64_t prev __attribute__((unused)) = row.data[0ULL];
+      row.data[0ULL] = (i + 1ULL);
+      uint64_t j2 __attribute__((unused)) = 0ULL;
       {
         while ((j2 < n)) {
-          uint64_t saved __attribute__((unused)) = row.data[(j2 + 1)];
+          uint64_t saved __attribute__((unused)) = row.data[(j2 + 1ULL)];
           if ((a.data[i] == b.data[j2])) {
-            row.data[(j2 + 1)] = prev;
+            row.data[(j2 + 1ULL)] = prev;
 
           } else {
-            uint64_t ins __attribute__((unused)) = (row.data[j2] + 1);
-            uint64_t del __attribute__((unused)) = (saved + 1);
-            uint64_t sub __attribute__((unused)) = (prev + 1);
+            uint64_t ins __attribute__((unused)) = (row.data[j2] + 1ULL);
+            uint64_t del __attribute__((unused)) = (saved + 1ULL);
+            uint64_t sub __attribute__((unused)) = (prev + 1ULL);
             uint64_t m1;
             if ((ins <= del)) {
               m1 = ins;
             } else {
               m1 = del;
             }
-            row.data[(j2 + 1)] = ((m1 <= sub) ? m1 : sub);
+            row.data[(j2 + 1ULL)] = ((m1 <= sub) ? m1 : sub);
 
           }
           prev = saved;
-          j2 = (j2 + 1);
+          j2 = (j2 + 1ULL);
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -62,7 +62,7 @@ uint64_t edit_distance(forge_span_u64_t a __attribute__((unused)), uint64_t m __
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

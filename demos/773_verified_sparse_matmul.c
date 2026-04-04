@@ -16,30 +16,30 @@ void spmv_csr(forge_span_u64_t row_ptr __attribute__((unused)), forge_span_u64_t
 int main();
 
 void spmv_csr(forge_span_u64_t row_ptr __attribute__((unused)), forge_span_u64_t col_idx __attribute__((unused)), forge_span_u64_t values __attribute__((unused)), uint64_t nrows __attribute__((unused)), uint64_t nnz __attribute__((unused)), forge_span_u64_t x __attribute__((unused)), uint64_t x_len __attribute__((unused)), forge_span_u64_t y __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nrows)) {
       uint64_t row_start __attribute__((unused)) = row_ptr.data[i];
-      uint64_t row_end __attribute__((unused)) = row_ptr.data[(i + 1)];
-      uint64_t acc __attribute__((unused)) = 0;
+      uint64_t row_end __attribute__((unused)) = row_ptr.data[(i + 1ULL)];
+      uint64_t acc __attribute__((unused)) = 0ULL;
       uint64_t j __attribute__((unused)) = row_start;
       {
         while ((j < row_end)) {
           uint64_t col __attribute__((unused)) = col_idx.data[j];
           acc = (acc + (values.data[j] * x.data[col]));
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
       y.data[i] = acc;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

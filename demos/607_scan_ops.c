@@ -18,49 +18,49 @@ void inclusive_scan_max(forge_span_u64_t src __attribute__((unused)), forge_span
 int main();
 
 void inclusive_scan_add(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  dst.data[0] = src.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  dst.data[0ULL] = src.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      dst.data[i] = (dst.data[(i - 1)] + src.data[i]);
-      i = (i + 1);
+      dst.data[i] = (dst.data[(i - 1ULL)] + src.data[i]);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void exclusive_scan_add(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  dst.data[0] = 0;
-  uint64_t i __attribute__((unused)) = 1;
+  dst.data[0ULL] = 0ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      dst.data[i] = (dst.data[(i - 1)] + src.data[(i - 1)]);
-      i = (i + 1);
+      dst.data[i] = (dst.data[(i - 1ULL)] + src.data[(i - 1ULL)]);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void inclusive_scan_max(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  dst.data[0] = src.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  dst.data[0ULL] = src.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      if ((src.data[i] > dst.data[(i - 1)])) {
+      if ((src.data[i] > dst.data[(i - 1ULL)])) {
         dst.data[i] = src.data[i];
 
       } else {
-        dst.data[i] = dst.data[(i - 1)];
+        dst.data[i] = dst.data[(i - 1ULL)];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

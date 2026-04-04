@@ -47,10 +47,10 @@ SortedPair make_sorted(uint64_t a __attribute__((unused)), uint64_t b __attribut
 }
 
 uint64_t frac_value_times_10(Fraction f __attribute__((unused))) {
-  if ((f.den == 0)) {
-    return 0;
+  if ((f.den == 0ULL)) {
+    return 0ULL;
   } else {
-    return ((f.num * 10) / f.den);
+    return ((f.num * 10ULL) / f.den);
   }
 }
 
@@ -59,13 +59,13 @@ uint64_t span_size(SortedPair p __attribute__((unused))) {
 }
 
 int main() {
-  BoundedU8 b1 __attribute__((unused)) = make_bounded(100);
-  BoundedU8 b2 __attribute__((unused)) = make_bounded(200);
-  Fraction f1 __attribute__((unused)) = make_fraction(1, 4);
-  Fraction f2 __attribute__((unused)) = make_fraction(3, 2);
+  BoundedU8 b1 __attribute__((unused)) = make_bounded(100ULL);
+  BoundedU8 b2 __attribute__((unused)) = make_bounded(200ULL);
+  Fraction f1 __attribute__((unused)) = make_fraction(1ULL, 4ULL);
+  Fraction f2 __attribute__((unused)) = make_fraction(3ULL, 2ULL);
   uint64_t fv1 __attribute__((unused)) = frac_value_times_10(f1);
   uint64_t fv2 __attribute__((unused)) = frac_value_times_10(f2);
-  SortedPair sp __attribute__((unused)) = make_sorted(7, 3);
+  SortedPair sp __attribute__((unused)) = make_sorted(7ULL, 3ULL);
   uint64_t sz __attribute__((unused)) = span_size(sp);
   return (int)(((((b1.val + b2.val) + fv1) + fv2) + sz));
 

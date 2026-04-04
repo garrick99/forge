@@ -20,12 +20,12 @@ uint64_t array_digit_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n 
 int main();
 
 uint64_t digit_count(uint64_t x __attribute__((unused))) {
-  uint64_t n __attribute__((unused)) = (x / 10);
-  uint64_t cnt __attribute__((unused)) = 1;
+  uint64_t n __attribute__((unused)) = (x / 10ULL);
+  uint64_t cnt __attribute__((unused)) = 1ULL;
   {
-    while ((n > 0)) {
-      n = (n / 10);
-      cnt = (cnt + 1);
+    while ((n > 0ULL)) {
+      n = (n / 10ULL);
+      cnt = (cnt + 1ULL);
     }
 
   }
@@ -34,11 +34,11 @@ uint64_t digit_count(uint64_t x __attribute__((unused))) {
 
 uint64_t digit_sum(uint64_t x __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = x;
-  uint64_t s __attribute__((unused)) = 0;
+  uint64_t s __attribute__((unused)) = 0ULL;
   {
-    while ((n > 0)) {
-      s = (s + (n % 10));
-      n = (n / 10);
+    while ((n > 0ULL)) {
+      s = (s + (n % 10ULL));
+      n = (n / 10ULL);
     }
 
   }
@@ -47,24 +47,24 @@ uint64_t digit_sum(uint64_t x __attribute__((unused))) {
 
 uint64_t digit_at(uint64_t x __attribute__((unused)), uint64_t pos __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = x;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < pos)) {
-      n = (n / 10);
-      i = (i + 1);
+      n = (n / 10ULL);
+      i = (i + 1ULL);
     }
 
   }
-  return (n % 10);
+  return (n % 10ULL);
 }
 
 uint64_t reverse_digits(uint64_t x __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = x;
-  uint64_t r __attribute__((unused)) = 0;
+  uint64_t r __attribute__((unused)) = 0ULL;
   {
-    while ((n > 0)) {
-      r = ((r * 10) + (n % 10));
-      n = (n / 10);
+    while ((n > 0ULL)) {
+      r = ((r * 10ULL) + (n % 10ULL));
+      n = (n / 10ULL);
     }
 
   }
@@ -72,13 +72,13 @@ uint64_t reverse_digits(uint64_t x __attribute__((unused))) {
 }
 
 uint64_t array_digit_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t ds __attribute__((unused)) = digit_sum(s.data[i]);
       acc = (acc + ds);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -86,7 +86,7 @@ uint64_t array_digit_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

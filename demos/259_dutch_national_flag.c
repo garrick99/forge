@@ -16,19 +16,19 @@ uint64_t count_partition(forge_span_u64_t s __attribute__((unused)), uint64_t n 
 int main();
 
 uint64_t count_partition(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t pivot __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
-  uint64_t eq __attribute__((unused)) = 0;
-  uint64_t hi __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
+  uint64_t eq __attribute__((unused)) = 0ULL;
+  uint64_t hi __attribute__((unused)) = 0ULL;
   {
     for (uint64_t i = 0; i < (uint64_t)(n); i++) {
       if ((s.data[i] < pivot)) {
-        lo = (lo + 1);
+        lo = (lo + 1ULL);
 
       } else if ((s.data[i] > pivot)) {
-        hi = (hi + 1);
+        hi = (hi + 1ULL);
 
       } else {
-        eq = (eq + 1);
+        eq = (eq + 1ULL);
 
       }
     }
@@ -38,7 +38,7 @@ uint64_t count_partition(forge_span_u64_t s __attribute__((unused)), uint64_t n 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

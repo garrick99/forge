@@ -17,7 +17,7 @@ int main();
 
 uint64_t for_sum(forge_span_u64_t s __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = s.len;
-  uint64_t acc __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
   {
     for (uint64_t i = 0; i < (uint64_t)(n); i++) {
       acc = (acc + s.data[i]);
@@ -28,7 +28,7 @@ uint64_t for_sum(forge_span_u64_t s __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

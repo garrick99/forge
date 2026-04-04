@@ -62,9 +62,9 @@ uint64_t min3(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unus
 }
 
 uint64_t span_range(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = s.data[0];
-  uint64_t hi __attribute__((unused)) = s.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t lo __attribute__((unused)) = s.data[0ULL];
+  uint64_t hi __attribute__((unused)) = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((s.data[i] < lo)) {
@@ -75,7 +75,7 @@ uint64_t span_range(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
         hi = s.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -83,15 +83,15 @@ uint64_t span_range(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 }
 
 uint64_t check_abs_diff_sym() {
-  return abs_diff(7, 4);
+  return abs_diff(7ULL, 4ULL);
 }
 
 uint64_t check_abs_diff_sym2() {
-  return abs_diff(4, 7);
+  return abs_diff(4ULL, 7ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

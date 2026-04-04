@@ -16,16 +16,16 @@ uint64_t copy_if_gt(forge_span_u64_t src __attribute__((unused)), forge_span_u64
 int main();
 
 uint64_t copy_if_gt(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t thresh __attribute__((unused))) {
-  uint64_t out __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t out __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((src.data[i] > thresh)) {
         dst.data[out] = src.data[i];
-        out = (out + 1);
+        out = (out + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -33,7 +33,7 @@ uint64_t copy_if_gt(forge_span_u64_t src __attribute__((unused)), forge_span_u64
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

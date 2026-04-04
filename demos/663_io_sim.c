@@ -21,30 +21,30 @@ uint64_t stream_fill(forge_span_u64_t buf __attribute__((unused)), uint64_t pos 
 int main();
 
 uint64_t stream_write_u8(forge_span_u64_t buf __attribute__((unused)), uint64_t pos __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  buf.data[pos] = (val % 256);
-  return (pos + 1);
+  buf.data[pos] = (val % 256ULL);
+  return (pos + 1ULL);
 }
 
 uint64_t stream_write_u16_be(forge_span_u64_t buf __attribute__((unused)), uint64_t pos __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  buf.data[pos] = ((val / 256) % 256);
-  buf.data[(pos + 1)] = (val % 256);
-  return (pos + 2);
+  buf.data[pos] = ((val / 256ULL) % 256ULL);
+  buf.data[(pos + 1ULL)] = (val % 256ULL);
+  return (pos + 2ULL);
 }
 
 uint64_t stream_read_u8(forge_span_u64_t buf __attribute__((unused)), uint64_t pos __attribute__((unused))) {
-  return (buf.data[pos] % 256);
+  return (buf.data[pos] % 256ULL);
 }
 
 uint64_t stream_read_u16_be(forge_span_u64_t buf __attribute__((unused)), uint64_t pos __attribute__((unused))) {
-  return (((buf.data[pos] % 256) * 256) + (buf.data[(pos + 1)] % 256));
+  return (((buf.data[pos] % 256ULL) * 256ULL) + (buf.data[(pos + 1ULL)] % 256ULL));
 }
 
 uint64_t stream_copy(forge_span_u64_t src __attribute__((unused)), uint64_t src_pos __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t dst_pos __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       dst.data[(dst_pos + i)] = src.data[(src_pos + i)];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -52,11 +52,11 @@ uint64_t stream_copy(forge_span_u64_t src __attribute__((unused)), uint64_t src_
 }
 
 uint64_t stream_fill(forge_span_u64_t buf __attribute__((unused)), uint64_t pos __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      buf.data[(pos + i)] = (val % 256);
-      i = (i + 1);
+      buf.data[(pos + i)] = (val % 256ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -64,7 +64,7 @@ uint64_t stream_fill(forge_span_u64_t buf __attribute__((unused)), uint64_t pos 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

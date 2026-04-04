@@ -16,11 +16,11 @@ void compute_syndrome(forge_span_u64_t received __attribute__((unused)), forge_s
 int main();
 
 void compute_syndrome(forge_span_u64_t received __attribute__((unused)), forge_span_u64_t h_matrix __attribute__((unused)), forge_span_u64_t syndrome __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t m __attribute__((unused)), uint64_t p __attribute__((unused))) {
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < m)) {
-      uint64_t acc __attribute__((unused)) = 0;
-      uint64_t i __attribute__((unused)) = 0;
+      uint64_t acc __attribute__((unused)) = 0ULL;
+      uint64_t i __attribute__((unused)) = 0ULL;
       {
         while ((i < n)) {
           uint64_t idx __attribute__((unused)) = ((j * n) + i);
@@ -28,19 +28,19 @@ void compute_syndrome(forge_span_u64_t received __attribute__((unused)), forge_s
             acc = ((acc + (received.data[i] * h_matrix.data[idx])) % p);
 
           }
-          i = (i + 1);
+          i = (i + 1ULL);
         }
 
       }
       syndrome.data[j] = acc;
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

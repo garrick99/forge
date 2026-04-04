@@ -16,7 +16,7 @@ void ntt_butterfly(forge_span_u64_t a __attribute__((unused)), uint64_t n __attr
 int main();
 
 void ntt_butterfly(forge_span_u64_t a __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t h __attribute__((unused)), uint64_t p __attribute__((unused)), forge_span_u64_t twiddle __attribute__((unused))) {
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < h)) {
       uint64_t w __attribute__((unused)) = (twiddle.data[j] % p);
@@ -28,7 +28,7 @@ void ntt_butterfly(forge_span_u64_t a __attribute__((unused)), uint64_t n __attr
         a.data[idx] = (((u_val + p) - v_val) % p);
 
       }
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
@@ -36,14 +36,14 @@ void ntt_butterfly(forge_span_u64_t a __attribute__((unused)), uint64_t n __attr
   {
     while ((k < n)) {
       a.data[k] = (a.data[k] % p);
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

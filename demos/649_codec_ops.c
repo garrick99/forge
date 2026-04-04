@@ -20,55 +20,55 @@ uint64_t sum_lengths(forge_span_u64_t lens __attribute__((unused)), uint64_t n _
 int main();
 
 void delta_encode(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  dst.data[0] = src.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  dst.data[0ULL] = src.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      dst.data[i] = ((src.data[i] >= src.data[(i - 1)]) ? (src.data[i] - src.data[(i - 1)]) : 0);
-      i = (i + 1);
+      dst.data[i] = ((src.data[i] >= src.data[(i - 1ULL)]) ? (src.data[i] - src.data[(i - 1ULL)]) : 0ULL);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void delta_decode(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  dst.data[0] = src.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  dst.data[0ULL] = src.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      dst.data[i] = (dst.data[(i - 1)] + src.data[i]);
-      i = (i + 1);
+      dst.data[i] = (dst.data[(i - 1ULL)] + src.data[i]);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t zigzag_encode(uint64_t n __attribute__((unused))) {
-  if (((n % 2) == 0)) {
-    return (n / 2);
+  if (((n % 2ULL) == 0ULL)) {
+    return (n / 2ULL);
   } else {
-    return ((n / 2) + 1);
+    return ((n / 2ULL) + 1ULL);
   }
 }
 
 void encode_lengths(forge_span_u64_t src __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t max_len __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       out.data[i] = ((src.data[i] <= max_len) ? src.data[i] : max_len);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t sum_lengths(forge_span_u64_t lens __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + lens.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -76,7 +76,7 @@ uint64_t sum_lengths(forge_span_u64_t lens __attribute__((unused)), uint64_t n _
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

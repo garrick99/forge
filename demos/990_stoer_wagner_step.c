@@ -19,25 +19,25 @@ __forge_tuple_u64_u64_t max_adj_search(forge_span_u64_t weights __attribute__((u
 int main();
 
 __forge_tuple_u64_u64_t max_adj_search(forge_span_u64_t weights __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t visited __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      visited.data[i] = 0;
-      i = (i + 1);
+      visited.data[i] = 0ULL;
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t last __attribute__((unused)) = 0;
-  uint64_t second_last __attribute__((unused)) = 0;
-  uint64_t step __attribute__((unused)) = 0;
+  uint64_t last __attribute__((unused)) = 0ULL;
+  uint64_t second_last __attribute__((unused)) = 0ULL;
+  uint64_t step __attribute__((unused)) = 0ULL;
   {
     while ((step < n)) {
-      uint64_t best __attribute__((unused)) = 0;
-      uint64_t best_w __attribute__((unused)) = 0;
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t best __attribute__((unused)) = 0ULL;
+      uint64_t best_w __attribute__((unused)) = 0ULL;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < n)) {
-          if ((visited.data[j] == 0)) {
+          if ((visited.data[j] == 0ULL)) {
             uint64_t idx __attribute__((unused)) = ((last * n) + j);
             if ((idx < (n * n))) {
               if ((weights.data[idx] >= best_w)) {
@@ -49,14 +49,14 @@ __forge_tuple_u64_u64_t max_adj_search(forge_span_u64_t weights __attribute__((u
             }
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
-      visited.data[best] = 1;
+      visited.data[best] = 1ULL;
       second_last = last;
       last = best;
-      step = (step + 1);
+      step = (step + 1ULL);
     }
 
   }
@@ -64,7 +64,7 @@ __forge_tuple_u64_u64_t max_adj_search(forge_span_u64_t weights __attribute__((u
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -27,25 +27,25 @@ uint64_t lo_dispatch_after_hi();
 int main();
 
 Scheduler sched_new() {
-  return (Scheduler){ .hi_count = 0, .lo_count = 0, .dispatched = 0 };
+  return (Scheduler){ .hi_count = 0ULL, .lo_count = 0ULL, .dispatched = 0ULL };
 }
 
 void sched_enqueue_hi(Scheduler* s __attribute__((unused))) {
-  (*s).hi_count = ((*s).hi_count + 1);
+  (*s).hi_count = ((*s).hi_count + 1ULL);
 }
 
 void sched_enqueue_lo(Scheduler* s __attribute__((unused))) {
-  (*s).lo_count = ((*s).lo_count + 1);
+  (*s).lo_count = ((*s).lo_count + 1ULL);
 }
 
 void sched_dispatch_hi(Scheduler* s __attribute__((unused))) {
-  (*s).hi_count = ((*s).hi_count - 1);
-  (*s).dispatched = ((*s).dispatched + 1);
+  (*s).hi_count = ((*s).hi_count - 1ULL);
+  (*s).dispatched = ((*s).dispatched + 1ULL);
 }
 
 void sched_dispatch_lo(Scheduler* s __attribute__((unused))) {
-  (*s).lo_count = ((*s).lo_count - 1);
-  (*s).dispatched = ((*s).dispatched + 1);
+  (*s).lo_count = ((*s).lo_count - 1ULL);
+  (*s).dispatched = ((*s).dispatched + 1ULL);
 }
 
 uint64_t enqueue_hi_three() {
@@ -90,7 +90,7 @@ uint64_t lo_dispatch_after_hi() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

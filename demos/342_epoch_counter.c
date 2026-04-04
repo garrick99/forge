@@ -25,15 +25,15 @@ uint64_t rollback_preserves_epoch();
 int main();
 
 Epoch epoch_new() {
-  return (Epoch){ .epoch = 0, .rollbacks = 0 };
+  return (Epoch){ .epoch = 0ULL, .rollbacks = 0ULL };
 }
 
 void epoch_commit(Epoch* e __attribute__((unused))) {
-  (*e).epoch = ((*e).epoch + 1);
+  (*e).epoch = ((*e).epoch + 1ULL);
 }
 
 void epoch_rollback(Epoch* e __attribute__((unused))) {
-  (*e).rollbacks = ((*e).rollbacks + 1);
+  (*e).rollbacks = ((*e).rollbacks + 1ULL);
 }
 
 uint64_t one_commit() {
@@ -75,7 +75,7 @@ uint64_t rollback_preserves_epoch() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

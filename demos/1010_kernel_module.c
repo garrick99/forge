@@ -25,95 +25,95 @@ int main();
 
 uint64_t device_transition(uint64_t state __attribute__((unused)), uint64_t event __attribute__((unused))) {
   uint64_t next __attribute__((unused)) = state;
-  if ((state == 0)) {
-    if ((event == 0)) {
-      next = 1;
+  if ((state == 0ULL)) {
+    if ((event == 0ULL)) {
+      next = 1ULL;
 
     }
 
-  } else if ((state == 1)) {
-    if ((event == 1)) {
-      next = 2;
+  } else if ((state == 1ULL)) {
+    if ((event == 1ULL)) {
+      next = 2ULL;
 
-    } else if ((event == 7)) {
-      next = 5;
-
-    }
-
-  } else if ((state == 2)) {
-    if ((event == 2)) {
-      next = 3;
-
-    } else if ((event == 4)) {
-      next = 1;
-
-    } else if ((event == 5)) {
-      next = 4;
+    } else if ((event == 7ULL)) {
+      next = 5ULL;
 
     }
 
-  } else if ((state == 3)) {
-    if ((event == 3)) {
-      next = 2;
+  } else if ((state == 2ULL)) {
+    if ((event == 2ULL)) {
+      next = 3ULL;
 
-    } else if ((event == 5)) {
-      next = 4;
+    } else if ((event == 4ULL)) {
+      next = 1ULL;
+
+    } else if ((event == 5ULL)) {
+      next = 4ULL;
 
     }
 
-  } else if ((state == 4)) {
-    if ((event == 6)) {
-      next = 1;
+  } else if ((state == 3ULL)) {
+    if ((event == 3ULL)) {
+      next = 2ULL;
 
-    } else if ((event == 7)) {
-      next = 5;
+    } else if ((event == 5ULL)) {
+      next = 4ULL;
+
+    }
+
+  } else if ((state == 4ULL)) {
+    if ((event == 6ULL)) {
+      next = 1ULL;
+
+    } else if ((event == 7ULL)) {
+      next = 5ULL;
 
     }
 
   } else {
-    next = 5;
+    next = 5ULL;
 
   }
   return next;
 }
 
 uint64_t handle_ioctl(uint64_t cmd __attribute__((unused)), uint64_t arg __attribute__((unused)), forge_span_u64_t device_regs __attribute__((unused)), uint64_t n_regs __attribute__((unused))) {
-  uint64_t ret __attribute__((unused)) = 2;
-  if ((cmd == 0)) {
+  uint64_t ret __attribute__((unused)) = 2ULL;
+  if ((cmd == 0ULL)) {
     if ((arg < n_regs)) {
       ret = device_regs.data[arg];
 
     }
 
-  } else if ((cmd == 1)) {
-    uint64_t reg_idx __attribute__((unused)) = (arg / 4294967296);
-    uint64_t value __attribute__((unused)) = (arg % 4294967296);
+  } else if ((cmd == 1ULL)) {
+    uint64_t reg_idx __attribute__((unused)) = (arg / 4294967296ULL);
+    uint64_t value __attribute__((unused)) = (arg % 4294967296ULL);
     if ((reg_idx < n_regs)) {
       device_regs.data[reg_idx] = value;
-      ret = 0;
+      ret = 0ULL;
 
     }
 
-  } else if ((cmd == 2)) {
-    ret = device_regs.data[0];
+  } else if ((cmd == 2ULL)) {
+    ret = device_regs.data[0ULL];
 
   }
   return ret;
 }
 
 uint64_t handle_interrupt(forge_span_u64_t status_regs __attribute__((unused)), uint64_t n_regs __attribute__((unused)), forge_span_u64_t pending __attribute__((unused)), uint64_t n_pending __attribute__((unused))) {
-  uint64_t handled __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t handled __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n_regs)) {
       uint64_t status __attribute__((unused)) = status_regs.data[i];
-      if (((status != 0) && (handled < n_pending))) {
+      if (((status != 0ULL) && (handled < n_pending))) {
         pending.data[handled] = i;
-        handled = (handled + 1);
-        status_regs.data[i] = 0;
+        handled = (handled + 1ULL);
+        status_regs.data[i] = 0ULL;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -123,13 +123,13 @@ uint64_t handle_interrupt(forge_span_u64_t status_regs __attribute__((unused)), 
 __forge_tuple_u64_u64_t klog_write(forge_span_u64_t log_buf __attribute__((unused)), uint64_t log_cap __attribute__((unused)), uint64_t tail __attribute__((unused)), uint64_t count __attribute__((unused)), forge_span_u64_t msg __attribute__((unused)), uint64_t msg_len __attribute__((unused))) {
   uint64_t t __attribute__((unused)) = tail;
   uint64_t c __attribute__((unused)) = count;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while (((i < msg_len) && (c < log_cap))) {
       log_buf.data[t] = msg.data[i];
-      t = (((t + 1) == log_cap) ? 0 : (t + 1));
-      c = (c + 1);
-      i = (i + 1);
+      t = (((t + 1ULL) == log_cap) ? 0ULL : (t + 1ULL));
+      c = (c + 1ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -137,26 +137,26 @@ __forge_tuple_u64_u64_t klog_write(forge_span_u64_t log_buf __attribute__((unuse
 }
 
 uint64_t module_init(forge_span_u64_t device_regs __attribute__((unused)), uint64_t n_regs __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n_regs)) {
-      device_regs.data[i] = 0;
-      i = (i + 1);
+      device_regs.data[i] = 0ULL;
+      i = (i + 1ULL);
     }
 
   }
-  device_regs.data[0] = 3735928559;
-  uint64_t state __attribute__((unused)) = device_transition(0, 0);
+  device_regs.data[0ULL] = 3735928559ULL;
+  uint64_t state __attribute__((unused)) = device_transition(0ULL, 0ULL);
   return state;
 }
 
 uint64_t module_cleanup(forge_span_u64_t device_regs __attribute__((unused)), uint64_t n_regs __attribute__((unused)), uint64_t state __attribute__((unused))) {
-  device_regs.data[0] = 0;
-  return device_transition(state, 7);
+  device_regs.data[0ULL] = 0ULL;
+  return device_transition(state, 7ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

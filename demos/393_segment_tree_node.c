@@ -27,60 +27,60 @@ uint64_t right_preserved();
 int main();
 
 SegNode sn_new(uint64_t v __attribute__((unused))) {
-  return (SegNode){ .value = v, .left = 0, .right = 0, .updates = 0 };
+  return (SegNode){ .value = v, .left = 0ULL, .right = 0ULL, .updates = 0ULL };
 }
 
 void sn_set_left(SegNode* n __attribute__((unused)), uint64_t v __attribute__((unused))) {
   (*n).left = v;
-  (*n).updates = ((*n).updates + 1);
+  (*n).updates = ((*n).updates + 1ULL);
 }
 
 void sn_set_right(SegNode* n __attribute__((unused)), uint64_t v __attribute__((unused))) {
   (*n).right = v;
-  (*n).updates = ((*n).updates + 1);
+  (*n).updates = ((*n).updates + 1ULL);
 }
 
 void sn_push_up(SegNode* n __attribute__((unused))) {
   (*n).value = ((*n).left + (*n).right);
-  (*n).updates = ((*n).updates + 1);
+  (*n).updates = ((*n).updates + 1ULL);
 }
 
 uint64_t push_up_sum() {
-  SegNode n __attribute__((unused)) = sn_new(0);
-  sn_set_left((&n), 10);
-  sn_set_right((&n), 20);
+  SegNode n __attribute__((unused)) = sn_new(0ULL);
+  sn_set_left((&n), 10ULL);
+  sn_set_right((&n), 20ULL);
   sn_push_up((&n));
   return n.value;
 }
 
 uint64_t update_count() {
-  SegNode n __attribute__((unused)) = sn_new(0);
-  sn_set_left((&n), 10);
-  sn_set_right((&n), 20);
+  SegNode n __attribute__((unused)) = sn_new(0ULL);
+  sn_set_left((&n), 10ULL);
+  sn_set_right((&n), 20ULL);
   sn_push_up((&n));
   return n.updates;
 }
 
 uint64_t update_left_repush() {
-  SegNode n __attribute__((unused)) = sn_new(0);
-  sn_set_left((&n), 10);
-  sn_set_right((&n), 20);
+  SegNode n __attribute__((unused)) = sn_new(0ULL);
+  sn_set_left((&n), 10ULL);
+  sn_set_right((&n), 20ULL);
   sn_push_up((&n));
-  sn_set_left((&n), 30);
+  sn_set_left((&n), 30ULL);
   sn_push_up((&n));
   return n.value;
 }
 
 uint64_t right_preserved() {
-  SegNode n __attribute__((unused)) = sn_new(0);
-  sn_set_left((&n), 10);
-  sn_set_right((&n), 20);
-  sn_set_left((&n), 30);
+  SegNode n __attribute__((unused)) = sn_new(0ULL);
+  sn_set_left((&n), 10ULL);
+  sn_set_right((&n), 20ULL);
+  sn_set_left((&n), 30ULL);
   return n.right;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

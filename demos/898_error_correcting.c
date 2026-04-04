@@ -18,12 +18,12 @@ uint64_t is_valid(forge_span_u64_t codeword __attribute__((unused)), uint64_t n 
 int main();
 
 uint64_t compute_syndrome(forge_span_u64_t codeword __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t syn __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t syn __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((codeword.data[i] == 1)) {
-        if ((syn == 0)) {
+      if ((codeword.data[i] == 1ULL)) {
+        if ((syn == 0ULL)) {
           syn = i;
 
         } else if ((i > syn)) {
@@ -32,7 +32,7 @@ uint64_t compute_syndrome(forge_span_u64_t codeword __attribute__((unused)), uin
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -40,15 +40,15 @@ uint64_t compute_syndrome(forge_span_u64_t codeword __attribute__((unused)), uin
 }
 
 uint64_t count_ones(forge_span_u64_t codeword __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((codeword.data[i] == 1)) {
-        cnt = (cnt + 1);
+      if ((codeword.data[i] == 1ULL)) {
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -57,15 +57,15 @@ uint64_t count_ones(forge_span_u64_t codeword __attribute__((unused)), uint64_t 
 
 uint64_t is_valid(forge_span_u64_t codeword __attribute__((unused)), uint64_t n __attribute__((unused))) {
   uint64_t s __attribute__((unused)) = compute_syndrome(codeword, n);
-  if ((s == 0)) {
-    return 1;
+  if ((s == 0ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

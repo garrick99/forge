@@ -27,7 +27,7 @@ _Bool bump_is_full(const BumpAlloc* a __attribute__((unused)));
 int main();
 
 BumpAlloc bump_new(forge_span_u64_t pool __attribute__((unused)), uint64_t cap __attribute__((unused))) {
-  return (BumpAlloc){ .pool = pool, .top = 0, .cap = cap };
+  return (BumpAlloc){ .pool = pool, .top = 0ULL, .cap = cap };
 }
 
 uint64_t bump_alloc(BumpAlloc* a __attribute__((unused)), uint64_t size __attribute__((unused))) {
@@ -37,7 +37,7 @@ uint64_t bump_alloc(BumpAlloc* a __attribute__((unused)), uint64_t size __attrib
 }
 
 void bump_free_all(BumpAlloc* a __attribute__((unused))) {
-  (*a).top = 0;
+  (*a).top = 0ULL;
 }
 
 uint64_t bump_remaining(const BumpAlloc* a __attribute__((unused))) {
@@ -45,7 +45,7 @@ uint64_t bump_remaining(const BumpAlloc* a __attribute__((unused))) {
 }
 
 _Bool bump_is_empty(const BumpAlloc* a __attribute__((unused))) {
-  return ((*a).top == 0);
+  return ((*a).top == 0ULL);
 }
 
 _Bool bump_is_full(const BumpAlloc* a __attribute__((unused))) {
@@ -53,7 +53,7 @@ _Bool bump_is_full(const BumpAlloc* a __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

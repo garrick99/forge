@@ -27,7 +27,7 @@ uint64_t total_consumed();
 int main();
 
 Handoff ho_new() {
-  return (Handoff){ .produced = 0, .handoff_pending = 0, .consumed = 0, .handoffs = 0 };
+  return (Handoff){ .produced = 0ULL, .handoff_pending = 0ULL, .consumed = 0ULL, .handoffs = 0ULL };
 }
 
 void ho_produce(Handoff* h __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -36,7 +36,7 @@ void ho_produce(Handoff* h __attribute__((unused)), uint64_t n __attribute__((un
 
 void ho_handoff(Handoff* h __attribute__((unused)), uint64_t n __attribute__((unused))) {
   (*h).handoff_pending = ((*h).handoff_pending + n);
-  (*h).handoffs = ((*h).handoffs + 1);
+  (*h).handoffs = ((*h).handoffs + 1ULL);
 }
 
 void ho_consume(Handoff* h __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -46,35 +46,35 @@ void ho_consume(Handoff* h __attribute__((unused)), uint64_t n __attribute__((un
 
 uint64_t produce_5() {
   Handoff h __attribute__((unused)) = ho_new();
-  ho_produce((&h), 5);
+  ho_produce((&h), 5ULL);
   return h.produced;
 }
 
 uint64_t handoff_3() {
   Handoff h __attribute__((unused)) = ho_new();
-  ho_produce((&h), 5);
-  ho_handoff((&h), 3);
+  ho_produce((&h), 5ULL);
+  ho_handoff((&h), 3ULL);
   return h.handoff_pending;
 }
 
 uint64_t consume_reduces() {
   Handoff h __attribute__((unused)) = ho_new();
-  ho_produce((&h), 5);
-  ho_handoff((&h), 3);
-  ho_consume((&h), 2);
+  ho_produce((&h), 5ULL);
+  ho_handoff((&h), 3ULL);
+  ho_consume((&h), 2ULL);
   return h.handoff_pending;
 }
 
 uint64_t total_consumed() {
   Handoff h __attribute__((unused)) = ho_new();
-  ho_produce((&h), 10);
-  ho_handoff((&h), 5);
-  ho_consume((&h), 3);
+  ho_produce((&h), 10ULL);
+  ho_handoff((&h), 5ULL);
+  ho_consume((&h), 3ULL);
   return h.consumed;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

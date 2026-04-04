@@ -17,14 +17,14 @@ int main();
 
 uint64_t min_index_range(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
   uint64_t idx __attribute__((unused)) = lo;
-  uint64_t i __attribute__((unused)) = (lo + 1);
+  uint64_t i __attribute__((unused)) = (lo + 1ULL);
   {
     while ((i < hi)) {
       if ((s.data[i] < s.data[idx])) {
         idx = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -32,7 +32,7 @@ uint64_t min_index_range(forge_span_u64_t s __attribute__((unused)), uint64_t n 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

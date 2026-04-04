@@ -28,18 +28,18 @@ uint64_t total_allocs();
 int main();
 
 ResourceQuota rq_new(uint64_t soft __attribute__((unused)), uint64_t hard __attribute__((unused))) {
-  return (ResourceQuota){ .used = 0, .soft_limit = soft, .hard_limit = hard, .over_soft = 0, .allocations = 0 };
+  return (ResourceQuota){ .used = 0ULL, .soft_limit = soft, .hard_limit = hard, .over_soft = 0ULL, .allocations = 0ULL };
 }
 
 void rq_alloc_normal(ResourceQuota* r __attribute__((unused)), uint64_t n __attribute__((unused))) {
   (*r).used = ((*r).used + n);
-  (*r).allocations = ((*r).allocations + 1);
+  (*r).allocations = ((*r).allocations + 1ULL);
 }
 
 void rq_alloc_over_soft(ResourceQuota* r __attribute__((unused)), uint64_t n __attribute__((unused))) {
   (*r).used = ((*r).used + n);
-  (*r).over_soft = ((*r).over_soft + 1);
-  (*r).allocations = ((*r).allocations + 1);
+  (*r).over_soft = ((*r).over_soft + 1ULL);
+  (*r).allocations = ((*r).allocations + 1ULL);
 }
 
 void rq_free(ResourceQuota* r __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -47,35 +47,35 @@ void rq_free(ResourceQuota* r __attribute__((unused)), uint64_t n __attribute__(
 }
 
 uint64_t normal_alloc() {
-  ResourceQuota r __attribute__((unused)) = rq_new(100, 200);
-  rq_alloc_normal((&r), 50);
+  ResourceQuota r __attribute__((unused)) = rq_new(100ULL, 200ULL);
+  rq_alloc_normal((&r), 50ULL);
   return r.used;
 }
 
 uint64_t over_soft_alloc() {
-  ResourceQuota r __attribute__((unused)) = rq_new(100, 200);
-  rq_alloc_normal((&r), 80);
-  rq_alloc_over_soft((&r), 50);
+  ResourceQuota r __attribute__((unused)) = rq_new(100ULL, 200ULL);
+  rq_alloc_normal((&r), 80ULL);
+  rq_alloc_over_soft((&r), 50ULL);
   return r.over_soft;
 }
 
 uint64_t free_reduces() {
-  ResourceQuota r __attribute__((unused)) = rq_new(100, 200);
-  rq_alloc_normal((&r), 80);
-  rq_free((&r), 50);
+  ResourceQuota r __attribute__((unused)) = rq_new(100ULL, 200ULL);
+  rq_alloc_normal((&r), 80ULL);
+  rq_free((&r), 50ULL);
   return r.used;
 }
 
 uint64_t total_allocs() {
-  ResourceQuota r __attribute__((unused)) = rq_new(100, 300);
-  rq_alloc_normal((&r), 50);
-  rq_alloc_normal((&r), 40);
-  rq_alloc_over_soft((&r), 80);
+  ResourceQuota r __attribute__((unused)) = rq_new(100ULL, 300ULL);
+  rq_alloc_normal((&r), 50ULL);
+  rq_alloc_normal((&r), 40ULL);
+  rq_alloc_over_soft((&r), 80ULL);
   return r.allocations;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

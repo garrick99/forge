@@ -16,16 +16,16 @@ _Bool all_equal(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
 int main();
 
 _Bool all_equal(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t first __attribute__((unused)) = s.data[0];
+  uint64_t first __attribute__((unused)) = s.data[0ULL];
   _Bool ok __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((s.data[i] != first)) {
         ok = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -33,7 +33,7 @@ _Bool all_equal(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -17,22 +17,22 @@ uint64_t rle_decode(forge_span_u64_t vals __attribute__((unused)), forge_span_u6
 int main();
 
 uint64_t rle_encode(forge_span_u64_t src __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t out_vals __attribute__((unused)), forge_span_u64_t out_lens __attribute__((unused))) {
-  out_vals.data[0] = src.data[0];
-  out_lens.data[0] = 1;
-  uint64_t runs __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  out_vals.data[0ULL] = src.data[0ULL];
+  out_lens.data[0ULL] = 1ULL;
+  uint64_t runs __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      if ((src.data[i] == src.data[(i - 1)])) {
-        out_lens.data[(runs - 1)] = (out_lens.data[(runs - 1)] + 1);
+      if ((src.data[i] == src.data[(i - 1ULL)])) {
+        out_lens.data[(runs - 1ULL)] = (out_lens.data[(runs - 1ULL)] + 1ULL);
 
       } else {
         out_vals.data[runs] = src.data[i];
-        out_lens.data[runs] = 1;
-        runs = (runs + 1);
+        out_lens.data[runs] = 1ULL;
+        runs = (runs + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -40,20 +40,20 @@ uint64_t rle_encode(forge_span_u64_t src __attribute__((unused)), uint64_t n __a
 }
 
 uint64_t rle_decode(forge_span_u64_t vals __attribute__((unused)), forge_span_u64_t lens __attribute__((unused)), uint64_t runs __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t pos __attribute__((unused)) = 0;
-  uint64_t r __attribute__((unused)) = 0;
+  uint64_t pos __attribute__((unused)) = 0ULL;
+  uint64_t r __attribute__((unused)) = 0ULL;
   {
     while (((r < runs) && (pos < out.len))) {
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while (((j < lens.data[r]) && (pos < out.len))) {
           out.data[pos] = vals.data[r];
-          pos = (pos + 1);
-          j = (j + 1);
+          pos = (pos + 1ULL);
+          j = (j + 1ULL);
         }
 
       }
-      r = (r + 1);
+      r = (r + 1ULL);
     }
 
   }
@@ -61,7 +61,7 @@ uint64_t rle_decode(forge_span_u64_t vals __attribute__((unused)), forge_span_u6
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

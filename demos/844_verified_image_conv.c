@@ -16,45 +16,45 @@ void convolve_3x3(forge_span_u64_t image __attribute__((unused)), uint64_t rows 
 int main();
 
 void convolve_3x3(forge_span_u64_t image __attribute__((unused)), uint64_t rows __attribute__((unused)), uint64_t cols __attribute__((unused)), forge_span_u64_t kernel __attribute__((unused)), forge_span_u64_t output __attribute__((unused))) {
-  uint64_t out_rows __attribute__((unused)) = (rows - 2);
-  uint64_t out_cols __attribute__((unused)) = (cols - 2);
-  uint64_t r __attribute__((unused)) = 0;
+  uint64_t out_rows __attribute__((unused)) = (rows - 2ULL);
+  uint64_t out_cols __attribute__((unused)) = (cols - 2ULL);
+  uint64_t r __attribute__((unused)) = 0ULL;
   {
     while ((r < out_rows)) {
-      uint64_t c __attribute__((unused)) = 0;
+      uint64_t c __attribute__((unused)) = 0ULL;
       {
         while ((c < out_cols)) {
-          uint64_t acc __attribute__((unused)) = 0;
-          uint64_t kr __attribute__((unused)) = 0;
+          uint64_t acc __attribute__((unused)) = 0ULL;
+          uint64_t kr __attribute__((unused)) = 0ULL;
           {
-            while ((kr < 3)) {
-              uint64_t kc __attribute__((unused)) = 0;
+            while ((kr < 3ULL)) {
+              uint64_t kc __attribute__((unused)) = 0ULL;
               {
-                while ((kc < 3)) {
+                while ((kc < 3ULL)) {
                   uint64_t img_idx __attribute__((unused)) = (((r + kr) * cols) + (c + kc));
-                  uint64_t ker_idx __attribute__((unused)) = ((kr * 3) + kc);
+                  uint64_t ker_idx __attribute__((unused)) = ((kr * 3ULL) + kc);
                   acc = (acc + (image.data[img_idx] * kernel.data[ker_idx]));
-                  kc = (kc + 1);
+                  kc = (kc + 1ULL);
                 }
 
               }
-              kr = (kr + 1);
+              kr = (kr + 1ULL);
             }
 
           }
           output.data[((r * out_cols) + c)] = acc;
-          c = (c + 1);
+          c = (c + 1ULL);
         }
 
       }
-      r = (r + 1);
+      r = (r + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

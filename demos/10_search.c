@@ -14,14 +14,14 @@ uint64_t search_step_hi(uint64_t lo __attribute__((unused)), uint64_t hi __attri
 uint64_t search_mid(uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused)));
 
 uint64_t search_step_lo(uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused)), uint64_t mid __attribute__((unused))) {
-  return (mid + 1);
+  return (mid + 1ULL);
 }
 
 uint64_t search_step_hi(uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused)), uint64_t mid __attribute__((unused))) {
-  return (mid - 1);
+  return (mid - 1ULL);
 }
 
 uint64_t search_mid(uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
-  return (lo + ((hi - lo) / 2));
+  return (lo + ((hi - lo) / 2ULL));
 }
 

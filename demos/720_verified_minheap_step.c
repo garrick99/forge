@@ -20,58 +20,58 @@ void heap_append(forge_span_u64_t s __attribute__((unused)), uint64_t n __attrib
 int main();
 
 _Bool node_ok(forge_span_u64_t s __attribute__((unused)), uint64_t i __attribute__((unused))) {
-  return (s.data[((i - 1) / 2)] <= s.data[i]);
+  return (s.data[((i - 1ULL) / 2ULL)] <= s.data[i]);
 }
 
 void sift_down_root(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  if ((n == 1)) {
+  if ((n == 1ULL)) {
 
-  } else if ((n == 2)) {
-    uint64_t v0 __attribute__((unused)) = s.data[0];
-    uint64_t v1 __attribute__((unused)) = s.data[1];
-    s.data[0] = ((v0 <= v1) ? v0 : v1);
-    s.data[1] = ((v0 <= v1) ? v1 : v0);
+  } else if ((n == 2ULL)) {
+    uint64_t v0 __attribute__((unused)) = s.data[0ULL];
+    uint64_t v1 __attribute__((unused)) = s.data[1ULL];
+    s.data[0ULL] = ((v0 <= v1) ? v0 : v1);
+    s.data[1ULL] = ((v0 <= v1) ? v1 : v0);
 
-  } else if ((s.data[1] <= s.data[2])) {
-    uint64_t v0 __attribute__((unused)) = s.data[0];
-    uint64_t v1 __attribute__((unused)) = s.data[1];
-    s.data[0] = ((v0 <= v1) ? v0 : v1);
-    s.data[1] = ((v0 <= v1) ? v1 : v0);
+  } else if ((s.data[1ULL] <= s.data[2ULL])) {
+    uint64_t v0 __attribute__((unused)) = s.data[0ULL];
+    uint64_t v1 __attribute__((unused)) = s.data[1ULL];
+    s.data[0ULL] = ((v0 <= v1) ? v0 : v1);
+    s.data[1ULL] = ((v0 <= v1) ? v1 : v0);
 
   } else {
-    uint64_t v0 __attribute__((unused)) = s.data[0];
-    uint64_t v2 __attribute__((unused)) = s.data[2];
-    s.data[0] = ((v0 <= v2) ? v0 : v2);
-    s.data[2] = ((v0 <= v2) ? v2 : v0);
+    uint64_t v0 __attribute__((unused)) = s.data[0ULL];
+    uint64_t v2 __attribute__((unused)) = s.data[2ULL];
+    s.data[0ULL] = ((v0 <= v2) ? v0 : v2);
+    s.data[2ULL] = ((v0 <= v2) ? v2 : v0);
 
   }
 }
 
 void heapify_3(forge_span_u64_t s __attribute__((unused))) {
-  if ((s.data[1] < s.data[0])) {
-    uint64_t t __attribute__((unused)) = s.data[0];
-    s.data[0] = s.data[1];
-    s.data[1] = t;
+  if ((s.data[1ULL] < s.data[0ULL])) {
+    uint64_t t __attribute__((unused)) = s.data[0ULL];
+    s.data[0ULL] = s.data[1ULL];
+    s.data[1ULL] = t;
 
   }
-  if ((s.data[2] < s.data[0])) {
-    uint64_t t __attribute__((unused)) = s.data[0];
-    s.data[0] = s.data[2];
-    s.data[2] = t;
+  if ((s.data[2ULL] < s.data[0ULL])) {
+    uint64_t t __attribute__((unused)) = s.data[0ULL];
+    s.data[0ULL] = s.data[2ULL];
+    s.data[2ULL] = t;
 
   }
 }
 
 uint64_t count_violations(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t viol __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t viol __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      if ((s.data[((i - 1) / 2)] > s.data[i])) {
-        viol = (viol + 1);
+      if ((s.data[((i - 1ULL) / 2ULL)] > s.data[i])) {
+        viol = (viol + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -83,7 +83,7 @@ void heap_append(forge_span_u64_t s __attribute__((unused)), uint64_t n __attrib
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

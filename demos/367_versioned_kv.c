@@ -26,42 +26,42 @@ uint64_t read_returns_value();
 int main();
 
 KVSlot kv_new() {
-  return (KVSlot){ .value = 0, .version = 0, .reads = 0 };
+  return (KVSlot){ .value = 0ULL, .version = 0ULL, .reads = 0ULL };
 }
 
 void kv_write(KVSlot* k __attribute__((unused)), uint64_t v __attribute__((unused))) {
   (*k).value = v;
-  (*k).version = ((*k).version + 1);
+  (*k).version = ((*k).version + 1ULL);
 }
 
 uint64_t kv_read(KVSlot* k __attribute__((unused))) {
-  (*k).reads = ((*k).reads + 1);
+  (*k).reads = ((*k).reads + 1ULL);
   return (*k).value;
 }
 
 uint64_t write_42() {
   KVSlot k __attribute__((unused)) = kv_new();
-  kv_write((&k), 42);
+  kv_write((&k), 42ULL);
   return k.value;
 }
 
 uint64_t two_writes_value() {
   KVSlot k __attribute__((unused)) = kv_new();
-  kv_write((&k), 42);
-  kv_write((&k), 99);
+  kv_write((&k), 42ULL);
+  kv_write((&k), 99ULL);
   return k.value;
 }
 
 uint64_t two_writes_version() {
   KVSlot k __attribute__((unused)) = kv_new();
-  kv_write((&k), 42);
-  kv_write((&k), 99);
+  kv_write((&k), 42ULL);
+  kv_write((&k), 99ULL);
   return k.version;
 }
 
 uint64_t three_reads() {
   KVSlot k __attribute__((unused)) = kv_new();
-  kv_write((&k), 10);
+  kv_write((&k), 10ULL);
   kv_read((&k));
   kv_read((&k));
   kv_read((&k));
@@ -70,12 +70,12 @@ uint64_t three_reads() {
 
 uint64_t read_returns_value() {
   KVSlot k __attribute__((unused)) = kv_new();
-  kv_write((&k), 77);
+  kv_write((&k), 77ULL);
   return kv_read((&k));
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

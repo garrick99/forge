@@ -18,15 +18,15 @@ void pancake_sort(forge_span_u64_t s __attribute__((unused)), uint64_t n __attri
 int main();
 
 uint64_t find_max_idx(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t best __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t best __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((s.data[i] > s.data[best])) {
         best = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -34,15 +34,15 @@ uint64_t find_max_idx(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
 }
 
 void reverse_prefix(forge_span_u64_t s __attribute__((unused)), uint64_t k __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
   uint64_t hi __attribute__((unused)) = k;
   {
-    while (((lo + 1) < hi)) {
-      hi = (hi - 1);
+    while (((lo + 1ULL) < hi)) {
+      hi = (hi - 1ULL);
       uint64_t tmp __attribute__((unused)) = s.data[lo];
       s.data[lo] = s.data[hi];
       s.data[hi] = tmp;
-      lo = (lo + 1);
+      lo = (lo + 1ULL);
     }
 
   }
@@ -51,21 +51,21 @@ void reverse_prefix(forge_span_u64_t s __attribute__((unused)), uint64_t k __att
 void pancake_sort(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
   uint64_t size __attribute__((unused)) = n;
   {
-    while ((size > 1)) {
+    while ((size > 1ULL)) {
       uint64_t max_i __attribute__((unused)) = find_max_idx(s, size);
-      if ((max_i > 0)) {
-        reverse_prefix(s, (max_i + 1));
+      if ((max_i > 0ULL)) {
+        reverse_prefix(s, (max_i + 1ULL));
 
       }
       reverse_prefix(s, size);
-      size = (size - 1);
+      size = (size - 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

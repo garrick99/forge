@@ -17,31 +17,31 @@ uint64_t rope_length(forge_span_u64_t pieces_len __attribute__((unused)), uint64
 int main();
 
 void rope_concat(forge_span_u64_t a __attribute__((unused)), uint64_t na __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t nb __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < na)) {
       out.data[i] = a.data[i];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < nb)) {
       out.data[(na + j)] = b.data[j];
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
 }
 
 uint64_t rope_length(forge_span_u64_t pieces_len __attribute__((unused)), uint64_t npieces __attribute__((unused))) {
-  uint64_t total __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t total __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < npieces)) {
       total = (total + pieces_len.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -49,7 +49,7 @@ uint64_t rope_length(forge_span_u64_t pieces_len __attribute__((unused)), uint64
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -12,6 +12,14 @@
 typedef struct { uint8_t* data; uintptr_t len; } forge_span_u8_t;
 typedef struct { uint64_t* data; uintptr_t len; } forge_span_u64_t;
 
+/* Function pointer typedefs */
+typedef uint64_t (*forge_fn__ret_u64_t)(void);
+typedef uint64_t (*forge_fn_u64_u64_ret_u64_t)(uint64_t, uint64_t);
+typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
+typedef void (*forge_fn_u64_u64_ret_unit_t)(uint64_t, uint64_t);
+typedef void (*forge_fn__ret_unit_t)(void);
+typedef void (*forge_fn_str_ret_unit_t)(forge_span_u8_t);
+
 uint64_t ptr_null(void);  /* extern: forge_raw */
 
 uint64_t ptr_offset(uint64_t ptr, uint64_t n);  /* extern: forge_raw */
@@ -43,20 +51,12 @@ typedef struct { uint64_t _0; uint64_t _1; } __forge_tuple_u64_u64_t;
 typedef struct { uint64_t _0; uint64_t _1; uint64_t _2; uint64_t _3; uint64_t _4; } __forge_tuple_u64_u64_u64_u64_u64_t;
 typedef struct { uint64_t _0; uint64_t _1; uint64_t _2; } __forge_tuple_u64_u64_u64_t;
 
-/* Function pointer typedefs */
-typedef uint64_t (*forge_fn__ret_u64_t)(void);
-typedef uint64_t (*forge_fn_u64_u64_ret_u64_t)(uint64_t, uint64_t);
-typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
-typedef void (*forge_fn_u64_u64_ret_unit_t)(uint64_t, uint64_t);
-typedef void (*forge_fn__ret_unit_t)(void);
-typedef void (*forge_fn_str_ret_unit_t)(forge_span_u8_t);
-
 /* Forward declarations */
 uint64_t min64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 uint64_t max64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 uint64_t clamp64(uint64_t v __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused)));
 uint64_t abs_diff(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
-uint64_t pow64(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused)));
+uint64_t pow64(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused)));
 uint64_t ceil_div(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 uint64_t round_up(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 uint64_t gcd64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
@@ -121,16 +121,16 @@ uint64_t abs_diff(uint64_t a __attribute__((unused)), uint64_t b __attribute__((
   }
 }
 
-uint64_t pow64(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused))) {
-  if ((exp == 0)) {
-    return 1;
+uint64_t pow64(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused))) {
+  if ((forge_exp == 0ULL)) {
+    return 1ULL;
   } else {
-    return (base * pow64(base, (exp - 1)));
+    return (base * pow64(base, (forge_exp - 1ULL)));
   }
 }
 
 uint64_t ceil_div(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  return (((a + b) - 1) / b);
+  return (((a + b) - 1ULL) / b);
 }
 
 uint64_t round_up(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
@@ -138,7 +138,7 @@ uint64_t round_up(uint64_t a __attribute__((unused)), uint64_t b __attribute__((
 }
 
 uint64_t gcd64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if ((b == 0)) {
+  if ((b == 0ULL)) {
     return a;
   } else {
     return gcd64(b, (a % b));
@@ -146,8 +146,8 @@ uint64_t gcd64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unu
 }
 
 uint64_t sat_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if ((a > (-1 - b))) {
-    return -1;
+  if ((a > (0xffffffffffffffffULL - b))) {
+    return 0xffffffffffffffffULL;
   } else {
     return (a + b);
   }
@@ -155,18 +155,18 @@ uint64_t sat_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((u
 
 uint64_t sat_sub(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
   if ((a < b)) {
-    return 0;
+    return 0ULL;
   } else {
     return (a - b);
   }
 }
 
 uint64_t sat_mul(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if ((b == 0)) {
-    return 0;
+  if ((b == 0ULL)) {
+    return 0ULL;
   } else {
-    if ((a > (-1 / b))) {
-      return -1;
+    if ((a > (0xffffffffffffffffULL / b))) {
+      return 0xffffffffffffffffULL;
     } else {
       return (a * b);
     }
@@ -174,48 +174,48 @@ uint64_t sat_mul(uint64_t a __attribute__((unused)), uint64_t b __attribute__((u
 }
 
 _Bool is_pow2(uint64_t n __attribute__((unused))) {
-  return ((n & (n - 1)) == 0);
+  return ((n & (n - 1ULL)) == 0ULL);
 }
 
 uint64_t popcount64(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return 0;
+  if ((n == 0ULL)) {
+    return 0ULL;
   } else {
-    return (1 + popcount64((n & (n - 1))));
+    return (1ULL + popcount64((n & (n - 1ULL))));
   }
 }
 
 uint64_t floor_log2(uint64_t n __attribute__((unused))) {
-  if ((n == 1)) {
-    return 0;
+  if ((n == 1ULL)) {
+    return 0ULL;
   } else {
-    return (1 + floor_log2((n / 2)));
+    return (1ULL + floor_log2((n / 2ULL)));
   }
 }
 
 uint64_t nic_read_status(uint64_t base __attribute__((unused))) {
-  return (*(volatile uint64_t*)((uintptr_t)((uint64_t)((uint64_t*)((uintptr_t)base) + 0))));
+  return (*(volatile uint64_t*)((uintptr_t)((uint64_t)((uint64_t*)((uintptr_t)base) + 0ULL))));
 }
 
 void nic_write_command(uint64_t base __attribute__((unused)), uint64_t cmd __attribute__((unused))) {
-  (*(volatile uint64_t*)((uintptr_t)((uint64_t)((uint64_t*)((uintptr_t)base) + 1))) = cmd);
+  (*(volatile uint64_t*)((uintptr_t)((uint64_t)((uint64_t*)((uintptr_t)base) + 1ULL))) = cmd);
   __asm__ volatile("" ::: "memory");
 }
 
 uint64_t nic_read_rx_head(uint64_t base __attribute__((unused))) {
-  return (*(volatile uint64_t*)((uintptr_t)((uint64_t)((uint64_t*)((uintptr_t)base) + 2))));
+  return (*(volatile uint64_t*)((uintptr_t)((uint64_t)((uint64_t*)((uintptr_t)base) + 2ULL))));
 }
 
 void nic_write_rx_tail(uint64_t base __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  (*(volatile uint64_t*)((uintptr_t)((uint64_t)((uint64_t*)((uintptr_t)base) + 3))) = val);
+  (*(volatile uint64_t*)((uintptr_t)((uint64_t)((uint64_t*)((uintptr_t)base) + 3ULL))) = val);
 }
 
 void ring_init(forge_span_u64_t buf __attribute__((unused)), uint64_t cap __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < cap)) {
-      buf.data[i] = 0;
-      i = (i + 1);
+      buf.data[i] = 0ULL;
+      i = (i + 1ULL);
     }
 
   }
@@ -223,80 +223,80 @@ void ring_init(forge_span_u64_t buf __attribute__((unused)), uint64_t cap __attr
 
 uint64_t ring_enqueue(forge_span_u64_t buf __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t tail __attribute__((unused)), uint64_t val __attribute__((unused))) {
   buf.data[tail] = val;
-  if (((tail + 1) == cap)) {
-    return 0;
+  if (((tail + 1ULL) == cap)) {
+    return 0ULL;
   } else {
-    return (tail + 1);
+    return (tail + 1ULL);
   }
 }
 
 __forge_tuple_u64_u64_t ring_dequeue(forge_span_u64_t buf __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t head __attribute__((unused))) {
   uint64_t val __attribute__((unused)) = buf.data[head];
   uint64_t new_head;
-  if (((head + 1) == cap)) {
-    new_head = 0;
+  if (((head + 1ULL) == cap)) {
+    new_head = 0ULL;
   } else {
-    new_head = (head + 1);
+    new_head = (head + 1ULL);
   }
   return (__forge_tuple_u64_u64_t){ ._0 = val, ._1 = new_head };
 }
 
 uint64_t eth_parse_ethertype(forge_span_u64_t pkt __attribute__((unused)), uint64_t pkt_len __attribute__((unused))) {
-  return ((pkt.data[12] * 256) + pkt.data[13]);
+  return ((pkt.data[12ULL] * 256ULL) + pkt.data[13ULL]);
 }
 
 __forge_tuple_u64_u64_u64_u64_u64_t ip_parse(forge_span_u64_t pkt __attribute__((unused)), uint64_t pkt_len __attribute__((unused))) {
-  uint64_t ver __attribute__((unused)) = ((pkt.data[14] / 16) % 16);
-  uint64_t ihl __attribute__((unused)) = (pkt.data[14] % 16);
-  uint64_t proto __attribute__((unused)) = (pkt.data[23] % 256);
-  uint64_t src __attribute__((unused)) = ((((pkt.data[26] * 16777216) + (pkt.data[27] * 65536)) + (pkt.data[28] * 256)) + pkt.data[29]);
-  uint64_t dst __attribute__((unused)) = ((((pkt.data[30] * 16777216) + (pkt.data[31] * 65536)) + (pkt.data[32] * 256)) + pkt.data[33]);
+  uint64_t ver __attribute__((unused)) = ((pkt.data[14ULL] / 16ULL) % 16ULL);
+  uint64_t ihl __attribute__((unused)) = (pkt.data[14ULL] % 16ULL);
+  uint64_t proto __attribute__((unused)) = (pkt.data[23ULL] % 256ULL);
+  uint64_t src __attribute__((unused)) = ((((pkt.data[26ULL] * 16777216ULL) + (pkt.data[27ULL] * 65536ULL)) + (pkt.data[28ULL] * 256ULL)) + pkt.data[29ULL]);
+  uint64_t dst __attribute__((unused)) = ((((pkt.data[30ULL] * 16777216ULL) + (pkt.data[31ULL] * 65536ULL)) + (pkt.data[32ULL] * 256ULL)) + pkt.data[33ULL]);
   return (__forge_tuple_u64_u64_u64_u64_u64_t){ ._0 = ver, ._1 = ihl, ._2 = proto, ._3 = src, ._4 = dst };
 }
 
 __forge_tuple_u64_u64_u64_t tcp_parse(forge_span_u64_t pkt __attribute__((unused)), uint64_t pkt_len __attribute__((unused)), uint64_t offset __attribute__((unused))) {
-  uint64_t src_port __attribute__((unused)) = ((pkt.data[offset] * 256) + pkt.data[(offset + 1)]);
-  uint64_t dst_port __attribute__((unused)) = ((pkt.data[(offset + 2)] * 256) + pkt.data[(offset + 3)]);
-  uint64_t flags __attribute__((unused)) = (pkt.data[(offset + 13)] % 64);
+  uint64_t src_port __attribute__((unused)) = ((pkt.data[offset] * 256ULL) + pkt.data[(offset + 1ULL)]);
+  uint64_t dst_port __attribute__((unused)) = ((pkt.data[(offset + 2ULL)] * 256ULL) + pkt.data[(offset + 3ULL)]);
+  uint64_t flags __attribute__((unused)) = (pkt.data[(offset + 13ULL)] % 64ULL);
   return (__forge_tuple_u64_u64_u64_t){ ._0 = src_port, ._1 = dst_port, ._2 = flags };
 }
 
 uint64_t conn_transition(uint64_t state __attribute__((unused)), uint64_t tcp_flags __attribute__((unused))) {
-  _Bool syn __attribute__((unused)) = (((tcp_flags / 2) % 2) == 1);
-  _Bool ack __attribute__((unused)) = (((tcp_flags / 16) % 2) == 1);
-  _Bool fin __attribute__((unused)) = ((tcp_flags % 2) == 1);
-  _Bool rst __attribute__((unused)) = (((tcp_flags / 4) % 2) == 1);
+  _Bool syn __attribute__((unused)) = (((tcp_flags / 2ULL) % 2ULL) == 1ULL);
+  _Bool ack __attribute__((unused)) = (((tcp_flags / 16ULL) % 2ULL) == 1ULL);
+  _Bool fin __attribute__((unused)) = ((tcp_flags % 2ULL) == 1ULL);
+  _Bool rst __attribute__((unused)) = (((tcp_flags / 4ULL) % 2ULL) == 1ULL);
   uint64_t next __attribute__((unused)) = state;
   if (rst) {
-    next = 0;
+    next = 0ULL;
 
-  } else if ((state == 0)) {
+  } else if ((state == 0ULL)) {
     if ((syn && (!ack))) {
-      next = 1;
+      next = 1ULL;
 
     }
 
-  } else if ((state == 1)) {
+  } else if ((state == 1ULL)) {
     if ((syn && ack)) {
-      next = 2;
+      next = 2ULL;
 
     }
 
-  } else if ((state == 2)) {
+  } else if ((state == 2ULL)) {
     if (ack) {
-      next = 3;
+      next = 3ULL;
 
     }
 
-  } else if ((state == 3)) {
+  } else if ((state == 3ULL)) {
     if (fin) {
-      next = 4;
+      next = 4ULL;
 
     }
 
-  } else if ((state == 4)) {
+  } else if ((state == 4ULL)) {
     if (ack) {
-      next = 5;
+      next = 5ULL;
 
     }
 
@@ -305,19 +305,19 @@ uint64_t conn_transition(uint64_t state __attribute__((unused)), uint64_t tcp_fl
 }
 
 uint64_t conn_lookup(forge_span_u64_t table __attribute__((unused)), uint64_t n_conns __attribute__((unused)), uint64_t src_ip __attribute__((unused)), uint64_t dst_ip __attribute__((unused)), uint64_t src_port __attribute__((unused)), uint64_t dst_port __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   uint64_t found __attribute__((unused)) = n_conns;
   {
     while ((i < n_conns)) {
-      uint64_t base __attribute__((unused)) = (i * 5);
-      if (((base + 4) < (n_conns * 5))) {
-        if ((((((table.data[base] == src_ip) && (table.data[(base + 1)] == dst_ip)) && (table.data[(base + 2)] == src_port)) && (table.data[(base + 3)] == dst_port)) && (found == n_conns))) {
+      uint64_t base __attribute__((unused)) = (i * 5ULL);
+      if (((base + 4ULL) < (n_conns * 5ULL))) {
+        if ((((((table.data[base] == src_ip) && (table.data[(base + 1ULL)] == dst_ip)) && (table.data[(base + 2ULL)] == src_port)) && (table.data[(base + 3ULL)] == dst_port)) && (found == n_conns))) {
           found = i;
 
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -325,32 +325,32 @@ uint64_t conn_lookup(forge_span_u64_t table __attribute__((unused)), uint64_t n_
 }
 
 void conn_update_state(forge_span_u64_t table __attribute__((unused)), uint64_t n_conns __attribute__((unused)), uint64_t idx __attribute__((unused)), uint64_t new_state __attribute__((unused))) {
-  uint64_t base __attribute__((unused)) = (idx * 5);
-  if (((base + 4) < (n_conns * 5))) {
-    table.data[(base + 4)] = new_state;
+  uint64_t base __attribute__((unused)) = (idx * 5ULL);
+  if (((base + 4ULL) < (n_conns * 5ULL))) {
+    table.data[(base + 4ULL)] = new_state;
 
   }
 }
 
 uint64_t acl_match(forge_span_u64_t rules __attribute__((unused)), uint64_t n_rules __attribute__((unused)), uint64_t proto __attribute__((unused)), uint64_t src_ip __attribute__((unused)), uint64_t dst_port __attribute__((unused))) {
-  uint64_t wildcard __attribute__((unused)) = -1;
-  uint64_t decision __attribute__((unused)) = 0;
+  uint64_t wildcard __attribute__((unused)) = 0xffffffffffffffffULL;
+  uint64_t decision __attribute__((unused)) = 0ULL;
   _Bool matched __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n_rules)) {
       if ((!matched)) {
-        uint64_t base __attribute__((unused)) = (i * 4);
-        if (((base + 3) < (n_rules * 4))) {
+        uint64_t base __attribute__((unused)) = (i * 4ULL);
+        if (((base + 3ULL) < (n_rules * 4ULL))) {
           uint64_t r_proto __attribute__((unused)) = rules.data[base];
-          uint64_t r_src __attribute__((unused)) = rules.data[(base + 1)];
-          uint64_t r_port __attribute__((unused)) = rules.data[(base + 2)];
-          uint64_t r_action __attribute__((unused)) = rules.data[(base + 3)];
+          uint64_t r_src __attribute__((unused)) = rules.data[(base + 1ULL)];
+          uint64_t r_port __attribute__((unused)) = rules.data[(base + 2ULL)];
+          uint64_t r_action __attribute__((unused)) = rules.data[(base + 3ULL)];
           _Bool proto_ok __attribute__((unused)) = ((r_proto == wildcard) || (r_proto == proto));
           _Bool src_ok __attribute__((unused)) = ((r_src == wildcard) || (r_src == src_ip));
           _Bool port_ok __attribute__((unused)) = ((r_port == wildcard) || (r_port == dst_port));
           if (((proto_ok && src_ok) && port_ok)) {
-            decision = ((r_action <= 2) ? r_action : 0);
+            decision = ((r_action <= 2ULL) ? r_action : 0ULL);
             matched = 1;
 
           }
@@ -358,7 +358,7 @@ uint64_t acl_match(forge_span_u64_t rules __attribute__((unused)), uint64_t n_ru
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -366,31 +366,31 @@ uint64_t acl_match(forge_span_u64_t rules __attribute__((unused)), uint64_t n_ru
 }
 
 uint64_t process_packet(forge_span_u64_t pkt __attribute__((unused)), uint64_t pkt_len __attribute__((unused)), forge_span_u64_t conn_table __attribute__((unused)), uint64_t n_conns __attribute__((unused)), forge_span_u64_t rules __attribute__((unused)), uint64_t n_rules __attribute__((unused))) {
-  uint64_t verdict __attribute__((unused)) = 2;
-  if ((pkt_len >= 34)) {
+  uint64_t verdict __attribute__((unused)) = 2ULL;
+  if ((pkt_len >= 34ULL)) {
     uint64_t ethertype __attribute__((unused)) = eth_parse_ethertype(pkt, pkt_len);
-    if ((ethertype == 2048)) {
+    if ((ethertype == 2048ULL)) {
       __forge_tuple_u64_u64_u64_u64_u64_t ip __attribute__((unused)) = ip_parse(pkt, pkt_len);
       uint64_t ver __attribute__((unused)) = (ip)._0;
       uint64_t ihl __attribute__((unused)) = (ip)._1;
       uint64_t proto __attribute__((unused)) = (ip)._2;
       uint64_t src_ip __attribute__((unused)) = (ip)._3;
       uint64_t dst_ip __attribute__((unused)) = (ip)._4;
-      if (((ver == 4) && (ihl >= 5))) {
-        uint64_t ip_header_len __attribute__((unused)) = (14 + (ihl * 4));
-        if (((ip_header_len + 14) <= pkt_len)) {
+      if (((ver == 4ULL) && (ihl >= 5ULL))) {
+        uint64_t ip_header_len __attribute__((unused)) = (14ULL + (ihl * 4ULL));
+        if (((ip_header_len + 14ULL) <= pkt_len)) {
           __forge_tuple_u64_u64_u64_t tcp __attribute__((unused)) = tcp_parse(pkt, pkt_len, ip_header_len);
           uint64_t dst_port __attribute__((unused)) = (tcp)._1;
           uint64_t flags __attribute__((unused)) = (tcp)._2;
           uint64_t acl_result __attribute__((unused)) = acl_match(rules, n_rules, proto, src_ip, dst_port);
-          if ((acl_result == 1)) {
+          if ((acl_result == 1ULL)) {
             uint64_t src_port __attribute__((unused)) = (tcp)._0;
             uint64_t conn_idx __attribute__((unused)) = conn_lookup(conn_table, n_conns, src_ip, dst_ip, src_port, dst_port);
             if ((conn_idx < n_conns)) {
-              uint64_t base __attribute__((unused)) = (conn_idx * 5);
-              if (((base + 4) < (n_conns * 5))) {
-                uint64_t old_state __attribute__((unused)) = conn_table.data[(base + 4)];
-                if ((old_state < 6)) {
+              uint64_t base __attribute__((unused)) = (conn_idx * 5ULL);
+              if (((base + 4ULL) < (n_conns * 5ULL))) {
+                uint64_t old_state __attribute__((unused)) = conn_table.data[(base + 4ULL)];
+                if ((old_state < 6ULL)) {
                   uint64_t new_state __attribute__((unused)) = conn_transition(old_state, flags);
                   conn_update_state(conn_table, n_conns, conn_idx, new_state);
 
@@ -399,7 +399,7 @@ uint64_t process_packet(forge_span_u64_t pkt __attribute__((unused)), uint64_t p
               }
 
             }
-            verdict = 1;
+            verdict = 1ULL;
 
           } else {
             verdict = acl_result;
@@ -407,7 +407,7 @@ uint64_t process_packet(forge_span_u64_t pkt __attribute__((unused)), uint64_t p
           }
 
         } else {
-          verdict = acl_match(rules, n_rules, proto, src_ip, 0);
+          verdict = acl_match(rules, n_rules, proto, src_ip, 0ULL);
 
         }
 
@@ -420,25 +420,25 @@ uint64_t process_packet(forge_span_u64_t pkt __attribute__((unused)), uint64_t p
 }
 
 uint64_t process_batch(forge_span_u64_t packets __attribute__((unused)), forge_span_u64_t pkt_offsets __attribute__((unused)), forge_span_u64_t pkt_lengths __attribute__((unused)), uint64_t n_packets __attribute__((unused)), uint64_t buf_len __attribute__((unused)), forge_span_u64_t conn_table __attribute__((unused)), uint64_t n_conns __attribute__((unused)), forge_span_u64_t rules __attribute__((unused)), uint64_t n_rules __attribute__((unused)), forge_span_u64_t verdicts __attribute__((unused))) {
-  uint64_t accepted __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t accepted __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n_packets)) {
       uint64_t off __attribute__((unused)) = pkt_offsets.data[i];
       uint64_t len __attribute__((unused)) = pkt_lengths.data[i];
-      uint64_t v __attribute__((unused)) = 2;
-      if ((((off + len) <= buf_len) && (len >= 34))) {
-        uint64_t ethertype __attribute__((unused)) = ((packets.data[(off + 12)] * 256) + packets.data[(off + 13)]);
-        if ((ethertype == 2048)) {
-          uint64_t ver __attribute__((unused)) = ((packets.data[(off + 14)] / 16) % 16);
+      uint64_t v __attribute__((unused)) = 2ULL;
+      if ((((off + len) <= buf_len) && (len >= 34ULL))) {
+        uint64_t ethertype __attribute__((unused)) = ((packets.data[(off + 12ULL)] * 256ULL) + packets.data[(off + 13ULL)]);
+        if ((ethertype == 2048ULL)) {
+          uint64_t ver __attribute__((unused)) = ((packets.data[(off + 14ULL)] / 16ULL) % 16ULL);
           uint64_t proto;
-          if (((off + 23) < buf_len)) {
-            proto = (packets.data[(off + 23)] % 256);
+          if (((off + 23ULL) < buf_len)) {
+            proto = (packets.data[(off + 23ULL)] % 256ULL);
           } else {
-            proto = 0;
+            proto = 0ULL;
           }
-          if ((ver == 4)) {
-            v = acl_match(rules, n_rules, proto, 0, 0);
+          if ((ver == 4ULL)) {
+            v = acl_match(rules, n_rules, proto, 0ULL, 0ULL);
 
           }
 
@@ -446,11 +446,11 @@ uint64_t process_batch(forge_span_u64_t packets __attribute__((unused)), forge_s
 
       }
       verdicts.data[i] = v;
-      if ((v == 1)) {
-        accepted = (accepted + 1);
+      if ((v == 1ULL)) {
+        accepted = (accepted + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -458,24 +458,24 @@ uint64_t process_batch(forge_span_u64_t packets __attribute__((unused)), forge_s
 }
 
 __forge_tuple_u64_u64_u64_t count_by_verdict(forge_span_u64_t verdicts __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t accepted __attribute__((unused)) = 0;
-  uint64_t dropped __attribute__((unused)) = 0;
-  uint64_t invalid __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t accepted __attribute__((unused)) = 0ULL;
+  uint64_t dropped __attribute__((unused)) = 0ULL;
+  uint64_t invalid __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t v __attribute__((unused)) = verdicts.data[i];
-      if ((v == 1)) {
-        accepted = (accepted + 1);
+      if ((v == 1ULL)) {
+        accepted = (accepted + 1ULL);
 
-      } else if ((v == 0)) {
-        dropped = (dropped + 1);
+      } else if ((v == 0ULL)) {
+        dropped = (dropped + 1ULL);
 
       } else {
-        invalid = (invalid + 1);
+        invalid = (invalid + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -483,7 +483,7 @@ __forge_tuple_u64_u64_u64_t count_by_verdict(forge_span_u64_t verdicts __attribu
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -14,11 +14,11 @@ int main();
 
 uint64_t popcount(uint64_t x __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = x;
-  uint64_t count __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
   {
-    while ((v > 0)) {
-      count = (count + (v & 1));
-      v = (v >> 1);
+    while ((v > 0ULL)) {
+      count = (count + (v & 1ULL));
+      v = (v >> 1ULL);
     }
 
   }
@@ -26,7 +26,7 @@ uint64_t popcount(uint64_t x __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

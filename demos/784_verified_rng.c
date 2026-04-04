@@ -18,11 +18,11 @@ int main();
 
 uint64_t xorshift64(uint64_t state __attribute__((unused))) {
   uint64_t s __attribute__((unused)) = state;
-  s = (s ^ (s << 13));
-  s = (s ^ (s >> 7));
-  s = (s ^ (s << 17));
-  if ((s == 0)) {
-    return 1;
+  s = (s ^ (s << 13ULL));
+  s = (s ^ (s >> 7ULL));
+  s = (s ^ (s << 17ULL));
+  if ((s == 0ULL)) {
+    return 1ULL;
   } else {
     return s;
   }
@@ -30,12 +30,12 @@ uint64_t xorshift64(uint64_t state __attribute__((unused))) {
 
 uint64_t fill_random(uint64_t seed __attribute__((unused)), uint64_t bound __attribute__((unused)), forge_span_u64_t output __attribute__((unused)), uint64_t n __attribute__((unused))) {
   uint64_t state __attribute__((unused)) = seed;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       state = xorshift64(state);
       output.data[i] = (state % bound);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -43,7 +43,7 @@ uint64_t fill_random(uint64_t seed __attribute__((unused)), uint64_t bound __att
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

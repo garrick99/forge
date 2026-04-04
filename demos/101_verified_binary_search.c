@@ -16,57 +16,57 @@ int main();
 
 uint64_t bsearch4(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t c __attribute__((unused)), uint64_t d __attribute__((unused)), uint64_t target __attribute__((unused))) {
   if ((c == target)) {
-    return 2;
+    return 2ULL;
   } else {
     if ((target < c)) {
       if ((a == target)) {
-        return 0;
+        return 0ULL;
       } else {
         if ((b == target)) {
-          return 1;
+          return 1ULL;
         } else {
-          return 4;
+          return 4ULL;
         }
       }
     } else {
       if ((d == target)) {
-        return 3;
+        return 3ULL;
       } else {
-        return 4;
+        return 4ULL;
       }
     }
   }
 }
 
 uint64_t isqrt(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return 0;
+  if ((n == 0ULL)) {
+    return 0ULL;
   } else {
-    if ((n < 4)) {
-      return 1;
+    if ((n < 4ULL)) {
+      return 1ULL;
     } else {
-      if ((n < 9)) {
-        return 2;
+      if ((n < 9ULL)) {
+        return 2ULL;
       } else {
-        if ((n < 16)) {
-          return 3;
+        if ((n < 16ULL)) {
+          return 3ULL;
         } else {
-          if ((n < 25)) {
-            return 4;
+          if ((n < 25ULL)) {
+            return 4ULL;
           } else {
-            if ((n < 36)) {
-              return 5;
+            if ((n < 36ULL)) {
+              return 5ULL;
             } else {
-              if ((n < 49)) {
-                return 6;
+              if ((n < 49ULL)) {
+                return 6ULL;
               } else {
-                if ((n < 64)) {
-                  return 7;
+                if ((n < 64ULL)) {
+                  return 7ULL;
                 } else {
-                  if ((n < 81)) {
-                    return 8;
+                  if ((n < 81ULL)) {
+                    return 8ULL;
                   } else {
-                    return 9;
+                    return 9ULL;
                   }
                 }
               }
@@ -85,16 +85,16 @@ uint64_t sum_sqrts(uint64_t a __attribute__((unused)), uint64_t b __attribute__(
 }
 
 int main() {
-  uint64_t i10 __attribute__((unused)) = bsearch4(10, 20, 30, 40, 10);
-  uint64_t i20 __attribute__((unused)) = bsearch4(10, 20, 30, 40, 20);
-  uint64_t i30 __attribute__((unused)) = bsearch4(10, 20, 30, 40, 30);
-  uint64_t i40 __attribute__((unused)) = bsearch4(10, 20, 30, 40, 40);
-  uint64_t i99 __attribute__((unused)) = bsearch4(10, 20, 30, 40, 99);
-  uint64_t s4 __attribute__((unused)) = isqrt(4);
-  uint64_t s25 __attribute__((unused)) = isqrt(25);
-  uint64_t s50 __attribute__((unused)) = isqrt(50);
-  uint64_t s81 __attribute__((unused)) = isqrt(81);
-  uint64_t ss __attribute__((unused)) = sum_sqrts(16, 25);
+  uint64_t i10 __attribute__((unused)) = bsearch4(10ULL, 20ULL, 30ULL, 40ULL, 10ULL);
+  uint64_t i20 __attribute__((unused)) = bsearch4(10ULL, 20ULL, 30ULL, 40ULL, 20ULL);
+  uint64_t i30 __attribute__((unused)) = bsearch4(10ULL, 20ULL, 30ULL, 40ULL, 30ULL);
+  uint64_t i40 __attribute__((unused)) = bsearch4(10ULL, 20ULL, 30ULL, 40ULL, 40ULL);
+  uint64_t i99 __attribute__((unused)) = bsearch4(10ULL, 20ULL, 30ULL, 40ULL, 99ULL);
+  uint64_t s4 __attribute__((unused)) = isqrt(4ULL);
+  uint64_t s25 __attribute__((unused)) = isqrt(25ULL);
+  uint64_t s50 __attribute__((unused)) = isqrt(50ULL);
+  uint64_t s81 __attribute__((unused)) = isqrt(81ULL);
+  uint64_t ss __attribute__((unused)) = sum_sqrts(16ULL, 25ULL);
   return (int)((((((((((i10 + i20) + i30) + i40) + i99) + s4) + s25) + s50) + s81) + ss));
 
 }

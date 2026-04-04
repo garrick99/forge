@@ -51,43 +51,43 @@ uint64_t div_upper_bound(uint64_t a __attribute__((unused)), uint64_t b __attrib
 }
 
 _Bool check_product_ok() {
-  return product_bounded(3, 4, 12);
+  return product_bounded(3ULL, 4ULL, 12ULL);
 }
 
 _Bool check_product_big() {
-  return product_bounded(5, 5, 20);
+  return product_bounded(5ULL, 5ULL, 20ULL);
 }
 
 _Bool check_sum_ok() {
-  return sum_bounded(3, 4, 10);
+  return sum_bounded(3ULL, 4ULL, 10ULL);
 }
 
 _Bool check_sum_big() {
-  return sum_bounded(8, 5, 10);
+  return sum_bounded(8ULL, 5ULL, 10ULL);
 }
 
 _Bool check_ratio_ok() {
-  return ratio_le_one(5, 10);
+  return ratio_le_one(5ULL, 10ULL);
 }
 
 _Bool check_ratio_big() {
-  return ratio_le_one(11, 10);
+  return ratio_le_one(11ULL, 10ULL);
 }
 
 uint64_t check_safe_add() {
-  return safe_add(7, 8);
+  return safe_add(7ULL, 8ULL);
 }
 
 uint64_t check_safe_mul() {
-  return safe_mul(6, 7);
+  return safe_mul(6ULL, 7ULL);
 }
 
 uint64_t check_div_upper() {
-  return div_upper_bound(10, 3);
+  return div_upper_bound(10ULL, 3ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

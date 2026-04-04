@@ -25,11 +25,11 @@ uint64_t mat_idx(uint64_t row __attribute__((unused)), uint64_t col __attribute_
 
 void mat_fill(forge_span_u64_t m __attribute__((unused)), uint64_t rows __attribute__((unused)), uint64_t cols __attribute__((unused)), uint64_t val __attribute__((unused))) {
   uint64_t total __attribute__((unused)) = (rows * cols);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < total)) {
       m.data[i] = val;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -37,11 +37,11 @@ void mat_fill(forge_span_u64_t m __attribute__((unused)), uint64_t rows __attrib
 
 void mat_add(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t c __attribute__((unused)), uint64_t rows __attribute__((unused)), uint64_t cols __attribute__((unused))) {
   uint64_t total __attribute__((unused)) = (rows * cols);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < total)) {
       c.data[i] = (a.data[i] + b.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -49,21 +49,21 @@ void mat_add(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __at
 
 void mat_scale(forge_span_u64_t m __attribute__((unused)), uint64_t rows __attribute__((unused)), uint64_t cols __attribute__((unused)), uint64_t scalar __attribute__((unused))) {
   uint64_t total __attribute__((unused)) = (rows * cols);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < total)) {
       m.data[i] = (m.data[i] * scalar);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void mat_transpose_square(forge_span_u64_t m __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t j __attribute__((unused)) = (i + 1);
+      uint64_t j __attribute__((unused)) = (i + 1ULL);
       {
         while ((j < n)) {
           uint64_t idx_ij __attribute__((unused)) = ((i * n) + j);
@@ -71,18 +71,18 @@ void mat_transpose_square(forge_span_u64_t m __attribute__((unused)), uint64_t n
           uint64_t tmp __attribute__((unused)) = m.data[idx_ij];
           m.data[idx_ij] = m.data[idx_ji];
           m.data[idx_ji] = tmp;
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

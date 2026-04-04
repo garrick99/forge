@@ -22,12 +22,12 @@ _Bool test_bit(uint64_t x __attribute__((unused)), uint64_t pos __attribute__((u
 int main();
 
 uint64_t xor_reduce(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc ^ s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -35,12 +35,12 @@ uint64_t xor_reduce(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 }
 
 uint64_t and_reduce(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = s.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t acc __attribute__((unused)) = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       acc = (acc & s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -48,12 +48,12 @@ uint64_t and_reduce(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 }
 
 uint64_t or_reduce(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc | s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -62,29 +62,29 @@ uint64_t or_reduce(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 
 uint64_t bit_parity(uint64_t x __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = x;
-  v = (v ^ (v >> 32));
-  v = (v ^ (v >> 16));
-  v = (v ^ (v >> 8));
-  v = (v ^ (v >> 4));
-  v = (v ^ (v >> 2));
-  v = (v ^ (v >> 1));
-  return (v & 1);
+  v = (v ^ (v >> 32ULL));
+  v = (v ^ (v >> 16ULL));
+  v = (v ^ (v >> 8ULL));
+  v = (v ^ (v >> 4ULL));
+  v = (v ^ (v >> 2ULL));
+  v = (v ^ (v >> 1ULL));
+  return (v & 1ULL);
 }
 
 uint64_t set_bit(uint64_t x __attribute__((unused)), uint64_t pos __attribute__((unused))) {
-  return (x | (1 << pos));
+  return (x | (1ULL << pos));
 }
 
 uint64_t clear_bit(uint64_t x __attribute__((unused)), uint64_t pos __attribute__((unused))) {
-  return (x & (~(1 << pos)));
+  return (x & (~(1ULL << pos)));
 }
 
 _Bool test_bit(uint64_t x __attribute__((unused)), uint64_t pos __attribute__((unused))) {
-  return (((x >> pos) & 1) == 1);
+  return (((x >> pos) & 1ULL) == 1ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

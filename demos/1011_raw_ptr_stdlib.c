@@ -11,6 +11,14 @@
 /* span<T> typedefs — fat pointers with proven bounds */
 typedef struct { uint8_t* data; uintptr_t len; } forge_span_u8_t;
 
+/* Function pointer typedefs */
+typedef uint64_t (*forge_fn__ret_u64_t)(void);
+typedef uint64_t (*forge_fn_u64_u64_ret_u64_t)(uint64_t, uint64_t);
+typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
+typedef void (*forge_fn_u64_u64_ret_unit_t)(uint64_t, uint64_t);
+typedef void (*forge_fn__ret_unit_t)(void);
+typedef void (*forge_fn_str_ret_unit_t)(forge_span_u8_t);
+
 uint64_t ptr_null(void);  /* extern: forge_raw */
 
 uint64_t ptr_offset(uint64_t ptr, uint64_t n);  /* extern: forge_raw */
@@ -37,14 +45,6 @@ void cpu_relax(void);  /* extern: forge_raw */
 
 void dmb(void);  /* extern: forge_raw */
 
-/* Function pointer typedefs */
-typedef uint64_t (*forge_fn__ret_u64_t)(void);
-typedef uint64_t (*forge_fn_u64_u64_ret_u64_t)(uint64_t, uint64_t);
-typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
-typedef void (*forge_fn_u64_u64_ret_unit_t)(uint64_t, uint64_t);
-typedef void (*forge_fn__ret_unit_t)(void);
-typedef void (*forge_fn_str_ret_unit_t)(forge_span_u8_t);
-
 /* Forward declarations */
 void init_device_regs(uint64_t base __attribute__((unused)), uint64_t n_regs __attribute__((unused)));
 _Bool write_verify(uint64_t addr __attribute__((unused)), uint64_t value __attribute__((unused)));
@@ -52,12 +52,12 @@ uint64_t safe_read(uint64_t ptr __attribute__((unused)));
 int main();
 
 void init_device_regs(uint64_t base __attribute__((unused)), uint64_t n_regs __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n_regs)) {
       uint64_t reg_addr __attribute__((unused)) = ((uint64_t)((uint64_t*)((uintptr_t)base) + i));
-      (*(volatile uint64_t*)((uintptr_t)reg_addr) = 0);
-      i = (i + 1);
+      (*(volatile uint64_t*)((uintptr_t)reg_addr) = 0ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -76,12 +76,12 @@ uint64_t safe_read(uint64_t ptr __attribute__((unused))) {
   if ((ptr != null)) {
     return (*(uint64_t*)((uintptr_t)ptr));
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

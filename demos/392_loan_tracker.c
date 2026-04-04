@@ -27,54 +27,54 @@ uint64_t period_count();
 int main();
 
 Loan loan_new(uint64_t principal __attribute__((unused))) {
-  return (Loan){ .principal = principal, .accrued = 0, .paid = 0, .periods = 0, .payments = 0 };
+  return (Loan){ .principal = principal, .accrued = 0ULL, .paid = 0ULL, .periods = 0ULL, .payments = 0ULL };
 }
 
 void loan_accrue(Loan* l __attribute__((unused)), uint64_t interest __attribute__((unused))) {
   (*l).accrued = ((*l).accrued + interest);
-  (*l).periods = ((*l).periods + 1);
+  (*l).periods = ((*l).periods + 1ULL);
 }
 
 void loan_pay(Loan* l __attribute__((unused)), uint64_t amount __attribute__((unused))) {
   (*l).paid = ((*l).paid + amount);
-  (*l).payments = ((*l).payments + 1);
+  (*l).payments = ((*l).payments + 1ULL);
 }
 
 uint64_t three_periods() {
-  Loan l __attribute__((unused)) = loan_new(100);
-  loan_accrue((&l), 10);
-  loan_accrue((&l), 10);
-  loan_accrue((&l), 10);
+  Loan l __attribute__((unused)) = loan_new(100ULL);
+  loan_accrue((&l), 10ULL);
+  loan_accrue((&l), 10ULL);
+  loan_accrue((&l), 10ULL);
   return l.accrued;
 }
 
 uint64_t balance_after_payment() {
-  Loan l __attribute__((unused)) = loan_new(100);
-  loan_accrue((&l), 10);
-  loan_pay((&l), 20);
+  Loan l __attribute__((unused)) = loan_new(100ULL);
+  loan_accrue((&l), 10ULL);
+  loan_pay((&l), 20ULL);
   return ((l.principal + l.accrued) - l.paid);
 }
 
 uint64_t payment_count() {
-  Loan l __attribute__((unused)) = loan_new(200);
-  loan_accrue((&l), 10);
-  loan_pay((&l), 20);
-  loan_pay((&l), 20);
-  loan_pay((&l), 20);
+  Loan l __attribute__((unused)) = loan_new(200ULL);
+  loan_accrue((&l), 10ULL);
+  loan_pay((&l), 20ULL);
+  loan_pay((&l), 20ULL);
+  loan_pay((&l), 20ULL);
   return l.payments;
 }
 
 uint64_t period_count() {
-  Loan l __attribute__((unused)) = loan_new(100);
-  loan_accrue((&l), 5);
-  loan_accrue((&l), 5);
-  loan_accrue((&l), 5);
-  loan_accrue((&l), 5);
+  Loan l __attribute__((unused)) = loan_new(100ULL);
+  loan_accrue((&l), 5ULL);
+  loan_accrue((&l), 5ULL);
+  loan_accrue((&l), 5ULL);
+  loan_accrue((&l), 5ULL);
   return l.periods;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

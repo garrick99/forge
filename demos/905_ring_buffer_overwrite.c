@@ -17,16 +17,16 @@ int main();
 
 uint64_t ring_write(forge_span_u64_t buf __attribute__((unused)), uint64_t cap __attribute__((unused)), forge_span_u64_t src __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t head __attribute__((unused))) {
   uint64_t h __attribute__((unused)) = head;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       buf.data[h] = src.data[i];
-      h = (h + 1);
+      h = (h + 1ULL);
       if ((h == cap)) {
-        h = 0;
+        h = 0ULL;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -34,7 +34,7 @@ uint64_t ring_write(forge_span_u64_t buf __attribute__((unused)), uint64_t cap _
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

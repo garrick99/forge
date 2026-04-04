@@ -26,20 +26,20 @@ uint64_t two_saves();
 int main();
 
 Checkpoint cp_new(uint64_t initial __attribute__((unused))) {
-  return (Checkpoint){ .value = initial, .saved = 0, .saves = 0 };
+  return (Checkpoint){ .value = initial, .saved = 0ULL, .saves = 0ULL };
 }
 
 void cp_advance(Checkpoint* c __attribute__((unused))) {
-  (*c).value = ((*c).value + 1);
+  (*c).value = ((*c).value + 1ULL);
 }
 
 void cp_save(Checkpoint* c __attribute__((unused))) {
   (*c).saved = (*c).value;
-  (*c).saves = ((*c).saves + 1);
+  (*c).saves = ((*c).saves + 1ULL);
 }
 
 uint64_t advance_three() {
-  Checkpoint c __attribute__((unused)) = cp_new(0);
+  Checkpoint c __attribute__((unused)) = cp_new(0ULL);
   cp_advance((&c));
   cp_advance((&c));
   cp_advance((&c));
@@ -47,7 +47,7 @@ uint64_t advance_three() {
 }
 
 uint64_t save_at_2() {
-  Checkpoint c __attribute__((unused)) = cp_new(0);
+  Checkpoint c __attribute__((unused)) = cp_new(0ULL);
   cp_advance((&c));
   cp_advance((&c));
   cp_save((&c));
@@ -55,7 +55,7 @@ uint64_t save_at_2() {
 }
 
 uint64_t advance_past_checkpoint_value() {
-  Checkpoint c __attribute__((unused)) = cp_new(0);
+  Checkpoint c __attribute__((unused)) = cp_new(0ULL);
   cp_advance((&c));
   cp_advance((&c));
   cp_save((&c));
@@ -65,7 +65,7 @@ uint64_t advance_past_checkpoint_value() {
 }
 
 uint64_t advance_past_checkpoint_saved() {
-  Checkpoint c __attribute__((unused)) = cp_new(0);
+  Checkpoint c __attribute__((unused)) = cp_new(0ULL);
   cp_advance((&c));
   cp_advance((&c));
   cp_save((&c));
@@ -75,7 +75,7 @@ uint64_t advance_past_checkpoint_saved() {
 }
 
 uint64_t two_saves() {
-  Checkpoint c __attribute__((unused)) = cp_new(0);
+  Checkpoint c __attribute__((unused)) = cp_new(0ULL);
   cp_advance((&c));
   cp_save((&c));
   cp_advance((&c));
@@ -84,7 +84,7 @@ uint64_t two_saves() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

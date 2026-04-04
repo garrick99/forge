@@ -21,29 +21,29 @@ _Bool is_triangular(uint64_t k __attribute__((unused)));
 int main();
 
 uint64_t arith_sum(uint64_t first __attribute__((unused)), uint64_t last __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  return ((n * (first + last)) / 2);
+  return ((n * (first + last)) / 2ULL);
 }
 
 void fill_arith(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t start __attribute__((unused)), uint64_t step __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   uint64_t val __attribute__((unused)) = start;
   {
     while ((i < n)) {
       s.data[i] = val;
       val = (val + step);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t sum_arith_array(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -51,14 +51,14 @@ uint64_t sum_arith_array(forge_span_u64_t s __attribute__((unused)), uint64_t n 
 }
 
 uint64_t geom_sum_approx(uint64_t ratio __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t term __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t term __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + term);
       term = (term * ratio);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -66,19 +66,19 @@ uint64_t geom_sum_approx(uint64_t ratio __attribute__((unused)), uint64_t n __at
 }
 
 uint64_t triangular(uint64_t n __attribute__((unused))) {
-  return ((n * (n + 1)) / 2);
+  return ((n * (n + 1ULL)) / 2ULL);
 }
 
 _Bool is_triangular(uint64_t k __attribute__((unused))) {
-  uint64_t n __attribute__((unused)) = 0;
+  uint64_t n __attribute__((unused)) = 0ULL;
   _Bool found __attribute__((unused)) = 0;
   {
-    while ((((n * (n + 1)) / 2) <= k)) {
-      if ((((n * (n + 1)) / 2) == k)) {
+    while ((((n * (n + 1ULL)) / 2ULL) <= k)) {
+      if ((((n * (n + 1ULL)) / 2ULL) == k)) {
         found = 1;
 
       }
-      n = (n + 1);
+      n = (n + 1ULL);
     }
 
   }
@@ -86,7 +86,7 @@ _Bool is_triangular(uint64_t k __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

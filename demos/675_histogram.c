@@ -20,24 +20,24 @@ void hist_clear(forge_span_u64_t hist __attribute__((unused)), uint64_t bins __a
 int main();
 
 void hist_build(forge_span_u64_t src __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t hist __attribute__((unused)), uint64_t bins __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t bin __attribute__((unused)) = (src.data[i] % bins);
-      hist.data[bin] = (hist.data[bin] + 1);
-      i = (i + 1);
+      hist.data[bin] = (hist.data[bin] + 1ULL);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t hist_total(forge_span_u64_t hist __attribute__((unused)), uint64_t bins __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < bins)) {
       acc = (acc + hist.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -45,9 +45,9 @@ uint64_t hist_total(forge_span_u64_t hist __attribute__((unused)), uint64_t bins
 }
 
 uint64_t hist_max_bin(forge_span_u64_t hist __attribute__((unused)), uint64_t bins __attribute__((unused))) {
-  uint64_t mx __attribute__((unused)) = hist.data[0];
-  uint64_t idx __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t mx __attribute__((unused)) = hist.data[0ULL];
+  uint64_t idx __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < bins)) {
       if ((hist.data[i] > mx)) {
@@ -55,7 +55,7 @@ uint64_t hist_max_bin(forge_span_u64_t hist __attribute__((unused)), uint64_t bi
         idx = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -63,30 +63,30 @@ uint64_t hist_max_bin(forge_span_u64_t hist __attribute__((unused)), uint64_t bi
 }
 
 void hist_cumulative(forge_span_u64_t hist __attribute__((unused)), forge_span_u64_t cum __attribute__((unused)), uint64_t bins __attribute__((unused))) {
-  cum.data[0] = hist.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  cum.data[0ULL] = hist.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < bins)) {
-      cum.data[i] = (cum.data[(i - 1)] + hist.data[i]);
-      i = (i + 1);
+      cum.data[i] = (cum.data[(i - 1ULL)] + hist.data[i]);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void hist_clear(forge_span_u64_t hist __attribute__((unused)), uint64_t bins __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < bins)) {
-      hist.data[i] = 0;
-      i = (i + 1);
+      hist.data[i] = 0ULL;
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

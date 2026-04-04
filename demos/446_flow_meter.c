@@ -28,7 +28,7 @@ uint64_t overflow_detected();
 int main();
 
 FlowMeter fm_new(uint64_t interval __attribute__((unused)), uint64_t threshold __attribute__((unused))) {
-  return (FlowMeter){ .bytes_accumulated = 0, .sample_interval = interval, .samples = 0, .overflow_count = 0, .threshold = threshold };
+  return (FlowMeter){ .bytes_accumulated = 0ULL, .sample_interval = interval, .samples = 0ULL, .overflow_count = 0ULL, .threshold = threshold };
 }
 
 void fm_add(FlowMeter* f __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -36,44 +36,44 @@ void fm_add(FlowMeter* f __attribute__((unused)), uint64_t n __attribute__((unus
 }
 
 void fm_sample(FlowMeter* f __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  (*f).bytes_accumulated = 0;
-  (*f).samples = ((*f).samples + 1);
+  (*f).bytes_accumulated = 0ULL;
+  (*f).samples = ((*f).samples + 1ULL);
 }
 
 void fm_overflow(FlowMeter* f __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  (*f).overflow_count = ((*f).overflow_count + 1);
-  (*f).bytes_accumulated = 0;
+  (*f).overflow_count = ((*f).overflow_count + 1ULL);
+  (*f).bytes_accumulated = 0ULL;
 }
 
 uint64_t add_bytes() {
-  FlowMeter f __attribute__((unused)) = fm_new(100, 1000);
-  fm_add((&f), 30);
-  fm_add((&f), 20);
+  FlowMeter f __attribute__((unused)) = fm_new(100ULL, 1000ULL);
+  fm_add((&f), 30ULL);
+  fm_add((&f), 20ULL);
   return f.bytes_accumulated;
 }
 
 uint64_t sample_fires() {
-  FlowMeter f __attribute__((unused)) = fm_new(100, 1000);
-  fm_add((&f), 60);
-  fm_sample((&f), 50);
+  FlowMeter f __attribute__((unused)) = fm_new(100ULL, 1000ULL);
+  fm_add((&f), 60ULL);
+  fm_sample((&f), 50ULL);
   return f.samples;
 }
 
 uint64_t sample_resets() {
-  FlowMeter f __attribute__((unused)) = fm_new(100, 1000);
-  fm_add((&f), 70);
-  fm_sample((&f), 40);
+  FlowMeter f __attribute__((unused)) = fm_new(100ULL, 1000ULL);
+  fm_add((&f), 70ULL);
+  fm_sample((&f), 40ULL);
   return f.bytes_accumulated;
 }
 
 uint64_t overflow_detected() {
-  FlowMeter f __attribute__((unused)) = fm_new(100, 200);
-  fm_overflow((&f), 201);
+  FlowMeter f __attribute__((unused)) = fm_new(100ULL, 200ULL);
+  fm_overflow((&f), 201ULL);
   return f.overflow_count;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

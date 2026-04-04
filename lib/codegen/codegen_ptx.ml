@@ -136,8 +136,13 @@ let rec lower_expr st e : string =
   | ELit (LFloat (f, _)) ->
       let rty = rty_of_expr e in
       let r   = fresh_reg st rty in
-      emit st (Printf.sprintf "mov%s %s, 0f%08lX; // %g"
-        (ptx_rty_name rty) r (Int32.bits_of_float f) f);
+      (match rty with
+      | F64 ->
+          let bits = Int64.bits_of_float f in
+          emit st (Printf.sprintf "mov.f64 %s, 0d%016LX; // %g" r bits f)
+      | _ ->
+          emit st (Printf.sprintf "mov.f32 %s, 0f%08lX; // %g"
+            r (Int32.bits_of_float f) f));
       r
 
   | ELit _ ->
@@ -194,7 +199,12 @@ let rec lower_expr st e : string =
       (match op with
       | Add    -> emit st (Printf.sprintf "add.%s %s, %s, %s;" pfx dst rl rr)
       | Sub    -> emit st (Printf.sprintf "sub.%s %s, %s, %s;" pfx dst rl rr)
-      | Mul    -> emit st (Printf.sprintf "mul.lo.%s %s, %s, %s;" pfx dst rl rr)
+      | Mul    ->
+          (match rty with
+           | F32 | F64 ->
+               emit st (Printf.sprintf "mul.%s %s, %s, %s;" pfx dst rl rr)
+           | _ ->
+               emit st (Printf.sprintf "mul.lo.%s %s, %s, %s;" pfx dst rl rr))
       | Div    -> emit st (Printf.sprintf "div.%s %s, %s, %s;" pfx dst rl rr)
       | Mod    -> emit st (Printf.sprintf "rem.%s %s, %s, %s;" pfx dst rl rr)
       | BitAnd -> emit st (Printf.sprintf "and.b%d %s, %s, %s;" (sizeof_rty rty*8) dst rl rr)
@@ -268,8 +278,10 @@ let rec lower_expr st e : string =
           r
         end
       in
+      let rsz = fresh_reg st U64 in
+      emit st (Printf.sprintf "mov.u64 %s, %d;" rsz sz);
       let offset = fresh_reg st U64 in
-      emit st (Printf.sprintf "mul.lo.u64 %s, %s, %d;" offset ridx64 sz);
+      emit st (Printf.sprintf "mul.lo.u64 %s, %s, %s;" offset ridx64 rsz);
       let addr = fresh_reg st U64 in
       emit st (Printf.sprintf "add.u64 %s, %s, %s;" addr base offset);
       (* secret<T> array → cache-volatile load *)
@@ -483,8 +495,10 @@ and lower_assign st lhs rv =
       in
       let elem_rty = rty_of_expr lhs in
       let sz = sizeof_rty elem_rty in
+      let rsz = fresh_reg st U64 in
+      emit st (Printf.sprintf "mov.u64 %s, %d;" rsz sz);
       let offset = fresh_reg st U64 in
-      emit st (Printf.sprintf "mul.lo.u64 %s, %s, %d;" offset ridx64 sz);
+      emit st (Printf.sprintf "mul.lo.u64 %s, %s, %s;" offset ridx64 rsz);
       let addr = fresh_reg st U64 in
       emit st (Printf.sprintf "add.u64 %s, %s, %s;" addr base offset);
       let is_sec = match lhs.expr_ty with
@@ -522,6 +536,15 @@ and lower_stmt st s =
       let lbl_top = Printf.sprintf "%s_loop_%d" st.fn_name st.counter in
       let lbl_end = Printf.sprintf "%s_loop_end_%d" st.fn_name st.counter in
       st.counter <- st.counter + 1;
+      (* Snapshot unique name->register bindings before entering the loop.
+         After the body, emit mov to write back any updated bindings,
+         then restore reg_env to the pre-loop originals so the back-edge
+         reads the original (mutable) registers. *)
+      let loop_snapshot =
+        List.fold_left (fun acc (name, reg) ->
+          if List.mem_assoc name acc then acc else (name, reg) :: acc
+        ) [] st.reg_env
+      in
       emit st (lbl_top ^ ":");
       let rc = lower_expr st cond in
       let pred =
@@ -535,6 +558,25 @@ and lower_stmt st s =
       in
       emit st (Printf.sprintf "@!%s bra %s;" pred lbl_end);
       List.iter (lower_stmt st) body;
+      (* Write back: for each name in snapshot, if reg_env now maps it to
+         a different register, emit mov orig_reg, cur_reg *)
+      List.iter (fun (name, orig_reg) ->
+        match List.assoc_opt name st.reg_env with
+        | Some cur_reg when cur_reg <> orig_reg ->
+            let rty = reg_rty st cur_reg in
+            let pfx = match rty with
+              | Pred -> "pred"
+              | _ -> arith_pfx rty
+            in
+            emit st (Printf.sprintf "mov.%s %s, %s; // loop wb: %s"
+                       pfx orig_reg cur_reg name)
+        | _ -> ()
+      ) loop_snapshot;
+      (* Restore reg_env to pre-loop bindings for the back-edge *)
+      let snapshot_names = List.map fst loop_snapshot in
+      st.reg_env <-
+        List.filter (fun (n, _) -> not (List.mem n snapshot_names)) st.reg_env
+        @ loop_snapshot;
       emit st (Printf.sprintf "bra %s;" lbl_top);
       emit st (lbl_end ^ ":")
 
@@ -602,6 +644,18 @@ let emit_param st (id, ty) =
       st.reg_env <- (name, r) :: st.reg_env;
       ([Printf.sprintf "    .param .u32 %s" p],
        [Printf.sprintf "  ld.param.u32 %s, [%s];" r p])
+  | TPrim (TFloat F32) | TQual (_, TPrim (TFloat F32)) ->
+      let p = Printf.sprintf "%s_param_%s" st.fn_name name in
+      let r = fresh_reg st F32 in
+      st.reg_env <- (name, r) :: st.reg_env;
+      ([Printf.sprintf "    .param .f32 %s" p],
+       [Printf.sprintf "  ld.param.f32 %s, [%s];" r p])
+  | TPrim (TFloat F64) | TQual (_, TPrim (TFloat F64)) ->
+      let p = Printf.sprintf "%s_param_%s" st.fn_name name in
+      let r = fresh_reg st F64 in
+      st.reg_env <- (name, r) :: st.reg_env;
+      ([Printf.sprintf "    .param .f64 %s" p],
+       [Printf.sprintf "  ld.param.f64 %s, [%s];" r p])
   | _ ->
       let rty = ptx_rty_of_ty ty in
       let bits = sizeof_rty rty * 8 in

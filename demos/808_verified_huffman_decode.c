@@ -16,20 +16,20 @@ uint64_t huffman_decode(forge_span_u64_t bitstream __attribute__((unused)), uint
 int main();
 
 uint64_t huffman_decode(forge_span_u64_t bitstream __attribute__((unused)), uint64_t n_bits __attribute__((unused)), forge_span_u64_t table_sym __attribute__((unused)), forge_span_u64_t table_len __attribute__((unused)), uint64_t table_size __attribute__((unused)), forge_span_u64_t output __attribute__((unused)), uint64_t out_cap __attribute__((unused))) {
-  uint64_t bit_pos __attribute__((unused)) = 0;
-  uint64_t out_idx __attribute__((unused)) = 0;
+  uint64_t bit_pos __attribute__((unused)) = 0ULL;
+  uint64_t out_idx __attribute__((unused)) = 0ULL;
   {
     while (((bit_pos < n_bits) && (out_idx < out_cap))) {
       uint64_t code __attribute__((unused)) = (bitstream.data[bit_pos] % table_size);
       uint64_t sym __attribute__((unused)) = table_sym.data[code];
       uint64_t len __attribute__((unused)) = table_len.data[code];
       output.data[out_idx] = sym;
-      out_idx = (out_idx + 1);
+      out_idx = (out_idx + 1ULL);
       uint64_t advance;
-      if ((len >= 1)) {
+      if ((len >= 1ULL)) {
         advance = len;
       } else {
-        advance = 1;
+        advance = 1ULL;
       }
       if (((bit_pos + advance) <= n_bits)) {
         bit_pos = (bit_pos + advance);
@@ -45,7 +45,7 @@ uint64_t huffman_decode(forge_span_u64_t bitstream __attribute__((unused)), uint
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

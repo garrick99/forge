@@ -28,7 +28,7 @@ void ntt_round(forge_span_u64_t a __attribute__((unused)), uint64_t half __attri
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -29,27 +29,27 @@ uint64_t dram_tracked();
 int main();
 
 MemoryHierarchy mh_new() {
-  return (MemoryHierarchy){ .l1_hits = 0, .l2_hits = 0, .l3_hits = 0, .dram_accesses = 0, .total_requests = 0 };
+  return (MemoryHierarchy){ .l1_hits = 0ULL, .l2_hits = 0ULL, .l3_hits = 0ULL, .dram_accesses = 0ULL, .total_requests = 0ULL };
 }
 
 void mh_l1_hit(MemoryHierarchy* m __attribute__((unused))) {
-  (*m).l1_hits = ((*m).l1_hits + 1);
-  (*m).total_requests = ((*m).total_requests + 1);
+  (*m).l1_hits = ((*m).l1_hits + 1ULL);
+  (*m).total_requests = ((*m).total_requests + 1ULL);
 }
 
 void mh_l2_hit(MemoryHierarchy* m __attribute__((unused))) {
-  (*m).l2_hits = ((*m).l2_hits + 1);
-  (*m).total_requests = ((*m).total_requests + 1);
+  (*m).l2_hits = ((*m).l2_hits + 1ULL);
+  (*m).total_requests = ((*m).total_requests + 1ULL);
 }
 
 void mh_l3_hit(MemoryHierarchy* m __attribute__((unused))) {
-  (*m).l3_hits = ((*m).l3_hits + 1);
-  (*m).total_requests = ((*m).total_requests + 1);
+  (*m).l3_hits = ((*m).l3_hits + 1ULL);
+  (*m).total_requests = ((*m).total_requests + 1ULL);
 }
 
 void mh_dram(MemoryHierarchy* m __attribute__((unused))) {
-  (*m).dram_accesses = ((*m).dram_accesses + 1);
-  (*m).total_requests = ((*m).total_requests + 1);
+  (*m).dram_accesses = ((*m).dram_accesses + 1ULL);
+  (*m).total_requests = ((*m).total_requests + 1ULL);
 }
 
 uint64_t l1_hits() {
@@ -91,7 +91,7 @@ uint64_t dram_tracked() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

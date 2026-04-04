@@ -20,16 +20,16 @@ uint64_t hash_range(forge_span_u64_t data __attribute__((unused)), uint64_t star
 int main();
 
 uint64_t fnv1a_update(uint64_t hash __attribute__((unused)), uint64_t byte __attribute__((unused))) {
-  return ((hash ^ (byte % 256)) * 1099511628211);
+  return ((hash ^ (byte % 256ULL)) * 1099511628211ULL);
 }
 
 uint64_t fnv1a_hash(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t h __attribute__((unused)) = -3750763034362895579;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t h __attribute__((unused)) = 0xcbf29ce484222325ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       h = fnv1a_update(h, data.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -37,12 +37,12 @@ uint64_t fnv1a_hash(forge_span_u64_t data __attribute__((unused)), uint64_t n __
 }
 
 uint64_t djb2_hash(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t h __attribute__((unused)) = 5381;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t h __attribute__((unused)) = 5381ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      h = ((h * 33) + (data.data[i] % 256));
-      i = (i + 1);
+      h = ((h * 33ULL) + (data.data[i] % 256ULL));
+      i = (i + 1ULL);
     }
 
   }
@@ -50,16 +50,16 @@ uint64_t djb2_hash(forge_span_u64_t data __attribute__((unused)), uint64_t n __a
 }
 
 uint64_t hash_combine(uint64_t h1 __attribute__((unused)), uint64_t h2 __attribute__((unused))) {
-  return (h1 ^ (((h2 + 2654435769) + (h1 << 6)) + (h1 >> 2)));
+  return (h1 ^ (((h2 + 2654435769ULL) + (h1 << 6ULL)) + (h1 >> 2ULL)));
 }
 
 uint64_t hash_range(forge_span_u64_t data __attribute__((unused)), uint64_t start __attribute__((unused)), uint64_t end_ __attribute__((unused))) {
-  uint64_t h __attribute__((unused)) = 0;
+  uint64_t h __attribute__((unused)) = 0ULL;
   uint64_t i __attribute__((unused)) = start;
   {
     while ((i < end_)) {
-      h = ((h * 31) + data.data[i]);
-      i = (i + 1);
+      h = ((h * 31ULL) + data.data[i]);
+      i = (i + 1ULL);
     }
 
   }
@@ -67,7 +67,7 @@ uint64_t hash_range(forge_span_u64_t data __attribute__((unused)), uint64_t star
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

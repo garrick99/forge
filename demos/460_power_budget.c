@@ -28,7 +28,7 @@ uint64_t draw_sum();
 int main();
 
 PowerBudget pb_new(uint64_t budget __attribute__((unused))) {
-  return (PowerBudget){ .budget = budget, .cpu_draw = 0, .gpu_draw = 0, .io_draw = 0, .total_draw = 0 };
+  return (PowerBudget){ .budget = budget, .cpu_draw = 0ULL, .gpu_draw = 0ULL, .io_draw = 0ULL, .total_draw = 0ULL };
 }
 
 void pb_draw_cpu(PowerBudget* p __attribute__((unused)), uint64_t w __attribute__((unused))) {
@@ -47,36 +47,36 @@ void pb_draw_io(PowerBudget* p __attribute__((unused)), uint64_t w __attribute__
 }
 
 uint64_t cpu_draw() {
-  PowerBudget p __attribute__((unused)) = pb_new(300);
-  pb_draw_cpu((&p), 50);
+  PowerBudget p __attribute__((unused)) = pb_new(300ULL);
+  pb_draw_cpu((&p), 50ULL);
   return p.cpu_draw;
 }
 
 uint64_t total_150() {
-  PowerBudget p __attribute__((unused)) = pb_new(300);
-  pb_draw_cpu((&p), 50);
-  pb_draw_gpu((&p), 80);
-  pb_draw_io((&p), 20);
+  PowerBudget p __attribute__((unused)) = pb_new(300ULL);
+  pb_draw_cpu((&p), 50ULL);
+  pb_draw_gpu((&p), 80ULL);
+  pb_draw_io((&p), 20ULL);
   return p.total_draw;
 }
 
 uint64_t gpu_independent() {
-  PowerBudget p __attribute__((unused)) = pb_new(300);
-  pb_draw_cpu((&p), 50);
-  pb_draw_gpu((&p), 80);
+  PowerBudget p __attribute__((unused)) = pb_new(300ULL);
+  pb_draw_cpu((&p), 50ULL);
+  pb_draw_gpu((&p), 80ULL);
   return p.gpu_draw;
 }
 
 uint64_t draw_sum() {
-  PowerBudget p __attribute__((unused)) = pb_new(300);
-  pb_draw_cpu((&p), 40);
-  pb_draw_gpu((&p), 90);
-  pb_draw_io((&p), 30);
+  PowerBudget p __attribute__((unused)) = pb_new(300ULL);
+  pb_draw_cpu((&p), 40ULL);
+  pb_draw_gpu((&p), 90ULL);
+  pb_draw_io((&p), 30ULL);
   return (((p.total_draw - p.cpu_draw) - p.gpu_draw) - p.io_draw);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

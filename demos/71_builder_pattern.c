@@ -8,7 +8,7 @@
 #  define __attribute__(x)
 #endif
 
-static const uint64_t DEFAULT_CAP = 8;
+static const uint64_t DEFAULT_CAP = 8ULL;
 
 typedef uint64_t Weight;
 
@@ -31,7 +31,7 @@ Score run_with(uint64_t max_iter __attribute__((unused)), Weight threshold __att
 int main();
 
 Config Config__default() {
-  return (Config){ .max_iter = DEFAULT_CAP, .threshold = 10, .verbose = 0 };
+  return (Config){ .max_iter = DEFAULT_CAP, .threshold = 10ULL, .verbose = 0 };
 }
 
 Config Config__with_max_iter(const Config* self __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -56,7 +56,7 @@ Weight Config__threshold(const Config* self __attribute__((unused))) {
 
 Score run_with(uint64_t max_iter __attribute__((unused)), Weight threshold __attribute__((unused)), uint64_t data __attribute__((unused))) {
   if ((data <= threshold)) {
-    return 0;
+    return 0ULL;
   } else {
     return (data / max_iter);
   }
@@ -64,11 +64,11 @@ Score run_with(uint64_t max_iter __attribute__((unused)), Weight threshold __att
 
 int main() {
   Config cfg __attribute__((unused)) = Config__default();
-  Config cfg2 __attribute__((unused)) = Config__with_threshold(((Config[1]){Config__with_max_iter((&cfg), 4)}), 5);
+  Config cfg2 __attribute__((unused)) = Config__with_threshold(((Config[1]){Config__with_max_iter((&cfg), 4ULL)}), 5ULL);
   uint64_t n1 __attribute__((unused)) = Config__max_iter((&cfg2));
   uint64_t n2 __attribute__((unused)) = Config__threshold((&cfg2));
-  Score s1 __attribute__((unused)) = run_with(4, n2, 100);
-  Score s2 __attribute__((unused)) = run_with(4, n2, 3);
+  Score s1 __attribute__((unused)) = run_with(4ULL, n2, 100ULL);
+  Score s2 __attribute__((unused)) = run_with(4ULL, n2, 3ULL);
   return (int)((((n1 + n2) + s1) + s2));
 
 }

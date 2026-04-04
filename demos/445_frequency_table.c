@@ -27,22 +27,22 @@ uint64_t b_independent();
 int main();
 
 FreqTable ft_new() {
-  return (FreqTable){ .count_a = 0, .count_b = 0, .count_c = 0, .total = 0 };
+  return (FreqTable){ .count_a = 0ULL, .count_b = 0ULL, .count_c = 0ULL, .total = 0ULL };
 }
 
 void ft_observe_a(FreqTable* f __attribute__((unused))) {
-  (*f).count_a = ((*f).count_a + 1);
-  (*f).total = ((*f).total + 1);
+  (*f).count_a = ((*f).count_a + 1ULL);
+  (*f).total = ((*f).total + 1ULL);
 }
 
 void ft_observe_b(FreqTable* f __attribute__((unused))) {
-  (*f).count_b = ((*f).count_b + 1);
-  (*f).total = ((*f).total + 1);
+  (*f).count_b = ((*f).count_b + 1ULL);
+  (*f).total = ((*f).total + 1ULL);
 }
 
 void ft_observe_c(FreqTable* f __attribute__((unused))) {
-  (*f).count_c = ((*f).count_c + 1);
-  (*f).total = ((*f).total + 1);
+  (*f).count_c = ((*f).count_c + 1ULL);
+  (*f).total = ((*f).total + 1ULL);
 }
 
 uint64_t count_a_two() {
@@ -88,7 +88,7 @@ uint64_t b_independent() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

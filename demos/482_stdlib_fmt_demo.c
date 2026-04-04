@@ -48,7 +48,7 @@ uint64_t check_parse_zero(forge_span_u8_t data __attribute__((unused)));
 int main();
 
 Str str_new(forge_span_u8_t data __attribute__((unused))) {
-  return (Str){ .data = data, .len = 0 };
+  return (Str){ .data = data, .len = 0ULL };
 }
 
 uint64_t str_len(const Str* s __attribute__((unused))) {
@@ -60,7 +60,7 @@ uint64_t str_capacity(const Str* s __attribute__((unused))) {
 }
 
 _Bool str_is_empty(const Str* s __attribute__((unused))) {
-  return ((*s).len == 0);
+  return ((*s).len == 0ULL);
 }
 
 uint8_t str_at(const Str* s __attribute__((unused)), uint64_t i __attribute__((unused))) {
@@ -69,11 +69,11 @@ uint8_t str_at(const Str* s __attribute__((unused)), uint64_t i __attribute__((u
 
 void str_push(Str* s __attribute__((unused)), uint8_t b __attribute__((unused))) {
   (*s).data.data[(*s).len] = b;
-  (*s).len = ((*s).len + 1);
+  (*s).len = ((*s).len + 1ULL);
 }
 
 void str_clear(Str* s __attribute__((unused))) {
-  (*s).len = 0;
+  (*s).len = 0ULL;
 }
 
 _Bool byte_eq(uint8_t a __attribute__((unused)), uint8_t b __attribute__((unused))) {
@@ -81,79 +81,79 @@ _Bool byte_eq(uint8_t a __attribute__((unused)), uint8_t b __attribute__((unused
 }
 
 _Bool str_starts_with_byte(const Str* s __attribute__((unused)), uint8_t b __attribute__((unused))) {
-  if (((*s).len > 0)) {
-    return ((*s).data.data[0] == b);
+  if (((*s).len > 0ULL)) {
+    return ((*s).data.data[0ULL] == b);
   } else {
     return 0;
   }
 }
 
 _Bool is_ascii_digit(uint8_t b __attribute__((unused))) {
-  return ((b >= 48) && (b <= 57));
+  return ((b >= 48ULL) && (b <= 57ULL));
 }
 
 _Bool is_ascii_lower(uint8_t b __attribute__((unused))) {
-  return ((b >= 97) && (b <= 122));
+  return ((b >= 97ULL) && (b <= 122ULL));
 }
 
 _Bool is_ascii_upper(uint8_t b __attribute__((unused))) {
-  return ((b >= 65) && (b <= 90));
+  return ((b >= 65ULL) && (b <= 90ULL));
 }
 
 uint8_t to_ascii_lower(uint8_t b __attribute__((unused))) {
-  if (((b >= 65) && (b <= 90))) {
-    return (b + 32);
+  if (((b >= 65ULL) && (b <= 90ULL))) {
+    return (b + 32ULL);
   } else {
     return b;
   }
 }
 
 uint8_t to_ascii_upper(uint8_t b __attribute__((unused))) {
-  if (((b >= 97) && (b <= 122))) {
-    return (b - 32);
+  if (((b >= 97ULL) && (b <= 122ULL))) {
+    return (b - 32ULL);
   } else {
     return b;
   }
 }
 
 uint64_t count_digits_u64(uint64_t n __attribute__((unused))) {
-  if ((n < 10)) {
-    return 1;
+  if ((n < 10ULL)) {
+    return 1ULL;
   } else {
-    return (1 + count_digits_u64((n / 10)));
+    return (1ULL + count_digits_u64((n / 10ULL)));
   }
 }
 
 uint64_t count_hex_digits(uint64_t n __attribute__((unused))) {
-  if ((n < 16)) {
-    return 1;
+  if ((n < 16ULL)) {
+    return 1ULL;
   } else {
-    return (1 + count_hex_digits((n / 16)));
+    return (1ULL + count_hex_digits((n / 16ULL)));
   }
 }
 
 uint8_t hex_digit(uint64_t v __attribute__((unused))) {
-  if ((v < 10)) {
-    return (48 + ((uint8_t)v));
+  if ((v < 10ULL)) {
+    return (48ULL + ((uint8_t)v));
   } else {
-    return (87 + ((uint8_t)v));
+    return (87ULL + ((uint8_t)v));
   }
 }
 
 uint8_t dec_digit(uint64_t v __attribute__((unused))) {
-  return (48 + ((uint8_t)v));
+  return (48ULL + ((uint8_t)v));
 }
 
 uint64_t parse_u64_at(const Str* s __attribute__((unused)), uint64_t off __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
   uint64_t i __attribute__((unused)) = off;
   _Bool parsing __attribute__((unused)) = 1;
   {
     while (((i < (*s).len) && parsing)) {
       uint8_t b __attribute__((unused)) = (*s).data.data[i];
-      if (((b >= 48) && (b <= 57))) {
-        acc = ((acc * 10) + ((uint64_t)(b - 48)));
-        i = (i + 1);
+      if (((b >= 48ULL) && (b <= 57ULL))) {
+        acc = ((acc * 10ULL) + ((uint64_t)(b - 48ULL)));
+        i = (i + 1ULL);
 
       } else {
         parsing = 0;
@@ -166,44 +166,44 @@ uint64_t parse_u64_at(const Str* s __attribute__((unused)), uint64_t off __attri
 }
 
 uint64_t check_count_digits_1() {
-  return count_digits_u64(0);
+  return count_digits_u64(0ULL);
 }
 
 uint64_t check_count_digits_3() {
-  return count_digits_u64(100);
+  return count_digits_u64(100ULL);
 }
 
 uint64_t check_count_digits_20() {
-  return count_digits_u64(-1);
+  return count_digits_u64(0xffffffffffffffffULL);
 }
 
 uint64_t check_count_hex_1() {
-  return count_hex_digits(0);
+  return count_hex_digits(0ULL);
 }
 
 uint64_t check_count_hex_2() {
-  return count_hex_digits(16);
+  return count_hex_digits(16ULL);
 }
 
 uint8_t check_hex_digit_0() {
-  return hex_digit(0);
+  return hex_digit(0ULL);
 }
 
 uint8_t check_hex_digit_a() {
-  return hex_digit(10);
+  return hex_digit(10ULL);
 }
 
 uint8_t check_dec_digit_5() {
-  return dec_digit(5);
+  return dec_digit(5ULL);
 }
 
 uint64_t check_parse_zero(forge_span_u8_t data __attribute__((unused))) {
   Str s __attribute__((unused)) = str_new(data);
-  return parse_u64_at((&s), 0);
+  return parse_u64_at((&s), 0ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

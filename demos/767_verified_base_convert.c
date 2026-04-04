@@ -18,17 +18,17 @@ int main();
 
 uint64_t to_base(uint64_t val __attribute__((unused)), uint64_t base __attribute__((unused)), forge_span_u64_t digits __attribute__((unused)), uint64_t max_digits __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
-  uint64_t i __attribute__((unused)) = 0;
-  if ((val == 0)) {
-    digits.data[0] = 0;
-    i = 1;
+  uint64_t i __attribute__((unused)) = 0ULL;
+  if ((val == 0ULL)) {
+    digits.data[0ULL] = 0ULL;
+    i = 1ULL;
 
   } else {
     {
-      while (((v > 0) && (i < max_digits))) {
+      while (((v > 0ULL) && (i < max_digits))) {
         digits.data[i] = (v % base);
         v = (v / base);
-        i = (i + 1);
+        i = (i + 1ULL);
       }
 
     }
@@ -38,14 +38,14 @@ uint64_t to_base(uint64_t val __attribute__((unused)), uint64_t base __attribute
 }
 
 uint64_t from_base(forge_span_u64_t digits __attribute__((unused)), uint64_t ndigits __attribute__((unused)), uint64_t base __attribute__((unused))) {
-  uint64_t val __attribute__((unused)) = 0;
-  uint64_t power __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t val __attribute__((unused)) = 0ULL;
+  uint64_t power __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < ndigits)) {
       val = (val + (digits.data[i] * power));
       power = (power * base);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -53,7 +53,7 @@ uint64_t from_base(forge_span_u64_t digits __attribute__((unused)), uint64_t ndi
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

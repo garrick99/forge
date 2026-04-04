@@ -17,25 +17,25 @@ int main();
 
 void normalize_to_pivot(forge_span_u64_t s __attribute__((unused)), uint64_t pivot __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = s.len;
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while ((k < n)) {
       if ((s.data[k] < pivot)) {
-        s.data[k] = 0;
+        s.data[k] = 0ULL;
 
       }
       if ((s.data[k] > pivot)) {
-        s.data[k] = (pivot + 1);
+        s.data[k] = (pivot + 1ULL);
 
       }
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

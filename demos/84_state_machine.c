@@ -54,7 +54,7 @@ Finished finish(Running s __attribute__((unused)), uint64_t tick __attribute__((
   if ((tick >= s.start_tick)) {
     elapsed_ticks = (tick - s.start_tick);
   } else {
-    elapsed_ticks = 0;
+    elapsed_ticks = 0ULL;
   }
   return (Finished){ .id = s.id, .elapsed = elapsed_ticks };
 }
@@ -64,15 +64,15 @@ uint64_t elapsed(Finished s __attribute__((unused))) {
 }
 
 int main() {
-  Idle idle __attribute__((unused)) = (Idle){ .id = 1 };
-  Running run1 __attribute__((unused)) = start(idle, 10);
-  Paused psd __attribute__((unused)) = pause(run1, 15);
-  Running run2 __attribute__((unused)) = resume(psd, 20);
-  Finished done __attribute__((unused)) = finish(run2, 30);
+  Idle idle __attribute__((unused)) = (Idle){ .id = 1ULL };
+  Running run1 __attribute__((unused)) = start(idle, 10ULL);
+  Paused psd __attribute__((unused)) = pause(run1, 15ULL);
+  Running run2 __attribute__((unused)) = resume(psd, 20ULL);
+  Finished done __attribute__((unused)) = finish(run2, 30ULL);
   uint64_t e __attribute__((unused)) = elapsed(done);
-  Idle i2 __attribute__((unused)) = (Idle){ .id = 2 };
-  Running r2 __attribute__((unused)) = start(i2, 0);
-  Finished f2 __attribute__((unused)) = finish(r2, 100);
+  Idle i2 __attribute__((unused)) = (Idle){ .id = 2ULL };
+  Running r2 __attribute__((unused)) = start(i2, 0ULL);
+  Finished f2 __attribute__((unused)) = finish(r2, 100ULL);
   uint64_t e2 __attribute__((unused)) = elapsed(f2);
   return (int)((e + e2));
 

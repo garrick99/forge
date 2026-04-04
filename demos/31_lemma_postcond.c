@@ -20,14 +20,14 @@ _Bool register_lemmas() {
 }
 
 uint64_t half_product(uint64_t n __attribute__((unused))) {
-  return ((n * (n + 1)) / 2);
+  return ((n * (n + 1ULL)) / 2ULL);
 }
 
 uint64_t safe_double(uint64_t n __attribute__((unused))) {
-  return (2 * n);
+  return (2ULL * n);
 }
 
 uint64_t triangle_ge_n(uint64_t n __attribute__((unused))) {
-  return ((n * (n + 1)) / 2);
+  return ((n * (n + 1ULL)) / 2ULL);
 }
 

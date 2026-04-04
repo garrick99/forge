@@ -16,16 +16,16 @@ uint64_t luhn(forge_span_u64_t digits __attribute__((unused)), uint64_t n __attr
 int main();
 
 uint64_t luhn(forge_span_u64_t digits __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t total __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t total __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t pos __attribute__((unused)) = ((n - 1) - i);
-      uint64_t d __attribute__((unused)) = (digits.data[pos] % 10);
-      if (((i % 2) == 1)) {
-        uint64_t doubled __attribute__((unused)) = (d * 2);
-        if ((doubled > 9)) {
-          total = ((total + doubled) - 9);
+      uint64_t pos __attribute__((unused)) = ((n - 1ULL) - i);
+      uint64_t d __attribute__((unused)) = (digits.data[pos] % 10ULL);
+      if (((i % 2ULL) == 1ULL)) {
+        uint64_t doubled __attribute__((unused)) = (d * 2ULL);
+        if ((doubled > 9ULL)) {
+          total = ((total + doubled) - 9ULL);
 
         } else {
           total = (total + doubled);
@@ -36,15 +36,15 @@ uint64_t luhn(forge_span_u64_t digits __attribute__((unused)), uint64_t n __attr
         total = (total + d);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
-  return (total % 10);
+  return (total % 10ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

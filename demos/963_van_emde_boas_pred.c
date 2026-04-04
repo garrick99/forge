@@ -18,27 +18,27 @@ int main();
 uint64_t veb_predecessor(forge_span_u64_t bits __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t query __attribute__((unused))) {
   uint64_t pos __attribute__((unused)) = query;
   _Bool found __attribute__((unused)) = 0;
-  uint64_t steps __attribute__((unused)) = 0;
-  uint64_t max_steps __attribute__((unused)) = (query + 1);
+  uint64_t steps __attribute__((unused)) = 0ULL;
+  uint64_t max_steps __attribute__((unused)) = (query + 1ULL);
   {
     while ((found == 0)) {
       if ((steps == max_steps)) {
         found = 1;
 
-      } else if ((bits.data[pos] > 0)) {
+      } else if ((bits.data[pos] > 0ULL)) {
         found = 1;
 
       } else {
-        if ((pos == 0)) {
+        if ((pos == 0ULL)) {
           found = 1;
 
         } else {
-          pos = (pos - 1);
+          pos = (pos - 1ULL);
 
         }
 
       }
-      steps = (steps + 1);
+      steps = (steps + 1ULL);
     }
 
   }
@@ -46,7 +46,7 @@ uint64_t veb_predecessor(forge_span_u64_t bits __attribute__((unused)), uint64_t
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

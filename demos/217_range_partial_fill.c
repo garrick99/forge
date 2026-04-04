@@ -18,14 +18,14 @@ int main();
 void zero_range(forge_span_u64_t s __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
   {
     for (uint64_t i = (uint64_t)(lo); i < (uint64_t)(hi); i++) {
-      s.data[i] = 0;
+      s.data[i] = 0ULL;
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

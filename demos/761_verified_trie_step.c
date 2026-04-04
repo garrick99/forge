@@ -16,8 +16,8 @@ uint64_t trie_lookup(forge_span_u64_t table __attribute__((unused)), uint64_t ta
 int main();
 
 uint64_t trie_lookup(forge_span_u64_t table __attribute__((unused)), uint64_t table_size __attribute__((unused)), forge_span_u64_t keys __attribute__((unused)), uint64_t key_len __attribute__((unused))) {
-  uint64_t node __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t node __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < key_len)) {
       if (((node + keys.data[i]) < table_size)) {
@@ -26,17 +26,17 @@ uint64_t trie_lookup(forge_span_u64_t table __attribute__((unused)), uint64_t ta
           node = child;
 
         } else {
-          node = 0;
+          node = 0ULL;
           i = key_len;
 
         }
 
       } else {
-        node = 0;
+        node = 0ULL;
         i = key_len;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -44,7 +44,7 @@ uint64_t trie_lookup(forge_span_u64_t table __attribute__((unused)), uint64_t ta
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

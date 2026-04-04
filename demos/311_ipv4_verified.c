@@ -30,41 +30,41 @@ _Bool pkt_valid(const Ipv4Header* h __attribute__((unused)));
 int main();
 
 Ipv4Header parse_ipv4(forge_span_u8_t pkt __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t b0 __attribute__((unused)) = ((uint64_t)pkt.data[0]);
-  uint64_t ver __attribute__((unused)) = (b0 / 16);
-  uint64_t ihl __attribute__((unused)) = (b0 % 16);
-  uint64_t tos __attribute__((unused)) = ((uint64_t)pkt.data[1]);
-  uint64_t tl_hi __attribute__((unused)) = ((uint64_t)pkt.data[2]);
-  uint64_t tl_lo __attribute__((unused)) = ((uint64_t)pkt.data[3]);
-  uint64_t total_len __attribute__((unused)) = ((tl_hi * 256) + tl_lo);
-  uint64_t id_hi __attribute__((unused)) = ((uint64_t)pkt.data[4]);
-  uint64_t id_lo __attribute__((unused)) = ((uint64_t)pkt.data[5]);
-  uint64_t id __attribute__((unused)) = ((id_hi * 256) + id_lo);
-  uint64_t ttl __attribute__((unused)) = ((uint64_t)pkt.data[8]);
-  uint64_t proto __attribute__((unused)) = ((uint64_t)pkt.data[9]);
-  uint64_t src3 __attribute__((unused)) = ((uint64_t)pkt.data[12]);
-  uint64_t src2 __attribute__((unused)) = ((uint64_t)pkt.data[13]);
-  uint64_t src1 __attribute__((unused)) = ((uint64_t)pkt.data[14]);
-  uint64_t src0 __attribute__((unused)) = ((uint64_t)pkt.data[15]);
-  uint64_t src_ip __attribute__((unused)) = ((((src3 * 16777216) + (src2 * 65536)) + (src1 * 256)) + src0);
-  uint64_t dst3 __attribute__((unused)) = ((uint64_t)pkt.data[16]);
-  uint64_t dst2 __attribute__((unused)) = ((uint64_t)pkt.data[17]);
-  uint64_t dst1 __attribute__((unused)) = ((uint64_t)pkt.data[18]);
-  uint64_t dst0 __attribute__((unused)) = ((uint64_t)pkt.data[19]);
-  uint64_t dst_ip __attribute__((unused)) = ((((dst3 * 16777216) + (dst2 * 65536)) + (dst1 * 256)) + dst0);
+  uint64_t b0 __attribute__((unused)) = ((uint64_t)pkt.data[0ULL]);
+  uint64_t ver __attribute__((unused)) = (b0 / 16ULL);
+  uint64_t ihl __attribute__((unused)) = (b0 % 16ULL);
+  uint64_t tos __attribute__((unused)) = ((uint64_t)pkt.data[1ULL]);
+  uint64_t tl_hi __attribute__((unused)) = ((uint64_t)pkt.data[2ULL]);
+  uint64_t tl_lo __attribute__((unused)) = ((uint64_t)pkt.data[3ULL]);
+  uint64_t total_len __attribute__((unused)) = ((tl_hi * 256ULL) + tl_lo);
+  uint64_t id_hi __attribute__((unused)) = ((uint64_t)pkt.data[4ULL]);
+  uint64_t id_lo __attribute__((unused)) = ((uint64_t)pkt.data[5ULL]);
+  uint64_t id __attribute__((unused)) = ((id_hi * 256ULL) + id_lo);
+  uint64_t ttl __attribute__((unused)) = ((uint64_t)pkt.data[8ULL]);
+  uint64_t proto __attribute__((unused)) = ((uint64_t)pkt.data[9ULL]);
+  uint64_t src3 __attribute__((unused)) = ((uint64_t)pkt.data[12ULL]);
+  uint64_t src2 __attribute__((unused)) = ((uint64_t)pkt.data[13ULL]);
+  uint64_t src1 __attribute__((unused)) = ((uint64_t)pkt.data[14ULL]);
+  uint64_t src0 __attribute__((unused)) = ((uint64_t)pkt.data[15ULL]);
+  uint64_t src_ip __attribute__((unused)) = ((((src3 * 16777216ULL) + (src2 * 65536ULL)) + (src1 * 256ULL)) + src0);
+  uint64_t dst3 __attribute__((unused)) = ((uint64_t)pkt.data[16ULL]);
+  uint64_t dst2 __attribute__((unused)) = ((uint64_t)pkt.data[17ULL]);
+  uint64_t dst1 __attribute__((unused)) = ((uint64_t)pkt.data[18ULL]);
+  uint64_t dst0 __attribute__((unused)) = ((uint64_t)pkt.data[19ULL]);
+  uint64_t dst_ip __attribute__((unused)) = ((((dst3 * 16777216ULL) + (dst2 * 65536ULL)) + (dst1 * 256ULL)) + dst0);
   return (Ipv4Header){ .version = ver, .ihl = ihl, .tos = tos, .total_len = total_len, .id = id, .ttl = ttl, .protocol = proto, .src_ip = src_ip, .dst_ip = dst_ip };
 }
 
 _Bool ihl_valid(const Ipv4Header* h __attribute__((unused))) {
-  return ((*h).ihl >= 5);
+  return ((*h).ihl >= 5ULL);
 }
 
 _Bool pkt_valid(const Ipv4Header* h __attribute__((unused))) {
-  return ((*h).total_len >= ((*h).ihl * 4));
+  return ((*h).total_len >= ((*h).ihl * 4ULL));
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

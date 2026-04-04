@@ -16,15 +16,15 @@ _Bool is_sorted_strong(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 int main();
 
 _Bool is_sorted_strong(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t k __attribute__((unused)) = 1;
+  uint64_t k __attribute__((unused)) = 1ULL;
   _Bool sorted __attribute__((unused)) = 1;
   {
     while ((k < n)) {
-      if ((s.data[(k - 1)] > s.data[k])) {
+      if ((s.data[(k - 1ULL)] > s.data[k])) {
         sorted = 0;
 
       }
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
@@ -32,7 +32,7 @@ _Bool is_sorted_strong(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

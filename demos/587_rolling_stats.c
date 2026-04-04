@@ -25,11 +25,11 @@ uint64_t stats_max(const RollingStats* s __attribute__((unused)));
 int main();
 
 RollingStats stats_new() {
-  return (RollingStats){ .min_val = -1, .max_val = 0, .count = 0, .sum = 0 };
+  return (RollingStats){ .min_val = 0xffffffffffffffffULL, .max_val = 0ULL, .count = 0ULL, .sum = 0ULL };
 }
 
 void stats_update(RollingStats* s __attribute__((unused)), uint64_t v __attribute__((unused))) {
-  if (((*s).count == 0)) {
+  if (((*s).count == 0ULL)) {
     (*s).min_val = v;
     (*s).max_val = v;
 
@@ -45,7 +45,7 @@ void stats_update(RollingStats* s __attribute__((unused)), uint64_t v __attribut
 
   }
   (*s).sum = ((*s).sum + v);
-  (*s).count = ((*s).count + 1);
+  (*s).count = ((*s).count + 1ULL);
 }
 
 uint64_t stats_count(const RollingStats* s __attribute__((unused))) {
@@ -65,7 +65,7 @@ uint64_t stats_max(const RollingStats* s __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

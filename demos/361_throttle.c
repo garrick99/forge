@@ -26,7 +26,7 @@ uint64_t multi_consume();
 int main();
 
 Throttle throttle_new(uint64_t cap __attribute__((unused))) {
-  return (Throttle){ .tokens = cap, .cap = cap, .used = 0 };
+  return (Throttle){ .tokens = cap, .cap = cap, .used = 0ULL };
 }
 
 void throttle_consume(Throttle* t __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -39,41 +39,41 @@ void throttle_refill(Throttle* t __attribute__((unused)), uint64_t n __attribute
 }
 
 uint64_t consume_30() {
-  Throttle t __attribute__((unused)) = throttle_new(100);
-  throttle_consume((&t), 30);
+  Throttle t __attribute__((unused)) = throttle_new(100ULL);
+  throttle_consume((&t), 30ULL);
   return t.tokens;
 }
 
 uint64_t consumed_used() {
-  Throttle t __attribute__((unused)) = throttle_new(100);
-  throttle_consume((&t), 30);
+  Throttle t __attribute__((unused)) = throttle_new(100ULL);
+  throttle_consume((&t), 30ULL);
   return t.used;
 }
 
 uint64_t consume_refill() {
-  Throttle t __attribute__((unused)) = throttle_new(100);
-  throttle_consume((&t), 50);
-  throttle_refill((&t), 20);
+  Throttle t __attribute__((unused)) = throttle_new(100ULL);
+  throttle_consume((&t), 50ULL);
+  throttle_refill((&t), 20ULL);
   return t.tokens;
 }
 
 uint64_t refill_no_affect_used() {
-  Throttle t __attribute__((unused)) = throttle_new(100);
-  throttle_consume((&t), 50);
-  throttle_refill((&t), 20);
+  Throttle t __attribute__((unused)) = throttle_new(100ULL);
+  throttle_consume((&t), 50ULL);
+  throttle_refill((&t), 20ULL);
   return t.used;
 }
 
 uint64_t multi_consume() {
-  Throttle t __attribute__((unused)) = throttle_new(100);
-  throttle_consume((&t), 10);
-  throttle_consume((&t), 20);
-  throttle_consume((&t), 15);
+  Throttle t __attribute__((unused)) = throttle_new(100ULL);
+  throttle_consume((&t), 10ULL);
+  throttle_consume((&t), 20ULL);
+  throttle_consume((&t), 15ULL);
   return t.used;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

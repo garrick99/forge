@@ -22,19 +22,19 @@ uint64_t fp_lerp(uint64_t lo __attribute__((unused)), uint64_t hi __attribute__(
 int main();
 
 uint64_t fp_scale() {
-  return 65536;
+  return 65536ULL;
 }
 
 uint64_t fp_from_int(uint64_t n __attribute__((unused))) {
-  return (n * 65536);
+  return (n * 65536ULL);
 }
 
 uint64_t fp_floor(uint64_t x __attribute__((unused))) {
-  return (x / 65536);
+  return (x / 65536ULL);
 }
 
 uint64_t fp_frac(uint64_t x __attribute__((unused))) {
-  return (x % 65536);
+  return (x % 65536ULL);
 }
 
 uint64_t fp_add(uint64_t x __attribute__((unused)), uint64_t y __attribute__((unused))) {
@@ -46,7 +46,7 @@ uint64_t fp_sub(uint64_t x __attribute__((unused)), uint64_t y __attribute__((un
 }
 
 uint64_t fp_mul(uint64_t x __attribute__((unused)), uint64_t y __attribute__((unused))) {
-  return ((x * y) / 65536);
+  return ((x * y) / 65536ULL);
 }
 
 uint64_t fp_scale_by(uint64_t x __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -67,15 +67,15 @@ uint64_t fp_clamp(uint64_t x __attribute__((unused)), uint64_t lo __attribute__(
 
 uint64_t fp_lerp(uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused)), uint64_t t __attribute__((unused))) {
   uint64_t span __attribute__((unused)) = (hi - lo);
-  uint64_t frac __attribute__((unused)) = ((span * t) / 65536);
+  uint64_t frac __attribute__((unused)) = ((span * t) / 65536ULL);
   return (lo + frac);
 }
 
 int main() {
-  uint64_t a __attribute__((unused)) = fp_from_int(3);
+  uint64_t a __attribute__((unused)) = fp_from_int(3ULL);
   uint64_t fl __attribute__((unused)) = fp_floor(a);
   uint64_t fr __attribute__((unused)) = fp_frac(a);
-  uint64_t half __attribute__((unused)) = (fp_from_int(1) + 32768);
+  uint64_t half __attribute__((unused)) = (fp_from_int(1ULL) + 32768ULL);
   uint64_t fl2 __attribute__((unused)) = fp_floor(half);
   uint64_t fr2 __attribute__((unused)) = fp_frac(half);
   uint64_t sum __attribute__((unused)) = fp_add(a, half);
@@ -84,13 +84,13 @@ int main() {
   uint64_t fl4 __attribute__((unused)) = fp_floor(diff);
   uint64_t prod __attribute__((unused)) = fp_mul(half, half);
   uint64_t fl5 __attribute__((unused)) = fp_floor(prod);
-  uint64_t fp1 __attribute__((unused)) = fp_from_int(1);
-  uint64_t fp4 __attribute__((unused)) = fp_from_int(4);
-  uint64_t fp5 __attribute__((unused)) = fp_from_int(5);
+  uint64_t fp1 __attribute__((unused)) = fp_from_int(1ULL);
+  uint64_t fp4 __attribute__((unused)) = fp_from_int(4ULL);
+  uint64_t fp5 __attribute__((unused)) = fp_from_int(5ULL);
   uint64_t cl __attribute__((unused)) = fp_clamp(fp5, fp1, fp4);
   uint64_t fl6 __attribute__((unused)) = fp_floor(cl);
-  uint64_t fp0 __attribute__((unused)) = fp_from_int(0);
-  uint64_t lr __attribute__((unused)) = fp_lerp(fp0, fp4, 16384);
+  uint64_t fp0 __attribute__((unused)) = fp_from_int(0ULL);
+  uint64_t lr __attribute__((unused)) = fp_lerp(fp0, fp4, 16384ULL);
   uint64_t fl7 __attribute__((unused)) = fp_floor(lr);
   return (int)(((((((((fl + fr) + fl2) + fr2) + fl3) + fl4) + fl5) + fl6) + fl7));
 

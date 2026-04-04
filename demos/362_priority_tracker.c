@@ -26,50 +26,50 @@ uint64_t lower_count(uint64_t max __attribute__((unused)));
 int main();
 
 Priority prio_new(uint64_t max __attribute__((unused))) {
-  return (Priority){ .level = 0, .max = max, .raised = 0, .lowered = 0 };
+  return (Priority){ .level = 0ULL, .max = max, .raised = 0ULL, .lowered = 0ULL };
 }
 
 void prio_raise(Priority* p __attribute__((unused)), uint64_t by __attribute__((unused))) {
   (*p).level = ((*p).level + by);
-  (*p).raised = ((*p).raised + 1);
+  (*p).raised = ((*p).raised + 1ULL);
 }
 
 void prio_lower(Priority* p __attribute__((unused)), uint64_t by __attribute__((unused))) {
   (*p).level = ((*p).level - by);
-  (*p).lowered = ((*p).lowered + 1);
+  (*p).lowered = ((*p).lowered + 1ULL);
 }
 
 uint64_t raise_3(uint64_t max __attribute__((unused))) {
   Priority p __attribute__((unused)) = prio_new(max);
-  prio_raise((&p), 3);
+  prio_raise((&p), 3ULL);
   return p.level;
 }
 
 uint64_t raise5_lower2(uint64_t max __attribute__((unused))) {
   Priority p __attribute__((unused)) = prio_new(max);
-  prio_raise((&p), 5);
-  prio_lower((&p), 2);
+  prio_raise((&p), 5ULL);
+  prio_lower((&p), 2ULL);
   return p.level;
 }
 
 uint64_t raise_count(uint64_t max __attribute__((unused))) {
   Priority p __attribute__((unused)) = prio_new(max);
-  prio_raise((&p), 2);
-  prio_raise((&p), 3);
-  prio_raise((&p), 5);
+  prio_raise((&p), 2ULL);
+  prio_raise((&p), 3ULL);
+  prio_raise((&p), 5ULL);
   return p.raised;
 }
 
 uint64_t lower_count(uint64_t max __attribute__((unused))) {
   Priority p __attribute__((unused)) = prio_new(max);
-  prio_raise((&p), 10);
-  prio_lower((&p), 3);
-  prio_lower((&p), 4);
+  prio_raise((&p), 10ULL);
+  prio_lower((&p), 3ULL);
+  prio_lower((&p), 4ULL);
   return p.lowered;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

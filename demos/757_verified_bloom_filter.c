@@ -25,15 +25,15 @@ uint64_t hash1(uint64_t val __attribute__((unused)), uint64_t nbits __attribute_
 }
 
 uint64_t hash2(uint64_t val __attribute__((unused)), uint64_t nbits __attribute__((unused))) {
-  return (((val * 2654435761) + 17) % nbits);
+  return (((val * 2654435761ULL) + 17ULL) % nbits);
 }
 
 void set_bit(forge_span_u64_t bits __attribute__((unused)), uint64_t nbits __attribute__((unused)), uint64_t pos __attribute__((unused))) {
-  bits.data[pos] = 1;
+  bits.data[pos] = 1ULL;
 }
 
 _Bool test_bit(forge_span_u64_t bits __attribute__((unused)), uint64_t nbits __attribute__((unused)), uint64_t pos __attribute__((unused))) {
-  return (bits.data[pos] != 0);
+  return (bits.data[pos] != 0ULL);
 }
 
 void bloom_insert(forge_span_u64_t bits __attribute__((unused)), uint64_t nbits __attribute__((unused)), uint64_t val __attribute__((unused))) {
@@ -50,7 +50,7 @@ _Bool bloom_query(forge_span_u64_t bits __attribute__((unused)), uint64_t nbits 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

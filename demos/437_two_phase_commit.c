@@ -29,31 +29,31 @@ uint64_t two_rounds();
 int main();
 
 TwoPhaseCommit tpc_new(uint64_t participants __attribute__((unused))) {
-  return (TwoPhaseCommit){ .participants = participants, .yes_votes = 0, .no_votes = 0, .commits = 0, .aborts = 0 };
+  return (TwoPhaseCommit){ .participants = participants, .yes_votes = 0ULL, .no_votes = 0ULL, .commits = 0ULL, .aborts = 0ULL };
 }
 
 void tpc_vote_yes(TwoPhaseCommit* t __attribute__((unused))) {
-  (*t).yes_votes = ((*t).yes_votes + 1);
+  (*t).yes_votes = ((*t).yes_votes + 1ULL);
 }
 
 void tpc_vote_no(TwoPhaseCommit* t __attribute__((unused))) {
-  (*t).no_votes = ((*t).no_votes + 1);
+  (*t).no_votes = ((*t).no_votes + 1ULL);
 }
 
 void tpc_commit(TwoPhaseCommit* t __attribute__((unused))) {
-  (*t).commits = ((*t).commits + 1);
-  (*t).yes_votes = 0;
-  (*t).no_votes = 0;
+  (*t).commits = ((*t).commits + 1ULL);
+  (*t).yes_votes = 0ULL;
+  (*t).no_votes = 0ULL;
 }
 
 void tpc_abort(TwoPhaseCommit* t __attribute__((unused))) {
-  (*t).aborts = ((*t).aborts + 1);
-  (*t).yes_votes = 0;
-  (*t).no_votes = 0;
+  (*t).aborts = ((*t).aborts + 1ULL);
+  (*t).yes_votes = 0ULL;
+  (*t).no_votes = 0ULL;
 }
 
 uint64_t all_yes_commits() {
-  TwoPhaseCommit t __attribute__((unused)) = tpc_new(3);
+  TwoPhaseCommit t __attribute__((unused)) = tpc_new(3ULL);
   tpc_vote_yes((&t));
   tpc_vote_yes((&t));
   tpc_vote_yes((&t));
@@ -62,7 +62,7 @@ uint64_t all_yes_commits() {
 }
 
 uint64_t one_no_aborts() {
-  TwoPhaseCommit t __attribute__((unused)) = tpc_new(3);
+  TwoPhaseCommit t __attribute__((unused)) = tpc_new(3ULL);
   tpc_vote_yes((&t));
   tpc_vote_no((&t));
   tpc_abort((&t));
@@ -70,7 +70,7 @@ uint64_t one_no_aborts() {
 }
 
 uint64_t commit_clears_votes() {
-  TwoPhaseCommit t __attribute__((unused)) = tpc_new(2);
+  TwoPhaseCommit t __attribute__((unused)) = tpc_new(2ULL);
   tpc_vote_yes((&t));
   tpc_vote_yes((&t));
   tpc_commit((&t));
@@ -78,7 +78,7 @@ uint64_t commit_clears_votes() {
 }
 
 uint64_t two_rounds() {
-  TwoPhaseCommit t __attribute__((unused)) = tpc_new(2);
+  TwoPhaseCommit t __attribute__((unused)) = tpc_new(2ULL);
   tpc_vote_yes((&t));
   tpc_vote_yes((&t));
   tpc_commit((&t));
@@ -89,7 +89,7 @@ uint64_t two_rounds() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

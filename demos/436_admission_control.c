@@ -28,25 +28,25 @@ uint64_t total_admitted();
 int main();
 
 AdmissionCtrl ac_new(uint64_t max __attribute__((unused))) {
-  return (AdmissionCtrl){ .active = 0, .max_concurrent = max, .total_admitted = 0, .rejected = 0, .completed = 0 };
+  return (AdmissionCtrl){ .active = 0ULL, .max_concurrent = max, .total_admitted = 0ULL, .rejected = 0ULL, .completed = 0ULL };
 }
 
 void ac_admit(AdmissionCtrl* a __attribute__((unused))) {
-  (*a).active = ((*a).active + 1);
-  (*a).total_admitted = ((*a).total_admitted + 1);
+  (*a).active = ((*a).active + 1ULL);
+  (*a).total_admitted = ((*a).total_admitted + 1ULL);
 }
 
 void ac_reject(AdmissionCtrl* a __attribute__((unused))) {
-  (*a).rejected = ((*a).rejected + 1);
+  (*a).rejected = ((*a).rejected + 1ULL);
 }
 
 void ac_complete(AdmissionCtrl* a __attribute__((unused))) {
-  (*a).active = ((*a).active - 1);
-  (*a).completed = ((*a).completed + 1);
+  (*a).active = ((*a).active - 1ULL);
+  (*a).completed = ((*a).completed + 1ULL);
 }
 
 uint64_t admit_3() {
-  AdmissionCtrl a __attribute__((unused)) = ac_new(4);
+  AdmissionCtrl a __attribute__((unused)) = ac_new(4ULL);
   ac_admit((&a));
   ac_admit((&a));
   ac_admit((&a));
@@ -54,7 +54,7 @@ uint64_t admit_3() {
 }
 
 uint64_t reject_when_full() {
-  AdmissionCtrl a __attribute__((unused)) = ac_new(2);
+  AdmissionCtrl a __attribute__((unused)) = ac_new(2ULL);
   ac_admit((&a));
   ac_admit((&a));
   ac_reject((&a));
@@ -63,7 +63,7 @@ uint64_t reject_when_full() {
 }
 
 uint64_t complete_reduces() {
-  AdmissionCtrl a __attribute__((unused)) = ac_new(4);
+  AdmissionCtrl a __attribute__((unused)) = ac_new(4ULL);
   ac_admit((&a));
   ac_admit((&a));
   ac_admit((&a));
@@ -73,7 +73,7 @@ uint64_t complete_reduces() {
 }
 
 uint64_t total_admitted() {
-  AdmissionCtrl a __attribute__((unused)) = ac_new(4);
+  AdmissionCtrl a __attribute__((unused)) = ac_new(4ULL);
   ac_admit((&a));
   ac_admit((&a));
   ac_admit((&a));
@@ -82,7 +82,7 @@ uint64_t total_admitted() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

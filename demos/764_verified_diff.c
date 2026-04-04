@@ -18,41 +18,41 @@ void second_diff(forge_span_u64_t s __attribute__((unused)), uint64_t n __attrib
 int main();
 
 void forward_diff(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while (((i + 1) < n)) {
-      out.data[i] = (s.data[(i + 1)] - s.data[i]);
-      i = (i + 1);
+    while (((i + 1ULL) < n)) {
+      out.data[i] = (s.data[(i + 1ULL)] - s.data[i]);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void cumsum(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  out.data[0] = s.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  out.data[0ULL] = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      out.data[i] = (out.data[(i - 1)] + s.data[i]);
-      i = (i + 1);
+      out.data[i] = (out.data[(i - 1ULL)] + s.data[i]);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void second_diff(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while (((i + 2) < n)) {
-      out.data[i] = ((s.data[(i + 2)] - (2 * s.data[(i + 1)])) + s.data[i]);
-      i = (i + 1);
+    while (((i + 2ULL) < n)) {
+      out.data[i] = ((s.data[(i + 2ULL)] - (2ULL * s.data[(i + 1ULL)])) + s.data[i]);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

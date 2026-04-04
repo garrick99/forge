@@ -16,19 +16,19 @@ void lcp_array(forge_span_u64_t text __attribute__((unused)), forge_span_u64_t s
 int main();
 
 void lcp_array(forge_span_u64_t text __attribute__((unused)), forge_span_u64_t sa __attribute__((unused)), forge_span_u64_t rank __attribute__((unused)), forge_span_u64_t lcp __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t k __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t ri __attribute__((unused)) = rank.data[i];
-      if ((ri > 0)) {
-        uint64_t j __attribute__((unused)) = sa.data[(ri - 1)];
-        uint64_t steps __attribute__((unused)) = 0;
+      if ((ri > 0ULL)) {
+        uint64_t j __attribute__((unused)) = sa.data[(ri - 1ULL)];
+        uint64_t steps __attribute__((unused)) = 0ULL;
         {
           while (((((i + k) < n) && ((j + k) < n)) && (steps < n))) {
             if ((text.data[(i + k)] == text.data[(j + k)])) {
-              k = (k + 1);
-              steps = (steps + 1);
+              k = (k + 1ULL);
+              steps = (steps + 1ULL);
 
             } else {
               steps = n;
@@ -38,24 +38,24 @@ void lcp_array(forge_span_u64_t text __attribute__((unused)), forge_span_u64_t s
 
         }
         lcp.data[ri] = k;
-        if ((k > 0)) {
-          k = (k - 1);
+        if ((k > 0ULL)) {
+          k = (k - 1ULL);
 
         }
 
       } else {
-        lcp.data[0] = 0;
-        k = 0;
+        lcp.data[0ULL] = 0ULL;
+        k = 0ULL;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

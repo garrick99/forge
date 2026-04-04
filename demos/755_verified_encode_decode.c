@@ -18,42 +18,42 @@ void xor_encode(forge_span_u64_t data __attribute__((unused)), uint64_t n __attr
 int main();
 
 void delta_encode(forge_span_u64_t input __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t output __attribute__((unused))) {
-  output.data[0] = input.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  output.data[0ULL] = input.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      output.data[i] = (input.data[i] - input.data[(i - 1)]);
-      i = (i + 1);
+      output.data[i] = (input.data[i] - input.data[(i - 1ULL)]);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void delta_decode(forge_span_u64_t encoded __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t output __attribute__((unused))) {
-  output.data[0] = encoded.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  output.data[0ULL] = encoded.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      output.data[i] = (output.data[(i - 1)] + encoded.data[i]);
-      i = (i + 1);
+      output.data[i] = (output.data[(i - 1ULL)] + encoded.data[i]);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void xor_encode(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t key __attribute__((unused)), uint64_t key_len __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       data.data[i] = (data.data[i] ^ key.data[(i % key_len)]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -24,22 +24,22 @@ uint64_t count_preserved();
 int main();
 
 Sched sched_new(uint64_t count __attribute__((unused))) {
-  return (Sched){ .current = 0, .count = count, .yields = 0 };
+  return (Sched){ .current = 0ULL, .count = count, .yields = 0ULL };
 }
 
 void sched_yield(Sched* s __attribute__((unused))) {
-  (*s).current = (((*s).current + 1) % (*s).count);
-  (*s).yields = ((*s).yields + 1);
+  (*s).current = (((*s).current + 1ULL) % (*s).count);
+  (*s).yields = ((*s).yields + 1ULL);
 }
 
 uint64_t yield_once_3tasks() {
-  Sched s __attribute__((unused)) = sched_new(3);
+  Sched s __attribute__((unused)) = sched_new(3ULL);
   sched_yield((&s));
   return s.current;
 }
 
 uint64_t yield_full_cycle() {
-  Sched s __attribute__((unused)) = sched_new(3);
+  Sched s __attribute__((unused)) = sched_new(3ULL);
   sched_yield((&s));
   sched_yield((&s));
   sched_yield((&s));
@@ -47,7 +47,7 @@ uint64_t yield_full_cycle() {
 }
 
 uint64_t yield_count() {
-  Sched s __attribute__((unused)) = sched_new(5);
+  Sched s __attribute__((unused)) = sched_new(5ULL);
   sched_yield((&s));
   sched_yield((&s));
   sched_yield((&s));
@@ -55,14 +55,14 @@ uint64_t yield_count() {
 }
 
 uint64_t count_preserved() {
-  Sched s __attribute__((unused)) = sched_new(4);
+  Sched s __attribute__((unused)) = sched_new(4ULL);
   sched_yield((&s));
   sched_yield((&s));
   return s.count;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

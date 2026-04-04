@@ -16,8 +16,8 @@ uint64_t augment_flow(forge_span_u64_t path __attribute__((unused)), forge_span_
 int main();
 
 uint64_t augment_flow(forge_span_u64_t path __attribute__((unused)), forge_span_u64_t cap __attribute__((unused)), forge_span_u64_t flow __attribute__((unused)), uint64_t plen __attribute__((unused)), uint64_t n_edges __attribute__((unused))) {
-  uint64_t bottleneck __attribute__((unused)) = cap.data[path.data[0]];
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t bottleneck __attribute__((unused)) = cap.data[path.data[0ULL]];
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < plen)) {
       uint64_t e __attribute__((unused)) = path.data[i];
@@ -29,11 +29,11 @@ uint64_t augment_flow(forge_span_u64_t path __attribute__((unused)), forge_span_
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < plen)) {
       uint64_t e __attribute__((unused)) = path.data[j];
@@ -41,7 +41,7 @@ uint64_t augment_flow(forge_span_u64_t path __attribute__((unused)), forge_span_
         flow.data[e] = (flow.data[e] + bottleneck);
 
       }
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
@@ -49,7 +49,7 @@ uint64_t augment_flow(forge_span_u64_t path __attribute__((unused)), forge_span_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

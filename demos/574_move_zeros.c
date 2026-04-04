@@ -18,15 +18,15 @@ _Bool all_zeros_from(forge_span_u64_t s __attribute__((unused)), uint64_t start 
 int main();
 
 uint64_t count_nonzero(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t c __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t c __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((s.data[i] != 0)) {
-        c = (c + 1);
+      if ((s.data[i] != 0ULL)) {
+        c = (c + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -34,24 +34,24 @@ uint64_t count_nonzero(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 uint64_t move_zeros(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t write __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t write __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((s.data[i] != 0)) {
+      if ((s.data[i] != 0ULL)) {
         s.data[write] = s.data[i];
-        write = (write + 1);
+        write = (write + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
   uint64_t j __attribute__((unused)) = write;
   {
     while ((j < n)) {
-      s.data[j] = 0;
-      j = (j + 1);
+      s.data[j] = 0ULL;
+      j = (j + 1ULL);
     }
 
   }
@@ -63,11 +63,11 @@ _Bool all_zeros_from(forge_span_u64_t s __attribute__((unused)), uint64_t start 
   _Bool ok __attribute__((unused)) = 1;
   {
     while ((i < n)) {
-      if ((s.data[i] != 0)) {
+      if ((s.data[i] != 0ULL)) {
         ok = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -75,7 +75,7 @@ _Bool all_zeros_from(forge_span_u64_t s __attribute__((unused)), uint64_t start 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

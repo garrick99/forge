@@ -56,7 +56,7 @@ uint64_t abs_diff(uint64_t a __attribute__((unused)), uint64_t b __attribute__((
 }
 
 uint64_t select(uint64_t flag __attribute__((unused)), uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if ((flag != 0)) {
+  if ((flag != 0ULL)) {
     return a;
   } else {
     return b;
@@ -65,17 +65,17 @@ uint64_t select(uint64_t flag __attribute__((unused)), uint64_t a __attribute__(
 
 uint64_t bounded_inc(uint64_t x __attribute__((unused)), uint64_t limit __attribute__((unused))) {
   if ((x < limit)) {
-    return (x + 1);
+    return (x + 1ULL);
   } else {
     return x;
   }
 }
 
 uint64_t sign_bit(uint64_t x __attribute__((unused))) {
-  if ((x >= 128)) {
-    return 1;
+  if ((x >= 128ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
@@ -83,12 +83,12 @@ uint64_t sat_sub(uint64_t a __attribute__((unused)), uint64_t b __attribute__((u
   if ((a >= b)) {
     return (a - b);
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

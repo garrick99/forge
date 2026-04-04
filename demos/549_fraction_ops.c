@@ -50,23 +50,23 @@ _Bool frac_le(Frac a __attribute__((unused)), Frac b __attribute__((unused))) {
 }
 
 uint64_t check_frac_num() {
-  Frac f __attribute__((unused)) = frac_new(3, 5);
+  Frac f __attribute__((unused)) = frac_new(3ULL, 5ULL);
   return f.num;
 }
 
 uint64_t check_frac_floor() {
-  Frac f __attribute__((unused)) = frac_new(10, 4);
+  Frac f __attribute__((unused)) = frac_new(10ULL, 4ULL);
   return frac_to_floor(f);
 }
 
 uint64_t check_frac_scale() {
-  Frac f __attribute__((unused)) = frac_new(3, 5);
-  Frac g __attribute__((unused)) = frac_scale(f, 2);
+  Frac f __attribute__((unused)) = frac_new(3ULL, 5ULL);
+  Frac g __attribute__((unused)) = frac_scale(f, 2ULL);
   return g.num;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

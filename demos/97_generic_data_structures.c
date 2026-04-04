@@ -26,21 +26,21 @@ uint64_t Stack4_u64__is_empty(const Stack4_u64* self __attribute__((unused)));
 int main();
 
 Stack4_u64 Stack4_u64__new() {
-  return (Stack4_u64){ .data0 = 0, .data1 = 0, .data2 = 0, .data3 = 0, .top = 0 };
+  return (Stack4_u64){ .data0 = 0ULL, .data1 = 0ULL, .data2 = 0ULL, .data3 = 0ULL, .top = 0ULL };
 }
 
 Stack4_u64 Stack4_u64__push(const Stack4_u64* self __attribute__((unused)), uint64_t val __attribute__((unused))) {
   uint64_t t __attribute__((unused)) = (*self).top;
-  if ((t == 0)) {
-    return (Stack4_u64){ .data0 = val, .data1 = (*self).data1, .data2 = (*self).data2, .data3 = (*self).data3, .top = 1 };
+  if ((t == 0ULL)) {
+    return (Stack4_u64){ .data0 = val, .data1 = (*self).data1, .data2 = (*self).data2, .data3 = (*self).data3, .top = 1ULL };
   } else {
-    if ((t == 1)) {
-      return (Stack4_u64){ .data0 = (*self).data0, .data1 = val, .data2 = (*self).data2, .data3 = (*self).data3, .top = 2 };
+    if ((t == 1ULL)) {
+      return (Stack4_u64){ .data0 = (*self).data0, .data1 = val, .data2 = (*self).data2, .data3 = (*self).data3, .top = 2ULL };
     } else {
-      if ((t == 2)) {
-        return (Stack4_u64){ .data0 = (*self).data0, .data1 = (*self).data1, .data2 = val, .data3 = (*self).data3, .top = 3 };
+      if ((t == 2ULL)) {
+        return (Stack4_u64){ .data0 = (*self).data0, .data1 = (*self).data1, .data2 = val, .data3 = (*self).data3, .top = 3ULL };
       } else {
-        return (Stack4_u64){ .data0 = (*self).data0, .data1 = (*self).data1, .data2 = (*self).data2, .data3 = val, .top = 4 };
+        return (Stack4_u64){ .data0 = (*self).data0, .data1 = (*self).data1, .data2 = (*self).data2, .data3 = val, .top = 4ULL };
       }
     }
   }
@@ -48,16 +48,16 @@ Stack4_u64 Stack4_u64__push(const Stack4_u64* self __attribute__((unused)), uint
 
 uint64_t Stack4_u64__peek(const Stack4_u64* self __attribute__((unused))) {
   uint64_t t __attribute__((unused)) = (*self).top;
-  if ((t == 0)) {
-    return 0;
+  if ((t == 0ULL)) {
+    return 0ULL;
   } else {
-    if ((t == 1)) {
+    if ((t == 1ULL)) {
       return (*self).data0;
     } else {
-      if ((t == 2)) {
+      if ((t == 2ULL)) {
         return (*self).data1;
       } else {
-        if ((t == 3)) {
+        if ((t == 3ULL)) {
           return (*self).data2;
         } else {
           return (*self).data3;
@@ -72,22 +72,22 @@ uint64_t Stack4_u64__size(const Stack4_u64* self __attribute__((unused))) {
 }
 
 uint64_t Stack4_u64__is_empty(const Stack4_u64* self __attribute__((unused))) {
-  if (((*self).top == 0)) {
-    return 1;
+  if (((*self).top == 0ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 int main() {
   Stack4_u64 s0 __attribute__((unused)) = Stack4_u64__new();
-  Stack4_u64 s1 __attribute__((unused)) = Stack4_u64__push((&s0), 10);
-  Stack4_u64 s2 __attribute__((unused)) = Stack4_u64__push((&s1), 20);
-  Stack4_u64 s3 __attribute__((unused)) = Stack4_u64__push((&s2), 30);
+  Stack4_u64 s1 __attribute__((unused)) = Stack4_u64__push((&s0), 10ULL);
+  Stack4_u64 s2 __attribute__((unused)) = Stack4_u64__push((&s1), 20ULL);
+  Stack4_u64 s3 __attribute__((unused)) = Stack4_u64__push((&s2), 30ULL);
   uint64_t sz __attribute__((unused)) = Stack4_u64__size((&s3));
   uint64_t top __attribute__((unused)) = Stack4_u64__peek((&s3));
   uint64_t emp __attribute__((unused)) = Stack4_u64__is_empty((&s0));
-  Stack4_u64 s4 __attribute__((unused)) = Stack4_u64__push((&s3), 40);
+  Stack4_u64 s4 __attribute__((unused)) = Stack4_u64__push((&s3), 40ULL);
   uint64_t top4 __attribute__((unused)) = Stack4_u64__peek((&s4));
   uint64_t sz4 __attribute__((unused)) = Stack4_u64__size((&s4));
   return (int)(((((sz + top) + emp) + top4) + sz4));

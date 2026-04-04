@@ -17,8 +17,8 @@ void add_node_shift(forge_span_u64_t ring __attribute__((unused)), uint64_t n __
 int main();
 
 uint64_t hash_lookup(forge_span_u64_t ring __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t key __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
-  uint64_t found __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
+  uint64_t found __attribute__((unused)) = 0ULL;
   _Bool done __attribute__((unused)) = 0;
   {
     while ((i < n)) {
@@ -27,7 +27,7 @@ uint64_t hash_lookup(forge_span_u64_t ring __attribute__((unused)), uint64_t n _
         done = 1;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -35,25 +35,25 @@ uint64_t hash_lookup(forge_span_u64_t ring __attribute__((unused)), uint64_t n _
 }
 
 void add_node_shift(forge_span_u64_t ring __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t pos __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = (n - 1);
+  uint64_t i __attribute__((unused)) = (n - 1ULL);
   _Bool shifted __attribute__((unused)) = 0;
   {
-    while ((i > 0)) {
+    while ((i > 0ULL)) {
       if (((shifted == 0) && (ring.data[i] > pos))) {
-        ring.data[i] = ring.data[(i - 1)];
+        ring.data[i] = ring.data[(i - 1ULL)];
 
       } else {
         shifted = 1;
 
       }
-      i = (i - 1);
+      i = (i - 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

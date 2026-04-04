@@ -16,7 +16,7 @@ uint64_t vec_max(uint64_t N __attribute__((unused)), uint64_t* a __attribute__((
 uint64_t run();
 
 uint64_t dot(uint64_t N __attribute__((unused)), uint64_t* a __attribute__((unused)), uint64_t* b __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
   {
     for (uint64_t i = 0; i < (uint64_t)(N); i++) {
       acc = (acc + (a[i] * b[i]));
@@ -36,26 +36,26 @@ void vec_add_mod(uint64_t N __attribute__((unused)), uint64_t* a __attribute__((
 }
 
 void prefix_sum(uint64_t N __attribute__((unused)), uint64_t* a __attribute__((unused)), uint64_t* out __attribute__((unused))) {
-  out[0] = a[0];
-  uint64_t i __attribute__((unused)) = 1;
+  out[0ULL] = a[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < N)) {
-      out[i] = (out[(i - 1)] + a[i]);
-      i = (i + 1);
+      out[i] = (out[(i - 1ULL)] + a[i]);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t vec_max(uint64_t N __attribute__((unused)), uint64_t* a __attribute__((unused))) {
-  uint64_t m __attribute__((unused)) = a[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t m __attribute__((unused)) = a[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < N)) {
       if ((a[i] > m)) {
         m = a[i];
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -63,14 +63,14 @@ uint64_t vec_max(uint64_t N __attribute__((unused)), uint64_t* a __attribute__((
 }
 
 uint64_t run() {
-  uint64_t a0 __attribute__((unused)) = 1;
-  uint64_t a1 __attribute__((unused)) = 2;
-  uint64_t a2 __attribute__((unused)) = 3;
-  uint64_t a3 __attribute__((unused)) = 4;
-  uint64_t b0 __attribute__((unused)) = 4;
-  uint64_t b1 __attribute__((unused)) = 3;
-  uint64_t b2 __attribute__((unused)) = 2;
-  uint64_t b3 __attribute__((unused)) = 1;
+  uint64_t a0 __attribute__((unused)) = 1ULL;
+  uint64_t a1 __attribute__((unused)) = 2ULL;
+  uint64_t a2 __attribute__((unused)) = 3ULL;
+  uint64_t a3 __attribute__((unused)) = 4ULL;
+  uint64_t b0 __attribute__((unused)) = 4ULL;
+  uint64_t b1 __attribute__((unused)) = 3ULL;
+  uint64_t b2 __attribute__((unused)) = 2ULL;
+  uint64_t b3 __attribute__((unused)) = 1ULL;
   uint64_t r __attribute__((unused)) = ((((a0 * b0) + (a1 * b1)) + (a2 * b2)) + (a3 * b3));
   return r;
 }

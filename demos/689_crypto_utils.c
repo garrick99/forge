@@ -20,42 +20,42 @@ uint64_t checksum_xor(forge_span_u64_t buf __attribute__((unused)), uint64_t n _
 int main();
 
 void xor_cipher(forge_span_u64_t buf __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t key __attribute__((unused))) {
-  uint64_t k __attribute__((unused)) = (key % 256);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = (key % 256ULL);
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      buf.data[i] = ((((buf.data[i] % 256) * 256) / 256) + k);
-      i = (i + 1);
+      buf.data[i] = ((((buf.data[i] % 256ULL) * 256ULL) / 256ULL) + k);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t rotate_left_8(uint64_t x __attribute__((unused)), uint64_t r __attribute__((unused))) {
-  uint64_t x8 __attribute__((unused)) = (x % 256);
-  uint64_t shifted __attribute__((unused)) = (x8 * 2);
-  return (shifted % 256);
+  uint64_t x8 __attribute__((unused)) = (x % 256ULL);
+  uint64_t shifted __attribute__((unused)) = (x8 * 2ULL);
+  return (shifted % 256ULL);
 }
 
 void xor_buf(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      out.data[i] = ((a.data[i] + b.data[i]) % 256);
-      i = (i + 1);
+      out.data[i] = ((a.data[i] + b.data[i]) % 256ULL);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t hash_fnv(forge_span_u64_t buf __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t h __attribute__((unused)) = 2166136261;
-  uint64_t prime __attribute__((unused)) = 16777619;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t h __attribute__((unused)) = 2166136261ULL;
+  uint64_t prime __attribute__((unused)) = 16777619ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      h = ((h * prime) + (buf.data[i] % 256));
-      i = (i + 1);
+      h = ((h * prime) + (buf.data[i] % 256ULL));
+      i = (i + 1ULL);
     }
 
   }
@@ -63,12 +63,12 @@ uint64_t hash_fnv(forge_span_u64_t buf __attribute__((unused)), uint64_t n __att
 }
 
 uint64_t checksum_xor(forge_span_u64_t buf __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      acc = ((acc + (buf.data[i] % 256)) % 256);
-      i = (i + 1);
+      acc = ((acc + (buf.data[i] % 256ULL)) % 256ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -76,7 +76,7 @@ uint64_t checksum_xor(forge_span_u64_t buf __attribute__((unused)), uint64_t n _
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -29,22 +29,22 @@ uint64_t min3(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unus
 }
 
 uint64_t edit_row(forge_span_u64_t prev __attribute__((unused)), forge_span_u64_t cur __attribute__((unused)), uint64_t cols __attribute__((unused)), uint64_t ch __attribute__((unused)), forge_span_u64_t text __attribute__((unused)), uint64_t row __attribute__((unused))) {
-  cur.data[0] = row;
-  uint64_t j __attribute__((unused)) = 0;
+  cur.data[0ULL] = row;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < cols)) {
       uint64_t cost;
       if ((text.data[j] == ch)) {
-        cost = 0;
+        cost = 0ULL;
       } else {
-        cost = 1;
+        cost = 1ULL;
       }
-      uint64_t del __attribute__((unused)) = (prev.data[(j + 1)] + 1);
-      uint64_t ins __attribute__((unused)) = (cur.data[j] + 1);
+      uint64_t del __attribute__((unused)) = (prev.data[(j + 1ULL)] + 1ULL);
+      uint64_t ins __attribute__((unused)) = (cur.data[j] + 1ULL);
       uint64_t sub __attribute__((unused)) = (prev.data[j] + cost);
       uint64_t best __attribute__((unused)) = min3(del, ins, sub);
-      cur.data[(j + 1)] = best;
-      j = (j + 1);
+      cur.data[(j + 1ULL)] = best;
+      j = (j + 1ULL);
     }
 
   }
@@ -52,7 +52,7 @@ uint64_t edit_row(forge_span_u64_t prev __attribute__((unused)), forge_span_u64_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

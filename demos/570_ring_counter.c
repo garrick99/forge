@@ -23,15 +23,15 @@ void ring_add(RingCounter* c __attribute__((unused)), uint64_t n __attribute__((
 int main();
 
 RingCounter ring_new(uint64_t m __attribute__((unused))) {
-  return (RingCounter){ .val = 0, .modulus = m };
+  return (RingCounter){ .val = 0ULL, .modulus = m };
 }
 
 void ring_inc(RingCounter* c __attribute__((unused))) {
-  if ((((*c).val + 1) == (*c).modulus)) {
-    (*c).val = 0;
+  if ((((*c).val + 1ULL) == (*c).modulus)) {
+    (*c).val = 0ULL;
 
   } else {
-    (*c).val = ((*c).val + 1);
+    (*c).val = ((*c).val + 1ULL);
 
   }
 }
@@ -41,11 +41,11 @@ uint64_t ring_get(const RingCounter* c __attribute__((unused))) {
 }
 
 void ring_reset(RingCounter* c __attribute__((unused))) {
-  (*c).val = 0;
+  (*c).val = 0ULL;
 }
 
 _Bool ring_is_zero(const RingCounter* c __attribute__((unused))) {
-  return ((*c).val == 0);
+  return ((*c).val == 0ULL);
 }
 
 void ring_add(RingCounter* c __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -53,7 +53,7 @@ void ring_add(RingCounter* c __attribute__((unused)), uint64_t n __attribute__((
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

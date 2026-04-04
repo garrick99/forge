@@ -22,72 +22,72 @@ uint64_t is_page_aligned(uint64_t addr __attribute__((unused)));
 int main();
 
 uint64_t is_aligned_2(uint64_t x __attribute__((unused))) {
-  if (((x % 2) == 0)) {
-    return 1;
+  if (((x % 2ULL) == 0ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t is_aligned_4(uint64_t x __attribute__((unused))) {
-  if (((x % 4) == 0)) {
-    return 1;
+  if (((x % 4ULL) == 0ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t is_aligned_8(uint64_t x __attribute__((unused))) {
-  if (((x % 8) == 0)) {
-    return 1;
+  if (((x % 8ULL) == 0ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t is_aligned_64(uint64_t x __attribute__((unused))) {
-  if (((x % 64) == 0)) {
-    return 1;
+  if (((x % 64ULL) == 0ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t align_up_4(uint64_t x __attribute__((unused))) {
-  return (((x + 3) / 4) * 4);
+  return (((x + 3ULL) / 4ULL) * 4ULL);
 }
 
 uint64_t align_up_8(uint64_t x __attribute__((unused))) {
-  return (((x + 7) / 8) * 8);
+  return (((x + 7ULL) / 8ULL) * 8ULL);
 }
 
 uint64_t align_up_64(uint64_t x __attribute__((unused))) {
-  return (((x + 63) / 64) * 64);
+  return (((x + 63ULL) / 64ULL) * 64ULL);
 }
 
 uint64_t padding_to_8(uint64_t x __attribute__((unused))) {
-  uint64_t r __attribute__((unused)) = (x % 8);
-  if ((r == 0)) {
-    return 0;
+  uint64_t r __attribute__((unused)) = (x % 8ULL);
+  if ((r == 0ULL)) {
+    return 0ULL;
   } else {
-    return (8 - r);
+    return (8ULL - r);
   }
 }
 
 uint64_t align_down_8(uint64_t x __attribute__((unused))) {
-  return ((x / 8) * 8);
+  return ((x / 8ULL) * 8ULL);
 }
 
 uint64_t is_page_aligned(uint64_t addr __attribute__((unused))) {
-  if (((addr % 4096) == 0)) {
-    return 1;
+  if (((addr % 4096ULL) == 0ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -31,39 +31,39 @@ uint64_t header_bytes(TcpHdr h __attribute__((unused)));
 int main();
 
 TcpHdr parse_tcp(uint64_t raw_src __attribute__((unused)), uint64_t raw_dst __attribute__((unused)), uint64_t raw_seq __attribute__((unused)), uint64_t raw_ack __attribute__((unused)), uint64_t raw_doff_flags __attribute__((unused)), uint64_t raw_window __attribute__((unused)), uint64_t raw_chk __attribute__((unused))) {
-  return (TcpHdr){ .src_port = raw_src, .dst_port = raw_dst, .seq_num = raw_seq, .ack_num = raw_ack, .data_offset = ((raw_doff_flags >> 12) & 15), .flags = (raw_doff_flags & 63), .window = raw_window, .checksum = raw_chk };
+  return (TcpHdr){ .src_port = raw_src, .dst_port = raw_dst, .seq_num = raw_seq, .ack_num = raw_ack, .data_offset = ((raw_doff_flags >> 12ULL) & 15ULL), .flags = (raw_doff_flags & 63ULL), .window = raw_window, .checksum = raw_chk };
 }
 
 uint64_t flag_urg(TcpHdr h __attribute__((unused))) {
-  return ((h.flags >> 5) & 1);
+  return ((h.flags >> 5ULL) & 1ULL);
 }
 
 uint64_t flag_ack(TcpHdr h __attribute__((unused))) {
-  return ((h.flags >> 4) & 1);
+  return ((h.flags >> 4ULL) & 1ULL);
 }
 
 uint64_t flag_psh(TcpHdr h __attribute__((unused))) {
-  return ((h.flags >> 3) & 1);
+  return ((h.flags >> 3ULL) & 1ULL);
 }
 
 uint64_t flag_rst(TcpHdr h __attribute__((unused))) {
-  return ((h.flags >> 2) & 1);
+  return ((h.flags >> 2ULL) & 1ULL);
 }
 
 uint64_t flag_syn(TcpHdr h __attribute__((unused))) {
-  return ((h.flags >> 1) & 1);
+  return ((h.flags >> 1ULL) & 1ULL);
 }
 
 uint64_t flag_fin(TcpHdr h __attribute__((unused))) {
-  return (h.flags & 1);
+  return (h.flags & 1ULL);
 }
 
 uint64_t header_bytes(TcpHdr h __attribute__((unused))) {
-  return (h.data_offset * 4);
+  return (h.data_offset * 4ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -72,7 +72,7 @@ uint64_t Option_u64__map_or(const Option_u64* self __attribute__((unused)), uint
 }
 
 Option_u64 safe_div(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if ((b == 0)) {
+  if ((b == 0ULL)) {
     return (Option_u64){ .tag = Option_u64_tag_None, .data.None = { ._dummy = 0 } };
   } else {
     return (Option_u64){ .tag = Option_u64_tag_Some, .data.Some = { ._v0 = (a / b) } };
@@ -80,25 +80,25 @@ Option_u64 safe_div(uint64_t a __attribute__((unused)), uint64_t b __attribute__
 }
 
 int main() {
-  Option_u64 x __attribute__((unused)) = safe_div(10, 2);
-  Option_u64 y __attribute__((unused)) = safe_div(7, 0);
+  Option_u64 x __attribute__((unused)) = safe_div(10ULL, 2ULL);
+  Option_u64 y __attribute__((unused)) = safe_div(7ULL, 0ULL);
   _Bool sx __attribute__((unused)) = Option_u64__is_some((&x));
   _Bool sy __attribute__((unused)) = Option_u64__is_some((&y));
-  uint64_t vx __attribute__((unused)) = Option_u64__unwrap_or((&x), 99);
-  uint64_t vy __attribute__((unused)) = Option_u64__unwrap_or((&y), 99);
-  uint64_t mx __attribute__((unused)) = Option_u64__map_or((&x), 0, 3);
-  uint64_t my __attribute__((unused)) = Option_u64__map_or((&y), 0, 3);
+  uint64_t vx __attribute__((unused)) = Option_u64__unwrap_or((&x), 99ULL);
+  uint64_t vy __attribute__((unused)) = Option_u64__unwrap_or((&y), 99ULL);
+  uint64_t mx __attribute__((unused)) = Option_u64__map_or((&x), 0ULL, 3ULL);
+  uint64_t my __attribute__((unused)) = Option_u64__map_or((&y), 0ULL, 3ULL);
   uint64_t sx_val;
   if (sx) {
-    sx_val = 1;
+    sx_val = 1ULL;
   } else {
-    sx_val = 0;
+    sx_val = 0ULL;
   }
   uint64_t sy_val;
   if (sy) {
-    sy_val = 1;
+    sy_val = 1ULL;
   } else {
-    sy_val = 0;
+    sy_val = 0ULL;
   }
   return (int)((((((sx_val + sy_val) + vx) + vy) + mx) + my));
 

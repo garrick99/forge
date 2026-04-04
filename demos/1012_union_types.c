@@ -33,7 +33,7 @@ uint64_t get_raw(PacketHeader pkt __attribute__((unused))) {
 }
 
 PacketHeader make_tcp(uint64_t flags __attribute__((unused))) {
-  return (PacketHeader){ .raw_bytes = flags, .tcp_flags = flags, .udp_len = 0 };
+  return (PacketHeader){ .raw_bytes = flags };
 }
 
 uint64_t parse_ethertype(EthernetFrame frame __attribute__((unused))) {
@@ -41,7 +41,7 @@ uint64_t parse_ethertype(EthernetFrame frame __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

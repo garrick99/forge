@@ -43,8 +43,8 @@ uint64_t mod_double(uint64_t a __attribute__((unused)), uint64_t m __attribute__
 }
 
 uint64_t mod_neg(uint64_t a __attribute__((unused)), uint64_t m __attribute__((unused))) {
-  if ((a == 0)) {
-    return 0;
+  if ((a == 0ULL)) {
+    return 0ULL;
   } else {
     return (m - a);
   }
@@ -55,27 +55,27 @@ uint64_t mod_reduce(uint64_t x __attribute__((unused)), uint64_t m __attribute__
 }
 
 uint64_t check_mod_add() {
-  return mod_add(3, 5, 7);
+  return mod_add(3ULL, 5ULL, 7ULL);
 }
 
 uint64_t check_mod_sub() {
-  return mod_sub(2, 4, 7);
+  return mod_sub(2ULL, 4ULL, 7ULL);
 }
 
 uint64_t check_mod_neg_3() {
-  return mod_neg(3, 7);
+  return mod_neg(3ULL, 7ULL);
 }
 
 uint64_t check_mod_neg_0() {
-  return mod_neg(0, 7);
+  return mod_neg(0ULL, 7ULL);
 }
 
 uint64_t check_mod_reduce() {
-  return mod_reduce(10, 7);
+  return mod_reduce(10ULL, 7ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

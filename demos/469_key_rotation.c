@@ -27,22 +27,22 @@ uint64_t total_uses_preserved();
 int main();
 
 KeyRotation kr_new(uint64_t max_uses __attribute__((unused))) {
-  return (KeyRotation){ .version = 1, .use_count = 0, .total_uses = 0, .rotations = 0, .max_uses = max_uses };
+  return (KeyRotation){ .version = 1ULL, .use_count = 0ULL, .total_uses = 0ULL, .rotations = 0ULL, .max_uses = max_uses };
 }
 
 void kr_use(KeyRotation* k __attribute__((unused))) {
-  (*k).use_count = ((*k).use_count + 1);
-  (*k).total_uses = ((*k).total_uses + 1);
+  (*k).use_count = ((*k).use_count + 1ULL);
+  (*k).total_uses = ((*k).total_uses + 1ULL);
 }
 
 void kr_rotate(KeyRotation* k __attribute__((unused))) {
-  (*k).version = ((*k).version + 1);
-  (*k).use_count = 0;
-  (*k).rotations = ((*k).rotations + 1);
+  (*k).version = ((*k).version + 1ULL);
+  (*k).use_count = 0ULL;
+  (*k).rotations = ((*k).rotations + 1ULL);
 }
 
 uint64_t three_uses() {
-  KeyRotation k __attribute__((unused)) = kr_new(10);
+  KeyRotation k __attribute__((unused)) = kr_new(10ULL);
   kr_use((&k));
   kr_use((&k));
   kr_use((&k));
@@ -50,7 +50,7 @@ uint64_t three_uses() {
 }
 
 uint64_t rotation_resets() {
-  KeyRotation k __attribute__((unused)) = kr_new(10);
+  KeyRotation k __attribute__((unused)) = kr_new(10ULL);
   kr_use((&k));
   kr_use((&k));
   kr_rotate((&k));
@@ -58,14 +58,14 @@ uint64_t rotation_resets() {
 }
 
 uint64_t version_advances() {
-  KeyRotation k __attribute__((unused)) = kr_new(10);
+  KeyRotation k __attribute__((unused)) = kr_new(10ULL);
   kr_rotate((&k));
   kr_rotate((&k));
   return k.version;
 }
 
 uint64_t total_uses_preserved() {
-  KeyRotation k __attribute__((unused)) = kr_new(10);
+  KeyRotation k __attribute__((unused)) = kr_new(10ULL);
   kr_use((&k));
   kr_use((&k));
   kr_use((&k));
@@ -76,7 +76,7 @@ uint64_t total_uses_preserved() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

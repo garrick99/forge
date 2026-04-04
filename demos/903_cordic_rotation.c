@@ -18,20 +18,20 @@ int main();
 __forge_tuple_u64_u64_t cordic(uint64_t x0 __attribute__((unused)), uint64_t y0 __attribute__((unused)), uint64_t steps __attribute__((unused))) {
   uint64_t x __attribute__((unused)) = x0;
   uint64_t y __attribute__((unused)) = y0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < steps)) {
-      uint64_t dx __attribute__((unused)) = (y / (1 + i));
-      uint64_t dy __attribute__((unused)) = (x / (1 + i));
+      uint64_t dx __attribute__((unused)) = (y / (1ULL + i));
+      uint64_t dy __attribute__((unused)) = (x / (1ULL + i));
       if ((dx <= x)) {
         x = (x - dx);
 
       }
-      if ((dy <= (2000000 - y))) {
+      if ((dy <= (2000000ULL - y))) {
         y = (y + dy);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -39,7 +39,7 @@ __forge_tuple_u64_u64_t cordic(uint64_t x0 __attribute__((unused)), uint64_t y0 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

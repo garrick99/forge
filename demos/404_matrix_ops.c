@@ -29,7 +29,7 @@ uint64_t zero_offdiag_result();
 int main();
 
 Mat2x2 mat_new(uint64_t a00 __attribute__((unused)), uint64_t a01 __attribute__((unused)), uint64_t a10 __attribute__((unused)), uint64_t a11 __attribute__((unused))) {
-  return (Mat2x2){ .a00 = a00, .a01 = a01, .a10 = a10, .a11 = a11, .ops = 0 };
+  return (Mat2x2){ .a00 = a00, .a01 = a01, .a10 = a10, .a11 = a11, .ops = 0ULL };
 }
 
 void mat_add_scalar(Mat2x2* m __attribute__((unused)), uint64_t v __attribute__((unused))) {
@@ -37,55 +37,55 @@ void mat_add_scalar(Mat2x2* m __attribute__((unused)), uint64_t v __attribute__(
   (*m).a01 = ((*m).a01 + v);
   (*m).a10 = ((*m).a10 + v);
   (*m).a11 = ((*m).a11 + v);
-  (*m).ops = ((*m).ops + 1);
+  (*m).ops = ((*m).ops + 1ULL);
 }
 
 void mat_add_diag(Mat2x2* m __attribute__((unused)), uint64_t v __attribute__((unused))) {
   (*m).a00 = ((*m).a00 + v);
   (*m).a11 = ((*m).a11 + v);
-  (*m).ops = ((*m).ops + 1);
+  (*m).ops = ((*m).ops + 1ULL);
 }
 
 void mat_zero_offdiag(Mat2x2* m __attribute__((unused))) {
-  (*m).a01 = 0;
-  (*m).a10 = 0;
-  (*m).ops = ((*m).ops + 1);
+  (*m).a01 = 0ULL;
+  (*m).a10 = 0ULL;
+  (*m).ops = ((*m).ops + 1ULL);
 }
 
 uint64_t diag_after_add() {
-  Mat2x2 m __attribute__((unused)) = mat_new(1, 0, 0, 1);
-  mat_add_diag((&m), 5);
+  Mat2x2 m __attribute__((unused)) = mat_new(1ULL, 0ULL, 0ULL, 1ULL);
+  mat_add_diag((&m), 5ULL);
   return m.a00;
 }
 
 uint64_t offdiag_unchanged() {
-  Mat2x2 m __attribute__((unused)) = mat_new(1, 0, 0, 1);
-  mat_add_diag((&m), 5);
+  Mat2x2 m __attribute__((unused)) = mat_new(1ULL, 0ULL, 0ULL, 1ULL);
+  mat_add_diag((&m), 5ULL);
   return m.a01;
 }
 
 uint64_t scalar_then_diag() {
-  Mat2x2 m __attribute__((unused)) = mat_new(1, 1, 1, 1);
-  mat_add_scalar((&m), 3);
-  mat_add_diag((&m), 2);
+  Mat2x2 m __attribute__((unused)) = mat_new(1ULL, 1ULL, 1ULL, 1ULL);
+  mat_add_scalar((&m), 3ULL);
+  mat_add_diag((&m), 2ULL);
   return m.a00;
 }
 
 uint64_t a01_scalar_only() {
-  Mat2x2 m __attribute__((unused)) = mat_new(1, 1, 1, 1);
-  mat_add_scalar((&m), 3);
-  mat_add_diag((&m), 2);
+  Mat2x2 m __attribute__((unused)) = mat_new(1ULL, 1ULL, 1ULL, 1ULL);
+  mat_add_scalar((&m), 3ULL);
+  mat_add_diag((&m), 2ULL);
   return m.a01;
 }
 
 uint64_t zero_offdiag_result() {
-  Mat2x2 m __attribute__((unused)) = mat_new(3, 5, 7, 2);
+  Mat2x2 m __attribute__((unused)) = mat_new(3ULL, 5ULL, 7ULL, 2ULL);
   mat_zero_offdiag((&m));
   return (m.a01 + m.a10);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

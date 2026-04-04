@@ -23,7 +23,7 @@ uint64_t cycle_length(forge_span_u64_t perm __attribute__((unused)), uint64_t n 
   } else {
     cur = start;
   }
-  uint64_t len __attribute__((unused)) = 1;
+  uint64_t len __attribute__((unused)) = 1ULL;
   {
     while (((cur != start) && (len < n))) {
       uint64_t next __attribute__((unused)) = perm.data[cur];
@@ -35,7 +35,7 @@ uint64_t cycle_length(forge_span_u64_t perm __attribute__((unused)), uint64_t n 
 
       }
       if ((len < n)) {
-        len = (len + 1);
+        len = (len + 1ULL);
 
       }
     }
@@ -45,7 +45,7 @@ uint64_t cycle_length(forge_span_u64_t perm __attribute__((unused)), uint64_t n 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

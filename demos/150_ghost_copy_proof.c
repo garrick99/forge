@@ -16,20 +16,20 @@ void copy_span(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t ds
 int main();
 
 void copy_span(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused))) {
-
-
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t src_len_snap __attribute__((unused)) = src.len;
+  uint64_t dst_len_snap __attribute__((unused)) = dst.len;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while ((k < n)) {
       dst.data[k] = src.data[k];
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

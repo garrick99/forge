@@ -26,7 +26,7 @@ uint64_t multi_send();
 int main();
 
 Flow flow_new() {
-  return (Flow){ .sent = 0, .received = 0, .dropped = 0 };
+  return (Flow){ .sent = 0ULL, .received = 0ULL, .dropped = 0ULL };
 }
 
 void flow_send(Flow* f __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -43,35 +43,35 @@ void flow_drop(Flow* f __attribute__((unused)), uint64_t n __attribute__((unused
 
 uint64_t send_100() {
   Flow f __attribute__((unused)) = flow_new();
-  flow_send((&f), 100);
+  flow_send((&f), 100ULL);
   return f.sent;
 }
 
 uint64_t send_receive() {
   Flow f __attribute__((unused)) = flow_new();
-  flow_send((&f), 100);
-  flow_receive((&f), 80);
+  flow_send((&f), 100ULL);
+  flow_receive((&f), 80ULL);
   return f.received;
 }
 
 uint64_t in_flight() {
   Flow f __attribute__((unused)) = flow_new();
-  flow_send((&f), 100);
-  flow_receive((&f), 70);
-  flow_drop((&f), 20);
+  flow_send((&f), 100ULL);
+  flow_receive((&f), 70ULL);
+  flow_drop((&f), 20ULL);
   return ((f.sent - f.received) - f.dropped);
 }
 
 uint64_t multi_send() {
   Flow f __attribute__((unused)) = flow_new();
-  flow_send((&f), 30);
-  flow_send((&f), 50);
-  flow_send((&f), 20);
+  flow_send((&f), 30ULL);
+  flow_send((&f), 50ULL);
+  flow_send((&f), 20ULL);
   return f.sent;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -16,17 +16,17 @@ uint64_t minmax_range(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
 int main();
 
 uint64_t minmax_range(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-
-
+  uint64_t gmin __attribute__((unused)) = s.data[0ULL];
+  uint64_t gmax __attribute__((unused)) = s.data[0ULL];
   {
     for (uint64_t i = 0; i < (uint64_t)(n); i++) {
       uint64_t cur __attribute__((unused)) = s.data[i];
       if ((cur < gmin)) {
-
+        gmin = cur;
 
       }
       if ((cur > gmax)) {
-
+        gmax = cur;
 
       }
     }
@@ -36,7 +36,7 @@ uint64_t minmax_range(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

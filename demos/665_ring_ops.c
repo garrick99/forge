@@ -17,7 +17,7 @@ uint64_t ring_neg(uint64_t a __attribute__((unused)), uint64_t n __attribute__((
 uint64_t ring_sub(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t n __attribute__((unused)));
 uint64_t ring_mul(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t n __attribute__((unused)));
 uint64_t ring_sum(forge_span_u64_t s __attribute__((unused)), uint64_t k __attribute__((unused)), uint64_t n __attribute__((unused)));
-uint64_t ring_pow(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused)), uint64_t n __attribute__((unused)));
+uint64_t ring_pow(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused)), uint64_t n __attribute__((unused)));
 int main();
 
 uint64_t ring_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -26,8 +26,8 @@ uint64_t ring_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((
 
 uint64_t ring_neg(uint64_t a __attribute__((unused)), uint64_t n __attribute__((unused))) {
   uint64_t am __attribute__((unused)) = (a % n);
-  if ((am == 0)) {
-    return 0;
+  if ((am == 0ULL)) {
+    return 0ULL;
   } else {
     return (n - am);
   }
@@ -48,30 +48,30 @@ uint64_t ring_mul(uint64_t a __attribute__((unused)), uint64_t b __attribute__((
 }
 
 uint64_t ring_sum(forge_span_u64_t s __attribute__((unused)), uint64_t k __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < k)) {
       acc = ((acc + (s.data[i] % n)) % n);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
   return acc;
 }
 
-uint64_t ring_pow(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = (1 % n);
+uint64_t ring_pow(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused)), uint64_t n __attribute__((unused))) {
+  uint64_t acc __attribute__((unused)) = (1ULL % n);
   uint64_t b __attribute__((unused)) = (base % n);
-  uint64_t e __attribute__((unused)) = exp;
+  uint64_t e __attribute__((unused)) = forge_exp;
   {
-    while ((e > 0)) {
-      if (((e % 2) == 1)) {
+    while ((e > 0ULL)) {
+      if (((e % 2ULL) == 1ULL)) {
         acc = ((acc * b) % n);
 
       }
       b = ((b * b) % n);
-      e = (e / 2);
+      e = (e / 2ULL);
     }
 
   }
@@ -79,7 +79,7 @@ uint64_t ring_pow(uint64_t base __attribute__((unused)), uint64_t exp __attribut
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -26,7 +26,7 @@ uint64_t stats_range(const Stats* st __attribute__((unused)));
 int main();
 
 Stats stats_new(uint64_t first __attribute__((unused))) {
-  return (Stats){ .min = first, .max = first, .sum = first, .count = 1 };
+  return (Stats){ .min = first, .max = first, .sum = first, .count = 1ULL };
 }
 
 void stats_update(Stats* st __attribute__((unused)), uint64_t v __attribute__((unused))) {
@@ -39,12 +39,12 @@ void stats_update(Stats* st __attribute__((unused)), uint64_t v __attribute__((u
 
   }
   (*st).sum = ((*st).sum + v);
-  (*st).count = ((*st).count + 1);
+  (*st).count = ((*st).count + 1ULL);
 }
 
 Stats span_stats(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  Stats st __attribute__((unused)) = stats_new(s.data[0]);
-  uint64_t i __attribute__((unused)) = 1;
+  Stats st __attribute__((unused)) = stats_new(s.data[0ULL]);
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((s.data[i] < st.min)) {
@@ -55,8 +55,8 @@ Stats span_stats(forge_span_u64_t s __attribute__((unused)), uint64_t n __attrib
         st.max = s.data[i];
 
       }
-      st.count = (st.count + 1);
-      i = (i + 1);
+      st.count = (st.count + 1ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -67,12 +67,12 @@ uint64_t stats_range(const Stats* st __attribute__((unused))) {
   if (((*st).max >= (*st).min)) {
     return ((*st).max - (*st).min);
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

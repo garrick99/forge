@@ -27,17 +27,17 @@ uint64_t min_of_4(uint64_t a __attribute__((unused)), uint64_t b __attribute__((
 int main();
 
 Heap4 heap_new() {
-  return (Heap4){ .d0 = 0, .d1 = 0, .d2 = 0, .d3 = 0, .size = 0 };
+  return (Heap4){ .d0 = 0ULL, .d1 = 0ULL, .d2 = 0ULL, .d3 = 0ULL, .size = 0ULL };
 }
 
 uint64_t heap_get(Heap4 h __attribute__((unused)), uint64_t i __attribute__((unused))) {
-  if ((i == 0)) {
+  if ((i == 0ULL)) {
     return h.d0;
   } else {
-    if ((i == 1)) {
+    if ((i == 1ULL)) {
       return h.d1;
     } else {
-      if ((i == 2)) {
+      if ((i == 2ULL)) {
         return h.d2;
       } else {
         return h.d3;
@@ -47,13 +47,13 @@ uint64_t heap_get(Heap4 h __attribute__((unused)), uint64_t i __attribute__((unu
 }
 
 Heap4 heap_set(Heap4 h __attribute__((unused)), uint64_t i __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  if ((i == 0)) {
+  if ((i == 0ULL)) {
     return (Heap4){ .d0 = val, .d1 = h.d1, .d2 = h.d2, .d3 = h.d3, .size = h.size };
   } else {
-    if ((i == 1)) {
+    if ((i == 1ULL)) {
       return (Heap4){ .d0 = h.d0, .d1 = val, .d2 = h.d2, .d3 = h.d3, .size = h.size };
     } else {
-      if ((i == 2)) {
+      if ((i == 2ULL)) {
         return (Heap4){ .d0 = h.d0, .d1 = h.d1, .d2 = val, .d3 = h.d3, .size = h.size };
       } else {
         return (Heap4){ .d0 = h.d0, .d1 = h.d1, .d2 = h.d2, .d3 = val, .size = h.size };
@@ -68,16 +68,16 @@ uint64_t heap_peek(Heap4 h __attribute__((unused))) {
 
 Heap4 heap_insert(Heap4 h __attribute__((unused)), uint64_t val __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = h.size;
-  if ((n == 0)) {
-    return (Heap4){ .d0 = val, .d1 = 0, .d2 = 0, .d3 = 0, .size = 1 };
+  if ((n == 0ULL)) {
+    return (Heap4){ .d0 = val, .d1 = 0ULL, .d2 = 0ULL, .d3 = 0ULL, .size = 1ULL };
   } else {
-    if ((n == 1)) {
-      return (Heap4){ .d0 = h.d0, .d1 = val, .d2 = 0, .d3 = 0, .size = 2 };
+    if ((n == 1ULL)) {
+      return (Heap4){ .d0 = h.d0, .d1 = val, .d2 = 0ULL, .d3 = 0ULL, .size = 2ULL };
     } else {
-      if ((n == 2)) {
-        return (Heap4){ .d0 = h.d0, .d1 = h.d1, .d2 = val, .d3 = 0, .size = 3 };
+      if ((n == 2ULL)) {
+        return (Heap4){ .d0 = h.d0, .d1 = h.d1, .d2 = val, .d3 = 0ULL, .size = 3ULL };
       } else {
-        return (Heap4){ .d0 = h.d0, .d1 = h.d1, .d2 = h.d2, .d3 = val, .size = 4 };
+        return (Heap4){ .d0 = h.d0, .d1 = h.d1, .d2 = h.d2, .d3 = val, .size = 4ULL };
       }
     }
   }
@@ -100,13 +100,13 @@ uint64_t min_of_4(uint64_t a __attribute__((unused)), uint64_t b __attribute__((
 
 int main() {
   Heap4 h0 __attribute__((unused)) = heap_new();
-  Heap4 h1 __attribute__((unused)) = heap_insert(h0, 30);
-  Heap4 h2 __attribute__((unused)) = heap_insert(h1, 10);
-  Heap4 h3 __attribute__((unused)) = heap_insert(h2, 20);
-  Heap4 h4 __attribute__((unused)) = heap_insert(h3, 5);
+  Heap4 h1 __attribute__((unused)) = heap_insert(h0, 30ULL);
+  Heap4 h2 __attribute__((unused)) = heap_insert(h1, 10ULL);
+  Heap4 h3 __attribute__((unused)) = heap_insert(h2, 20ULL);
+  Heap4 h4 __attribute__((unused)) = heap_insert(h3, 5ULL);
   uint64_t sz4 __attribute__((unused)) = h4.size;
   uint64_t top __attribute__((unused)) = h4.d0;
-  uint64_t mn __attribute__((unused)) = min_of_4(30, 10, 20, 5);
+  uint64_t mn __attribute__((unused)) = min_of_4(30ULL, 10ULL, 20ULL, 5ULL);
   uint64_t a1 __attribute__((unused)) = mn;
   uint64_t a2 __attribute__((unused)) = mn;
   uint64_t a3 __attribute__((unused)) = mn;

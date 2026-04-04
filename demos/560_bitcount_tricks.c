@@ -22,54 +22,54 @@ uint64_t check_clear_lowest();
 int main();
 
 _Bool is_power_of_two(uint64_t x __attribute__((unused))) {
-  return ((x & (x - 1)) == 0);
+  return ((x & (x - 1ULL)) == 0ULL);
 }
 
 uint64_t round_up_pow2(uint64_t x __attribute__((unused))) {
-  uint64_t v __attribute__((unused)) = (x - 1);
-  v = (v | (v >> 1));
-  v = (v | (v >> 2));
-  v = (v | (v >> 4));
-  v = (v | (v >> 8));
-  v = (v | (v >> 16));
-  v = (v | (v >> 32));
-  return (v + 1);
+  uint64_t v __attribute__((unused)) = (x - 1ULL);
+  v = (v | (v >> 1ULL));
+  v = (v | (v >> 2ULL));
+  v = (v | (v >> 4ULL));
+  v = (v | (v >> 8ULL));
+  v = (v | (v >> 16ULL));
+  v = (v | (v >> 32ULL));
+  return (v + 1ULL);
 }
 
 uint64_t lowest_set_bit(uint64_t x __attribute__((unused))) {
-  return (x & (0 - x));
+  return (x & (0ULL - x));
 }
 
 uint64_t clear_lowest_bit(uint64_t x __attribute__((unused))) {
-  return (x & (x - 1));
+  return (x & (x - 1ULL));
 }
 
 uint64_t bit_at(uint64_t x __attribute__((unused)), uint64_t pos __attribute__((unused))) {
-  return ((x >> pos) & 1);
+  return ((x >> pos) & 1ULL);
 }
 
 uint64_t set_bit(uint64_t x __attribute__((unused)), uint64_t pos __attribute__((unused))) {
-  return (x | (1 << pos));
+  return (x | (1ULL << pos));
 }
 
 uint64_t clear_bit(uint64_t x __attribute__((unused)), uint64_t pos __attribute__((unused))) {
-  return (x & (~(1 << pos)));
+  return (x & (~(1ULL << pos)));
 }
 
 uint64_t toggle_bit(uint64_t x __attribute__((unused)), uint64_t pos __attribute__((unused))) {
-  return (x ^ (1 << pos));
+  return (x ^ (1ULL << pos));
 }
 
 uint64_t check_lowest_set_bit_power() {
-  return lowest_set_bit(12);
+  return lowest_set_bit(12ULL);
 }
 
 uint64_t check_clear_lowest() {
-  return clear_lowest_bit(12);
+  return clear_lowest_bit(12ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

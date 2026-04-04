@@ -27,17 +27,17 @@ uint64_t three_cycles_pings();
 int main();
 
 PingPong pp_new() {
-  return (PingPong){ .pings = 0, .pongs = 0, .turn = 0 };
+  return (PingPong){ .pings = 0ULL, .pongs = 0ULL, .turn = 0ULL };
 }
 
 void pp_ping(PingPong* p __attribute__((unused))) {
-  (*p).pings = ((*p).pings + 1);
-  (*p).turn = 1;
+  (*p).pings = ((*p).pings + 1ULL);
+  (*p).turn = 1ULL;
 }
 
 void pp_pong(PingPong* p __attribute__((unused))) {
-  (*p).pongs = ((*p).pongs + 1);
-  (*p).turn = 0;
+  (*p).pongs = ((*p).pongs + 1ULL);
+  (*p).turn = 0ULL;
 }
 
 uint64_t one_ping_count() {
@@ -85,7 +85,7 @@ uint64_t three_cycles_pings() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -18,7 +18,7 @@ int main();
 
 uint64_t dfa_run(forge_span_u64_t table __attribute__((unused)), uint64_t nstates __attribute__((unused)), uint64_t nalpha __attribute__((unused)), forge_span_u64_t input __attribute__((unused)), uint64_t input_len __attribute__((unused)), uint64_t start __attribute__((unused))) {
   uint64_t state __attribute__((unused)) = start;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < input_len)) {
       uint64_t idx __attribute__((unused)) = ((state * nalpha) + input.data[i]);
@@ -26,7 +26,7 @@ uint64_t dfa_run(forge_span_u64_t table __attribute__((unused)), uint64_t nstate
         state = table.data[idx];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -35,11 +35,11 @@ uint64_t dfa_run(forge_span_u64_t table __attribute__((unused)), uint64_t nstate
 
 _Bool dfa_accepts(forge_span_u64_t table __attribute__((unused)), uint64_t nstates __attribute__((unused)), uint64_t nalpha __attribute__((unused)), forge_span_u64_t input __attribute__((unused)), uint64_t input_len __attribute__((unused)), uint64_t start __attribute__((unused)), forge_span_u64_t accept __attribute__((unused))) {
   uint64_t final_state __attribute__((unused)) = dfa_run(table, nstates, nalpha, input, input_len, start);
-  return (accept.data[final_state] != 0);
+  return (accept.data[final_state] != 0ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

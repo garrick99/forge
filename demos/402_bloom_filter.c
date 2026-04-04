@@ -25,16 +25,16 @@ uint64_t capacity_preserved(uint64_t cap __attribute__((unused)));
 int main();
 
 BloomFilter bf_new(uint64_t capacity __attribute__((unused)), uint64_t k __attribute__((unused))) {
-  return (BloomFilter){ .bit_count = 0, .capacity = capacity, .insertions = 0, .k = k };
+  return (BloomFilter){ .bit_count = 0ULL, .capacity = capacity, .insertions = 0ULL, .k = k };
 }
 
 void bf_insert(BloomFilter* b __attribute__((unused))) {
   (*b).bit_count = ((*b).bit_count + (*b).k);
-  (*b).insertions = ((*b).insertions + 1);
+  (*b).insertions = ((*b).insertions + 1ULL);
 }
 
 uint64_t insert_three_k2() {
-  BloomFilter b __attribute__((unused)) = bf_new(100, 2);
+  BloomFilter b __attribute__((unused)) = bf_new(100ULL, 2ULL);
   bf_insert((&b));
   bf_insert((&b));
   bf_insert((&b));
@@ -42,7 +42,7 @@ uint64_t insert_three_k2() {
 }
 
 uint64_t insertion_count() {
-  BloomFilter b __attribute__((unused)) = bf_new(100, 3);
+  BloomFilter b __attribute__((unused)) = bf_new(100ULL, 3ULL);
   bf_insert((&b));
   bf_insert((&b));
   bf_insert((&b));
@@ -51,7 +51,7 @@ uint64_t insertion_count() {
 }
 
 uint64_t k1_bitcount_eq_insertions() {
-  BloomFilter b __attribute__((unused)) = bf_new(100, 1);
+  BloomFilter b __attribute__((unused)) = bf_new(100ULL, 1ULL);
   bf_insert((&b));
   bf_insert((&b));
   bf_insert((&b));
@@ -61,14 +61,14 @@ uint64_t k1_bitcount_eq_insertions() {
 }
 
 uint64_t capacity_preserved(uint64_t cap __attribute__((unused))) {
-  BloomFilter b __attribute__((unused)) = bf_new(cap, 3);
+  BloomFilter b __attribute__((unused)) = bf_new(cap, 3ULL);
   bf_insert((&b));
   bf_insert((&b));
   return b.capacity;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

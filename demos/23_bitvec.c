@@ -19,19 +19,19 @@ uint32_t wrapping_mul(uint32_t a __attribute__((unused)), uint32_t b __attribute
 uint32_t bitfield(uint32_t x __attribute__((unused)), uint32_t shift __attribute__((unused)), uint32_t mask __attribute__((unused)));
 
 uint32_t lo_byte(uint32_t x __attribute__((unused))) {
-  return (x & 255);
+  return (x & 255ULL);
 }
 
 uint32_t hi_byte(uint32_t x __attribute__((unused))) {
-  return ((x >> 8) & 255);
+  return ((x >> 8ULL) & 255ULL);
 }
 
 uint32_t byte2(uint32_t x __attribute__((unused))) {
-  return ((x >> 16) & 255);
+  return ((x >> 16ULL) & 255ULL);
 }
 
 uint32_t byte3(uint32_t x __attribute__((unused))) {
-  return (x >> 24);
+  return (x >> 24ULL);
 }
 
 uint64_t thread_index(uint64_t block_id __attribute__((unused)), uint64_t block_dim __attribute__((unused)), uint64_t thread_id __attribute__((unused))) {

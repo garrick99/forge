@@ -26,23 +26,23 @@ uint64_t cap_preserved(uint64_t cap __attribute__((unused)));
 int main();
 
 Deque deque_new(uint64_t cap __attribute__((unused))) {
-  return (Deque){ .len = 0, .cap = cap };
+  return (Deque){ .len = 0ULL, .cap = cap };
 }
 
 void deque_push_front(Deque* d __attribute__((unused))) {
-  (*d).len = ((*d).len + 1);
+  (*d).len = ((*d).len + 1ULL);
 }
 
 void deque_push_back(Deque* d __attribute__((unused))) {
-  (*d).len = ((*d).len + 1);
+  (*d).len = ((*d).len + 1ULL);
 }
 
 void deque_pop_front(Deque* d __attribute__((unused))) {
-  (*d).len = ((*d).len - 1);
+  (*d).len = ((*d).len - 1ULL);
 }
 
 void deque_pop_back(Deque* d __attribute__((unused))) {
-  (*d).len = ((*d).len - 1);
+  (*d).len = ((*d).len - 1ULL);
 }
 
 uint64_t push_front_three(uint64_t cap __attribute__((unused))) {
@@ -82,7 +82,7 @@ uint64_t cap_preserved(uint64_t cap __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

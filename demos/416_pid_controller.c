@@ -28,61 +28,61 @@ uint64_t kp_preserved();
 int main();
 
 PIDState pid_new(uint64_t kp __attribute__((unused)), uint64_t ki __attribute__((unused))) {
-  return (PIDState){ .integral = 0, .prev_error = 0, .steps = 0, .kp = kp, .ki = ki };
+  return (PIDState){ .integral = 0ULL, .prev_error = 0ULL, .steps = 0ULL, .kp = kp, .ki = ki };
 }
 
 void pid_step(PIDState* p __attribute__((unused)), uint64_t error __attribute__((unused))) {
   (*p).integral = ((*p).integral + error);
   (*p).prev_error = error;
-  (*p).steps = ((*p).steps + 1);
+  (*p).steps = ((*p).steps + 1ULL);
 }
 
 void pid_reset_integral(PIDState* p __attribute__((unused))) {
-  (*p).integral = 0;
+  (*p).integral = 0ULL;
 }
 
 uint64_t integral_accumulates() {
-  PIDState p __attribute__((unused)) = pid_new(100, 10);
-  pid_step((&p), 10);
-  pid_step((&p), 5);
-  pid_step((&p), 8);
+  PIDState p __attribute__((unused)) = pid_new(100ULL, 10ULL);
+  pid_step((&p), 10ULL);
+  pid_step((&p), 5ULL);
+  pid_step((&p), 8ULL);
   return p.integral;
 }
 
 uint64_t prev_error_last() {
-  PIDState p __attribute__((unused)) = pid_new(100, 10);
-  pid_step((&p), 10);
-  pid_step((&p), 5);
-  pid_step((&p), 8);
+  PIDState p __attribute__((unused)) = pid_new(100ULL, 10ULL);
+  pid_step((&p), 10ULL);
+  pid_step((&p), 5ULL);
+  pid_step((&p), 8ULL);
   return p.prev_error;
 }
 
 uint64_t reset_mid_run() {
-  PIDState p __attribute__((unused)) = pid_new(100, 10);
-  pid_step((&p), 10);
-  pid_step((&p), 5);
+  PIDState p __attribute__((unused)) = pid_new(100ULL, 10ULL);
+  pid_step((&p), 10ULL);
+  pid_step((&p), 5ULL);
   pid_reset_integral((&p));
   return p.integral;
 }
 
 uint64_t step_count() {
-  PIDState p __attribute__((unused)) = pid_new(100, 10);
-  pid_step((&p), 3);
-  pid_step((&p), 6);
-  pid_step((&p), 2);
-  pid_step((&p), 9);
+  PIDState p __attribute__((unused)) = pid_new(100ULL, 10ULL);
+  pid_step((&p), 3ULL);
+  pid_step((&p), 6ULL);
+  pid_step((&p), 2ULL);
+  pid_step((&p), 9ULL);
   return p.steps;
 }
 
 uint64_t kp_preserved() {
-  PIDState p __attribute__((unused)) = pid_new(150, 20);
-  pid_step((&p), 5);
-  pid_step((&p), 3);
+  PIDState p __attribute__((unused)) = pid_new(150ULL, 20ULL);
+  pid_step((&p), 5ULL);
+  pid_step((&p), 3ULL);
   return p.kp;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

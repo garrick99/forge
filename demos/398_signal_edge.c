@@ -27,17 +27,17 @@ uint64_t signal_after_pulse();
 int main();
 
 EdgeDetector ed_new() {
-  return (EdgeDetector){ .signal = 0, .rising_edges = 0, .falling_edges = 0 };
+  return (EdgeDetector){ .signal = 0ULL, .rising_edges = 0ULL, .falling_edges = 0ULL };
 }
 
 void ed_set_high(EdgeDetector* e __attribute__((unused))) {
-  (*e).signal = 1;
-  (*e).rising_edges = ((*e).rising_edges + 1);
+  (*e).signal = 1ULL;
+  (*e).rising_edges = ((*e).rising_edges + 1ULL);
 }
 
 void ed_set_low(EdgeDetector* e __attribute__((unused))) {
-  (*e).signal = 0;
-  (*e).falling_edges = ((*e).falling_edges + 1);
+  (*e).signal = 0ULL;
+  (*e).falling_edges = ((*e).falling_edges + 1ULL);
 }
 
 uint64_t one_rising() {
@@ -90,7 +90,7 @@ uint64_t signal_after_pulse() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

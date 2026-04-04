@@ -16,19 +16,19 @@ void selection_sort_perm(forge_span_u64_t s __attribute__((unused)), forge_span_
 int main();
 
 void selection_sort_perm(forge_span_u64_t s __attribute__((unused)), forge_span_u64_t perm __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t min_idx __attribute__((unused)) = i;
-      uint64_t j __attribute__((unused)) = (i + 1);
+      uint64_t j __attribute__((unused)) = (i + 1ULL);
       {
         while ((j < n)) {
           if ((s.data[j] < s.data[min_idx])) {
             min_idx = j;
-            j = (j + 1);
+            j = (j + 1ULL);
 
           } else {
-            j = (j + 1);
+            j = (j + 1ULL);
 
           }
         }
@@ -40,14 +40,14 @@ void selection_sort_perm(forge_span_u64_t s __attribute__((unused)), forge_span_
       uint64_t tmp_p __attribute__((unused)) = perm.data[i];
       perm.data[i] = perm.data[min_idx];
       perm.data[min_idx] = tmp_p;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -18,23 +18,23 @@ uint64_t seg_query(forge_span_u64_t tree __attribute__((unused)), uint64_t n __a
 int main();
 
 void seg_build(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t tree __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       tree.data[(n + i)] = data.data[i];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t j __attribute__((unused)) = (n - 1);
+  uint64_t j __attribute__((unused)) = (n - 1ULL);
   {
-    while ((j >= 1)) {
-      tree.data[j] = (tree.data[(j + j)] + tree.data[((j + j) + 1)]);
-      if ((j == 1)) {
-        j = 0;
+    while ((j >= 1ULL)) {
+      tree.data[j] = (tree.data[(j + j)] + tree.data[((j + j) + 1ULL)]);
+      if ((j == 1ULL)) {
+        j = 0ULL;
 
       } else {
-        j = (j - 1);
+        j = (j - 1ULL);
 
       }
     }
@@ -45,15 +45,15 @@ void seg_build(forge_span_u64_t data __attribute__((unused)), uint64_t n __attri
 void seg_update(forge_span_u64_t tree __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t pos __attribute__((unused)), uint64_t val __attribute__((unused))) {
   uint64_t i __attribute__((unused)) = (pos + n);
   tree.data[i] = val;
-  i = (i / 2);
+  i = (i / 2ULL);
   {
-    while ((i >= 1)) {
-      tree.data[i] = (tree.data[(i + i)] + tree.data[((i + i) + 1)]);
-      if ((i == 1)) {
-        i = 0;
+    while ((i >= 1ULL)) {
+      tree.data[i] = (tree.data[(i + i)] + tree.data[((i + i) + 1ULL)]);
+      if ((i == 1ULL)) {
+        i = 0ULL;
 
       } else {
-        i = (i / 2);
+        i = (i / 2ULL);
 
       }
     }
@@ -62,23 +62,23 @@ void seg_update(forge_span_u64_t tree __attribute__((unused)), uint64_t n __attr
 }
 
 uint64_t seg_query(forge_span_u64_t tree __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
-  uint64_t sum __attribute__((unused)) = 0;
+  uint64_t sum __attribute__((unused)) = 0ULL;
   uint64_t l __attribute__((unused)) = (lo + n);
   uint64_t r __attribute__((unused)) = (hi + n);
   {
     while ((l < r)) {
-      if (((l % 2) == 1)) {
+      if (((l % 2ULL) == 1ULL)) {
         sum = (sum + tree.data[l]);
-        l = (l + 1);
+        l = (l + 1ULL);
 
       }
-      if (((r % 2) == 1)) {
-        r = (r - 1);
+      if (((r % 2ULL) == 1ULL)) {
+        r = (r - 1ULL);
         sum = (sum + tree.data[r]);
 
       }
-      l = (l / 2);
-      r = (r / 2);
+      l = (l / 2ULL);
+      r = (r / 2ULL);
     }
 
   }
@@ -86,7 +86,7 @@ uint64_t seg_query(forge_span_u64_t tree __attribute__((unused)), uint64_t n __a
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -19,23 +19,23 @@ uint64_t majority_count_bound(forge_span_u64_t s __attribute__((unused)), uint64
 int main();
 
 uint64_t majority_candidate(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t candidate __attribute__((unused)) = s.data[0];
-  uint64_t count __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t candidate __attribute__((unused)) = s.data[0ULL];
+  uint64_t count __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((s.data[i] == candidate)) {
-        count = (count + 1);
+        count = (count + 1ULL);
 
-      } else if ((count > 1)) {
-        count = (count - 1);
+      } else if ((count > 1ULL)) {
+        count = (count - 1ULL);
 
       } else {
         candidate = s.data[i];
-        count = 1;
+        count = 1ULL;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -43,15 +43,15 @@ uint64_t majority_candidate(forge_span_u64_t s __attribute__((unused)), uint64_t
 }
 
 uint64_t count_occurrences(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t c __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t c __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((s.data[i] == val)) {
-        c = (c + 1);
+        c = (c + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -60,7 +60,7 @@ uint64_t count_occurrences(forge_span_u64_t s __attribute__((unused)), uint64_t 
 
 _Bool has_majority(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
   uint64_t candidate __attribute__((unused)) = majority_candidate(s, n);
-  return ((count_occurrences(s, n, candidate) * 2) > n);
+  return ((count_occurrences(s, n, candidate) * 2ULL) > n);
 }
 
 uint64_t majority_count_bound(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -69,7 +69,7 @@ uint64_t majority_count_bound(forge_span_u64_t s __attribute__((unused)), uint64
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -18,11 +18,11 @@ uint64_t remove_duplicates_sorted(forge_span_u64_t s __attribute__((unused)), ui
 int main();
 
 _Bool two_sum_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  if ((n == 0)) {
+  if ((n == 0ULL)) {
     return 0;
   } else {
-    uint64_t lo __attribute__((unused)) = 0;
-    uint64_t hi __attribute__((unused)) = (n - 1);
+    uint64_t lo __attribute__((unused)) = 0ULL;
+    uint64_t hi __attribute__((unused)) = (n - 1ULL);
     _Bool found __attribute__((unused)) = 0;
     {
       while (((lo < hi) && (!found))) {
@@ -31,10 +31,10 @@ _Bool two_sum_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
           found = 1;
 
         } else if ((s2 < target)) {
-          lo = (lo + 1);
+          lo = (lo + 1ULL);
 
         } else {
-          hi = (hi - 1);
+          hi = (hi - 1ULL);
 
         }
       }
@@ -45,15 +45,15 @@ _Bool two_sum_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 }
 
 uint64_t count_pairs_le_brute(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t limit __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((s.data[i] <= limit)) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -61,16 +61,16 @@ uint64_t count_pairs_le_brute(forge_span_u64_t s __attribute__((unused)), uint64
 }
 
 uint64_t remove_duplicates_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t w __attribute__((unused)) = 1;
-  uint64_t r __attribute__((unused)) = 1;
+  uint64_t w __attribute__((unused)) = 1ULL;
+  uint64_t r __attribute__((unused)) = 1ULL;
   {
     while ((r < n)) {
-      if ((s.data[r] != s.data[(r - 1)])) {
+      if ((s.data[r] != s.data[(r - 1ULL)])) {
         s.data[w] = s.data[r];
-        w = (w + 1);
+        w = (w + 1ULL);
 
       }
-      r = (r + 1);
+      r = (r + 1ULL);
     }
 
   }
@@ -78,7 +78,7 @@ uint64_t remove_duplicates_sorted(forge_span_u64_t s __attribute__((unused)), ui
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

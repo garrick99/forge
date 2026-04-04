@@ -17,11 +17,11 @@ void bellman_ford(forge_span_u64_t adj_ptr __attribute__((unused)), forge_span_u
 int main();
 
 void relax_edges(forge_span_u64_t adj_ptr __attribute__((unused)), forge_span_u64_t adj_list __attribute__((unused)), forge_span_u64_t weights __attribute__((unused)), uint64_t n_verts __attribute__((unused)), uint64_t n_edges __attribute__((unused)), forge_span_u64_t dist __attribute__((unused)), uint64_t u __attribute__((unused))) {
-  uint64_t sentinel __attribute__((unused)) = -1;
+  uint64_t sentinel __attribute__((unused)) = 0xffffffffffffffffULL;
   uint64_t du __attribute__((unused)) = dist.data[u];
   if ((du < sentinel)) {
     uint64_t start __attribute__((unused)) = adj_ptr.data[u];
-    uint64_t end __attribute__((unused)) = adj_ptr.data[(u + 1)];
+    uint64_t end __attribute__((unused)) = adj_ptr.data[(u + 1ULL)];
     uint64_t e __attribute__((unused)) = start;
     {
       while ((e < end)) {
@@ -32,7 +32,7 @@ void relax_edges(forge_span_u64_t adj_ptr __attribute__((unused)), forge_span_u6
           dist.data[v] = new_dist;
 
         }
-        e = (e + 1);
+        e = (e + 1ULL);
       }
 
     }
@@ -41,35 +41,35 @@ void relax_edges(forge_span_u64_t adj_ptr __attribute__((unused)), forge_span_u6
 }
 
 void bellman_ford(forge_span_u64_t adj_ptr __attribute__((unused)), forge_span_u64_t adj_list __attribute__((unused)), forge_span_u64_t weights __attribute__((unused)), uint64_t n_verts __attribute__((unused)), uint64_t n_edges __attribute__((unused)), forge_span_u64_t dist __attribute__((unused)), uint64_t source __attribute__((unused))) {
-  uint64_t sentinel __attribute__((unused)) = -1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t sentinel __attribute__((unused)) = 0xffffffffffffffffULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n_verts)) {
       dist.data[i] = sentinel;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
-  dist.data[source] = 0;
-  uint64_t round __attribute__((unused)) = 0;
+  dist.data[source] = 0ULL;
+  uint64_t round __attribute__((unused)) = 0ULL;
   {
-    while (((round + 1) < n_verts)) {
-      uint64_t u __attribute__((unused)) = 0;
+    while (((round + 1ULL) < n_verts)) {
+      uint64_t u __attribute__((unused)) = 0ULL;
       {
         while ((u < n_verts)) {
           relax_edges(adj_ptr, adj_list, weights, n_verts, n_edges, dist, u);
-          u = (u + 1);
+          u = (u + 1ULL);
         }
 
       }
-      round = (round + 1);
+      round = (round + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -17,13 +17,13 @@ int main();
 
 uint64_t route_lookup(forge_span_u64_t prefixes __attribute__((unused)), forge_span_u64_t mask_lens __attribute__((unused)), forge_span_u64_t next_hops __attribute__((unused)), uint64_t n_routes __attribute__((unused)), uint64_t dest_ip __attribute__((unused))) {
   uint64_t best_hop __attribute__((unused)) = n_routes;
-  uint64_t best_mask_len __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t best_mask_len __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n_routes)) {
       uint64_t mlen __attribute__((unused)) = mask_lens.data[i];
-      if (((mlen <= 64) && (mlen > 0))) {
-        uint64_t shift __attribute__((unused)) = (64 - mlen);
+      if (((mlen <= 64ULL) && (mlen > 0ULL))) {
+        uint64_t shift __attribute__((unused)) = (64ULL - mlen);
         uint64_t masked_dest __attribute__((unused)) = (dest_ip >> shift);
         uint64_t masked_prefix __attribute__((unused)) = (prefixes.data[i] >> shift);
         if (((masked_dest == masked_prefix) && (mlen >= best_mask_len))) {
@@ -33,7 +33,7 @@ uint64_t route_lookup(forge_span_u64_t prefixes __attribute__((unused)), forge_s
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -41,7 +41,7 @@ uint64_t route_lookup(forge_span_u64_t prefixes __attribute__((unused)), forge_s
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

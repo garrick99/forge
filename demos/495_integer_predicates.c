@@ -28,23 +28,23 @@ _Bool check_between_10_1_10();
 int main();
 
 _Bool is_zero(uint64_t v __attribute__((unused))) {
-  return (v == 0);
+  return (v == 0ULL);
 }
 
 _Bool is_positive(uint64_t v __attribute__((unused))) {
-  return (v > 0);
+  return (v > 0ULL);
 }
 
 _Bool is_odd(uint64_t v __attribute__((unused))) {
-  return ((v % 2) == 1);
+  return ((v % 2ULL) == 1ULL);
 }
 
 _Bool is_power_of_two(uint64_t v __attribute__((unused))) {
-  return ((v == 1) || ((v % 2) == 0));
+  return ((v == 1ULL) || ((v % 2ULL) == 0ULL));
 }
 
 _Bool is_multiple_of(uint64_t v __attribute__((unused)), uint64_t k __attribute__((unused))) {
-  return ((v % k) == 0);
+  return ((v % k) == 0ULL);
 }
 
 _Bool between_exclusive(uint64_t v __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
@@ -52,47 +52,47 @@ _Bool between_exclusive(uint64_t v __attribute__((unused)), uint64_t lo __attrib
 }
 
 _Bool check_zero() {
-  return is_zero(0);
+  return is_zero(0ULL);
 }
 
 _Bool check_nonzero() {
-  return is_zero(1);
+  return is_zero(1ULL);
 }
 
 _Bool check_positive_1() {
-  return is_positive(1);
+  return is_positive(1ULL);
 }
 
 _Bool check_positive_0() {
-  return is_positive(0);
+  return is_positive(0ULL);
 }
 
 _Bool check_odd_3() {
-  return is_odd(3);
+  return is_odd(3ULL);
 }
 
 _Bool check_odd_4() {
-  return is_odd(4);
+  return is_odd(4ULL);
 }
 
 _Bool check_mult_12_4() {
-  return is_multiple_of(12, 4);
+  return is_multiple_of(12ULL, 4ULL);
 }
 
 _Bool check_mult_10_3() {
-  return is_multiple_of(10, 3);
+  return is_multiple_of(10ULL, 3ULL);
 }
 
 _Bool check_between_5_1_10() {
-  return between_exclusive(5, 1, 10);
+  return between_exclusive(5ULL, 1ULL, 10ULL);
 }
 
 _Bool check_between_10_1_10() {
-  return between_exclusive(10, 1, 10);
+  return between_exclusive(10ULL, 1ULL, 10ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

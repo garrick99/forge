@@ -16,31 +16,31 @@ void tc_step(forge_span_u64_t adj __attribute__((unused)), uint64_t n __attribut
 int main();
 
 void tc_step(forge_span_u64_t adj __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t via __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < n)) {
           if ((((((i * n) + via) < (n * n)) && (((via * n) + j) < (n * n))) && (((i * n) + j) < (n * n)))) {
-            if (((adj.data[((i * n) + via)] > 0) && (adj.data[((via * n) + j)] > 0))) {
-              adj.data[((i * n) + j)] = 1;
+            if (((adj.data[((i * n) + via)] > 0ULL) && (adj.data[((via * n) + j)] > 0ULL))) {
+              adj.data[((i * n) + j)] = 1ULL;
 
             }
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

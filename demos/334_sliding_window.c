@@ -25,15 +25,15 @@ uint64_t send3_ack3(uint64_t win __attribute__((unused)));
 int main();
 
 Window window_new(uint64_t window __attribute__((unused))) {
-  return (Window){ .send_base = 0, .next_seq = 0, .window = window };
+  return (Window){ .send_base = 0ULL, .next_seq = 0ULL, .window = window };
 }
 
 void window_send(Window* w __attribute__((unused))) {
-  (*w).next_seq = ((*w).next_seq + 1);
+  (*w).next_seq = ((*w).next_seq + 1ULL);
 }
 
 void window_ack(Window* w __attribute__((unused))) {
-  (*w).send_base = ((*w).send_base + 1);
+  (*w).send_base = ((*w).send_base + 1ULL);
 }
 
 uint64_t send_one(uint64_t win __attribute__((unused))) {
@@ -70,7 +70,7 @@ uint64_t send3_ack3(uint64_t win __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

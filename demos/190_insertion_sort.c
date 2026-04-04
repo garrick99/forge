@@ -21,13 +21,13 @@ void insertion_sort(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
       uint64_t key __attribute__((unused)) = s.data[i];
       uint64_t j __attribute__((unused)) = i;
       {
-        while ((j > 0)) {
-          if ((s.data[(j - 1)] > key)) {
-            s.data[j] = s.data[(j - 1)];
-            j = (j - 1);
+        while ((j > 0ULL)) {
+          if ((s.data[(j - 1ULL)] > key)) {
+            s.data[j] = s.data[(j - 1ULL)];
+            j = (j - 1ULL);
 
           } else {
-            j = 0;
+            j = 0ULL;
 
           }
         }
@@ -40,7 +40,7 @@ void insertion_sort(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

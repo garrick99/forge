@@ -16,11 +16,11 @@ uint64_t all_positive(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
 int main();
 
 uint64_t all_positive(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t flag __attribute__((unused)) = 1;
+  uint64_t flag __attribute__((unused)) = 1ULL;
   {
     for (uint64_t i = 0; i < (uint64_t)(n); i++) {
-      if ((s.data[i] == 0)) {
-        flag = 0;
+      if ((s.data[i] == 0ULL)) {
+        flag = 0ULL;
 
       }
     }
@@ -30,7 +30,7 @@ uint64_t all_positive(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

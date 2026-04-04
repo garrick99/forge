@@ -21,11 +21,11 @@ int main();
 
 void mat_add(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t rows __attribute__((unused)), uint64_t cols __attribute__((unused))) {
   uint64_t total __attribute__((unused)) = (rows * cols);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < total)) {
       out.data[i] = (a.data[i] + b.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -33,23 +33,23 @@ void mat_add(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __at
 
 void mat_scale(forge_span_u64_t m __attribute__((unused)), uint64_t rows __attribute__((unused)), uint64_t cols __attribute__((unused)), uint64_t factor __attribute__((unused))) {
   uint64_t total __attribute__((unused)) = (rows * cols);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < total)) {
       m.data[i] = (m.data[i] * factor);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t mat_trace(forge_span_u64_t m __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + m.data[((i * n) + i)]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -59,11 +59,11 @@ uint64_t mat_trace(forge_span_u64_t m __attribute__((unused)), uint64_t n __attr
 void mat_row_copy(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t cols __attribute__((unused)), uint64_t src_row __attribute__((unused)), uint64_t dst_row __attribute__((unused))) {
   uint64_t sb __attribute__((unused)) = (src_row * cols);
   uint64_t db __attribute__((unused)) = (dst_row * cols);
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < cols)) {
       dst.data[(db + j)] = src.data[(sb + j)];
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
@@ -71,18 +71,18 @@ void mat_row_copy(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t
 
 void mat_zero(forge_span_u64_t m __attribute__((unused)), uint64_t rows __attribute__((unused)), uint64_t cols __attribute__((unused))) {
   uint64_t total __attribute__((unused)) = (rows * cols);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < total)) {
-      m.data[i] = 0;
-      i = (i + 1);
+      m.data[i] = 0ULL;
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -17,16 +17,16 @@ void running_max(forge_span_u64_t s __attribute__((unused)), uint64_t n __attrib
 int main();
 
 uint64_t array_max(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t mx __attribute__((unused)) = s.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t mx __attribute__((unused)) = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((s.data[i] > mx)) {
         mx = s.data[i];
-        i = (i + 1);
+        i = (i + 1ULL);
 
       } else {
-        i = (i + 1);
+        i = (i + 1ULL);
 
       }
     }
@@ -36,17 +36,17 @@ uint64_t array_max(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 }
 
 void running_max(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  out.data[0] = s.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  out.data[0ULL] = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      if ((s.data[i] > out.data[(i - 1)])) {
+      if ((s.data[i] > out.data[(i - 1ULL)])) {
         out.data[i] = s.data[i];
-        i = (i + 1);
+        i = (i + 1ULL);
 
       } else {
-        out.data[i] = out.data[(i - 1)];
-        i = (i + 1);
+        out.data[i] = out.data[(i - 1ULL)];
+        i = (i + 1ULL);
 
       }
     }
@@ -55,7 +55,7 @@ void running_max(forge_span_u64_t s __attribute__((unused)), uint64_t n __attrib
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

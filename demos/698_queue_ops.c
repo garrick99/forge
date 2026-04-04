@@ -22,11 +22,11 @@ int main();
 
 uint64_t queue_enqueue(forge_span_u64_t buf __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t tail __attribute__((unused)), uint64_t val __attribute__((unused))) {
   buf.data[tail] = val;
-  return ((tail + 1) % cap);
+  return ((tail + 1ULL) % cap);
 }
 
 uint64_t queue_dequeue(uint64_t head __attribute__((unused)), uint64_t cap __attribute__((unused))) {
-  return ((head + 1) % cap);
+  return ((head + 1ULL) % cap);
 }
 
 uint64_t queue_size(uint64_t head __attribute__((unused)), uint64_t tail __attribute__((unused)), uint64_t cap __attribute__((unused))) {
@@ -46,13 +46,13 @@ uint64_t queue_peek(forge_span_u64_t buf __attribute__((unused)), uint64_t cap _
 }
 
 uint64_t queue_fill(forge_span_u64_t buf __attribute__((unused)), uint64_t cap __attribute__((unused)), forge_span_u64_t vals __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t tail __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t tail __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       buf.data[tail] = vals.data[i];
-      tail = ((tail + 1) % cap);
-      i = (i + 1);
+      tail = ((tail + 1ULL) % cap);
+      i = (i + 1ULL);
     }
 
   }
@@ -60,7 +60,7 @@ uint64_t queue_fill(forge_span_u64_t buf __attribute__((unused)), uint64_t cap _
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

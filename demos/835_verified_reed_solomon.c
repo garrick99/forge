@@ -18,27 +18,27 @@ uint64_t gf_poly_eval(forge_span_u64_t coeffs __attribute__((unused)), uint64_t 
 int main();
 
 uint64_t gf_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  return ((a ^ b) % 256);
+  return ((a ^ b) % 256ULL);
 }
 
 uint64_t gf_mul(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), forge_span_u64_t log_table __attribute__((unused)), forge_span_u64_t exp_table __attribute__((unused))) {
-  if (((a == 0) || (b == 0))) {
-    return 0;
+  if (((a == 0ULL) || (b == 0ULL))) {
+    return 0ULL;
   } else {
     uint64_t log_sum __attribute__((unused)) = (log_table.data[a] + log_table.data[b]);
-    uint64_t idx __attribute__((unused)) = (log_sum % 255);
-    return (exp_table.data[idx] % 256);
+    uint64_t idx __attribute__((unused)) = (log_sum % 255ULL);
+    return (exp_table.data[idx] % 256ULL);
   }
 }
 
 uint64_t gf_poly_eval(forge_span_u64_t coeffs __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t x __attribute__((unused)), forge_span_u64_t log_table __attribute__((unused)), forge_span_u64_t exp_table __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = (coeffs.data[(n - 1)] % 256);
-  uint64_t i __attribute__((unused)) = (n - 1);
+  uint64_t acc __attribute__((unused)) = (coeffs.data[(n - 1ULL)] % 256ULL);
+  uint64_t i __attribute__((unused)) = (n - 1ULL);
   {
-    while ((i > 0)) {
-      i = (i - 1);
+    while ((i > 0ULL)) {
+      i = (i - 1ULL);
       uint64_t prod __attribute__((unused)) = gf_mul(acc, x, log_table, exp_table);
-      acc = gf_add(prod, (coeffs.data[i] % 256));
+      acc = gf_add(prod, (coeffs.data[i] % 256ULL));
     }
 
   }
@@ -46,7 +46,7 @@ uint64_t gf_poly_eval(forge_span_u64_t coeffs __attribute__((unused)), uint64_t 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -17,29 +17,29 @@ uint64_t sort_then_search(forge_span_u64_t s __attribute__((unused)), uint64_t n
 int main();
 
 void bubble_sort(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t pass __attribute__((unused)) = 0;
+  uint64_t pass __attribute__((unused)) = 0ULL;
   {
     while ((pass < n)) {
-      uint64_t i __attribute__((unused)) = 0;
+      uint64_t i __attribute__((unused)) = 0ULL;
       uint64_t limit;
-      if ((n >= (pass + 1))) {
-        limit = ((n - pass) - 1);
+      if ((n >= (pass + 1ULL))) {
+        limit = ((n - pass) - 1ULL);
       } else {
-        limit = 0;
+        limit = 0ULL;
       }
       {
         while ((i < limit)) {
-          if ((s.data[i] > s.data[(i + 1)])) {
+          if ((s.data[i] > s.data[(i + 1ULL)])) {
             uint64_t tmp __attribute__((unused)) = s.data[i];
-            s.data[i] = s.data[(i + 1)];
-            s.data[(i + 1)] = tmp;
+            s.data[i] = s.data[(i + 1ULL)];
+            s.data[(i + 1ULL)] = tmp;
 
           }
-          i = (i + 1);
+          i = (i + 1ULL);
         }
 
       }
-      pass = (pass + 1);
+      pass = (pass + 1ULL);
     }
 
   }
@@ -48,14 +48,14 @@ void bubble_sort(forge_span_u64_t s __attribute__((unused)), uint64_t n __attrib
 uint64_t sort_then_search(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
   bubble_sort(s, n);
   uint64_t found __attribute__((unused)) = n;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if (((s.data[i] == target) && (found == n))) {
         found = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -63,7 +63,7 @@ uint64_t sort_then_search(forge_span_u64_t s __attribute__((unused)), uint64_t n
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

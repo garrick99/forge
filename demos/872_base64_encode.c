@@ -18,33 +18,33 @@ uint64_t base64_encode(forge_span_u64_t input __attribute__((unused)), uint64_t 
 int main();
 
 uint64_t base64_out_len(uint64_t n __attribute__((unused))) {
-  uint64_t groups __attribute__((unused)) = ((n + 2) / 3);
-  return (groups * 4);
+  uint64_t groups __attribute__((unused)) = ((n + 2ULL) / 3ULL);
+  return (groups * 4ULL);
 }
 
 void encode_triple(uint64_t b0 __attribute__((unused)), uint64_t b1 __attribute__((unused)), uint64_t b2 __attribute__((unused)), forge_span_u64_t table __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t oi __attribute__((unused))) {
-  uint64_t combined __attribute__((unused)) = (((b0 * 65536) + (b1 * 256)) + b2);
-  uint64_t i0 __attribute__((unused)) = ((combined / 262144) % 64);
-  uint64_t i1 __attribute__((unused)) = ((combined / 4096) % 64);
-  uint64_t i2 __attribute__((unused)) = ((combined / 64) % 64);
-  uint64_t i3 __attribute__((unused)) = (combined % 64);
+  uint64_t combined __attribute__((unused)) = (((b0 * 65536ULL) + (b1 * 256ULL)) + b2);
+  uint64_t i0 __attribute__((unused)) = ((combined / 262144ULL) % 64ULL);
+  uint64_t i1 __attribute__((unused)) = ((combined / 4096ULL) % 64ULL);
+  uint64_t i2 __attribute__((unused)) = ((combined / 64ULL) % 64ULL);
+  uint64_t i3 __attribute__((unused)) = (combined % 64ULL);
   out.data[oi] = table.data[i0];
-  out.data[(oi + 1)] = table.data[i1];
-  out.data[(oi + 2)] = table.data[i2];
-  out.data[(oi + 3)] = table.data[i3];
+  out.data[(oi + 1ULL)] = table.data[i1];
+  out.data[(oi + 2ULL)] = table.data[i2];
+  out.data[(oi + 3ULL)] = table.data[i3];
 }
 
 uint64_t base64_encode(forge_span_u64_t input __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t output __attribute__((unused)), uint64_t out_len __attribute__((unused)), forge_span_u64_t table __attribute__((unused))) {
-  uint64_t ii __attribute__((unused)) = 0;
-  uint64_t oi __attribute__((unused)) = 0;
+  uint64_t ii __attribute__((unused)) = 0ULL;
+  uint64_t oi __attribute__((unused)) = 0ULL;
   {
-    while (((ii + 2) < n)) {
-      if (((oi + 3) < out_len)) {
-        encode_triple((input.data[ii] % 256), (input.data[(ii + 1)] % 256), (input.data[(ii + 2)] % 256), table, output, oi);
-        oi = (oi + 4);
+    while (((ii + 2ULL) < n)) {
+      if (((oi + 3ULL) < out_len)) {
+        encode_triple((input.data[ii] % 256ULL), (input.data[(ii + 1ULL)] % 256ULL), (input.data[(ii + 2ULL)] % 256ULL), table, output, oi);
+        oi = (oi + 4ULL);
 
       }
-      ii = (ii + 3);
+      ii = (ii + 3ULL);
     }
 
   }
@@ -52,7 +52,7 @@ uint64_t base64_encode(forge_span_u64_t input __attribute__((unused)), uint64_t 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -23,11 +23,11 @@ int main();
 
 uint64_t popcount_loop(uint64_t x __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = x;
-  uint64_t c __attribute__((unused)) = 0;
+  uint64_t c __attribute__((unused)) = 0ULL;
   {
-    while ((v > 0)) {
-      c = (c + (v & 1));
-      v = (v >> 1);
+    while ((v > 0ULL)) {
+      c = (c + (v & 1ULL));
+      v = (v >> 1ULL);
     }
 
   }
@@ -36,11 +36,11 @@ uint64_t popcount_loop(uint64_t x __attribute__((unused))) {
 
 uint64_t popcount_kernighan(uint64_t x __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = x;
-  uint64_t c __attribute__((unused)) = 0;
+  uint64_t c __attribute__((unused)) = 0ULL;
   {
-    while ((v > 0)) {
-      v = (v & (v - 1));
-      c = (c + 1);
+    while ((v > 0ULL)) {
+      v = (v & (v - 1ULL));
+      c = (c + 1ULL);
     }
 
   }
@@ -49,39 +49,39 @@ uint64_t popcount_kernighan(uint64_t x __attribute__((unused))) {
 
 uint64_t parity_bit(uint64_t x __attribute__((unused))) {
   uint64_t cnt __attribute__((unused)) = popcount_loop(x);
-  return (cnt % 2);
+  return (cnt % 2ULL);
 }
 
 _Bool has_exactly_one_bit(uint64_t x __attribute__((unused))) {
-  return ((x & (x - 1)) == 0);
+  return ((x & (x - 1ULL)) == 0ULL);
 }
 
 uint64_t check_popcount_0() {
-  return popcount_loop(0);
+  return popcount_loop(0ULL);
 }
 
 uint64_t check_popcount_1() {
-  return popcount_loop(1);
+  return popcount_loop(1ULL);
 }
 
 uint64_t check_popcount_255() {
-  return popcount_loop(255);
+  return popcount_loop(255ULL);
 }
 
 uint64_t check_kernighan_0() {
-  return popcount_kernighan(0);
+  return popcount_kernighan(0ULL);
 }
 
 uint64_t check_kernighan_1() {
-  return popcount_kernighan(1);
+  return popcount_kernighan(1ULL);
 }
 
 uint64_t check_parity_0() {
-  return parity_bit(0);
+  return parity_bit(0ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -18,15 +18,15 @@ uint64_t partition_point(forge_span_u64_t s __attribute__((unused)), uint64_t n 
 int main();
 
 _Bool two_sum_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  if ((n == 0)) {
+  if ((n == 0ULL)) {
     {
       return 0;
 
     }
 
   }
-  uint64_t lo __attribute__((unused)) = 0;
-  uint64_t hi __attribute__((unused)) = (n - 1);
+  uint64_t lo __attribute__((unused)) = 0ULL;
+  uint64_t hi __attribute__((unused)) = (n - 1ULL);
   {
     while ((lo < hi)) {
       uint64_t sum __attribute__((unused)) = (s.data[lo] + s.data[hi]);
@@ -37,10 +37,10 @@ _Bool two_sum_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
         }
 
       } else if ((sum < target)) {
-        lo = (lo + 1);
+        lo = (lo + 1ULL);
 
       } else {
-        hi = (hi - 1);
+        hi = (hi - 1ULL);
 
       }
     }
@@ -50,22 +50,22 @@ _Bool two_sum_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 }
 
 uint64_t count_pairs_le(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t limit __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t j __attribute__((unused)) = (i + 1);
+      uint64_t j __attribute__((unused)) = (i + 1ULL);
       {
         while ((j < n)) {
           if (((s.data[i] + s.data[j]) <= limit)) {
-            count = (count + 1);
+            count = (count + 1ULL);
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -73,13 +73,13 @@ uint64_t count_pairs_le(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 }
 
 uint64_t partition_point(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t pivot __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
   uint64_t hi __attribute__((unused)) = n;
   {
     while ((lo < hi)) {
-      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2));
+      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2ULL));
       if ((s.data[mid] < pivot)) {
-        lo = (mid + 1);
+        lo = (mid + 1ULL);
 
       } else {
         hi = mid;
@@ -92,7 +92,7 @@ uint64_t partition_point(forge_span_u64_t s __attribute__((unused)), uint64_t n 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

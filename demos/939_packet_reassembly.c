@@ -16,17 +16,17 @@ uint64_t reassemble(forge_span_u64_t offsets __attribute__((unused)), forge_span
 int main();
 
 uint64_t reassemble(forge_span_u64_t offsets __attribute__((unused)), forge_span_u64_t payloads __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t buf __attribute__((unused)), uint64_t cap __attribute__((unused))) {
-  uint64_t placed __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t placed __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t off __attribute__((unused)) = offsets.data[i];
       if ((off < cap)) {
         buf.data[off] = payloads.data[i];
-        placed = (placed + 1);
+        placed = (placed + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -34,7 +34,7 @@ uint64_t reassemble(forge_span_u64_t offsets __attribute__((unused)), forge_span
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -18,8 +18,8 @@ int main();
 void apply_mask(forge_span_u64_t s __attribute__((unused)), forge_span_u64_t mask __attribute__((unused)), uint64_t n __attribute__((unused))) {
   {
     for (uint64_t i = 0; i < (uint64_t)(n); i++) {
-      if ((mask.data[i] == 0)) {
-        s.data[i] = 0;
+      if ((mask.data[i] == 0ULL)) {
+        s.data[i] = 0ULL;
 
       }
     }
@@ -28,7 +28,7 @@ void apply_mask(forge_span_u64_t s __attribute__((unused)), forge_span_u64_t mas
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

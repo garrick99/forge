@@ -16,7 +16,7 @@ uint64_t gap_insertion(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 int main();
 
 uint64_t gap_insertion(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t gap __attribute__((unused))) {
-  uint64_t swaps __attribute__((unused)) = 0;
+  uint64_t swaps __attribute__((unused)) = 0ULL;
   uint64_t i __attribute__((unused)) = gap;
   {
     while ((i < n)) {
@@ -29,7 +29,7 @@ uint64_t gap_insertion(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 
           }
           if ((swaps < n)) {
-            swaps = (swaps + 1);
+            swaps = (swaps + 1ULL);
 
           }
           j = (j - gap);
@@ -40,7 +40,7 @@ uint64_t gap_insertion(forge_span_u64_t s __attribute__((unused)), uint64_t n __
         s.data[j] = key;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -48,7 +48,7 @@ uint64_t gap_insertion(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

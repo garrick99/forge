@@ -16,8 +16,8 @@ uint64_t sum_bounded(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 int main();
 
 uint64_t sum_bounded(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t cap __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   _Bool stopped __attribute__((unused)) = 0;
   {
     while ((i < n)) {
@@ -28,7 +28,7 @@ uint64_t sum_bounded(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
         stopped = 1;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -36,7 +36,7 @@ uint64_t sum_bounded(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

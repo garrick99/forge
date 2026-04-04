@@ -34,15 +34,15 @@ void accum_add(Accum* a __attribute__((unused)), uint64_t delta __attribute__((u
 int main();
 
 void counter_inc(Counter* c __attribute__((unused))) {
-  (*c).value = ((*c).value + 1);
+  (*c).value = ((*c).value + 1ULL);
 }
 
 void counter_dec(Counter* c __attribute__((unused))) {
-  (*c).value = ((*c).value - 1);
+  (*c).value = ((*c).value - 1ULL);
 }
 
 void counter_reset(Counter* c __attribute__((unused))) {
-  (*c).value = 0;
+  (*c).value = 0ULL;
 }
 
 void counter_set_max(Counter* c __attribute__((unused)), uint64_t m __attribute__((unused))) {
@@ -59,11 +59,11 @@ void conn_set_state(Conn* c __attribute__((unused)), uint64_t state __attribute_
 
 void accum_add(Accum* a __attribute__((unused)), uint64_t delta __attribute__((unused))) {
   (*a).total = ((*a).total + delta);
-  (*a).count = ((*a).count + 1);
+  (*a).count = ((*a).count + 1ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

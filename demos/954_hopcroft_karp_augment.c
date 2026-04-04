@@ -16,12 +16,12 @@ uint64_t augment_path(forge_span_u64_t path __attribute__((unused)), forge_span_
 int main();
 
 uint64_t augment_path(forge_span_u64_t path __attribute__((unused)), forge_span_u64_t match_u __attribute__((unused)), forge_span_u64_t match_v __attribute__((unused)), uint64_t plen __attribute__((unused)), uint64_t nu __attribute__((unused)), uint64_t nv __attribute__((unused))) {
-  uint64_t flipped __attribute__((unused)) = 0;
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t flipped __attribute__((unused)) = 0ULL;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
-    while (((k + 1) < plen)) {
+    while (((k + 1ULL) < plen)) {
       uint64_t u __attribute__((unused)) = path.data[k];
-      uint64_t v __attribute__((unused)) = path.data[(k + 1)];
+      uint64_t v __attribute__((unused)) = path.data[(k + 1ULL)];
       if ((u < nu)) {
         match_u.data[u] = v;
 
@@ -30,8 +30,8 @@ uint64_t augment_path(forge_span_u64_t path __attribute__((unused)), forge_span_
         match_v.data[v] = u;
 
       }
-      flipped = (flipped + 1);
-      k = (k + 2);
+      flipped = (flipped + 1ULL);
+      k = (k + 2ULL);
     }
 
   }
@@ -39,7 +39,7 @@ uint64_t augment_path(forge_span_u64_t path __attribute__((unused)), forge_span_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

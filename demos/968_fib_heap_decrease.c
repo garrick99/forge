@@ -18,7 +18,7 @@ int main();
 uint64_t decrease_key(forge_span_u64_t keys __attribute__((unused)), forge_span_u64_t parent __attribute__((unused)), forge_span_u64_t marked __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t node __attribute__((unused)), uint64_t new_val __attribute__((unused))) {
   keys.data[node] = new_val;
   uint64_t cur __attribute__((unused)) = node;
-  uint64_t cuts __attribute__((unused)) = 0;
+  uint64_t cuts __attribute__((unused)) = 0ULL;
   _Bool done __attribute__((unused)) = 0;
   {
     while ((done == 0)) {
@@ -30,14 +30,14 @@ uint64_t decrease_key(forge_span_u64_t keys __attribute__((unused)), forge_span_
         if ((p >= n)) {
           done = 1;
 
-        } else if ((marked.data[p] == 0)) {
-          marked.data[p] = 1;
+        } else if ((marked.data[p] == 0ULL)) {
+          marked.data[p] = 1ULL;
           done = 1;
 
         } else {
-          marked.data[p] = 0;
+          marked.data[p] = 0ULL;
           cur = p;
-          cuts = (cuts + 1);
+          cuts = (cuts + 1ULL);
 
         }
 
@@ -49,7 +49,7 @@ uint64_t decrease_key(forge_span_u64_t keys __attribute__((unused)), forge_span_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

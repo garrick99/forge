@@ -30,29 +30,29 @@ uint64_t push_pop_size(Stack8 s __attribute__((unused)), uint64_t val __attribut
 int main();
 
 Stack8 stack_new() {
-  return (Stack8){ .s0 = 0, .s1 = 0, .s2 = 0, .s3 = 0, .s4 = 0, .s5 = 0, .s6 = 0, .s7 = 0, .size = 0 };
+  return (Stack8){ .s0 = 0ULL, .s1 = 0ULL, .s2 = 0ULL, .s3 = 0ULL, .s4 = 0ULL, .s5 = 0ULL, .s6 = 0ULL, .s7 = 0ULL, .size = 0ULL };
 }
 
 uint64_t stack_get(Stack8 s __attribute__((unused)), uint64_t i __attribute__((unused))) {
-  if ((i == 0)) {
+  if ((i == 0ULL)) {
     return s.s0;
   } else {
-    if ((i == 1)) {
+    if ((i == 1ULL)) {
       return s.s1;
     } else {
-      if ((i == 2)) {
+      if ((i == 2ULL)) {
         return s.s2;
       } else {
-        if ((i == 3)) {
+        if ((i == 3ULL)) {
           return s.s3;
         } else {
-          if ((i == 4)) {
+          if ((i == 4ULL)) {
             return s.s4;
           } else {
-            if ((i == 5)) {
+            if ((i == 5ULL)) {
               return s.s5;
             } else {
-              if ((i == 6)) {
+              if ((i == 6ULL)) {
                 return s.s6;
               } else {
                 return s.s7;
@@ -67,28 +67,28 @@ uint64_t stack_get(Stack8 s __attribute__((unused)), uint64_t i __attribute__((u
 
 Stack8 stack_push(Stack8 s __attribute__((unused)), uint64_t val __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = s.size;
-  if ((n == 0)) {
-    return (Stack8){ .s0 = val, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 1 };
+  if ((n == 0ULL)) {
+    return (Stack8){ .s0 = val, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 1ULL };
   } else {
-    if ((n == 1)) {
-      return (Stack8){ .s0 = s.s0, .s1 = val, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 2 };
+    if ((n == 1ULL)) {
+      return (Stack8){ .s0 = s.s0, .s1 = val, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 2ULL };
     } else {
-      if ((n == 2)) {
-        return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = val, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 3 };
+      if ((n == 2ULL)) {
+        return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = val, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 3ULL };
       } else {
-        if ((n == 3)) {
-          return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = val, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 4 };
+        if ((n == 3ULL)) {
+          return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = val, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 4ULL };
         } else {
-          if ((n == 4)) {
-            return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = val, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 5 };
+          if ((n == 4ULL)) {
+            return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = val, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 5ULL };
           } else {
-            if ((n == 5)) {
-              return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = val, .s6 = s.s6, .s7 = s.s7, .size = 6 };
+            if ((n == 5ULL)) {
+              return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = val, .s6 = s.s6, .s7 = s.s7, .size = 6ULL };
             } else {
-              if ((n == 6)) {
-                return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = val, .s7 = s.s7, .size = 7 };
+              if ((n == 6ULL)) {
+                return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = val, .s7 = s.s7, .size = 7ULL };
               } else {
-                return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = val, .size = 8 };
+                return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = val, .size = 8ULL };
               }
             }
           }
@@ -99,33 +99,33 @@ Stack8 stack_push(Stack8 s __attribute__((unused)), uint64_t val __attribute__((
 }
 
 uint64_t stack_peek(Stack8 s __attribute__((unused))) {
-  return stack_get(s, (s.size - 1));
+  return stack_get(s, (s.size - 1ULL));
 }
 
 Stack8 stack_pop(Stack8 s __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = s.size;
-  if ((n == 1)) {
-    return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 0 };
+  if ((n == 1ULL)) {
+    return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 0ULL };
   } else {
-    if ((n == 2)) {
-      return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 1 };
+    if ((n == 2ULL)) {
+      return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 1ULL };
     } else {
-      if ((n == 3)) {
-        return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 2 };
+      if ((n == 3ULL)) {
+        return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 2ULL };
       } else {
-        if ((n == 4)) {
-          return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 3 };
+        if ((n == 4ULL)) {
+          return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 3ULL };
         } else {
-          if ((n == 5)) {
-            return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 4 };
+          if ((n == 5ULL)) {
+            return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 4ULL };
           } else {
-            if ((n == 6)) {
-              return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 5 };
+            if ((n == 6ULL)) {
+              return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 5ULL };
             } else {
-              if ((n == 7)) {
-                return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 6 };
+              if ((n == 7ULL)) {
+                return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 6ULL };
               } else {
-                return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 7 };
+                return (Stack8){ .s0 = s.s0, .s1 = s.s1, .s2 = s.s2, .s3 = s.s3, .s4 = s.s4, .s5 = s.s5, .s6 = s.s6, .s7 = s.s7, .size = 7ULL };
               }
             }
           }
@@ -143,14 +143,14 @@ uint64_t push_pop_size(Stack8 s __attribute__((unused)), uint64_t val __attribut
 
 int main() {
   Stack8 s0 __attribute__((unused)) = stack_new();
-  Stack8 s1 __attribute__((unused)) = stack_push(s0, 10);
-  Stack8 s2 __attribute__((unused)) = stack_push(s1, 20);
-  Stack8 s3 __attribute__((unused)) = stack_push(s2, 30);
+  Stack8 s1 __attribute__((unused)) = stack_push(s0, 10ULL);
+  Stack8 s2 __attribute__((unused)) = stack_push(s1, 20ULL);
+  Stack8 s3 __attribute__((unused)) = stack_push(s2, 30ULL);
   uint64_t sz3 __attribute__((unused)) = s3.size;
   uint64_t top __attribute__((unused)) = s3.s2;
   Stack8 s4 __attribute__((unused)) = stack_pop(s3);
   uint64_t sz4 __attribute__((unused)) = s4.size;
-  uint64_t inv __attribute__((unused)) = push_pop_size(s2, 99);
+  uint64_t inv __attribute__((unused)) = push_pop_size(s2, 99ULL);
   return (int)((((sz3 + top) + sz4) + inv));
 
 }

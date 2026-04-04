@@ -26,19 +26,19 @@ uint64_t exhaust_after_one(uint64_t max __attribute__((unused)));
 int main();
 
 Retry retry_new(uint64_t max_tries __attribute__((unused))) {
-  return (Retry){ .attempts = 0, .max_tries = max_tries, .succeeded = 0 };
+  return (Retry){ .attempts = 0ULL, .max_tries = max_tries, .succeeded = 0ULL };
 }
 
 void retry_attempt(Retry* r __attribute__((unused))) {
-  (*r).attempts = ((*r).attempts + 1);
+  (*r).attempts = ((*r).attempts + 1ULL);
 }
 
 void retry_succeed(Retry* r __attribute__((unused))) {
-  (*r).succeeded = 1;
+  (*r).succeeded = 1ULL;
 }
 
 void retry_exhaust(Retry* r __attribute__((unused))) {
-  (*r).succeeded = 2;
+  (*r).succeeded = 2ULL;
 }
 
 uint64_t one_attempt(uint64_t max __attribute__((unused))) {
@@ -69,7 +69,7 @@ uint64_t exhaust_after_one(uint64_t max __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -26,13 +26,13 @@ uint64_t reseed_count();
 int main();
 
 EntropyPool ep_new() {
-  return (EntropyPool){ .bits_available = 0, .bits_added = 0, .bits_drawn = 0, .reseeds = 0 };
+  return (EntropyPool){ .bits_available = 0ULL, .bits_added = 0ULL, .bits_drawn = 0ULL, .reseeds = 0ULL };
 }
 
 void ep_seed(EntropyPool* e __attribute__((unused)), uint64_t bits __attribute__((unused))) {
   (*e).bits_available = ((*e).bits_available + bits);
   (*e).bits_added = ((*e).bits_added + bits);
-  (*e).reseeds = ((*e).reseeds + 1);
+  (*e).reseeds = ((*e).reseeds + 1ULL);
 }
 
 void ep_draw(EntropyPool* e __attribute__((unused)), uint64_t bits __attribute__((unused))) {
@@ -42,36 +42,36 @@ void ep_draw(EntropyPool* e __attribute__((unused)), uint64_t bits __attribute__
 
 uint64_t seed_256() {
   EntropyPool e __attribute__((unused)) = ep_new();
-  ep_seed((&e), 256);
+  ep_seed((&e), 256ULL);
   return e.bits_available;
 }
 
 uint64_t seed_draw() {
   EntropyPool e __attribute__((unused)) = ep_new();
-  ep_seed((&e), 256);
-  ep_draw((&e), 128);
+  ep_seed((&e), 256ULL);
+  ep_draw((&e), 128ULL);
   return e.bits_available;
 }
 
 uint64_t conservation() {
   EntropyPool e __attribute__((unused)) = ep_new();
-  ep_seed((&e), 256);
-  ep_seed((&e), 128);
-  ep_draw((&e), 100);
-  ep_draw((&e), 50);
+  ep_seed((&e), 256ULL);
+  ep_seed((&e), 128ULL);
+  ep_draw((&e), 100ULL);
+  ep_draw((&e), 50ULL);
   return ((e.bits_added - e.bits_drawn) - e.bits_available);
 }
 
 uint64_t reseed_count() {
   EntropyPool e __attribute__((unused)) = ep_new();
-  ep_seed((&e), 64);
-  ep_seed((&e), 64);
-  ep_seed((&e), 128);
+  ep_seed((&e), 64ULL);
+  ep_seed((&e), 64ULL);
+  ep_seed((&e), 128ULL);
   return e.reseeds;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

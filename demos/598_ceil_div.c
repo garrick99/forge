@@ -18,11 +18,11 @@ uint64_t blocks_needed(uint64_t total __attribute__((unused)), uint64_t block_si
 int main();
 
 uint64_t ceil_div(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  return (((a + b) - 1) / b);
+  return (((a + b) - 1ULL) / b);
 }
 
 uint64_t round_up(uint64_t a __attribute__((unused)), uint64_t align __attribute__((unused))) {
-  return ((((a + align) - 1) / align) * align);
+  return ((((a + align) - 1ULL) / align) * align);
 }
 
 uint64_t round_down(uint64_t a __attribute__((unused)), uint64_t align __attribute__((unused))) {
@@ -30,7 +30,7 @@ uint64_t round_down(uint64_t a __attribute__((unused)), uint64_t align __attribu
 }
 
 _Bool is_aligned(uint64_t a __attribute__((unused)), uint64_t align __attribute__((unused))) {
-  return ((a % align) == 0);
+  return ((a % align) == 0ULL);
 }
 
 uint64_t align_offset(uint64_t base __attribute__((unused)), uint64_t size __attribute__((unused)), uint64_t align __attribute__((unused))) {
@@ -42,7 +42,7 @@ uint64_t blocks_needed(uint64_t total __attribute__((unused)), uint64_t block_si
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

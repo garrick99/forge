@@ -34,7 +34,7 @@ uint64_t suffix_child(forge_span_u64_t children __attribute__((unused)), uint64_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

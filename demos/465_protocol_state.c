@@ -29,27 +29,27 @@ uint64_t total_sum();
 int main();
 
 ProtocolState ps_new() {
-  return (ProtocolState){ .init_to_neg = 0, .neg_to_est = 0, .est_to_closed = 0, .errors = 0, .total_transitions = 0 };
+  return (ProtocolState){ .init_to_neg = 0ULL, .neg_to_est = 0ULL, .est_to_closed = 0ULL, .errors = 0ULL, .total_transitions = 0ULL };
 }
 
 void ps_negotiate(ProtocolState* p __attribute__((unused))) {
-  (*p).init_to_neg = ((*p).init_to_neg + 1);
-  (*p).total_transitions = ((*p).total_transitions + 1);
+  (*p).init_to_neg = ((*p).init_to_neg + 1ULL);
+  (*p).total_transitions = ((*p).total_transitions + 1ULL);
 }
 
 void ps_establish(ProtocolState* p __attribute__((unused))) {
-  (*p).neg_to_est = ((*p).neg_to_est + 1);
-  (*p).total_transitions = ((*p).total_transitions + 1);
+  (*p).neg_to_est = ((*p).neg_to_est + 1ULL);
+  (*p).total_transitions = ((*p).total_transitions + 1ULL);
 }
 
 void ps_close(ProtocolState* p __attribute__((unused))) {
-  (*p).est_to_closed = ((*p).est_to_closed + 1);
-  (*p).total_transitions = ((*p).total_transitions + 1);
+  (*p).est_to_closed = ((*p).est_to_closed + 1ULL);
+  (*p).total_transitions = ((*p).total_transitions + 1ULL);
 }
 
 void ps_error(ProtocolState* p __attribute__((unused))) {
-  (*p).errors = ((*p).errors + 1);
-  (*p).total_transitions = ((*p).total_transitions + 1);
+  (*p).errors = ((*p).errors + 1ULL);
+  (*p).total_transitions = ((*p).total_transitions + 1ULL);
 }
 
 uint64_t full_connect() {
@@ -84,7 +84,7 @@ uint64_t total_sum() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

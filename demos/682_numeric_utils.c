@@ -35,10 +35,10 @@ uint64_t round_to_multiple(uint64_t x __attribute__((unused)), uint64_t m __attr
 }
 
 uint64_t round_up_to_multiple(uint64_t x __attribute__((unused)), uint64_t m __attribute__((unused))) {
-  if (((x % m) == 0)) {
+  if (((x % m) == 0ULL)) {
     return x;
   } else {
-    return (((x / m) + 1) * m);
+    return (((x / m) + 1ULL) * m);
   }
 }
 
@@ -47,10 +47,10 @@ uint64_t align_down(uint64_t addr __attribute__((unused)), uint64_t align __attr
 }
 
 uint64_t align_up(uint64_t addr __attribute__((unused)), uint64_t align __attribute__((unused))) {
-  if (((addr % align) == 0)) {
+  if (((addr % align) == 0ULL)) {
     return addr;
   } else {
-    return (((addr / align) + 1) * align);
+    return (((addr / align) + 1ULL) * align);
   }
 }
 
@@ -79,7 +79,7 @@ uint64_t max3(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unus
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

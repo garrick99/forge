@@ -17,7 +17,7 @@ int main();
 
 void copy_back(forge_span_u64_t s __attribute__((unused)), uint64_t mid __attribute__((unused)), uint64_t n __attribute__((unused))) {
   {
-    for (uint64_t i = (uint64_t)(0); i < (uint64_t)((n - mid)); i++) {
+    for (uint64_t i = (uint64_t)(0ULL); i < (uint64_t)((n - mid)); i++) {
       s.data[i] = s.data[(mid + i)];
     }
 
@@ -25,7 +25,7 @@ void copy_back(forge_span_u64_t s __attribute__((unused)), uint64_t mid __attrib
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

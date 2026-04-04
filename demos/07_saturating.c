@@ -13,10 +13,10 @@ uint32_t sat_add_u32(uint32_t a __attribute__((unused)), uint32_t b __attribute_
 uint32_t sat_sub_u32(uint32_t a __attribute__((unused)), uint32_t b __attribute__((unused)));
 
 uint32_t sat_add_u32(uint32_t a __attribute__((unused)), uint32_t b __attribute__((unused))) {
-  if ((a <= (4294967295 - b))) {
+  if ((a <= (4294967295ULL - b))) {
     return (a + b);
   } else {
-    return 4294967295;
+    return 4294967295ULL;
   }
 }
 
@@ -24,7 +24,7 @@ uint32_t sat_sub_u32(uint32_t a __attribute__((unused)), uint32_t b __attribute_
   if ((a >= b)) {
     return (a - b);
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 

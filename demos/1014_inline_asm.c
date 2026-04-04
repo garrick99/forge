@@ -11,6 +11,14 @@
 /* span<T> typedefs — fat pointers with proven bounds */
 typedef struct { uint8_t* data; uintptr_t len; } forge_span_u8_t;
 
+/* Function pointer typedefs */
+typedef uint64_t (*forge_fn__ret_u64_t)(void);
+typedef uint64_t (*forge_fn_u64_u64_ret_u64_t)(uint64_t, uint64_t);
+typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
+typedef void (*forge_fn_u64_u64_ret_unit_t)(uint64_t, uint64_t);
+typedef void (*forge_fn__ret_unit_t)(void);
+typedef void (*forge_fn_str_ret_unit_t)(forge_span_u8_t);
+
 uint64_t ptr_null(void);  /* extern: forge_raw */
 
 uint64_t ptr_offset(uint64_t ptr, uint64_t n);  /* extern: forge_raw */
@@ -37,14 +45,6 @@ void cpu_relax(void);  /* extern: forge_raw */
 
 void dmb(void);  /* extern: forge_raw */
 
-/* Function pointer typedefs */
-typedef uint64_t (*forge_fn__ret_u64_t)(void);
-typedef uint64_t (*forge_fn_u64_u64_ret_u64_t)(uint64_t, uint64_t);
-typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
-typedef void (*forge_fn_u64_u64_ret_unit_t)(uint64_t, uint64_t);
-typedef void (*forge_fn__ret_unit_t)(void);
-typedef void (*forge_fn_str_ret_unit_t)(forge_span_u8_t);
-
 /* Forward declarations */
 _Bool spin_lock(uint64_t lock __attribute__((unused)), uint64_t max_spins __attribute__((unused)));
 void spin_unlock(uint64_t lock __attribute__((unused)));
@@ -54,12 +54,12 @@ int main();
 
 _Bool spin_lock(uint64_t lock __attribute__((unused)), uint64_t max_spins __attribute__((unused))) {
   _Bool acquired __attribute__((unused)) = 0;
-  uint64_t spins __attribute__((unused)) = 0;
+  uint64_t spins __attribute__((unused)) = 0ULL;
   {
     while (((spins < max_spins) && (!acquired))) {
       uint64_t val __attribute__((unused)) = (*(volatile uint64_t*)((uintptr_t)lock));
-      if ((val == 0)) {
-        (*(volatile uint64_t*)((uintptr_t)lock) = 1);
+      if ((val == 0ULL)) {
+        (*(volatile uint64_t*)((uintptr_t)lock) = 1ULL);
         __asm__ volatile("" ::: "memory");
         acquired = 1;
 
@@ -67,7 +67,7 @@ _Bool spin_lock(uint64_t lock __attribute__((unused)), uint64_t max_spins __attr
         __asm__ volatile("pause" ::: "memory");
 
       }
-      spins = (spins + 1);
+      spins = (spins + 1ULL);
     }
 
   }
@@ -76,7 +76,7 @@ _Bool spin_lock(uint64_t lock __attribute__((unused)), uint64_t max_spins __attr
 
 void spin_unlock(uint64_t lock __attribute__((unused))) {
   __asm__ volatile("" ::: "memory");
-  (*(volatile uint64_t*)((uintptr_t)lock) = 0);
+  (*(volatile uint64_t*)((uintptr_t)lock) = 0ULL);
 }
 
 void nop_sled() {
@@ -92,7 +92,7 @@ void mmio_write_barrier(uint64_t addr __attribute__((unused)), uint64_t val __at
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

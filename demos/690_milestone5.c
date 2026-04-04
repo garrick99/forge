@@ -20,17 +20,17 @@ _Bool is_palindrome(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 int main();
 
 uint64_t binary_search(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
   uint64_t hi __attribute__((unused)) = n;
   {
     while ((lo < hi)) {
-      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2));
+      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2ULL));
       if ((s.data[mid] == val)) {
         lo = mid;
         hi = mid;
 
       } else if ((s.data[mid] < val)) {
-        lo = (mid + 1);
+        lo = (mid + 1ULL);
 
       } else {
         hi = mid;
@@ -43,18 +43,18 @@ uint64_t binary_search(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 void selection_sort(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while (((i + 1) < n)) {
+    while (((i + 1ULL) < n)) {
       uint64_t min_idx __attribute__((unused)) = i;
-      uint64_t j __attribute__((unused)) = (i + 1);
+      uint64_t j __attribute__((unused)) = (i + 1ULL);
       {
         while ((j < n)) {
           if ((s.data[j] < s.data[min_idx])) {
             min_idx = j;
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
@@ -64,19 +64,19 @@ void selection_sort(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
         s.data[min_idx] = tmp;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t array_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -84,12 +84,12 @@ uint64_t array_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 }
 
 uint64_t array_product_mod(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t m __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = (1 % m);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = (1ULL % m);
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = ((acc * (s.data[i] % m)) % m);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -98,14 +98,14 @@ uint64_t array_product_mod(forge_span_u64_t s __attribute__((unused)), uint64_t 
 
 _Bool is_palindrome(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
   _Bool ok __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while (((i < (n / 2)) && ok)) {
-      if ((s.data[i] != s.data[((n - 1) - i)])) {
+    while (((i < (n / 2ULL)) && ok)) {
+      if ((s.data[i] != s.data[((n - 1ULL) - i)])) {
         ok = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -113,7 +113,7 @@ _Bool is_palindrome(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

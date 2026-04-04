@@ -15,24 +15,24 @@ typedef struct { uint64_t* data; uintptr_t len; } forge_span_u64_t;
 uint64_t binary_search2(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused)));
 void insertion_sort2(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)));
 uint64_t array_sum2(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)));
-void memset(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused)));
-void memcpy(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused)));
+void forge_memset(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused)));
+void forge_memcpy(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused)));
 int main();
 
 uint64_t binary_search2(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
   uint64_t hi __attribute__((unused)) = n;
   uint64_t found __attribute__((unused)) = n;
   _Bool done __attribute__((unused)) = 0;
   {
     while (((lo < hi) && (!done))) {
-      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2));
+      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2ULL));
       if ((s.data[mid] == target)) {
         found = mid;
         done = 1;
 
       } else if ((s.data[mid] < target)) {
-        lo = (mid + 1);
+        lo = (mid + 1ULL);
 
       } else {
         hi = mid;
@@ -45,17 +45,17 @@ uint64_t binary_search2(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 }
 
 void insertion_sort2(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       uint64_t key __attribute__((unused)) = s.data[i];
       uint64_t j __attribute__((unused)) = i;
       _Bool done __attribute__((unused)) = 0;
       {
-        while (((j >= 1) && (!done))) {
-          if ((s.data[(j - 1)] > key)) {
-            s.data[j] = s.data[(j - 1)];
-            j = (j - 1);
+        while (((j >= 1ULL) && (!done))) {
+          if ((s.data[(j - 1ULL)] > key)) {
+            s.data[j] = s.data[(j - 1ULL)];
+            j = (j - 1ULL);
 
           } else {
             done = 1;
@@ -65,49 +65,49 @@ void insertion_sort2(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 
       }
       s.data[j] = key;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t array_sum2(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
   return acc;
 }
 
-void memset(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+void forge_memset(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = val;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
-void memcpy(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+void forge_memcpy(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused))) {
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       dst.data[i] = src.data[i];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

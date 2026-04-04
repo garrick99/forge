@@ -17,17 +17,17 @@ uint64_t count_distinct(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 int main();
 
 uint64_t dedup_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  out.data[0] = s.data[0];
-  uint64_t write __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  out.data[0ULL] = s.data[0ULL];
+  uint64_t write __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      if ((s.data[i] != s.data[(i - 1)])) {
+      if ((s.data[i] != s.data[(i - 1ULL)])) {
         out.data[write] = s.data[i];
-        write = (write + 1);
+        write = (write + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -35,15 +35,15 @@ uint64_t dedup_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
 }
 
 uint64_t count_distinct(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t count __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      if ((s.data[i] != s.data[(i - 1)])) {
-        count = (count + 1);
+      if ((s.data[i] != s.data[(i - 1ULL)])) {
+        count = (count + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -51,7 +51,7 @@ uint64_t count_distinct(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -21,11 +21,11 @@ void zero(forge_span_u64_t s __attribute__((unused)));
 int main();
 
 void fill(forge_span_u64_t s __attribute__((unused)), uint64_t v __attribute__((unused))) {
-  uint64_t idx __attribute__((unused)) = 0;
+  uint64_t idx __attribute__((unused)) = 0ULL;
   {
     while ((idx < s.len)) {
       s.data[idx] = v;
-      idx = (idx + 1);
+      idx = (idx + 1ULL);
     }
 
   }
@@ -36,51 +36,51 @@ void fill_range(forge_span_u64_t s __attribute__((unused)), uint64_t lo __attrib
   {
     while ((idx < hi)) {
       s.data[idx] = v;
-      idx = (idx + 1);
+      idx = (idx + 1ULL);
     }
 
   }
 }
 
 void copy(forge_span_u64_t dst __attribute__((unused)), forge_span_u64_t src __attribute__((unused))) {
-  uint64_t idx __attribute__((unused)) = 0;
+  uint64_t idx __attribute__((unused)) = 0ULL;
   {
     while ((idx < dst.len)) {
       dst.data[idx] = src.data[idx];
-      idx = (idx + 1);
+      idx = (idx + 1ULL);
     }
 
   }
 }
 
 void map_add(forge_span_u64_t s __attribute__((unused)), uint64_t delta __attribute__((unused))) {
-  uint64_t idx __attribute__((unused)) = 0;
+  uint64_t idx __attribute__((unused)) = 0ULL;
   {
     while ((idx < s.len)) {
       s.data[idx] = delta;
-      idx = (idx + 1);
+      idx = (idx + 1ULL);
     }
 
   }
 }
 
 void clamp_all(forge_span_u64_t s __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
-  uint64_t idx __attribute__((unused)) = 0;
+  uint64_t idx __attribute__((unused)) = 0ULL;
   {
     while ((idx < s.len)) {
       s.data[idx] = ((s.data[idx] < lo) ? lo : ((s.data[idx] > hi) ? hi : s.data[idx]));
-      idx = (idx + 1);
+      idx = (idx + 1ULL);
     }
 
   }
 }
 
 void zero(forge_span_u64_t s __attribute__((unused))) {
-  fill(s, 0);
+  fill(s, 0ULL);
 }
 
 int main() {
-  return (int)(42);
+  return (int)(42ULL);
 
 }
 

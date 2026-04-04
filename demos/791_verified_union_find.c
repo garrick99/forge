@@ -18,11 +18,11 @@ int main();
 
 uint64_t find(forge_span_u64_t parent __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t x __attribute__((unused))) {
   uint64_t cur __attribute__((unused)) = x;
-  uint64_t steps __attribute__((unused)) = 0;
+  uint64_t steps __attribute__((unused)) = 0ULL;
   {
     while (((parent.data[cur] != cur) && (steps < n))) {
       cur = parent.data[cur];
-      steps = (steps + 1);
+      steps = (steps + 1ULL);
     }
 
   }
@@ -45,7 +45,7 @@ void uf_uf_union(forge_span_u64_t parent __attribute__((unused)), forge_span_u64
 
     } else {
       parent.data[ry] = rx;
-      rank.data[rx] = (rank.data[rx] + 1);
+      rank.data[rx] = (rank.data[rx] + 1ULL);
 
     }
 
@@ -53,7 +53,7 @@ void uf_uf_union(forge_span_u64_t parent __attribute__((unused)), forge_span_u64
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

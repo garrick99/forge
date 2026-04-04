@@ -18,21 +18,21 @@ int main();
 
 uint64_t cross_product(forge_span_u64_t pts __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t c __attribute__((unused))) {
   uint64_t ax __attribute__((unused)) = pts.data[(a + a)];
-  uint64_t ay __attribute__((unused)) = pts.data[((a + a) + 1)];
+  uint64_t ay __attribute__((unused)) = pts.data[((a + a) + 1ULL)];
   uint64_t bx __attribute__((unused)) = pts.data[(b + b)];
-  uint64_t by __attribute__((unused)) = pts.data[((b + b) + 1)];
+  uint64_t by __attribute__((unused)) = pts.data[((b + b) + 1ULL)];
   uint64_t cx __attribute__((unused)) = pts.data[(c + c)];
-  uint64_t cy __attribute__((unused)) = pts.data[((c + c) + 1)];
+  uint64_t cy __attribute__((unused)) = pts.data[((c + c) + 1ULL)];
   return (((bx - ax) * (cy - ay)) - ((by - ay) * (cx - ax)));
 }
 
 uint64_t find_bottom(forge_span_u64_t pts __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t best __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t best __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      uint64_t iy __attribute__((unused)) = pts.data[((i + i) + 1)];
-      uint64_t by __attribute__((unused)) = pts.data[((best + best) + 1)];
+      uint64_t iy __attribute__((unused)) = pts.data[((i + i) + 1ULL)];
+      uint64_t by __attribute__((unused)) = pts.data[((best + best) + 1ULL)];
       if ((iy < by)) {
         best = i;
 
@@ -45,7 +45,7 @@ uint64_t find_bottom(forge_span_u64_t pts __attribute__((unused)), uint64_t n __
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -53,7 +53,7 @@ uint64_t find_bottom(forge_span_u64_t pts __attribute__((unused)), uint64_t n __
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

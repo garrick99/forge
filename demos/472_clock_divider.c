@@ -26,22 +26,22 @@ uint64_t two_pulses();
 int main();
 
 ClockDivider cd_new(uint64_t divisor __attribute__((unused))) {
-  return (ClockDivider){ .count = 0, .divisor = divisor, .output_pulses = 0, .input_ticks = 0 };
+  return (ClockDivider){ .count = 0ULL, .divisor = divisor, .output_pulses = 0ULL, .input_ticks = 0ULL };
 }
 
 void cd_tick(ClockDivider* c __attribute__((unused))) {
-  (*c).count = ((*c).count + 1);
-  (*c).input_ticks = ((*c).input_ticks + 1);
+  (*c).count = ((*c).count + 1ULL);
+  (*c).input_ticks = ((*c).input_ticks + 1ULL);
 }
 
 void cd_tick_pulse(ClockDivider* c __attribute__((unused))) {
-  (*c).count = 0;
-  (*c).output_pulses = ((*c).output_pulses + 1);
-  (*c).input_ticks = ((*c).input_ticks + 1);
+  (*c).count = 0ULL;
+  (*c).output_pulses = ((*c).output_pulses + 1ULL);
+  (*c).input_ticks = ((*c).input_ticks + 1ULL);
 }
 
 uint64_t three_ticks() {
-  ClockDivider c __attribute__((unused)) = cd_new(4);
+  ClockDivider c __attribute__((unused)) = cd_new(4ULL);
   cd_tick((&c));
   cd_tick((&c));
   cd_tick((&c));
@@ -49,7 +49,7 @@ uint64_t three_ticks() {
 }
 
 uint64_t pulse_fires() {
-  ClockDivider c __attribute__((unused)) = cd_new(4);
+  ClockDivider c __attribute__((unused)) = cd_new(4ULL);
   cd_tick((&c));
   cd_tick((&c));
   cd_tick((&c));
@@ -58,7 +58,7 @@ uint64_t pulse_fires() {
 }
 
 uint64_t count_resets() {
-  ClockDivider c __attribute__((unused)) = cd_new(4);
+  ClockDivider c __attribute__((unused)) = cd_new(4ULL);
   cd_tick((&c));
   cd_tick((&c));
   cd_tick((&c));
@@ -67,7 +67,7 @@ uint64_t count_resets() {
 }
 
 uint64_t two_pulses() {
-  ClockDivider c __attribute__((unused)) = cd_new(4);
+  ClockDivider c __attribute__((unused)) = cd_new(4ULL);
   cd_tick((&c));
   cd_tick((&c));
   cd_tick((&c));
@@ -80,7 +80,7 @@ uint64_t two_pulses() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

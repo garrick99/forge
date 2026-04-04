@@ -11,7 +11,7 @@
 /* Forward declarations */
 uint64_t factorial(uint64_t n __attribute__((unused)));
 uint64_t fib(uint64_t n __attribute__((unused)));
-uint64_t ipow(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused)));
+uint64_t ipow(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused)));
 uint64_t rsum(uint64_t n __attribute__((unused)));
 uint64_t gcd(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 uint64_t count_digits(uint64_t n __attribute__((unused)));
@@ -19,40 +19,40 @@ uint64_t ilog2_rec(uint64_t n __attribute__((unused)));
 int main();
 
 uint64_t factorial(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return 1;
+  if ((n == 0ULL)) {
+    return 1ULL;
   } else {
-    return (n * factorial((n - 1)));
+    return (n * factorial((n - 1ULL)));
   }
 }
 
 uint64_t fib(uint64_t n __attribute__((unused))) {
-  if ((n <= 1)) {
+  if ((n <= 1ULL)) {
     return n;
   } else {
-    return (fib((n - 1)) + fib((n - 2)));
+    return (fib((n - 1ULL)) + fib((n - 2ULL)));
   }
 }
 
-uint64_t ipow(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused))) {
-  if ((exp == 0)) {
-    return 1;
+uint64_t ipow(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused))) {
+  if ((forge_exp == 0ULL)) {
+    return 1ULL;
   } else {
-    uint64_t sub __attribute__((unused)) = ipow(base, (exp - 1));
+    uint64_t sub __attribute__((unused)) = ipow(base, (forge_exp - 1ULL));
     return (base * sub);
   }
 }
 
 uint64_t rsum(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return 0;
+  if ((n == 0ULL)) {
+    return 0ULL;
   } else {
-    return (n + rsum((n - 1)));
+    return (n + rsum((n - 1ULL)));
   }
 }
 
 uint64_t gcd(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if (((a % b) == 0)) {
+  if (((a % b) == 0ULL)) {
     return b;
   } else {
     return gcd(b, (a % b));
@@ -60,29 +60,29 @@ uint64_t gcd(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unuse
 }
 
 uint64_t count_digits(uint64_t n __attribute__((unused))) {
-  if ((n < 10)) {
-    return 1;
+  if ((n < 10ULL)) {
+    return 1ULL;
   } else {
-    return (1 + count_digits((n / 10)));
+    return (1ULL + count_digits((n / 10ULL)));
   }
 }
 
 uint64_t ilog2_rec(uint64_t n __attribute__((unused))) {
-  if ((n <= 1)) {
-    return 0;
+  if ((n <= 1ULL)) {
+    return 0ULL;
   } else {
-    return (1 + ilog2_rec((n / 2)));
+    return (1ULL + ilog2_rec((n / 2ULL)));
   }
 }
 
 int main() {
-  uint64_t f5 __attribute__((unused)) = factorial(5);
-  uint64_t fb7 __attribute__((unused)) = fib(7);
-  uint64_t p3 __attribute__((unused)) = ipow(2, 10);
-  uint64_t rs __attribute__((unused)) = rsum(10);
-  uint64_t g __attribute__((unused)) = gcd(48, 18);
-  uint64_t cd __attribute__((unused)) = count_digits(12345);
-  uint64_t lg __attribute__((unused)) = ilog2_rec(256);
+  uint64_t f5 __attribute__((unused)) = factorial(5ULL);
+  uint64_t fb7 __attribute__((unused)) = fib(7ULL);
+  uint64_t p3 __attribute__((unused)) = ipow(2ULL, 10ULL);
+  uint64_t rs __attribute__((unused)) = rsum(10ULL);
+  uint64_t g __attribute__((unused)) = gcd(48ULL, 18ULL);
+  uint64_t cd __attribute__((unused)) = count_digits(12345ULL);
+  uint64_t lg __attribute__((unused)) = ilog2_rec(256ULL);
   return (int)(((((((f5 + fb7) + p3) + rs) + g) + cd) + lg));
 
 }

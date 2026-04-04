@@ -16,47 +16,47 @@ uint64_t kahn_topo_sort(forge_span_u64_t adj_ptr __attribute__((unused)), forge_
 int main();
 
 uint64_t kahn_topo_sort(forge_span_u64_t adj_ptr __attribute__((unused)), forge_span_u64_t adj_list __attribute__((unused)), uint64_t n_verts __attribute__((unused)), uint64_t n_edges __attribute__((unused)), forge_span_u64_t in_degree __attribute__((unused)), forge_span_u64_t queue __attribute__((unused)), forge_span_u64_t output __attribute__((unused))) {
-  uint64_t front __attribute__((unused)) = 0;
-  uint64_t back __attribute__((unused)) = 0;
-  uint64_t v __attribute__((unused)) = 0;
+  uint64_t front __attribute__((unused)) = 0ULL;
+  uint64_t back __attribute__((unused)) = 0ULL;
+  uint64_t v __attribute__((unused)) = 0ULL;
   {
     while ((v < n_verts)) {
-      if (((in_degree.data[v] == 0) && (back < n_verts))) {
+      if (((in_degree.data[v] == 0ULL) && (back < n_verts))) {
         queue.data[back] = v;
-        back = (back + 1);
+        back = (back + 1ULL);
 
       }
-      v = (v + 1);
+      v = (v + 1ULL);
     }
 
   }
-  uint64_t out_idx __attribute__((unused)) = 0;
+  uint64_t out_idx __attribute__((unused)) = 0ULL;
   {
     while ((front < back)) {
       uint64_t u __attribute__((unused)) = queue.data[front];
-      front = (front + 1);
+      front = (front + 1ULL);
       if ((out_idx < n_verts)) {
         output.data[out_idx] = u;
-        out_idx = (out_idx + 1);
+        out_idx = (out_idx + 1ULL);
 
       }
       if ((u < n_verts)) {
         uint64_t start __attribute__((unused)) = adj_ptr.data[u];
-        uint64_t end __attribute__((unused)) = adj_ptr.data[(u + 1)];
+        uint64_t end __attribute__((unused)) = adj_ptr.data[(u + 1ULL)];
         uint64_t e __attribute__((unused)) = start;
         {
           while ((e < end)) {
             uint64_t nb __attribute__((unused)) = adj_list.data[e];
-            if ((in_degree.data[nb] > 0)) {
-              in_degree.data[nb] = (in_degree.data[nb] - 1);
-              if (((in_degree.data[nb] == 0) && (back < n_verts))) {
+            if ((in_degree.data[nb] > 0ULL)) {
+              in_degree.data[nb] = (in_degree.data[nb] - 1ULL);
+              if (((in_degree.data[nb] == 0ULL) && (back < n_verts))) {
                 queue.data[back] = nb;
-                back = (back + 1);
+                back = (back + 1ULL);
 
               }
 
             }
-            e = (e + 1);
+            e = (e + 1ULL);
           }
 
         }
@@ -69,7 +69,7 @@ uint64_t kahn_topo_sort(forge_span_u64_t adj_ptr __attribute__((unused)), forge_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -16,9 +16,9 @@ uint64_t intersect(forge_span_u64_t a __attribute__((unused)), uint64_t na __att
 int main();
 
 uint64_t intersect(forge_span_u64_t a __attribute__((unused)), uint64_t na __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t nb __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t cap __attribute__((unused))) {
-  uint64_t ia __attribute__((unused)) = 0;
-  uint64_t ib __attribute__((unused)) = 0;
-  uint64_t cnt __attribute__((unused)) = 0;
+  uint64_t ia __attribute__((unused)) = 0ULL;
+  uint64_t ib __attribute__((unused)) = 0ULL;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
   {
     while ((ia < na)) {
       if ((ib >= nb)) {
@@ -29,15 +29,15 @@ uint64_t intersect(forge_span_u64_t a __attribute__((unused)), uint64_t na __att
           out.data[cnt] = a.data[ia];
 
         }
-        cnt = (cnt + 1);
-        ia = (ia + 1);
-        ib = (ib + 1);
+        cnt = (cnt + 1ULL);
+        ia = (ia + 1ULL);
+        ib = (ib + 1ULL);
 
       } else if ((a.data[ia] < b.data[ib])) {
-        ia = (ia + 1);
+        ia = (ia + 1ULL);
 
       } else {
-        ib = (ib + 1);
+        ib = (ib + 1ULL);
 
       }
     }
@@ -47,7 +47,7 @@ uint64_t intersect(forge_span_u64_t a __attribute__((unused)), uint64_t na __att
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

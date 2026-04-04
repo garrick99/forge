@@ -28,57 +28,57 @@ uint64_t clamp_count();
 int main();
 
 PIDIntegral pid_new(uint64_t max __attribute__((unused))) {
-  return (PIDIntegral){ .integral = 0, .max_integral = max, .accumulates = 0, .clamps = 0, .resets = 0 };
+  return (PIDIntegral){ .integral = 0ULL, .max_integral = max, .accumulates = 0ULL, .clamps = 0ULL, .resets = 0ULL };
 }
 
 void pid_accumulate(PIDIntegral* p __attribute__((unused)), uint64_t err __attribute__((unused))) {
   (*p).integral = ((*p).integral + err);
-  (*p).accumulates = ((*p).accumulates + 1);
+  (*p).accumulates = ((*p).accumulates + 1ULL);
 }
 
 void pid_clamp(PIDIntegral* p __attribute__((unused)), uint64_t err __attribute__((unused))) {
   (*p).integral = (*p).max_integral;
-  (*p).clamps = ((*p).clamps + 1);
+  (*p).clamps = ((*p).clamps + 1ULL);
 }
 
 void pid_reset(PIDIntegral* p __attribute__((unused))) {
-  (*p).integral = 0;
-  (*p).resets = ((*p).resets + 1);
+  (*p).integral = 0ULL;
+  (*p).resets = ((*p).resets + 1ULL);
 }
 
 uint64_t accumulate() {
-  PIDIntegral p __attribute__((unused)) = pid_new(200);
-  pid_accumulate((&p), 30);
-  pid_accumulate((&p), 20);
+  PIDIntegral p __attribute__((unused)) = pid_new(200ULL);
+  pid_accumulate((&p), 30ULL);
+  pid_accumulate((&p), 20ULL);
   return p.integral;
 }
 
 uint64_t clamp_at_max() {
-  PIDIntegral p __attribute__((unused)) = pid_new(100);
-  pid_accumulate((&p), 80);
-  pid_clamp((&p), 50);
+  PIDIntegral p __attribute__((unused)) = pid_new(100ULL);
+  pid_accumulate((&p), 80ULL);
+  pid_clamp((&p), 50ULL);
   return p.integral;
 }
 
 uint64_t reset_clears() {
-  PIDIntegral p __attribute__((unused)) = pid_new(100);
-  pid_accumulate((&p), 50);
+  PIDIntegral p __attribute__((unused)) = pid_new(100ULL);
+  pid_accumulate((&p), 50ULL);
   pid_reset((&p));
   return p.integral;
 }
 
 uint64_t clamp_count() {
-  PIDIntegral p __attribute__((unused)) = pid_new(100);
-  pid_accumulate((&p), 80);
-  pid_clamp((&p), 50);
+  PIDIntegral p __attribute__((unused)) = pid_new(100ULL);
+  pid_accumulate((&p), 80ULL);
+  pid_clamp((&p), 50ULL);
   pid_reset((&p));
-  pid_accumulate((&p), 70);
-  pid_clamp((&p), 60);
+  pid_accumulate((&p), 70ULL);
+  pid_clamp((&p), 60ULL);
   return p.clamps;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

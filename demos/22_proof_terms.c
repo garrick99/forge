@@ -16,7 +16,7 @@ uint64_t clamp(uint64_t x __attribute__((unused)), uint64_t lo __attribute__((un
 
 uint64_t double_half(uint64_t n __attribute__((unused))) {
   /* proof erased */;
-  return (2 * (n / 2));
+  return (2ULL * (n / 2ULL));
 }
 
 uint64_t identity(uint64_t x __attribute__((unused))) {

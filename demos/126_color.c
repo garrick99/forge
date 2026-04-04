@@ -32,8 +32,8 @@ RGB rgb_new(uint64_t r __attribute__((unused)), uint64_t g __attribute__((unused
 }
 
 uint64_t clamp8(uint64_t x __attribute__((unused))) {
-  if ((x > 255)) {
-    return 255;
+  if ((x > 255ULL)) {
+    return 255ULL;
   } else {
     return x;
   }
@@ -41,38 +41,38 @@ uint64_t clamp8(uint64_t x __attribute__((unused))) {
 
 uint64_t ch_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
   uint64_t s __attribute__((unused)) = (a + b);
-  if ((s > 255)) {
-    return 255;
+  if ((s > 255ULL)) {
+    return 255ULL;
   } else {
     return s;
   }
 }
 
 uint64_t ch_invert(uint64_t x __attribute__((unused))) {
-  return (255 - x);
+  return (255ULL - x);
 }
 
 uint64_t ch_scale(uint64_t x __attribute__((unused)), uint64_t factor __attribute__((unused))) {
-  return ((x * factor) / 256);
+  return ((x * factor) / 256ULL);
 }
 
 RGB rgb_invert(RGB c __attribute__((unused))) {
-  return (RGB){ .r = (255 - c.r), .g = (255 - c.g), .b = (255 - c.b) };
+  return (RGB){ .r = (255ULL - c.r), .g = (255ULL - c.g), .b = (255ULL - c.b) };
 }
 
 uint64_t ch_blend(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t t __attribute__((unused))) {
-  uint64_t wa __attribute__((unused)) = ((a * t) / 256);
-  uint64_t wb __attribute__((unused)) = ((b * (256 - t)) / 256);
+  uint64_t wa __attribute__((unused)) = ((a * t) / 256ULL);
+  uint64_t wb __attribute__((unused)) = ((b * (256ULL - t)) / 256ULL);
   uint64_t s __attribute__((unused)) = (wa + wb);
-  if ((s > 255)) {
-    return 255;
+  if ((s > 255ULL)) {
+    return 255ULL;
   } else {
     return s;
   }
 }
 
 uint64_t rgb_luma(RGB c __attribute__((unused))) {
-  return ((((c.r * 77) + (c.g * 150)) + (c.b * 29)) / 256);
+  return ((((c.r * 77ULL) + (c.g * 150ULL)) + (c.b * 29ULL)) / 256ULL);
 }
 
 RGB rgb_grayscale(RGB c __attribute__((unused))) {
@@ -84,32 +84,32 @@ uint64_t invert_involution(RGB c __attribute__((unused))) {
   RGB ci __attribute__((unused)) = rgb_invert(c);
   RGB cii __attribute__((unused)) = rgb_invert(ci);
   if ((((cii.r == c.r) && (cii.g == c.g)) && (cii.b == c.b))) {
-    return 1;
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 int main() {
-  RGB red __attribute__((unused)) = rgb_new(255, 0, 0);
-  RGB green __attribute__((unused)) = rgb_new(0, 255, 0);
-  RGB blue __attribute__((unused)) = rgb_new(0, 0, 255);
-  RGB gray __attribute__((unused)) = rgb_new(128, 128, 128);
+  RGB red __attribute__((unused)) = rgb_new(255ULL, 0ULL, 0ULL);
+  RGB green __attribute__((unused)) = rgb_new(0ULL, 255ULL, 0ULL);
+  RGB blue __attribute__((unused)) = rgb_new(0ULL, 0ULL, 255ULL);
+  RGB gray __attribute__((unused)) = rgb_new(128ULL, 128ULL, 128ULL);
   RGB ir __attribute__((unused)) = rgb_invert(red);
   uint64_t irr __attribute__((unused)) = ir.r;
   uint64_t irg __attribute__((unused)) = ir.g;
-  uint64_t ca __attribute__((unused)) = ch_add(200, 100);
-  uint64_t cb __attribute__((unused)) = ch_add(100, 50);
+  uint64_t ca __attribute__((unused)) = ch_add(200ULL, 100ULL);
+  uint64_t cb __attribute__((unused)) = ch_add(100ULL, 50ULL);
   uint64_t luma __attribute__((unused)) = rgb_luma(gray);
   RGB gs __attribute__((unused)) = rgb_grayscale(gray);
   uint64_t gs_eq;
   if ((gs.r == gs.g)) {
-    gs_eq = 1;
+    gs_eq = 1ULL;
   } else {
-    gs_eq = 0;
+    gs_eq = 0ULL;
   }
   uint64_t inv_inv __attribute__((unused)) = invert_involution(red);
-  uint64_t bl __attribute__((unused)) = ch_blend(0, 200, 128);
+  uint64_t bl __attribute__((unused)) = ch_blend(0ULL, 200ULL, 128ULL);
   return (int)((((((((irr + irg) + ca) + cb) + luma) + gs_eq) + inv_inv) + bl));
 
 }

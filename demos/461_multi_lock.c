@@ -30,31 +30,31 @@ uint64_t release_count();
 int main();
 
 MultiLock ml_new() {
-  return (MultiLock){ .lock_a = 0, .lock_b = 0, .lock_c = 0, .held_count = 0, .acquires = 0, .releases = 0 };
+  return (MultiLock){ .lock_a = 0ULL, .lock_b = 0ULL, .lock_c = 0ULL, .held_count = 0ULL, .acquires = 0ULL, .releases = 0ULL };
 }
 
 void ml_acquire_a(MultiLock* m __attribute__((unused))) {
-  (*m).lock_a = 1;
-  (*m).held_count = ((*m).held_count + 1);
-  (*m).acquires = ((*m).acquires + 1);
+  (*m).lock_a = 1ULL;
+  (*m).held_count = ((*m).held_count + 1ULL);
+  (*m).acquires = ((*m).acquires + 1ULL);
 }
 
 void ml_acquire_b(MultiLock* m __attribute__((unused))) {
-  (*m).lock_b = 1;
-  (*m).held_count = ((*m).held_count + 1);
-  (*m).acquires = ((*m).acquires + 1);
+  (*m).lock_b = 1ULL;
+  (*m).held_count = ((*m).held_count + 1ULL);
+  (*m).acquires = ((*m).acquires + 1ULL);
 }
 
 void ml_release_a(MultiLock* m __attribute__((unused))) {
-  (*m).lock_a = 0;
-  (*m).held_count = ((*m).held_count - 1);
-  (*m).releases = ((*m).releases + 1);
+  (*m).lock_a = 0ULL;
+  (*m).held_count = ((*m).held_count - 1ULL);
+  (*m).releases = ((*m).releases + 1ULL);
 }
 
 void ml_release_b(MultiLock* m __attribute__((unused))) {
-  (*m).lock_b = 0;
-  (*m).held_count = ((*m).held_count - 1);
-  (*m).releases = ((*m).releases + 1);
+  (*m).lock_b = 0ULL;
+  (*m).held_count = ((*m).held_count - 1ULL);
+  (*m).releases = ((*m).releases + 1ULL);
 }
 
 uint64_t hold_two() {
@@ -90,7 +90,7 @@ uint64_t release_count() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

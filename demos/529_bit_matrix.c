@@ -25,23 +25,23 @@ uint64_t check_xor_same();
 int main();
 
 _Bool bmat_get(uint64_t mat __attribute__((unused)), uint64_t row __attribute__((unused)), uint64_t col __attribute__((unused))) {
-  return (((mat >> ((row * 8) + col)) & 1) == 1);
+  return (((mat >> ((row * 8ULL) + col)) & 1ULL) == 1ULL);
 }
 
 uint64_t bmat_set(uint64_t mat __attribute__((unused)), uint64_t row __attribute__((unused)), uint64_t col __attribute__((unused))) {
-  return (mat | (1 << ((row * 8) + col)));
+  return (mat | (1ULL << ((row * 8ULL) + col)));
 }
 
 uint64_t bmat_clear(uint64_t mat __attribute__((unused)), uint64_t row __attribute__((unused)), uint64_t col __attribute__((unused))) {
-  return (mat & (~(1 << ((row * 8) + col))));
+  return (mat & (~(1ULL << ((row * 8ULL) + col))));
 }
 
 uint64_t bmat_row_mask(uint64_t row __attribute__((unused))) {
-  return (255 << (row * 8));
+  return (255ULL << (row * 8ULL));
 }
 
 uint64_t bmat_col_mask(uint64_t col __attribute__((unused))) {
-  return (72340172838076673 << col);
+  return (72340172838076673ULL << col);
 }
 
 uint64_t bmat_and(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
@@ -57,27 +57,27 @@ uint64_t bmat_xor(uint64_t a __attribute__((unused)), uint64_t b __attribute__((
 }
 
 uint64_t bmat_identity() {
-  return -9205322385119247871;
+  return 0x8040201008040201ULL;
 }
 
 uint64_t check_set_0_0() {
-  return bmat_set(0, 0, 0);
+  return bmat_set(0ULL, 0ULL, 0ULL);
 }
 
 uint64_t check_and_zero() {
-  return bmat_and(0, -1);
+  return bmat_and(0ULL, 0xffffffffffffffffULL);
 }
 
 uint64_t check_or_full() {
-  return bmat_or(0, -1);
+  return bmat_or(0ULL, 0xffffffffffffffffULL);
 }
 
 uint64_t check_xor_same() {
-  return bmat_xor(42, 42);
+  return bmat_xor(42ULL, 42ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

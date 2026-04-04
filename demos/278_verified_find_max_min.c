@@ -17,15 +17,15 @@ uint64_t min_val(forge_span_u64_t s __attribute__((unused)), uint64_t n __attrib
 int main();
 
 uint64_t max_val(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t m __attribute__((unused)) = s.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t m __attribute__((unused)) = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((s.data[i] > m)) {
         m = s.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -33,15 +33,15 @@ uint64_t max_val(forge_span_u64_t s __attribute__((unused)), uint64_t n __attrib
 }
 
 uint64_t min_val(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t m __attribute__((unused)) = s.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t m __attribute__((unused)) = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((s.data[i] < m)) {
         m = s.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -49,7 +49,7 @@ uint64_t min_val(forge_span_u64_t s __attribute__((unused)), uint64_t n __attrib
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

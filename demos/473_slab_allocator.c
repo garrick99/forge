@@ -27,23 +27,23 @@ uint64_t op_counts();
 int main();
 
 SlabAllocator sa_new(uint64_t total __attribute__((unused))) {
-  return (SlabAllocator){ .total_objects = total, .free_count = total, .used_count = 0, .alloc_ops = 0, .free_ops = 0 };
+  return (SlabAllocator){ .total_objects = total, .free_count = total, .used_count = 0ULL, .alloc_ops = 0ULL, .free_ops = 0ULL };
 }
 
 void sa_alloc(SlabAllocator* s __attribute__((unused))) {
-  (*s).free_count = ((*s).free_count - 1);
-  (*s).used_count = ((*s).used_count + 1);
-  (*s).alloc_ops = ((*s).alloc_ops + 1);
+  (*s).free_count = ((*s).free_count - 1ULL);
+  (*s).used_count = ((*s).used_count + 1ULL);
+  (*s).alloc_ops = ((*s).alloc_ops + 1ULL);
 }
 
 void sa_free(SlabAllocator* s __attribute__((unused))) {
-  (*s).used_count = ((*s).used_count - 1);
-  (*s).free_count = ((*s).free_count + 1);
-  (*s).free_ops = ((*s).free_ops + 1);
+  (*s).used_count = ((*s).used_count - 1ULL);
+  (*s).free_count = ((*s).free_count + 1ULL);
+  (*s).free_ops = ((*s).free_ops + 1ULL);
 }
 
 uint64_t alloc_3() {
-  SlabAllocator s __attribute__((unused)) = sa_new(8);
+  SlabAllocator s __attribute__((unused)) = sa_new(8ULL);
   sa_alloc((&s));
   sa_alloc((&s));
   sa_alloc((&s));
@@ -51,7 +51,7 @@ uint64_t alloc_3() {
 }
 
 uint64_t conservation() {
-  SlabAllocator s __attribute__((unused)) = sa_new(8);
+  SlabAllocator s __attribute__((unused)) = sa_new(8ULL);
   sa_alloc((&s));
   sa_alloc((&s));
   sa_alloc((&s));
@@ -60,7 +60,7 @@ uint64_t conservation() {
 }
 
 uint64_t free_reduces() {
-  SlabAllocator s __attribute__((unused)) = sa_new(8);
+  SlabAllocator s __attribute__((unused)) = sa_new(8ULL);
   sa_alloc((&s));
   sa_alloc((&s));
   sa_alloc((&s));
@@ -70,7 +70,7 @@ uint64_t free_reduces() {
 }
 
 uint64_t op_counts() {
-  SlabAllocator s __attribute__((unused)) = sa_new(8);
+  SlabAllocator s __attribute__((unused)) = sa_new(8ULL);
   sa_alloc((&s));
   sa_alloc((&s));
   sa_alloc((&s));
@@ -80,7 +80,7 @@ uint64_t op_counts() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

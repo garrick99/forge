@@ -18,10 +18,10 @@ uint64_t loop_count(uint64_t k __attribute__((unused)));
 int main();
 
 uint64_t count_up(uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -31,8 +31,8 @@ uint64_t count_up(uint64_t n __attribute__((unused))) {
 uint64_t count_down(uint64_t n __attribute__((unused))) {
   uint64_t i __attribute__((unused)) = n;
   {
-    while ((i > 0)) {
-      i = (i - 1);
+    while ((i > 0ULL)) {
+      i = (i - 1ULL);
     }
 
   }
@@ -40,12 +40,12 @@ uint64_t count_down(uint64_t n __attribute__((unused))) {
 }
 
 uint64_t mul_by_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < b)) {
       acc = (acc + a);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -54,11 +54,11 @@ uint64_t mul_by_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__
 
 uint64_t increment_n_times(uint64_t start __attribute__((unused)), uint64_t n __attribute__((unused))) {
   uint64_t val __attribute__((unused)) = start;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      val = (val + 1);
-      i = (i + 1);
+      val = (val + 1ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -66,12 +66,12 @@ uint64_t increment_n_times(uint64_t start __attribute__((unused)), uint64_t n __
 }
 
 uint64_t sum_with_bound(uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + i);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -79,12 +79,12 @@ uint64_t sum_with_bound(uint64_t n __attribute__((unused))) {
 }
 
 uint64_t loop_count(uint64_t k __attribute__((unused))) {
-  uint64_t c __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t c __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < k)) {
-      c = (c + 1);
-      i = (i + 1);
+      c = (c + 1ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -92,12 +92,12 @@ uint64_t loop_count(uint64_t k __attribute__((unused))) {
 }
 
 int main() {
-  uint64_t cu __attribute__((unused)) = count_up(10);
-  uint64_t cd __attribute__((unused)) = count_down(5);
-  uint64_t ml __attribute__((unused)) = mul_by_add(3, 4);
-  uint64_t it __attribute__((unused)) = increment_n_times(100, 5);
-  uint64_t sb __attribute__((unused)) = sum_with_bound(10);
-  uint64_t lc __attribute__((unused)) = loop_count(7);
+  uint64_t cu __attribute__((unused)) = count_up(10ULL);
+  uint64_t cd __attribute__((unused)) = count_down(5ULL);
+  uint64_t ml __attribute__((unused)) = mul_by_add(3ULL, 4ULL);
+  uint64_t it __attribute__((unused)) = increment_n_times(100ULL, 5ULL);
+  uint64_t sb __attribute__((unused)) = sum_with_bound(10ULL);
+  uint64_t lc __attribute__((unused)) = loop_count(7ULL);
   return (int)((((((cu + cd) + ml) + it) + sb) + lc));
 
 }

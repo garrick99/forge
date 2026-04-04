@@ -17,19 +17,19 @@ uint64_t collatz_steps(uint64_t n __attribute__((unused))) {
   uint64_t steps __attribute__((unused)) = ({ uint64_t __loop_result_0;
     for(;;) {
       uint64_t x __attribute__((unused)) = n;
-      uint64_t cnt __attribute__((unused)) = 0;
+      uint64_t cnt __attribute__((unused)) = 0ULL;
       {
-        while ((x != 1)) {
+        while ((x != 1ULL)) {
           uint64_t next;
-          if ((x % 2) == 0) {
-            next = (x / 2);
+          if ((x % 2ULL) == 0ULL) {
+            next = (x / 2ULL);
           }
           else if (1) {
-            next = ((3 * x) + 1);
+            next = ((3ULL * x) + 1ULL);
           }
 
           x = next;
-          cnt = (cnt + 1);
+          cnt = (cnt + 1ULL);
         }
 
       }
@@ -41,21 +41,21 @@ uint64_t collatz_steps(uint64_t n __attribute__((unused))) {
 
 uint64_t classify(uint64_t x __attribute__((unused))) {
   if ((x <= 9)) {
-    return 0;
+    return 0ULL;
   }
   else if ((x >= 10 && x <= 99)) {
-    return 1;
+    return 1ULL;
   }
   else if (1) {
-    return 2;
+    return 2ULL;
   }
 
 }
 
 int main() {
-  uint64_t a __attribute__((unused)) = classify(5);
-  uint64_t b __attribute__((unused)) = classify(42);
-  uint64_t c __attribute__((unused)) = classify(100);
+  uint64_t a __attribute__((unused)) = classify(5ULL);
+  uint64_t b __attribute__((unused)) = classify(42ULL);
+  uint64_t c __attribute__((unused)) = classify(100ULL);
   return (int)(((a + b) + c));
 
 }

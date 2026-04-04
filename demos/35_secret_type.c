@@ -17,16 +17,16 @@ uint64_t mulmod(volatile uint64_t a __attribute__((unused)), volatile uint64_t b
 uint64_t run();
 
 uint64_t ct_select(volatile uint64_t flag __attribute__((unused)), volatile uint64_t a __attribute__((unused)), volatile uint64_t b __attribute__((unused))) {
-  volatile uint64_t mask __attribute__((unused)) = (0 - flag);
+  volatile uint64_t mask __attribute__((unused)) = (0ULL - flag);
   volatile uint64_t neg_mask __attribute__((unused)) = (~mask);
   return ((mask & a) | (neg_mask & b));
 }
 
 uint64_t ct_eq(volatile uint64_t a __attribute__((unused)), volatile uint64_t b __attribute__((unused))) {
   volatile uint64_t diff __attribute__((unused)) = (a ^ b);
-  volatile uint64_t neg_diff __attribute__((unused)) = (0 - diff);
+  volatile uint64_t neg_diff __attribute__((unused)) = (0ULL - diff);
   volatile uint64_t x __attribute__((unused)) = (diff | neg_diff);
-  return (1 - (x >> 63));
+  return (1ULL - (x >> 63ULL));
 }
 
 uint64_t mulmod(volatile uint64_t a __attribute__((unused)), volatile uint64_t b __attribute__((unused)), uint64_t q __attribute__((unused))) {
@@ -34,12 +34,12 @@ uint64_t mulmod(volatile uint64_t a __attribute__((unused)), volatile uint64_t b
 }
 
 uint64_t run() {
-  volatile uint64_t a __attribute__((unused)) = 7;
-  volatile uint64_t b __attribute__((unused)) = 11;
-  uint64_t q __attribute__((unused)) = 17;
+  volatile uint64_t a __attribute__((unused)) = 7ULL;
+  volatile uint64_t b __attribute__((unused)) = 11ULL;
+  uint64_t q __attribute__((unused)) = 17ULL;
   volatile uint64_t product __attribute__((unused)) = mulmod(a, b, q);
-  volatile uint64_t selected __attribute__((unused)) = ct_select(1, a, b);
+  volatile uint64_t selected __attribute__((unused)) = ct_select(1ULL, a, b);
   volatile uint64_t eq_sum __attribute__((unused)) = (ct_eq(a, b) + ct_eq(a, a));
-  return (((selected + product) + eq_sum) & 255);
+  return (((selected + product) + eq_sum) & 255ULL);
 }
 

@@ -18,7 +18,7 @@ uint64_t find_first(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 int main();
 
 uint64_t find_last(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   uint64_t last __attribute__((unused)) = n;
   {
     while ((i < n)) {
@@ -26,7 +26,7 @@ uint64_t find_last(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
         last = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -34,7 +34,7 @@ uint64_t find_last(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 }
 
 uint64_t find_last_ge(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t threshold __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   uint64_t last __attribute__((unused)) = n;
   {
     while ((i < n)) {
@@ -42,7 +42,7 @@ uint64_t find_last_ge(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
         last = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -50,17 +50,17 @@ uint64_t find_last_ge(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
 }
 
 uint64_t find_first(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   uint64_t first __attribute__((unused)) = n;
   _Bool found __attribute__((unused)) = 0;
   {
     while ((i < n)) {
-      if (((s.data[i] == target) && (found == (i != i)))) {
+      if (((s.data[i] == target) && (found == 0))) {
         first = i;
-        found = (i == i);
+        found = 1;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -68,7 +68,7 @@ uint64_t find_first(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

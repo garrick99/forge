@@ -17,26 +17,26 @@ uint64_t mod_inv_naive(uint64_t a __attribute__((unused)), uint64_t m __attribut
 int main();
 
 void affine_enc(forge_span_u64_t plain __attribute__((unused)), forge_span_u64_t cipher __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t m __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       cipher.data[i] = (((a * plain.data[i]) + b) % m);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t mod_inv_naive(uint64_t a __attribute__((unused)), uint64_t m __attribute__((unused))) {
-  uint64_t x __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t x __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < m)) {
-      if ((((a * i) % m) == 1)) {
+      if ((((a * i) % m) == 1ULL)) {
         x = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -44,7 +44,7 @@ uint64_t mod_inv_naive(uint64_t a __attribute__((unused)), uint64_t m __attribut
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

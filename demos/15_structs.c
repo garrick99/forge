@@ -27,15 +27,15 @@ Range clamp_range(uint64_t v __attribute__((unused)), uint64_t max __attribute__
   if ((v <= max)) {
     return (Range){ .lo = v, .hi = max };
   } else {
-    return (Range){ .lo = 0, .hi = max };
+    return (Range){ .lo = 0ULL, .hi = max };
   }
 }
 
 uint64_t in_range(Range r __attribute__((unused)), uint64_t x __attribute__((unused))) {
   if (((r.lo <= x) && (x <= r.hi))) {
-    return 1;
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 

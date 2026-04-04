@@ -16,42 +16,42 @@ void lu_decompose(forge_span_u64_t a __attribute__((unused)), uint64_t n __attri
 int main();
 
 void lu_decompose(forge_span_u64_t a __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while ((k < n)) {
       uint64_t pivot_idx __attribute__((unused)) = ((k * n) + k);
       uint64_t pivot __attribute__((unused)) = a.data[pivot_idx];
-      if ((pivot > 0)) {
-        uint64_t i __attribute__((unused)) = (k + 1);
+      if ((pivot > 0ULL)) {
+        uint64_t i __attribute__((unused)) = (k + 1ULL);
         {
           while ((i < n)) {
             uint64_t lik_idx __attribute__((unused)) = ((i * n) + k);
             a.data[lik_idx] = (a.data[lik_idx] / pivot);
             uint64_t lik __attribute__((unused)) = a.data[lik_idx];
-            uint64_t j __attribute__((unused)) = (k + 1);
+            uint64_t j __attribute__((unused)) = (k + 1ULL);
             {
               while ((j < n)) {
                 uint64_t ij_idx __attribute__((unused)) = ((i * n) + j);
                 uint64_t kj_idx __attribute__((unused)) = ((k * n) + j);
                 a.data[ij_idx] = (a.data[ij_idx] - (lik * a.data[kj_idx]));
-                j = (j + 1);
+                j = (j + 1ULL);
               }
 
             }
-            i = (i + 1);
+            i = (i + 1ULL);
           }
 
         }
 
       }
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

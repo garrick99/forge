@@ -10,22 +10,22 @@
 
 /* Forward declarations */
 uint64_t isqrt(uint64_t n __attribute__((unused)));
-uint64_t pow(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused)));
+uint64_t forge_pow(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused)));
 uint64_t factorial(uint64_t n __attribute__((unused)));
 uint64_t gcd2(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 uint64_t lcm2(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 int main();
 
 uint64_t isqrt(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return 0;
+  if ((n == 0ULL)) {
+    return 0ULL;
   } else {
     uint64_t x __attribute__((unused)) = n;
-    uint64_t y __attribute__((unused)) = ((x + 1) / 2);
+    uint64_t y __attribute__((unused)) = ((x + 1ULL) / 2ULL);
     {
       while ((y < x)) {
         x = y;
-        y = ((x + (n / x)) / 2);
+        y = ((x + (n / x)) / 2ULL);
       }
 
     }
@@ -33,13 +33,13 @@ uint64_t isqrt(uint64_t n __attribute__((unused))) {
   }
 }
 
-uint64_t pow(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+uint64_t forge_pow(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused))) {
+  uint64_t acc __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < exp)) {
+    while ((i < forge_exp)) {
       acc = (acc * base);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -47,12 +47,12 @@ uint64_t pow(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((
 }
 
 uint64_t factorial(uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t acc __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i <= n)) {
       acc = (acc * i);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -63,7 +63,7 @@ uint64_t gcd2(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unus
   uint64_t x __attribute__((unused)) = a;
   uint64_t y __attribute__((unused)) = b;
   {
-    while ((y > 0)) {
+    while ((y > 0ULL)) {
       uint64_t t __attribute__((unused)) = y;
       y = (x % y);
       x = t;
@@ -79,7 +79,7 @@ uint64_t lcm2(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unus
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

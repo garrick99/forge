@@ -23,54 +23,54 @@ uint64_t sum_xor_key(forge_span_u64_t data __attribute__((unused)), uint64_t n _
 int main();
 
 void xor_cipher(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t key __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       data.data[i] = (data.data[i] ^ key);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t pack_bytes(uint64_t b0 __attribute__((unused)), uint64_t b1 __attribute__((unused)), uint64_t b2 __attribute__((unused)), uint64_t b3 __attribute__((unused))) {
-  return (((b0 | (b1 << 8)) | (b2 << 16)) | (b3 << 24));
+  return (((b0 | (b1 << 8ULL)) | (b2 << 16ULL)) | (b3 << 24ULL));
 }
 
 uint64_t unpack_byte0(uint64_t word __attribute__((unused))) {
-  return (word % 256);
+  return (word % 256ULL);
 }
 
 uint64_t unpack_byte1(uint64_t word __attribute__((unused))) {
-  return ((word / 256) % 256);
+  return ((word / 256ULL) % 256ULL);
 }
 
 uint64_t unpack_byte2(uint64_t word __attribute__((unused))) {
-  return ((word / 65536) % 256);
+  return ((word / 65536ULL) % 256ULL);
 }
 
 uint64_t unpack_byte3(uint64_t word __attribute__((unused))) {
-  return ((word / 16777216) % 256);
+  return ((word / 16777216ULL) % 256ULL);
 }
 
 void copy_xor(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t key __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       dst.data[i] = (src.data[i] ^ key);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t sum_xor_key(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t key __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = ((acc ^ data.data[i]) ^ key);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -78,7 +78,7 @@ uint64_t sum_xor_key(forge_span_u64_t data __attribute__((unused)), uint64_t n _
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

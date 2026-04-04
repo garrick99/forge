@@ -16,9 +16,9 @@ uint64_t argmax(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
 int main();
 
 uint64_t argmax(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t best_idx __attribute__((unused)) = 0;
-  uint64_t best_val __attribute__((unused)) = s.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t best_idx __attribute__((unused)) = 0ULL;
+  uint64_t best_val __attribute__((unused)) = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((s.data[i] > best_val)) {
@@ -26,7 +26,7 @@ uint64_t argmax(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
         best_val = s.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -34,7 +34,7 @@ uint64_t argmax(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

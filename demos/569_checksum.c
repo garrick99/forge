@@ -21,22 +21,22 @@ int main();
 
 uint64_t ones_complement_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
   uint64_t s __attribute__((unused)) = (a + b);
-  if ((s >= 65536)) {
-    return ((s + 1) % 65536);
+  if ((s >= 65536ULL)) {
+    return ((s + 1ULL) % 65536ULL);
   } else {
     return s;
   }
 }
 
 uint64_t inet_checksum(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t word __attribute__((unused)) = (data.data[i] % 65536);
+      uint64_t word __attribute__((unused)) = (data.data[i] % 65536ULL);
       uint64_t s __attribute__((unused)) = (acc + word);
-      acc = ((s >= 65536) ? ((s + 1) % 65536) : s);
-      i = (i + 1);
+      acc = ((s >= 65536ULL) ? ((s + 1ULL) % 65536ULL) : s);
+      i = (i + 1ULL);
     }
 
   }
@@ -44,20 +44,20 @@ uint64_t inet_checksum(forge_span_u64_t data __attribute__((unused)), uint64_t n
 }
 
 uint64_t checksum_finalize(uint64_t acc __attribute__((unused))) {
-  return (65535 - acc);
+  return (65535ULL - acc);
 }
 
 _Bool checksum_is_valid(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused))) {
   uint64_t cs __attribute__((unused)) = inet_checksum(data, n);
-  return (checksum_finalize(cs) == 65535);
+  return (checksum_finalize(cs) == 65535ULL);
 }
 
 uint64_t checksum_single(uint64_t word __attribute__((unused))) {
-  return ones_complement_add(0, word);
+  return ones_complement_add(0ULL, word);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

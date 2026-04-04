@@ -30,7 +30,7 @@ uint64_t gcd(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unuse
   uint64_t x __attribute__((unused)) = a;
   uint64_t y __attribute__((unused)) = b;
   {
-    while ((y > 0)) {
+    while ((y > 0ULL)) {
       uint64_t t __attribute__((unused)) = y;
       y = (x % y);
       x = t;
@@ -46,12 +46,12 @@ uint64_t lcm(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unuse
 }
 
 uint64_t sum_range(uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
   uint64_t i __attribute__((unused)) = lo;
   {
     while ((i <= hi)) {
       acc = (acc + i);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -59,12 +59,12 @@ uint64_t sum_range(uint64_t lo __attribute__((unused)), uint64_t hi __attribute_
 }
 
 uint64_t product_range(uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 1;
+  uint64_t acc __attribute__((unused)) = 1ULL;
   uint64_t i __attribute__((unused)) = lo;
   {
     while ((i <= hi)) {
       acc = (acc * i);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -72,15 +72,15 @@ uint64_t product_range(uint64_t lo __attribute__((unused)), uint64_t hi __attrib
 }
 
 uint64_t count_divisors(uint64_t n __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 2;
+  uint64_t cnt __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 2ULL;
   {
     while ((i <= n)) {
-      if (((n % i) == 0)) {
-        cnt = (cnt + 1);
+      if (((n % i) == 0ULL)) {
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -88,15 +88,15 @@ uint64_t count_divisors(uint64_t n __attribute__((unused))) {
 }
 
 _Bool is_prime(uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 2;
+  uint64_t i __attribute__((unused)) = 2ULL;
   _Bool prime __attribute__((unused)) = 1;
   {
     while ((((i * i) <= n) && prime)) {
-      if (((n % i) == 0)) {
+      if (((n % i) == 0ULL)) {
         prime = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -104,7 +104,7 @@ _Bool is_prime(uint64_t n __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -18,15 +18,15 @@ _Bool all_zero(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribut
 int main();
 
 _Bool span_equal(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   _Bool eq __attribute__((unused)) = 1;
   {
     while ((i < n)) {
       if ((a.data[i] != b.data[i])) {
-        eq = (i != i);
+        eq = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -34,24 +34,24 @@ _Bool span_equal(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b 
 }
 
 _Bool span_lex_le(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   _Bool res __attribute__((unused)) = 1;
   _Bool done __attribute__((unused)) = 0;
   {
     while ((i < n)) {
-      if ((done == (i != i))) {
+      if ((done == 0)) {
         if ((a.data[i] < b.data[i])) {
-          res = (i == i);
-          done = (i == i);
+          res = 1;
+          done = 1;
 
         } else if ((a.data[i] > b.data[i])) {
-          res = (i != i);
-          done = (i == i);
+          res = 0;
+          done = 1;
 
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -59,15 +59,15 @@ _Bool span_lex_le(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b
 }
 
 _Bool all_zero(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   _Bool ok __attribute__((unused)) = 1;
   {
     while ((i < n)) {
-      if ((s.data[i] != 0)) {
-        ok = (i != i);
+      if ((s.data[i] != 0ULL)) {
+        ok = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -75,7 +75,7 @@ _Bool all_zero(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribut
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

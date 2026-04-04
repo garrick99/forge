@@ -18,16 +18,16 @@ _Bool all_equal(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
 int main();
 
 uint64_t dedup_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t write __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t write __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      if ((s.data[i] != s.data[(write - 1)])) {
+      if ((s.data[i] != s.data[(write - 1ULL)])) {
         s.data[write] = s.data[i];
-        write = (write + 1);
+        write = (write + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -35,15 +35,15 @@ uint64_t dedup_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
 }
 
 uint64_t count_unique_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t count __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      if ((s.data[i] != s.data[(i - 1)])) {
-        count = (count + 1);
+      if ((s.data[i] != s.data[(i - 1ULL)])) {
+        count = (count + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -51,15 +51,15 @@ uint64_t count_unique_sorted(forge_span_u64_t s __attribute__((unused)), uint64_
 }
 
 _Bool all_equal(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t i __attribute__((unused)) = 1ULL;
   _Bool eq __attribute__((unused)) = 1;
   {
     while ((i < n)) {
-      if ((s.data[i] != s.data[0])) {
+      if ((s.data[i] != s.data[0ULL])) {
         eq = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -67,7 +67,7 @@ _Bool all_equal(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

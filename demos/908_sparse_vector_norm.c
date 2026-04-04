@@ -17,12 +17,12 @@ uint64_t sparse_l2sq(forge_span_u64_t val __attribute__((unused)), uint64_t nnz 
 int main();
 
 uint64_t sparse_l1(forge_span_u64_t val __attribute__((unused)), uint64_t nnz __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nnz)) {
       acc = (acc + val.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -30,8 +30,8 @@ uint64_t sparse_l1(forge_span_u64_t val __attribute__((unused)), uint64_t nnz __
 }
 
 uint64_t sparse_l2sq(forge_span_u64_t val __attribute__((unused)), uint64_t nnz __attribute__((unused)), uint64_t cap __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nnz)) {
       uint64_t sq __attribute__((unused)) = (val.data[i] * val.data[i]);
@@ -39,7 +39,7 @@ uint64_t sparse_l2sq(forge_span_u64_t val __attribute__((unused)), uint64_t nnz 
         acc = (acc + sq);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -47,7 +47,7 @@ uint64_t sparse_l2sq(forge_span_u64_t val __attribute__((unused)), uint64_t nnz 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

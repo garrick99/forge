@@ -31,7 +31,7 @@ void elementwise_max(forge_span_u64_t a __attribute__((unused)), forge_span_u64_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

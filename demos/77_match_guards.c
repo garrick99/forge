@@ -57,13 +57,13 @@ uint64_t process_opt(Option_u64 o __attribute__((unused)));
 int main();
 
 Category classify(uint64_t n __attribute__((unused))) {
-  if ((n <= 10)) {
+  if ((n <= 10ULL)) {
     return (Category){ .tag = Category_tag_Small, .data.Small = { ._dummy = 0 } };
   } else {
-    if ((n <= 100)) {
+    if ((n <= 100ULL)) {
       return (Category){ .tag = Category_tag_Medium, .data.Medium = { ._dummy = 0 } };
     } else {
-      if ((n <= 1000)) {
+      if ((n <= 1000ULL)) {
         return (Category){ .tag = Category_tag_Large, .data.Large = { ._dummy = 0 } };
       } else {
         return (Category){ .tag = Category_tag_Huge, .data.Huge = { ._dummy = 0 } };
@@ -75,16 +75,16 @@ Category classify(uint64_t n __attribute__((unused))) {
 uint64_t category_score(Category c __attribute__((unused))) {
   switch (c.tag) {
     case Category_tag_Small: {
-      return 1;
+      return 1ULL;
     }
     case Category_tag_Medium: {
-      return 2;
+      return 2ULL;
     }
     case Category_tag_Large: {
-      return 3;
+      return 3ULL;
     }
     case Category_tag_Huge: {
-      return 4;
+      return 4ULL;
     }
     default: __builtin_unreachable();
   }
@@ -95,30 +95,30 @@ uint64_t process_opt(Option_u64 o __attribute__((unused))) {
     case Option_u64_tag_Some: {
       uint64_t v __attribute__((unused)) = o.data.Some._v0;
       if ((v > 100)) {
-        return (v * 2);
+        return (v * 2ULL);
       } else {
       if ((v > 10)) {
-        return (v + 50);
+        return (v + 50ULL);
       } else {
       return v;
       }
       }
     }
     case Option_u64_tag_None: {
-      return 0;
+      return 0ULL;
     }
     default: __builtin_unreachable();
   }
 }
 
 int main() {
-  uint64_t s1 __attribute__((unused)) = category_score(classify(5));
-  uint64_t s2 __attribute__((unused)) = category_score(classify(50));
-  uint64_t s3 __attribute__((unused)) = category_score(classify(500));
-  uint64_t s4 __attribute__((unused)) = category_score(classify(5000));
-  uint64_t p1 __attribute__((unused)) = process_opt((Option_u64){ .tag = Option_u64_tag_Some, .data.Some = { ._v0 = 200 } });
-  uint64_t p2 __attribute__((unused)) = process_opt((Option_u64){ .tag = Option_u64_tag_Some, .data.Some = { ._v0 = 50 } });
-  uint64_t p3 __attribute__((unused)) = process_opt((Option_u64){ .tag = Option_u64_tag_Some, .data.Some = { ._v0 = 5 } });
+  uint64_t s1 __attribute__((unused)) = category_score(classify(5ULL));
+  uint64_t s2 __attribute__((unused)) = category_score(classify(50ULL));
+  uint64_t s3 __attribute__((unused)) = category_score(classify(500ULL));
+  uint64_t s4 __attribute__((unused)) = category_score(classify(5000ULL));
+  uint64_t p1 __attribute__((unused)) = process_opt((Option_u64){ .tag = Option_u64_tag_Some, .data.Some = { ._v0 = 200ULL } });
+  uint64_t p2 __attribute__((unused)) = process_opt((Option_u64){ .tag = Option_u64_tag_Some, .data.Some = { ._v0 = 50ULL } });
+  uint64_t p3 __attribute__((unused)) = process_opt((Option_u64){ .tag = Option_u64_tag_Some, .data.Some = { ._v0 = 5ULL } });
   Option_u64 none_val __attribute__((unused)) = (Option_u64){ .tag = Option_u64_tag_None, .data.None = { ._dummy = 0 } };
   uint64_t p4 __attribute__((unused)) = process_opt(none_val);
   return (int)((((((((s1 + s2) + s3) + s4) + p1) + p2) + p3) + p4));

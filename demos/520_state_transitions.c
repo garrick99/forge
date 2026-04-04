@@ -24,43 +24,43 @@ _Bool is_stable(uint64_t state __attribute__((unused)));
 int main();
 
 uint64_t state_closed() {
-  return 0;
+  return 0ULL;
 }
 
 uint64_t state_opening() {
-  return 1;
+  return 1ULL;
 }
 
 uint64_t state_open() {
-  return 2;
+  return 2ULL;
 }
 
 uint64_t state_closing() {
-  return 3;
+  return 3ULL;
 }
 
 _Bool can_open(uint64_t state __attribute__((unused))) {
-  return (state == 0);
+  return (state == 0ULL);
 }
 
 _Bool can_close(uint64_t state __attribute__((unused))) {
-  return (state == 2);
+  return (state == 2ULL);
 }
 
 uint64_t transition_open(uint64_t state __attribute__((unused))) {
-  return 1;
+  return 1ULL;
 }
 
 uint64_t transition_opened(uint64_t state __attribute__((unused))) {
-  return 2;
+  return 2ULL;
 }
 
 uint64_t transition_close(uint64_t state __attribute__((unused))) {
-  return 3;
+  return 3ULL;
 }
 
 uint64_t transition_closed(uint64_t state __attribute__((unused))) {
-  return 0;
+  return 0ULL;
 }
 
 uint64_t open_then_close(uint64_t init __attribute__((unused))) {
@@ -71,11 +71,11 @@ uint64_t open_then_close(uint64_t init __attribute__((unused))) {
 }
 
 _Bool is_stable(uint64_t state __attribute__((unused))) {
-  return ((state == 0) || (state == 2));
+  return ((state == 0ULL) || (state == 2ULL));
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

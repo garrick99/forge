@@ -19,21 +19,21 @@ uint64_t check_fib_10();
 int main();
 
 uint64_t fib(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return 0;
+  if ((n == 0ULL)) {
+    return 0ULL;
   } else {
-    if ((n == 1)) {
-      return 1;
+    if ((n == 1ULL)) {
+      return 1ULL;
     } else {
-      uint64_t a __attribute__((unused)) = 0;
-      uint64_t b __attribute__((unused)) = 1;
-      uint64_t i __attribute__((unused)) = 2;
+      uint64_t a __attribute__((unused)) = 0ULL;
+      uint64_t b __attribute__((unused)) = 1ULL;
+      uint64_t i __attribute__((unused)) = 2ULL;
       {
         while ((i <= n)) {
           uint64_t c __attribute__((unused)) = (a + b);
           a = b;
           b = c;
-          i = (i + 1);
+          i = (i + 1ULL);
         }
 
       }
@@ -43,15 +43,15 @@ uint64_t fib(uint64_t n __attribute__((unused))) {
 }
 
 uint64_t fib_positive(uint64_t n __attribute__((unused))) {
-  uint64_t a __attribute__((unused)) = 0;
-  uint64_t b __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t a __attribute__((unused)) = 0ULL;
+  uint64_t b __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       uint64_t c __attribute__((unused)) = (a + b);
       a = b;
       b = c;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -59,27 +59,27 @@ uint64_t fib_positive(uint64_t n __attribute__((unused))) {
 }
 
 uint64_t check_fib_0() {
-  return fib(0);
+  return fib(0ULL);
 }
 
 uint64_t check_fib_1() {
-  return fib(1);
+  return fib(1ULL);
 }
 
 uint64_t check_fib_2() {
-  return fib_positive(2);
+  return fib_positive(2ULL);
 }
 
 uint64_t check_fib_6() {
-  return fib_positive(6);
+  return fib_positive(6ULL);
 }
 
 uint64_t check_fib_10() {
-  return fib_positive(10);
+  return fib_positive(10ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

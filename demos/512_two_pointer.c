@@ -18,15 +18,15 @@ _Bool two_sum_exists(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 int main();
 
 uint64_t count_unique_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t count __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      if ((s.data[i] != s.data[(i - 1)])) {
-        count = (count + 1);
+      if ((s.data[i] != s.data[(i - 1ULL)])) {
+        count = (count + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -34,21 +34,21 @@ uint64_t count_unique_sorted(forge_span_u64_t s __attribute__((unused)), uint64_
 }
 
 uint64_t max_adjacent_diff(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t gap __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t gap __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       uint64_t d;
-      if ((s.data[i] >= s.data[(i - 1)])) {
-        d = (s.data[i] - s.data[(i - 1)]);
+      if ((s.data[i] >= s.data[(i - 1ULL)])) {
+        d = (s.data[i] - s.data[(i - 1ULL)]);
       } else {
-        d = (s.data[(i - 1)] - s.data[i]);
+        d = (s.data[(i - 1ULL)] - s.data[i]);
       }
       if ((d > gap)) {
         gap = d;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -56,22 +56,22 @@ uint64_t max_adjacent_diff(forge_span_u64_t s __attribute__((unused)), uint64_t 
 }
 
 _Bool two_sum_exists(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   _Bool found __attribute__((unused)) = 0;
   {
     while ((i < n)) {
-      uint64_t j __attribute__((unused)) = (i + 1);
+      uint64_t j __attribute__((unused)) = (i + 1ULL);
       {
         while ((j < n)) {
           if (((s.data[i] + s.data[j]) == target)) {
-            found = (i == i);
+            found = 1;
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -79,7 +79,7 @@ _Bool two_sum_exists(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

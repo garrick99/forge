@@ -39,7 +39,7 @@ uint64_t unwrap_or_zero(Option_u64 opt __attribute__((unused))) {
       return v;
     }
     case Option_u64_tag_None: {
-      return 0;
+      return 0ULL;
     }
     default: __builtin_unreachable();
   }
@@ -60,7 +60,7 @@ uint64_t double_via_as(uint64_t x __attribute__((unused))) {
   uint64_t _z __attribute__((unused)) = x;
   uint64_t n __attribute__((unused)) = x;
   if (x == 0) {
-    return 0;
+    return 0ULL;
   }
   else if (1) {
     return (n + n);

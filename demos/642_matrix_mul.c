@@ -18,45 +18,45 @@ uint64_t mat_frobenius_sq(forge_span_u64_t m __attribute__((unused)), uint64_t n
 int main();
 
 void matmul_sq(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < n)) {
-          uint64_t acc __attribute__((unused)) = 0;
-          uint64_t k __attribute__((unused)) = 0;
+          uint64_t acc __attribute__((unused)) = 0ULL;
+          uint64_t k __attribute__((unused)) = 0ULL;
           {
             while ((k < n)) {
               acc = (acc + (a.data[((i * n) + k)] * b.data[((k * n) + j)]));
-              k = (k + 1);
+              k = (k + 1ULL);
             }
 
           }
           out.data[((i * n) + j)] = acc;
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void mat_identity(forge_span_u64_t out __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < n)) {
-          out.data[((i * n) + j)] = ((i == j) ? 1 : 0);
-          j = (j + 1);
+          out.data[((i * n) + j)] = ((i == j) ? 1ULL : 0ULL);
+          j = (j + 1ULL);
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -64,12 +64,12 @@ void mat_identity(forge_span_u64_t out __attribute__((unused)), uint64_t n __att
 
 uint64_t mat_frobenius_sq(forge_span_u64_t m __attribute__((unused)), uint64_t n __attribute__((unused))) {
   uint64_t total __attribute__((unused)) = (n * n);
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < total)) {
       acc = (acc + (m.data[i] * m.data[i]));
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -77,7 +77,7 @@ uint64_t mat_frobenius_sq(forge_span_u64_t m __attribute__((unused)), uint64_t n
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -20,30 +20,30 @@ int main();
 
 __forge_tuple_u64_u64_t minmax(forge_span_u64_t s __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = s.len;
-  uint64_t cur_min __attribute__((unused)) = s.data[0];
-  uint64_t cur_max __attribute__((unused)) = s.data[0];
-
-
-  uint64_t k __attribute__((unused)) = 1;
+  uint64_t cur_min __attribute__((unused)) = s.data[0ULL];
+  uint64_t cur_max __attribute__((unused)) = s.data[0ULL];
+  uint64_t gmin __attribute__((unused)) = s.data[0ULL];
+  uint64_t gmax __attribute__((unused)) = s.data[0ULL];
+  uint64_t k __attribute__((unused)) = 1ULL;
   {
     while ((k < n)) {
       if ((s.data[k] < cur_min)) {
         cur_min = s.data[k];
-
+        gmin = s.data[k];
 
       } else {
-
+        gmin = gmin;
 
       }
       if ((s.data[k] > cur_max)) {
         cur_max = s.data[k];
-
+        gmax = s.data[k];
 
       } else {
-
+        gmax = gmax;
 
       }
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
@@ -51,7 +51,7 @@ __forge_tuple_u64_u64_t minmax(forge_span_u64_t s __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -29,28 +29,28 @@ uint64_t steal_count();
 int main();
 
 TaskPool tp_new() {
-  return (TaskPool){ .high_q = 0, .med_q = 0, .low_q = 0, .total = 0, .steals = 0 };
+  return (TaskPool){ .high_q = 0ULL, .med_q = 0ULL, .low_q = 0ULL, .total = 0ULL, .steals = 0ULL };
 }
 
 void tp_submit_high(TaskPool* t __attribute__((unused))) {
-  (*t).high_q = ((*t).high_q + 1);
-  (*t).total = ((*t).total + 1);
+  (*t).high_q = ((*t).high_q + 1ULL);
+  (*t).total = ((*t).total + 1ULL);
 }
 
 void tp_submit_low(TaskPool* t __attribute__((unused))) {
-  (*t).low_q = ((*t).low_q + 1);
-  (*t).total = ((*t).total + 1);
+  (*t).low_q = ((*t).low_q + 1ULL);
+  (*t).total = ((*t).total + 1ULL);
 }
 
 void tp_steal_low_to_high(TaskPool* t __attribute__((unused)), uint64_t n __attribute__((unused))) {
   (*t).low_q = ((*t).low_q - n);
   (*t).high_q = ((*t).high_q + n);
-  (*t).steals = ((*t).steals + 1);
+  (*t).steals = ((*t).steals + 1ULL);
 }
 
 void tp_complete_high(TaskPool* t __attribute__((unused))) {
-  (*t).high_q = ((*t).high_q - 1);
-  (*t).total = ((*t).total - 1);
+  (*t).high_q = ((*t).high_q - 1ULL);
+  (*t).total = ((*t).total - 1ULL);
 }
 
 uint64_t submit_high() {
@@ -68,7 +68,7 @@ uint64_t steal_to_high() {
   tp_submit_low((&t));
   tp_submit_low((&t));
   tp_submit_low((&t));
-  tp_steal_low_to_high((&t), 2);
+  tp_steal_low_to_high((&t), 2ULL);
   return t.high_q;
 }
 
@@ -79,7 +79,7 @@ uint64_t total_conserved() {
   tp_submit_low((&t));
   tp_submit_low((&t));
   tp_submit_low((&t));
-  tp_steal_low_to_high((&t), 2);
+  tp_steal_low_to_high((&t), 2ULL);
   return t.total;
 }
 
@@ -89,13 +89,13 @@ uint64_t steal_count() {
   tp_submit_low((&t));
   tp_submit_low((&t));
   tp_submit_low((&t));
-  tp_steal_low_to_high((&t), 1);
-  tp_steal_low_to_high((&t), 1);
+  tp_steal_low_to_high((&t), 1ULL);
+  tp_steal_low_to_high((&t), 1ULL);
   return t.steals;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

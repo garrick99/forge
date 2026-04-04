@@ -26,59 +26,59 @@ uint64_t equal_weights_num();
 int main();
 
 WeightedAvg wa_new() {
-  return (WeightedAvg){ .numerator = 0, .denominator = 0, .samples = 0 };
+  return (WeightedAvg){ .numerator = 0ULL, .denominator = 0ULL, .samples = 0ULL };
 }
 
 void wa_add(WeightedAvg* w __attribute__((unused)), uint64_t value __attribute__((unused)), uint64_t weight __attribute__((unused))) {
   (*w).numerator = ((*w).numerator + (value * weight));
   (*w).denominator = ((*w).denominator + weight);
-  (*w).samples = ((*w).samples + 1);
+  (*w).samples = ((*w).samples + 1ULL);
 }
 
 uint64_t one_sample_num() {
   WeightedAvg w __attribute__((unused)) = wa_new();
-  wa_add((&w), 10, 2);
+  wa_add((&w), 10ULL, 2ULL);
   return w.numerator;
 }
 
 uint64_t one_sample_denom() {
   WeightedAvg w __attribute__((unused)) = wa_new();
-  wa_add((&w), 10, 2);
+  wa_add((&w), 10ULL, 2ULL);
   return w.denominator;
 }
 
 uint64_t two_samples_num() {
   WeightedAvg w __attribute__((unused)) = wa_new();
-  wa_add((&w), 10, 2);
-  wa_add((&w), 20, 3);
+  wa_add((&w), 10ULL, 2ULL);
+  wa_add((&w), 20ULL, 3ULL);
   return w.numerator;
 }
 
 uint64_t two_samples_denom() {
   WeightedAvg w __attribute__((unused)) = wa_new();
-  wa_add((&w), 10, 2);
-  wa_add((&w), 20, 3);
+  wa_add((&w), 10ULL, 2ULL);
+  wa_add((&w), 20ULL, 3ULL);
   return w.denominator;
 }
 
 uint64_t sample_count() {
   WeightedAvg w __attribute__((unused)) = wa_new();
-  wa_add((&w), 5, 1);
-  wa_add((&w), 10, 2);
-  wa_add((&w), 15, 3);
+  wa_add((&w), 5ULL, 1ULL);
+  wa_add((&w), 10ULL, 2ULL);
+  wa_add((&w), 15ULL, 3ULL);
   return w.samples;
 }
 
 uint64_t equal_weights_num() {
   WeightedAvg w __attribute__((unused)) = wa_new();
-  wa_add((&w), 5, 1);
-  wa_add((&w), 10, 1);
-  wa_add((&w), 15, 1);
+  wa_add((&w), 5ULL, 1ULL);
+  wa_add((&w), 10ULL, 1ULL);
+  wa_add((&w), 15ULL, 1ULL);
   return w.numerator;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -30,32 +30,32 @@ uint64_t high_before_med();
 int main();
 
 PriorityQueue pq_new() {
-  return (PriorityQueue){ .high = 0, .med = 0, .low = 0, .total_in = 0, .total_out = 0 };
+  return (PriorityQueue){ .high = 0ULL, .med = 0ULL, .low = 0ULL, .total_in = 0ULL, .total_out = 0ULL };
 }
 
 void pq_enqueue_high(PriorityQueue* p __attribute__((unused))) {
-  (*p).high = ((*p).high + 1);
-  (*p).total_in = ((*p).total_in + 1);
+  (*p).high = ((*p).high + 1ULL);
+  (*p).total_in = ((*p).total_in + 1ULL);
 }
 
 void pq_enqueue_med(PriorityQueue* p __attribute__((unused))) {
-  (*p).med = ((*p).med + 1);
-  (*p).total_in = ((*p).total_in + 1);
+  (*p).med = ((*p).med + 1ULL);
+  (*p).total_in = ((*p).total_in + 1ULL);
 }
 
 void pq_enqueue_low(PriorityQueue* p __attribute__((unused))) {
-  (*p).low = ((*p).low + 1);
-  (*p).total_in = ((*p).total_in + 1);
+  (*p).low = ((*p).low + 1ULL);
+  (*p).total_in = ((*p).total_in + 1ULL);
 }
 
 void pq_dequeue_high(PriorityQueue* p __attribute__((unused))) {
-  (*p).high = ((*p).high - 1);
-  (*p).total_out = ((*p).total_out + 1);
+  (*p).high = ((*p).high - 1ULL);
+  (*p).total_out = ((*p).total_out + 1ULL);
 }
 
 void pq_dequeue_med(PriorityQueue* p __attribute__((unused))) {
-  (*p).med = ((*p).med - 1);
-  (*p).total_out = ((*p).total_out + 1);
+  (*p).med = ((*p).med - 1ULL);
+  (*p).total_out = ((*p).total_out + 1ULL);
 }
 
 uint64_t enqueue_high() {
@@ -98,7 +98,7 @@ uint64_t high_before_med() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

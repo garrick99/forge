@@ -19,32 +19,32 @@ void histogram_cumulative(forge_span_u64_t bins __attribute__((unused)), uint64_
 int main();
 
 void histogram_build(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t bins __attribute__((unused)), uint64_t nbins __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nbins)) {
-      bins.data[i] = 0;
-      i = (i + 1);
+      bins.data[i] = 0ULL;
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < n)) {
       uint64_t idx __attribute__((unused)) = (data.data[j] % nbins);
-      bins.data[idx] = (bins.data[idx] + 1);
-      j = (j + 1);
+      bins.data[idx] = (bins.data[idx] + 1ULL);
+      j = (j + 1ULL);
     }
 
   }
 }
 
 uint64_t histogram_total(forge_span_u64_t bins __attribute__((unused)), uint64_t nbins __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nbins)) {
       acc = (acc + bins.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -52,9 +52,9 @@ uint64_t histogram_total(forge_span_u64_t bins __attribute__((unused)), uint64_t
 }
 
 uint64_t histogram_max_bin(forge_span_u64_t bins __attribute__((unused)), uint64_t nbins __attribute__((unused))) {
-  uint64_t best __attribute__((unused)) = 0;
-  uint64_t best_idx __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t best __attribute__((unused)) = 0ULL;
+  uint64_t best_idx __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nbins)) {
       if ((bins.data[i] > best)) {
@@ -62,7 +62,7 @@ uint64_t histogram_max_bin(forge_span_u64_t bins __attribute__((unused)), uint64
         best_idx = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -70,19 +70,19 @@ uint64_t histogram_max_bin(forge_span_u64_t bins __attribute__((unused)), uint64
 }
 
 void histogram_cumulative(forge_span_u64_t bins __attribute__((unused)), uint64_t nbins __attribute__((unused)), forge_span_u64_t cum __attribute__((unused))) {
-  cum.data[0] = bins.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  cum.data[0ULL] = bins.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < nbins)) {
-      cum.data[i] = (cum.data[(i - 1)] + bins.data[i]);
-      i = (i + 1);
+      cum.data[i] = (cum.data[(i - 1ULL)] + bins.data[i]);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

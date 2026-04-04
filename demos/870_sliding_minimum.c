@@ -18,7 +18,7 @@ int main();
 
 uint64_t window_min(forge_span_u64_t s __attribute__((unused)), uint64_t start __attribute__((unused)), uint64_t k __attribute__((unused)), uint64_t n __attribute__((unused))) {
   uint64_t mn __attribute__((unused)) = s.data[start];
-  uint64_t j __attribute__((unused)) = 1;
+  uint64_t j __attribute__((unused)) = 1ULL;
   {
     while ((j < k)) {
       uint64_t idx __attribute__((unused)) = (start + j);
@@ -26,7 +26,7 @@ uint64_t window_min(forge_span_u64_t s __attribute__((unused)), uint64_t start _
         mn = s.data[idx];
 
       }
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
@@ -34,8 +34,8 @@ uint64_t window_min(forge_span_u64_t s __attribute__((unused)), uint64_t start _
 }
 
 uint64_t sliding_min(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t k __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t out_len __attribute__((unused)) = ((n - k) + 1);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t out_len __attribute__((unused)) = ((n - k) + 1ULL);
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < out_len)) {
       if (((i + k) <= n)) {
@@ -43,7 +43,7 @@ uint64_t sliding_min(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
         out.data[i] = mn;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -51,7 +51,7 @@ uint64_t sliding_min(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

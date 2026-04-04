@@ -23,19 +23,19 @@ int main();
 
 uint64_t stack_push(forge_span_u64_t s __attribute__((unused)), uint64_t len __attribute__((unused)), uint64_t val __attribute__((unused))) {
   s.data[len] = val;
-  return (len + 1);
+  return (len + 1ULL);
 }
 
 uint64_t stack_pop(forge_span_u64_t s __attribute__((unused)), uint64_t len __attribute__((unused))) {
-  return (len - 1);
+  return (len - 1ULL);
 }
 
 uint64_t stack_top(forge_span_u64_t s __attribute__((unused)), uint64_t len __attribute__((unused))) {
-  return s.data[(len - 1)];
+  return s.data[(len - 1ULL)];
 }
 
 _Bool stack_is_empty(uint64_t len __attribute__((unused))) {
-  return (len == 0);
+  return (len == 0ULL);
 }
 
 _Bool stack_is_full(uint64_t len __attribute__((unused)), uint64_t cap __attribute__((unused))) {
@@ -47,14 +47,14 @@ uint64_t stack_size(uint64_t len __attribute__((unused))) {
 }
 
 uint64_t check_push_pop(forge_span_u64_t s __attribute__((unused))) {
-  uint64_t len0 __attribute__((unused)) = 0;
-  uint64_t len1 __attribute__((unused)) = stack_push(s, len0, 42);
-  uint64_t len2 __attribute__((unused)) = stack_push(s, len1, 99);
+  uint64_t len0 __attribute__((unused)) = 0ULL;
+  uint64_t len1 __attribute__((unused)) = stack_push(s, len0, 42ULL);
+  uint64_t len2 __attribute__((unused)) = stack_push(s, len1, 99ULL);
   return stack_pop(s, len2);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

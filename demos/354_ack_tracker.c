@@ -25,15 +25,15 @@ uint64_t window_preserved(uint64_t w __attribute__((unused)));
 int main();
 
 AckTracker ack_new(uint64_t window __attribute__((unused))) {
-  return (AckTracker){ .next_send = 0, .ack_up_to = 0, .window = window };
+  return (AckTracker){ .next_send = 0ULL, .ack_up_to = 0ULL, .window = window };
 }
 
 void ack_send(AckTracker* a __attribute__((unused))) {
-  (*a).next_send = ((*a).next_send + 1);
+  (*a).next_send = ((*a).next_send + 1ULL);
 }
 
 void ack_ack(AckTracker* a __attribute__((unused))) {
-  (*a).ack_up_to = ((*a).ack_up_to + 1);
+  (*a).ack_up_to = ((*a).ack_up_to + 1ULL);
 }
 
 uint64_t send_three(uint64_t w __attribute__((unused))) {
@@ -74,7 +74,7 @@ uint64_t window_preserved(uint64_t w __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

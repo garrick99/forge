@@ -22,35 +22,35 @@ uint64_t first_error(forge_span_u64_t codes __attribute__((unused)), uint64_t n 
 int main();
 
 _Bool is_ok(uint64_t code __attribute__((unused))) {
-  return (code == 0);
+  return (code == 0ULL);
 }
 
 _Bool is_err(uint64_t code __attribute__((unused))) {
-  return (code != 0);
+  return (code != 0ULL);
 }
 
 uint64_t err_category(uint64_t code __attribute__((unused))) {
-  return ((code >> 4) % 16);
+  return ((code >> 4ULL) % 16ULL);
 }
 
 uint64_t err_index(uint64_t code __attribute__((unused))) {
-  return (code % 16);
+  return (code % 16ULL);
 }
 
 uint64_t make_error(uint64_t category __attribute__((unused)), uint64_t index __attribute__((unused))) {
-  return (((category * 16) + index) + 1);
+  return (((category * 16ULL) + index) + 1ULL);
 }
 
 uint64_t count_errors(forge_span_u64_t codes __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((codes.data[i] != 0)) {
-        cnt = (cnt + 1);
+      if ((codes.data[i] != 0ULL)) {
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -58,17 +58,17 @@ uint64_t count_errors(forge_span_u64_t codes __attribute__((unused)), uint64_t n
 }
 
 uint64_t first_error(forge_span_u64_t codes __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   uint64_t found __attribute__((unused)) = n;
   _Bool done __attribute__((unused)) = 0;
   {
     while (((i < n) && (!done))) {
-      if ((codes.data[i] != 0)) {
+      if ((codes.data[i] != 0ULL)) {
         found = i;
         done = 1;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -76,7 +76,7 @@ uint64_t first_error(forge_span_u64_t codes __attribute__((unused)), uint64_t n 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

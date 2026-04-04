@@ -64,12 +64,12 @@ uint64_t Speed__value(const Speed* self __attribute__((unused))) {
 }
 
 int main() {
-  Meters d1 __attribute__((unused)) = Meters__new(60);
-  Meters d2 __attribute__((unused)) = Meters__new(40);
-  Seconds t __attribute__((unused)) = Seconds__new(5);
+  Meters d1 __attribute__((unused)) = Meters__new(60ULL);
+  Meters d2 __attribute__((unused)) = Meters__new(40ULL);
+  Seconds t __attribute__((unused)) = Seconds__new(5ULL);
   Meters total __attribute__((unused)) = Meters__add((&d1), (&d2));
-  Speed spd __attribute__((unused)) = compute_speed(Meters__value((&total)), 5);
-  Meters doubled __attribute__((unused)) = Meters__scale((&total), 2);
+  Speed spd __attribute__((unused)) = compute_speed(Meters__value((&total)), 5ULL);
+  Meters doubled __attribute__((unused)) = Meters__scale((&total), 2ULL);
   return (int)(((Meters__value((&total)) + Speed__value((&spd))) + Meters__value((&doubled))));
 
 }

@@ -23,15 +23,15 @@ uint64_t locked_read(uint64_t data __attribute__((unused)));
 int main();
 
 Lock lock_new() {
-  return (Lock){ .state = 0 };
+  return (Lock){ .state = 0ULL };
 }
 
 void lock_acquire(Lock* l __attribute__((unused))) {
-  (*l).state = 1;
+  (*l).state = 1ULL;
 }
 
 void lock_release(Lock* l __attribute__((unused))) {
-  (*l).state = 0;
+  (*l).state = 0ULL;
 }
 
 uint64_t lock_is_held(Lock* l __attribute__((unused))) {
@@ -66,7 +66,7 @@ uint64_t locked_read(uint64_t data __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

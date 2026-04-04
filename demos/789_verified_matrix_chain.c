@@ -16,47 +16,47 @@ uint64_t matrix_chain_cost(forge_span_u64_t dims __attribute__((unused)), uint64
 int main();
 
 uint64_t matrix_chain_cost(forge_span_u64_t dims __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t dp __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < (n - 1))) {
-      dp.data[((i * n) + i)] = 0;
-      i = (i + 1);
+    while ((i < (n - 1ULL))) {
+      dp.data[((i * n) + i)] = 0ULL;
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t len __attribute__((unused)) = 2;
+  uint64_t len __attribute__((unused)) = 2ULL;
   {
     while ((len < n)) {
-      uint64_t start __attribute__((unused)) = 0;
+      uint64_t start __attribute__((unused)) = 0ULL;
       {
         while (((start + len) < n)) {
-          uint64_t end __attribute__((unused)) = ((start + len) - 1);
-          dp.data[((start * n) + end)] = -1;
+          uint64_t end __attribute__((unused)) = ((start + len) - 1ULL);
+          dp.data[((start * n) + end)] = 0xffffffffffffffffULL;
           uint64_t k __attribute__((unused)) = start;
           {
             while ((k < end)) {
-              uint64_t cost __attribute__((unused)) = ((dp.data[((start * n) + k)] + dp.data[(((k + 1) * n) + end)]) + ((dims.data[start] * dims.data[(k + 1)]) * dims.data[(end + 1)]));
+              uint64_t cost __attribute__((unused)) = ((dp.data[((start * n) + k)] + dp.data[(((k + 1ULL) * n) + end)]) + ((dims.data[start] * dims.data[(k + 1ULL)]) * dims.data[(end + 1ULL)]));
               if ((cost < dp.data[((start * n) + end)])) {
                 dp.data[((start * n) + end)] = cost;
 
               }
-              k = (k + 1);
+              k = (k + 1ULL);
             }
 
           }
-          start = (start + 1);
+          start = (start + 1ULL);
         }
 
       }
-      len = (len + 1);
+      len = (len + 1ULL);
     }
 
   }
-  return dp.data[((0 * n) + (n - 2))];
+  return dp.data[((0ULL * n) + (n - 2ULL))];
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

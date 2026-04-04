@@ -16,32 +16,32 @@ void kmp_failure(forge_span_u64_t pattern __attribute__((unused)), uint64_t m __
 int main();
 
 void kmp_failure(forge_span_u64_t pattern __attribute__((unused)), uint64_t m __attribute__((unused)), forge_span_u64_t fail __attribute__((unused))) {
-  fail.data[0] = 0;
-  uint64_t i __attribute__((unused)) = 1;
-  uint64_t j __attribute__((unused)) = 0;
+  fail.data[0ULL] = 0ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((i < m)) {
       if ((pattern.data[i] == pattern.data[j])) {
-        j = (j + 1);
+        j = (j + 1ULL);
         fail.data[i] = j;
-        i = (i + 1);
+        i = (i + 1ULL);
 
-      } else if ((j > 0)) {
-        uint64_t fj __attribute__((unused)) = fail.data[(j - 1)];
+      } else if ((j > 0ULL)) {
+        uint64_t fj __attribute__((unused)) = fail.data[(j - 1ULL)];
         if ((fj < j)) {
           j = fj;
 
         } else {
-          j = 0;
+          j = 0ULL;
 
         }
-        fail.data[i] = 0;
-        i = (i + 1);
-        j = 0;
+        fail.data[i] = 0ULL;
+        i = (i + 1ULL);
+        j = 0ULL;
 
       } else {
-        fail.data[i] = 0;
-        i = (i + 1);
+        fail.data[i] = 0ULL;
+        i = (i + 1ULL);
 
       }
     }
@@ -50,7 +50,7 @@ void kmp_failure(forge_span_u64_t pattern __attribute__((unused)), uint64_t m __
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

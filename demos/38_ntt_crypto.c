@@ -46,23 +46,23 @@ uint64_t ntt_butterfly_hi(volatile uint64_t a __attribute__((unused)), volatile 
 }
 
 uint64_t poly_eval4(uint64_t* a __attribute__((unused)), volatile uint64_t x __attribute__((unused)), uint64_t q __attribute__((unused))) {
-  volatile uint64_t r __attribute__((unused)) = a[3];
+  volatile uint64_t r __attribute__((unused)) = a[3ULL];
   r = ct_mul_mod(r, x, q);
-  r = ct_add_mod(r, a[2], q);
+  r = ct_add_mod(r, a[2ULL], q);
   r = ct_mul_mod(r, x, q);
-  r = ct_add_mod(r, a[1], q);
+  r = ct_add_mod(r, a[1ULL], q);
   r = ct_mul_mod(r, x, q);
-  return ct_add_mod(r, a[0], q);
+  return ct_add_mod(r, a[0ULL], q);
 }
 
 uint64_t secret_dot4(uint64_t* a __attribute__((unused)), uint64_t* b __attribute__((unused)), uint64_t q __attribute__((unused))) {
-  volatile uint64_t s __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  volatile uint64_t s __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < 4)) {
+    while ((i < 4ULL)) {
       volatile uint64_t t __attribute__((unused)) = ct_mul_mod(a[i], b[i], q);
       s = ct_add_mod(s, t, q);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -70,15 +70,15 @@ uint64_t secret_dot4(uint64_t* a __attribute__((unused)), uint64_t* b __attribut
 }
 
 uint64_t run() {
-  uint64_t q __attribute__((unused)) = 17;
-  uint64_t a[4] = { 1, 2, 3, 4 };
-  volatile uint64_t x __attribute__((unused)) = 2;
+  uint64_t q __attribute__((unused)) = 17ULL;
+  uint64_t a[4] __attribute__((unused)) = { 1ULL, 2ULL, 3ULL, 4ULL };
+  volatile uint64_t x __attribute__((unused)) = 2ULL;
   volatile uint64_t ev __attribute__((unused)) = poly_eval4(a, x, q);
-  uint64_t b[4] = { 1, 1, 1, 1 };
+  uint64_t b[4] __attribute__((unused)) = { 1ULL, 1ULL, 1ULL, 1ULL };
   volatile uint64_t dp __attribute__((unused)) = secret_dot4(a, b, q);
-  volatile uint64_t u __attribute__((unused)) = 3;
-  volatile uint64_t v __attribute__((unused)) = 5;
-  volatile uint64_t w __attribute__((unused)) = 2;
+  volatile uint64_t u __attribute__((unused)) = 3ULL;
+  volatile uint64_t v __attribute__((unused)) = 5ULL;
+  volatile uint64_t w __attribute__((unused)) = 2ULL;
   volatile uint64_t lo __attribute__((unused)) = ntt_butterfly_lo(u, v, w, q);
   volatile uint64_t hi __attribute__((unused)) = ntt_butterfly_hi(u, v, w, q);
   uint64_t r __attribute__((unused)) = (((ev + dp) + lo) + hi);

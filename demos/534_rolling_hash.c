@@ -20,12 +20,12 @@ uint64_t check_hash_empty(forge_span_u64_t s __attribute__((unused)));
 int main();
 
 uint64_t span_hash(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t base __attribute__((unused)), uint64_t mod __attribute__((unused))) {
-  uint64_t h __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t h __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       h = (((h * base) + s.data[i]) % mod);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -41,15 +41,15 @@ uint64_t hash_append(uint64_t h __attribute__((unused)), uint64_t v __attribute_
 }
 
 uint64_t check_hash_mod(forge_span_u64_t s __attribute__((unused))) {
-  return span_hash(s, 3, 31, 1000);
+  return span_hash(s, 3ULL, 31ULL, 1000ULL);
 }
 
 uint64_t check_hash_empty(forge_span_u64_t s __attribute__((unused))) {
-  return span_hash(s, 0, 31, 1000);
+  return span_hash(s, 0ULL, 31ULL, 1000ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

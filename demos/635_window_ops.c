@@ -18,76 +18,76 @@ void window_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
 int main();
 
 void window_min(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t k __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t nout __attribute__((unused)) = ((n - k) + 1);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t nout __attribute__((unused)) = ((n - k) + 1ULL);
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nout)) {
       uint64_t m __attribute__((unused)) = s.data[i];
-      uint64_t j __attribute__((unused)) = 1;
+      uint64_t j __attribute__((unused)) = 1ULL;
       {
         while ((j < k)) {
           if ((s.data[(i + j)] < m)) {
             m = s.data[(i + j)];
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
       out.data[i] = m;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void window_max(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t k __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t nout __attribute__((unused)) = ((n - k) + 1);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t nout __attribute__((unused)) = ((n - k) + 1ULL);
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nout)) {
       uint64_t m __attribute__((unused)) = s.data[i];
-      uint64_t j __attribute__((unused)) = 1;
+      uint64_t j __attribute__((unused)) = 1ULL;
       {
         while ((j < k)) {
           if ((s.data[(i + j)] > m)) {
             m = s.data[(i + j)];
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
       out.data[i] = m;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void window_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t k __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t nout __attribute__((unused)) = ((n - k) + 1);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t nout __attribute__((unused)) = ((n - k) + 1ULL);
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nout)) {
-      uint64_t acc __attribute__((unused)) = 0;
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t acc __attribute__((unused)) = 0ULL;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < k)) {
           acc = (acc + s.data[(i + j)]);
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
       out.data[i] = acc;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

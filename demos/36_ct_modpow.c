@@ -13,7 +13,7 @@
 /* Forward declarations */
 uint64_t mulmod(volatile uint64_t a __attribute__((unused)), volatile uint64_t b __attribute__((unused)), uint64_t q __attribute__((unused)));
 uint64_t ct_select(volatile uint64_t flag __attribute__((unused)), volatile uint64_t a __attribute__((unused)), volatile uint64_t b __attribute__((unused)));
-uint64_t ct_modpow(uint64_t base __attribute__((unused)), volatile uint64_t exp __attribute__((unused)), uint64_t q __attribute__((unused)));
+uint64_t ct_modpow(uint64_t base __attribute__((unused)), volatile uint64_t forge_exp __attribute__((unused)), uint64_t q __attribute__((unused)));
 uint64_t run();
 
 uint64_t mulmod(volatile uint64_t a __attribute__((unused)), volatile uint64_t b __attribute__((unused)), uint64_t q __attribute__((unused))) {
@@ -21,23 +21,23 @@ uint64_t mulmod(volatile uint64_t a __attribute__((unused)), volatile uint64_t b
 }
 
 uint64_t ct_select(volatile uint64_t flag __attribute__((unused)), volatile uint64_t a __attribute__((unused)), volatile uint64_t b __attribute__((unused))) {
-  volatile uint64_t mask __attribute__((unused)) = (0 - flag);
+  volatile uint64_t mask __attribute__((unused)) = (0ULL - flag);
   volatile uint64_t neg __attribute__((unused)) = (~mask);
   return ((mask & a) | (neg & b));
 }
 
-uint64_t ct_modpow(uint64_t base __attribute__((unused)), volatile uint64_t exp __attribute__((unused)), uint64_t q __attribute__((unused))) {
-  volatile uint64_t acc __attribute__((unused)) = 1;
+uint64_t ct_modpow(uint64_t base __attribute__((unused)), volatile uint64_t forge_exp __attribute__((unused)), uint64_t q __attribute__((unused))) {
+  volatile uint64_t acc __attribute__((unused)) = 1ULL;
   volatile uint64_t b __attribute__((unused)) = base;
-  volatile uint64_t e __attribute__((unused)) = exp;
-  uint64_t i __attribute__((unused)) = 0;
+  volatile uint64_t e __attribute__((unused)) = forge_exp;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < 64)) {
-      volatile uint64_t bit __attribute__((unused)) = (e & 1);
+    while ((i < 64ULL)) {
+      volatile uint64_t bit __attribute__((unused)) = (e & 1ULL);
       acc = ct_select(bit, mulmod(acc, b, q), acc);
       b = mulmod(b, b, q);
-      e = (e >> 1);
-      i = (i + 1);
+      e = (e >> 1ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -45,9 +45,9 @@ uint64_t ct_modpow(uint64_t base __attribute__((unused)), volatile uint64_t exp 
 }
 
 uint64_t run() {
-  uint64_t base __attribute__((unused)) = 3;
-  volatile uint64_t exp __attribute__((unused)) = 7;
-  uint64_t q __attribute__((unused)) = 17;
-  return ct_modpow(base, exp, q);
+  uint64_t base __attribute__((unused)) = 3ULL;
+  volatile uint64_t forge_exp __attribute__((unused)) = 7ULL;
+  uint64_t q __attribute__((unused)) = 17ULL;
+  return ct_modpow(base, forge_exp, q);
 }
 

@@ -18,30 +18,30 @@ uint64_t run();
 
 void swap_adjacent(forge_span_u64_t s __attribute__((unused)), uint64_t i __attribute__((unused))) {
   uint64_t tmp __attribute__((unused)) = s.data[i];
-  s.data[i] = s.data[(i + 1)];
-  s.data[(i + 1)] = tmp;
+  s.data[i] = s.data[(i + 1ULL)];
+  s.data[(i + 1ULL)] = tmp;
 }
 
 void insertion_sort(forge_span_u64_t s __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = s.len;
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while ((k < n)) {
       uint64_t j __attribute__((unused)) = k;
       {
-        while (((j > 0) && (s.data[(j - 1)] > s.data[j]))) {
-          swap_adjacent(s, (j - 1));
-          j = (j - 1);
+        while (((j > 0ULL) && (s.data[(j - 1ULL)] > s.data[j]))) {
+          swap_adjacent(s, (j - 1ULL));
+          j = (j - 1ULL);
         }
 
       }
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
 }
 
 uint64_t run() {
-  return 0;
+  return 0ULL;
 }
 

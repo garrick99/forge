@@ -17,15 +17,15 @@ void poly_reduce(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b 
 int main();
 
 uint64_t poly_degree(forge_span_u64_t coeffs __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t deg __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t deg __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((coeffs.data[i] > 0)) {
+      if ((coeffs.data[i] > 0ULL)) {
         deg = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -33,7 +33,7 @@ uint64_t poly_degree(forge_span_u64_t coeffs __attribute__((unused)), uint64_t n
 }
 
 void poly_reduce(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t p __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t bv __attribute__((unused)) = (b.data[i] % p);
@@ -44,14 +44,14 @@ void poly_reduce(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b 
         a.data[i] = (((a.data[i] + p) - bv) % p);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

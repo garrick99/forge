@@ -49,15 +49,15 @@ void print_char(uint64_t c __attribute__((unused))) {
 }
 
 void print_newline() {
-  putchar(10);
+  putchar(10ULL);
 }
 
 void print_u64(uint64_t n __attribute__((unused))) {
-  if ((n >= 10)) {
-    print_u64((n / 10));
+  if ((n >= 10ULL)) {
+    print_u64((n / 10ULL));
 
   }
-  putchar((48 + (n % 10)));
+  putchar((48ULL + (n % 10ULL)));
 }
 
 void println_u64(uint64_t n __attribute__((unused))) {
@@ -67,8 +67,8 @@ void println_u64(uint64_t n __attribute__((unused))) {
 
 void print_i64(int64_t n __attribute__((unused))) {
   if ((n < 0)) {
-    putchar(45);
-    print_u64((0 - ((uint64_t)n)));
+    putchar(45ULL);
+    print_u64((0ULL - ((uint64_t)n)));
 
   } else {
     print_u64(((uint64_t)n));
@@ -82,41 +82,41 @@ void println_i64(int64_t n __attribute__((unused))) {
 }
 
 void print_hex_nibble(uint64_t v __attribute__((unused))) {
-  if ((v < 10)) {
-    putchar((48 + v));
+  if ((v < 10ULL)) {
+    putchar((48ULL + v));
 
   } else {
-    putchar((87 + v));
+    putchar((87ULL + v));
 
   }
 }
 
 void print_hex_u64(uint64_t n __attribute__((unused))) {
-  if ((n >= 16)) {
-    print_hex_u64((n / 16));
+  if ((n >= 16ULL)) {
+    print_hex_u64((n / 16ULL));
 
   }
-  print_hex_nibble((n % 16));
+  print_hex_nibble((n % 16ULL));
 }
 
 void print_hex_u64_padded(uint64_t n __attribute__((unused))) {
-  uint64_t shift __attribute__((unused)) = 60;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t shift __attribute__((unused)) = 60ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < 16)) {
-      uint64_t nibble __attribute__((unused)) = ((n >> (60 - (i * 4))) & 15);
+    while ((i < 16ULL)) {
+      uint64_t nibble __attribute__((unused)) = ((n >> (60ULL - (i * 4ULL))) & 15ULL);
       print_hex_nibble(nibble);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void print_hex(uint64_t n __attribute__((unused))) {
-  putchar(48);
-  putchar(120);
-  if ((n == 0)) {
-    putchar(48);
+  putchar(48ULL);
+  putchar(120ULL);
+  if ((n == 0ULL)) {
+    putchar(48ULL);
 
   } else {
     print_hex_u64(n);
@@ -126,30 +126,30 @@ void print_hex(uint64_t n __attribute__((unused))) {
 
 void print_bool(_Bool b __attribute__((unused))) {
   if (b) {
-    putchar(116);
-    putchar(114);
-    putchar(117);
-    putchar(101);
+    putchar(116ULL);
+    putchar(114ULL);
+    putchar(117ULL);
+    putchar(101ULL);
 
   } else {
-    putchar(102);
-    putchar(97);
-    putchar(108);
-    putchar(115);
-    putchar(101);
+    putchar(102ULL);
+    putchar(97ULL);
+    putchar(108ULL);
+    putchar(115ULL);
+    putchar(101ULL);
 
   }
 }
 
 void flush_stdout() {
-  fflush(0);
+  fflush(0ULL);
 }
 
 int main() {
-  println_u64(0);
-  println_u64(1);
-  println_u64(999);
-  println_u64(-1);
+  println_u64(0ULL);
+  println_u64(1ULL);
+  println_u64(999ULL);
+  println_u64(0xffffffffffffffffULL);
   print_i64(0);
   print_newline();
   print_i64(42);
@@ -160,13 +160,13 @@ int main() {
   print_newline();
   print_bool(0);
   print_newline();
-  print_hex(0);
+  print_hex(0ULL);
   print_newline();
-  print_hex(255);
+  print_hex(255ULL);
   print_newline();
-  print_hex(4096);
+  print_hex(4096ULL);
   print_newline();
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -19,40 +19,40 @@ uint64_t bit_count(forge_span_u64_t words __attribute__((unused)), uint64_t nwor
 int main();
 
 _Bool bit_get(forge_span_u64_t words __attribute__((unused)), uint64_t nwords __attribute__((unused)), uint64_t pos __attribute__((unused))) {
-  uint64_t word_idx __attribute__((unused)) = (pos / 64);
-  uint64_t bit_idx __attribute__((unused)) = (pos % 64);
-  uint64_t mask __attribute__((unused)) = (1 * (1 << bit_idx));
-  return ((words.data[word_idx] & mask) != 0);
+  uint64_t word_idx __attribute__((unused)) = (pos / 64ULL);
+  uint64_t bit_idx __attribute__((unused)) = (pos % 64ULL);
+  uint64_t mask __attribute__((unused)) = (1ULL * (1ULL << bit_idx));
+  return ((words.data[word_idx] & mask) != 0ULL);
 }
 
 void bit_set(forge_span_u64_t words __attribute__((unused)), uint64_t nwords __attribute__((unused)), uint64_t pos __attribute__((unused))) {
-  uint64_t word_idx __attribute__((unused)) = (pos / 64);
-  uint64_t bit_idx __attribute__((unused)) = (pos % 64);
-  uint64_t mask __attribute__((unused)) = (1 << bit_idx);
+  uint64_t word_idx __attribute__((unused)) = (pos / 64ULL);
+  uint64_t bit_idx __attribute__((unused)) = (pos % 64ULL);
+  uint64_t mask __attribute__((unused)) = (1ULL << bit_idx);
   words.data[word_idx] = (words.data[word_idx] | mask);
 }
 
 void bit_clear(forge_span_u64_t words __attribute__((unused)), uint64_t nwords __attribute__((unused)), uint64_t pos __attribute__((unused))) {
-  uint64_t word_idx __attribute__((unused)) = (pos / 64);
-  uint64_t bit_idx __attribute__((unused)) = (pos % 64);
-  uint64_t mask __attribute__((unused)) = (1 << bit_idx);
-  words.data[word_idx] = (words.data[word_idx] & (mask ^ -1));
+  uint64_t word_idx __attribute__((unused)) = (pos / 64ULL);
+  uint64_t bit_idx __attribute__((unused)) = (pos % 64ULL);
+  uint64_t mask __attribute__((unused)) = (1ULL << bit_idx);
+  words.data[word_idx] = (words.data[word_idx] & (mask ^ 0xffffffffffffffffULL));
 }
 
 uint64_t bit_count(forge_span_u64_t words __attribute__((unused)), uint64_t nwords __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nwords)) {
       uint64_t w __attribute__((unused)) = words.data[i];
       {
-        while ((w != 0)) {
-          w = (w & (w - 1));
-          count = (count + 1);
+        while ((w != 0ULL)) {
+          w = (w & (w - 1ULL));
+          count = (count + 1ULL);
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -60,7 +60,7 @@ uint64_t bit_count(forge_span_u64_t words __attribute__((unused)), uint64_t nwor
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

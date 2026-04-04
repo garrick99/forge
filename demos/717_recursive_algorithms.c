@@ -19,20 +19,20 @@ uint64_t bsearch_iter(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
 int main();
 
 uint64_t sum_prefix(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return 0;
+  if ((n == 0ULL)) {
+    return 0ULL;
   } else {
-    return (s.data[(n - 1)] + sum_prefix(s, (n - 1)));
+    return (s.data[(n - 1ULL)] + sum_prefix(s, (n - 1ULL)));
   }
 }
 
 uint64_t max_array_rec(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  if ((n == 1)) {
-    return s.data[0];
+  if ((n == 1ULL)) {
+    return s.data[0ULL];
   } else {
-    uint64_t prev_max __attribute__((unused)) = max_array_rec(s, (n - 1));
-    if ((s.data[(n - 1)] > prev_max)) {
-      return s.data[(n - 1)];
+    uint64_t prev_max __attribute__((unused)) = max_array_rec(s, (n - 1ULL));
+    if ((s.data[(n - 1ULL)] > prev_max)) {
+      return s.data[(n - 1ULL)];
     } else {
       return prev_max;
     }
@@ -40,12 +40,12 @@ uint64_t max_array_rec(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 uint64_t count_le(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t threshold __attribute__((unused))) {
-  if ((n == 0)) {
-    return 0;
+  if ((n == 0ULL)) {
+    return 0ULL;
   } else {
-    uint64_t rest __attribute__((unused)) = count_le(s, (n - 1), threshold);
-    if ((s.data[(n - 1)] <= threshold)) {
-      return (rest + 1);
+    uint64_t rest __attribute__((unused)) = count_le(s, (n - 1ULL), threshold);
+    if ((s.data[(n - 1ULL)] <= threshold)) {
+      return (rest + 1ULL);
     } else {
       return rest;
     }
@@ -53,18 +53,18 @@ uint64_t count_le(forge_span_u64_t s __attribute__((unused)), uint64_t n __attri
 }
 
 uint64_t bsearch_iter(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
   uint64_t hi __attribute__((unused)) = n;
   uint64_t ans __attribute__((unused)) = n;
   {
     while ((lo < hi)) {
-      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2));
+      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2ULL));
       if ((s.data[mid] == target)) {
         ans = mid;
         lo = hi;
 
       } else if ((s.data[mid] < target)) {
-        lo = (mid + 1);
+        lo = (mid + 1ULL);
 
       } else {
         hi = mid;
@@ -77,7 +77,7 @@ uint64_t bsearch_iter(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

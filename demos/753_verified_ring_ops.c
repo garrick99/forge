@@ -24,33 +24,33 @@ int main();
 __forge_tuple_u64_u64_t ring_enqueue(forge_span_u64_t buf __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t tail __attribute__((unused)), uint64_t count __attribute__((unused)), uint64_t val __attribute__((unused))) {
   buf.data[tail] = val;
   uint64_t new_tail;
-  if (((tail + 1) == cap)) {
-    new_tail = 0;
+  if (((tail + 1ULL) == cap)) {
+    new_tail = 0ULL;
   } else {
-    new_tail = (tail + 1);
+    new_tail = (tail + 1ULL);
   }
-  return (__forge_tuple_u64_u64_t){ ._0 = new_tail, ._1 = (count + 1) };
+  return (__forge_tuple_u64_u64_t){ ._0 = new_tail, ._1 = (count + 1ULL) };
 }
 
 __forge_tuple_u64_u64_u64_t ring_dequeue(forge_span_u64_t buf __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t head __attribute__((unused)), uint64_t count __attribute__((unused))) {
   uint64_t val __attribute__((unused)) = buf.data[head];
   uint64_t new_head;
-  if (((head + 1) == cap)) {
-    new_head = 0;
+  if (((head + 1ULL) == cap)) {
+    new_head = 0ULL;
   } else {
-    new_head = (head + 1);
+    new_head = (head + 1ULL);
   }
-  return (__forge_tuple_u64_u64_u64_t){ ._0 = val, ._1 = new_head, ._2 = (count - 1) };
+  return (__forge_tuple_u64_u64_u64_t){ ._0 = val, ._1 = new_head, ._2 = (count - 1ULL) };
 }
 
 __forge_tuple_u64_u64_t ring_fill(forge_span_u64_t buf __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t tail __attribute__((unused)) = 0;
-  uint64_t count __attribute__((unused)) = 0;
+  uint64_t tail __attribute__((unused)) = 0ULL;
+  uint64_t count __attribute__((unused)) = 0ULL;
   {
     while ((count < cap)) {
       buf.data[tail] = val;
-      tail = (((tail + 1) == cap) ? 0 : (tail + 1));
-      count = (count + 1);
+      tail = (((tail + 1ULL) == cap) ? 0ULL : (tail + 1ULL));
+      count = (count + 1ULL);
     }
 
   }
@@ -58,7 +58,7 @@ __forge_tuple_u64_u64_t ring_fill(forge_span_u64_t buf __attribute__((unused)), 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

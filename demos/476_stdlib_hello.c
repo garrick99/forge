@@ -63,15 +63,15 @@ void print_char(uint64_t c __attribute__((unused))) {
 }
 
 void print_newline() {
-  putchar(10);
+  putchar(10ULL);
 }
 
 void print_u64(uint64_t n __attribute__((unused))) {
-  if ((n >= 10)) {
-    print_u64((n / 10));
+  if ((n >= 10ULL)) {
+    print_u64((n / 10ULL));
 
   }
-  putchar((48 + (n % 10)));
+  putchar((48ULL + (n % 10ULL)));
 }
 
 void println_u64(uint64_t n __attribute__((unused))) {
@@ -81,8 +81,8 @@ void println_u64(uint64_t n __attribute__((unused))) {
 
 void print_i64(int64_t n __attribute__((unused))) {
   if ((n < 0)) {
-    putchar(45);
-    print_u64((0 - ((uint64_t)n)));
+    putchar(45ULL);
+    print_u64((0ULL - ((uint64_t)n)));
 
   } else {
     print_u64(((uint64_t)n));
@@ -96,41 +96,41 @@ void println_i64(int64_t n __attribute__((unused))) {
 }
 
 void print_hex_nibble(uint64_t v __attribute__((unused))) {
-  if ((v < 10)) {
-    putchar((48 + v));
+  if ((v < 10ULL)) {
+    putchar((48ULL + v));
 
   } else {
-    putchar((87 + v));
+    putchar((87ULL + v));
 
   }
 }
 
 void print_hex_u64(uint64_t n __attribute__((unused))) {
-  if ((n >= 16)) {
-    print_hex_u64((n / 16));
+  if ((n >= 16ULL)) {
+    print_hex_u64((n / 16ULL));
 
   }
-  print_hex_nibble((n % 16));
+  print_hex_nibble((n % 16ULL));
 }
 
 void print_hex_u64_padded(uint64_t n __attribute__((unused))) {
-  uint64_t shift __attribute__((unused)) = 60;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t shift __attribute__((unused)) = 60ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < 16)) {
-      uint64_t nibble __attribute__((unused)) = ((n >> (60 - (i * 4))) & 15);
+    while ((i < 16ULL)) {
+      uint64_t nibble __attribute__((unused)) = ((n >> (60ULL - (i * 4ULL))) & 15ULL);
       print_hex_nibble(nibble);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void print_hex(uint64_t n __attribute__((unused))) {
-  putchar(48);
-  putchar(120);
-  if ((n == 0)) {
-    putchar(48);
+  putchar(48ULL);
+  putchar(120ULL);
+  if ((n == 0ULL)) {
+    putchar(48ULL);
 
   } else {
     print_hex_u64(n);
@@ -140,23 +140,23 @@ void print_hex(uint64_t n __attribute__((unused))) {
 
 void print_bool(_Bool b __attribute__((unused))) {
   if (b) {
-    putchar(116);
-    putchar(114);
-    putchar(117);
-    putchar(101);
+    putchar(116ULL);
+    putchar(114ULL);
+    putchar(117ULL);
+    putchar(101ULL);
 
   } else {
-    putchar(102);
-    putchar(97);
-    putchar(108);
-    putchar(115);
-    putchar(101);
+    putchar(102ULL);
+    putchar(97ULL);
+    putchar(108ULL);
+    putchar(115ULL);
+    putchar(101ULL);
 
   }
 }
 
 void flush_stdout() {
-  fflush(0);
+  fflush(0ULL);
 }
 
 uint64_t min64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
@@ -196,15 +196,15 @@ uint64_t abs_diff(uint64_t a __attribute__((unused)), uint64_t b __attribute__((
 }
 
 uint64_t pow64(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused))) {
-  if ((exp == 0)) {
-    return 1;
+  if ((exp == 0ULL)) {
+    return 1ULL;
   } else {
-    return (base * pow64(base, (exp - 1)));
+    return (base * pow64(base, (exp - 1ULL)));
   }
 }
 
 uint64_t ceil_div(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  return (((a + b) - 1) / b);
+  return (((a + b) - 1ULL) / b);
 }
 
 uint64_t round_up(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
@@ -212,7 +212,7 @@ uint64_t round_up(uint64_t a __attribute__((unused)), uint64_t b __attribute__((
 }
 
 uint64_t gcd64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if ((b == 0)) {
+  if ((b == 0ULL)) {
     return a;
   } else {
     return gcd64(b, (a % b));
@@ -220,8 +220,8 @@ uint64_t gcd64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unu
 }
 
 uint64_t sat_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if ((a > (-1 - b))) {
-    return -1;
+  if ((a > (0xffffffffffffffffULL - b))) {
+    return 0xffffffffffffffffULL;
   } else {
     return (a + b);
   }
@@ -229,18 +229,18 @@ uint64_t sat_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((u
 
 uint64_t sat_sub(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
   if ((a < b)) {
-    return 0;
+    return 0ULL;
   } else {
     return (a - b);
   }
 }
 
 uint64_t sat_mul(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if ((b == 0)) {
-    return 0;
+  if ((b == 0ULL)) {
+    return 0ULL;
   } else {
-    if ((a > (-1 / b))) {
-      return -1;
+    if ((a > (0xffffffffffffffffULL / b))) {
+      return 0xffffffffffffffffULL;
     } else {
       return (a * b);
     }
@@ -248,52 +248,52 @@ uint64_t sat_mul(uint64_t a __attribute__((unused)), uint64_t b __attribute__((u
 }
 
 _Bool is_pow2(uint64_t n __attribute__((unused))) {
-  return ((n & (n - 1)) == 0);
+  return ((n & (n - 1ULL)) == 0ULL);
 }
 
 uint64_t popcount64(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return 0;
+  if ((n == 0ULL)) {
+    return 0ULL;
   } else {
-    return (1 + popcount64((n & (n - 1))));
+    return (1ULL + popcount64((n & (n - 1ULL))));
   }
 }
 
 uint64_t floor_log2(uint64_t n __attribute__((unused))) {
-  if ((n == 1)) {
-    return 0;
+  if ((n == 1ULL)) {
+    return 0ULL;
   } else {
-    return (1 + floor_log2((n / 2)));
+    return (1ULL + floor_log2((n / 2ULL)));
   }
 }
 
 int main() {
-  putchar(72);
-  putchar(101);
-  putchar(108);
-  putchar(108);
-  putchar(111);
-  putchar(32);
-  putchar(102);
-  putchar(114);
-  putchar(111);
-  putchar(109);
-  putchar(32);
-  putchar(70);
-  putchar(111);
-  putchar(114);
-  putchar(103);
-  putchar(101);
-  putchar(33);
+  putchar(72ULL);
+  putchar(101ULL);
+  putchar(108ULL);
+  putchar(108ULL);
+  putchar(111ULL);
+  putchar(32ULL);
+  putchar(102ULL);
+  putchar(114ULL);
+  putchar(111ULL);
+  putchar(109ULL);
+  putchar(32ULL);
+  putchar(70ULL);
+  putchar(111ULL);
+  putchar(114ULL);
+  putchar(103ULL);
+  putchar(101ULL);
+  putchar(33ULL);
   print_newline();
-  println_u64(42);
-  uint64_t g __attribute__((unused)) = gcd64(48, 18);
+  println_u64(42ULL);
+  uint64_t g __attribute__((unused)) = gcd64(48ULL, 18ULL);
   println_u64(g);
-  uint64_t big __attribute__((unused)) = sat_add(-1, 1);
+  uint64_t big __attribute__((unused)) = sat_add(0xffffffffffffffffULL, 1ULL);
   println_u64(big);
-  uint64_t p __attribute__((unused)) = popcount64(255);
+  uint64_t p __attribute__((unused)) = popcount64(255ULL);
   println_u64(p);
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

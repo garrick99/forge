@@ -27,24 +27,24 @@ uint64_t Release__Config__version();
 uint64_t Debug__Config__flags();
 
 uint64_t Debug__Config__name_hash(const Debug* self __attribute__((unused))) {
-  return ((*self).seed * 37);
+  return ((*self).seed * 37ULL);
 }
 
 uint64_t Debug__Config__version() {
-  return 999;
+  return 999ULL;
 }
 
 uint64_t Release__Config__name_hash(const Release* self __attribute__((unused))) {
-  return ((*self).optimized * 7);
+  return ((*self).optimized * 7ULL);
 }
 
 uint64_t Release__Config__flags() {
-  return 128;
+  return 128ULL;
 }
 
 int main() {
-  Debug d __attribute__((unused)) = (Debug){ .seed = 5 };
-  Release r __attribute__((unused)) = (Release){ .optimized = 10 };
+  Debug d __attribute__((unused)) = (Debug){ .seed = 5ULL };
+  Release r __attribute__((unused)) = (Release){ .optimized = 10ULL };
   uint64_t dh __attribute__((unused)) = Debug__Config__name_hash((&d));
   uint64_t dv __attribute__((unused)) = Debug__Config__version();
   uint64_t df __attribute__((unused)) = Debug__Config__flags();
@@ -56,10 +56,10 @@ int main() {
 }
 
 uint64_t Release__Config__version() {
-  return 1;
+  return 1ULL;
 }
 
 uint64_t Debug__Config__flags() {
-  return 0;
+  return 0ULL;
 }
 

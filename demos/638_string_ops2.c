@@ -20,7 +20,7 @@ uint64_t trim_right(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 int main();
 
 uint64_t find_value(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   uint64_t found __attribute__((unused)) = n;
   _Bool done __attribute__((unused)) = 0;
   {
@@ -30,7 +30,7 @@ uint64_t find_value(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
         done = 1;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -38,16 +38,16 @@ uint64_t find_value(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 }
 
 uint64_t replace_value(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t old_val __attribute__((unused)), uint64_t new_val __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((s.data[i] == old_val)) {
         s.data[i] = new_val;
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -55,15 +55,15 @@ uint64_t replace_value(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 uint64_t count_delim(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t delim __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((s.data[i] == delim)) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -71,12 +71,12 @@ uint64_t count_delim(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 }
 
 uint64_t trim_left(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   _Bool done __attribute__((unused)) = 0;
   {
     while (((i < n) && (!done))) {
       if ((s.data[i] == val)) {
-        i = (i + 1);
+        i = (i + 1ULL);
 
       } else {
         done = 1;
@@ -92,9 +92,9 @@ uint64_t trim_right(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
   uint64_t end __attribute__((unused)) = n;
   _Bool done __attribute__((unused)) = 0;
   {
-    while (((end >= 1) && (!done))) {
-      if ((s.data[(end - 1)] == val)) {
-        end = (end - 1);
+    while (((end >= 1ULL) && (!done))) {
+      if ((s.data[(end - 1ULL)] == val)) {
+        end = (end - 1ULL);
 
       } else {
         done = 1;
@@ -107,7 +107,7 @@ uint64_t trim_right(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

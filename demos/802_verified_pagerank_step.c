@@ -16,42 +16,42 @@ void pagerank_step(forge_span_u64_t adj_ptr __attribute__((unused)), forge_span_
 int main();
 
 void pagerank_step(forge_span_u64_t adj_ptr __attribute__((unused)), forge_span_u64_t adj_list __attribute__((unused)), uint64_t n_verts __attribute__((unused)), uint64_t n_edges __attribute__((unused)), forge_span_u64_t out_degree __attribute__((unused)), forge_span_u64_t old_rank __attribute__((unused)), forge_span_u64_t new_rank __attribute__((unused)), uint64_t damping __attribute__((unused))) {
-  uint64_t base __attribute__((unused)) = ((1000 - damping) / n_verts);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t base __attribute__((unused)) = ((1000ULL - damping) / n_verts);
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n_verts)) {
       new_rank.data[i] = base;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t v __attribute__((unused)) = 0;
+  uint64_t v __attribute__((unused)) = 0ULL;
   {
     while ((v < n_verts)) {
       uint64_t deg __attribute__((unused)) = out_degree.data[v];
-      if ((deg > 0)) {
-        uint64_t contrib __attribute__((unused)) = ((damping * old_rank.data[v]) / (1000 * deg));
+      if ((deg > 0ULL)) {
+        uint64_t contrib __attribute__((unused)) = ((damping * old_rank.data[v]) / (1000ULL * deg));
         uint64_t start __attribute__((unused)) = adj_ptr.data[v];
-        uint64_t end __attribute__((unused)) = adj_ptr.data[(v + 1)];
+        uint64_t end __attribute__((unused)) = adj_ptr.data[(v + 1ULL)];
         uint64_t e __attribute__((unused)) = start;
         {
           while ((e < end)) {
             uint64_t nb __attribute__((unused)) = adj_list.data[e];
             new_rank.data[nb] = (new_rank.data[nb] + contrib);
-            e = (e + 1);
+            e = (e + 1ULL);
           }
 
         }
 
       }
-      v = (v + 1);
+      v = (v + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

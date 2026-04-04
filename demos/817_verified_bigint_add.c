@@ -17,20 +17,20 @@ uint64_t bigint_compare(forge_span_u64_t a __attribute__((unused)), forge_span_u
 int main();
 
 uint64_t bigint_add(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t result_span __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t carry __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t carry __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t sum __attribute__((unused)) = ((a.data[i] + b.data[i]) + carry);
-      if (((sum < a.data[i]) || ((carry == 1) && (sum <= a.data[i])))) {
-        carry = 1;
+      if (((sum < a.data[i]) || ((carry == 1ULL) && (sum <= a.data[i])))) {
+        carry = 1ULL;
 
       } else {
-        carry = 0;
+        carry = 0ULL;
 
       }
       result_span.data[i] = sum;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -39,17 +39,17 @@ uint64_t bigint_add(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t
 }
 
 uint64_t bigint_compare(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t res __attribute__((unused)) = 0;
+  uint64_t res __attribute__((unused)) = 0ULL;
   uint64_t i __attribute__((unused)) = n;
   {
-    while ((i > 0)) {
-      i = (i - 1);
-      if ((res == 0)) {
+    while ((i > 0ULL)) {
+      i = (i - 1ULL);
+      if ((res == 0ULL)) {
         if ((a.data[i] > b.data[i])) {
-          res = 1;
+          res = 1ULL;
 
         } else if ((a.data[i] < b.data[i])) {
-          res = 2;
+          res = 2ULL;
 
         }
 
@@ -61,7 +61,7 @@ uint64_t bigint_compare(forge_span_u64_t a __attribute__((unused)), forge_span_u
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

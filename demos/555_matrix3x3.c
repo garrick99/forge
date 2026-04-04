@@ -22,19 +22,19 @@ void mat3_add(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __a
 int main();
 
 uint64_t mat3_get(forge_span_u64_t m __attribute__((unused)), uint64_t r __attribute__((unused)), uint64_t c __attribute__((unused))) {
-  return m.data[((r * 3) + c)];
+  return m.data[((r * 3ULL) + c)];
 }
 
 void mat3_set(forge_span_u64_t m __attribute__((unused)), uint64_t r __attribute__((unused)), uint64_t c __attribute__((unused)), uint64_t v __attribute__((unused))) {
-  m.data[((r * 3) + c)] = v;
+  m.data[((r * 3ULL) + c)] = v;
 }
 
 void mat3_zero(forge_span_u64_t m __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < 9)) {
-      m.data[i] = 0;
-      i = (i + 1);
+    while ((i < 9ULL)) {
+      m.data[i] = 0ULL;
+      i = (i + 1ULL);
     }
 
   }
@@ -42,39 +42,39 @@ void mat3_zero(forge_span_u64_t m __attribute__((unused))) {
 
 void mat3_identity(forge_span_u64_t m __attribute__((unused))) {
   mat3_zero(m);
-  m.data[0] = 1;
-  m.data[4] = 1;
-  m.data[8] = 1;
+  m.data[0ULL] = 1ULL;
+  m.data[4ULL] = 1ULL;
+  m.data[8ULL] = 1ULL;
 }
 
 uint64_t mat3_trace(forge_span_u64_t m __attribute__((unused))) {
-  return ((m.data[0] + m.data[4]) + m.data[8]);
+  return ((m.data[0ULL] + m.data[4ULL]) + m.data[8ULL]);
 }
 
 void mat3_scale(forge_span_u64_t m __attribute__((unused)), uint64_t k __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < 9)) {
+    while ((i < 9ULL)) {
       m.data[i] = (m.data[i] * k);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void mat3_add(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < 9)) {
+    while ((i < 9ULL)) {
       out.data[i] = (a.data[i] + b.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

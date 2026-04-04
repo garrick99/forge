@@ -15,40 +15,40 @@ uint64_t hamming_decode(uint64_t codeword __attribute__((unused)));
 int main();
 
 uint64_t hamming_encode(uint64_t d __attribute__((unused))) {
-  uint64_t d1 __attribute__((unused)) = ((d >> 0) & 1);
-  uint64_t d2 __attribute__((unused)) = ((d >> 1) & 1);
-  uint64_t d3 __attribute__((unused)) = ((d >> 2) & 1);
-  uint64_t d4 __attribute__((unused)) = ((d >> 3) & 1);
+  uint64_t d1 __attribute__((unused)) = ((d >> 0ULL) & 1ULL);
+  uint64_t d2 __attribute__((unused)) = ((d >> 1ULL) & 1ULL);
+  uint64_t d3 __attribute__((unused)) = ((d >> 2ULL) & 1ULL);
+  uint64_t d4 __attribute__((unused)) = ((d >> 3ULL) & 1ULL);
   uint64_t p1 __attribute__((unused)) = ((d1 ^ d2) ^ d4);
   uint64_t p2 __attribute__((unused)) = ((d1 ^ d3) ^ d4);
   uint64_t p3 __attribute__((unused)) = ((d2 ^ d3) ^ d4);
-  return (((((((p1 << 0) | (p2 << 1)) | (d1 << 2)) | (p3 << 3)) | (d2 << 4)) | (d3 << 5)) | (d4 << 6));
+  return (((((((p1 << 0ULL) | (p2 << 1ULL)) | (d1 << 2ULL)) | (p3 << 3ULL)) | (d2 << 4ULL)) | (d3 << 5ULL)) | (d4 << 6ULL));
 }
 
 uint64_t hamming_syndrome(uint64_t codeword __attribute__((unused))) {
-  uint64_t b1 __attribute__((unused)) = ((codeword >> 0) & 1);
-  uint64_t b2 __attribute__((unused)) = ((codeword >> 1) & 1);
-  uint64_t b3 __attribute__((unused)) = ((codeword >> 2) & 1);
-  uint64_t b4 __attribute__((unused)) = ((codeword >> 3) & 1);
-  uint64_t b5 __attribute__((unused)) = ((codeword >> 4) & 1);
-  uint64_t b6 __attribute__((unused)) = ((codeword >> 5) & 1);
-  uint64_t b7 __attribute__((unused)) = ((codeword >> 6) & 1);
+  uint64_t b1 __attribute__((unused)) = ((codeword >> 0ULL) & 1ULL);
+  uint64_t b2 __attribute__((unused)) = ((codeword >> 1ULL) & 1ULL);
+  uint64_t b3 __attribute__((unused)) = ((codeword >> 2ULL) & 1ULL);
+  uint64_t b4 __attribute__((unused)) = ((codeword >> 3ULL) & 1ULL);
+  uint64_t b5 __attribute__((unused)) = ((codeword >> 4ULL) & 1ULL);
+  uint64_t b6 __attribute__((unused)) = ((codeword >> 5ULL) & 1ULL);
+  uint64_t b7 __attribute__((unused)) = ((codeword >> 6ULL) & 1ULL);
   uint64_t s1 __attribute__((unused)) = (((b1 ^ b3) ^ b5) ^ b7);
   uint64_t s2 __attribute__((unused)) = (((b2 ^ b3) ^ b6) ^ b7);
   uint64_t s3 __attribute__((unused)) = (((b4 ^ b5) ^ b6) ^ b7);
-  return (((s3 << 2) | (s2 << 1)) | s1);
+  return (((s3 << 2ULL) | (s2 << 1ULL)) | s1);
 }
 
 uint64_t hamming_decode(uint64_t codeword __attribute__((unused))) {
-  uint64_t d1 __attribute__((unused)) = ((codeword >> 2) & 1);
-  uint64_t d2 __attribute__((unused)) = ((codeword >> 4) & 1);
-  uint64_t d3 __attribute__((unused)) = ((codeword >> 5) & 1);
-  uint64_t d4 __attribute__((unused)) = ((codeword >> 6) & 1);
-  return (((d1 | (d2 << 1)) | (d3 << 2)) | (d4 << 3));
+  uint64_t d1 __attribute__((unused)) = ((codeword >> 2ULL) & 1ULL);
+  uint64_t d2 __attribute__((unused)) = ((codeword >> 4ULL) & 1ULL);
+  uint64_t d3 __attribute__((unused)) = ((codeword >> 5ULL) & 1ULL);
+  uint64_t d4 __attribute__((unused)) = ((codeword >> 6ULL) & 1ULL);
+  return (((d1 | (d2 << 1ULL)) | (d3 << 2ULL)) | (d4 << 3ULL));
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

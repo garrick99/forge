@@ -27,21 +27,21 @@ uint64_t snapshot_resets_reads();
 int main();
 
 MVCC mvcc_new() {
-  return (MVCC){ .current_version = 1, .snapshot_version = 1, .writes = 0, .reads_at_snapshot = 0 };
+  return (MVCC){ .current_version = 1ULL, .snapshot_version = 1ULL, .writes = 0ULL, .reads_at_snapshot = 0ULL };
 }
 
 void mvcc_write(MVCC* m __attribute__((unused))) {
-  (*m).current_version = ((*m).current_version + 1);
-  (*m).writes = ((*m).writes + 1);
+  (*m).current_version = ((*m).current_version + 1ULL);
+  (*m).writes = ((*m).writes + 1ULL);
 }
 
 void mvcc_take_snapshot(MVCC* m __attribute__((unused))) {
   (*m).snapshot_version = (*m).current_version;
-  (*m).reads_at_snapshot = 0;
+  (*m).reads_at_snapshot = 0ULL;
 }
 
 void mvcc_read(MVCC* m __attribute__((unused))) {
-  (*m).reads_at_snapshot = ((*m).reads_at_snapshot + 1);
+  (*m).reads_at_snapshot = ((*m).reads_at_snapshot + 1ULL);
 }
 
 uint64_t three_writes() {
@@ -82,7 +82,7 @@ uint64_t snapshot_resets_reads() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

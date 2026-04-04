@@ -87,7 +87,7 @@ uint32_t unwrap_or(Option_u32 opt __attribute__((unused)), uint32_t forge_defaul
 }
 
 Option_u32 safe_div(uint32_t a __attribute__((unused)), uint32_t b __attribute__((unused))) {
-  if ((b == 0)) {
+  if ((b == 0ULL)) {
     return (Option_u32){ .tag = Option_u32_tag_None, .data.None = { ._dummy = 0 } };
   } else {
     return (Option_u32){ .tag = Option_u32_tag_Some, .data.Some = { ._v0 = (a / b) } };
@@ -95,8 +95,8 @@ Option_u32 safe_div(uint32_t a __attribute__((unused)), uint32_t b __attribute__
 }
 
 Option_u64 first_nonzero(forge_span_u64_t s __attribute__((unused))) {
-  if ((s.data[0] != 0)) {
-    return (Option_u64){ .tag = Option_u64_tag_Some, .data.Some = { ._v0 = s.data[0] } };
+  if ((s.data[0ULL] != 0ULL)) {
+    return (Option_u64){ .tag = Option_u64_tag_Some, .data.Some = { ._v0 = s.data[0ULL] } };
   } else {
     return (Option_u64){ .tag = Option_u64_tag_None, .data.None = { ._dummy = 0 } };
   }
@@ -106,7 +106,7 @@ Result_u32_u64 checked_add(uint32_t a __attribute__((unused)), uint32_t b __attr
   if (((a + b) >= a)) {
     return (Result_u32_u64){ .tag = Result_u32_u64_tag_Ok, .data.Ok = { ._v0 = (a + b) } };
   } else {
-    return (Result_u32_u64){ .tag = Result_u32_u64_tag_Err, .data.Err = { ._v0 = 1 } };
+    return (Result_u32_u64){ .tag = Result_u32_u64_tag_Err, .data.Err = { ._v0 = 1ULL } };
   }
 }
 

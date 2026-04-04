@@ -16,22 +16,22 @@ uint64_t count_inv(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 int main();
 
 uint64_t count_inv(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t j __attribute__((unused)) = (i + 1);
+      uint64_t j __attribute__((unused)) = (i + 1ULL);
       {
         while ((j < n)) {
           if ((s.data[i] > s.data[j])) {
-            cnt = (cnt + 1);
+            cnt = (cnt + 1ULL);
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -39,7 +39,7 @@ uint64_t count_inv(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

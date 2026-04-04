@@ -16,37 +16,37 @@ uint64_t streaming_median(forge_span_u64_t data __attribute__((unused)), uint64_
 int main();
 
 uint64_t streaming_median(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t est __attribute__((unused)) = data.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t est __attribute__((unused)) = data.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      uint64_t below __attribute__((unused)) = 0;
-      uint64_t above __attribute__((unused)) = 0;
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t below __attribute__((unused)) = 0ULL;
+      uint64_t above __attribute__((unused)) = 0ULL;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j <= i)) {
           if ((data.data[j] < est)) {
-            below = (below + 1);
+            below = (below + 1ULL);
 
           } else if ((data.data[j] > est)) {
-            above = (above + 1);
+            above = (above + 1ULL);
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
-      if ((below > (above + 1))) {
-        if ((est > 0)) {
-          est = (est - 1);
+      if ((below > (above + 1ULL))) {
+        if ((est > 0ULL)) {
+          est = (est - 1ULL);
 
         }
 
-      } else if ((above > (below + 1))) {
-        est = (est + 1);
+      } else if ((above > (below + 1ULL))) {
+        est = (est + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -54,7 +54,7 @@ uint64_t streaming_median(forge_span_u64_t data __attribute__((unused)), uint64_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

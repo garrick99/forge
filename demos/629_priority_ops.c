@@ -21,23 +21,23 @@ int main();
 uint64_t pq_insert_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
   uint64_t i __attribute__((unused)) = n;
   {
-    while (((i >= 1) && (s.data[(i - 1)] > val))) {
-      s.data[i] = s.data[(i - 1)];
-      i = (i - 1);
+    while (((i >= 1ULL) && (s.data[(i - 1ULL)] > val))) {
+      s.data[i] = s.data[(i - 1ULL)];
+      i = (i - 1ULL);
     }
 
   }
   s.data[i] = val;
-  return (n + 1);
+  return (n + 1ULL);
 }
 
 uint64_t pq_remove_min(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t min_val __attribute__((unused)) = s.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t min_val __attribute__((unused)) = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      s.data[(i - 1)] = s.data[i];
-      i = (i + 1);
+      s.data[(i - 1ULL)] = s.data[i];
+      i = (i + 1ULL);
     }
 
   }
@@ -45,19 +45,19 @@ uint64_t pq_remove_min(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 uint64_t pq_peek_min(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  return s.data[0];
+  return s.data[0ULL];
 }
 
 uint64_t pq_find_rank(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((s.data[i] < val)) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -65,7 +65,7 @@ uint64_t pq_find_rank(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

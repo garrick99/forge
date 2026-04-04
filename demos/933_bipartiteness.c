@@ -16,41 +16,41 @@ uint64_t bipartite_check(forge_span_u64_t adj __attribute__((unused)), uint64_t 
 int main();
 
 uint64_t bipartite_check(forge_span_u64_t adj __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t color __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      color.data[i] = 0;
-      i = (i + 1);
+      color.data[i] = 0ULL;
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t ok __attribute__((unused)) = 1;
-  uint64_t u __attribute__((unused)) = 0;
+  uint64_t ok __attribute__((unused)) = 1ULL;
+  uint64_t u __attribute__((unused)) = 0ULL;
   {
     while ((u < n)) {
-      uint64_t v __attribute__((unused)) = 0;
+      uint64_t v __attribute__((unused)) = 0ULL;
       {
         while ((v < n)) {
-          if (((((u * n) + v) < (n * n)) && (adj.data[((u * n) + v)] > 0))) {
-            if (((color.data[u] == color.data[v]) && (color.data[u] > 0))) {
-              ok = 0;
+          if (((((u * n) + v) < (n * n)) && (adj.data[((u * n) + v)] > 0ULL))) {
+            if (((color.data[u] == color.data[v]) && (color.data[u] > 0ULL))) {
+              ok = 0ULL;
 
             }
-            if (((color.data[v] == 0) && (color.data[u] > 0))) {
-              color.data[v] = (3 - color.data[u]);
+            if (((color.data[v] == 0ULL) && (color.data[u] > 0ULL))) {
+              color.data[v] = (3ULL - color.data[u]);
 
             }
 
           }
-          v = (v + 1);
+          v = (v + 1ULL);
         }
 
       }
-      if ((color.data[u] == 0)) {
-        color.data[u] = 1;
+      if ((color.data[u] == 0ULL)) {
+        color.data[u] = 1ULL;
 
       }
-      u = (u + 1);
+      u = (u + 1ULL);
     }
 
   }
@@ -58,7 +58,7 @@ uint64_t bipartite_check(forge_span_u64_t adj __attribute__((unused)), uint64_t 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

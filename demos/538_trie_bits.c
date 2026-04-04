@@ -22,31 +22,31 @@ uint64_t check_trie_parent_2();
 int main();
 
 uint64_t trie_left(uint64_t node __attribute__((unused))) {
-  return ((node * 2) + 1);
+  return ((node * 2ULL) + 1ULL);
 }
 
 uint64_t trie_right(uint64_t node __attribute__((unused))) {
-  return ((node * 2) + 2);
+  return ((node * 2ULL) + 2ULL);
 }
 
 uint64_t trie_parent(uint64_t node __attribute__((unused))) {
-  return ((node - 1) / 2);
+  return ((node - 1ULL) / 2ULL);
 }
 
 uint64_t trie_depth(uint64_t node __attribute__((unused))) {
-  if ((node == 0)) {
+  if ((node == 0ULL)) {
     {
-      return 0;
+      return 0ULL;
 
     }
 
   }
-  uint64_t d __attribute__((unused)) = 0;
+  uint64_t d __attribute__((unused)) = 0ULL;
   uint64_t n __attribute__((unused)) = node;
   {
-    while ((n > 0)) {
-      n = ((n - 1) / 2);
-      d = (d + 1);
+    while ((n > 0ULL)) {
+      n = ((n - 1ULL) / 2ULL);
+      d = (d + 1ULL);
     }
 
   }
@@ -58,31 +58,31 @@ _Bool trie_is_leaf(uint64_t node __attribute__((unused)), uint64_t max_depth __a
 }
 
 uint64_t trie_sibling(uint64_t node __attribute__((unused))) {
-  if (((node % 2) == 1)) {
-    return (node + 1);
+  if (((node % 2ULL) == 1ULL)) {
+    return (node + 1ULL);
   } else {
-    return (node - 1);
+    return (node - 1ULL);
   }
 }
 
 uint64_t check_trie_left_root() {
-  return trie_left(0);
+  return trie_left(0ULL);
 }
 
 uint64_t check_trie_right_root() {
-  return trie_right(0);
+  return trie_right(0ULL);
 }
 
 uint64_t check_trie_parent_1() {
-  return trie_parent(1);
+  return trie_parent(1ULL);
 }
 
 uint64_t check_trie_parent_2() {
-  return trie_parent(2);
+  return trie_parent(2ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

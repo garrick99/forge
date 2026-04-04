@@ -16,31 +16,31 @@ uint64_t slip_encode(forge_span_u64_t src __attribute__((unused)), forge_span_u6
 int main();
 
 uint64_t slip_encode(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t cap __attribute__((unused))) {
-  uint64_t end_byte __attribute__((unused)) = 192;
-  uint64_t esc_byte __attribute__((unused)) = 219;
-  uint64_t out __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t end_byte __attribute__((unused)) = 192ULL;
+  uint64_t esc_byte __attribute__((unused)) = 219ULL;
+  uint64_t out __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t b __attribute__((unused)) = (src.data[i] & 255);
+      uint64_t b __attribute__((unused)) = (src.data[i] & 255ULL);
       if ((b == end_byte)) {
         dst.data[out] = esc_byte;
-        out = (out + 1);
-        dst.data[out] = 220;
-        out = (out + 1);
+        out = (out + 1ULL);
+        dst.data[out] = 220ULL;
+        out = (out + 1ULL);
 
       } else if ((b == esc_byte)) {
         dst.data[out] = esc_byte;
-        out = (out + 1);
-        dst.data[out] = 221;
-        out = (out + 1);
+        out = (out + 1ULL);
+        dst.data[out] = 221ULL;
+        out = (out + 1ULL);
 
       } else {
         dst.data[out] = b;
-        out = (out + 1);
+        out = (out + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -48,7 +48,7 @@ uint64_t slip_encode(forge_span_u64_t src __attribute__((unused)), forge_span_u6
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

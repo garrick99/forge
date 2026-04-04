@@ -17,11 +17,11 @@ uint64_t prefix_min_val(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 int main();
 
 void prefix_min(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  out.data[0] = s.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  out.data[0ULL] = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      uint64_t prev __attribute__((unused)) = out.data[(i - 1)];
+      uint64_t prev __attribute__((unused)) = out.data[(i - 1ULL)];
       if ((s.data[i] < prev)) {
         out.data[i] = s.data[i];
 
@@ -29,22 +29,22 @@ void prefix_min(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
         out.data[i] = prev;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t prefix_min_val(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t m __attribute__((unused)) = s.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t m __attribute__((unused)) = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((s.data[i] < m)) {
         m = s.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -52,7 +52,7 @@ uint64_t prefix_min_val(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -16,18 +16,18 @@ uint64_t cholesky_diag_sums(forge_span_u64_t mat_diag __attribute__((unused)), f
 int main();
 
 uint64_t cholesky_diag_sums(forge_span_u64_t mat_diag __attribute__((unused)), forge_span_u64_t l_col __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t sum_sq __attribute__((unused)) = 0;
-      uint64_t k __attribute__((unused)) = 0;
+      uint64_t sum_sq __attribute__((unused)) = 0ULL;
+      uint64_t k __attribute__((unused)) = 0ULL;
       {
         while ((k < i)) {
           if ((k < n)) {
             sum_sq = (sum_sq + (l_col.data[k] * l_col.data[k]));
 
           }
-          k = (k + 1);
+          k = (k + 1ULL);
         }
 
       }
@@ -35,10 +35,10 @@ uint64_t cholesky_diag_sums(forge_span_u64_t mat_diag __attribute__((unused)), f
         out.data[i] = (mat_diag.data[i] - sum_sq);
 
       } else {
-        out.data[i] = 0;
+        out.data[i] = 0ULL;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -46,7 +46,7 @@ uint64_t cholesky_diag_sums(forge_span_u64_t mat_diag __attribute__((unused)), f
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

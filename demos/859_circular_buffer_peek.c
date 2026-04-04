@@ -21,7 +21,7 @@ uint64_t peek(forge_span_u64_t buf __attribute__((unused)), uint64_t cap __attri
 }
 
 uint64_t batch_read(forge_span_u64_t buf __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t head __attribute__((unused)), uint64_t count __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < count)) {
       uint64_t idx __attribute__((unused)) = ((head + i) % cap);
@@ -29,7 +29,7 @@ uint64_t batch_read(forge_span_u64_t buf __attribute__((unused)), uint64_t cap _
         out.data[i] = buf.data[idx];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -37,7 +37,7 @@ uint64_t batch_read(forge_span_u64_t buf __attribute__((unused)), uint64_t cap _
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

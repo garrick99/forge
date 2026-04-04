@@ -28,16 +28,16 @@ Count Acc__count(const Acc* self __attribute__((unused)));
 int main();
 
 Acc Acc__new() {
-  return (Acc){ .total = 0, .count = 0 };
+  return (Acc){ .total = 0ULL, .count = 0ULL };
 }
 
 Acc Acc__add(const Acc* self __attribute__((unused)), Score v __attribute__((unused))) {
-  return (Acc){ .total = ((*self).total + v), .count = ((*self).count + 1) };
+  return (Acc){ .total = ((*self).total + v), .count = ((*self).count + 1ULL) };
 }
 
 Score Acc__mean(const Acc* self __attribute__((unused))) {
-  if (((*self).count == 0)) {
-    return 0;
+  if (((*self).count == 0ULL)) {
+    return 0ULL;
   } else {
     return ((*self).total / (*self).count);
   }
@@ -53,13 +53,13 @@ Count Acc__count(const Acc* self __attribute__((unused))) {
 
 int main() {
   Acc a0 __attribute__((unused)) = Acc__new();
-  Acc a1 __attribute__((unused)) = Acc__add((&a0), 10);
-  Acc a2 __attribute__((unused)) = Acc__add((&a1), 20);
-  Acc a3 __attribute__((unused)) = Acc__add((&a2), 30);
+  Acc a1 __attribute__((unused)) = Acc__add((&a0), 10ULL);
+  Acc a2 __attribute__((unused)) = Acc__add((&a1), 20ULL);
+  Acc a3 __attribute__((unused)) = Acc__add((&a2), 30ULL);
   Count n __attribute__((unused)) = Acc__count((&a3));
   Score t __attribute__((unused)) = Acc__total((&a3));
   Score m __attribute__((unused)) = Acc__mean((&a3));
-  Meters dist __attribute__((unused)) = 5;
+  Meters dist __attribute__((unused)) = 5ULL;
   return (int)((((n + t) + m) + dist));
 
 }

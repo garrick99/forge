@@ -18,26 +18,26 @@ uint64_t copy_if_less(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
 int main();
 
 void merge_sorted(forge_span_u64_t a __attribute__((unused)), uint64_t na __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t nb __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t ia __attribute__((unused)) = 0;
-  uint64_t ib __attribute__((unused)) = 0;
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t ia __attribute__((unused)) = 0ULL;
+  uint64_t ib __attribute__((unused)) = 0ULL;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while (((ia < na) || (ib < nb))) {
       if ((ia >= na)) {
         out.data[(ia + ib)] = b.data[ib];
-        ib = (ib + 1);
+        ib = (ib + 1ULL);
 
       } else if ((ib >= nb)) {
         out.data[(ia + ib)] = a.data[ia];
-        ia = (ia + 1);
+        ia = (ia + 1ULL);
 
       } else if ((a.data[ia] <= b.data[ib])) {
         out.data[(ia + ib)] = a.data[ia];
-        ia = (ia + 1);
+        ia = (ia + 1ULL);
 
       } else {
         out.data[(ia + ib)] = b.data[ib];
-        ib = (ib + 1);
+        ib = (ib + 1ULL);
 
       }
     }
@@ -50,16 +50,16 @@ uint64_t merge_count(uint64_t na __attribute__((unused)), uint64_t nb __attribut
 }
 
 uint64_t copy_if_less(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t thresh __attribute__((unused))) {
-  uint64_t k __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((s.data[i] < thresh)) {
         out.data[k] = s.data[i];
-        k = (k + 1);
+        k = (k + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -67,7 +67,7 @@ uint64_t copy_if_less(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

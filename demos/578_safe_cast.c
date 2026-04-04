@@ -24,62 +24,62 @@ uint64_t check_sat_u8_overflow();
 int main();
 
 uint64_t saturate_to_u8(uint64_t v __attribute__((unused))) {
-  if ((v > 255)) {
-    return 255;
+  if ((v > 255ULL)) {
+    return 255ULL;
   } else {
     return v;
   }
 }
 
 uint64_t saturate_to_u16(uint64_t v __attribute__((unused))) {
-  if ((v > 65535)) {
-    return 65535;
+  if ((v > 65535ULL)) {
+    return 65535ULL;
   } else {
     return v;
   }
 }
 
 uint64_t saturate_to_u32(uint64_t v __attribute__((unused))) {
-  if ((v > 4294967295)) {
-    return 4294967295;
+  if ((v > 4294967295ULL)) {
+    return 4294967295ULL;
   } else {
     return v;
   }
 }
 
 _Bool fits_u8(uint64_t v __attribute__((unused))) {
-  return (v <= 255);
+  return (v <= 255ULL);
 }
 
 _Bool fits_u16(uint64_t v __attribute__((unused))) {
-  return (v <= 65535);
+  return (v <= 65535ULL);
 }
 
 _Bool fits_u32(uint64_t v __attribute__((unused))) {
-  return (v <= 4294967295);
+  return (v <= 4294967295ULL);
 }
 
 void clamp_span_u8(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = saturate_to_u8(s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t check_sat_u8_in_range() {
-  return saturate_to_u8(100);
+  return saturate_to_u8(100ULL);
 }
 
 uint64_t check_sat_u8_overflow() {
-  return saturate_to_u8(1000);
+  return saturate_to_u8(1000ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

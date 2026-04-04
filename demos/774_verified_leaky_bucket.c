@@ -17,23 +17,23 @@ int main();
 
 uint64_t process_requests(forge_span_u64_t arrivals __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t capacity __attribute__((unused)), uint64_t refill_rate __attribute__((unused)), forge_span_u64_t results __attribute__((unused))) {
   uint64_t tokens __attribute__((unused)) = capacity;
-  uint64_t accepted __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t accepted __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t refill __attribute__((unused)) = arrivals.data[i];
       uint64_t new_tokens __attribute__((unused)) = (tokens + (refill * refill_rate));
       tokens = ((new_tokens > capacity) ? capacity : new_tokens);
-      if ((tokens >= 1)) {
-        tokens = (tokens - 1);
-        results.data[i] = 1;
-        accepted = (accepted + 1);
+      if ((tokens >= 1ULL)) {
+        tokens = (tokens - 1ULL);
+        results.data[i] = 1ULL;
+        accepted = (accepted + 1ULL);
 
       } else {
-        results.data[i] = 0;
+        results.data[i] = 0ULL;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -41,7 +41,7 @@ uint64_t process_requests(forge_span_u64_t arrivals __attribute__((unused)), uin
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

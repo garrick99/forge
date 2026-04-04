@@ -19,14 +19,14 @@ void selection_sort(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
   {
     for (uint64_t i = 0; i < (uint64_t)(n); i++) {
       uint64_t min_idx __attribute__((unused)) = i;
-      uint64_t j __attribute__((unused)) = (i + 1);
+      uint64_t j __attribute__((unused)) = (i + 1ULL);
       {
         while ((j < n)) {
           if ((s.data[j] < s.data[min_idx])) {
             min_idx = j;
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
@@ -42,7 +42,7 @@ void selection_sort(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

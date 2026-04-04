@@ -17,25 +17,25 @@ uint64_t count_occurrences(forge_span_u64_t s __attribute__((unused)), uint64_t 
 int main();
 
 uint64_t majority_candidate(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t candidate __attribute__((unused)) = s.data[0];
-  uint64_t cand_idx __attribute__((unused)) = 0;
-  uint64_t count __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t candidate __attribute__((unused)) = s.data[0ULL];
+  uint64_t cand_idx __attribute__((unused)) = 0ULL;
+  uint64_t count __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((s.data[i] == candidate)) {
-        count = (count + 1);
+        count = (count + 1ULL);
 
-      } else if ((count == 0)) {
+      } else if ((count == 0ULL)) {
         candidate = s.data[i];
         cand_idx = i;
-        count = 1;
+        count = 1ULL;
 
       } else {
-        count = (count - 1);
+        count = (count - 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -43,15 +43,15 @@ uint64_t majority_candidate(forge_span_u64_t s __attribute__((unused)), uint64_t
 }
 
 uint64_t count_occurrences(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((s.data[i] == val)) {
-        count = (count + 1);
+        count = (count + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -59,7 +59,7 @@ uint64_t count_occurrences(forge_span_u64_t s __attribute__((unused)), uint64_t 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

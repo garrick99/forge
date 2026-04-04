@@ -28,25 +28,25 @@ uint64_t hits_tracked();
 int main();
 
 LRUCache lru_new(uint64_t capacity __attribute__((unused))) {
-  return (LRUCache){ .occupancy = 0, .capacity = capacity, .hits = 0, .misses = 0, .evictions = 0 };
+  return (LRUCache){ .occupancy = 0ULL, .capacity = capacity, .hits = 0ULL, .misses = 0ULL, .evictions = 0ULL };
 }
 
 void lru_hit(LRUCache* c __attribute__((unused))) {
-  (*c).hits = ((*c).hits + 1);
+  (*c).hits = ((*c).hits + 1ULL);
 }
 
 void lru_miss_insert(LRUCache* c __attribute__((unused))) {
-  (*c).misses = ((*c).misses + 1);
-  (*c).occupancy = ((*c).occupancy + 1);
+  (*c).misses = ((*c).misses + 1ULL);
+  (*c).occupancy = ((*c).occupancy + 1ULL);
 }
 
 void lru_miss_evict(LRUCache* c __attribute__((unused))) {
-  (*c).misses = ((*c).misses + 1);
-  (*c).evictions = ((*c).evictions + 1);
+  (*c).misses = ((*c).misses + 1ULL);
+  (*c).evictions = ((*c).evictions + 1ULL);
 }
 
 uint64_t fill_and_hit() {
-  LRUCache c __attribute__((unused)) = lru_new(4);
+  LRUCache c __attribute__((unused)) = lru_new(4ULL);
   lru_miss_insert((&c));
   lru_miss_insert((&c));
   lru_miss_insert((&c));
@@ -56,7 +56,7 @@ uint64_t fill_and_hit() {
 }
 
 uint64_t fill_evict() {
-  LRUCache c __attribute__((unused)) = lru_new(3);
+  LRUCache c __attribute__((unused)) = lru_new(3ULL);
   lru_miss_insert((&c));
   lru_miss_insert((&c));
   lru_miss_insert((&c));
@@ -66,7 +66,7 @@ uint64_t fill_evict() {
 }
 
 uint64_t total_misses() {
-  LRUCache c __attribute__((unused)) = lru_new(3);
+  LRUCache c __attribute__((unused)) = lru_new(3ULL);
   lru_miss_insert((&c));
   lru_miss_insert((&c));
   lru_miss_insert((&c));
@@ -76,7 +76,7 @@ uint64_t total_misses() {
 }
 
 uint64_t hits_tracked() {
-  LRUCache c __attribute__((unused)) = lru_new(4);
+  LRUCache c __attribute__((unused)) = lru_new(4ULL);
   lru_miss_insert((&c));
   lru_miss_insert((&c));
   lru_hit((&c));
@@ -86,7 +86,7 @@ uint64_t hits_tracked() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

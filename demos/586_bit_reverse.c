@@ -16,13 +16,13 @@ int main();
 
 uint64_t reverse_bits_8(uint64_t x __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = x;
-  uint64_t r __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t r __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < 8)) {
-      r = (((r * 2) % 256) + (v & 1));
-      v = (v >> 1);
-      i = (i + 1);
+    while ((i < 8ULL)) {
+      r = (((r * 2ULL) % 256ULL) + (v & 1ULL));
+      v = (v >> 1ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -31,13 +31,13 @@ uint64_t reverse_bits_8(uint64_t x __attribute__((unused))) {
 
 uint64_t reverse_bits_n(uint64_t x __attribute__((unused)), uint64_t n __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = x;
-  uint64_t r __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t r __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      r = ((r * 2) + (v & 1));
-      v = (v >> 1);
-      i = (i + 1);
+      r = ((r * 2ULL) + (v & 1ULL));
+      v = (v >> 1ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -49,7 +49,7 @@ uint64_t bit_rev_index(uint64_t i __attribute__((unused)), uint64_t log2n __attr
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

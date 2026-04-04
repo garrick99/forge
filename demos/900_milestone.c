@@ -27,11 +27,11 @@ __forge_tuple_u64_u64_t stk_pop(forge_span_u64_t d __attribute__((unused)), uint
 int main();
 
 void fill(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t v __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = v;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -46,24 +46,24 @@ uint64_t clamp_u(uint64_t x __attribute__((unused)), uint64_t c __attribute__((u
 }
 
 void scale_clamp(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t f __attribute__((unused)), uint64_t c __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t v __attribute__((unused)) = clamp_u((s.data[i] * f), c);
       s.data[i] = v;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t fact(uint64_t n __attribute__((unused))) {
-  uint64_t a __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t a __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i <= n)) {
       a = (a * i);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -71,19 +71,19 @@ uint64_t fact(uint64_t n __attribute__((unused))) {
 }
 
 uint64_t bfs_ok(forge_span_u64_t lev __attribute__((unused)), forge_span_u64_t par __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t ok __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t ok __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       uint64_t p __attribute__((unused)) = par.data[i];
       if ((p < n)) {
-        if ((lev.data[i] != (lev.data[p] + 1))) {
-          ok = 0;
+        if ((lev.data[i] != (lev.data[p] + 1ULL))) {
+          ok = 0ULL;
 
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -91,9 +91,9 @@ uint64_t bfs_ok(forge_span_u64_t lev __attribute__((unused)), forge_span_u64_t p
 }
 
 uint64_t kadane(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t best __attribute__((unused)) = s.data[0];
-  uint64_t cur __attribute__((unused)) = s.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t best __attribute__((unused)) = s.data[0ULL];
+  uint64_t cur __attribute__((unused)) = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if (((cur + s.data[i]) > s.data[i])) {
@@ -107,7 +107,7 @@ uint64_t kadane(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
         best = cur;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -115,36 +115,36 @@ uint64_t kadane(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
 }
 
 uint64_t ct_eq(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t d __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t d __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((a.data[i] != b.data[i])) {
-        d = (d + 1);
+        d = (d + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
-  if ((d == 0)) {
-    return 1;
+  if ((d == 0ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t stk_push(forge_span_u64_t d __attribute__((unused)), uint64_t top __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t v __attribute__((unused))) {
   d.data[top] = v;
-  return (top + 1);
+  return (top + 1ULL);
 }
 
 __forge_tuple_u64_u64_t stk_pop(forge_span_u64_t d __attribute__((unused)), uint64_t top __attribute__((unused)), uint64_t cap __attribute__((unused))) {
-  return (__forge_tuple_u64_u64_t){ ._0 = d.data[(top - 1)], ._1 = (top - 1) };
+  return (__forge_tuple_u64_u64_t){ ._0 = d.data[(top - 1ULL)], ._1 = (top - 1ULL) };
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

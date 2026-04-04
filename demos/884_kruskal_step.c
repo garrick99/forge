@@ -18,11 +18,11 @@ int main();
 
 uint64_t find_root(forge_span_u64_t parent __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t x __attribute__((unused))) {
   uint64_t cur __attribute__((unused)) = x;
-  uint64_t steps __attribute__((unused)) = 0;
+  uint64_t steps __attribute__((unused)) = 0ULL;
   {
     while (((parent.data[cur] != cur) && (steps < n))) {
       cur = parent.data[cur];
-      steps = (steps + 1);
+      steps = (steps + 1ULL);
     }
 
   }
@@ -34,14 +34,14 @@ uint64_t union_sets(forge_span_u64_t parent __attribute__((unused)), uint64_t n 
   uint64_t rb __attribute__((unused)) = find_root(parent, n, b);
   if ((ra != rb)) {
     parent.data[ra] = rb;
-    return 1;
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

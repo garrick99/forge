@@ -9,23 +9,23 @@
 #endif
 
 /* Forward declarations */
-uint64_t modpow(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused)), uint64_t m __attribute__((unused)));
+uint64_t modpow(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused)), uint64_t m __attribute__((unused)));
 uint64_t modpow_terminates(uint64_t base __attribute__((unused)), uint64_t m __attribute__((unused)));
-uint64_t modpow_small(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused)));
+uint64_t modpow_small(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused)));
 int main();
 
-uint64_t modpow(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused)), uint64_t m __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = (1 % m);
+uint64_t modpow(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused)), uint64_t m __attribute__((unused))) {
+  uint64_t acc __attribute__((unused)) = (1ULL % m);
   uint64_t b __attribute__((unused)) = (base % m);
-  uint64_t e __attribute__((unused)) = exp;
+  uint64_t e __attribute__((unused)) = forge_exp;
   {
-    while ((e > 0)) {
-      if (((e % 2) == 1)) {
+    while ((e > 0ULL)) {
+      if (((e % 2ULL) == 1ULL)) {
         acc = ((acc * b) % m);
 
       }
       b = ((b * b) % m);
-      e = (e / 2);
+      e = (e / 2ULL);
     }
 
   }
@@ -33,15 +33,15 @@ uint64_t modpow(uint64_t base __attribute__((unused)), uint64_t exp __attribute_
 }
 
 uint64_t modpow_terminates(uint64_t base __attribute__((unused)), uint64_t m __attribute__((unused))) {
-  return modpow(base, 0, m);
+  return modpow(base, 0ULL, m);
 }
 
-uint64_t modpow_small(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused))) {
-  return modpow(base, exp, 1000);
+uint64_t modpow_small(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused))) {
+  return modpow(base, forge_exp, 1000ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

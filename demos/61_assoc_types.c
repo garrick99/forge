@@ -28,7 +28,7 @@ uint64_t Triple__Container__size(const Triple* self __attribute__((unused)));
 int main();
 
 uint64_t Pair__Container__get(const Pair* self __attribute__((unused)), uint64_t i __attribute__((unused))) {
-  if ((i == 0)) {
+  if ((i == 0ULL)) {
     return (*self).a;
   } else {
     return (*self).b;
@@ -36,14 +36,14 @@ uint64_t Pair__Container__get(const Pair* self __attribute__((unused)), uint64_t
 }
 
 uint64_t Pair__Container__size(const Pair* self __attribute__((unused))) {
-  return 2;
+  return 2ULL;
 }
 
 uint64_t Triple__Container__get(const Triple* self __attribute__((unused)), uint64_t i __attribute__((unused))) {
-  if ((i == 0)) {
+  if ((i == 0ULL)) {
     return (*self).x;
   } else {
-    if ((i == 1)) {
+    if ((i == 1ULL)) {
       return (*self).y;
     } else {
       return (*self).z;
@@ -52,18 +52,18 @@ uint64_t Triple__Container__get(const Triple* self __attribute__((unused)), uint
 }
 
 uint64_t Triple__Container__size(const Triple* self __attribute__((unused))) {
-  return 3;
+  return 3ULL;
 }
 
 int main() {
-  Pair p __attribute__((unused)) = (Pair){ .a = 10, .b = 20 };
-  Triple t __attribute__((unused)) = (Triple){ .x = 1, .y = 2, .z = 3 };
-  uint64_t pa __attribute__((unused)) = Pair__Container__get((&p), 0);
-  uint64_t pb __attribute__((unused)) = Pair__Container__get((&p), 1);
+  Pair p __attribute__((unused)) = (Pair){ .a = 10ULL, .b = 20ULL };
+  Triple t __attribute__((unused)) = (Triple){ .x = 1ULL, .y = 2ULL, .z = 3ULL };
+  uint64_t pa __attribute__((unused)) = Pair__Container__get((&p), 0ULL);
+  uint64_t pb __attribute__((unused)) = Pair__Container__get((&p), 1ULL);
   uint64_t ps __attribute__((unused)) = Pair__Container__size((&p));
-  uint64_t tx __attribute__((unused)) = Triple__Container__get((&t), 0);
-  uint64_t ty __attribute__((unused)) = Triple__Container__get((&t), 1);
-  uint64_t tz __attribute__((unused)) = Triple__Container__get((&t), 2);
+  uint64_t tx __attribute__((unused)) = Triple__Container__get((&t), 0ULL);
+  uint64_t ty __attribute__((unused)) = Triple__Container__get((&t), 1ULL);
+  uint64_t tz __attribute__((unused)) = Triple__Container__get((&t), 2ULL);
   uint64_t ts __attribute__((unused)) = Triple__Container__size((&t));
   return (int)(((((((pa + pb) + ps) + tx) + ty) + tz) + ts));
 

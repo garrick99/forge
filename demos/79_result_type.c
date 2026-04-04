@@ -53,7 +53,7 @@ uint64_t error_code(Result_u64 r __attribute__((unused)));
 int main();
 
 Result_u64 safe_div(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if ((b == 0)) {
+  if ((b == 0ULL)) {
     return (Result_u64){ .tag = Result_u64_tag_Err, .data.Err = { ._v0 = (MathError){ .tag = MathError_tag_DivByZero, .data.DivByZero = { ._dummy = 0 } } } };
   } else {
     return (Result_u64){ .tag = Result_u64_tag_Ok, .data.Ok = { ._v0 = (a / b) } };
@@ -61,13 +61,13 @@ Result_u64 safe_div(uint64_t a __attribute__((unused)), uint64_t b __attribute__
 }
 
 Result_u64 safe_sqrt_approx(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return (Result_u64){ .tag = Result_u64_tag_Ok, .data.Ok = { ._v0 = 0 } };
+  if ((n == 0ULL)) {
+    return (Result_u64){ .tag = Result_u64_tag_Ok, .data.Ok = { ._v0 = 0ULL } };
   } else {
     uint64_t x __attribute__((unused)) = n;
-    uint64_t x1 __attribute__((unused)) = ((x + (n / x)) / 2);
-    uint64_t x2 __attribute__((unused)) = ((x1 + (n / x1)) / 2);
-    uint64_t x3 __attribute__((unused)) = ((x2 + (n / x2)) / 2);
+    uint64_t x1 __attribute__((unused)) = ((x + (n / x)) / 2ULL);
+    uint64_t x2 __attribute__((unused)) = ((x1 + (n / x1)) / 2ULL);
+    uint64_t x3 __attribute__((unused)) = ((x2 + (n / x2)) / 2ULL);
     return (Result_u64){ .tag = Result_u64_tag_Ok, .data.Ok = { ._v0 = x3 } };
   }
 }
@@ -88,10 +88,10 @@ uint64_t unwrap_or(Result_u64 r __attribute__((unused)), uint64_t forge_default 
 uint64_t is_ok(Result_u64 r __attribute__((unused))) {
   switch (r.tag) {
     case Result_u64_tag_Ok: {
-      return 1;
+      return 1ULL;
     }
     case Result_u64_tag_Err: {
-      return 0;
+      return 0ULL;
     }
     default: __builtin_unreachable();
   }
@@ -100,27 +100,27 @@ uint64_t is_ok(Result_u64 r __attribute__((unused))) {
 uint64_t error_code(Result_u64 r __attribute__((unused))) {
   switch (r.tag) {
     case Result_u64_tag_Ok: {
-      return 0;
+      return 0ULL;
     }
     case Result_u64_tag_Err: {
       MathError DivByZero __attribute__((unused)) = r.data.Err._v0;
-      return 1;
+      return 1ULL;
     }
     default: __builtin_unreachable();
   }
 }
 
 int main() {
-  Result_u64 r1 __attribute__((unused)) = safe_div(100, 4);
-  Result_u64 r2 __attribute__((unused)) = safe_div(7, 0);
-  Result_u64 r3 __attribute__((unused)) = safe_div(81, 9);
-  uint64_t v1 __attribute__((unused)) = unwrap_or(r1, 0);
-  uint64_t v2 __attribute__((unused)) = unwrap_or(r2, 99);
-  uint64_t v3 __attribute__((unused)) = unwrap_or(r3, 0);
-  uint64_t ok1 __attribute__((unused)) = is_ok(safe_div(10, 2));
-  uint64_t ok2 __attribute__((unused)) = is_ok(safe_div(10, 0));
-  uint64_t ec1 __attribute__((unused)) = error_code(safe_div(5, 0));
-  uint64_t ec2 __attribute__((unused)) = error_code(safe_div(5, 1));
+  Result_u64 r1 __attribute__((unused)) = safe_div(100ULL, 4ULL);
+  Result_u64 r2 __attribute__((unused)) = safe_div(7ULL, 0ULL);
+  Result_u64 r3 __attribute__((unused)) = safe_div(81ULL, 9ULL);
+  uint64_t v1 __attribute__((unused)) = unwrap_or(r1, 0ULL);
+  uint64_t v2 __attribute__((unused)) = unwrap_or(r2, 99ULL);
+  uint64_t v3 __attribute__((unused)) = unwrap_or(r3, 0ULL);
+  uint64_t ok1 __attribute__((unused)) = is_ok(safe_div(10ULL, 2ULL));
+  uint64_t ok2 __attribute__((unused)) = is_ok(safe_div(10ULL, 0ULL));
+  uint64_t ec1 __attribute__((unused)) = error_code(safe_div(5ULL, 0ULL));
+  uint64_t ec2 __attribute__((unused)) = error_code(safe_div(5ULL, 1ULL));
   return (int)(((((((v1 + v2) + v3) + ok1) + ok2) + ec1) + ec2));
 
 }

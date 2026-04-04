@@ -28,79 +28,79 @@ uint64_t check_digit_value();
 int main();
 
 _Bool is_alpha(uint8_t b __attribute__((unused))) {
-  return (((b >= 65) && (b <= 90)) || ((b >= 97) && (b <= 122)));
+  return (((b >= 65ULL) && (b <= 90ULL)) || ((b >= 97ULL) && (b <= 122ULL)));
 }
 
 _Bool is_digit(uint8_t b __attribute__((unused))) {
-  return ((b >= 48) && (b <= 57));
+  return ((b >= 48ULL) && (b <= 57ULL));
 }
 
 _Bool is_alnum(uint8_t b __attribute__((unused))) {
-  return ((((b >= 48) && (b <= 57)) || ((b >= 65) && (b <= 90))) || ((b >= 97) && (b <= 122)));
+  return ((((b >= 48ULL) && (b <= 57ULL)) || ((b >= 65ULL) && (b <= 90ULL))) || ((b >= 97ULL) && (b <= 122ULL)));
 }
 
 _Bool is_whitespace(uint8_t b __attribute__((unused))) {
-  return ((((b == 32) || (b == 9)) || (b == 10)) || (b == 13));
+  return ((((b == 32ULL) || (b == 9ULL)) || (b == 10ULL)) || (b == 13ULL));
 }
 
 uint8_t to_lower(uint8_t b __attribute__((unused))) {
-  if (((b >= 65) && (b <= 90))) {
-    return (b + 32);
+  if (((b >= 65ULL) && (b <= 90ULL))) {
+    return (b + 32ULL);
   } else {
     return b;
   }
 }
 
 uint8_t to_upper(uint8_t b __attribute__((unused))) {
-  if (((b >= 97) && (b <= 122))) {
-    return (b - 32);
+  if (((b >= 97ULL) && (b <= 122ULL))) {
+    return (b - 32ULL);
   } else {
     return b;
   }
 }
 
 uint64_t digit_value(uint8_t b __attribute__((unused))) {
-  return ((uint64_t)(b - 48));
+  return ((uint64_t)(b - 48ULL));
 }
 
 _Bool check_is_alpha_upper() {
-  return is_alpha(65);
+  return is_alpha(65ULL);
 }
 
 _Bool check_is_alpha_lower() {
-  return is_alpha(122);
+  return is_alpha(122ULL);
 }
 
 _Bool check_not_alpha() {
-  return is_alpha(48);
+  return is_alpha(48ULL);
 }
 
 _Bool check_is_digit() {
-  return is_digit(57);
+  return is_digit(57ULL);
 }
 
 _Bool check_is_space() {
-  return is_whitespace(32);
+  return is_whitespace(32ULL);
 }
 
 uint8_t check_to_lower() {
-  return to_lower(65);
+  return to_lower(65ULL);
 }
 
 uint8_t check_to_upper() {
-  return to_upper(97);
+  return to_upper(97ULL);
 }
 
 uint8_t check_to_lower_noop() {
-  return to_lower(97);
+  return to_lower(97ULL);
 }
 
 uint64_t check_digit_value() {
-  return digit_value(53);
+  return digit_value(53ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

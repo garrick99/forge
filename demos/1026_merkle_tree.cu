@@ -27,6 +27,12 @@
 /* span<T> typedefs — fat pointers with proven bounds */
 typedef struct { uint32_t* data; uintptr_t len; } forge_span_u32_t;
 
+/* Function pointer typedefs */
+typedef uint64_t (*forge_fn_u64_u64_u64_ret_u64_t)(uint64_t, uint64_t, uint64_t);
+typedef uint64_t (*forge_fn_ptr_u64_u64_ret_u64_t)(uint64_t*, uint64_t);
+typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
+typedef uint64_t (*forge_fn__ret_u64_t)(void);
+
 uint64_t shfl_down_sync(uint64_t val, uint64_t delta, uint64_t width);  /* extern: forge_gpu */
 
 uint64_t shfl_xor_sync(uint64_t val, uint64_t mask, uint64_t width);  /* extern: forge_gpu */
@@ -45,12 +51,6 @@ uint64_t lane_id(void);  /* extern: forge_gpu */
 
 uint64_t warp_id(void);  /* extern: forge_gpu */
 
-/* Function pointer typedefs */
-typedef uint64_t (*forge_fn_u64_u64_u64_ret_u64_t)(uint64_t, uint64_t, uint64_t);
-typedef uint64_t (*forge_fn_ptr_u64_u64_ret_u64_t)(uint64_t*, uint64_t);
-typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
-typedef uint64_t (*forge_fn__ret_u64_t)(void);
-
 /* Forward declarations */
 uint64_t warp_reduce_sum(uint64_t val __attribute__((unused)));
 uint64_t warp_reduce_max(uint64_t val __attribute__((unused)));
@@ -65,37 +65,37 @@ int main();
 
 uint64_t warp_reduce_sum(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
-  v = (v + __shfl_xor_sync(0xffffffff, v, 16, 32));
-  v = (v + __shfl_xor_sync(0xffffffff, v, 8, 32));
-  v = (v + __shfl_xor_sync(0xffffffff, v, 4, 32));
-  v = (v + __shfl_xor_sync(0xffffffff, v, 2, 32));
-  v = (v + __shfl_xor_sync(0xffffffff, v, 1, 32));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 8ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 4ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 2ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 1ULL, 32ULL));
   return v;
 }
 
 uint64_t warp_reduce_max(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
-  uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16, 32);
+  uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 8, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 8ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 4, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 4ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 2, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 2ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 1, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 1ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
@@ -105,27 +105,27 @@ uint64_t warp_reduce_max(uint64_t val __attribute__((unused))) {
 
 uint64_t warp_reduce_min(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
-  uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16, 32);
+  uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 8, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 8ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 4, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 4ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 2, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 2ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 1, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 1ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
@@ -142,7 +142,7 @@ uint64_t grid_stride_step(uint64_t block_dim __attribute__((unused)), uint64_t g
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 
@@ -150,7 +150,7 @@ __global__ void merkle_leaf_kernel(forge_span_u32_t tree __attribute__((unused))
   uint64_t gid __attribute__((unused)) = ((blockIdx_x * blockDim_x) + threadIdx_x);
   if ((gid < n_leaves)) {
     /* assert erased */;
-    uint64_t leaf_node __attribute__((unused)) = ((n_leaves - 1) + gid);
+    uint64_t leaf_node __attribute__((unused)) = ((n_leaves - 1ULL) + gid);
     /* assert erased */;
 
   }
@@ -160,8 +160,8 @@ __global__ void merkle_inner_kernel(forge_span_u32_t tree __attribute__((unused)
   uint64_t tid __attribute__((unused)) = ((blockIdx_x * blockDim_x) + threadIdx_x);
   if ((tid < n_nodes)) {
     uint64_t parent __attribute__((unused)) = (node_base + tid);
-    uint64_t left __attribute__((unused)) = ((2 * parent) + 1);
-    uint64_t right __attribute__((unused)) = ((2 * parent) + 2);
+    uint64_t left __attribute__((unused)) = ((2ULL * parent) + 1ULL);
+    uint64_t right __attribute__((unused)) = ((2ULL * parent) + 2ULL);
     /* assert erased */;
     /* assert erased */;
     /* assert erased */;
@@ -172,36 +172,36 @@ __global__ void merkle_inner_kernel(forge_span_u32_t tree __attribute__((unused)
 
 __global__ void merkle_verify_root(forge_span_u32_t tree __attribute__((unused)), forge_span_u32_t expected_root __attribute__((unused)), forge_span_u32_t match_out __attribute__((unused))) {
   uint64_t tid __attribute__((unused)) = ((blockIdx_x * blockDim_x) + threadIdx_x);
-  if ((tid == 0)) {
-    uint32_t w0 __attribute__((unused)) = tree.data[0];
-    uint32_t w1 __attribute__((unused)) = tree.data[1];
-    uint32_t w2 __attribute__((unused)) = tree.data[2];
-    uint32_t w3 __attribute__((unused)) = tree.data[3];
-    uint32_t w4 __attribute__((unused)) = tree.data[4];
-    uint32_t w5 __attribute__((unused)) = tree.data[5];
-    uint32_t w6 __attribute__((unused)) = tree.data[6];
-    uint32_t w7 __attribute__((unused)) = tree.data[7];
-    uint32_t e0 __attribute__((unused)) = expected_root.data[0];
-    uint32_t e1 __attribute__((unused)) = expected_root.data[1];
-    uint32_t e2 __attribute__((unused)) = expected_root.data[2];
-    uint32_t e3 __attribute__((unused)) = expected_root.data[3];
-    uint32_t e4 __attribute__((unused)) = expected_root.data[4];
-    uint32_t e5 __attribute__((unused)) = expected_root.data[5];
-    uint32_t e6 __attribute__((unused)) = expected_root.data[6];
-    uint32_t e7 __attribute__((unused)) = expected_root.data[7];
+  if ((tid == 0ULL)) {
+    uint32_t w0 __attribute__((unused)) = tree.data[0ULL];
+    uint32_t w1 __attribute__((unused)) = tree.data[1ULL];
+    uint32_t w2 __attribute__((unused)) = tree.data[2ULL];
+    uint32_t w3 __attribute__((unused)) = tree.data[3ULL];
+    uint32_t w4 __attribute__((unused)) = tree.data[4ULL];
+    uint32_t w5 __attribute__((unused)) = tree.data[5ULL];
+    uint32_t w6 __attribute__((unused)) = tree.data[6ULL];
+    uint32_t w7 __attribute__((unused)) = tree.data[7ULL];
+    uint32_t e0 __attribute__((unused)) = expected_root.data[0ULL];
+    uint32_t e1 __attribute__((unused)) = expected_root.data[1ULL];
+    uint32_t e2 __attribute__((unused)) = expected_root.data[2ULL];
+    uint32_t e3 __attribute__((unused)) = expected_root.data[3ULL];
+    uint32_t e4 __attribute__((unused)) = expected_root.data[4ULL];
+    uint32_t e5 __attribute__((unused)) = expected_root.data[5ULL];
+    uint32_t e6 __attribute__((unused)) = expected_root.data[6ULL];
+    uint32_t e7 __attribute__((unused)) = expected_root.data[7ULL];
     uint32_t all_eq;
     if (((((((((w0 == e0) && (w1 == e1)) && (w2 == e2)) && (w3 == e3)) && (w4 == e4)) && (w5 == e5)) && (w6 == e6)) && (w7 == e7))) {
-      all_eq = 1;
+      all_eq = 1ULL;
     } else {
-      all_eq = 0;
+      all_eq = 0ULL;
     }
-    match_out.data[0] = all_eq;
+    match_out.data[0ULL] = all_eq;
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

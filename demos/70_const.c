@@ -8,11 +8,11 @@
 #  define __attribute__(x)
 #endif
 
-static const uint64_t MAX_SIZE = 1024;
+static const uint64_t MAX_SIZE = 1024ULL;
 
-static const uint64_t MAGIC = 4660;
+static const uint64_t MAGIC = 4660ULL;
 
-static const uint64_t PI_INT = 3;
+static const uint64_t PI_INT = 3ULL;
 
 /* Forward declarations */
 uint64_t clamp_to_max(uint64_t v __attribute__((unused)));
@@ -37,15 +37,15 @@ uint64_t circle_area_approx(uint64_t r __attribute__((unused))) {
 }
 
 int main() {
-  uint64_t c1 __attribute__((unused)) = clamp_to_max(2000);
-  uint64_t c2 __attribute__((unused)) = clamp_to_max(100);
-  _Bool m __attribute__((unused)) = is_magic(4660);
-  uint64_t a __attribute__((unused)) = circle_area_approx(5);
+  uint64_t c1 __attribute__((unused)) = clamp_to_max(2000ULL);
+  uint64_t c2 __attribute__((unused)) = clamp_to_max(100ULL);
+  _Bool m __attribute__((unused)) = is_magic(4660ULL);
+  uint64_t a __attribute__((unused)) = circle_area_approx(5ULL);
   uint64_t m_val;
   if (m) {
-    m_val = 1;
+    m_val = 1ULL;
   } else {
-    m_val = 0;
+    m_val = 0ULL;
   }
   return (int)((((c1 + c2) + m_val) + a));
 

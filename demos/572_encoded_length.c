@@ -22,11 +22,11 @@ int main();
 
 uint64_t varint_size(uint64_t v __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = v;
-  uint64_t bytes __attribute__((unused)) = 1;
+  uint64_t bytes __attribute__((unused)) = 1ULL;
   {
-    while ((n >= 128)) {
-      bytes = (bytes + 1);
-      n = (n / 128);
+    while ((n >= 128ULL)) {
+      bytes = (bytes + 1ULL);
+      n = (n / 128ULL);
     }
 
   }
@@ -34,16 +34,16 @@ uint64_t varint_size(uint64_t v __attribute__((unused))) {
 }
 
 uint64_t utf8_encode_size(uint64_t codepoint __attribute__((unused))) {
-  if ((codepoint < 128)) {
-    return 1;
+  if ((codepoint < 128ULL)) {
+    return 1ULL;
   } else {
-    if ((codepoint < 2048)) {
-      return 2;
+    if ((codepoint < 2048ULL)) {
+      return 2ULL;
     } else {
-      if ((codepoint < 65536)) {
-        return 3;
+      if ((codepoint < 65536ULL)) {
+        return 3ULL;
       } else {
-        return 4;
+        return 4ULL;
       }
     }
   }
@@ -51,11 +51,11 @@ uint64_t utf8_encode_size(uint64_t codepoint __attribute__((unused))) {
 
 uint64_t leb128_size(uint64_t v __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = v;
-  uint64_t bytes __attribute__((unused)) = 1;
+  uint64_t bytes __attribute__((unused)) = 1ULL;
   {
-    while ((n > 127)) {
-      bytes = (bytes + 1);
-      n = (n >> 7);
+    while ((n > 127ULL)) {
+      bytes = (bytes + 1ULL);
+      n = (n >> 7ULL);
     }
 
   }
@@ -63,12 +63,12 @@ uint64_t leb128_size(uint64_t v __attribute__((unused))) {
 }
 
 uint64_t total_varint_size(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t total __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t total __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       total = (total + varint_size(s.data[i]));
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -76,15 +76,15 @@ uint64_t total_varint_size(forge_span_u64_t s __attribute__((unused)), uint64_t 
 }
 
 uint64_t check_varint_size_0() {
-  return varint_size(0);
+  return varint_size(0ULL);
 }
 
 uint64_t check_varint_size_127() {
-  return varint_size(127);
+  return varint_size(127ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

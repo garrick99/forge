@@ -16,17 +16,17 @@ void kronecker(forge_span_u64_t a __attribute__((unused)), uint64_t ra __attribu
 int main();
 
 void kronecker(forge_span_u64_t a __attribute__((unused)), uint64_t ra __attribute__((unused)), uint64_t ca __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t rb __attribute__((unused)), uint64_t cb __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t orows __attribute__((unused)), uint64_t ocols __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < ra)) {
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < ca)) {
           uint64_t aij __attribute__((unused)) = a.data[((i * ca) + j)];
-          uint64_t p __attribute__((unused)) = 0;
+          uint64_t p __attribute__((unused)) = 0ULL;
           {
             while ((p < rb)) {
-              uint64_t q __attribute__((unused)) = 0;
+              uint64_t q __attribute__((unused)) = 0ULL;
               {
                 while ((q < cb)) {
                   uint64_t row __attribute__((unused)) = ((i * rb) + p);
@@ -38,26 +38,26 @@ void kronecker(forge_span_u64_t a __attribute__((unused)), uint64_t ra __attribu
                     }
 
                   }
-                  q = (q + 1);
+                  q = (q + 1ULL);
                 }
 
               }
-              p = (p + 1);
+              p = (p + 1ULL);
             }
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

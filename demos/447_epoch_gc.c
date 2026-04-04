@@ -27,7 +27,7 @@ uint64_t epoch_advances();
 int main();
 
 EpochGC egc_new() {
-  return (EpochGC){ .epoch = 1, .allocated = 0, .reclaimed = 0, .live = 0, .gc_runs = 0 };
+  return (EpochGC){ .epoch = 1ULL, .allocated = 0ULL, .reclaimed = 0ULL, .live = 0ULL, .gc_runs = 0ULL };
 }
 
 void egc_alloc(EpochGC* e __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -38,42 +38,42 @@ void egc_alloc(EpochGC* e __attribute__((unused)), uint64_t n __attribute__((unu
 void egc_collect(EpochGC* e __attribute__((unused)), uint64_t n __attribute__((unused))) {
   (*e).reclaimed = ((*e).reclaimed + n);
   (*e).live = ((*e).live - n);
-  (*e).epoch = ((*e).epoch + 1);
-  (*e).gc_runs = ((*e).gc_runs + 1);
+  (*e).epoch = ((*e).epoch + 1ULL);
+  (*e).gc_runs = ((*e).gc_runs + 1ULL);
 }
 
 uint64_t alloc_10() {
   EpochGC e __attribute__((unused)) = egc_new();
-  egc_alloc((&e), 10);
+  egc_alloc((&e), 10ULL);
   return e.live;
 }
 
 uint64_t collect_4() {
   EpochGC e __attribute__((unused)) = egc_new();
-  egc_alloc((&e), 10);
-  egc_collect((&e), 4);
+  egc_alloc((&e), 10ULL);
+  egc_collect((&e), 4ULL);
   return e.live;
 }
 
 uint64_t live_invariant() {
   EpochGC e __attribute__((unused)) = egc_new();
-  egc_alloc((&e), 20);
-  egc_collect((&e), 8);
-  egc_alloc((&e), 5);
-  egc_collect((&e), 3);
+  egc_alloc((&e), 20ULL);
+  egc_collect((&e), 8ULL);
+  egc_alloc((&e), 5ULL);
+  egc_collect((&e), 3ULL);
   return (e.live - (e.allocated - e.reclaimed));
 }
 
 uint64_t epoch_advances() {
   EpochGC e __attribute__((unused)) = egc_new();
-  egc_alloc((&e), 10);
-  egc_collect((&e), 3);
-  egc_collect((&e), 2);
+  egc_alloc((&e), 10ULL);
+  egc_collect((&e), 3ULL);
+  egc_collect((&e), 2ULL);
   return e.epoch;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

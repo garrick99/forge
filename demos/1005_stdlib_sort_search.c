@@ -33,44 +33,44 @@ __forge_tuple_u64_u64_t find_extremes(forge_span_u64_t s __attribute__((unused))
 int main();
 
 void insertion_sort(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while ((k < n)) {
       uint64_t j __attribute__((unused)) = k;
       {
-        while ((j > 0)) {
-          if ((s.data[(j - 1)] > s.data[j])) {
-            uint64_t tmp __attribute__((unused)) = s.data[(j - 1)];
-            s.data[(j - 1)] = s.data[j];
+        while ((j > 0ULL)) {
+          if ((s.data[(j - 1ULL)] > s.data[j])) {
+            uint64_t tmp __attribute__((unused)) = s.data[(j - 1ULL)];
+            s.data[(j - 1ULL)] = s.data[j];
             s.data[j] = tmp;
-            j = (j - 1);
+            j = (j - 1ULL);
 
           } else {
-            j = 0;
+            j = 0ULL;
 
           }
         }
 
       }
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
 }
 
 void selection_sort(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t min_idx __attribute__((unused)) = i;
-      uint64_t j __attribute__((unused)) = (i + 1);
+      uint64_t j __attribute__((unused)) = (i + 1ULL);
       {
         while ((j < n)) {
           if ((s.data[j] < s.data[min_idx])) {
             min_idx = j;
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
@@ -80,7 +80,7 @@ void selection_sort(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
         s.data[min_idx] = tmp;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -88,14 +88,14 @@ void selection_sort(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 
 _Bool is_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
   _Bool ok __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      if ((s.data[(i - 1)] > s.data[i])) {
+      if ((s.data[(i - 1ULL)] > s.data[i])) {
         ok = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -103,48 +103,48 @@ _Bool is_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
 }
 
 void sort2(forge_span_u64_t s __attribute__((unused))) {
-  if ((s.data[0] > s.data[1])) {
-    uint64_t tmp __attribute__((unused)) = s.data[0];
-    s.data[0] = s.data[1];
-    s.data[1] = tmp;
+  if ((s.data[0ULL] > s.data[1ULL])) {
+    uint64_t tmp __attribute__((unused)) = s.data[0ULL];
+    s.data[0ULL] = s.data[1ULL];
+    s.data[1ULL] = tmp;
 
   }
 }
 
 void sort3(forge_span_u64_t s __attribute__((unused))) {
-  if ((s.data[0] > s.data[1])) {
-    uint64_t t __attribute__((unused)) = s.data[0];
-    s.data[0] = s.data[1];
-    s.data[1] = t;
+  if ((s.data[0ULL] > s.data[1ULL])) {
+    uint64_t t __attribute__((unused)) = s.data[0ULL];
+    s.data[0ULL] = s.data[1ULL];
+    s.data[1ULL] = t;
 
   }
-  if ((s.data[1] > s.data[2])) {
-    uint64_t t __attribute__((unused)) = s.data[1];
-    s.data[1] = s.data[2];
-    s.data[2] = t;
+  if ((s.data[1ULL] > s.data[2ULL])) {
+    uint64_t t __attribute__((unused)) = s.data[1ULL];
+    s.data[1ULL] = s.data[2ULL];
+    s.data[2ULL] = t;
 
   }
-  if ((s.data[0] > s.data[1])) {
-    uint64_t t __attribute__((unused)) = s.data[0];
-    s.data[0] = s.data[1];
-    s.data[1] = t;
+  if ((s.data[0ULL] > s.data[1ULL])) {
+    uint64_t t __attribute__((unused)) = s.data[0ULL];
+    s.data[0ULL] = s.data[1ULL];
+    s.data[1ULL] = t;
 
   }
 }
 
 uint64_t binary_search(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
   uint64_t hi __attribute__((unused)) = n;
   uint64_t ans __attribute__((unused)) = n;
   {
     while ((lo < hi)) {
-      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2));
+      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2ULL));
       if ((s.data[mid] == target)) {
         ans = mid;
         lo = hi;
 
       } else if ((s.data[mid] < target)) {
-        lo = (mid + 1);
+        lo = (mid + 1ULL);
 
       } else {
         hi = mid;
@@ -157,13 +157,13 @@ uint64_t binary_search(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 uint64_t lower_bound(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
   uint64_t hi __attribute__((unused)) = n;
   {
     while ((lo < hi)) {
-      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2));
+      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2ULL));
       if ((s.data[mid] < target)) {
-        lo = (mid + 1);
+        lo = (mid + 1ULL);
 
       } else {
         hi = mid;
@@ -176,13 +176,13 @@ uint64_t lower_bound(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 }
 
 uint64_t upper_bound(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
   uint64_t hi __attribute__((unused)) = n;
   {
     while ((lo < hi)) {
-      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2));
+      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2ULL));
       if ((s.data[mid] <= target)) {
-        lo = (mid + 1);
+        lo = (mid + 1ULL);
 
       } else {
         hi = mid;
@@ -195,7 +195,7 @@ uint64_t upper_bound(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 }
 
 uint64_t linear_search(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   uint64_t found __attribute__((unused)) = n;
   {
     while ((i < n)) {
@@ -203,7 +203,7 @@ uint64_t linear_search(forge_span_u64_t s __attribute__((unused)), uint64_t n __
         found = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -216,15 +216,15 @@ _Bool contains(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribut
 }
 
 uint64_t min_index(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t best __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t best __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((s.data[i] < s.data[best])) {
         best = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -232,15 +232,15 @@ uint64_t min_index(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 }
 
 uint64_t max_index(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t best __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t best __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((s.data[i] > s.data[best])) {
         best = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -266,7 +266,7 @@ __forge_tuple_u64_u64_t find_extremes(forge_span_u64_t s __attribute__((unused))
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

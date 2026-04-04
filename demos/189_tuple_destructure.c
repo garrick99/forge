@@ -32,7 +32,7 @@ uint64_t use_minmax(uint64_t x __attribute__((unused)), uint64_t y __attribute__
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

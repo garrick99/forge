@@ -19,38 +19,38 @@ int main();
 
 void convolve(forge_span_u64_t a __attribute__((unused)), uint64_t na __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t nb __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
   uint64_t nc __attribute__((unused)) = (na + nb);
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while ((k < nc)) {
-      out.data[k] = 0;
-      k = (k + 1);
+      out.data[k] = 0ULL;
+      k = (k + 1ULL);
     }
 
   }
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < na)) {
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < nb)) {
           out.data[(i + j)] = (out.data[(i + j)] + (a.data[i] * b.data[j]));
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t dot_product(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + (a.data[i] * b.data[i]));
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -58,28 +58,28 @@ uint64_t dot_product(forge_span_u64_t a __attribute__((unused)), forge_span_u64_
 }
 
 void cross_correlate(forge_span_u64_t signal __attribute__((unused)), uint64_t ns __attribute__((unused)), forge_span_u64_t kernel __attribute__((unused)), uint64_t nk __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t nout __attribute__((unused)) = ((ns - nk) + 1);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t nout __attribute__((unused)) = ((ns - nk) + 1ULL);
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nout)) {
-      uint64_t acc __attribute__((unused)) = 0;
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t acc __attribute__((unused)) = 0ULL;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < nk)) {
           acc = (acc + (signal.data[(i + j)] * kernel.data[j]));
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
       out.data[i] = acc;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -19,18 +19,18 @@ uint64_t crc8_single_zero_byte();
 int main();
 
 uint64_t crc8_update(uint64_t crc __attribute__((unused)), uint64_t byte __attribute__((unused))) {
-  uint64_t val __attribute__((unused)) = ((crc ^ byte) % 256);
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t val __attribute__((unused)) = ((crc ^ byte) % 256ULL);
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
-    while ((j < 8)) {
-      if ((val >= 128)) {
-        val = ((((val * 2) % 256) ^ 7) % 256);
+    while ((j < 8ULL)) {
+      if ((val >= 128ULL)) {
+        val = ((((val * 2ULL) % 256ULL) ^ 7ULL) % 256ULL);
 
       } else {
-        val = ((val * 2) % 256);
+        val = ((val * 2ULL) % 256ULL);
 
       }
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
@@ -38,13 +38,13 @@ uint64_t crc8_update(uint64_t crc __attribute__((unused)), uint64_t byte __attri
 }
 
 uint64_t crc8_compute(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t crc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t crc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t byte __attribute__((unused)) = (data.data[i] % 256);
+      uint64_t byte __attribute__((unused)) = (data.data[i] % 256ULL);
       crc = crc8_update(crc, byte);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -56,11 +56,11 @@ _Bool crc8_check(forge_span_u64_t data __attribute__((unused)), uint64_t n __att
 }
 
 uint64_t crc8_single_zero_byte() {
-  return crc8_update(0, 0);
+  return crc8_update(0ULL, 0ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

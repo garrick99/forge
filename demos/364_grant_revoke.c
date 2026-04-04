@@ -26,17 +26,17 @@ uint64_t total_grants(uint64_t cap __attribute__((unused)));
 int main();
 
 Permissions perm_new(uint64_t cap __attribute__((unused))) {
-  return (Permissions){ .count = 0, .cap = cap, .grants = 0, .revokes = 0 };
+  return (Permissions){ .count = 0ULL, .cap = cap, .grants = 0ULL, .revokes = 0ULL };
 }
 
 void perm_grant(Permissions* p __attribute__((unused))) {
-  (*p).count = ((*p).count + 1);
-  (*p).grants = ((*p).grants + 1);
+  (*p).count = ((*p).count + 1ULL);
+  (*p).grants = ((*p).grants + 1ULL);
 }
 
 void perm_revoke(Permissions* p __attribute__((unused))) {
-  (*p).count = ((*p).count - 1);
-  (*p).revokes = ((*p).revokes + 1);
+  (*p).count = ((*p).count - 1ULL);
+  (*p).revokes = ((*p).revokes + 1ULL);
 }
 
 uint64_t grant_three(uint64_t cap __attribute__((unused))) {
@@ -78,7 +78,7 @@ uint64_t total_grants(uint64_t cap __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

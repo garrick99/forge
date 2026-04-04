@@ -18,7 +18,7 @@ uint64_t gallop_search(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 int main();
 
 uint64_t gallop_bound(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t bound __attribute__((unused)) = 1;
+  uint64_t bound __attribute__((unused)) = 1ULL;
   {
     while ((bound < n)) {
       if ((s.data[bound] < target)) {
@@ -36,18 +36,18 @@ uint64_t gallop_bound(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
 }
 
 uint64_t bin_search(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
   uint64_t hi __attribute__((unused)) = n;
   uint64_t ans __attribute__((unused)) = n;
   {
     while ((lo < hi)) {
-      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2));
+      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2ULL));
       if ((s.data[mid] == target)) {
         ans = mid;
         lo = hi;
 
       } else if ((s.data[mid] < target)) {
-        lo = (mid + 1);
+        lo = (mid + 1ULL);
 
       } else {
         hi = mid;
@@ -65,7 +65,7 @@ uint64_t gallop_search(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

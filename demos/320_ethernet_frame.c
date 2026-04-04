@@ -35,34 +35,34 @@ uint64_t same_dst_oui(EtherFrame a __attribute__((unused)), EtherFrame b __attri
 int main();
 
 uint64_t dst_oui(EtherFrame f __attribute__((unused))) {
-  return (f.dst.hi % 16777216);
+  return (f.dst.hi % 16777216ULL);
 }
 
 uint64_t src_oui(EtherFrame f __attribute__((unused))) {
-  return (f.src.hi % 16777216);
+  return (f.src.hi % 16777216ULL);
 }
 
 uint64_t is_ipv4(EtherFrame f __attribute__((unused))) {
-  if ((f.etype.raw == 2048)) {
-    return 1;
+  if ((f.etype.raw == 2048ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t is_arp(EtherFrame f __attribute__((unused))) {
-  if ((f.etype.raw == 2054)) {
-    return 1;
+  if ((f.etype.raw == 2054ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t same_vendor(EtherFrame f __attribute__((unused))) {
   if ((f.dst.hi == f.src.hi)) {
-    return 1;
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
@@ -72,19 +72,19 @@ uint64_t etype_value(EtherFrame f __attribute__((unused))) {
 
 uint64_t is_known_etype(EtherFrame f __attribute__((unused))) {
   uint64_t t __attribute__((unused)) = f.etype.raw;
-  if ((t == 2048)) {
-    return 1;
+  if ((t == 2048ULL)) {
+    return 1ULL;
   } else {
-    if ((t == 2054)) {
-      return 1;
+    if ((t == 2054ULL)) {
+      return 1ULL;
     } else {
-      if ((t == 34525)) {
-        return 1;
+      if ((t == 34525ULL)) {
+        return 1ULL;
       } else {
-        if ((t == 33024)) {
-          return 1;
+        if ((t == 33024ULL)) {
+          return 1ULL;
         } else {
-          return 0;
+          return 0ULL;
         }
       }
     }
@@ -93,14 +93,14 @@ uint64_t is_known_etype(EtherFrame f __attribute__((unused))) {
 
 uint64_t same_dst_oui(EtherFrame a __attribute__((unused)), EtherFrame b __attribute__((unused))) {
   if ((a.dst.hi == b.dst.hi)) {
-    return 1;
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

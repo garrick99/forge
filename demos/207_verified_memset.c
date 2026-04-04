@@ -12,10 +12,10 @@
 typedef struct { uint64_t* data; uintptr_t len; } forge_span_u64_t;
 
 /* Forward declarations */
-void memset(forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused)));
+void forge_memset(forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused)));
 int main();
 
-void memset(forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
+void forge_memset(forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
   {
     for (uint64_t i = 0; i < (uint64_t)(n); i++) {
       dst.data[i] = val;
@@ -25,7 +25,7 @@ void memset(forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

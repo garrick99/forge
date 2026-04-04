@@ -17,15 +17,15 @@ uint64_t jarvis_step(forge_span_u64_t xs __attribute__((unused)), forge_span_u64
 int main();
 
 uint64_t find_leftmost(forge_span_u64_t xs __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t best __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t best __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((xs.data[i] < xs.data[best])) {
         best = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -34,12 +34,12 @@ uint64_t find_leftmost(forge_span_u64_t xs __attribute__((unused)), uint64_t n _
 
 uint64_t jarvis_step(forge_span_u64_t xs __attribute__((unused)), forge_span_u64_t ys __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t current __attribute__((unused))) {
   uint64_t candidate;
-  if ((current == 0)) {
-    candidate = 1;
+  if ((current == 0ULL)) {
+    candidate = 1ULL;
   } else {
-    candidate = 0;
+    candidate = 0ULL;
   }
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if (((i != current) && (i != candidate))) {
@@ -52,7 +52,7 @@ uint64_t jarvis_step(forge_span_u64_t xs __attribute__((unused)), forge_span_u64
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -60,7 +60,7 @@ uint64_t jarvis_step(forge_span_u64_t xs __attribute__((unused)), forge_span_u64
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

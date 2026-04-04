@@ -26,7 +26,7 @@ uint8_t str_at(forge_span_u8_t s __attribute__((unused)), uint64_t i __attribute
 }
 
 uint64_t byte_sum(forge_span_u8_t s __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
   {
     { forge_span_u8_t __span_b = s;
       for (uint64_t __i_b = 0; __i_b < __span_b.len; __i_b++) {

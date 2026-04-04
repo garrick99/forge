@@ -17,29 +17,29 @@ uint64_t merkle_verify(uint64_t leaf __attribute__((unused)), forge_span_u64_t p
 int main();
 
 uint64_t merkle_combine(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t modulus __attribute__((unused))) {
-  return ((((a * 37) + (b * 53)) + 7) % modulus);
+  return ((((a * 37ULL) + (b * 53ULL)) + 7ULL) % modulus);
 }
 
 uint64_t merkle_verify(uint64_t leaf __attribute__((unused)), forge_span_u64_t prf __attribute__((unused)), forge_span_u64_t sides __attribute__((unused)), uint64_t plen __attribute__((unused)), uint64_t modulus __attribute__((unused))) {
   uint64_t h __attribute__((unused)) = (leaf % modulus);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < plen)) {
       uint64_t sibling __attribute__((unused)) = (prf.data[i] % modulus);
       uint64_t left;
-      if ((sides.data[i] == 0)) {
+      if ((sides.data[i] == 0ULL)) {
         left = h;
       } else {
         left = sibling;
       }
       uint64_t right;
-      if ((sides.data[i] == 0)) {
+      if ((sides.data[i] == 0ULL)) {
         right = sibling;
       } else {
         right = h;
       }
       h = merkle_combine(left, right, modulus);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -47,7 +47,7 @@ uint64_t merkle_verify(uint64_t leaf __attribute__((unused)), forge_span_u64_t p
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

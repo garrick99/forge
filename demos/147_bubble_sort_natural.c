@@ -17,31 +17,31 @@ int main();
 
 void bubble_sort_natural(forge_span_u64_t s __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = s.len;
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while ((k < n)) {
-      uint64_t bound __attribute__((unused)) = ((n - k) - 1);
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t bound __attribute__((unused)) = ((n - k) - 1ULL);
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < bound)) {
-          if ((s.data[j] > s.data[(j + 1)])) {
+          if ((s.data[j] > s.data[(j + 1ULL)])) {
             uint64_t tmp __attribute__((unused)) = s.data[j];
-            s.data[j] = s.data[(j + 1)];
-            s.data[(j + 1)] = tmp;
+            s.data[j] = s.data[(j + 1ULL)];
+            s.data[(j + 1ULL)] = tmp;
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -23,8 +23,8 @@ uint64_t check_clamp_hi();
 int main();
 
 uint64_t sat_add_u64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if ((a > (-1 - b))) {
-    return -1;
+  if ((a > (0xffffffffffffffffULL - b))) {
+    return 0xffffffffffffffffULL;
   } else {
     return (a + b);
   }
@@ -32,7 +32,7 @@ uint64_t sat_add_u64(uint64_t a __attribute__((unused)), uint64_t b __attribute_
 
 uint64_t sat_sub_u64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
   if ((b > a)) {
-    return 0;
+    return 0ULL;
   } else {
     return (a - b);
   }
@@ -75,27 +75,27 @@ uint64_t max_u64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((u
 }
 
 uint64_t check_sat_add_overflow() {
-  return sat_add_u64(-1, 1);
+  return sat_add_u64(0xffffffffffffffffULL, 1ULL);
 }
 
 uint64_t check_sat_sub_underflow() {
-  return sat_sub_u64(3, 5);
+  return sat_sub_u64(3ULL, 5ULL);
 }
 
 uint64_t check_clamp_mid() {
-  return clamp_u64(5, 1, 10);
+  return clamp_u64(5ULL, 1ULL, 10ULL);
 }
 
 uint64_t check_clamp_lo() {
-  return clamp_u64(0, 1, 10);
+  return clamp_u64(0ULL, 1ULL, 10ULL);
 }
 
 uint64_t check_clamp_hi() {
-  return clamp_u64(20, 1, 10);
+  return clamp_u64(20ULL, 1ULL, 10ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

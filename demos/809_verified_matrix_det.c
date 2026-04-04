@@ -19,34 +19,34 @@ _Bool is_identity3(forge_span_u64_t m __attribute__((unused)));
 int main();
 
 uint64_t det3(forge_span_u64_t m __attribute__((unused))) {
-  uint64_t a __attribute__((unused)) = m.data[0];
-  uint64_t b __attribute__((unused)) = m.data[1];
-  uint64_t c __attribute__((unused)) = m.data[2];
-  uint64_t d __attribute__((unused)) = m.data[3];
-  uint64_t e __attribute__((unused)) = m.data[4];
-  uint64_t f __attribute__((unused)) = m.data[5];
-  uint64_t g __attribute__((unused)) = m.data[6];
-  uint64_t h __attribute__((unused)) = m.data[7];
-  uint64_t i __attribute__((unused)) = m.data[8];
+  uint64_t a __attribute__((unused)) = m.data[0ULL];
+  uint64_t b __attribute__((unused)) = m.data[1ULL];
+  uint64_t c __attribute__((unused)) = m.data[2ULL];
+  uint64_t d __attribute__((unused)) = m.data[3ULL];
+  uint64_t e __attribute__((unused)) = m.data[4ULL];
+  uint64_t f __attribute__((unused)) = m.data[5ULL];
+  uint64_t g __attribute__((unused)) = m.data[6ULL];
+  uint64_t h __attribute__((unused)) = m.data[7ULL];
+  uint64_t i __attribute__((unused)) = m.data[8ULL];
   return (((a * ((e * i) - (f * h))) - (b * ((d * i) - (f * g)))) + (c * ((d * h) - (e * g))));
 }
 
 uint64_t trace3(forge_span_u64_t m __attribute__((unused))) {
-  return ((m.data[0] + m.data[4]) + m.data[8]);
+  return ((m.data[0ULL] + m.data[4ULL]) + m.data[8ULL]);
 }
 
 void matvec3(forge_span_u64_t m __attribute__((unused)), forge_span_u64_t x __attribute__((unused)), forge_span_u64_t y __attribute__((unused))) {
-  y.data[0] = (((m.data[0] * x.data[0]) + (m.data[1] * x.data[1])) + (m.data[2] * x.data[2]));
-  y.data[1] = (((m.data[3] * x.data[0]) + (m.data[4] * x.data[1])) + (m.data[5] * x.data[2]));
-  y.data[2] = (((m.data[6] * x.data[0]) + (m.data[7] * x.data[1])) + (m.data[8] * x.data[2]));
+  y.data[0ULL] = (((m.data[0ULL] * x.data[0ULL]) + (m.data[1ULL] * x.data[1ULL])) + (m.data[2ULL] * x.data[2ULL]));
+  y.data[1ULL] = (((m.data[3ULL] * x.data[0ULL]) + (m.data[4ULL] * x.data[1ULL])) + (m.data[5ULL] * x.data[2ULL]));
+  y.data[2ULL] = (((m.data[6ULL] * x.data[0ULL]) + (m.data[7ULL] * x.data[1ULL])) + (m.data[8ULL] * x.data[2ULL]));
 }
 
 _Bool is_identity3(forge_span_u64_t m __attribute__((unused))) {
-  return (((((((((m.data[0] == 1) && (m.data[1] == 0)) && (m.data[2] == 0)) && (m.data[3] == 0)) && (m.data[4] == 1)) && (m.data[5] == 0)) && (m.data[6] == 0)) && (m.data[7] == 0)) && (m.data[8] == 1));
+  return (((((((((m.data[0ULL] == 1ULL) && (m.data[1ULL] == 0ULL)) && (m.data[2ULL] == 0ULL)) && (m.data[3ULL] == 0ULL)) && (m.data[4ULL] == 1ULL)) && (m.data[5ULL] == 0ULL)) && (m.data[6ULL] == 0ULL)) && (m.data[7ULL] == 0ULL)) && (m.data[8ULL] == 1ULL));
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

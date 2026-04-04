@@ -27,26 +27,26 @@ uint64_t two_presses();
 int main();
 
 Debounce db_new(uint64_t threshold __attribute__((unused))) {
-  return (Debounce){ .stable_count = 0, .threshold = threshold, .registered = 0, .state = 0 };
+  return (Debounce){ .stable_count = 0ULL, .threshold = threshold, .registered = 0ULL, .state = 0ULL };
 }
 
 void db_read_pressed(Debounce* d __attribute__((unused))) {
-  (*d).stable_count = ((*d).stable_count + 1);
+  (*d).stable_count = ((*d).stable_count + 1ULL);
 }
 
 void db_register_press(Debounce* d __attribute__((unused))) {
-  (*d).registered = ((*d).registered + 1);
-  (*d).state = 1;
-  (*d).stable_count = ((*d).stable_count + 1);
+  (*d).registered = ((*d).registered + 1ULL);
+  (*d).state = 1ULL;
+  (*d).stable_count = ((*d).stable_count + 1ULL);
 }
 
 void db_read_released(Debounce* d __attribute__((unused))) {
-  (*d).stable_count = 0;
-  (*d).state = 0;
+  (*d).stable_count = 0ULL;
+  (*d).state = 0ULL;
 }
 
 uint64_t debounce_register() {
-  Debounce d __attribute__((unused)) = db_new(4);
+  Debounce d __attribute__((unused)) = db_new(4ULL);
   db_read_pressed((&d));
   db_read_pressed((&d));
   db_read_pressed((&d));
@@ -55,7 +55,7 @@ uint64_t debounce_register() {
 }
 
 uint64_t state_pressed() {
-  Debounce d __attribute__((unused)) = db_new(3);
+  Debounce d __attribute__((unused)) = db_new(3ULL);
   db_read_pressed((&d));
   db_read_pressed((&d));
   db_register_press((&d));
@@ -63,7 +63,7 @@ uint64_t state_pressed() {
 }
 
 uint64_t release_resets() {
-  Debounce d __attribute__((unused)) = db_new(3);
+  Debounce d __attribute__((unused)) = db_new(3ULL);
   db_read_pressed((&d));
   db_read_pressed((&d));
   db_register_press((&d));
@@ -72,7 +72,7 @@ uint64_t release_resets() {
 }
 
 uint64_t two_presses() {
-  Debounce d __attribute__((unused)) = db_new(2);
+  Debounce d __attribute__((unused)) = db_new(2ULL);
   db_read_pressed((&d));
   db_register_press((&d));
   db_read_released((&d));
@@ -82,7 +82,7 @@ uint64_t two_presses() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

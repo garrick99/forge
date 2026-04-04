@@ -31,86 +31,86 @@ uint64_t pci_get_status(uint64_t config1 __attribute__((unused)));
 int main();
 
 uint64_t field_extract(uint64_t val __attribute__((unused)), uint64_t shift __attribute__((unused)), uint64_t width __attribute__((unused))) {
-  uint64_t mask __attribute__((unused)) = ((1 << width) - 1);
+  uint64_t mask __attribute__((unused)) = ((1ULL << width) - 1ULL);
   return ((val >> shift) & mask);
 }
 
 uint64_t field_insert(uint64_t val __attribute__((unused)), uint64_t field_val __attribute__((unused)), uint64_t shift __attribute__((unused)), uint64_t width __attribute__((unused))) {
-  uint64_t mask __attribute__((unused)) = ((1 << width) - 1);
-  uint64_t cleared __attribute__((unused)) = (val & ((mask << shift) ^ -1));
+  uint64_t mask __attribute__((unused)) = ((1ULL << width) - 1ULL);
+  uint64_t cleared __attribute__((unused)) = (val & ((mask << shift) ^ 0xffffffffffffffffULL));
   return (cleared | ((field_val & mask) << shift));
 }
 
 uint64_t eth_get_ethertype(uint64_t header_lo __attribute__((unused)), uint64_t header_hi __attribute__((unused))) {
-  return (header_hi % 65536);
+  return (header_hi % 65536ULL);
 }
 
 uint64_t eth_set_ethertype(uint64_t header_hi __attribute__((unused)), uint64_t ethertype __attribute__((unused))) {
-  return (((header_hi / 65536) * 65536) + ethertype);
+  return (((header_hi / 65536ULL) * 65536ULL) + ethertype);
 }
 
 uint64_t ip_get_flags(uint64_t flags_frag __attribute__((unused))) {
-  return ((flags_frag / 8192) % 8);
+  return ((flags_frag / 8192ULL) % 8ULL);
 }
 
 uint64_t ip_get_fragment_offset(uint64_t flags_frag __attribute__((unused))) {
-  return (flags_frag % 8192);
+  return (flags_frag % 8192ULL);
 }
 
 uint64_t ip_pack_flags_frag(uint64_t flags __attribute__((unused)), uint64_t frag_offset __attribute__((unused))) {
-  return ((flags * 8192) + frag_offset);
+  return ((flags * 8192ULL) + frag_offset);
 }
 
 _Bool tcp_get_syn(uint64_t flags __attribute__((unused))) {
-  return (((flags >> 1) & 1) == 1);
+  return (((flags >> 1ULL) & 1ULL) == 1ULL);
 }
 
 _Bool tcp_get_ack(uint64_t flags __attribute__((unused))) {
-  return (((flags >> 4) & 1) == 1);
+  return (((flags >> 4ULL) & 1ULL) == 1ULL);
 }
 
 _Bool tcp_get_fin(uint64_t flags __attribute__((unused))) {
-  return ((flags & 1) == 1);
+  return ((flags & 1ULL) == 1ULL);
 }
 
 _Bool tcp_get_rst(uint64_t flags __attribute__((unused))) {
-  return (((flags >> 2) & 1) == 1);
+  return (((flags >> 2ULL) & 1ULL) == 1ULL);
 }
 
 _Bool tcp_get_psh(uint64_t flags __attribute__((unused))) {
-  return (((flags >> 3) & 1) == 1);
+  return (((flags >> 3ULL) & 1ULL) == 1ULL);
 }
 
 uint64_t tcp_set_syn(uint64_t flags __attribute__((unused))) {
-  return (flags | (1 << 1));
+  return (flags | (1ULL << 1ULL));
 }
 
 uint64_t tcp_set_ack(uint64_t flags __attribute__((unused))) {
-  return (flags | (1 << 4));
+  return (flags | (1ULL << 4ULL));
 }
 
 uint64_t tcp_set_fin(uint64_t flags __attribute__((unused))) {
-  return (flags | 1);
+  return (flags | 1ULL);
 }
 
 uint64_t pci_get_vendor_id(uint64_t config0 __attribute__((unused))) {
-  return (config0 % 65536);
+  return (config0 % 65536ULL);
 }
 
 uint64_t pci_get_device_id(uint64_t config0 __attribute__((unused))) {
-  return ((config0 / 65536) % 65536);
+  return ((config0 / 65536ULL) % 65536ULL);
 }
 
 uint64_t pci_get_command(uint64_t config1 __attribute__((unused))) {
-  return (config1 % 65536);
+  return (config1 % 65536ULL);
 }
 
 uint64_t pci_get_status(uint64_t config1 __attribute__((unused))) {
-  return ((config1 / 65536) % 65536);
+  return ((config1 / 65536ULL) % 65536ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

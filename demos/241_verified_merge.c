@@ -28,15 +28,15 @@ void merge_copy(forge_span_u64_t dst __attribute__((unused)), forge_span_u64_t a
 void interleave(forge_span_u64_t dst __attribute__((unused)), forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
   {
     for (uint64_t i = 0; i < (uint64_t)(n); i++) {
-      dst.data[(2 * i)] = a.data[i];
-      dst.data[((2 * i) + 1)] = b.data[i];
+      dst.data[(2ULL * i)] = a.data[i];
+      dst.data[((2ULL * i) + 1ULL)] = b.data[i];
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

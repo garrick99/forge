@@ -34,20 +34,20 @@ uint64_t clamp_u64(uint64_t x __attribute__((unused)), uint64_t lo __attribute__
 }
 
 void array_clamp(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t v __attribute__((unused)) = clamp_u64(s.data[i], lo, hi);
       s.data[i] = v;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t array_sum_bounded(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t bound __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((s.data[i] <= bound)) {
@@ -57,7 +57,7 @@ uint64_t array_sum_bounded(forge_span_u64_t s __attribute__((unused)), uint64_t 
         acc = (acc + bound);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -65,15 +65,15 @@ uint64_t array_sum_bounded(forge_span_u64_t s __attribute__((unused)), uint64_t 
 }
 
 uint64_t count_in_range(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if (((s.data[i] >= lo) && (s.data[i] <= hi))) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -81,15 +81,15 @@ uint64_t count_in_range(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 }
 
 uint64_t array_min(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t mn __attribute__((unused)) = s.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t mn __attribute__((unused)) = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((s.data[i] < mn)) {
         mn = s.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -97,15 +97,15 @@ uint64_t array_min(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 }
 
 uint64_t array_max(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t mx __attribute__((unused)) = s.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t mx __attribute__((unused)) = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((s.data[i] > mx)) {
         mx = s.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -113,24 +113,24 @@ uint64_t array_max(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 }
 
 void normalize_to_range(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t new_max __attribute__((unused))) {
-  uint64_t mx __attribute__((unused)) = s.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t mx __attribute__((unused)) = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((s.data[i] > mx)) {
         mx = s.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
-  if ((mx > 0)) {
-    uint64_t j __attribute__((unused)) = 0;
+  if ((mx > 0ULL)) {
+    uint64_t j __attribute__((unused)) = 0ULL;
     {
       while ((j < n)) {
         s.data[j] = ((s.data[j] * new_max) / mx);
-        j = (j + 1);
+        j = (j + 1ULL);
       }
 
     }
@@ -139,7 +139,7 @@ void normalize_to_range(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

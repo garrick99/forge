@@ -23,32 +23,32 @@ void grayscale_image(forge_span_u64_t pixels __attribute__((unused)), uint64_t n
 int main();
 
 uint64_t rgba_pack(uint64_t r __attribute__((unused)), uint64_t g __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t a __attribute__((unused))) {
-  return (((r | (g << 8)) | (b << 16)) | (a << 24));
+  return (((r | (g << 8ULL)) | (b << 16ULL)) | (a << 24ULL));
 }
 
 uint64_t rgba_red(uint64_t pixel __attribute__((unused))) {
-  return (pixel % 256);
+  return (pixel % 256ULL);
 }
 
 uint64_t rgba_green(uint64_t pixel __attribute__((unused))) {
-  return ((pixel / 256) % 256);
+  return ((pixel / 256ULL) % 256ULL);
 }
 
 uint64_t rgba_blue(uint64_t pixel __attribute__((unused))) {
-  return ((pixel / 65536) % 256);
+  return ((pixel / 65536ULL) % 256ULL);
 }
 
 uint64_t rgba_alpha(uint64_t pixel __attribute__((unused))) {
-  return ((pixel / 16777216) % 256);
+  return ((pixel / 16777216ULL) % 256ULL);
 }
 
 uint64_t pixel_luminance(uint64_t pixel __attribute__((unused))) {
   uint64_t r __attribute__((unused)) = rgba_red(pixel);
   uint64_t g __attribute__((unused)) = rgba_green(pixel);
   uint64_t b __attribute__((unused)) = rgba_blue(pixel);
-  uint64_t lum __attribute__((unused)) = ((((r * 3) + (g * 6)) + (b * 1)) / 10);
-  if ((lum > 255)) {
-    return 255;
+  uint64_t lum __attribute__((unused)) = ((((r * 3ULL) + (g * 6ULL)) + (b * 1ULL)) / 10ULL);
+  if ((lum > 255ULL)) {
+    return 255ULL;
   } else {
     return lum;
   }
@@ -61,26 +61,26 @@ uint64_t pixel_blend(uint64_t a __attribute__((unused)), uint64_t b __attribute_
   uint64_t gb __attribute__((unused)) = rgba_green(b);
   uint64_t ba2 __attribute__((unused)) = rgba_blue(a);
   uint64_t bb __attribute__((unused)) = rgba_blue(b);
-  uint64_t r __attribute__((unused)) = (((ra * (255 - t)) + (rb * t)) / 255);
-  uint64_t g __attribute__((unused)) = (((ga * (255 - t)) + (gb * t)) / 255);
-  uint64_t bv __attribute__((unused)) = (((ba2 * (255 - t)) + (bb * t)) / 255);
-  return (((r | (g << 8)) | (bv << 16)) | (255 << 24));
+  uint64_t r __attribute__((unused)) = (((ra * (255ULL - t)) + (rb * t)) / 255ULL);
+  uint64_t g __attribute__((unused)) = (((ga * (255ULL - t)) + (gb * t)) / 255ULL);
+  uint64_t bv __attribute__((unused)) = (((ba2 * (255ULL - t)) + (bb * t)) / 255ULL);
+  return (((r | (g << 8ULL)) | (bv << 16ULL)) | (255ULL << 24ULL));
 }
 
 void grayscale_image(forge_span_u64_t pixels __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t lum __attribute__((unused)) = pixel_luminance(pixels.data[i]);
-      pixels.data[i] = (((lum | (lum << 8)) | (lum << 16)) | (255 << 24));
-      i = (i + 1);
+      pixels.data[i] = (((lum | (lum << 8ULL)) | (lum << 16ULL)) | (255ULL << 24ULL));
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -49,7 +49,7 @@ _Bool check_not_empty_after_push(forge_span_u64_t data __attribute__((unused)));
 int main();
 
 Vec_u64 vec_u64_new(forge_span_u64_t data __attribute__((unused))) {
-  return (Vec_u64){ .data = data, .len = 0 };
+  return (Vec_u64){ .data = data, .len = 0ULL };
 }
 
 uint64_t vec_u64_len(const Vec_u64* v __attribute__((unused))) {
@@ -61,7 +61,7 @@ uint64_t vec_u64_capacity(const Vec_u64* v __attribute__((unused))) {
 }
 
 _Bool vec_u64_is_empty(const Vec_u64* v __attribute__((unused))) {
-  return ((*v).len == 0);
+  return ((*v).len == 0ULL);
 }
 
 _Bool vec_u64_is_full(const Vec_u64* v __attribute__((unused))) {
@@ -78,31 +78,31 @@ void vec_u64_set(Vec_u64* v __attribute__((unused)), uint64_t i __attribute__((u
 
 void vec_u64_push(Vec_u64* v __attribute__((unused)), uint64_t val __attribute__((unused))) {
   (*v).data.data[(*v).len] = val;
-  (*v).len = ((*v).len + 1);
+  (*v).len = ((*v).len + 1ULL);
 }
 
 uint64_t vec_u64_pop(Vec_u64* v __attribute__((unused))) {
-  (*v).len = ((*v).len - 1);
+  (*v).len = ((*v).len - 1ULL);
   return (*v).data.data[(*v).len];
 }
 
 uint64_t vec_u64_peek(const Vec_u64* v __attribute__((unused))) {
-  return (*v).data.data[((*v).len - 1)];
+  return (*v).data.data[((*v).len - 1ULL)];
 }
 
 void vec_u64_fill(Vec_u64* v __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < (*v).len)) {
       (*v).data.data[i] = val;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t vec_u64_find(const Vec_u64* v __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   uint64_t ans __attribute__((unused)) = (*v).len;
   {
     while ((i < (*v).len)) {
@@ -111,7 +111,7 @@ uint64_t vec_u64_find(const Vec_u64* v __attribute__((unused)), uint64_t val __a
         ans = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -119,12 +119,12 @@ uint64_t vec_u64_find(const Vec_u64* v __attribute__((unused)), uint64_t val __a
 }
 
 uint64_t vec_u64_sum(const Vec_u64* v __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < (*v).len)) {
       acc = (acc + (*v).data.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -132,15 +132,15 @@ uint64_t vec_u64_sum(const Vec_u64* v __attribute__((unused))) {
 }
 
 uint64_t vec_u64_max(const Vec_u64* v __attribute__((unused))) {
-  uint64_t m __attribute__((unused)) = (*v).data.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t m __attribute__((unused)) = (*v).data.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < (*v).len)) {
       if (((*v).data.data[i] > m)) {
         m = (*v).data.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -148,15 +148,15 @@ uint64_t vec_u64_max(const Vec_u64* v __attribute__((unused))) {
 }
 
 uint64_t vec_u64_min(const Vec_u64* v __attribute__((unused))) {
-  uint64_t m __attribute__((unused)) = (*v).data.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t m __attribute__((unused)) = (*v).data.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < (*v).len)) {
       if (((*v).data.data[i] < m)) {
         m = (*v).data.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -164,12 +164,12 @@ uint64_t vec_u64_min(const Vec_u64* v __attribute__((unused))) {
 }
 
 Vec_u8 vec_u8_new(forge_span_u8_t data __attribute__((unused))) {
-  return (Vec_u8){ .data = data, .len = 0 };
+  return (Vec_u8){ .data = data, .len = 0ULL };
 }
 
 void vec_u8_push(Vec_u8* v __attribute__((unused)), uint8_t val __attribute__((unused))) {
   (*v).data.data[(*v).len] = val;
-  (*v).len = ((*v).len + 1);
+  (*v).len = ((*v).len + 1ULL);
 }
 
 uint8_t vec_u8_get(const Vec_u8* v __attribute__((unused)), uint64_t i __attribute__((unused))) {
@@ -182,34 +182,34 @@ uint64_t vec_u8_len(const Vec_u8* v __attribute__((unused))) {
 
 uint64_t check_set_get(forge_span_u64_t data __attribute__((unused))) {
   Vec_u64 v __attribute__((unused)) = vec_u64_new(data);
-  vec_u64_push((&v), 99);
-  vec_u64_set((&v), 0, 42);
-  return vec_u64_get((&v), 0);
+  vec_u64_push((&v), 99ULL);
+  vec_u64_set((&v), 0ULL, 42ULL);
+  return vec_u64_get((&v), 0ULL);
 }
 
 uint64_t check_fill_capacity(forge_span_u64_t data __attribute__((unused))) {
   Vec_u64 v __attribute__((unused)) = vec_u64_new(data);
-  vec_u64_push((&v), 1);
-  vec_u64_push((&v), 2);
-  vec_u64_push((&v), 3);
-  vec_u64_fill((&v), 0);
+  vec_u64_push((&v), 1ULL);
+  vec_u64_push((&v), 2ULL);
+  vec_u64_push((&v), 3ULL);
+  vec_u64_fill((&v), 0ULL);
   return vec_u64_capacity((&v));
 }
 
 uint64_t check_peek(forge_span_u64_t data __attribute__((unused))) {
   Vec_u64 v __attribute__((unused)) = vec_u64_new(data);
-  vec_u64_push((&v), 77);
+  vec_u64_push((&v), 77ULL);
   return vec_u64_peek((&v));
 }
 
 _Bool check_not_empty_after_push(forge_span_u64_t data __attribute__((unused))) {
   Vec_u64 v __attribute__((unused)) = vec_u64_new(data);
-  vec_u64_push((&v), 5);
+  vec_u64_push((&v), 5ULL);
   return vec_u64_is_empty((&v));
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

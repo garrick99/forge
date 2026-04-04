@@ -16,16 +16,16 @@ void z_naive(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute_
 int main();
 
 void z_naive(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t z __attribute__((unused))) {
-  z.data[0] = n;
-  uint64_t i __attribute__((unused)) = 1;
+  z.data[0ULL] = n;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t j __attribute__((unused)) = 0ULL;
       _Bool done __attribute__((unused)) = 0;
       {
         while ((done == 0)) {
           if ((((i + j) < n) && (s.data[j] == s.data[(i + j)]))) {
-            j = (j + 1);
+            j = (j + 1ULL);
 
           } else {
             done = 1;
@@ -35,14 +35,14 @@ void z_naive(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute_
 
       }
       z.data[i] = j;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

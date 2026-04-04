@@ -18,12 +18,12 @@ int main();
 
 uint64_t transfer(forge_span_u64_t in_stk __attribute__((unused)), uint64_t in_top __attribute__((unused)), forge_span_u64_t out_stk __attribute__((unused)), uint64_t out_cap __attribute__((unused))) {
   uint64_t ri __attribute__((unused)) = in_top;
-  uint64_t wi __attribute__((unused)) = 0;
+  uint64_t wi __attribute__((unused)) = 0ULL;
   {
-    while ((ri > 0)) {
-      ri = (ri - 1);
+    while ((ri > 0ULL)) {
+      ri = (ri - 1ULL);
       out_stk.data[wi] = in_stk.data[ri];
-      wi = (wi + 1);
+      wi = (wi + 1ULL);
     }
 
   }
@@ -32,11 +32,11 @@ uint64_t transfer(forge_span_u64_t in_stk __attribute__((unused)), uint64_t in_t
 
 uint64_t push(forge_span_u64_t stk __attribute__((unused)), uint64_t top __attribute__((unused)), uint64_t val __attribute__((unused))) {
   stk.data[top] = val;
-  return (top + 1);
+  return (top + 1ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

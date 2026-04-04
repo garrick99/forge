@@ -20,7 +20,7 @@ uint64_t lexicmp(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b 
 int main();
 
 uint64_t prefix_len(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   _Bool found __attribute__((unused)) = 0;
   {
     while (((i < n) && (!found))) {
@@ -28,7 +28,7 @@ uint64_t prefix_len(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t
         found = 1;
 
       } else {
-        i = (i + 1);
+        i = (i + 1ULL);
 
       }
     }
@@ -43,15 +43,15 @@ _Bool arrays_equal(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t 
 }
 
 uint64_t count_matching(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((a.data[i] == b.data[i])) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -59,15 +59,15 @@ uint64_t count_matching(forge_span_u64_t a __attribute__((unused)), forge_span_u
 }
 
 uint64_t count_diff(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((a.data[i] != b.data[i])) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -75,21 +75,21 @@ uint64_t count_diff(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t
 }
 
 uint64_t lexicmp(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
-  uint64_t res __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
+  uint64_t res __attribute__((unused)) = 0ULL;
   _Bool done __attribute__((unused)) = 0;
   {
     while (((i < n) && (!done))) {
       if ((a.data[i] < b.data[i])) {
-        res = 1;
+        res = 1ULL;
         done = 1;
 
       } else if ((a.data[i] > b.data[i])) {
-        res = 2;
+        res = 2ULL;
         done = 1;
 
       } else {
-        i = (i + 1);
+        i = (i + 1ULL);
 
       }
     }
@@ -99,7 +99,7 @@ uint64_t lexicmp(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

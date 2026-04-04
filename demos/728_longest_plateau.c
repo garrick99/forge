@@ -17,23 +17,23 @@ uint64_t count_plateaus(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 int main();
 
 uint64_t longest_plateau(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t best __attribute__((unused)) = 1;
-  uint64_t cur __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t best __attribute__((unused)) = 1ULL;
+  uint64_t cur __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      if ((s.data[i] == s.data[(i - 1)])) {
-        cur = (cur + 1);
+      if ((s.data[i] == s.data[(i - 1ULL)])) {
+        cur = (cur + 1ULL);
         if ((cur > best)) {
           best = cur;
 
         }
 
       } else {
-        cur = 1;
+        cur = 1ULL;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -41,15 +41,15 @@ uint64_t longest_plateau(forge_span_u64_t s __attribute__((unused)), uint64_t n 
 }
 
 uint64_t count_plateaus(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t count __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      if ((s.data[i] != s.data[(i - 1)])) {
-        count = (count + 1);
+      if ((s.data[i] != s.data[(i - 1ULL)])) {
+        count = (count + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -57,7 +57,7 @@ uint64_t count_plateaus(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

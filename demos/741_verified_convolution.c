@@ -17,49 +17,49 @@ void correlate_1d(forge_span_u64_t input __attribute__((unused)), uint64_t n __a
 int main();
 
 void convolve_1d(forge_span_u64_t input __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t kernel __attribute__((unused)), uint64_t k __attribute__((unused)), forge_span_u64_t output __attribute__((unused))) {
-  uint64_t out_len __attribute__((unused)) = ((n - k) + 1);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t out_len __attribute__((unused)) = ((n - k) + 1ULL);
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < out_len)) {
-      uint64_t acc __attribute__((unused)) = 0;
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t acc __attribute__((unused)) = 0ULL;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < k)) {
           acc = (acc + (input.data[(i + j)] * kernel.data[j]));
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
       output.data[i] = acc;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void correlate_1d(forge_span_u64_t input __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t pattern __attribute__((unused)), uint64_t k __attribute__((unused)), forge_span_u64_t output __attribute__((unused))) {
-  uint64_t out_len __attribute__((unused)) = ((n - k) + 1);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t out_len __attribute__((unused)) = ((n - k) + 1ULL);
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < out_len)) {
-      uint64_t acc __attribute__((unused)) = 0;
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t acc __attribute__((unused)) = 0ULL;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < k)) {
           acc = (acc + (input.data[(i + j)] * pattern.data[j]));
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
       output.data[i] = acc;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

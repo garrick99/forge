@@ -20,21 +20,21 @@ void reverse_segment(forge_span_u64_t s __attribute__((unused)), uint64_t lo __a
   uint64_t left __attribute__((unused)) = lo;
   uint64_t right __attribute__((unused)) = hi;
   {
-    while (((left + 1) < right)) {
-      right = (right - 1);
+    while (((left + 1ULL) < right)) {
+      right = (right - 1ULL);
       uint64_t tmp __attribute__((unused)) = s.data[left];
       s.data[left] = s.data[right];
       s.data[right] = tmp;
-      left = (left + 1);
+      left = (left + 1ULL);
     }
 
   }
 }
 
 uint64_t count_words(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t sep __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
   _Bool in_word __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((s.data[i] == sep)) {
@@ -42,13 +42,13 @@ uint64_t count_words(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 
       } else {
         if ((in_word == 0)) {
-          count = (count + 1);
+          count = (count + 1ULL);
           in_word = 1;
 
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -56,7 +56,7 @@ uint64_t count_words(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -17,8 +17,8 @@ void normalize(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribut
 int main();
 
 uint64_t clamp255(uint64_t x __attribute__((unused))) {
-  if ((x > 255)) {
-    return 255;
+  if ((x > 255ULL)) {
+    return 255ULL;
   } else {
     return x;
   }
@@ -34,7 +34,7 @@ void normalize(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribut
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

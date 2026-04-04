@@ -20,62 +20,62 @@ void fill_pattern(forge_span_u64_t dst __attribute__((unused)), uint64_t n __att
 int main();
 
 void copy_n(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       dst.data[i] = src.data[i];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void copy_stride(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t stride __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       dst.data[i] = src.data[(i * stride)];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void copy_reverse(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      dst.data[i] = src.data[((n - 1) - i)];
-      i = (i + 1);
+      dst.data[i] = src.data[((n - 1ULL) - i)];
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void copy_offset(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t src_off __attribute__((unused)), uint64_t dst_off __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       dst.data[(dst_off + i)] = src.data[(src_off + i)];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void fill_pattern(forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t pat __attribute__((unused)), uint64_t pat_len __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       dst.data[i] = pat.data[(i % pat_len)];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -24,7 +24,7 @@ uint64_t hash_slot(uint64_t key __attribute__((unused)), uint64_t cap __attribut
 
 uint64_t ht_probe_insert(forge_span_u64_t keys __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t key __attribute__((unused)), uint64_t sentinel __attribute__((unused))) {
   uint64_t start __attribute__((unused)) = hash_slot(key, cap);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   uint64_t slot __attribute__((unused)) = cap;
   _Bool done __attribute__((unused)) = 0;
   {
@@ -36,7 +36,7 @@ uint64_t ht_probe_insert(forge_span_u64_t keys __attribute__((unused)), uint64_t
         done = 1;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -45,7 +45,7 @@ uint64_t ht_probe_insert(forge_span_u64_t keys __attribute__((unused)), uint64_t
 
 uint64_t ht_probe_find(forge_span_u64_t keys __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t key __attribute__((unused)), uint64_t sentinel __attribute__((unused))) {
   uint64_t start __attribute__((unused)) = hash_slot(key, cap);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   uint64_t slot __attribute__((unused)) = cap;
   _Bool done __attribute__((unused)) = 0;
   {
@@ -59,7 +59,7 @@ uint64_t ht_probe_find(forge_span_u64_t keys __attribute__((unused)), uint64_t c
         done = 1;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -67,15 +67,15 @@ uint64_t ht_probe_find(forge_span_u64_t keys __attribute__((unused)), uint64_t c
 }
 
 uint64_t ht_count(forge_span_u64_t keys __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t sentinel __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < cap)) {
       if ((keys.data[i] != sentinel)) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -83,7 +83,7 @@ uint64_t ht_count(forge_span_u64_t keys __attribute__((unused)), uint64_t cap __
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

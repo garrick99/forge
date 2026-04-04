@@ -16,10 +16,10 @@ uint64_t coalesce(forge_span_u64_t starts __attribute__((unused)), forge_span_u6
 int main();
 
 uint64_t coalesce(forge_span_u64_t starts __attribute__((unused)), forge_span_u64_t sizes __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t out_starts __attribute__((unused)), forge_span_u64_t out_sizes __attribute__((unused))) {
-  out_starts.data[0] = starts.data[0];
-  out_sizes.data[0] = sizes.data[0];
-  uint64_t wi __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 1;
+  out_starts.data[0ULL] = starts.data[0ULL];
+  out_sizes.data[0ULL] = sizes.data[0ULL];
+  uint64_t wi __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       uint64_t prev_end __attribute__((unused)) = (out_starts.data[wi] + out_sizes.data[wi]);
@@ -27,7 +27,7 @@ uint64_t coalesce(forge_span_u64_t starts __attribute__((unused)), forge_span_u6
         out_sizes.data[wi] = (out_sizes.data[wi] + sizes.data[i]);
 
       } else {
-        wi = (wi + 1);
+        wi = (wi + 1ULL);
         if ((wi < n)) {
           out_starts.data[wi] = starts.data[i];
           out_sizes.data[wi] = sizes.data[i];
@@ -35,15 +35,15 @@ uint64_t coalesce(forge_span_u64_t starts __attribute__((unused)), forge_span_u6
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
-  return (wi + 1);
+  return (wi + 1ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

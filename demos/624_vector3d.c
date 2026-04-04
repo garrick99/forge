@@ -66,23 +66,23 @@ uint64_t vec3_min_component(uint64_t x __attribute__((unused)), uint64_t y __att
 }
 
 void array_vec3_sum(forge_span_u64_t pts __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t* ox __attribute__((unused)), uint64_t* oy __attribute__((unused)), uint64_t* oz __attribute__((unused))) {
-  (*ox) = 0;
-  (*oy) = 0;
-  (*oz) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  (*ox) = 0ULL;
+  (*oy) = 0ULL;
+  (*oz) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      (*ox) = ((*ox) + pts.data[(i * 3)]);
-      (*oy) = ((*oy) + pts.data[((i * 3) + 1)]);
-      (*oz) = ((*oz) + pts.data[((i * 3) + 2)]);
-      i = (i + 1);
+      (*ox) = ((*ox) + pts.data[(i * 3ULL)]);
+      (*oy) = ((*oy) + pts.data[((i * 3ULL) + 1ULL)]);
+      (*oz) = ((*oz) + pts.data[((i * 3ULL) + 2ULL)]);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

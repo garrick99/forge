@@ -30,14 +30,14 @@ void rb_fill(RingBuf* rb __attribute__((unused)), forge_span_u64_t src __attribu
 int main();
 
 RingBuf rb_new(forge_span_u64_t data __attribute__((unused)), uint64_t cap __attribute__((unused))) {
-  return (RingBuf){ .data = data, .cap = cap, .head = 0, .tail = 0, .count = 0 };
+  return (RingBuf){ .data = data, .cap = cap, .head = 0ULL, .tail = 0ULL, .count = 0ULL };
 }
 
 uint64_t rb_next(uint64_t idx __attribute__((unused)), uint64_t cap __attribute__((unused))) {
-  if (((idx + 1) < cap)) {
-    return (idx + 1);
+  if (((idx + 1ULL) < cap)) {
+    return (idx + 1ULL);
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
@@ -45,19 +45,19 @@ void rb_enqueue(RingBuf* rb __attribute__((unused)), uint64_t val __attribute__(
   (*rb).data.data[(*rb).tail] = val;
   uint64_t new_tail __attribute__((unused)) = rb_next((*rb).tail, (*rb).cap);
   (*rb).tail = new_tail;
-  (*rb).count = ((*rb).count + 1);
+  (*rb).count = ((*rb).count + 1ULL);
 }
 
 uint64_t rb_dequeue(RingBuf* rb __attribute__((unused))) {
   uint64_t val __attribute__((unused)) = (*rb).data.data[(*rb).head];
   uint64_t new_head __attribute__((unused)) = rb_next((*rb).head, (*rb).cap);
   (*rb).head = new_head;
-  (*rb).count = ((*rb).count - 1);
+  (*rb).count = ((*rb).count - 1ULL);
   return val;
 }
 
 _Bool rb_is_empty(const RingBuf* rb __attribute__((unused))) {
-  return ((*rb).count == 0);
+  return ((*rb).count == 0ULL);
 }
 
 _Bool rb_is_full(const RingBuf* rb __attribute__((unused))) {
@@ -65,18 +65,18 @@ _Bool rb_is_full(const RingBuf* rb __attribute__((unused))) {
 }
 
 void rb_fill(RingBuf* rb __attribute__((unused)), forge_span_u64_t src __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       rb_enqueue(rb, src.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

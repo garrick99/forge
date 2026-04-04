@@ -17,12 +17,12 @@ int main();
 
 void selection_sort(forge_span_u64_t s __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = s.len;
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while ((k < n)) {
       uint64_t min_idx __attribute__((unused)) = k;
       uint64_t m __attribute__((unused)) = s.data[k];
-      uint64_t idx __attribute__((unused)) = (k + 1);
+      uint64_t idx __attribute__((unused)) = (k + 1ULL);
       {
         while ((idx < n)) {
           if ((s.data[idx] < m)) {
@@ -30,21 +30,21 @@ void selection_sort(forge_span_u64_t s __attribute__((unused))) {
             m = s.data[idx];
 
           }
-          idx = (idx + 1);
+          idx = (idx + 1ULL);
         }
 
       }
       uint64_t old_k __attribute__((unused)) = s.data[k];
       s.data[k] = s.data[min_idx];
       s.data[min_idx] = old_k;
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

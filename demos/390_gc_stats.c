@@ -26,18 +26,18 @@ uint64_t gc_cycle_count();
 int main();
 
 GCStats gc_new() {
-  return (GCStats){ .live = 0, .collected = 0, .gc_cycles = 0, .allocs = 0 };
+  return (GCStats){ .live = 0ULL, .collected = 0ULL, .gc_cycles = 0ULL, .allocs = 0ULL };
 }
 
 void gc_alloc(GCStats* g __attribute__((unused))) {
-  (*g).live = ((*g).live + 1);
-  (*g).allocs = ((*g).allocs + 1);
+  (*g).live = ((*g).live + 1ULL);
+  (*g).allocs = ((*g).allocs + 1ULL);
 }
 
 void gc_collect(GCStats* g __attribute__((unused)), uint64_t freed __attribute__((unused))) {
   (*g).live = ((*g).live - freed);
   (*g).collected = ((*g).collected + freed);
-  (*g).gc_cycles = ((*g).gc_cycles + 1);
+  (*g).gc_cycles = ((*g).gc_cycles + 1ULL);
 }
 
 uint64_t alloc_five() {
@@ -57,7 +57,7 @@ uint64_t collect_three() {
   gc_alloc((&g));
   gc_alloc((&g));
   gc_alloc((&g));
-  gc_collect((&g), 3);
+  gc_collect((&g), 3ULL);
   return g.live;
 }
 
@@ -68,10 +68,10 @@ uint64_t collected_total() {
   gc_alloc((&g));
   gc_alloc((&g));
   gc_alloc((&g));
-  gc_collect((&g), 3);
+  gc_collect((&g), 3ULL);
   gc_alloc((&g));
   gc_alloc((&g));
-  gc_collect((&g), 4);
+  gc_collect((&g), 4ULL);
   return g.collected;
 }
 
@@ -80,14 +80,14 @@ uint64_t gc_cycle_count() {
   gc_alloc((&g));
   gc_alloc((&g));
   gc_alloc((&g));
-  gc_collect((&g), 2);
+  gc_collect((&g), 2ULL);
   gc_alloc((&g));
-  gc_collect((&g), 2);
+  gc_collect((&g), 2ULL);
   return g.gc_cycles;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -16,58 +16,58 @@ void merge3(forge_span_u64_t a __attribute__((unused)), uint64_t na __attribute_
 int main();
 
 void merge3(forge_span_u64_t a __attribute__((unused)), uint64_t na __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t nb __attribute__((unused)), forge_span_u64_t c __attribute__((unused)), uint64_t nc __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
-  uint64_t j __attribute__((unused)) = 0;
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
+  uint64_t j __attribute__((unused)) = 0ULL;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while ((((i + j) + k) < ((na + nb) + nc))) {
       if (((i >= na) && (j >= nb))) {
         out.data[((i + j) + k)] = c.data[k];
-        k = (k + 1);
+        k = (k + 1ULL);
 
       } else if (((i >= na) && (k >= nc))) {
         out.data[((i + j) + k)] = b.data[j];
-        j = (j + 1);
+        j = (j + 1ULL);
 
       } else if (((j >= nb) && (k >= nc))) {
         out.data[((i + j) + k)] = a.data[i];
-        i = (i + 1);
+        i = (i + 1ULL);
 
       } else if (((i >= na) && (b.data[j] <= c.data[k]))) {
         out.data[((i + j) + k)] = b.data[j];
-        j = (j + 1);
+        j = (j + 1ULL);
 
       } else if ((i >= na)) {
         out.data[((i + j) + k)] = c.data[k];
-        k = (k + 1);
+        k = (k + 1ULL);
 
       } else if (((j >= nb) && (a.data[i] <= c.data[k]))) {
         out.data[((i + j) + k)] = a.data[i];
-        i = (i + 1);
+        i = (i + 1ULL);
 
       } else if ((j >= nb)) {
         out.data[((i + j) + k)] = c.data[k];
-        k = (k + 1);
+        k = (k + 1ULL);
 
       } else if (((k >= nc) && (a.data[i] <= b.data[j]))) {
         out.data[((i + j) + k)] = a.data[i];
-        i = (i + 1);
+        i = (i + 1ULL);
 
       } else if ((k >= nc)) {
         out.data[((i + j) + k)] = b.data[j];
-        j = (j + 1);
+        j = (j + 1ULL);
 
       } else if (((a.data[i] <= b.data[j]) && (a.data[i] <= c.data[k]))) {
         out.data[((i + j) + k)] = a.data[i];
-        i = (i + 1);
+        i = (i + 1ULL);
 
       } else if ((b.data[j] <= c.data[k])) {
         out.data[((i + j) + k)] = b.data[j];
-        j = (j + 1);
+        j = (j + 1ULL);
 
       } else {
         out.data[((i + j) + k)] = c.data[k];
-        k = (k + 1);
+        k = (k + 1ULL);
 
       }
     }
@@ -76,7 +76,7 @@ void merge3(forge_span_u64_t a __attribute__((unused)), uint64_t na __attribute_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

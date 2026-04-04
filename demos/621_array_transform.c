@@ -20,62 +20,62 @@ void array_mod(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribut
 int main();
 
 void array_negate_sat(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t max_val __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      s.data[i] = ((s.data[i] <= max_val) ? (max_val - s.data[i]) : 0);
-      i = (i + 1);
+      s.data[i] = ((s.data[i] <= max_val) ? (max_val - s.data[i]) : 0ULL);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void array_square_mod(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t m __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = ((s.data[i] * s.data[i]) % m);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void array_threshold(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t thresh __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      s.data[i] = ((s.data[i] >= thresh) ? 1 : 0);
-      i = (i + 1);
+      s.data[i] = ((s.data[i] >= thresh) ? 1ULL : 0ULL);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void array_abs_diff(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       out.data[i] = ((a.data[i] >= b.data[i]) ? (a.data[i] - b.data[i]) : (b.data[i] - a.data[i]));
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void array_mod(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t m __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = (s.data[i] % m);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -21,71 +21,71 @@ uint64_t count_digits4(uint64_t c0 __attribute__((unused)), uint64_t c1 __attrib
 int main();
 
 uint64_t is_digit(uint64_t c __attribute__((unused))) {
-  if (((c >= 48) && (c <= 57))) {
-    return 1;
+  if (((c >= 48ULL) && (c <= 57ULL))) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t is_upper(uint64_t c __attribute__((unused))) {
-  if (((c >= 65) && (c <= 90))) {
-    return 1;
+  if (((c >= 65ULL) && (c <= 90ULL))) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t is_lower(uint64_t c __attribute__((unused))) {
-  if (((c >= 97) && (c <= 122))) {
-    return 1;
+  if (((c >= 97ULL) && (c <= 122ULL))) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t is_alpha(uint64_t c __attribute__((unused))) {
-  if ((((c >= 65) && (c <= 90)) || ((c >= 97) && (c <= 122)))) {
-    return 1;
+  if ((((c >= 65ULL) && (c <= 90ULL)) || ((c >= 97ULL) && (c <= 122ULL)))) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t is_alnum(uint64_t c __attribute__((unused))) {
-  if (((((c >= 48) && (c <= 57)) || ((c >= 65) && (c <= 90))) || ((c >= 97) && (c <= 122)))) {
-    return 1;
+  if (((((c >= 48ULL) && (c <= 57ULL)) || ((c >= 65ULL) && (c <= 90ULL))) || ((c >= 97ULL) && (c <= 122ULL)))) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t is_whitespace(uint64_t c __attribute__((unused))) {
-  if (((((c == 32) || (c == 9)) || (c == 10)) || (c == 13))) {
-    return 1;
+  if (((((c == 32ULL) || (c == 9ULL)) || (c == 10ULL)) || (c == 13ULL))) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t dfa_step(uint64_t state __attribute__((unused)), uint64_t c __attribute__((unused))) {
-  if (((c >= 48) && (c <= 57))) {
-    return 1;
+  if (((c >= 48ULL) && (c <= 57ULL))) {
+    return 1ULL;
   } else {
-    if ((((c >= 65) && (c <= 90)) || ((c >= 97) && (c <= 122)))) {
-      return 2;
+    if ((((c >= 65ULL) && (c <= 90ULL)) || ((c >= 97ULL) && (c <= 122ULL)))) {
+      return 2ULL;
     } else {
-      if (((((c == 32) || (c == 9)) || (c == 10)) || (c == 13))) {
-        return 3;
+      if (((((c == 32ULL) || (c == 9ULL)) || (c == 10ULL)) || (c == 13ULL))) {
+        return 3ULL;
       } else {
-        return 4;
+        return 4ULL;
       }
     }
   }
 }
 
 uint64_t dfa_run4(uint64_t c0 __attribute__((unused)), uint64_t c1 __attribute__((unused)), uint64_t c2 __attribute__((unused)), uint64_t c3 __attribute__((unused))) {
-  uint64_t s0 __attribute__((unused)) = 0;
+  uint64_t s0 __attribute__((unused)) = 0ULL;
   uint64_t s1 __attribute__((unused)) = dfa_step(s0, c0);
   uint64_t s2 __attribute__((unused)) = dfa_step(s1, c1);
   uint64_t s3 __attribute__((unused)) = dfa_step(s2, c2);
@@ -102,18 +102,18 @@ uint64_t count_digits4(uint64_t c0 __attribute__((unused)), uint64_t c1 __attrib
 }
 
 int main() {
-  uint64_t d0 __attribute__((unused)) = is_digit(48);
-  uint64_t d1 __attribute__((unused)) = is_digit(65);
-  uint64_t a0 __attribute__((unused)) = is_alpha(65);
-  uint64_t a1 __attribute__((unused)) = is_alpha(97);
-  uint64_t a2 __attribute__((unused)) = is_alpha(48);
-  uint64_t w0 __attribute__((unused)) = is_whitespace(32);
-  uint64_t w1 __attribute__((unused)) = is_whitespace(65);
-  uint64_t n0 __attribute__((unused)) = is_alnum(48);
-  uint64_t n1 __attribute__((unused)) = is_alnum(65);
-  uint64_t n2 __attribute__((unused)) = is_alnum(33);
-  uint64_t final_state __attribute__((unused)) = dfa_run4(48, 65, 98, 33);
-  uint64_t cnt __attribute__((unused)) = count_digits4(48, 50, 65, 33);
+  uint64_t d0 __attribute__((unused)) = is_digit(48ULL);
+  uint64_t d1 __attribute__((unused)) = is_digit(65ULL);
+  uint64_t a0 __attribute__((unused)) = is_alpha(65ULL);
+  uint64_t a1 __attribute__((unused)) = is_alpha(97ULL);
+  uint64_t a2 __attribute__((unused)) = is_alpha(48ULL);
+  uint64_t w0 __attribute__((unused)) = is_whitespace(32ULL);
+  uint64_t w1 __attribute__((unused)) = is_whitespace(65ULL);
+  uint64_t n0 __attribute__((unused)) = is_alnum(48ULL);
+  uint64_t n1 __attribute__((unused)) = is_alnum(65ULL);
+  uint64_t n2 __attribute__((unused)) = is_alnum(33ULL);
+  uint64_t final_state __attribute__((unused)) = dfa_run4(48ULL, 65ULL, 98ULL, 33ULL);
+  uint64_t cnt __attribute__((unused)) = count_digits4(48ULL, 50ULL, 65ULL, 33ULL);
   return (int)((((((((((((d0 + d1) + a0) + a1) + a2) + w0) + w1) + n0) + n1) + n2) + final_state) + cnt));
 
 }

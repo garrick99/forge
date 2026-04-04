@@ -26,19 +26,19 @@ uint64_t union_superset(uint64_t s __attribute__((unused)), uint64_t t __attribu
 int main();
 
 uint64_t bs_set(uint64_t s __attribute__((unused)), uint64_t i __attribute__((unused))) {
-  return (s | (1 << i));
+  return (s | (1ULL << i));
 }
 
 uint64_t bs_clear(uint64_t s __attribute__((unused)), uint64_t i __attribute__((unused))) {
-  return (s & (~(1 << i)));
+  return (s & (~(1ULL << i)));
 }
 
 uint64_t bs_test(uint64_t s __attribute__((unused)), uint64_t i __attribute__((unused))) {
-  return ((s >> i) & 1);
+  return ((s >> i) & 1ULL);
 }
 
 uint64_t bs_toggle(uint64_t s __attribute__((unused)), uint64_t i __attribute__((unused))) {
-  return (s ^ (1 << i));
+  return (s ^ (1ULL << i));
 }
 
 uint64_t bs_union(uint64_t s __attribute__((unused)), uint64_t t __attribute__((unused))) {
@@ -60,28 +60,28 @@ uint64_t bs_comp(uint64_t s __attribute__((unused))) {
 
 uint64_t bs_subset(uint64_t s __attribute__((unused)), uint64_t t __attribute__((unused))) {
   if (((s & t) == s)) {
-    return 1;
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t bs_disjoint(uint64_t s __attribute__((unused)), uint64_t t __attribute__((unused))) {
-  if (((s & t) == 0)) {
-    return 1;
+  if (((s & t) == 0ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t bs_count(uint64_t s __attribute__((unused))) {
-  uint64_t m1 __attribute__((unused)) = 6148914691236517205;
-  uint64_t s1 __attribute__((unused)) = ((s & m1) + ((s >> 1) & m1));
-  uint64_t m2 __attribute__((unused)) = 3689348814741910323;
-  uint64_t s2 __attribute__((unused)) = ((s1 & m2) + ((s1 >> 2) & m2));
-  uint64_t m4 __attribute__((unused)) = 1085102592571150095;
-  uint64_t s3 __attribute__((unused)) = ((s2 + (s2 >> 4)) & m4);
-  return ((s3 * 72340172838076673) >> 56);
+  uint64_t m1 __attribute__((unused)) = 6148914691236517205ULL;
+  uint64_t s1 __attribute__((unused)) = ((s & m1) + ((s >> 1ULL) & m1));
+  uint64_t m2 __attribute__((unused)) = 3689348814741910323ULL;
+  uint64_t s2 __attribute__((unused)) = ((s1 & m2) + ((s1 >> 2ULL) & m2));
+  uint64_t m4 __attribute__((unused)) = 1085102592571150095ULL;
+  uint64_t s3 __attribute__((unused)) = ((s2 + (s2 >> 4ULL)) & m4);
+  return ((s3 * 72340172838076673ULL) >> 56ULL);
 }
 
 uint64_t set_test(uint64_t s __attribute__((unused)), uint64_t i __attribute__((unused))) {
@@ -100,28 +100,28 @@ uint64_t union_superset(uint64_t s __attribute__((unused)), uint64_t t __attribu
   uint64_t u __attribute__((unused)) = bs_union(s, t);
   uint64_t ss __attribute__((unused)) = bs_subset(s, u);
   uint64_t ts __attribute__((unused)) = bs_subset(t, u);
-  if (((ss == 1) && (ts == 1))) {
-    return 1;
+  if (((ss == 1ULL) && (ts == 1ULL))) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 int main() {
-  uint64_t s0 __attribute__((unused)) = 0;
-  uint64_t s1 __attribute__((unused)) = bs_set(s0, 0);
-  uint64_t s2 __attribute__((unused)) = bs_set(s1, 3);
-  uint64_t s3 __attribute__((unused)) = bs_set(s2, 7);
-  uint64_t t0 __attribute__((unused)) = bs_test(s3, 0);
-  uint64_t t3 __attribute__((unused)) = bs_test(s3, 3);
-  uint64_t t1 __attribute__((unused)) = bs_test(s3, 1);
-  uint64_t s4 __attribute__((unused)) = bs_clear(s3, 3);
-  uint64_t t3c __attribute__((unused)) = bs_test(s4, 3);
+  uint64_t s0 __attribute__((unused)) = 0ULL;
+  uint64_t s1 __attribute__((unused)) = bs_set(s0, 0ULL);
+  uint64_t s2 __attribute__((unused)) = bs_set(s1, 3ULL);
+  uint64_t s3 __attribute__((unused)) = bs_set(s2, 7ULL);
+  uint64_t t0 __attribute__((unused)) = bs_test(s3, 0ULL);
+  uint64_t t3 __attribute__((unused)) = bs_test(s3, 3ULL);
+  uint64_t t1 __attribute__((unused)) = bs_test(s3, 1ULL);
+  uint64_t s4 __attribute__((unused)) = bs_clear(s3, 3ULL);
+  uint64_t t3c __attribute__((unused)) = bs_test(s4, 3ULL);
   uint64_t cnt __attribute__((unused)) = bs_count(s3);
   uint64_t sub __attribute__((unused)) = bs_subset(s1, s3);
-  uint64_t dis __attribute__((unused)) = bs_disjoint(s1, 2);
-  uint64_t st __attribute__((unused)) = set_test(s0, 5);
-  uint64_t ct __attribute__((unused)) = clear_test(s3, 7);
+  uint64_t dis __attribute__((unused)) = bs_disjoint(s1, 2ULL);
+  uint64_t st __attribute__((unused)) = set_test(s0, 5ULL);
+  uint64_t ct __attribute__((unused)) = clear_test(s3, 7ULL);
   uint64_t up __attribute__((unused)) = union_superset(s1, s2);
   return (int)((((((((((t0 + t3) + t1) + t3c) + cnt) + sub) + dis) + st) + ct) + up));
 

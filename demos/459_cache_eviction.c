@@ -28,25 +28,25 @@ uint64_t capacity_stable();
 int main();
 
 CacheEviction ce_new(uint64_t cap __attribute__((unused))) {
-  return (CacheEviction){ .used = 0, .capacity = cap, .hits = 0, .misses = 0, .evictions = 0 };
+  return (CacheEviction){ .used = 0ULL, .capacity = cap, .hits = 0ULL, .misses = 0ULL, .evictions = 0ULL };
 }
 
 void ce_hit(CacheEviction* c __attribute__((unused))) {
-  (*c).hits = ((*c).hits + 1);
+  (*c).hits = ((*c).hits + 1ULL);
 }
 
 void ce_miss_insert(CacheEviction* c __attribute__((unused))) {
-  (*c).misses = ((*c).misses + 1);
-  (*c).used = ((*c).used + 1);
+  (*c).misses = ((*c).misses + 1ULL);
+  (*c).used = ((*c).used + 1ULL);
 }
 
 void ce_miss_evict(CacheEviction* c __attribute__((unused))) {
-  (*c).misses = ((*c).misses + 1);
-  (*c).evictions = ((*c).evictions + 1);
+  (*c).misses = ((*c).misses + 1ULL);
+  (*c).evictions = ((*c).evictions + 1ULL);
 }
 
 uint64_t cold_misses() {
-  CacheEviction c __attribute__((unused)) = ce_new(4);
+  CacheEviction c __attribute__((unused)) = ce_new(4ULL);
   ce_miss_insert((&c));
   ce_miss_insert((&c));
   ce_miss_insert((&c));
@@ -54,7 +54,7 @@ uint64_t cold_misses() {
 }
 
 uint64_t eviction_when_full() {
-  CacheEviction c __attribute__((unused)) = ce_new(2);
+  CacheEviction c __attribute__((unused)) = ce_new(2ULL);
   ce_miss_insert((&c));
   ce_miss_insert((&c));
   ce_miss_evict((&c));
@@ -63,7 +63,7 @@ uint64_t eviction_when_full() {
 }
 
 uint64_t hit_count() {
-  CacheEviction c __attribute__((unused)) = ce_new(4);
+  CacheEviction c __attribute__((unused)) = ce_new(4ULL);
   ce_miss_insert((&c));
   ce_hit((&c));
   ce_hit((&c));
@@ -72,7 +72,7 @@ uint64_t hit_count() {
 }
 
 uint64_t capacity_stable() {
-  CacheEviction c __attribute__((unused)) = ce_new(2);
+  CacheEviction c __attribute__((unused)) = ce_new(2ULL);
   ce_miss_insert((&c));
   ce_miss_insert((&c));
   ce_miss_evict((&c));
@@ -81,7 +81,7 @@ uint64_t capacity_stable() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

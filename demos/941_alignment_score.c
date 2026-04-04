@@ -17,15 +17,15 @@ uint64_t hamming_dist(forge_span_u64_t a __attribute__((unused)), forge_span_u64
 int main();
 
 uint64_t align_score(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t score __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t score __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((a.data[i] == b.data[i])) {
-        score = (score + 2);
+        score = (score + 2ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -33,15 +33,15 @@ uint64_t align_score(forge_span_u64_t a __attribute__((unused)), forge_span_u64_
 }
 
 uint64_t hamming_dist(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t d __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t d __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((a.data[i] != b.data[i])) {
-        d = (d + 1);
+        d = (d + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -49,7 +49,7 @@ uint64_t hamming_dist(forge_span_u64_t a __attribute__((unused)), forge_span_u64
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

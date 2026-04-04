@@ -16,11 +16,11 @@ void fill_last(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribut
 int main();
 
 void fill_last(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  s.data[(n - 1)] = val;
+  s.data[(n - 1ULL)] = val;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

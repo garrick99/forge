@@ -16,7 +16,7 @@ void bloom_union(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b 
 int main();
 
 void bloom_union(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t av __attribute__((unused)) = a.data[i];
@@ -28,14 +28,14 @@ void bloom_union(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b 
         dst.data[i] = bv;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

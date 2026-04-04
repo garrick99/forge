@@ -74,11 +74,11 @@ _Bool Rect__contains(Rect self __attribute__((unused)), uint64_t px __attribute_
 }
 
 Counter Counter__new(uint64_t max __attribute__((unused))) {
-  return (Counter){ .val = 0, .max = max };
+  return (Counter){ .val = 0ULL, .max = max };
 }
 
 Counter Counter__increment(Counter self __attribute__((unused))) {
-  return (Counter){ .val = (self.val + 1), .max = self.max };
+  return (Counter){ .val = (self.val + 1ULL), .max = self.max };
 }
 
 _Bool Counter__is_full(Counter self __attribute__((unused))) {

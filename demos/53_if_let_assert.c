@@ -35,7 +35,7 @@ uint64_t clamp(uint64_t x __attribute__((unused)), uint64_t lo __attribute__((un
 uint64_t run();
 
 Option_u64 safe_div(uint64_t n __attribute__((unused)), uint64_t d __attribute__((unused))) {
-  if ((d != 0)) {
+  if ((d != 0ULL)) {
     return (Option_u64){ .tag = Option_u64_tag_Some, .data.Some = { ._v0 = (n / d) } };
   } else {
     return (Option_u64){ .tag = Option_u64_tag_None, .data.None = { ._dummy = 0 } };
@@ -50,7 +50,7 @@ uint64_t div_or_zero(uint64_t n __attribute__((unused)), uint64_t d __attribute_
     }
     default: ;
     {
-      return 0;
+      return 0ULL;
     }
   }
 }
@@ -78,7 +78,7 @@ uint64_t safe_add_divs(uint64_t a __attribute__((unused)), uint64_t b __attribut
 }
 
 uint64_t div4(uint64_t n __attribute__((unused))) {
-  uint64_t q __attribute__((unused)) = (n >> 2);
+  uint64_t q __attribute__((unused)) = (n >> 2ULL);
   /* assert erased */;
   return q;
 }
@@ -99,6 +99,6 @@ uint64_t clamp(uint64_t x __attribute__((unused)), uint64_t lo __attribute__((un
 }
 
 uint64_t run() {
-  return 0;
+  return 0ULL;
 }
 

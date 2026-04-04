@@ -16,22 +16,22 @@ uint64_t two_sum_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 int main();
 
 uint64_t two_sum_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
-  uint64_t hi __attribute__((unused)) = (n - 1);
-  uint64_t found __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
+  uint64_t hi __attribute__((unused)) = (n - 1ULL);
+  uint64_t found __attribute__((unused)) = 0ULL;
   {
     while ((lo < hi)) {
       uint64_t sum __attribute__((unused)) = (s.data[lo] + s.data[hi]);
       if ((sum == target)) {
-        found = 1;
+        found = 1ULL;
         lo = hi;
 
       } else if ((s.data[lo] < s.data[hi])) {
-        lo = (lo + 1);
+        lo = (lo + 1ULL);
 
       } else {
-        if ((hi > 0)) {
-          hi = (hi - 1);
+        if ((hi > 0ULL)) {
+          hi = (hi - 1ULL);
 
         } else {
           lo = hi;
@@ -46,7 +46,7 @@ uint64_t two_sum_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

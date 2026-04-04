@@ -18,39 +18,39 @@ uint64_t swap_nibbles(uint64_t x __attribute__((unused)));
 int main();
 
 uint64_t rotate_left32(uint64_t x __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = (x % 4294967296);
-  return (((lo << n) | (lo >> (32 - n))) % 4294967296);
+  uint64_t lo __attribute__((unused)) = (x % 4294967296ULL);
+  return (((lo << n) | (lo >> (32ULL - n))) % 4294967296ULL);
 }
 
 uint64_t extract_bits(uint64_t x __attribute__((unused)), uint64_t pos __attribute__((unused)), uint64_t width __attribute__((unused))) {
-  return ((x >> pos) % (1 << width));
+  return ((x >> pos) % (1ULL << width));
 }
 
 uint64_t deposit_bit(uint64_t x __attribute__((unused)), uint64_t pos __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  if ((val == 1)) {
-    return (x | (1 << pos));
+  if ((val == 1ULL)) {
+    return (x | (1ULL << pos));
   } else {
-    return (x & (!(1 << pos)));
+    return (x & (~(1ULL << pos)));
   }
 }
 
 uint64_t get_nibble(uint64_t x __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  return ((x >> (n * 4)) % 16);
+  return ((x >> (n * 4ULL)) % 16ULL);
 }
 
 uint64_t set_nibble(uint64_t x __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t mask __attribute__((unused)) = (15 << (n * 4));
-  return ((x & (!mask)) | (val << (n * 4)));
+  uint64_t mask __attribute__((unused)) = (15ULL << (n * 4ULL));
+  return ((x & (~mask)) | (val << (n * 4ULL)));
 }
 
 uint64_t swap_nibbles(uint64_t x __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = (x % 16);
-  uint64_t hi __attribute__((unused)) = ((x / 16) % 16);
-  return (((lo * 16) | hi) | (x & (!255)));
+  uint64_t lo __attribute__((unused)) = (x % 16ULL);
+  uint64_t hi __attribute__((unused)) = ((x / 16ULL) % 16ULL);
+  return (((lo * 16ULL) | hi) | (x & (~255ULL)));
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

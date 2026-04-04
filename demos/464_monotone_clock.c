@@ -27,12 +27,12 @@ uint64_t total_skew();
 int main();
 
 MonotoneClock mc_new() {
-  return (MonotoneClock){ .time = 0, .ticks = 0, .corrections = 0, .total_skew = 0 };
+  return (MonotoneClock){ .time = 0ULL, .ticks = 0ULL, .corrections = 0ULL, .total_skew = 0ULL };
 }
 
 void mc_tick(MonotoneClock* c __attribute__((unused))) {
-  (*c).time = ((*c).time + 1);
-  (*c).ticks = ((*c).ticks + 1);
+  (*c).time = ((*c).time + 1ULL);
+  (*c).ticks = ((*c).ticks + 1ULL);
 }
 
 void mc_advance(MonotoneClock* c __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -42,7 +42,7 @@ void mc_advance(MonotoneClock* c __attribute__((unused)), uint64_t n __attribute
 
 void mc_correct_skew(MonotoneClock* c __attribute__((unused)), uint64_t skew __attribute__((unused))) {
   (*c).time = ((*c).time + skew);
-  (*c).corrections = ((*c).corrections + 1);
+  (*c).corrections = ((*c).corrections + 1ULL);
   (*c).total_skew = ((*c).total_skew + skew);
 }
 
@@ -58,27 +58,27 @@ uint64_t five_ticks() {
 
 uint64_t advance_10() {
   MonotoneClock c __attribute__((unused)) = mc_new();
-  mc_advance((&c), 10);
+  mc_advance((&c), 10ULL);
   return c.time;
 }
 
 uint64_t skew_advances() {
   MonotoneClock c __attribute__((unused)) = mc_new();
-  mc_advance((&c), 10);
-  mc_correct_skew((&c), 5);
+  mc_advance((&c), 10ULL);
+  mc_correct_skew((&c), 5ULL);
   return c.time;
 }
 
 uint64_t total_skew() {
   MonotoneClock c __attribute__((unused)) = mc_new();
-  mc_advance((&c), 10);
-  mc_correct_skew((&c), 3);
-  mc_correct_skew((&c), 4);
+  mc_advance((&c), 10ULL);
+  mc_correct_skew((&c), 3ULL);
+  mc_correct_skew((&c), 4ULL);
   return c.total_skew;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

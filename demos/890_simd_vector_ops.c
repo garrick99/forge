@@ -18,33 +18,33 @@ uint64_t vec4_dot(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b
 int main();
 
 void vec4_add(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < 4)) {
+    while ((i < 4ULL)) {
       out.data[i] = (a.data[i] + b.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void vec4_scale(forge_span_u64_t a __attribute__((unused)), uint64_t s __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < 4)) {
+    while ((i < 4ULL)) {
       out.data[i] = (a.data[i] * s);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t vec4_dot(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused))) {
-  return ((((a.data[0] * b.data[0]) + (a.data[1] * b.data[1])) + (a.data[2] * b.data[2])) + (a.data[3] * b.data[3]));
+  return ((((a.data[0ULL] * b.data[0ULL]) + (a.data[1ULL] * b.data[1ULL])) + (a.data[2ULL] * b.data[2ULL])) + (a.data[3ULL] * b.data[3ULL]));
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

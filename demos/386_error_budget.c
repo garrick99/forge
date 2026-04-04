@@ -26,12 +26,12 @@ uint64_t total_preserved(uint64_t total __attribute__((unused)));
 int main();
 
 ErrorBudget eb_new(uint64_t total __attribute__((unused))) {
-  return (ErrorBudget){ .total = total, .burned = 0, .incidents = 0 };
+  return (ErrorBudget){ .total = total, .burned = 0ULL, .incidents = 0ULL };
 }
 
 void eb_burn(ErrorBudget* e __attribute__((unused)), uint64_t amount __attribute__((unused))) {
   (*e).burned = ((*e).burned + amount);
-  (*e).incidents = ((*e).incidents + 1);
+  (*e).incidents = ((*e).incidents + 1ULL);
 }
 
 void eb_restore(ErrorBudget* e __attribute__((unused)), uint64_t amount __attribute__((unused))) {
@@ -39,43 +39,43 @@ void eb_restore(ErrorBudget* e __attribute__((unused)), uint64_t amount __attrib
 }
 
 uint64_t burn_20() {
-  ErrorBudget e __attribute__((unused)) = eb_new(100);
-  eb_burn((&e), 20);
+  ErrorBudget e __attribute__((unused)) = eb_new(100ULL);
+  eb_burn((&e), 20ULL);
   return (e.total - e.burned);
 }
 
 uint64_t three_incidents() {
-  ErrorBudget e __attribute__((unused)) = eb_new(100);
-  eb_burn((&e), 10);
-  eb_burn((&e), 5);
-  eb_burn((&e), 15);
+  ErrorBudget e __attribute__((unused)) = eb_new(100ULL);
+  eb_burn((&e), 10ULL);
+  eb_burn((&e), 5ULL);
+  eb_burn((&e), 15ULL);
   return e.incidents;
 }
 
 uint64_t burn_restore() {
-  ErrorBudget e __attribute__((unused)) = eb_new(100);
-  eb_burn((&e), 30);
-  eb_restore((&e), 10);
+  ErrorBudget e __attribute__((unused)) = eb_new(100ULL);
+  eb_burn((&e), 30ULL);
+  eb_restore((&e), 10ULL);
   return e.burned;
 }
 
 uint64_t restore_no_incident() {
-  ErrorBudget e __attribute__((unused)) = eb_new(100);
-  eb_burn((&e), 30);
-  eb_restore((&e), 10);
+  ErrorBudget e __attribute__((unused)) = eb_new(100ULL);
+  eb_burn((&e), 30ULL);
+  eb_restore((&e), 10ULL);
   return e.incidents;
 }
 
 uint64_t total_preserved(uint64_t total __attribute__((unused))) {
   ErrorBudget e __attribute__((unused)) = eb_new(total);
-  eb_burn((&e), 10);
-  eb_burn((&e), 5);
-  eb_restore((&e), 3);
+  eb_burn((&e), 10ULL);
+  eb_burn((&e), 5ULL);
+  eb_restore((&e), 3ULL);
   return e.total;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

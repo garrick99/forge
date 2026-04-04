@@ -17,12 +17,12 @@ int main();
 
 uint64_t ema_filter(forge_span_u64_t s __attribute__((unused)), uint64_t alpha __attribute__((unused)), uint64_t max_elem __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = s.len;
-  uint64_t acc __attribute__((unused)) = s.data[0];
-  uint64_t k __attribute__((unused)) = 1;
+  uint64_t acc __attribute__((unused)) = s.data[0ULL];
+  uint64_t k __attribute__((unused)) = 1ULL;
   {
     while ((k < n)) {
-      acc = (((alpha * s.data[k]) + ((256 - alpha) * acc)) / 256);
-      k = (k + 1);
+      acc = (((alpha * s.data[k]) + ((256ULL - alpha) * acc)) / 256ULL);
+      k = (k + 1ULL);
     }
 
   }
@@ -30,7 +30,7 @@ uint64_t ema_filter(forge_span_u64_t s __attribute__((unused)), uint64_t alpha _
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

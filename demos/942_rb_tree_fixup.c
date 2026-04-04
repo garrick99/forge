@@ -17,19 +17,19 @@ uint64_t count_black_nodes(forge_span_u64_t color __attribute__((unused)), uint6
 int main();
 
 uint64_t check_rb_violations(forge_span_u64_t color __attribute__((unused)), forge_span_u64_t parent __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t violations __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t violations __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((color.data[i] == 1)) {
+      if ((color.data[i] == 1ULL)) {
         uint64_t p __attribute__((unused)) = parent.data[i];
-        if (((p < n) && (color.data[p] == 1))) {
-          violations = (violations + 1);
+        if (((p < n) && (color.data[p] == 1ULL))) {
+          violations = (violations + 1ULL);
 
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -37,15 +37,15 @@ uint64_t check_rb_violations(forge_span_u64_t color __attribute__((unused)), for
 }
 
 uint64_t count_black_nodes(forge_span_u64_t color __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((color.data[i] == 0)) {
-        cnt = (cnt + 1);
+      if ((color.data[i] == 0ULL)) {
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -53,7 +53,7 @@ uint64_t count_black_nodes(forge_span_u64_t color __attribute__((unused)), uint6
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

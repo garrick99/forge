@@ -16,55 +16,55 @@ void radix_pass(forge_span_u64_t input __attribute__((unused)), uint64_t n __att
 int main();
 
 void radix_pass(forge_span_u64_t input __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t output __attribute__((unused)), forge_span_u64_t counts __attribute__((unused))) {
-  uint64_t c __attribute__((unused)) = 0;
+  uint64_t c __attribute__((unused)) = 0ULL;
   {
-    while ((c < 256)) {
-      counts.data[c] = 0;
-      c = (c + 1);
+    while ((c < 256ULL)) {
+      counts.data[c] = 0ULL;
+      c = (c + 1ULL);
     }
 
   }
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t digit __attribute__((unused)) = (input.data[i] % 256);
-      counts.data[digit] = (counts.data[digit] + 1);
-      i = (i + 1);
+      uint64_t digit __attribute__((unused)) = (input.data[i] % 256ULL);
+      counts.data[digit] = (counts.data[digit] + 1ULL);
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t sum __attribute__((unused)) = 0;
-  uint64_t d __attribute__((unused)) = 0;
+  uint64_t sum __attribute__((unused)) = 0ULL;
+  uint64_t d __attribute__((unused)) = 0ULL;
   {
-    while ((d < 256)) {
+    while ((d < 256ULL)) {
       uint64_t old_count __attribute__((unused)) = counts.data[d];
       counts.data[d] = sum;
       if (((sum + old_count) <= n)) {
         sum = (sum + old_count);
 
       }
-      d = (d + 1);
+      d = (d + 1ULL);
     }
 
   }
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < n)) {
-      uint64_t digit2 __attribute__((unused)) = (input.data[j] % 256);
+      uint64_t digit2 __attribute__((unused)) = (input.data[j] % 256ULL);
       uint64_t pos __attribute__((unused)) = counts.data[digit2];
       if ((pos < n)) {
         output.data[pos] = input.data[j];
-        counts.data[digit2] = (pos + 1);
+        counts.data[digit2] = (pos + 1ULL);
 
       }
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

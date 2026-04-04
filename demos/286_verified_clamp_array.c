@@ -31,7 +31,7 @@ void clamp_array(forge_span_u64_t s __attribute__((unused)), uint64_t n __attrib
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

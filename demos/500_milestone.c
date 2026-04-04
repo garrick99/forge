@@ -32,11 +32,11 @@ uint64_t check_one();
 int main();
 
 _Bool add_commutative(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  return ((a + b) == (b + a));
+  return 1;
 }
 
 _Bool mul_commutative(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  return ((a * b) == (b * a));
+  return 1;
 }
 
 _Bool triangle_inequality(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t c __attribute__((unused))) {
@@ -86,55 +86,55 @@ _Bool div_then_mul_le(uint64_t a __attribute__((unused)), uint64_t b __attribute
 }
 
 uint64_t zero_identity_add(uint64_t a __attribute__((unused))) {
-  return (a + 0);
+  return (a + 0ULL);
 }
 
 uint64_t one_identity_mul(uint64_t a __attribute__((unused))) {
-  return (a * 1);
+  return (a * 1ULL);
 }
 
 _Bool double_half(uint64_t a __attribute__((unused))) {
-  return (((a / 2) * 2) <= a);
+  return (((a / 2ULL) * 2ULL) <= a);
 }
 
 _Bool check_add_comm() {
-  return add_commutative(3, 7);
+  return add_commutative(3ULL, 7ULL);
 }
 
 _Bool check_mul_comm() {
-  return mul_commutative(6, 9);
+  return mul_commutative(6ULL, 9ULL);
 }
 
 _Bool check_max_ge() {
-  return max_ge_both(5, 3);
+  return max_ge_both(5ULL, 3ULL);
 }
 
 _Bool check_min_le() {
-  return min_le_both(5, 3);
+  return min_le_both(5ULL, 3ULL);
 }
 
 _Bool check_clamp() {
-  return clamp_in_range(15, 1, 10);
+  return clamp_in_range(15ULL, 1ULL, 10ULL);
 }
 
 uint64_t check_sub_add() {
-  return sub_then_add(10, 3);
+  return sub_then_add(10ULL, 3ULL);
 }
 
 _Bool check_div_mul() {
-  return div_then_mul_le(10, 3);
+  return div_then_mul_le(10ULL, 3ULL);
 }
 
 uint64_t check_zero() {
-  return zero_identity_add(42);
+  return zero_identity_add(42ULL);
 }
 
 uint64_t check_one() {
-  return one_identity_mul(42);
+  return one_identity_mul(42ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

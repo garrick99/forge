@@ -28,11 +28,11 @@ uint64_t stack_size(const Stack* s __attribute__((unused)));
 int main();
 
 Stack stack_new(forge_span_u64_t buf __attribute__((unused)), uint64_t cap __attribute__((unused))) {
-  return (Stack){ .data = buf, .top = 0, .cap = cap };
+  return (Stack){ .data = buf, .top = 0ULL, .cap = cap };
 }
 
 _Bool stack_is_empty(const Stack* s __attribute__((unused))) {
-  return ((*s).top == 0);
+  return ((*s).top == 0ULL);
 }
 
 _Bool stack_is_full(const Stack* s __attribute__((unused))) {
@@ -41,16 +41,16 @@ _Bool stack_is_full(const Stack* s __attribute__((unused))) {
 
 void stack_push(Stack* s __attribute__((unused)), uint64_t v __attribute__((unused))) {
   (*s).data.data[(*s).top] = v;
-  (*s).top = ((*s).top + 1);
+  (*s).top = ((*s).top + 1ULL);
 }
 
 uint64_t stack_pop(Stack* s __attribute__((unused))) {
-  (*s).top = ((*s).top - 1);
+  (*s).top = ((*s).top - 1ULL);
   return (*s).data.data[(*s).top];
 }
 
 uint64_t stack_peek(const Stack* s __attribute__((unused))) {
-  return (*s).data.data[((*s).top - 1)];
+  return (*s).data.data[((*s).top - 1ULL)];
 }
 
 uint64_t stack_size(const Stack* s __attribute__((unused))) {
@@ -58,7 +58,7 @@ uint64_t stack_size(const Stack* s __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

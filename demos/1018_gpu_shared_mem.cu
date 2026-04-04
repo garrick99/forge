@@ -27,6 +27,12 @@
 /* span<T> typedefs — fat pointers with proven bounds */
 typedef struct { uint64_t* data; uintptr_t len; } forge_span_u64_t;
 
+/* Function pointer typedefs */
+typedef uint64_t (*forge_fn_u64_u64_u64_ret_u64_t)(uint64_t, uint64_t, uint64_t);
+typedef uint64_t (*forge_fn_ptr_u64_u64_ret_u64_t)(uint64_t*, uint64_t);
+typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
+typedef uint64_t (*forge_fn__ret_u64_t)(void);
+
 uint64_t shfl_down_sync(uint64_t val, uint64_t delta, uint64_t width);  /* extern: forge_gpu */
 
 uint64_t shfl_xor_sync(uint64_t val, uint64_t mask, uint64_t width);  /* extern: forge_gpu */
@@ -45,12 +51,6 @@ uint64_t lane_id(void);  /* extern: forge_gpu */
 
 uint64_t warp_id(void);  /* extern: forge_gpu */
 
-/* Function pointer typedefs */
-typedef uint64_t (*forge_fn_u64_u64_u64_ret_u64_t)(uint64_t, uint64_t, uint64_t);
-typedef uint64_t (*forge_fn_ptr_u64_u64_ret_u64_t)(uint64_t*, uint64_t);
-typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
-typedef uint64_t (*forge_fn__ret_u64_t)(void);
-
 /* Forward declarations */
 uint64_t warp_reduce_sum(uint64_t val __attribute__((unused)));
 uint64_t warp_reduce_max(uint64_t val __attribute__((unused)));
@@ -64,37 +64,37 @@ int main();
 
 uint64_t warp_reduce_sum(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
-  v = (v + __shfl_xor_sync(0xffffffff, v, 16, 32));
-  v = (v + __shfl_xor_sync(0xffffffff, v, 8, 32));
-  v = (v + __shfl_xor_sync(0xffffffff, v, 4, 32));
-  v = (v + __shfl_xor_sync(0xffffffff, v, 2, 32));
-  v = (v + __shfl_xor_sync(0xffffffff, v, 1, 32));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 8ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 4ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 2ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 1ULL, 32ULL));
   return v;
 }
 
 uint64_t warp_reduce_max(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
-  uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16, 32);
+  uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 8, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 8ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 4, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 4ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 2, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 2ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 1, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 1ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
@@ -104,27 +104,27 @@ uint64_t warp_reduce_max(uint64_t val __attribute__((unused))) {
 
 uint64_t warp_reduce_min(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
-  uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16, 32);
+  uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 8, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 8ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 4, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 4ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 2, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 2ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 1, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 1ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
@@ -141,7 +141,7 @@ uint64_t grid_stride_step(uint64_t block_dim __attribute__((unused)), uint64_t g
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 
@@ -149,52 +149,52 @@ __global__ void block_reduce_sum(forge_span_u64_t data __attribute__((unused)), 
   __shared__ uint64_t smem[256];
   uint64_t tid __attribute__((unused)) = threadIdx_x;
   uint64_t gid __attribute__((unused)) = ((blockIdx_x * blockDim_x) + threadIdx_x);
-  if (((tid < 256) && (gid < n))) {
+  if (((tid < 256ULL) && (gid < n))) {
     smem[tid] = data.data[gid];
 
   }
   __syncthreads();
-  if ((tid < 128)) {
-    smem[tid] = (smem[tid] + smem[(tid + 128)]);
+  if ((tid < 128ULL)) {
+    smem[tid] = (smem[tid] + smem[(tid + 128ULL)]);
 
   }
   __syncthreads();
-  if ((tid < 64)) {
-    smem[tid] = (smem[tid] + smem[(tid + 64)]);
+  if ((tid < 64ULL)) {
+    smem[tid] = (smem[tid] + smem[(tid + 64ULL)]);
 
   }
   __syncthreads();
-  if ((tid < 32)) {
-    smem[tid] = (smem[tid] + smem[(tid + 32)]);
+  if ((tid < 32ULL)) {
+    smem[tid] = (smem[tid] + smem[(tid + 32ULL)]);
 
   }
   __syncthreads();
-  if ((tid < 16)) {
-    smem[tid] = (smem[tid] + smem[(tid + 16)]);
+  if ((tid < 16ULL)) {
+    smem[tid] = (smem[tid] + smem[(tid + 16ULL)]);
 
   }
   __syncthreads();
-  if ((tid < 8)) {
-    smem[tid] = (smem[tid] + smem[(tid + 8)]);
+  if ((tid < 8ULL)) {
+    smem[tid] = (smem[tid] + smem[(tid + 8ULL)]);
 
   }
   __syncthreads();
-  if ((tid < 4)) {
-    smem[tid] = (smem[tid] + smem[(tid + 4)]);
+  if ((tid < 4ULL)) {
+    smem[tid] = (smem[tid] + smem[(tid + 4ULL)]);
 
   }
   __syncthreads();
-  if ((tid < 2)) {
-    smem[tid] = (smem[tid] + smem[(tid + 2)]);
+  if ((tid < 2ULL)) {
+    smem[tid] = (smem[tid] + smem[(tid + 2ULL)]);
 
   }
   __syncthreads();
-  if ((tid < 1)) {
-    smem[tid] = (smem[tid] + smem[(tid + 1)]);
+  if ((tid < 1ULL)) {
+    smem[tid] = (smem[tid] + smem[(tid + 1ULL)]);
 
   }
-  if (((tid == 0) && (blockIdx_x < block_results.len))) {
-    block_results.data[blockIdx_x] = smem[0];
+  if (((tid == 0ULL) && (blockIdx_x < block_results.len))) {
+    block_results.data[blockIdx_x] = smem[0ULL];
 
   }
 }
@@ -202,35 +202,35 @@ __global__ void block_reduce_sum(forge_span_u64_t data __attribute__((unused)), 
 __global__ void dot_product_block(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
   __shared__ uint64_t smem[256];
   uint64_t tid __attribute__((unused)) = threadIdx_x;
-  if (((tid < 256) && (tid < n))) {
+  if (((tid < 256ULL) && (tid < n))) {
     smem[tid] = (a.data[tid] * b.data[tid]);
 
   }
   __syncthreads();
-  if ((tid < 128)) {
-    smem[tid] = (smem[tid] + smem[(tid + 128)]);
+  if ((tid < 128ULL)) {
+    smem[tid] = (smem[tid] + smem[(tid + 128ULL)]);
 
   }
   __syncthreads();
-  if ((tid < 64)) {
-    smem[tid] = (smem[tid] + smem[(tid + 64)]);
+  if ((tid < 64ULL)) {
+    smem[tid] = (smem[tid] + smem[(tid + 64ULL)]);
 
   }
   __syncthreads();
-  if ((tid < 32)) {
-    smem[tid] = (smem[tid] + smem[(tid + 32)]);
+  if ((tid < 32ULL)) {
+    smem[tid] = (smem[tid] + smem[(tid + 32ULL)]);
 
   }
   __syncthreads();
-  if ((tid < 32)) {
+  if ((tid < 32ULL)) {
     uint64_t val __attribute__((unused)) = smem[tid];
-    val = (val + __shfl_xor_sync(0xffffffff, val, 16, 32));
-    val = (val + __shfl_xor_sync(0xffffffff, val, 8, 32));
-    val = (val + __shfl_xor_sync(0xffffffff, val, 4, 32));
-    val = (val + __shfl_xor_sync(0xffffffff, val, 2, 32));
-    val = (val + __shfl_xor_sync(0xffffffff, val, 1, 32));
-    if (((tid == 0) && (out.len >= 1))) {
-      out.data[0] = val;
+    val = (val + __shfl_xor_sync(0xffffffff, val, 16ULL, 32ULL));
+    val = (val + __shfl_xor_sync(0xffffffff, val, 8ULL, 32ULL));
+    val = (val + __shfl_xor_sync(0xffffffff, val, 4ULL, 32ULL));
+    val = (val + __shfl_xor_sync(0xffffffff, val, 2ULL, 32ULL));
+    val = (val + __shfl_xor_sync(0xffffffff, val, 1ULL, 32ULL));
+    if (((tid == 0ULL) && (out.len >= 1ULL))) {
+      out.data[0ULL] = val;
 
     }
 
@@ -238,7 +238,7 @@ __global__ void dot_product_block(forge_span_u64_t a __attribute__((unused)), fo
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

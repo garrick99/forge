@@ -25,7 +25,7 @@ uint64_t Pair__sum(const Pair* self __attribute__((unused)));
 int main();
 
 uint64_t Point__Hashable__hash(const Point* self __attribute__((unused))) {
-  return (((*self).x * 2654435761) ^ ((*self).y * 2246822519));
+  return (((*self).x * 2654435761ULL) ^ ((*self).y * 2246822519ULL));
 }
 
 uint64_t Pair__sum(const Pair* self __attribute__((unused))) {
@@ -33,9 +33,9 @@ uint64_t Pair__sum(const Pair* self __attribute__((unused))) {
 }
 
 int main() {
-  Point p __attribute__((unused)) = (Point){ .x = 3, .y = 7 };
+  Point p __attribute__((unused)) = (Point){ .x = 3ULL, .y = 7ULL };
   uint64_t h __attribute__((unused)) = Point__Hashable__hash((&p));
-  Pair q __attribute__((unused)) = (Pair){ .a = 10, .b = 32 };
+  Pair q __attribute__((unused)) = (Pair){ .a = 10ULL, .b = 32ULL };
   uint64_t s __attribute__((unused)) = Pair__sum((&q));
   return (int)(s);
 

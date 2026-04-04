@@ -28,48 +28,48 @@ uint64_t process_packet_stream(forge_span_u64_t buf __attribute__((unused)), uin
 int main();
 
 uint64_t get_version(forge_span_u64_t pkt __attribute__((unused)), uint64_t pkt_len __attribute__((unused))) {
-  return ((pkt.data[0] / 16) % 16);
+  return ((pkt.data[0ULL] / 16ULL) % 16ULL);
 }
 
 uint64_t get_ihl(forge_span_u64_t pkt __attribute__((unused)), uint64_t pkt_len __attribute__((unused))) {
-  return (pkt.data[0] % 16);
+  return (pkt.data[0ULL] % 16ULL);
 }
 
 uint64_t get_total_length(forge_span_u64_t pkt __attribute__((unused)), uint64_t pkt_len __attribute__((unused))) {
-  return ((pkt.data[2] * 256) + pkt.data[3]);
+  return ((pkt.data[2ULL] * 256ULL) + pkt.data[3ULL]);
 }
 
 uint64_t get_protocol(forge_span_u64_t pkt __attribute__((unused)), uint64_t pkt_len __attribute__((unused))) {
-  return pkt.data[9];
+  return pkt.data[9ULL];
 }
 
 uint64_t get_src_ip(forge_span_u64_t pkt __attribute__((unused)), uint64_t pkt_len __attribute__((unused))) {
-  return ((((pkt.data[12] * 16777216) + (pkt.data[13] * 65536)) + (pkt.data[14] * 256)) + pkt.data[15]);
+  return ((((pkt.data[12ULL] * 16777216ULL) + (pkt.data[13ULL] * 65536ULL)) + (pkt.data[14ULL] * 256ULL)) + pkt.data[15ULL]);
 }
 
 uint64_t get_dst_ip(forge_span_u64_t pkt __attribute__((unused)), uint64_t pkt_len __attribute__((unused))) {
-  return ((((pkt.data[16] * 16777216) + (pkt.data[17] * 65536)) + (pkt.data[18] * 256)) + pkt.data[19]);
+  return ((((pkt.data[16ULL] * 16777216ULL) + (pkt.data[17ULL] * 65536ULL)) + (pkt.data[18ULL] * 256ULL)) + pkt.data[19ULL]);
 }
 
 uint64_t compute_checksum(forge_span_u64_t pkt __attribute__((unused)), uint64_t header_len __attribute__((unused))) {
-  uint64_t sum __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t sum __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while (((i + 1) < header_len)) {
-      uint64_t word __attribute__((unused)) = ((pkt.data[i] * 256) + pkt.data[(i + 1)]);
+    while (((i + 1ULL) < header_len)) {
+      uint64_t word __attribute__((unused)) = ((pkt.data[i] * 256ULL) + pkt.data[(i + 1ULL)]);
       sum = (sum + word);
-      i = (i + 2);
+      i = (i + 2ULL);
     }
 
   }
   uint64_t folded __attribute__((unused)) = sum;
-  uint64_t folds __attribute__((unused)) = 0;
+  uint64_t folds __attribute__((unused)) = 0ULL;
   {
-    while (((folded > 65535) && (folds < 4))) {
-      uint64_t hi __attribute__((unused)) = (folded / 65536);
-      uint64_t lo __attribute__((unused)) = (folded % 65536);
+    while (((folded > 65535ULL) && (folds < 4ULL))) {
+      uint64_t hi __attribute__((unused)) = (folded / 65536ULL);
+      uint64_t lo __attribute__((unused)) = (folded % 65536ULL);
       folded = (hi + lo);
-      folds = (folds + 1);
+      folds = (folds + 1ULL);
     }
 
   }
@@ -77,26 +77,26 @@ uint64_t compute_checksum(forge_span_u64_t pkt __attribute__((unused)), uint64_t
 }
 
 __forge_tuple_u64_u64_u64_t validate_ipv4(forge_span_u64_t pkt __attribute__((unused)), uint64_t pkt_len __attribute__((unused))) {
-  uint64_t err __attribute__((unused)) = 0;
-  uint64_t pay_off __attribute__((unused)) = 0;
-  uint64_t pay_len __attribute__((unused)) = 0;
-  if ((pkt_len < 20)) {
-    err = 1;
+  uint64_t err __attribute__((unused)) = 0ULL;
+  uint64_t pay_off __attribute__((unused)) = 0ULL;
+  uint64_t pay_len __attribute__((unused)) = 0ULL;
+  if ((pkt_len < 20ULL)) {
+    err = 1ULL;
 
   } else {
     uint64_t version __attribute__((unused)) = get_version(pkt, pkt_len);
     uint64_t ihl __attribute__((unused)) = get_ihl(pkt, pkt_len);
-    uint64_t header_len __attribute__((unused)) = (ihl * 4);
-    if ((version != 4)) {
-      err = 2;
+    uint64_t header_len __attribute__((unused)) = (ihl * 4ULL);
+    if ((version != 4ULL)) {
+      err = 2ULL;
 
-    } else if (((ihl < 5) || (header_len > pkt_len))) {
-      err = 3;
+    } else if (((ihl < 5ULL) || (header_len > pkt_len))) {
+      err = 3ULL;
 
     } else {
       uint64_t total_len __attribute__((unused)) = get_total_length(pkt, pkt_len);
       if (((total_len < header_len) || (total_len > pkt_len))) {
-        err = 4;
+        err = 4ULL;
 
       } else {
         pay_off = header_len;
@@ -111,39 +111,39 @@ __forge_tuple_u64_u64_u64_t validate_ipv4(forge_span_u64_t pkt __attribute__((un
 }
 
 void copy_payload(forge_span_u64_t pkt __attribute__((unused)), uint64_t pkt_len __attribute__((unused)), uint64_t payload_offset __attribute__((unused)), uint64_t payload_length __attribute__((unused)), forge_span_u64_t dst __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < payload_length)) {
       dst.data[i] = pkt.data[(payload_offset + i)];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t process_packet_stream(forge_span_u64_t buf __attribute__((unused)), uint64_t buf_len __attribute__((unused))) {
-  uint64_t offset __attribute__((unused)) = 0;
-  uint64_t valid_count __attribute__((unused)) = 0;
+  uint64_t offset __attribute__((unused)) = 0ULL;
+  uint64_t valid_count __attribute__((unused)) = 0ULL;
   {
-    while (((offset + 2) < buf_len)) {
-      uint64_t pkt_size __attribute__((unused)) = ((buf.data[offset] * 256) + buf.data[(offset + 1)]);
-      uint64_t pkt_start __attribute__((unused)) = (offset + 2);
-      if (((pkt_size == 0) || ((pkt_start + pkt_size) > buf_len))) {
+    while (((offset + 2ULL) < buf_len)) {
+      uint64_t pkt_size __attribute__((unused)) = ((buf.data[offset] * 256ULL) + buf.data[(offset + 1ULL)]);
+      uint64_t pkt_start __attribute__((unused)) = (offset + 2ULL);
+      if (((pkt_size == 0ULL) || ((pkt_start + pkt_size) > buf_len))) {
         offset = buf_len;
 
       } else {
         _Bool is_valid __attribute__((unused)) = 0;
-        if ((pkt_size >= 20)) {
-          uint64_t version __attribute__((unused)) = ((buf.data[pkt_start] / 16) % 16);
-          uint64_t ihl __attribute__((unused)) = (buf.data[pkt_start] % 16);
-          if ((((version == 4) && (ihl >= 5)) && ((ihl * 4) <= pkt_size))) {
+        if ((pkt_size >= 20ULL)) {
+          uint64_t version __attribute__((unused)) = ((buf.data[pkt_start] / 16ULL) % 16ULL);
+          uint64_t ihl __attribute__((unused)) = (buf.data[pkt_start] % 16ULL);
+          if ((((version == 4ULL) && (ihl >= 5ULL)) && ((ihl * 4ULL) <= pkt_size))) {
             is_valid = 1;
 
           }
 
         }
         if (is_valid) {
-          valid_count = (valid_count + 1);
+          valid_count = (valid_count + 1ULL);
 
         }
         offset = (pkt_start + pkt_size);
@@ -156,7 +156,7 @@ uint64_t process_packet_stream(forge_span_u64_t buf __attribute__((unused)), uin
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

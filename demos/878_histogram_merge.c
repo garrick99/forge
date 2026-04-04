@@ -17,23 +17,23 @@ uint64_t histogram_total(forge_span_u64_t bins __attribute__((unused)), uint64_t
 int main();
 
 void merge_histograms(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       out.data[i] = (a.data[i] + b.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t histogram_total(forge_span_u64_t bins __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t total __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t total __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       total = (total + bins.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -41,7 +41,7 @@ uint64_t histogram_total(forge_span_u64_t bins __attribute__((unused)), uint64_t
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

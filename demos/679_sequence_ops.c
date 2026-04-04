@@ -20,18 +20,18 @@ void seq_prefix_copy(forge_span_u64_t src __attribute__((unused)), forge_span_u6
 int main();
 
 void seq_zip_add(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       out.data[i] = (a.data[i] + b.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void seq_zip_max(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((a.data[i] >= b.data[i])) {
@@ -41,34 +41,34 @@ void seq_zip_max(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b 
         out.data[i] = b.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void seq_interleave(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      out.data[(2 * i)] = a.data[i];
-      out.data[((2 * i) + 1)] = b.data[i];
-      i = (i + 1);
+      out.data[(2ULL * i)] = a.data[i];
+      out.data[((2ULL * i) + 1ULL)] = b.data[i];
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t seq_dedup_count(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t cnt __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      if ((s.data[i] != s.data[(i - 1)])) {
-        cnt = (cnt + 1);
+      if ((s.data[i] != s.data[(i - 1ULL)])) {
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -76,18 +76,18 @@ uint64_t seq_dedup_count(forge_span_u64_t s __attribute__((unused)), uint64_t n 
 }
 
 void seq_prefix_copy(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       dst.data[i] = src.data[i];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

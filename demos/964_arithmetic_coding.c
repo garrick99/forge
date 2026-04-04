@@ -31,15 +31,15 @@ __forge_tuple_u64_u64_t arith_encode_step(uint64_t lo __attribute__((unused)), u
 }
 
 __forge_tuple_u64_u64_t arith_encode_seq(forge_span_u64_t symbols __attribute__((unused)), forge_span_u64_t cum_freq __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t alpha __attribute__((unused)), uint64_t total __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
-  uint64_t hi __attribute__((unused)) = 1000000000;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
+  uint64_t hi __attribute__((unused)) = 1000000000ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t s __attribute__((unused)) = symbols.data[i];
       if ((s < alpha)) {
         uint64_t sl __attribute__((unused)) = cum_freq.data[s];
-        uint64_t sh __attribute__((unused)) = cum_freq.data[(s + 1)];
+        uint64_t sh __attribute__((unused)) = cum_freq.data[(s + 1ULL)];
         if ((sl < sh)) {
           if ((sh <= total)) {
             __forge_tuple_u64_u64_t p __attribute__((unused)) = arith_encode_step(lo, hi, sl, sh, total);
@@ -51,7 +51,7 @@ __forge_tuple_u64_u64_t arith_encode_seq(forge_span_u64_t symbols __attribute__(
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -59,7 +59,7 @@ __forge_tuple_u64_u64_t arith_encode_seq(forge_span_u64_t symbols __attribute__(
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -23,7 +23,7 @@ uint64_t safe_add64(uint64_t a __attribute__((unused)), uint64_t b __attribute__
 }
 
 uint64_t scale_to_u32(uint64_t a __attribute__((unused))) {
-  return (a / 1);
+  return (a / 1ULL);
 }
 
 uint64_t forge_double(uint64_t x __attribute__((unused))) {

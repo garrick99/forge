@@ -19,29 +19,29 @@ uint64_t freq_nonzero(forge_span_u64_t freq __attribute__((unused)), uint64_t nb
 int main();
 
 void freq_count(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t freq __attribute__((unused)), uint64_t nbuckets __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nbuckets)) {
-      freq.data[i] = 0;
-      i = (i + 1);
+      freq.data[i] = 0ULL;
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < n)) {
       uint64_t sym __attribute__((unused)) = (data.data[j] % nbuckets);
-      freq.data[sym] = (freq.data[sym] + 1);
-      j = (j + 1);
+      freq.data[sym] = (freq.data[sym] + 1ULL);
+      j = (j + 1ULL);
     }
 
   }
 }
 
 uint64_t freq_max(forge_span_u64_t freq __attribute__((unused)), uint64_t nbuckets __attribute__((unused))) {
-  uint64_t best __attribute__((unused)) = 0;
-  uint64_t best_idx __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t best __attribute__((unused)) = 0ULL;
+  uint64_t best_idx __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nbuckets)) {
       if ((freq.data[i] > best)) {
@@ -49,7 +49,7 @@ uint64_t freq_max(forge_span_u64_t freq __attribute__((unused)), uint64_t nbucke
         best_idx = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -57,12 +57,12 @@ uint64_t freq_max(forge_span_u64_t freq __attribute__((unused)), uint64_t nbucke
 }
 
 uint64_t freq_total(forge_span_u64_t freq __attribute__((unused)), uint64_t nbuckets __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nbuckets)) {
       acc = (acc + freq.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -70,15 +70,15 @@ uint64_t freq_total(forge_span_u64_t freq __attribute__((unused)), uint64_t nbuc
 }
 
 uint64_t freq_nonzero(forge_span_u64_t freq __attribute__((unused)), uint64_t nbuckets __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nbuckets)) {
-      if ((freq.data[i] > 0)) {
-        cnt = (cnt + 1);
+      if ((freq.data[i] > 0ULL)) {
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -86,7 +86,7 @@ uint64_t freq_nonzero(forge_span_u64_t freq __attribute__((unused)), uint64_t nb
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

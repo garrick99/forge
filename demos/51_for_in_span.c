@@ -21,7 +21,7 @@ _Bool span_all_le(forge_span_u64_t s __attribute__((unused)), uint64_t bound __a
 uint64_t run();
 
 uint64_t span_sum(forge_span_u64_t s __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
   {
     { forge_span_u64_t __span_x = s;
       for (uint64_t __i_x = 0; __i_x < __span_x.len; __i_x++) {
@@ -35,13 +35,13 @@ uint64_t span_sum(forge_span_u64_t s __attribute__((unused))) {
 }
 
 uint64_t span_count_above(forge_span_u64_t s __attribute__((unused)), uint64_t threshold __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
   {
     { forge_span_u64_t __span_x = s;
       for (uint64_t __i_x = 0; __i_x < __span_x.len; __i_x++) {
         uint64_t x __attribute__((unused)) = __span_x.data[__i_x];
         if ((x > threshold)) {
-          count = (count + 1);
+          count = (count + 1ULL);
         }
       }
     }
@@ -67,7 +67,7 @@ _Bool span_contains(forge_span_u64_t s __attribute__((unused)), uint64_t target 
 }
 
 uint64_t span_or_all(forge_span_u64_t s __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
   {
     { forge_span_u64_t __span_x = s;
       for (uint64_t __i_x = 0; __i_x < __span_x.len; __i_x++) {
@@ -81,7 +81,7 @@ uint64_t span_or_all(forge_span_u64_t s __attribute__((unused))) {
 }
 
 uint64_t span_and_all(forge_span_u64_t s __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = -1;
+  uint64_t acc __attribute__((unused)) = 0xffffffffffffffffULL;
   {
     { forge_span_u64_t __span_x = s;
       for (uint64_t __i_x = 0; __i_x < __span_x.len; __i_x++) {
@@ -111,6 +111,6 @@ _Bool span_all_le(forge_span_u64_t s __attribute__((unused)), uint64_t bound __a
 }
 
 uint64_t run() {
-  return 0;
+  return 0ULL;
 }
 

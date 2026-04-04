@@ -27,22 +27,22 @@ uint64_t delete_count();
 int main();
 
 AuditLog al_new() {
-  return (AuditLog){ .seq = 0, .reads = 0, .writes = 0, .deletes = 0 };
+  return (AuditLog){ .seq = 0ULL, .reads = 0ULL, .writes = 0ULL, .deletes = 0ULL };
 }
 
 void al_log_read(AuditLog* a __attribute__((unused))) {
-  (*a).seq = ((*a).seq + 1);
-  (*a).reads = ((*a).reads + 1);
+  (*a).seq = ((*a).seq + 1ULL);
+  (*a).reads = ((*a).reads + 1ULL);
 }
 
 void al_log_write(AuditLog* a __attribute__((unused))) {
-  (*a).seq = ((*a).seq + 1);
-  (*a).writes = ((*a).writes + 1);
+  (*a).seq = ((*a).seq + 1ULL);
+  (*a).writes = ((*a).writes + 1ULL);
 }
 
 void al_log_delete(AuditLog* a __attribute__((unused))) {
-  (*a).seq = ((*a).seq + 1);
-  (*a).deletes = ((*a).deletes + 1);
+  (*a).seq = ((*a).seq + 1ULL);
+  (*a).deletes = ((*a).deletes + 1ULL);
 }
 
 uint64_t seq_advances() {
@@ -84,7 +84,7 @@ uint64_t delete_count() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

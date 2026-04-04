@@ -29,25 +29,25 @@ uint64_t write_writeback_counts();
 int main();
 
 VNode vnode_new() {
-  return (VNode){ .refcount = 0, .dirty = 0, .writes = 0, .writebacks = 0 };
+  return (VNode){ .refcount = 0ULL, .dirty = 0ULL, .writes = 0ULL, .writebacks = 0ULL };
 }
 
 void vnode_get(VNode* v __attribute__((unused))) {
-  (*v).refcount = ((*v).refcount + 1);
+  (*v).refcount = ((*v).refcount + 1ULL);
 }
 
 void vnode_put(VNode* v __attribute__((unused))) {
-  (*v).refcount = ((*v).refcount - 1);
+  (*v).refcount = ((*v).refcount - 1ULL);
 }
 
 void vnode_write(VNode* v __attribute__((unused))) {
-  (*v).dirty = 1;
-  (*v).writes = ((*v).writes + 1);
+  (*v).dirty = 1ULL;
+  (*v).writes = ((*v).writes + 1ULL);
 }
 
 void vnode_writeback(VNode* v __attribute__((unused))) {
-  (*v).dirty = 0;
-  (*v).writebacks = ((*v).writebacks + 1);
+  (*v).dirty = 0ULL;
+  (*v).writebacks = ((*v).writebacks + 1ULL);
 }
 
 uint64_t get_three() {
@@ -94,7 +94,7 @@ uint64_t write_writeback_counts() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

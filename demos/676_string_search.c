@@ -20,14 +20,14 @@ int main();
 
 _Bool str_match_at(forge_span_u64_t text __attribute__((unused)), uint64_t tlen __attribute__((unused)), forge_span_u64_t pat __attribute__((unused)), uint64_t plen __attribute__((unused)), uint64_t pos __attribute__((unused))) {
   _Bool ok __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while (((i < plen) && ok)) {
       if ((text.data[(pos + i)] != pat.data[i])) {
         ok = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -35,9 +35,9 @@ _Bool str_match_at(forge_span_u64_t text __attribute__((unused)), uint64_t tlen 
 }
 
 uint64_t str_find_first(forge_span_u64_t text __attribute__((unused)), uint64_t tlen __attribute__((unused)), forge_span_u64_t pat __attribute__((unused)), uint64_t plen __attribute__((unused))) {
-  uint64_t limit __attribute__((unused)) = ((tlen - plen) + 1);
+  uint64_t limit __attribute__((unused)) = ((tlen - plen) + 1ULL);
   uint64_t found __attribute__((unused)) = tlen;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   _Bool done __attribute__((unused)) = 0;
   {
     while (((i < limit) && (!done))) {
@@ -47,7 +47,7 @@ uint64_t str_find_first(forge_span_u64_t text __attribute__((unused)), uint64_t 
         done = 1;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -55,17 +55,17 @@ uint64_t str_find_first(forge_span_u64_t text __attribute__((unused)), uint64_t 
 }
 
 uint64_t str_count(forge_span_u64_t text __attribute__((unused)), uint64_t tlen __attribute__((unused)), forge_span_u64_t pat __attribute__((unused)), uint64_t plen __attribute__((unused))) {
-  uint64_t limit __attribute__((unused)) = ((tlen - plen) + 1);
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t limit __attribute__((unused)) = ((tlen - plen) + 1ULL);
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < limit)) {
       _Bool ok __attribute__((unused)) = str_match_at(text, tlen, pat, plen, i);
       if (ok) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -74,14 +74,14 @@ uint64_t str_count(forge_span_u64_t text __attribute__((unused)), uint64_t tlen 
 
 _Bool str_eq(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
   _Bool ok __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while (((i < n) && ok)) {
       if ((a.data[i] != b.data[i])) {
         ok = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -89,7 +89,7 @@ _Bool str_eq(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __at
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

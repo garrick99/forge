@@ -28,8 +28,8 @@ uint64_t probe_index(uint64_t start __attribute__((unused)), uint64_t step __att
 
 uint64_t ht_lookup(forge_span_u64_t keys __attribute__((unused)), forge_span_u64_t vals __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t key __attribute__((unused))) {
   uint64_t start __attribute__((unused)) = hash_key(key, cap);
-  uint64_t step __attribute__((unused)) = 0;
-  uint64_t found_val __attribute__((unused)) = 0;
+  uint64_t step __attribute__((unused)) = 0ULL;
+  uint64_t found_val __attribute__((unused)) = 0ULL;
   {
     while ((step < cap)) {
       uint64_t idx __attribute__((unused)) = probe_index(start, step, cap);
@@ -38,11 +38,11 @@ uint64_t ht_lookup(forge_span_u64_t keys __attribute__((unused)), forge_span_u64
         found_val = vals.data[idx];
         step = cap;
 
-      } else if ((k == 0)) {
+      } else if ((k == 0ULL)) {
         step = cap;
 
       } else {
-        step = (step + 1);
+        step = (step + 1ULL);
 
       }
     }
@@ -53,20 +53,20 @@ uint64_t ht_lookup(forge_span_u64_t keys __attribute__((unused)), forge_span_u64
 
 _Bool ht_insert(forge_span_u64_t keys __attribute__((unused)), forge_span_u64_t vals __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t key __attribute__((unused)), uint64_t val __attribute__((unused))) {
   uint64_t start __attribute__((unused)) = hash_key(key, cap);
-  uint64_t step __attribute__((unused)) = 0;
+  uint64_t step __attribute__((unused)) = 0ULL;
   _Bool inserted __attribute__((unused)) = 0;
   {
     while ((step < cap)) {
       uint64_t idx __attribute__((unused)) = probe_index(start, step, cap);
       uint64_t k __attribute__((unused)) = keys.data[idx];
-      if (((k == 0) || (k == key))) {
+      if (((k == 0ULL) || (k == key))) {
         keys.data[idx] = key;
         vals.data[idx] = val;
         inserted = 1;
         step = cap;
 
       } else {
-        step = (step + 1);
+        step = (step + 1ULL);
 
       }
     }
@@ -76,7 +76,7 @@ _Bool ht_insert(forge_span_u64_t keys __attribute__((unused)), forge_span_u64_t 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

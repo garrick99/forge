@@ -18,12 +18,12 @@ uint64_t window_count(uint64_t n __attribute__((unused)), uint64_t k __attribute
 int main();
 
 uint64_t sliding_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t k __attribute__((unused))) {
-  uint64_t window __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t window __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < k)) {
       window = (window + s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -31,35 +31,35 @@ uint64_t sliding_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 }
 
 void sliding_sum_all(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t k __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t window __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t window __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < k)) {
       window = (window + s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
-  out.data[0] = window;
-  uint64_t pos __attribute__((unused)) = 1;
+  out.data[0ULL] = window;
+  uint64_t pos __attribute__((unused)) = 1ULL;
   uint64_t right __attribute__((unused)) = k;
   {
     while ((right < n)) {
       window = ((window + s.data[right]) - s.data[(right - k)]);
       out.data[pos] = window;
-      pos = (pos + 1);
-      right = (right + 1);
+      pos = (pos + 1ULL);
+      right = (right + 1ULL);
     }
 
   }
 }
 
 uint64_t window_count(uint64_t n __attribute__((unused)), uint64_t k __attribute__((unused))) {
-  return ((n - k) + 1);
+  return ((n - k) + 1ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

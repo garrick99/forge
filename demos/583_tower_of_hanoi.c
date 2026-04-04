@@ -17,49 +17,49 @@ uint64_t check_hanoi_3();
 int main();
 
 uint64_t hanoi_moves(uint64_t n __attribute__((unused))) {
-  uint64_t total __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t total __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      total = (total * 2);
-      i = (i + 1);
+      total = (total * 2ULL);
+      i = (i + 1ULL);
     }
 
   }
-  if ((total > 0)) {
-    return (total - 1);
+  if ((total > 0ULL)) {
+    return (total - 1ULL);
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t hanoi_moves_pos(uint64_t n __attribute__((unused))) {
-  uint64_t total __attribute__((unused)) = 2;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t total __attribute__((unused)) = 2ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      total = (total * 2);
-      i = (i + 1);
+      total = (total * 2ULL);
+      i = (i + 1ULL);
     }
 
   }
-  return (total - 1);
+  return (total - 1ULL);
 }
 
 uint64_t check_hanoi_1() {
-  return hanoi_moves_pos(1);
+  return hanoi_moves_pos(1ULL);
 }
 
 uint64_t check_hanoi_2() {
-  return hanoi_moves_pos(2);
+  return hanoi_moves_pos(2ULL);
 }
 
 uint64_t check_hanoi_3() {
-  return hanoi_moves_pos(3);
+  return hanoi_moves_pos(3ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

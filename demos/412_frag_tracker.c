@@ -28,31 +28,31 @@ uint64_t total_blocks(uint64_t init __attribute__((unused)));
 int main();
 
 FragTracker ft_new(uint64_t free_fragments __attribute__((unused))) {
-  return (FragTracker){ .alloc_blocks = 0, .free_fragments = free_fragments, .splits = 0, .merges = 0 };
+  return (FragTracker){ .alloc_blocks = 0ULL, .free_fragments = free_fragments, .splits = 0ULL, .merges = 0ULL };
 }
 
 void ft_alloc(FragTracker* f __attribute__((unused))) {
-  (*f).alloc_blocks = ((*f).alloc_blocks + 1);
-  (*f).free_fragments = ((*f).free_fragments - 1);
+  (*f).alloc_blocks = ((*f).alloc_blocks + 1ULL);
+  (*f).free_fragments = ((*f).free_fragments - 1ULL);
 }
 
 void ft_free(FragTracker* f __attribute__((unused))) {
-  (*f).free_fragments = ((*f).free_fragments + 1);
-  (*f).alloc_blocks = ((*f).alloc_blocks - 1);
+  (*f).free_fragments = ((*f).free_fragments + 1ULL);
+  (*f).alloc_blocks = ((*f).alloc_blocks - 1ULL);
 }
 
 void ft_split(FragTracker* f __attribute__((unused))) {
-  (*f).free_fragments = ((*f).free_fragments + 1);
-  (*f).splits = ((*f).splits + 1);
+  (*f).free_fragments = ((*f).free_fragments + 1ULL);
+  (*f).splits = ((*f).splits + 1ULL);
 }
 
 void ft_merge(FragTracker* f __attribute__((unused))) {
-  (*f).free_fragments = ((*f).free_fragments - 1);
-  (*f).merges = ((*f).merges + 1);
+  (*f).free_fragments = ((*f).free_fragments - 1ULL);
+  (*f).merges = ((*f).merges + 1ULL);
 }
 
 uint64_t alloc_three_free() {
-  FragTracker f __attribute__((unused)) = ft_new(5);
+  FragTracker f __attribute__((unused)) = ft_new(5ULL);
   ft_alloc((&f));
   ft_alloc((&f));
   ft_alloc((&f));
@@ -60,14 +60,14 @@ uint64_t alloc_three_free() {
 }
 
 uint64_t two_splits() {
-  FragTracker f __attribute__((unused)) = ft_new(5);
+  FragTracker f __attribute__((unused)) = ft_new(5ULL);
   ft_split((&f));
   ft_split((&f));
   return f.free_fragments;
 }
 
 uint64_t split_merge_net() {
-  FragTracker f __attribute__((unused)) = ft_new(5);
+  FragTracker f __attribute__((unused)) = ft_new(5ULL);
   ft_split((&f));
   ft_merge((&f));
   return f.free_fragments;
@@ -83,7 +83,7 @@ uint64_t total_blocks(uint64_t init __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

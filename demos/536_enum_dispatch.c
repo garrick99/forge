@@ -118,19 +118,19 @@ uint64_t binop_max(uint64_t a __attribute__((unused)), uint64_t b __attribute__(
 }
 
 uint64_t check_add() {
-  return binop_add(3, 4);
+  return binop_add(3ULL, 4ULL);
 }
 
 uint64_t check_sub() {
-  return binop_sub(5, 3);
+  return binop_sub(5ULL, 3ULL);
 }
 
 uint64_t check_min() {
-  return binop_min(3, 7);
+  return binop_min(3ULL, 7ULL);
 }
 
 uint64_t check_max() {
-  return binop_max(3, 7);
+  return binop_max(3ULL, 7ULL);
 }
 
 _Bool check_sym_add() {
@@ -142,7 +142,7 @@ _Bool check_sym_sub() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

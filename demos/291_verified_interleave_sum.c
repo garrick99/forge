@@ -17,15 +17,15 @@ uint64_t sum_odd(forge_span_u64_t s __attribute__((unused)), uint64_t n __attrib
 int main();
 
 uint64_t sum_even(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if (((i % 2) == 0)) {
+      if (((i % 2ULL) == 0ULL)) {
         acc = (acc + s.data[i]);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -33,15 +33,15 @@ uint64_t sum_even(forge_span_u64_t s __attribute__((unused)), uint64_t n __attri
 }
 
 uint64_t sum_odd(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if (((i % 2) == 1)) {
+      if (((i % 2ULL) == 1ULL)) {
         acc = (acc + s.data[i]);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -49,7 +49,7 @@ uint64_t sum_odd(forge_span_u64_t s __attribute__((unused)), uint64_t n __attrib
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -19,15 +19,15 @@ BoundedCounter increment(BoundedCounter c __attribute__((unused)));
 int main();
 
 BoundedCounter make_counter(uint64_t limit __attribute__((unused))) {
-  return (BoundedCounter){ .count = 0, .max = limit };
+  return (BoundedCounter){ .count = 0ULL, .max = limit };
 }
 
 BoundedCounter increment(BoundedCounter c __attribute__((unused))) {
-  return (BoundedCounter){ .count = (c.count + 1), .max = c.max };
+  return (BoundedCounter){ .count = (c.count + 1ULL), .max = c.max };
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

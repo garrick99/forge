@@ -20,15 +20,15 @@ uint64_t check_count_digits_single();
 int main();
 
 uint64_t digit_sum(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return 0;
+  if ((n == 0ULL)) {
+    return 0ULL;
   } else {
     uint64_t v __attribute__((unused)) = n;
-    uint64_t s __attribute__((unused)) = 0;
+    uint64_t s __attribute__((unused)) = 0ULL;
     {
-      while ((v > 0)) {
-        s = (s + (v % 10));
-        v = (v / 10);
+      while ((v > 0ULL)) {
+        s = (s + (v % 10ULL));
+        v = (v / 10ULL);
       }
 
     }
@@ -37,12 +37,12 @@ uint64_t digit_sum(uint64_t n __attribute__((unused))) {
 }
 
 uint64_t count_digits(uint64_t n __attribute__((unused))) {
-  uint64_t v __attribute__((unused)) = (n / 10);
-  uint64_t d __attribute__((unused)) = 1;
+  uint64_t v __attribute__((unused)) = (n / 10ULL);
+  uint64_t d __attribute__((unused)) = 1ULL;
   {
-    while ((v > 0)) {
-      d = (d + 1);
-      v = (v / 10);
+    while ((v > 0ULL)) {
+      d = (d + 1ULL);
+      v = (v / 10ULL);
     }
 
   }
@@ -51,11 +51,11 @@ uint64_t count_digits(uint64_t n __attribute__((unused))) {
 
 uint64_t reverse_digits(uint64_t n __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = n;
-  uint64_t r __attribute__((unused)) = 0;
+  uint64_t r __attribute__((unused)) = 0ULL;
   {
-    while ((v > 0)) {
-      r = ((r * 10) + (v % 10));
-      v = (v / 10);
+    while ((v > 0ULL)) {
+      r = ((r * 10ULL) + (v % 10ULL));
+      v = (v / 10ULL);
     }
 
   }
@@ -63,27 +63,27 @@ uint64_t reverse_digits(uint64_t n __attribute__((unused))) {
 }
 
 uint64_t last_digit(uint64_t n __attribute__((unused))) {
-  return (n % 10);
+  return (n % 10ULL);
 }
 
 uint64_t remove_last_digit(uint64_t n __attribute__((unused))) {
-  return (n / 10);
+  return (n / 10ULL);
 }
 
 uint64_t check_digit_sum_0() {
-  return digit_sum(0);
+  return digit_sum(0ULL);
 }
 
 uint64_t check_last_digit() {
-  return last_digit(12347);
+  return last_digit(12347ULL);
 }
 
 uint64_t check_count_digits_single() {
-  return count_digits(0);
+  return count_digits(0ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

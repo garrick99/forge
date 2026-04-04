@@ -19,18 +19,18 @@ uint64_t fib_sum(uint64_t n __attribute__((unused)));
 int main();
 
 uint64_t fib(uint64_t n __attribute__((unused))) {
-  if ((n <= 1)) {
+  if ((n <= 1ULL)) {
     return n;
   } else {
-    uint64_t a __attribute__((unused)) = 0;
-    uint64_t b __attribute__((unused)) = 1;
-    uint64_t i __attribute__((unused)) = 2;
+    uint64_t a __attribute__((unused)) = 0ULL;
+    uint64_t b __attribute__((unused)) = 1ULL;
+    uint64_t i __attribute__((unused)) = 2ULL;
     {
       while ((i <= n)) {
         uint64_t c __attribute__((unused)) = (a + b);
         a = b;
         b = c;
-        i = (i + 1);
+        i = (i + 1ULL);
       }
 
     }
@@ -39,39 +39,39 @@ uint64_t fib(uint64_t n __attribute__((unused))) {
 }
 
 void fib_array(forge_span_u64_t out __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  out.data[0] = 0;
-  out.data[1] = 1;
-  uint64_t i __attribute__((unused)) = 2;
+  out.data[0ULL] = 0ULL;
+  out.data[1ULL] = 1ULL;
+  uint64_t i __attribute__((unused)) = 2ULL;
   {
     while ((i < n)) {
-      out.data[i] = (out.data[(i - 1)] + out.data[(i - 2)]);
-      i = (i + 1);
+      out.data[i] = (out.data[(i - 1ULL)] + out.data[(i - 2ULL)]);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t tribonacci(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return 0;
+  if ((n == 0ULL)) {
+    return 0ULL;
   } else {
-    if ((n == 1)) {
-      return 0;
+    if ((n == 1ULL)) {
+      return 0ULL;
     } else {
-      if ((n == 2)) {
-        return 1;
+      if ((n == 2ULL)) {
+        return 1ULL;
       } else {
-        uint64_t a __attribute__((unused)) = 0;
-        uint64_t b __attribute__((unused)) = 0;
-        uint64_t c __attribute__((unused)) = 1;
-        uint64_t i __attribute__((unused)) = 3;
+        uint64_t a __attribute__((unused)) = 0ULL;
+        uint64_t b __attribute__((unused)) = 0ULL;
+        uint64_t c __attribute__((unused)) = 1ULL;
+        uint64_t i __attribute__((unused)) = 3ULL;
         {
           while ((i <= n)) {
             uint64_t d __attribute__((unused)) = ((a + b) + c);
             a = b;
             b = c;
             c = d;
-            i = (i + 1);
+            i = (i + 1ULL);
           }
 
         }
@@ -82,17 +82,17 @@ uint64_t tribonacci(uint64_t n __attribute__((unused))) {
 }
 
 uint64_t fib_sum(uint64_t n __attribute__((unused))) {
-  uint64_t a __attribute__((unused)) = 0;
-  uint64_t b __attribute__((unused)) = 1;
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t a __attribute__((unused)) = 0ULL;
+  uint64_t b __attribute__((unused)) = 1ULL;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i <= n)) {
       acc = (acc + a);
       uint64_t c __attribute__((unused)) = (a + b);
       a = b;
       b = c;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -100,7 +100,7 @@ uint64_t fib_sum(uint64_t n __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

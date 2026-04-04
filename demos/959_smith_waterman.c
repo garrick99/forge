@@ -16,32 +16,32 @@ uint64_t sw_row(forge_span_u64_t prev __attribute__((unused)), forge_span_u64_t 
 int main();
 
 uint64_t sw_row(forge_span_u64_t prev __attribute__((unused)), forge_span_u64_t curr __attribute__((unused)), uint64_t seq_a __attribute__((unused)), forge_span_u64_t seq_b __attribute__((unused)), uint64_t m __attribute__((unused)), uint64_t match_sc __attribute__((unused)), uint64_t gap __attribute__((unused))) {
-  uint64_t best_j __attribute__((unused)) = 0;
-  uint64_t best_v __attribute__((unused)) = 0;
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t best_j __attribute__((unused)) = 0ULL;
+  uint64_t best_v __attribute__((unused)) = 0ULL;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < m)) {
       uint64_t diag;
-      if ((j > 0)) {
-        diag = prev.data[(j - 1)];
+      if ((j > 0ULL)) {
+        diag = prev.data[(j - 1ULL)];
       } else {
-        diag = 0;
+        diag = 0ULL;
       }
       uint64_t bonus;
       if ((seq_a == seq_b.data[j])) {
         bonus = match_sc;
       } else {
-        bonus = 0;
+        bonus = 0ULL;
       }
       uint64_t from_diag __attribute__((unused)) = (diag + bonus);
       uint64_t from_up __attribute__((unused)) = prev.data[j];
       uint64_t from_left;
-      if ((j > 0)) {
-        from_left = curr.data[(j - 1)];
+      if ((j > 0ULL)) {
+        from_left = curr.data[(j - 1ULL)];
       } else {
-        from_left = 0;
+        from_left = 0ULL;
       }
-      uint64_t v __attribute__((unused)) = 0;
+      uint64_t v __attribute__((unused)) = 0ULL;
       if ((from_diag > v)) {
         v = from_diag;
 
@@ -60,7 +60,7 @@ uint64_t sw_row(forge_span_u64_t prev __attribute__((unused)), forge_span_u64_t 
         best_j = j;
 
       }
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
@@ -68,7 +68,7 @@ uint64_t sw_row(forge_span_u64_t prev __attribute__((unused)), forge_span_u64_t 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

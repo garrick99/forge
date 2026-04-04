@@ -30,7 +30,7 @@ void transpose(forge_span_u64_t A __attribute__((unused)), forge_span_u64_t out 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

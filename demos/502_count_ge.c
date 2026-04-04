@@ -19,15 +19,15 @@ uint64_t count_in_range(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 int main();
 
 uint64_t count_ge(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t threshold __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
-  uint64_t cnt __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((s.data[i] >= threshold)) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -35,15 +35,15 @@ uint64_t count_ge(forge_span_u64_t s __attribute__((unused)), uint64_t n __attri
 }
 
 uint64_t count_lt(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t threshold __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
-  uint64_t cnt __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((s.data[i] < threshold)) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -51,15 +51,15 @@ uint64_t count_lt(forge_span_u64_t s __attribute__((unused)), uint64_t n __attri
 }
 
 uint64_t count_eq(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
-  uint64_t cnt __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((s.data[i] == val)) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -67,15 +67,15 @@ uint64_t count_eq(forge_span_u64_t s __attribute__((unused)), uint64_t n __attri
 }
 
 uint64_t count_in_range(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
-  uint64_t cnt __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if (((s.data[i] >= lo) && (s.data[i] <= hi))) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -83,7 +83,7 @@ uint64_t count_in_range(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

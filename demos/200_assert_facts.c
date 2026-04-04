@@ -18,7 +18,7 @@ uint64_t bounded_add(uint64_t a __attribute__((unused)), uint64_t b __attribute_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

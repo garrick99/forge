@@ -17,15 +17,15 @@ int main();
 
 void bubble_sort(forge_span_u64_t s __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = s.len;
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while ((k < n)) {
-      uint64_t bound __attribute__((unused)) = ((n - k) - 1);
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t bound __attribute__((unused)) = ((n - k) - 1ULL);
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < bound)) {
           uint64_t a __attribute__((unused)) = s.data[j];
-          uint64_t b __attribute__((unused)) = s.data[(j + 1)];
+          uint64_t b __attribute__((unused)) = s.data[(j + 1ULL)];
           uint64_t lo_val;
           if ((a <= b)) {
             lo_val = a;
@@ -39,19 +39,19 @@ void bubble_sort(forge_span_u64_t s __attribute__((unused))) {
             hi_val = a;
           }
           s.data[j] = lo_val;
-          s.data[(j + 1)] = hi_val;
-          j = (j + 1);
+          s.data[(j + 1ULL)] = hi_val;
+          j = (j + 1ULL);
         }
 
       }
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

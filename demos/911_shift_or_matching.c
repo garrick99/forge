@@ -16,19 +16,19 @@ uint64_t shift_or(forge_span_u64_t text __attribute__((unused)), uint64_t n __at
 int main();
 
 uint64_t shift_or(forge_span_u64_t text __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t pat_mask __attribute__((unused)), uint64_t pat_len __attribute__((unused))) {
-  uint64_t state __attribute__((unused)) = 0;
-  uint64_t accept __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t state __attribute__((unused)) = 0ULL;
+  uint64_t accept __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   uint64_t found __attribute__((unused)) = n;
   {
     while ((i < n)) {
-      uint64_t ch __attribute__((unused)) = (text.data[i] & 255);
-      state = (((state * 2) + 1) & pat_mask.data[ch]);
+      uint64_t ch __attribute__((unused)) = (text.data[i] & 255ULL);
+      state = (((state * 2ULL) + 1ULL) & pat_mask.data[ch]);
       if (((state >= accept) && (found == n))) {
         found = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -36,7 +36,7 @@ uint64_t shift_or(forge_span_u64_t text __attribute__((unused)), uint64_t n __at
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

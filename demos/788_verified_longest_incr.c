@@ -16,30 +16,30 @@ uint64_t lis_length(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 int main();
 
 uint64_t lis_length(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t dp __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      dp.data[i] = 1;
-      i = (i + 1);
+      dp.data[i] = 1ULL;
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t best __attribute__((unused)) = 1;
-  uint64_t i2 __attribute__((unused)) = 1;
+  uint64_t best __attribute__((unused)) = 1ULL;
+  uint64_t i2 __attribute__((unused)) = 1ULL;
   {
     while ((i2 < n)) {
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < i2)) {
           if ((s.data[j] < s.data[i2])) {
-            uint64_t candidate __attribute__((unused)) = (dp.data[j] + 1);
+            uint64_t candidate __attribute__((unused)) = (dp.data[j] + 1ULL);
             if ((candidate > dp.data[i2])) {
               dp.data[i2] = candidate;
 
             }
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
@@ -47,7 +47,7 @@ uint64_t lis_length(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
         best = dp.data[i2];
 
       }
-      i2 = (i2 + 1);
+      i2 = (i2 + 1ULL);
     }
 
   }
@@ -55,7 +55,7 @@ uint64_t lis_length(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -16,24 +16,24 @@ uint64_t dedup_packets(forge_span_u64_t seqs __attribute__((unused)), forge_span
 int main();
 
 uint64_t dedup_packets(forge_span_u64_t seqs __attribute__((unused)), forge_span_u64_t seen __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t max_seq __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t seq __attribute__((unused)) = seqs.data[i];
       if ((seq < max_seq)) {
-        if ((seen.data[seq] == 0)) {
-          seen.data[seq] = 1;
+        if ((seen.data[seq] == 0ULL)) {
+          seen.data[seq] = 1ULL;
           if ((count < n)) {
             out.data[count] = seq;
 
           }
-          count = (count + 1);
+          count = (count + 1ULL);
 
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -41,7 +41,7 @@ uint64_t dedup_packets(forge_span_u64_t seqs __attribute__((unused)), forge_span
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -16,21 +16,21 @@ uint64_t cache_sim(forge_span_u64_t accesses __attribute__((unused)), uint64_t n
 int main();
 
 uint64_t cache_sim(forge_span_u64_t accesses __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t cache __attribute__((unused)), uint64_t nlines __attribute__((unused))) {
-  uint64_t hits __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t hits __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t addr __attribute__((unused)) = accesses.data[i];
       uint64_t line __attribute__((unused)) = (addr % nlines);
       uint64_t tag __attribute__((unused)) = (addr / nlines);
-      if ((cache.data[line] == (tag + 1))) {
-        hits = (hits + 1);
+      if ((cache.data[line] == (tag + 1ULL))) {
+        hits = (hits + 1ULL);
 
       } else {
-        cache.data[line] = (tag + 1);
+        cache.data[line] = (tag + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -38,7 +38,7 @@ uint64_t cache_sim(forge_span_u64_t accesses __attribute__((unused)), uint64_t n
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

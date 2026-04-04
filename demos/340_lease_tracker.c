@@ -25,15 +25,15 @@ uint64_t fully_released();
 int main();
 
 Lease lease_new() {
-  return (Lease){ .acquired = 0, .released = 0 };
+  return (Lease){ .acquired = 0ULL, .released = 0ULL };
 }
 
 void lease_acquire(Lease* l __attribute__((unused))) {
-  (*l).acquired = ((*l).acquired + 1);
+  (*l).acquired = ((*l).acquired + 1ULL);
 }
 
 void lease_release(Lease* l __attribute__((unused))) {
-  (*l).released = ((*l).released + 1);
+  (*l).released = ((*l).released + 1ULL);
 }
 
 uint64_t one_acquire() {
@@ -77,7 +77,7 @@ uint64_t fully_released() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

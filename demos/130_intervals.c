@@ -38,9 +38,9 @@ uint64_t ivl_width(Ivl i __attribute__((unused))) {
 
 uint64_t ivl_contains(Ivl i __attribute__((unused)), uint64_t x __attribute__((unused))) {
   if (((x >= i.lo) && (x <= i.hi))) {
-    return 1;
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
@@ -113,27 +113,27 @@ Ivl ivl_intersect(Ivl a __attribute__((unused)), Ivl b __attribute__((unused))) 
 }
 
 int main() {
-  Ivl i1 __attribute__((unused)) = ivl_new(2, 8);
-  Ivl i2 __attribute__((unused)) = ivl_new(5, 12);
-  Ivl i3 __attribute__((unused)) = ivl_new(0, 10);
+  Ivl i1 __attribute__((unused)) = ivl_new(2ULL, 8ULL);
+  Ivl i2 __attribute__((unused)) = ivl_new(5ULL, 12ULL);
+  Ivl i3 __attribute__((unused)) = ivl_new(0ULL, 10ULL);
   uint64_t w1 __attribute__((unused)) = ivl_width(i1);
   uint64_t w2 __attribute__((unused)) = ivl_width(i2);
   uint64_t w3 __attribute__((unused)) = ivl_width(i3);
-  uint64_t c1 __attribute__((unused)) = ivl_contains(i1, 5);
-  uint64_t c2 __attribute__((unused)) = ivl_contains(i1, 9);
+  uint64_t c1 __attribute__((unused)) = ivl_contains(i1, 5ULL);
+  uint64_t c2 __attribute__((unused)) = ivl_contains(i1, 9ULL);
   uint64_t clo __attribute__((unused)) = ivl_contains_lo(i1);
   uint64_t chi __attribute__((unused)) = ivl_contains_hi(i1);
-  uint64_t cl1 __attribute__((unused)) = ivl_clamp(i1, 0);
-  uint64_t cl2 __attribute__((unused)) = ivl_clamp(i1, 5);
-  uint64_t cl3 __attribute__((unused)) = ivl_clamp(i1, 99);
+  uint64_t cl1 __attribute__((unused)) = ivl_clamp(i1, 0ULL);
+  uint64_t cl2 __attribute__((unused)) = ivl_clamp(i1, 5ULL);
+  uint64_t cl3 __attribute__((unused)) = ivl_clamp(i1, 99ULL);
   Ivl iadd __attribute__((unused)) = ivl_add(i1, i2);
   uint64_t alo __attribute__((unused)) = iadd.lo;
   uint64_t ahi __attribute__((unused)) = iadd.hi;
   uint64_t aw __attribute__((unused)) = add_width(i1, i2);
-  Ivl isc __attribute__((unused)) = ivl_scale(i1, 3);
+  Ivl isc __attribute__((unused)) = ivl_scale(i1, 3ULL);
   uint64_t slo __attribute__((unused)) = isc.lo;
   uint64_t shi __attribute__((unused)) = isc.hi;
-  Ivl ish __attribute__((unused)) = ivl_shift(i1, 10);
+  Ivl ish __attribute__((unused)) = ivl_shift(i1, 10ULL);
   uint64_t shlo __attribute__((unused)) = ish.lo;
   uint64_t shhi __attribute__((unused)) = ish.hi;
   return (int)(((((((((((((((((w1 + w2) + w3) + c1) + c2) + clo) + chi) + cl1) + cl2) + cl3) + alo) + ahi) + aw) + slo) + shi) + shlo) + shhi));

@@ -38,7 +38,7 @@ void clamp_all(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribut
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

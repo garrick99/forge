@@ -17,14 +17,14 @@ int main();
 
 uint64_t min_index_from(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t start __attribute__((unused))) {
   uint64_t best __attribute__((unused)) = start;
-  uint64_t k __attribute__((unused)) = (start + 1);
+  uint64_t k __attribute__((unused)) = (start + 1ULL);
   {
     while ((k < n)) {
       if ((s.data[k] < s.data[best])) {
         best = k;
 
       }
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
@@ -32,7 +32,7 @@ uint64_t min_index_from(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

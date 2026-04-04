@@ -21,36 +21,36 @@ _Bool mask_le_left(uint64_t a __attribute__((unused)), uint64_t b __attribute__(
 int main();
 
 uint64_t low4(uint64_t x __attribute__((unused))) {
-  return (x & 15);
+  return (x & 15ULL);
 }
 
 uint64_t low8(uint64_t x __attribute__((unused))) {
-  return (x & 255);
+  return (x & 255ULL);
 }
 
 uint64_t shr4(uint64_t x __attribute__((unused))) {
-  return (x >> 4);
+  return (x >> 4ULL);
 }
 
 uint64_t upper_nibble_bits(uint64_t x __attribute__((unused))) {
-  uint64_t shifted __attribute__((unused)) = (x >> 4);
-  return (shifted & 15);
+  uint64_t shifted __attribute__((unused)) = (x >> 4ULL);
+  return (shifted & 15ULL);
 }
 
 uint64_t byte0(uint64_t x __attribute__((unused))) {
-  return (x & 255);
+  return (x & 255ULL);
 }
 
 uint64_t byte1(uint64_t x __attribute__((unused))) {
-  return ((x >> 8) & 255);
+  return ((x >> 8ULL) & 255ULL);
 }
 
 uint64_t byte2(uint64_t x __attribute__((unused))) {
-  return ((x >> 16) & 255);
+  return ((x >> 16ULL) & 255ULL);
 }
 
 uint64_t byte3(uint64_t x __attribute__((unused))) {
-  return ((x >> 24) & 255);
+  return ((x >> 24ULL) & 255ULL);
 }
 
 _Bool mask_le_left(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
@@ -59,7 +59,7 @@ _Bool mask_le_left(uint64_t a __attribute__((unused)), uint64_t b __attribute__(
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

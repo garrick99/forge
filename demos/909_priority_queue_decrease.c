@@ -19,8 +19,8 @@ int main();
 uint64_t sift_up(forge_span_u64_t heap __attribute__((unused)), uint64_t pos __attribute__((unused))) {
   uint64_t i __attribute__((unused)) = pos;
   {
-    while ((i > 0)) {
-      uint64_t parent __attribute__((unused)) = ((i - 1) / 2);
+    while ((i > 0ULL)) {
+      uint64_t parent __attribute__((unused)) = ((i - 1ULL) / 2ULL);
       if ((heap.data[i] < heap.data[parent])) {
         uint64_t tmp __attribute__((unused)) = heap.data[i];
         heap.data[i] = heap.data[parent];
@@ -28,7 +28,7 @@ uint64_t sift_up(forge_span_u64_t heap __attribute__((unused)), uint64_t pos __a
         i = parent;
 
       } else {
-        i = 0;
+        i = 0ULL;
 
       }
     }
@@ -44,7 +44,7 @@ uint64_t decrease_key(forge_span_u64_t heap __attribute__((unused)), uint64_t n 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -21,14 +21,14 @@ int main();
 
 _Bool all_positive(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
   _Bool ok __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while (((i < n) && ok)) {
-      if ((s.data[i] == 0)) {
+      if ((s.data[i] == 0ULL)) {
         ok = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -37,14 +37,14 @@ _Bool all_positive(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 
 _Bool any_zero(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
   _Bool found __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while (((i < n) && (!found))) {
-      if ((s.data[i] == 0)) {
+      if ((s.data[i] == 0ULL)) {
         found = 1;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -53,14 +53,14 @@ _Bool any_zero(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribut
 
 _Bool none_above(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t limit __attribute__((unused))) {
   _Bool ok __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while (((i < n) && ok)) {
       if ((s.data[i] > limit)) {
         ok = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -68,7 +68,7 @@ _Bool none_above(forge_span_u64_t s __attribute__((unused)), uint64_t n __attrib
 }
 
 uint64_t find_first_ge(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   uint64_t found __attribute__((unused)) = n;
   _Bool done __attribute__((unused)) = 0;
   {
@@ -78,7 +78,7 @@ uint64_t find_first_ge(forge_span_u64_t s __attribute__((unused)), uint64_t n __
         done = 1;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -86,15 +86,15 @@ uint64_t find_first_ge(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 uint64_t count_between(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if (((s.data[i] >= lo) && (s.data[i] <= hi))) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -102,7 +102,7 @@ uint64_t count_between(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -27,23 +27,23 @@ uint64_t two_readers_one_unlocks();
 int main();
 
 RWLock rwl_new() {
-  return (RWLock){ .readers = 0, .writer = 0 };
+  return (RWLock){ .readers = 0ULL, .writer = 0ULL };
 }
 
 void rwl_read_lock(RWLock* l __attribute__((unused))) {
-  (*l).readers = ((*l).readers + 1);
+  (*l).readers = ((*l).readers + 1ULL);
 }
 
 void rwl_read_unlock(RWLock* l __attribute__((unused))) {
-  (*l).readers = ((*l).readers - 1);
+  (*l).readers = ((*l).readers - 1ULL);
 }
 
 void rwl_write_lock(RWLock* l __attribute__((unused))) {
-  (*l).writer = 1;
+  (*l).writer = 1ULL;
 }
 
 void rwl_write_unlock(RWLock* l __attribute__((unused))) {
-  (*l).writer = 0;
+  (*l).writer = 0ULL;
 }
 
 uint64_t three_readers() {
@@ -83,7 +83,7 @@ uint64_t two_readers_one_unlocks() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

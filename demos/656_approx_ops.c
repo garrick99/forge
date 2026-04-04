@@ -17,15 +17,15 @@ uint64_t integer_percent(uint64_t val __attribute__((unused)), uint64_t total __
 int main();
 
 uint64_t isqrt2(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return 0;
+  if ((n == 0ULL)) {
+    return 0ULL;
   } else {
     uint64_t x __attribute__((unused)) = n;
-    uint64_t y __attribute__((unused)) = ((x + 1) / 2);
+    uint64_t y __attribute__((unused)) = ((x + 1ULL) / 2ULL);
     {
       while ((y < x)) {
         x = y;
-        y = ((x + (n / x)) / 2);
+        y = ((x + (n / x)) / 2ULL);
       }
 
     }
@@ -34,12 +34,12 @@ uint64_t isqrt2(uint64_t n __attribute__((unused))) {
 }
 
 uint64_t log2_ceil(uint64_t n __attribute__((unused))) {
-  uint64_t x __attribute__((unused)) = (n - 1);
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t x __attribute__((unused)) = (n - 1ULL);
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
-    while ((x > 0)) {
-      x = (x / 2);
-      k = (k + 1);
+    while ((x > 0ULL)) {
+      x = (x / 2ULL);
+      k = (k + 1ULL);
     }
 
   }
@@ -47,10 +47,10 @@ uint64_t log2_ceil(uint64_t n __attribute__((unused))) {
 }
 
 uint64_t round_to_power2(uint64_t n __attribute__((unused))) {
-  uint64_t p __attribute__((unused)) = 1;
+  uint64_t p __attribute__((unused)) = 1ULL;
   {
     while ((p < n)) {
-      p = (p * 2);
+      p = (p * 2ULL);
     }
 
   }
@@ -62,11 +62,11 @@ uint64_t fast_div_by_const(uint64_t x __attribute__((unused)), uint64_t d __attr
 }
 
 uint64_t integer_percent(uint64_t val __attribute__((unused)), uint64_t total __attribute__((unused))) {
-  return (((val * 100) / total) % 101);
+  return (((val * 100ULL) / total) % 101ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

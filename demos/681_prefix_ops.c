@@ -20,77 +20,77 @@ uint64_t range_sum(forge_span_u64_t dst __attribute__((unused)), uint64_t n __at
 int main();
 
 void prefix_sum(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + src.data[i]);
       dst.data[i] = acc;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void prefix_max(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  dst.data[0] = src.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  dst.data[0ULL] = src.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      if ((src.data[i] > dst.data[(i - 1)])) {
+      if ((src.data[i] > dst.data[(i - 1ULL)])) {
         dst.data[i] = src.data[i];
 
       } else {
-        dst.data[i] = dst.data[(i - 1)];
+        dst.data[i] = dst.data[(i - 1ULL)];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void prefix_min(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  dst.data[0] = src.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  dst.data[0ULL] = src.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      if ((src.data[i] < dst.data[(i - 1)])) {
+      if ((src.data[i] < dst.data[(i - 1ULL)])) {
         dst.data[i] = src.data[i];
 
       } else {
-        dst.data[i] = dst.data[(i - 1)];
+        dst.data[i] = dst.data[(i - 1ULL)];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void prefix_sum_mod(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t m __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = ((acc + (src.data[i] % m)) % m);
       dst.data[i] = acc;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t range_sum(forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
-  if ((lo == 0)) {
+  if ((lo == 0ULL)) {
     return dst.data[hi];
   } else {
-    return (dst.data[hi] - dst.data[(lo - 1)]);
+    return (dst.data[hi] - dst.data[(lo - 1ULL)]);
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

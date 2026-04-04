@@ -18,18 +18,18 @@ int main();
 
 uint64_t batch_write(forge_span_u64_t buf __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t tail __attribute__((unused)), forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused))) {
   uint64_t wi __attribute__((unused)) = tail;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       buf.data[wi] = data.data[i];
-      if (((wi + 1) < cap)) {
-        wi = (wi + 1);
+      if (((wi + 1ULL) < cap)) {
+        wi = (wi + 1ULL);
 
       } else {
-        wi = 0;
+        wi = 0ULL;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -47,7 +47,7 @@ uint64_t batch_write_with_count(forge_span_u64_t buf __attribute__((unused)), ui
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

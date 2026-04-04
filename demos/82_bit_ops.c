@@ -17,53 +17,53 @@ uint64_t rotate_left(uint64_t x __attribute__((unused)), uint64_t n __attribute_
 int main();
 
 uint64_t popcount(uint64_t x __attribute__((unused))) {
-  uint64_t x1 __attribute__((unused)) = (x - ((x >> 1) & 6148914691236517205));
-  uint64_t x2 __attribute__((unused)) = ((x1 & 3689348814741910323) + ((x1 >> 2) & 3689348814741910323));
-  uint64_t x3 __attribute__((unused)) = ((x2 + (x2 >> 4)) & 1085102592571150095);
-  return ((x3 * 72340172838076673) >> 56);
+  uint64_t x1 __attribute__((unused)) = (x - ((x >> 1ULL) & 6148914691236517205ULL));
+  uint64_t x2 __attribute__((unused)) = ((x1 & 3689348814741910323ULL) + ((x1 >> 2ULL) & 3689348814741910323ULL));
+  uint64_t x3 __attribute__((unused)) = ((x2 + (x2 >> 4ULL)) & 1085102592571150095ULL);
+  return ((x3 * 72340172838076673ULL) >> 56ULL);
 }
 
 uint64_t is_power_of_two(uint64_t x __attribute__((unused))) {
-  if ((x == 0)) {
-    return 0;
+  if ((x == 0ULL)) {
+    return 0ULL;
   } else {
-    if (((x & (x - 1)) == 0)) {
-      return 1;
+    if (((x & (x - 1ULL)) == 0ULL)) {
+      return 1ULL;
     } else {
-      return 0;
+      return 0ULL;
     }
   }
 }
 
 uint64_t lowest_set_bit(uint64_t x __attribute__((unused))) {
-  if ((x == 0)) {
-    return 0;
+  if ((x == 0ULL)) {
+    return 0ULL;
   } else {
-    return (x & (0 - x));
+    return (x & (0ULL - x));
   }
 }
 
 uint64_t extract_bits(uint64_t x __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t len __attribute__((unused))) {
-  return ((x >> lo) & ((1 << len) - 1));
+  return ((x >> lo) & ((1ULL << len) - 1ULL));
 }
 
 uint64_t rotate_left(uint64_t x __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t n_mod __attribute__((unused)) = (n & 63);
-  return ((x << n_mod) | (x >> (64 - n_mod)));
+  uint64_t n_mod __attribute__((unused)) = (n & 63ULL);
+  return ((x << n_mod) | (x >> (64ULL - n_mod)));
 }
 
 int main() {
-  uint64_t pc1 __attribute__((unused)) = popcount(255);
-  uint64_t pc2 __attribute__((unused)) = popcount(0);
-  uint64_t pc3 __attribute__((unused)) = popcount(170);
-  uint64_t p1 __attribute__((unused)) = is_power_of_two(16);
-  uint64_t p2 __attribute__((unused)) = is_power_of_two(15);
-  uint64_t p3 __attribute__((unused)) = is_power_of_two(0);
-  uint64_t l1 __attribute__((unused)) = lowest_set_bit(12);
-  uint64_t l2 __attribute__((unused)) = lowest_set_bit(0);
-  uint64_t e1 __attribute__((unused)) = extract_bits(214, 2, 3);
-  uint64_t e2 __attribute__((unused)) = extract_bits(255, 0, 4);
-  uint64_t r1 __attribute__((unused)) = rotate_left(1, 4);
+  uint64_t pc1 __attribute__((unused)) = popcount(255ULL);
+  uint64_t pc2 __attribute__((unused)) = popcount(0ULL);
+  uint64_t pc3 __attribute__((unused)) = popcount(170ULL);
+  uint64_t p1 __attribute__((unused)) = is_power_of_two(16ULL);
+  uint64_t p2 __attribute__((unused)) = is_power_of_two(15ULL);
+  uint64_t p3 __attribute__((unused)) = is_power_of_two(0ULL);
+  uint64_t l1 __attribute__((unused)) = lowest_set_bit(12ULL);
+  uint64_t l2 __attribute__((unused)) = lowest_set_bit(0ULL);
+  uint64_t e1 __attribute__((unused)) = extract_bits(214ULL, 2ULL, 3ULL);
+  uint64_t e2 __attribute__((unused)) = extract_bits(255ULL, 0ULL, 4ULL);
+  uint64_t r1 __attribute__((unused)) = rotate_left(1ULL, 4ULL);
   return (int)(((((((((((pc1 + pc2) + pc3) + p1) + p2) + p3) + l1) + l2) + e1) + e2) + r1));
 
 }

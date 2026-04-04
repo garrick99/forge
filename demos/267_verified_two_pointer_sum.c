@@ -16,16 +16,16 @@ uint64_t sum_both_ends(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 int main();
 
 uint64_t sum_both_ends(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t l __attribute__((unused)) = 0;
+  uint64_t l __attribute__((unused)) = 0ULL;
   uint64_t r __attribute__((unused)) = n;
-  uint64_t acc __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
   {
     while ((l < r)) {
       acc = (acc + s.data[l]);
-      l = (l + 1);
+      l = (l + 1ULL);
       if ((l < r)) {
-        acc = (acc + s.data[(r - 1)]);
-        r = (r - 1);
+        acc = (acc + s.data[(r - 1ULL)]);
+        r = (r - 1ULL);
 
       }
     }
@@ -35,7 +35,7 @@ uint64_t sum_both_ends(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

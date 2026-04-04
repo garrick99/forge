@@ -17,15 +17,15 @@ _Bool check_partition(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
 int main();
 
 uint64_t partition_inplace(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t pivot __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
   uint64_t hi __attribute__((unused)) = n;
   {
     while ((lo < hi)) {
       if ((s.data[lo] < pivot)) {
-        lo = (lo + 1);
+        lo = (lo + 1ULL);
 
       } else {
-        hi = (hi - 1);
+        hi = (hi - 1ULL);
         uint64_t tmp __attribute__((unused)) = s.data[lo];
         s.data[lo] = s.data[hi];
         s.data[hi] = tmp;
@@ -61,7 +61,7 @@ _Bool check_partition(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

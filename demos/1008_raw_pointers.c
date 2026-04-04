@@ -36,20 +36,20 @@ void register_set_bits(forge_span_u64_t regs __attribute__((unused)), uint64_t r
 
 void register_clear_bits(forge_span_u64_t regs __attribute__((unused)), uint64_t reg_offset __attribute__((unused)), uint64_t mask __attribute__((unused))) {
   uint64_t prev __attribute__((unused)) = regs.data[reg_offset];
-  regs.data[reg_offset] = (prev & (mask ^ -1));
+  regs.data[reg_offset] = (prev & (mask ^ 0xffffffffffffffffULL));
 }
 
 _Bool register_wait_bit(forge_span_u64_t regs __attribute__((unused)), uint64_t reg_offset __attribute__((unused)), uint64_t bit_mask __attribute__((unused)), uint64_t max_retries __attribute__((unused))) {
-  uint64_t retries __attribute__((unused)) = 0;
+  uint64_t retries __attribute__((unused)) = 0ULL;
   _Bool found __attribute__((unused)) = 0;
   {
     while (((retries < max_retries) && (!found))) {
       uint64_t val __attribute__((unused)) = regs.data[reg_offset];
-      if (((val & bit_mask) != 0)) {
+      if (((val & bit_mask) != 0ULL)) {
         found = 1;
 
       }
-      retries = (retries + 1);
+      retries = (retries + 1ULL);
     }
 
   }
@@ -57,36 +57,36 @@ _Bool register_wait_bit(forge_span_u64_t regs __attribute__((unused)), uint64_t 
 }
 
 void dma_copy(forge_span_u64_t src __attribute__((unused)), uint64_t src_offset __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t dst_offset __attribute__((unused)), uint64_t length __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < length)) {
       dst.data[(dst_offset + i)] = src.data[(src_offset + i)];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t scatter_gather(forge_span_u64_t srcs __attribute__((unused)), forge_span_u64_t src_offsets __attribute__((unused)), forge_span_u64_t src_lengths __attribute__((unused)), uint64_t n_srcs __attribute__((unused)), uint64_t total_src_len __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t dst_len __attribute__((unused))) {
-  uint64_t dst_pos __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t dst_pos __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n_srcs)) {
       uint64_t off __attribute__((unused)) = src_offsets.data[i];
       uint64_t len __attribute__((unused)) = src_lengths.data[i];
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while (((j < len) && (dst_pos < dst_len))) {
           if (((off + j) < total_src_len)) {
             dst.data[dst_pos] = srcs.data[(off + j)];
-            dst_pos = (dst_pos + 1);
+            dst_pos = (dst_pos + 1ULL);
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -94,7 +94,7 @@ uint64_t scatter_gather(forge_span_u64_t srcs __attribute__((unused)), forge_spa
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -33,7 +33,7 @@ uint64_t triple_bound(uint64_t x __attribute__((unused))) {
 }
 
 uint64_t always_zero(uint64_t dummy __attribute__((unused))) {
-  uint64_t z __attribute__((unused)) = 0;
+  uint64_t z __attribute__((unused)) = 0ULL;
   return z;
 }
 
@@ -42,8 +42,8 @@ uint64_t wrapper_zero(uint64_t x __attribute__((unused))) {
 }
 
 uint64_t clamp_to_99(uint64_t n __attribute__((unused))) {
-  if ((n >= 100)) {
-    return 99;
+  if ((n >= 100ULL)) {
+    return 99ULL;
   } else {
     return n;
   }
@@ -62,11 +62,11 @@ uint64_t relay(uint64_t x __attribute__((unused))) {
 }
 
 int main() {
-  uint64_t a __attribute__((unused)) = double_bound(3);
-  uint64_t b __attribute__((unused)) = triple_bound(4);
-  uint64_t c __attribute__((unused)) = wrapper_zero(42);
-  uint64_t d __attribute__((unused)) = bounded_clamp(200);
-  uint64_t e __attribute__((unused)) = relay(7);
+  uint64_t a __attribute__((unused)) = double_bound(3ULL);
+  uint64_t b __attribute__((unused)) = triple_bound(4ULL);
+  uint64_t c __attribute__((unused)) = wrapper_zero(42ULL);
+  uint64_t d __attribute__((unused)) = bounded_clamp(200ULL);
+  uint64_t e __attribute__((unused)) = relay(7ULL);
   return (int)(((((a + b) + c) + d) + e));
 
 }

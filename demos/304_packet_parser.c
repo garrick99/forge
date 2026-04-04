@@ -30,52 +30,52 @@ uint64_t classify_packet(forge_span_u8_t pkt __attribute__((unused)), uint64_t n
 int main();
 
 PacketHeader parse_header(forge_span_u8_t pkt __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t byte0 __attribute__((unused)) = ((uint64_t)pkt.data[0]);
-  uint64_t ver __attribute__((unused)) = (byte0 / 16);
-  uint64_t hlen __attribute__((unused)) = (byte0 % 16);
-  uint64_t tos __attribute__((unused)) = ((uint64_t)pkt.data[1]);
-  uint64_t tlen_hi __attribute__((unused)) = ((uint64_t)pkt.data[2]);
-  uint64_t tlen_lo __attribute__((unused)) = ((uint64_t)pkt.data[3]);
-  uint64_t total_len __attribute__((unused)) = ((tlen_hi * 256) + tlen_lo);
-  uint64_t id_hi __attribute__((unused)) = ((uint64_t)pkt.data[4]);
-  uint64_t id_lo __attribute__((unused)) = ((uint64_t)pkt.data[5]);
-  uint64_t id __attribute__((unused)) = ((id_hi * 256) + id_lo);
-  uint64_t ttl __attribute__((unused)) = ((uint64_t)pkt.data[8]);
-  uint64_t protocol __attribute__((unused)) = ((uint64_t)pkt.data[9]);
+  uint64_t byte0 __attribute__((unused)) = ((uint64_t)pkt.data[0ULL]);
+  uint64_t ver __attribute__((unused)) = (byte0 / 16ULL);
+  uint64_t hlen __attribute__((unused)) = (byte0 % 16ULL);
+  uint64_t tos __attribute__((unused)) = ((uint64_t)pkt.data[1ULL]);
+  uint64_t tlen_hi __attribute__((unused)) = ((uint64_t)pkt.data[2ULL]);
+  uint64_t tlen_lo __attribute__((unused)) = ((uint64_t)pkt.data[3ULL]);
+  uint64_t total_len __attribute__((unused)) = ((tlen_hi * 256ULL) + tlen_lo);
+  uint64_t id_hi __attribute__((unused)) = ((uint64_t)pkt.data[4ULL]);
+  uint64_t id_lo __attribute__((unused)) = ((uint64_t)pkt.data[5ULL]);
+  uint64_t id __attribute__((unused)) = ((id_hi * 256ULL) + id_lo);
+  uint64_t ttl __attribute__((unused)) = ((uint64_t)pkt.data[8ULL]);
+  uint64_t protocol __attribute__((unused)) = ((uint64_t)pkt.data[9ULL]);
   return (PacketHeader){ .version = ver, .header_len = hlen, .tos = tos, .total_len = total_len, .id = id, .ttl = ttl, .protocol = protocol };
 }
 
 _Bool is_ipv4(const PacketHeader* h __attribute__((unused))) {
-  return ((*h).version == 4);
+  return ((*h).version == 4ULL);
 }
 
 _Bool is_tcp(const PacketHeader* h __attribute__((unused))) {
-  return ((*h).protocol == 6);
+  return ((*h).protocol == 6ULL);
 }
 
 _Bool is_udp(const PacketHeader* h __attribute__((unused))) {
-  return ((*h).protocol == 17);
+  return ((*h).protocol == 17ULL);
 }
 
 uint64_t classify_packet(forge_span_u8_t pkt __attribute__((unused)), uint64_t n __attribute__((unused))) {
   PacketHeader h __attribute__((unused)) = parse_header(pkt, n);
   if (is_ipv4((&h))) {
     if (is_tcp((&h))) {
-      return 1;
+      return 1ULL;
     } else {
       if (is_udp((&h))) {
-        return 2;
+        return 2ULL;
       } else {
-        return 0;
+        return 0ULL;
       }
     }
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

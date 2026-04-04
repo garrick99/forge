@@ -20,7 +20,7 @@ _Bool span_all_eq(forge_span_u64_t s __attribute__((unused)), uint64_t n __attri
 int main();
 
 uint64_t find_first_ge(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((s.data[i] >= target)) {
@@ -30,7 +30,7 @@ uint64_t find_first_ge(forge_span_u64_t s __attribute__((unused)), uint64_t n __
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -38,7 +38,7 @@ uint64_t find_first_ge(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 uint64_t find_first_gt(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((s.data[i] > target)) {
@@ -48,7 +48,7 @@ uint64_t find_first_gt(forge_span_u64_t s __attribute__((unused)), uint64_t n __
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -56,15 +56,15 @@ uint64_t find_first_gt(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 uint64_t count_in_range(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if (((s.data[i] >= lo) && (s.data[i] <= hi))) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -72,15 +72,15 @@ uint64_t count_in_range(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 }
 
 _Bool span_is_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   _Bool ok __attribute__((unused)) = 1;
   {
-    while (((i + 1) < n)) {
-      if ((s.data[i] > s.data[(i + 1)])) {
-        ok = (i != i);
+    while (((i + 1ULL) < n)) {
+      if ((s.data[i] > s.data[(i + 1ULL)])) {
+        ok = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -88,15 +88,15 @@ _Bool span_is_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 }
 
 _Bool span_all_eq(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t v __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   _Bool ok __attribute__((unused)) = 1;
   {
     while ((i < n)) {
       if ((s.data[i] != v)) {
-        ok = (i != i);
+        ok = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -104,7 +104,7 @@ _Bool span_all_eq(forge_span_u64_t s __attribute__((unused)), uint64_t n __attri
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

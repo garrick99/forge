@@ -26,8 +26,8 @@ uint64_t demo(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute
 int main();
 
 uint64_t clamp255(uint64_t x __attribute__((unused))) {
-  if ((x > 255)) {
-    return 255;
+  if ((x > 255ULL)) {
+    return 255ULL;
   } else {
     return x;
   }
@@ -38,24 +38,24 @@ uint64_t double_clamp(uint64_t x __attribute__((unused))) {
 }
 
 void map_clamped(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_fn_u64_ret_u64_t f __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t v __attribute__((unused)) = f(s.data[i]);
       s.data[i] = v;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void map_bounded(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t bound __attribute__((unused)), forge_fn_u64_ret_u64_t f __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t v __attribute__((unused)) = f(s.data[i]);
       s.data[i] = v;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -63,12 +63,12 @@ void map_bounded(forge_span_u64_t s __attribute__((unused)), uint64_t n __attrib
 
 uint64_t fold_nonneg(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t init __attribute__((unused)), forge_fn_u64_u64_ret_u64_t f __attribute__((unused))) {
   uint64_t acc __attribute__((unused)) = init;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t v __attribute__((unused)) = f(acc, s.data[i]);
       acc = v;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -82,11 +82,11 @@ uint64_t add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unuse
 uint64_t demo(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
   map_clamped(s, n, clamp255);
   map_clamped(s, n, double_clamp);
-  return fold_nonneg(s, n, 0, add);
+  return fold_nonneg(s, n, 0ULL, add);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -26,11 +26,11 @@ _Bool check_sign_set();
 int main();
 
 _Bool is_upper(uint8_t b __attribute__((unused))) {
-  return ((b >= 65) && (b <= 90));
+  return ((b >= 65ULL) && (b <= 90ULL));
 }
 
 _Bool is_lower(uint8_t b __attribute__((unused))) {
-  return ((b >= 97) && (b <= 122));
+  return ((b >= 97ULL) && (b <= 122ULL));
 }
 
 _Bool negate_bool(_Bool v __attribute__((unused))) {
@@ -58,7 +58,7 @@ uint8_t abs_diff_u8(uint8_t a __attribute__((unused)), uint8_t b __attribute__((
 }
 
 _Bool sign_bit_clear(uint8_t v __attribute__((unused))) {
-  return (!(v >= 128));
+  return (!(v >= 128ULL));
 }
 
 _Bool check_negate_false() {
@@ -70,31 +70,31 @@ _Bool check_negate_true() {
 }
 
 uint8_t check_clamp_mid() {
-  return clamp_u8(100, 0, 200);
+  return clamp_u8(100ULL, 0ULL, 200ULL);
 }
 
 uint8_t check_clamp_lo() {
-  return clamp_u8(5, 10, 20);
+  return clamp_u8(5ULL, 10ULL, 20ULL);
 }
 
 uint8_t check_clamp_hi() {
-  return clamp_u8(30, 10, 20);
+  return clamp_u8(30ULL, 10ULL, 20ULL);
 }
 
 uint8_t check_abs_diff() {
-  return abs_diff_u8(15, 10);
+  return abs_diff_u8(15ULL, 10ULL);
 }
 
 _Bool check_sign_clear() {
-  return sign_bit_clear(127);
+  return sign_bit_clear(127ULL);
 }
 
 _Bool check_sign_set() {
-  return sign_bit_clear(128);
+  return sign_bit_clear(128ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

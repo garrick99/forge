@@ -20,7 +20,7 @@ void zero_matrix(forge_span_u64_t s __attribute__((unused)), uint64_t rows __att
     for (uint64_t row = 0; row < (uint64_t)(rows); row++) {
       {
         for (uint64_t col = 0; col < (uint64_t)(cols); col++) {
-          s.data[((row * cols) + col)] = 0;
+          s.data[((row * cols) + col)] = 0ULL;
         }
 
       }
@@ -30,7 +30,7 @@ void zero_matrix(forge_span_u64_t s __attribute__((unused)), uint64_t rows __att
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

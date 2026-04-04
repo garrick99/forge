@@ -21,50 +21,50 @@ void flood_fill(forge_span_u64_t grid __attribute__((unused)), uint64_t rows __a
 
   } else {
     grid.data[((start_r * cols) + start_c)] = fill_val;
-    stack.data[0] = ((start_r * cols) + start_c);
-    uint64_t sp __attribute__((unused)) = 1;
+    stack.data[0ULL] = ((start_r * cols) + start_c);
+    uint64_t sp __attribute__((unused)) = 1ULL;
     {
-      while ((sp > 0)) {
-        sp = (sp - 1);
+      while ((sp > 0ULL)) {
+        sp = (sp - 1ULL);
         uint64_t pos __attribute__((unused)) = stack.data[sp];
         uint64_t r __attribute__((unused)) = (pos / cols);
         uint64_t c __attribute__((unused)) = (pos % cols);
-        if ((r > 0)) {
-          uint64_t idx __attribute__((unused)) = (((r - 1) * cols) + c);
+        if ((r > 0ULL)) {
+          uint64_t idx __attribute__((unused)) = (((r - 1ULL) * cols) + c);
           if ((((idx < (rows * cols)) && (grid.data[idx] == old_val)) && (sp < stack_cap))) {
             grid.data[idx] = fill_val;
             stack.data[sp] = idx;
-            sp = (sp + 1);
+            sp = (sp + 1ULL);
 
           }
 
         }
-        if (((r + 1) < rows)) {
-          uint64_t idx __attribute__((unused)) = (((r + 1) * cols) + c);
+        if (((r + 1ULL) < rows)) {
+          uint64_t idx __attribute__((unused)) = (((r + 1ULL) * cols) + c);
           if ((((idx < (rows * cols)) && (grid.data[idx] == old_val)) && (sp < stack_cap))) {
             grid.data[idx] = fill_val;
             stack.data[sp] = idx;
-            sp = (sp + 1);
+            sp = (sp + 1ULL);
 
           }
 
         }
-        if ((c > 0)) {
-          uint64_t idx __attribute__((unused)) = ((r * cols) + (c - 1));
+        if ((c > 0ULL)) {
+          uint64_t idx __attribute__((unused)) = ((r * cols) + (c - 1ULL));
           if ((((idx < (rows * cols)) && (grid.data[idx] == old_val)) && (sp < stack_cap))) {
             grid.data[idx] = fill_val;
             stack.data[sp] = idx;
-            sp = (sp + 1);
+            sp = (sp + 1ULL);
 
           }
 
         }
-        if (((c + 1) < cols)) {
-          uint64_t idx __attribute__((unused)) = ((r * cols) + (c + 1));
+        if (((c + 1ULL) < cols)) {
+          uint64_t idx __attribute__((unused)) = ((r * cols) + (c + 1ULL));
           if ((((idx < (rows * cols)) && (grid.data[idx] == old_val)) && (sp < stack_cap))) {
             grid.data[idx] = fill_val;
             stack.data[sp] = idx;
-            sp = (sp + 1);
+            sp = (sp + 1ULL);
 
           }
 
@@ -77,7 +77,7 @@ void flood_fill(forge_span_u64_t grid __attribute__((unused)), uint64_t rows __a
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

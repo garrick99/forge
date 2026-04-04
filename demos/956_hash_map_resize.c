@@ -16,22 +16,22 @@ uint64_t rehash(forge_span_u64_t old_keys __attribute__((unused)), forge_span_u6
 int main();
 
 uint64_t rehash(forge_span_u64_t old_keys __attribute__((unused)), forge_span_u64_t old_vals __attribute__((unused)), forge_span_u64_t new_keys __attribute__((unused)), forge_span_u64_t new_vals __attribute__((unused)), uint64_t old_cap __attribute__((unused)), uint64_t new_cap __attribute__((unused))) {
-  uint64_t moved __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t moved __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < old_cap)) {
       uint64_t key __attribute__((unused)) = old_keys.data[i];
-      if ((key > 0)) {
+      if ((key > 0ULL)) {
         uint64_t slot __attribute__((unused)) = (key % new_cap);
         if ((slot < new_cap)) {
           new_keys.data[slot] = key;
           new_vals.data[slot] = old_vals.data[i];
-          moved = (moved + 1);
+          moved = (moved + 1ULL);
 
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -39,7 +39,7 @@ uint64_t rehash(forge_span_u64_t old_keys __attribute__((unused)), forge_span_u6
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

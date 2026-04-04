@@ -49,23 +49,23 @@ uint64_t gcd_loop(uint64_t a __attribute__((unused)), uint64_t b __attribute__((
 }
 
 _Bool is_coprime(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  return (gcd(a, b) == 1);
+  return (gcd(a, b) == 1ULL);
 }
 
 uint64_t check_gcd_same() {
-  return gcd(5, 5);
+  return gcd(5ULL, 5ULL);
 }
 
 uint64_t check_gcd_pos() {
-  return gcd_loop(12, 8);
+  return gcd_loop(12ULL, 8ULL);
 }
 
 uint64_t check_loop_pos() {
-  return gcd_loop(9, 6);
+  return gcd_loop(9ULL, 6ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -16,7 +16,7 @@ uint64_t lcp_query(forge_span_u64_t text __attribute__((unused)), uint64_t n __a
 int main();
 
 uint64_t lcp_query(forge_span_u64_t text __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t start_a __attribute__((unused)), uint64_t start_b __attribute__((unused))) {
-  uint64_t len __attribute__((unused)) = 0;
+  uint64_t len __attribute__((unused)) = 0ULL;
   uint64_t a __attribute__((unused)) = start_a;
   uint64_t b __attribute__((unused)) = start_b;
   {
@@ -25,9 +25,9 @@ uint64_t lcp_query(forge_span_u64_t text __attribute__((unused)), uint64_t n __a
         a = n;
 
       } else if ((text.data[a] == text.data[b])) {
-        len = (len + 1);
-        a = (a + 1);
-        b = (b + 1);
+        len = (len + 1ULL);
+        a = (a + 1ULL);
+        b = (b + 1ULL);
 
       } else {
         a = n;
@@ -40,7 +40,7 @@ uint64_t lcp_query(forge_span_u64_t text __attribute__((unused)), uint64_t n __a
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

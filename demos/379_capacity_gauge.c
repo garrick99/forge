@@ -27,57 +27,57 @@ uint64_t capacity_preserved(uint64_t cap __attribute__((unused)));
 int main();
 
 Gauge gauge_new(uint64_t cap __attribute__((unused))) {
-  return (Gauge){ .fill_level = 0, .capacity = cap, .fills = 0, .drains = 0 };
+  return (Gauge){ .fill_level = 0ULL, .capacity = cap, .fills = 0ULL, .drains = 0ULL };
 }
 
 void gauge_fill(Gauge* g __attribute__((unused)), uint64_t amount __attribute__((unused))) {
   (*g).fill_level = ((*g).fill_level + amount);
-  (*g).fills = ((*g).fills + 1);
+  (*g).fills = ((*g).fills + 1ULL);
 }
 
 void gauge_drain(Gauge* g __attribute__((unused)), uint64_t amount __attribute__((unused))) {
   (*g).fill_level = ((*g).fill_level - amount);
-  (*g).drains = ((*g).drains + 1);
+  (*g).drains = ((*g).drains + 1ULL);
 }
 
 uint64_t fill_60() {
-  Gauge g __attribute__((unused)) = gauge_new(100);
-  gauge_fill((&g), 60);
+  Gauge g __attribute__((unused)) = gauge_new(100ULL);
+  gauge_fill((&g), 60ULL);
   return g.fill_level;
 }
 
 uint64_t fill_drain() {
-  Gauge g __attribute__((unused)) = gauge_new(100);
-  gauge_fill((&g), 60);
-  gauge_drain((&g), 20);
+  Gauge g __attribute__((unused)) = gauge_new(100ULL);
+  gauge_fill((&g), 60ULL);
+  gauge_drain((&g), 20ULL);
   return g.fill_level;
 }
 
 uint64_t op_counts() {
-  Gauge g __attribute__((unused)) = gauge_new(100);
-  gauge_fill((&g), 30);
-  gauge_fill((&g), 20);
-  gauge_fill((&g), 10);
+  Gauge g __attribute__((unused)) = gauge_new(100ULL);
+  gauge_fill((&g), 30ULL);
+  gauge_fill((&g), 20ULL);
+  gauge_fill((&g), 10ULL);
   return g.fills;
 }
 
 uint64_t drain_count() {
-  Gauge g __attribute__((unused)) = gauge_new(100);
-  gauge_fill((&g), 60);
-  gauge_drain((&g), 10);
-  gauge_drain((&g), 20);
+  Gauge g __attribute__((unused)) = gauge_new(100ULL);
+  gauge_fill((&g), 60ULL);
+  gauge_drain((&g), 10ULL);
+  gauge_drain((&g), 20ULL);
   return g.drains;
 }
 
 uint64_t capacity_preserved(uint64_t cap __attribute__((unused))) {
   Gauge g __attribute__((unused)) = gauge_new(cap);
-  gauge_fill((&g), 40);
-  gauge_drain((&g), 15);
+  gauge_fill((&g), 40ULL);
+  gauge_drain((&g), 15ULL);
   return g.capacity;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

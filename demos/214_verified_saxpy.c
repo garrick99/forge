@@ -25,7 +25,7 @@ void saxpy(forge_span_u64_t y __attribute__((unused)), forge_span_u64_t x __attr
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

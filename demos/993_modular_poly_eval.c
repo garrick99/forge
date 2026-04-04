@@ -16,13 +16,13 @@ uint64_t horner_eval(forge_span_u64_t coeffs __attribute__((unused)), uint64_t n
 int main();
 
 uint64_t horner_eval(forge_span_u64_t coeffs __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t x __attribute__((unused)), uint64_t p __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = (coeffs.data[(n - 1)] % p);
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t acc __attribute__((unused)) = (coeffs.data[(n - 1ULL)] % p);
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      uint64_t idx __attribute__((unused)) = ((n - 1) - i);
+      uint64_t idx __attribute__((unused)) = ((n - 1ULL) - i);
       acc = (((acc * (x % p)) + coeffs.data[idx]) % p);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -30,7 +30,7 @@ uint64_t horner_eval(forge_span_u64_t coeffs __attribute__((unused)), uint64_t n
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

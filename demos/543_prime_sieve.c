@@ -19,10 +19,10 @@ uint64_t find_next_prime(forge_span_u64_t flags __attribute__((unused)), uint64_
 int main();
 
 void sieve_mark(forge_span_u64_t flags __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t p __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = (p * 2);
+  uint64_t i __attribute__((unused)) = (p * 2ULL);
   {
     while ((i < n)) {
-      flags.data[i] = 0;
+      flags.data[i] = 0ULL;
       i = (i + p);
     }
 
@@ -30,26 +30,26 @@ void sieve_mark(forge_span_u64_t flags __attribute__((unused)), uint64_t n __att
 }
 
 void sieve_init(forge_span_u64_t flags __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      flags.data[i] = 1;
-      i = (i + 1);
+      flags.data[i] = 1ULL;
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t count_primes(forge_span_u64_t flags __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 2;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 2ULL;
   {
     while ((i < n)) {
-      if ((flags.data[i] == 1)) {
-        cnt = (cnt + 1);
+      if ((flags.data[i] == 1ULL)) {
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -60,14 +60,14 @@ uint64_t find_next_prime(forge_span_u64_t flags __attribute__((unused)), uint64_
   uint64_t i __attribute__((unused)) = start;
   {
     while ((i < n)) {
-      if ((flags.data[i] == 1)) {
+      if ((flags.data[i] == 1ULL)) {
         {
           return i;
 
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -75,7 +75,7 @@ uint64_t find_next_prime(forge_span_u64_t flags __attribute__((unused)), uint64_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

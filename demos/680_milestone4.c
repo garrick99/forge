@@ -25,7 +25,7 @@ uint64_t gcd(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unuse
   uint64_t x __attribute__((unused)) = a;
   uint64_t y __attribute__((unused)) = b;
   {
-    while ((y > 0)) {
+    while ((y > 0ULL)) {
       uint64_t t __attribute__((unused)) = y;
       y = (x % y);
       x = t;
@@ -49,15 +49,15 @@ uint64_t abs_diff(uint64_t a __attribute__((unused)), uint64_t b __attribute__((
 }
 
 uint64_t array_max_elem(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t mx __attribute__((unused)) = s.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t mx __attribute__((unused)) = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((s.data[i] > mx)) {
         mx = s.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -65,13 +65,13 @@ uint64_t array_max_elem(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 }
 
 uint64_t array_abs_diff_sum(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t d __attribute__((unused)) = abs_diff(a.data[i], b.data[i]);
       acc = (acc + d);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -79,7 +79,7 @@ uint64_t array_abs_diff_sum(forge_span_u64_t a __attribute__((unused)), forge_sp
 }
 
 void clamp_array_range(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((s.data[i] < lo)) {
@@ -89,7 +89,7 @@ void clamp_array_range(forge_span_u64_t s __attribute__((unused)), uint64_t n __
         s.data[i] = hi;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -97,14 +97,14 @@ void clamp_array_range(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 
 _Bool array_contains(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
   _Bool found __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while (((i < n) && (!found))) {
       if ((s.data[i] == val)) {
         found = 1;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -112,7 +112,7 @@ _Bool array_contains(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

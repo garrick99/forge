@@ -18,38 +18,38 @@ uint64_t window_min_subarray_ge(forge_span_u64_t s __attribute__((unused)), uint
 int main();
 
 void window_sum_fixed(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t k __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t wsum __attribute__((unused)) = 0;
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t wsum __attribute__((unused)) = 0ULL;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < k)) {
       wsum = (wsum + s.data[j]);
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
-  out.data[0] = wsum;
-  uint64_t i __attribute__((unused)) = 1;
+  out.data[0ULL] = wsum;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i <= (n - k))) {
-      wsum = ((wsum - s.data[(i - 1)]) + s.data[((i + k) - 1)]);
+      wsum = ((wsum - s.data[(i - 1ULL)]) + s.data[((i + k) - 1ULL)]);
       out.data[i] = wsum;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t window_max_fixed(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t k __attribute__((unused))) {
-  uint64_t best __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t best __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i <= (n - k))) {
-      uint64_t wsum __attribute__((unused)) = 0;
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t wsum __attribute__((unused)) = 0ULL;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < k)) {
           wsum = (wsum + s.data[(i + j)]);
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
@@ -57,7 +57,7 @@ uint64_t window_max_fixed(forge_span_u64_t s __attribute__((unused)), uint64_t n
         best = wsum;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -65,14 +65,14 @@ uint64_t window_max_fixed(forge_span_u64_t s __attribute__((unused)), uint64_t n
 }
 
 uint64_t window_min_subarray_ge(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t best __attribute__((unused)) = (n + 1);
-  uint64_t wsum __attribute__((unused)) = 0;
-  uint64_t lo __attribute__((unused)) = 0;
-  uint64_t hi __attribute__((unused)) = 0;
+  uint64_t best __attribute__((unused)) = (n + 1ULL);
+  uint64_t wsum __attribute__((unused)) = 0ULL;
+  uint64_t lo __attribute__((unused)) = 0ULL;
+  uint64_t hi __attribute__((unused)) = 0ULL;
   {
     while ((hi < n)) {
       wsum = (wsum + s.data[hi]);
-      hi = (hi + 1);
+      hi = (hi + 1ULL);
       {
         while (((wsum >= target) && (lo < hi))) {
           uint64_t len __attribute__((unused)) = (hi - lo);
@@ -81,7 +81,7 @@ uint64_t window_min_subarray_ge(forge_span_u64_t s __attribute__((unused)), uint
 
           }
           wsum = (wsum - s.data[lo]);
-          lo = (lo + 1);
+          lo = (lo + 1ULL);
         }
 
       }
@@ -92,7 +92,7 @@ uint64_t window_min_subarray_ge(forge_span_u64_t s __attribute__((unused)), uint
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -23,21 +23,21 @@ uint64_t reopen_cycle(uint64_t port1 __attribute__((unused)), uint64_t port2 __a
 int main();
 
 Conn conn_new() {
-  return (Conn){ .state = 0, .port = 0 };
+  return (Conn){ .state = 0ULL, .port = 0ULL };
 }
 
 void conn_listen(Conn* c __attribute__((unused)), uint64_t port __attribute__((unused))) {
-  (*c).state = 1;
+  (*c).state = 1ULL;
   (*c).port = port;
 }
 
 void conn_accept(Conn* c __attribute__((unused))) {
-  (*c).state = 2;
+  (*c).state = 2ULL;
 }
 
 void conn_close(Conn* c __attribute__((unused))) {
-  (*c).state = 0;
-  (*c).port = 0;
+  (*c).state = 0ULL;
+  (*c).port = 0ULL;
 }
 
 uint64_t full_cycle(uint64_t port __attribute__((unused))) {
@@ -58,7 +58,7 @@ uint64_t reopen_cycle(uint64_t port1 __attribute__((unused)), uint64_t port2 __a
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

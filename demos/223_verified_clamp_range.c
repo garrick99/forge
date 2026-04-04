@@ -32,7 +32,7 @@ void clamp_range(forge_span_u64_t s __attribute__((unused)), uint64_t lo __attri
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -17,7 +17,7 @@ uint64_t use_sum();
 int main();
 
 uint64_t sum_buf(uint64_t N __attribute__((unused)), forge_span_u64_t s __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
   {
     for (uint64_t i = 0; i < (uint64_t)(N); i++) {
       acc = (acc + s.data[i]);
@@ -28,12 +28,12 @@ uint64_t sum_buf(uint64_t N __attribute__((unused)), forge_span_u64_t s __attrib
 }
 
 uint64_t use_sum() {
-  uint64_t arr[4] = { 1, 2, 3, 4 };
-  return 0;
+  uint64_t arr[4] __attribute__((unused)) = { 1ULL, 2ULL, 3ULL, 4ULL };
+  return 0ULL;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

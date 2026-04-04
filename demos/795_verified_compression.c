@@ -16,13 +16,13 @@ uint64_t lz_compress_step(forge_span_u64_t input __attribute__((unused)), uint64
 int main();
 
 uint64_t lz_compress_step(forge_span_u64_t input __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t hash_table __attribute__((unused)), uint64_t ht_size __attribute__((unused)), forge_span_u64_t output __attribute__((unused)), uint64_t out_cap __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
-  uint64_t out_idx __attribute__((unused)) = 0;
-  uint64_t h __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
+  uint64_t out_idx __attribute__((unused)) = 0ULL;
+  uint64_t h __attribute__((unused)) = 0ULL;
   {
     while ((h < ht_size)) {
       hash_table.data[h] = n;
-      h = (h + 1);
+      h = (h + 1ULL);
     }
 
   }
@@ -30,18 +30,18 @@ uint64_t lz_compress_step(forge_span_u64_t input __attribute__((unused)), uint64
     while ((i < n)) {
       uint64_t hash __attribute__((unused)) = (input.data[i] % ht_size);
       uint64_t prev __attribute__((unused)) = hash_table.data[hash];
-      if (((((prev < i) && (prev < n)) && (input.data[prev] == input.data[i])) && ((out_idx + 2) < out_cap))) {
+      if (((((prev < i) && (prev < n)) && (input.data[prev] == input.data[i])) && ((out_idx + 2ULL) < out_cap))) {
         output.data[out_idx] = (i - prev);
-        output.data[(out_idx + 1)] = 1;
-        out_idx = (out_idx + 2);
+        output.data[(out_idx + 1ULL)] = 1ULL;
+        out_idx = (out_idx + 2ULL);
 
       } else if ((out_idx < out_cap)) {
         output.data[out_idx] = input.data[i];
-        out_idx = (out_idx + 1);
+        out_idx = (out_idx + 1ULL);
 
       }
       hash_table.data[hash] = i;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -49,7 +49,7 @@ uint64_t lz_compress_step(forge_span_u64_t input __attribute__((unused)), uint64
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

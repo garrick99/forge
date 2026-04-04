@@ -16,54 +16,54 @@ uint64_t parity(uint64_t x __attribute__((unused)));
 int main();
 
 uint64_t popcount(uint64_t x __attribute__((unused))) {
-  uint64_t m1 __attribute__((unused)) = 6148914691236517205;
-  uint64_t s1 __attribute__((unused)) = ((x & m1) + ((x >> 1) & m1));
-  uint64_t m2 __attribute__((unused)) = 3689348814741910323;
-  uint64_t s2 __attribute__((unused)) = ((s1 & m2) + ((s1 >> 2) & m2));
-  uint64_t m4 __attribute__((unused)) = 1085102592571150095;
-  uint64_t s3 __attribute__((unused)) = ((s2 + (s2 >> 4)) & m4);
-  uint64_t final_ __attribute__((unused)) = ((s3 * 72340172838076673) >> 56);
+  uint64_t m1 __attribute__((unused)) = 6148914691236517205ULL;
+  uint64_t s1 __attribute__((unused)) = ((x & m1) + ((x >> 1ULL) & m1));
+  uint64_t m2 __attribute__((unused)) = 3689348814741910323ULL;
+  uint64_t s2 __attribute__((unused)) = ((s1 & m2) + ((s1 >> 2ULL) & m2));
+  uint64_t m4 __attribute__((unused)) = 1085102592571150095ULL;
+  uint64_t s3 __attribute__((unused)) = ((s2 + (s2 >> 4ULL)) & m4);
+  uint64_t final_ __attribute__((unused)) = ((s3 * 72340172838076673ULL) >> 56ULL);
   return final_;
 }
 
 uint64_t ctz(uint64_t x __attribute__((unused))) {
-  uint64_t lowest __attribute__((unused)) = (x & (0 - x));
-  uint64_t below __attribute__((unused)) = (lowest - 1);
+  uint64_t lowest __attribute__((unused)) = (x & (0ULL - x));
+  uint64_t below __attribute__((unused)) = (lowest - 1ULL);
   uint64_t r __attribute__((unused)) = popcount(below);
   return r;
 }
 
 uint64_t is_pow2(uint64_t x __attribute__((unused))) {
-  if (((x & (x - 1)) == 0)) {
-    return 1;
+  if (((x & (x - 1ULL)) == 0ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t parity(uint64_t x __attribute__((unused))) {
-  uint64_t a __attribute__((unused)) = (x ^ (x >> 32));
-  uint64_t b __attribute__((unused)) = (a ^ (a >> 16));
-  uint64_t c __attribute__((unused)) = (b ^ (b >> 8));
-  uint64_t d __attribute__((unused)) = (c ^ (c >> 4));
-  uint64_t e __attribute__((unused)) = (d ^ (d >> 2));
-  uint64_t f __attribute__((unused)) = (e ^ (e >> 1));
-  return (f & 1);
+  uint64_t a __attribute__((unused)) = (x ^ (x >> 32ULL));
+  uint64_t b __attribute__((unused)) = (a ^ (a >> 16ULL));
+  uint64_t c __attribute__((unused)) = (b ^ (b >> 8ULL));
+  uint64_t d __attribute__((unused)) = (c ^ (c >> 4ULL));
+  uint64_t e __attribute__((unused)) = (d ^ (d >> 2ULL));
+  uint64_t f __attribute__((unused)) = (e ^ (e >> 1ULL));
+  return (f & 1ULL);
 }
 
 int main() {
-  uint64_t pc0 __attribute__((unused)) = popcount(0);
-  uint64_t pc8 __attribute__((unused)) = popcount(255);
-  uint64_t pc3 __attribute__((unused)) = popcount(7);
-  uint64_t pc1 __attribute__((unused)) = popcount(256);
-  uint64_t tz3 __attribute__((unused)) = ctz(8);
-  uint64_t tz0 __attribute__((unused)) = ctz(1);
-  uint64_t tz2 __attribute__((unused)) = ctz(12);
-  uint64_t p16 __attribute__((unused)) = is_pow2(16);
-  uint64_t p12 __attribute__((unused)) = is_pow2(12);
-  uint64_t par0 __attribute__((unused)) = parity(0);
-  uint64_t par1 __attribute__((unused)) = parity(7);
-  uint64_t par2 __attribute__((unused)) = parity(6);
+  uint64_t pc0 __attribute__((unused)) = popcount(0ULL);
+  uint64_t pc8 __attribute__((unused)) = popcount(255ULL);
+  uint64_t pc3 __attribute__((unused)) = popcount(7ULL);
+  uint64_t pc1 __attribute__((unused)) = popcount(256ULL);
+  uint64_t tz3 __attribute__((unused)) = ctz(8ULL);
+  uint64_t tz0 __attribute__((unused)) = ctz(1ULL);
+  uint64_t tz2 __attribute__((unused)) = ctz(12ULL);
+  uint64_t p16 __attribute__((unused)) = is_pow2(16ULL);
+  uint64_t p12 __attribute__((unused)) = is_pow2(12ULL);
+  uint64_t par0 __attribute__((unused)) = parity(0ULL);
+  uint64_t par1 __attribute__((unused)) = parity(7ULL);
+  uint64_t par2 __attribute__((unused)) = parity(6ULL);
   return (int)((((((((((((pc0 + pc8) + pc3) + pc1) + tz3) + tz0) + tz2) + p16) + p12) + par0) + par1) + par2));
 
 }

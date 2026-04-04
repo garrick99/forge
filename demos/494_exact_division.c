@@ -32,7 +32,7 @@ uint64_t rem_bound(uint64_t a __attribute__((unused)), uint64_t b __attribute__(
 }
 
 _Bool is_divisible(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  return ((a % b) == 0);
+  return ((a % b) == 0ULL);
 }
 
 uint64_t align_down(uint64_t v __attribute__((unused)), uint64_t align __attribute__((unused))) {
@@ -40,39 +40,39 @@ uint64_t align_down(uint64_t v __attribute__((unused)), uint64_t align __attribu
 }
 
 uint64_t align_up(uint64_t v __attribute__((unused)), uint64_t align __attribute__((unused))) {
-  return ((((v + align) - 1) / align) * align);
+  return ((((v + align) - 1ULL) / align) * align);
 }
 
 uint64_t check_div_floor_10_3() {
-  return div_floor(10, 3);
+  return div_floor(10ULL, 3ULL);
 }
 
 uint64_t check_rem_10_3() {
-  return rem_bound(10, 3);
+  return rem_bound(10ULL, 3ULL);
 }
 
 _Bool check_divisible_12_4() {
-  return is_divisible(12, 4);
+  return is_divisible(12ULL, 4ULL);
 }
 
 _Bool check_not_divisible_10_3() {
-  return is_divisible(10, 3);
+  return is_divisible(10ULL, 3ULL);
 }
 
 uint64_t check_align_down_10_4() {
-  return align_down(10, 4);
+  return align_down(10ULL, 4ULL);
 }
 
 uint64_t check_align_up_9_4() {
-  return align_up(9, 4);
+  return align_up(9ULL, 4ULL);
 }
 
 uint64_t check_align_up_exact() {
-  return align_up(8, 4);
+  return align_up(8ULL, 4ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

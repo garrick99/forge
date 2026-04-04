@@ -28,27 +28,27 @@ uint64_t four_ops();
 int main();
 
 Device dev_new() {
-  return (Device){ .powered = 0, .initialized = 0, .active = 0, .ops = 0 };
+  return (Device){ .powered = 0ULL, .initialized = 0ULL, .active = 0ULL, .ops = 0ULL };
 }
 
 void dev_power_on(Device* d __attribute__((unused))) {
-  (*d).powered = 1;
-  (*d).ops = ((*d).ops + 1);
+  (*d).powered = 1ULL;
+  (*d).ops = ((*d).ops + 1ULL);
 }
 
 void dev_init(Device* d __attribute__((unused))) {
-  (*d).initialized = 1;
-  (*d).ops = ((*d).ops + 1);
+  (*d).initialized = 1ULL;
+  (*d).ops = ((*d).ops + 1ULL);
 }
 
 void dev_activate(Device* d __attribute__((unused))) {
-  (*d).active = 1;
-  (*d).ops = ((*d).ops + 1);
+  (*d).active = 1ULL;
+  (*d).ops = ((*d).ops + 1ULL);
 }
 
 void dev_deactivate(Device* d __attribute__((unused))) {
-  (*d).active = 0;
-  (*d).ops = ((*d).ops + 1);
+  (*d).active = 0ULL;
+  (*d).ops = ((*d).ops + 1ULL);
 }
 
 uint64_t full_startup_active() {
@@ -86,7 +86,7 @@ uint64_t four_ops() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

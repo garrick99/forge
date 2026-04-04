@@ -16,29 +16,29 @@ void sift_down(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribut
 int main();
 
 void sift_down(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  if ((n == 1)) {
+  if ((n == 1ULL)) {
 
-  } else if ((n == 2)) {
-    if ((s.data[0] > s.data[1])) {
-      uint64_t tmp __attribute__((unused)) = s.data[0];
-      s.data[0] = s.data[1];
-      s.data[1] = tmp;
+  } else if ((n == 2ULL)) {
+    if ((s.data[0ULL] > s.data[1ULL])) {
+      uint64_t tmp __attribute__((unused)) = s.data[0ULL];
+      s.data[0ULL] = s.data[1ULL];
+      s.data[1ULL] = tmp;
 
     }
 
-  } else if ((s.data[1] <= s.data[2])) {
-    if ((s.data[0] > s.data[1])) {
-      uint64_t tmp __attribute__((unused)) = s.data[0];
-      s.data[0] = s.data[1];
-      s.data[1] = tmp;
+  } else if ((s.data[1ULL] <= s.data[2ULL])) {
+    if ((s.data[0ULL] > s.data[1ULL])) {
+      uint64_t tmp __attribute__((unused)) = s.data[0ULL];
+      s.data[0ULL] = s.data[1ULL];
+      s.data[1ULL] = tmp;
 
     }
 
   } else {
-    if ((s.data[0] > s.data[2])) {
-      uint64_t tmp __attribute__((unused)) = s.data[0];
-      s.data[0] = s.data[2];
-      s.data[2] = tmp;
+    if ((s.data[0ULL] > s.data[2ULL])) {
+      uint64_t tmp __attribute__((unused)) = s.data[0ULL];
+      s.data[0ULL] = s.data[2ULL];
+      s.data[2ULL] = tmp;
 
     }
 
@@ -46,7 +46,7 @@ void sift_down(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribut
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

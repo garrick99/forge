@@ -24,43 +24,43 @@ uint64_t check_4byte_len();
 int main();
 
 uint64_t utf8_seq_len(uint64_t first_byte __attribute__((unused))) {
-  if ((first_byte < 128)) {
-    return 1;
+  if ((first_byte < 128ULL)) {
+    return 1ULL;
   } else {
-    if ((first_byte < 224)) {
-      return 2;
+    if ((first_byte < 224ULL)) {
+      return 2ULL;
     } else {
-      if ((first_byte < 240)) {
-        return 3;
+      if ((first_byte < 240ULL)) {
+        return 3ULL;
       } else {
-        return 4;
+        return 4ULL;
       }
     }
   }
 }
 
 _Bool utf8_is_ascii(uint64_t b __attribute__((unused))) {
-  return (b < 128);
+  return (b < 128ULL);
 }
 
 _Bool utf8_is_continuation(uint64_t b __attribute__((unused))) {
-  return ((b >= 128) && (b < 192));
+  return ((b >= 128ULL) && (b < 192ULL));
 }
 
 _Bool utf8_is_start_2(uint64_t b __attribute__((unused))) {
-  return ((b >= 192) && (b < 224));
+  return ((b >= 192ULL) && (b < 224ULL));
 }
 
 uint64_t utf8_count_ascii(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((s.data[i] < 128)) {
-        cnt = (cnt + 1);
+      if ((s.data[i] < 128ULL)) {
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -68,23 +68,23 @@ uint64_t utf8_count_ascii(forge_span_u64_t s __attribute__((unused)), uint64_t n
 }
 
 uint64_t check_ascii_len() {
-  return utf8_seq_len(65);
+  return utf8_seq_len(65ULL);
 }
 
 uint64_t check_2byte_len() {
-  return utf8_seq_len(200);
+  return utf8_seq_len(200ULL);
 }
 
 uint64_t check_3byte_len() {
-  return utf8_seq_len(230);
+  return utf8_seq_len(230ULL);
 }
 
 uint64_t check_4byte_len() {
-  return utf8_seq_len(245);
+  return utf8_seq_len(245ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

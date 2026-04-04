@@ -25,7 +25,7 @@ void memmove_fwd(forge_span_u64_t dst __attribute__((unused)), forge_span_u64_t 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

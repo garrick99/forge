@@ -29,28 +29,28 @@ void set_val(uint64_t* v __attribute__((unused)), uint64_t val __attribute__((un
 int main();
 
 void counter_init(Counter* c __attribute__((unused)), uint64_t max __attribute__((unused))) {
-  (*c).value = 0;
+  (*c).value = 0ULL;
   (*c).max = max;
 }
 
 void counter_inc(Counter* c __attribute__((unused))) {
-  (*c).value = ((*c).value + 1);
+  (*c).value = ((*c).value + 1ULL);
 }
 
 void counter_reset(Counter* c __attribute__((unused))) {
-  (*c).value = 0;
+  (*c).value = 0ULL;
 }
 
 void conn_open(ConnState* c __attribute__((unused))) {
-  (*c).state = 1;
+  (*c).state = 1ULL;
 }
 
 void conn_send(ConnState* c __attribute__((unused))) {
-  (*c).count = ((*c).count + 1);
+  (*c).count = ((*c).count + 1ULL);
 }
 
 void conn_close(ConnState* c __attribute__((unused))) {
-  (*c).state = 2;
+  (*c).state = 2ULL;
 }
 
 void set_val(uint64_t* v __attribute__((unused)), uint64_t val __attribute__((unused))) {
@@ -58,7 +58,7 @@ void set_val(uint64_t* v __attribute__((unused)), uint64_t val __attribute__((un
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

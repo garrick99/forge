@@ -16,7 +16,7 @@ uint64_t min64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unu
 uint64_t max64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 uint64_t clamp64(uint64_t v __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused)));
 uint64_t abs_diff(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
-uint64_t pow64(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused)));
+uint64_t pow64(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused)));
 uint64_t ceil_div(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 uint64_t round_up(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 uint64_t gcd64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
@@ -68,16 +68,16 @@ uint64_t abs_diff(uint64_t a __attribute__((unused)), uint64_t b __attribute__((
   }
 }
 
-uint64_t pow64(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused))) {
-  if ((exp == 0)) {
-    return 1;
+uint64_t pow64(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused))) {
+  if ((forge_exp == 0ULL)) {
+    return 1ULL;
   } else {
-    return (base * pow64(base, (exp - 1)));
+    return (base * pow64(base, (forge_exp - 1ULL)));
   }
 }
 
 uint64_t ceil_div(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  return (((a + b) - 1) / b);
+  return (((a + b) - 1ULL) / b);
 }
 
 uint64_t round_up(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
@@ -85,7 +85,7 @@ uint64_t round_up(uint64_t a __attribute__((unused)), uint64_t b __attribute__((
 }
 
 uint64_t gcd64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if ((b == 0)) {
+  if ((b == 0ULL)) {
     return a;
   } else {
     return gcd64(b, (a % b));
@@ -93,8 +93,8 @@ uint64_t gcd64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unu
 }
 
 uint64_t sat_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if ((a > (-1 - b))) {
-    return -1;
+  if ((a > (0xffffffffffffffffULL - b))) {
+    return 0xffffffffffffffffULL;
   } else {
     return (a + b);
   }
@@ -102,18 +102,18 @@ uint64_t sat_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((u
 
 uint64_t sat_sub(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
   if ((a < b)) {
-    return 0;
+    return 0ULL;
   } else {
     return (a - b);
   }
 }
 
 uint64_t sat_mul(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if ((b == 0)) {
-    return 0;
+  if ((b == 0ULL)) {
+    return 0ULL;
   } else {
-    if ((a > (-1 / b))) {
-      return -1;
+    if ((a > (0xffffffffffffffffULL / b))) {
+      return 0xffffffffffffffffULL;
     } else {
       return (a * b);
     }
@@ -121,39 +121,39 @@ uint64_t sat_mul(uint64_t a __attribute__((unused)), uint64_t b __attribute__((u
 }
 
 _Bool is_pow2(uint64_t n __attribute__((unused))) {
-  return ((n & (n - 1)) == 0);
+  return ((n & (n - 1ULL)) == 0ULL);
 }
 
 uint64_t popcount64(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return 0;
+  if ((n == 0ULL)) {
+    return 0ULL;
   } else {
-    return (1 + popcount64((n & (n - 1))));
+    return (1ULL + popcount64((n & (n - 1ULL))));
   }
 }
 
 uint64_t floor_log2(uint64_t n __attribute__((unused))) {
-  if ((n == 1)) {
-    return 0;
+  if ((n == 1ULL)) {
+    return 0ULL;
   } else {
-    return (1 + floor_log2((n / 2)));
+    return (1ULL + floor_log2((n / 2ULL)));
   }
 }
 
 void selection_sort(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t min_idx __attribute__((unused)) = i;
-      uint64_t j __attribute__((unused)) = (i + 1);
+      uint64_t j __attribute__((unused)) = (i + 1ULL);
       {
         while ((j < n)) {
           if ((s.data[j] < s.data[min_idx])) {
             min_idx = j;
-            j = (j + 1);
+            j = (j + 1ULL);
 
           } else {
-            j = (j + 1);
+            j = (j + 1ULL);
 
           }
         }
@@ -162,25 +162,25 @@ void selection_sort(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
       uint64_t tmp __attribute__((unused)) = s.data[i];
       s.data[i] = s.data[min_idx];
       s.data[min_idx] = tmp;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t bin_search(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
   uint64_t hi __attribute__((unused)) = n;
   uint64_t ans __attribute__((unused)) = n;
   {
     while ((lo < hi)) {
-      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2));
+      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2ULL));
       if ((s.data[mid] == target)) {
         ans = mid;
         lo = hi;
 
       } else if ((s.data[mid] < target)) {
-        lo = (mid + 1);
+        lo = (mid + 1ULL);
 
       } else {
         hi = mid;
@@ -198,12 +198,12 @@ uint64_t sort_and_search(forge_span_u64_t s __attribute__((unused)), uint64_t n 
 }
 
 uint64_t array_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -211,7 +211,7 @@ uint64_t array_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -22,12 +22,12 @@ uint64_t span_last(forge_span_u64_t s __attribute__((unused)));
 int main();
 
 uint64_t span_sum(forge_span_u64_t s __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < s.len)) {
       acc = (acc + s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -35,15 +35,15 @@ uint64_t span_sum(forge_span_u64_t s __attribute__((unused))) {
 }
 
 uint64_t all_below(forge_span_u64_t s __attribute__((unused)), uint64_t bound __attribute__((unused))) {
-  uint64_t ok __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t ok __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < s.len)) {
       if ((s.data[i] >= bound)) {
-        ok = 0;
+        ok = 0ULL;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -51,15 +51,15 @@ uint64_t all_below(forge_span_u64_t s __attribute__((unused)), uint64_t bound __
 }
 
 uint64_t count_equal(forge_span_u64_t s __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < s.len)) {
       if ((s.data[i] == target)) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -68,16 +68,16 @@ uint64_t count_equal(forge_span_u64_t s __attribute__((unused)), uint64_t target
 
 uint64_t find_first(forge_span_u64_t s __attribute__((unused)), uint64_t target __attribute__((unused))) {
   uint64_t idx __attribute__((unused)) = s.len;
-  uint64_t i __attribute__((unused)) = 0;
-  uint64_t found __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
+  uint64_t found __attribute__((unused)) = 0ULL;
   {
     while ((i < s.len)) {
-      if (((s.data[i] == target) && (found == 0))) {
+      if (((s.data[i] == target) && (found == 0ULL))) {
         idx = i;
-        found = 1;
+        found = 1ULL;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -89,16 +89,16 @@ uint64_t span_len(forge_span_u64_t s __attribute__((unused))) {
 }
 
 uint64_t span_first(forge_span_u64_t s __attribute__((unused))) {
-  return s.data[0];
+  return s.data[0ULL];
 }
 
 uint64_t span_last(forge_span_u64_t s __attribute__((unused))) {
-  return s.data[(s.len - 1)];
+  return s.data[(s.len - 1ULL)];
 }
 
 int main() {
-  uint64_t sl __attribute__((unused)) = 5;
-  uint64_t sl2 __attribute__((unused)) = 3;
+  uint64_t sl __attribute__((unused)) = 5ULL;
+  uint64_t sl2 __attribute__((unused)) = 3ULL;
   uint64_t r_sl __attribute__((unused)) = sl;
   return (int)((sl + sl2));
 

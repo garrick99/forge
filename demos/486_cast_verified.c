@@ -48,27 +48,27 @@ uint64_t scale_byte(uint8_t v __attribute__((unused)), uint64_t factor __attribu
 }
 
 uint8_t check_cast_48() {
-  return u64_to_u8(48);
+  return u64_to_u8(48ULL);
 }
 
 uint8_t check_cast_255() {
-  return u64_to_u8(255);
+  return u64_to_u8(255ULL);
 }
 
 uint64_t check_widen_97() {
-  return u8_to_u64(97);
+  return u8_to_u64(97ULL);
 }
 
 uint8_t check_round_trip() {
-  return round_trip_u8(65);
+  return round_trip_u8(65ULL);
 }
 
 uint64_t check_scale_zero() {
-  return scale_byte(0, 100);
+  return scale_byte(0ULL, 100ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

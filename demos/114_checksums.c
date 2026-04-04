@@ -19,11 +19,11 @@ int main();
 
 uint64_t oc_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
   uint64_t s __attribute__((unused)) = (a + b);
-  uint64_t lo __attribute__((unused)) = (s & 65535);
-  uint64_t carry __attribute__((unused)) = (s >> 16);
+  uint64_t lo __attribute__((unused)) = (s & 65535ULL);
+  uint64_t carry __attribute__((unused)) = (s >> 16ULL);
   uint64_t r __attribute__((unused)) = (lo + carry);
-  if ((r >= 65536)) {
-    return (r - 65536);
+  if ((r >= 65536ULL)) {
+    return (r - 65536ULL);
   } else {
     return r;
   }
@@ -31,65 +31,65 @@ uint64_t oc_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((un
 
 uint64_t inet_checksum4(uint64_t w0 __attribute__((unused)), uint64_t w1 __attribute__((unused))) {
   uint64_t s __attribute__((unused)) = oc_add(w0, w1);
-  uint64_t inv __attribute__((unused)) = (s ^ 65535);
-  return (inv & 65535);
+  uint64_t inv __attribute__((unused)) = (s ^ 65535ULL);
+  return (inv & 65535ULL);
 }
 
 uint64_t crc8_byte(uint64_t crc __attribute__((unused)), uint64_t data __attribute__((unused))) {
   uint64_t x __attribute__((unused)) = (crc ^ data);
   uint64_t x0;
-  if (((x & 128) > 0)) {
-    x0 = (((x << 1) & 255) ^ 7);
+  if (((x & 128ULL) > 0ULL)) {
+    x0 = (((x << 1ULL) & 255ULL) ^ 7ULL);
   } else {
-    x0 = ((x << 1) & 255);
+    x0 = ((x << 1ULL) & 255ULL);
   }
   uint64_t x1;
-  if (((x0 & 128) > 0)) {
-    x1 = (((x0 << 1) & 255) ^ 7);
+  if (((x0 & 128ULL) > 0ULL)) {
+    x1 = (((x0 << 1ULL) & 255ULL) ^ 7ULL);
   } else {
-    x1 = ((x0 << 1) & 255);
+    x1 = ((x0 << 1ULL) & 255ULL);
   }
   uint64_t x2;
-  if (((x1 & 128) > 0)) {
-    x2 = (((x1 << 1) & 255) ^ 7);
+  if (((x1 & 128ULL) > 0ULL)) {
+    x2 = (((x1 << 1ULL) & 255ULL) ^ 7ULL);
   } else {
-    x2 = ((x1 << 1) & 255);
+    x2 = ((x1 << 1ULL) & 255ULL);
   }
   uint64_t x3;
-  if (((x2 & 128) > 0)) {
-    x3 = (((x2 << 1) & 255) ^ 7);
+  if (((x2 & 128ULL) > 0ULL)) {
+    x3 = (((x2 << 1ULL) & 255ULL) ^ 7ULL);
   } else {
-    x3 = ((x2 << 1) & 255);
+    x3 = ((x2 << 1ULL) & 255ULL);
   }
   uint64_t x4;
-  if (((x3 & 128) > 0)) {
-    x4 = (((x3 << 1) & 255) ^ 7);
+  if (((x3 & 128ULL) > 0ULL)) {
+    x4 = (((x3 << 1ULL) & 255ULL) ^ 7ULL);
   } else {
-    x4 = ((x3 << 1) & 255);
+    x4 = ((x3 << 1ULL) & 255ULL);
   }
   uint64_t x5;
-  if (((x4 & 128) > 0)) {
-    x5 = (((x4 << 1) & 255) ^ 7);
+  if (((x4 & 128ULL) > 0ULL)) {
+    x5 = (((x4 << 1ULL) & 255ULL) ^ 7ULL);
   } else {
-    x5 = ((x4 << 1) & 255);
+    x5 = ((x4 << 1ULL) & 255ULL);
   }
   uint64_t x6;
-  if (((x5 & 128) > 0)) {
-    x6 = (((x5 << 1) & 255) ^ 7);
+  if (((x5 & 128ULL) > 0ULL)) {
+    x6 = (((x5 << 1ULL) & 255ULL) ^ 7ULL);
   } else {
-    x6 = ((x5 << 1) & 255);
+    x6 = ((x5 << 1ULL) & 255ULL);
   }
   uint64_t x7;
-  if (((x6 & 128) > 0)) {
-    x7 = (((x6 << 1) & 255) ^ 7);
+  if (((x6 & 128ULL) > 0ULL)) {
+    x7 = (((x6 << 1ULL) & 255ULL) ^ 7ULL);
   } else {
-    x7 = ((x6 << 1) & 255);
+    x7 = ((x6 << 1ULL) & 255ULL);
   }
   return x7;
 }
 
 uint64_t crc8_4(uint64_t b0 __attribute__((unused)), uint64_t b1 __attribute__((unused)), uint64_t b2 __attribute__((unused)), uint64_t b3 __attribute__((unused))) {
-  uint64_t c0 __attribute__((unused)) = crc8_byte(0, b0);
+  uint64_t c0 __attribute__((unused)) = crc8_byte(0ULL, b0);
   uint64_t c1 __attribute__((unused)) = crc8_byte(c0, b1);
   uint64_t c2 __attribute__((unused)) = crc8_byte(c1, b2);
   uint64_t c3 __attribute__((unused)) = crc8_byte(c2, b3);
@@ -97,31 +97,31 @@ uint64_t crc8_4(uint64_t b0 __attribute__((unused)), uint64_t b1 __attribute__((
 }
 
 uint64_t fletcher_sum1(uint64_t b0 __attribute__((unused)), uint64_t b1 __attribute__((unused)), uint64_t b2 __attribute__((unused)), uint64_t b3 __attribute__((unused))) {
-  uint64_t s __attribute__((unused)) = ((((b0 + b1) + b2) + b3) % 255);
+  uint64_t s __attribute__((unused)) = ((((b0 + b1) + b2) + b3) % 255ULL);
   return s;
 }
 
 uint64_t fletcher_sum2(uint64_t b0 __attribute__((unused)), uint64_t b1 __attribute__((unused)), uint64_t b2 __attribute__((unused)), uint64_t b3 __attribute__((unused))) {
-  uint64_t a1 __attribute__((unused)) = (b0 % 255);
-  uint64_t a2 __attribute__((unused)) = ((a1 + b1) % 255);
-  uint64_t a3 __attribute__((unused)) = ((a2 + b2) % 255);
-  uint64_t a4 __attribute__((unused)) = ((a3 + b3) % 255);
-  uint64_t c1 __attribute__((unused)) = (b0 % 255);
-  uint64_t c2 __attribute__((unused)) = ((c1 + ((a1 + b1) % 255)) % 255);
-  uint64_t c3 __attribute__((unused)) = ((c2 + ((a2 + b2) % 255)) % 255);
-  uint64_t c4 __attribute__((unused)) = ((c3 + ((a3 + b3) % 255)) % 255);
+  uint64_t a1 __attribute__((unused)) = (b0 % 255ULL);
+  uint64_t a2 __attribute__((unused)) = ((a1 + b1) % 255ULL);
+  uint64_t a3 __attribute__((unused)) = ((a2 + b2) % 255ULL);
+  uint64_t a4 __attribute__((unused)) = ((a3 + b3) % 255ULL);
+  uint64_t c1 __attribute__((unused)) = (b0 % 255ULL);
+  uint64_t c2 __attribute__((unused)) = ((c1 + ((a1 + b1) % 255ULL)) % 255ULL);
+  uint64_t c3 __attribute__((unused)) = ((c2 + ((a2 + b2) % 255ULL)) % 255ULL);
+  uint64_t c4 __attribute__((unused)) = ((c3 + ((a3 + b3) % 255ULL)) % 255ULL);
   return c4;
 }
 
 int main() {
-  uint64_t oc1 __attribute__((unused)) = oc_add(0, 0);
-  uint64_t oc2 __attribute__((unused)) = oc_add(65535, 1);
-  uint64_t oc3 __attribute__((unused)) = oc_add(60000, 10000);
-  uint64_t ic0 __attribute__((unused)) = inet_checksum4(0, 0);
-  uint64_t crc0 __attribute__((unused)) = crc8_4(0, 0, 0, 0);
-  uint64_t crc1 __attribute__((unused)) = crc8_4(1, 2, 3, 4);
-  uint64_t fs1 __attribute__((unused)) = fletcher_sum1(1, 2, 3, 4);
-  uint64_t fs2 __attribute__((unused)) = fletcher_sum2(1, 2, 3, 4);
+  uint64_t oc1 __attribute__((unused)) = oc_add(0ULL, 0ULL);
+  uint64_t oc2 __attribute__((unused)) = oc_add(65535ULL, 1ULL);
+  uint64_t oc3 __attribute__((unused)) = oc_add(60000ULL, 10000ULL);
+  uint64_t ic0 __attribute__((unused)) = inet_checksum4(0ULL, 0ULL);
+  uint64_t crc0 __attribute__((unused)) = crc8_4(0ULL, 0ULL, 0ULL, 0ULL);
+  uint64_t crc1 __attribute__((unused)) = crc8_4(1ULL, 2ULL, 3ULL, 4ULL);
+  uint64_t fs1 __attribute__((unused)) = fletcher_sum1(1ULL, 2ULL, 3ULL, 4ULL);
+  uint64_t fs2 __attribute__((unused)) = fletcher_sum2(1ULL, 2ULL, 3ULL, 4ULL);
   return (int)((((((((oc1 + oc2) + oc3) + ic0) + crc0) + crc1) + fs1) + fs2));
 
 }

@@ -17,18 +17,18 @@ int main();
 
 void scale(forge_span_u64_t s __attribute__((unused)), uint64_t factor __attribute__((unused)), uint64_t max_elem __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = s.len;
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while ((k < n)) {
       s.data[k] = (s.data[k] * factor);
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

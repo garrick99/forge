@@ -27,7 +27,7 @@ uint64_t expire_count();
 int main();
 
 RewardPoints rp_new() {
-  return (RewardPoints){ .earned = 0, .redeemed = 0, .expired = 0, .balance = 0 };
+  return (RewardPoints){ .earned = 0ULL, .redeemed = 0ULL, .expired = 0ULL, .balance = 0ULL };
 }
 
 void rp_earn(RewardPoints* r __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -47,36 +47,36 @@ void rp_expire(RewardPoints* r __attribute__((unused)), uint64_t n __attribute__
 
 uint64_t earn_200() {
   RewardPoints r __attribute__((unused)) = rp_new();
-  rp_earn((&r), 100);
-  rp_earn((&r), 100);
+  rp_earn((&r), 100ULL);
+  rp_earn((&r), 100ULL);
   return r.balance;
 }
 
 uint64_t redeem_50() {
   RewardPoints r __attribute__((unused)) = rp_new();
-  rp_earn((&r), 200);
-  rp_redeem((&r), 50);
+  rp_earn((&r), 200ULL);
+  rp_redeem((&r), 50ULL);
   return r.balance;
 }
 
 uint64_t balance_invariant() {
   RewardPoints r __attribute__((unused)) = rp_new();
-  rp_earn((&r), 300);
-  rp_redeem((&r), 100);
-  rp_expire((&r), 50);
+  rp_earn((&r), 300ULL);
+  rp_redeem((&r), 100ULL);
+  rp_expire((&r), 50ULL);
   return (r.balance - ((r.earned - r.redeemed) - r.expired));
 }
 
 uint64_t expire_count() {
   RewardPoints r __attribute__((unused)) = rp_new();
-  rp_earn((&r), 200);
-  rp_expire((&r), 25);
-  rp_expire((&r), 50);
+  rp_earn((&r), 200ULL);
+  rp_expire((&r), 25ULL);
+  rp_expire((&r), 50ULL);
   return r.expired;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

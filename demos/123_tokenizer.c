@@ -25,46 +25,46 @@ uint64_t scan_int_len(uint64_t c0 __attribute__((unused)), uint64_t c1 __attribu
 int main();
 
 uint64_t CC_DIGIT() {
-  return 1;
+  return 1ULL;
 }
 
 uint64_t CC_ALPHA() {
-  return 2;
+  return 2ULL;
 }
 
 uint64_t CC_UNDER() {
-  return 3;
+  return 3ULL;
 }
 
 uint64_t CC_SPACE() {
-  return 4;
+  return 4ULL;
 }
 
 uint64_t CC_OPER() {
-  return 5;
+  return 5ULL;
 }
 
 uint64_t CC_OTHER() {
-  return 6;
+  return 6ULL;
 }
 
 uint64_t char_class(uint64_t c __attribute__((unused))) {
-  if (((c >= 48) && (c <= 57))) {
-    return 1;
+  if (((c >= 48ULL) && (c <= 57ULL))) {
+    return 1ULL;
   } else {
-    if ((((c >= 65) && (c <= 90)) || ((c >= 97) && (c <= 122)))) {
-      return 2;
+    if ((((c >= 65ULL) && (c <= 90ULL)) || ((c >= 97ULL) && (c <= 122ULL)))) {
+      return 2ULL;
     } else {
-      if ((c == 95)) {
-        return 3;
+      if ((c == 95ULL)) {
+        return 3ULL;
       } else {
-        if (((((c == 32) || (c == 9)) || (c == 10)) || (c == 13))) {
-          return 4;
+        if (((((c == 32ULL) || (c == 9ULL)) || (c == 10ULL)) || (c == 13ULL))) {
+          return 4ULL;
         } else {
-          if ((((((((c == 43) || (c == 45)) || (c == 42)) || (c == 47)) || (c == 61)) || (c == 60)) || (c == 62))) {
-            return 5;
+          if ((((((((c == 43ULL) || (c == 45ULL)) || (c == 42ULL)) || (c == 47ULL)) || (c == 61ULL)) || (c == 60ULL)) || (c == 62ULL))) {
+            return 5ULL;
           } else {
-            return 6;
+            return 6ULL;
           }
         }
       }
@@ -73,44 +73,44 @@ uint64_t char_class(uint64_t c __attribute__((unused))) {
 }
 
 uint64_t is_int_start(uint64_t cc __attribute__((unused))) {
-  if ((cc == 1)) {
-    return 1;
+  if ((cc == 1ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t is_ident_start(uint64_t cc __attribute__((unused))) {
-  if (((cc == 2) || (cc == 3))) {
-    return 1;
+  if (((cc == 2ULL) || (cc == 3ULL))) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t is_ident_cont(uint64_t cc __attribute__((unused))) {
-  if ((((cc == 1) || (cc == 2)) || (cc == 3))) {
-    return 1;
+  if ((((cc == 1ULL) || (cc == 2ULL)) || (cc == 3ULL))) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t token_type1(uint64_t c0 __attribute__((unused))) {
   uint64_t cc __attribute__((unused)) = char_class(c0);
-  if ((cc == 1)) {
-    return 1;
+  if ((cc == 1ULL)) {
+    return 1ULL;
   } else {
-    if (((cc == 2) || (cc == 3))) {
-      return 2;
+    if (((cc == 2ULL) || (cc == 3ULL))) {
+      return 2ULL;
     } else {
-      if ((cc == 5)) {
-        return 3;
+      if ((cc == 5ULL)) {
+        return 3ULL;
       } else {
-        if ((cc == 4)) {
-          return 0;
+        if ((cc == 4ULL)) {
+          return 0ULL;
         } else {
-          return 4;
+          return 4ULL;
         }
       }
     }
@@ -120,16 +120,16 @@ uint64_t token_type1(uint64_t c0 __attribute__((unused))) {
 uint64_t token_type2(uint64_t c0 __attribute__((unused)), uint64_t c1 __attribute__((unused))) {
   uint64_t cc0 __attribute__((unused)) = char_class(c0);
   uint64_t cc1 __attribute__((unused)) = char_class(c1);
-  if (((cc0 == 1) && (cc1 == 1))) {
-    return 1;
+  if (((cc0 == 1ULL) && (cc1 == 1ULL))) {
+    return 1ULL;
   } else {
-    if ((((cc0 == 2) || (cc0 == 3)) && (((cc1 == 1) || (cc1 == 2)) || (cc1 == 3)))) {
-      return 2;
+    if ((((cc0 == 2ULL) || (cc0 == 3ULL)) && (((cc1 == 1ULL) || (cc1 == 2ULL)) || (cc1 == 3ULL)))) {
+      return 2ULL;
     } else {
-      if (((cc0 == 5) && (cc1 == 5))) {
-        return 3;
+      if (((cc0 == 5ULL) && (cc1 == 5ULL))) {
+        return 3ULL;
       } else {
-        return 4;
+        return 4ULL;
       }
     }
   }
@@ -137,42 +137,42 @@ uint64_t token_type2(uint64_t c0 __attribute__((unused)), uint64_t c1 __attribut
 
 uint64_t scan_int_len(uint64_t c0 __attribute__((unused)), uint64_t c1 __attribute__((unused)), uint64_t c2 __attribute__((unused)), uint64_t c3 __attribute__((unused))) {
   uint64_t d0;
-  if ((char_class(c0) == 1)) {
-    d0 = 1;
+  if ((char_class(c0) == 1ULL)) {
+    d0 = 1ULL;
   } else {
-    d0 = 0;
+    d0 = 0ULL;
   }
   uint64_t d1;
-  if ((char_class(c1) == 1)) {
-    d1 = 1;
+  if ((char_class(c1) == 1ULL)) {
+    d1 = 1ULL;
   } else {
-    d1 = 0;
+    d1 = 0ULL;
   }
   uint64_t d2;
-  if ((char_class(c2) == 1)) {
-    d2 = 1;
+  if ((char_class(c2) == 1ULL)) {
+    d2 = 1ULL;
   } else {
-    d2 = 0;
+    d2 = 0ULL;
   }
   uint64_t d3;
-  if ((char_class(c3) == 1)) {
-    d3 = 1;
+  if ((char_class(c3) == 1ULL)) {
+    d3 = 1ULL;
   } else {
-    d3 = 0;
+    d3 = 0ULL;
   }
-  if ((d0 == 0)) {
-    return 0;
+  if ((d0 == 0ULL)) {
+    return 0ULL;
   } else {
-    if ((d1 == 0)) {
-      return 1;
+    if ((d1 == 0ULL)) {
+      return 1ULL;
     } else {
-      if ((d2 == 0)) {
-        return 2;
+      if ((d2 == 0ULL)) {
+        return 2ULL;
       } else {
-        if ((d3 == 0)) {
-          return 3;
+        if ((d3 == 0ULL)) {
+          return 3ULL;
         } else {
-          return 4;
+          return 4ULL;
         }
       }
     }
@@ -180,18 +180,18 @@ uint64_t scan_int_len(uint64_t c0 __attribute__((unused)), uint64_t c1 __attribu
 }
 
 int main() {
-  uint64_t cc1 __attribute__((unused)) = char_class(48);
-  uint64_t cc2 __attribute__((unused)) = char_class(65);
-  uint64_t cc3 __attribute__((unused)) = char_class(95);
-  uint64_t cc4 __attribute__((unused)) = char_class(32);
-  uint64_t cc5 __attribute__((unused)) = char_class(43);
-  uint64_t cc6 __attribute__((unused)) = char_class(36);
-  uint64_t ia __attribute__((unused)) = is_ident_start(2);
-  uint64_t id __attribute__((unused)) = is_ident_start(1);
-  uint64_t t1 __attribute__((unused)) = token_type1(49);
-  uint64_t t2 __attribute__((unused)) = token_type1(97);
-  uint64_t t3 __attribute__((unused)) = token_type1(43);
-  uint64_t sl __attribute__((unused)) = scan_int_len(49, 50, 51, 120);
+  uint64_t cc1 __attribute__((unused)) = char_class(48ULL);
+  uint64_t cc2 __attribute__((unused)) = char_class(65ULL);
+  uint64_t cc3 __attribute__((unused)) = char_class(95ULL);
+  uint64_t cc4 __attribute__((unused)) = char_class(32ULL);
+  uint64_t cc5 __attribute__((unused)) = char_class(43ULL);
+  uint64_t cc6 __attribute__((unused)) = char_class(36ULL);
+  uint64_t ia __attribute__((unused)) = is_ident_start(2ULL);
+  uint64_t id __attribute__((unused)) = is_ident_start(1ULL);
+  uint64_t t1 __attribute__((unused)) = token_type1(49ULL);
+  uint64_t t2 __attribute__((unused)) = token_type1(97ULL);
+  uint64_t t3 __attribute__((unused)) = token_type1(43ULL);
+  uint64_t sl __attribute__((unused)) = scan_int_len(49ULL, 50ULL, 51ULL, 120ULL);
   return (int)((((((((((((cc1 + cc2) + cc3) + cc4) + cc5) + cc6) + ia) + id) + t1) + t2) + t3) + sl));
 
 }

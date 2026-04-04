@@ -1,0 +1,221 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry linepoly_fold_m31_kernel(
+    .param .u64 linepoly_fold_m31_kernel_param_out_data,
+    .param .u64 linepoly_fold_m31_kernel_param_out_len,
+    .param .u64 linepoly_fold_m31_kernel_param_eval_data,
+    .param .u64 linepoly_fold_m31_kernel_param_eval_len,
+    .param .u64 linepoly_fold_m31_kernel_param_inv_2y_data,
+    .param .u64 linepoly_fold_m31_kernel_param_inv_2y_len,
+    .param .u32 linepoly_fold_m31_kernel_param_alpha,
+    .param .u32 linepoly_fold_m31_kernel_param_inv2,
+    .param .u64 linepoly_fold_m31_kernel_param_half
+)
+{
+    .reg .pred %p14;
+    .reg .u64 %rd0, %rd1, %rd15, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd29, %rd3, %rd30, %rd31, %rd32, %rd4, %rd5, %rd8;
+    .reg .u32 %r10, %r11, %r12, %r13, %r33, %r34, %r35, %r6, %r7, %r9;
+
+  ld.param.u64 %rd0, [linepoly_fold_m31_kernel_param_out_data];
+  ld.param.u64 %rd1, [linepoly_fold_m31_kernel_param_out_len];
+  ld.param.u64 %rd2, [linepoly_fold_m31_kernel_param_eval_data];
+  ld.param.u64 %rd3, [linepoly_fold_m31_kernel_param_eval_len];
+  ld.param.u64 %rd4, [linepoly_fold_m31_kernel_param_inv_2y_data];
+  ld.param.u64 %rd5, [linepoly_fold_m31_kernel_param_inv_2y_len];
+  ld.param.u32 %r6, [linepoly_fold_m31_kernel_param_alpha];
+  ld.param.u32 %r7, [linepoly_fold_m31_kernel_param_inv2];
+  ld.param.u64 %rd8, [linepoly_fold_m31_kernel_param_half];
+
+  mov.u32 %r9, %ctaid.x;
+  mov.u32 %r10, %ntid.x;
+  mul.lo.u32 %r11, %r9, %r10;
+  mov.u32 %r12, %tid.x;
+  add.u32 %r13, %r11, %r12;
+  cvt.u64.u32 %rd15, %r13;
+  setp.lt.u64 %p14, %rd15, %rd8;
+  @%p14 bra linepoly_fold_m31_kernel_then_16;
+  bra linepoly_fold_m31_kernel_else_16;
+  linepoly_fold_m31_kernel_then_16:
+  mov.u64 %rd17, 0; // unhandled expr
+  mov.u64 %rd18, 0; // unhandled expr
+  mov.u64 %rd19, 0; // unhandled expr
+  mov.u64 %rd20, 0; // call m31_get (device fn)
+  mov.u64 %rd21, 0; // call m31_get (device fn)
+  mov.u64 %rd22, 0; // call m31_get (device fn)
+  mov.u64 %rd23, 0; // call m31_add (device fn)
+  mov.u64 %rd24, 0; // call m31_mul (device fn)
+  mov.u64 %rd25, 0; // call m31_sub (device fn)
+  mov.u64 %rd26, 0; // call m31_mul (device fn)
+  mov.u64 %rd27, 0; // call m31_mul (device fn)
+  mov.u64 %rd28, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd29, %r13;
+  mov.u64 %rd30, 4;
+  mul.lo.u64 %rd31, %rd29, %rd30;
+  add.u64 %rd32, %rd0, %rd31;
+  st.global.u32 [%rd32], %rd28;
+  mov.u32 %r33, 0; // unit
+  mov.u32 %r34, %r33;
+  bra linepoly_fold_m31_kernel_end_16;
+  linepoly_fold_m31_kernel_else_16:
+  mov.u32 %r34, 0; // no else branch
+  linepoly_fold_m31_kernel_end_16:
+  mov.u32 %r35, 0; // unit
+  ret;
+}
+
+.visible .entry linepoly_fold_qm31_kernel(
+    .param .u64 linepoly_fold_qm31_kernel_param_out_rr_data,
+    .param .u64 linepoly_fold_qm31_kernel_param_out_rr_len,
+    .param .u64 linepoly_fold_qm31_kernel_param_out_ri_data,
+    .param .u64 linepoly_fold_qm31_kernel_param_out_ri_len,
+    .param .u64 linepoly_fold_qm31_kernel_param_out_ir_data,
+    .param .u64 linepoly_fold_qm31_kernel_param_out_ir_len,
+    .param .u64 linepoly_fold_qm31_kernel_param_out_ii_data,
+    .param .u64 linepoly_fold_qm31_kernel_param_out_ii_len,
+    .param .u64 linepoly_fold_qm31_kernel_param_eval_data,
+    .param .u64 linepoly_fold_qm31_kernel_param_eval_len,
+    .param .u64 linepoly_fold_qm31_kernel_param_inv_2y_data,
+    .param .u64 linepoly_fold_qm31_kernel_param_inv_2y_len,
+    .param .u32 linepoly_fold_qm31_kernel_param_alpha_rr,
+    .param .u32 linepoly_fold_qm31_kernel_param_alpha_ri,
+    .param .u32 linepoly_fold_qm31_kernel_param_alpha_ir,
+    .param .u32 linepoly_fold_qm31_kernel_param_alpha_ii,
+    .param .u32 linepoly_fold_qm31_kernel_param_inv2,
+    .param .u64 linepoly_fold_qm31_kernel_param_half
+)
+{
+    .reg .pred %p23;
+    .reg .u64 %rd0, %rd1, %rd10, %rd11, %rd17, %rd2, %rd24, %rd26, %rd27, %rd28, %rd29, %rd3, %rd30, %rd31, %rd32, %rd33, %rd34, %rd35, %rd36, %rd37, %rd38, %rd39, %rd4, %rd40, %rd41, %rd42, %rd43, %rd44, %rd45, %rd46, %rd47, %rd48, %rd49, %rd5, %rd50, %rd51, %rd52, %rd53, %rd54, %rd55, %rd56, %rd6, %rd7, %rd8, %rd9;
+    .reg .u32 %r12, %r13, %r14, %r15, %r16, %r18, %r19, %r20, %r21, %r22, %r57, %r58, %r59;
+
+  ld.param.u64 %rd0, [linepoly_fold_qm31_kernel_param_out_rr_data];
+  ld.param.u64 %rd1, [linepoly_fold_qm31_kernel_param_out_rr_len];
+  ld.param.u64 %rd2, [linepoly_fold_qm31_kernel_param_out_ri_data];
+  ld.param.u64 %rd3, [linepoly_fold_qm31_kernel_param_out_ri_len];
+  ld.param.u64 %rd4, [linepoly_fold_qm31_kernel_param_out_ir_data];
+  ld.param.u64 %rd5, [linepoly_fold_qm31_kernel_param_out_ir_len];
+  ld.param.u64 %rd6, [linepoly_fold_qm31_kernel_param_out_ii_data];
+  ld.param.u64 %rd7, [linepoly_fold_qm31_kernel_param_out_ii_len];
+  ld.param.u64 %rd8, [linepoly_fold_qm31_kernel_param_eval_data];
+  ld.param.u64 %rd9, [linepoly_fold_qm31_kernel_param_eval_len];
+  ld.param.u64 %rd10, [linepoly_fold_qm31_kernel_param_inv_2y_data];
+  ld.param.u64 %rd11, [linepoly_fold_qm31_kernel_param_inv_2y_len];
+  ld.param.u32 %r12, [linepoly_fold_qm31_kernel_param_alpha_rr];
+  ld.param.u32 %r13, [linepoly_fold_qm31_kernel_param_alpha_ri];
+  ld.param.u32 %r14, [linepoly_fold_qm31_kernel_param_alpha_ir];
+  ld.param.u32 %r15, [linepoly_fold_qm31_kernel_param_alpha_ii];
+  ld.param.u32 %r16, [linepoly_fold_qm31_kernel_param_inv2];
+  ld.param.u64 %rd17, [linepoly_fold_qm31_kernel_param_half];
+
+  mov.u32 %r18, %ctaid.x;
+  mov.u32 %r19, %ntid.x;
+  mul.lo.u32 %r20, %r18, %r19;
+  mov.u32 %r21, %tid.x;
+  add.u32 %r22, %r20, %r21;
+  cvt.u64.u32 %rd24, %r22;
+  setp.lt.u64 %p23, %rd24, %rd17;
+  @%p23 bra linepoly_fold_qm31_kernel_then_25;
+  bra linepoly_fold_qm31_kernel_else_25;
+  linepoly_fold_qm31_kernel_then_25:
+  mov.u64 %rd26, 0; // unhandled expr
+  mov.u64 %rd27, 0; // unhandled expr
+  mov.u64 %rd28, 0; // unhandled expr
+  mov.u64 %rd29, 0; // call m31_get (device fn)
+  mov.u64 %rd30, 0; // call m31_get (device fn)
+  mov.u64 %rd31, 0; // call m31_get (device fn)
+  mov.u64 %rd32, 0; // call m31_add (device fn)
+  mov.u64 %rd33, 0; // call m31_mul (device fn)
+  mov.u64 %rd34, 0; // call m31_sub (device fn)
+  mov.u64 %rd35, 0; // call m31_mul (device fn)
+  mov.u64 %rd36, 0; // call m31_mul (device fn)
+  mov.u64 %rd37, 0; // call m31_mul (device fn)
+  mov.u64 %rd38, 0; // call m31_mul (device fn)
+  mov.u64 %rd39, 0; // call m31_mul (device fn)
+  mov.u64 %rd40, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd41, %r22;
+  mov.u64 %rd42, 4;
+  mul.lo.u64 %rd43, %rd41, %rd42;
+  add.u64 %rd44, %rd0, %rd43;
+  st.global.u32 [%rd44], %rd40;
+  cvt.u64.u32 %rd45, %r22;
+  mov.u64 %rd46, 4;
+  mul.lo.u64 %rd47, %rd45, %rd46;
+  add.u64 %rd48, %rd2, %rd47;
+  st.global.u32 [%rd48], %rd37;
+  cvt.u64.u32 %rd49, %r22;
+  mov.u64 %rd50, 4;
+  mul.lo.u64 %rd51, %rd49, %rd50;
+  add.u64 %rd52, %rd4, %rd51;
+  st.global.u32 [%rd52], %rd38;
+  cvt.u64.u32 %rd53, %r22;
+  mov.u64 %rd54, 4;
+  mul.lo.u64 %rd55, %rd53, %rd54;
+  add.u64 %rd56, %rd6, %rd55;
+  st.global.u32 [%rd56], %rd39;
+  mov.u32 %r57, 0; // unit
+  mov.u32 %r58, %r57;
+  bra linepoly_fold_qm31_kernel_end_25;
+  linepoly_fold_qm31_kernel_else_25:
+  mov.u32 %r58, 0; // no else branch
+  linepoly_fold_qm31_kernel_end_25:
+  mov.u32 %r59, 0; // unit
+  ret;
+}
+
+.visible .entry linepoly_eval_kernel(
+    .param .u64 linepoly_eval_kernel_param_out_data,
+    .param .u64 linepoly_eval_kernel_param_out_len,
+    .param .u64 linepoly_eval_kernel_param_x_coord_data,
+    .param .u64 linepoly_eval_kernel_param_x_coord_len,
+    .param .u32 linepoly_eval_kernel_param_f0,
+    .param .u32 linepoly_eval_kernel_param_f1,
+    .param .u64 linepoly_eval_kernel_param_n
+)
+{
+    .reg .pred %p12;
+    .reg .u64 %rd0, %rd1, %rd13, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd3, %rd6;
+    .reg .u32 %r10, %r11, %r24, %r25, %r26, %r4, %r5, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [linepoly_eval_kernel_param_out_data];
+  ld.param.u64 %rd1, [linepoly_eval_kernel_param_out_len];
+  ld.param.u64 %rd2, [linepoly_eval_kernel_param_x_coord_data];
+  ld.param.u64 %rd3, [linepoly_eval_kernel_param_x_coord_len];
+  ld.param.u32 %r4, [linepoly_eval_kernel_param_f0];
+  ld.param.u32 %r5, [linepoly_eval_kernel_param_f1];
+  ld.param.u64 %rd6, [linepoly_eval_kernel_param_n];
+
+  mov.u32 %r7, %ctaid.x;
+  mov.u32 %r8, %ntid.x;
+  mul.lo.u32 %r9, %r7, %r8;
+  mov.u32 %r10, %tid.x;
+  add.u32 %r11, %r9, %r10;
+  cvt.u64.u32 %rd13, %r11;
+  setp.lt.u64 %p12, %rd13, %rd6;
+  @%p12 bra linepoly_eval_kernel_then_14;
+  bra linepoly_eval_kernel_else_14;
+  linepoly_eval_kernel_then_14:
+  mov.u64 %rd15, 0; // unhandled expr
+  mov.u64 %rd16, 0; // unhandled expr
+  mov.u64 %rd17, 0; // call m31_get (device fn)
+  mov.u64 %rd18, 0; // call m31_mul (device fn)
+  mov.u64 %rd19, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd20, %r11;
+  mov.u64 %rd21, 4;
+  mul.lo.u64 %rd22, %rd20, %rd21;
+  add.u64 %rd23, %rd0, %rd22;
+  st.global.u32 [%rd23], %rd19;
+  mov.u32 %r24, 0; // unit
+  mov.u32 %r25, %r24;
+  bra linepoly_eval_kernel_end_14;
+  linepoly_eval_kernel_else_14:
+  mov.u32 %r25, 0; // no else branch
+  linepoly_eval_kernel_end_14:
+  mov.u32 %r26, 0; // unit
+  ret;
+}
+

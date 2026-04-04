@@ -19,51 +19,51 @@ void fill_inc_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t start 
 int main();
 
 void fill_increasing(forge_span_u64_t s __attribute__((unused)), uint64_t start __attribute__((unused))) {
-  uint64_t idx __attribute__((unused)) = 0;
+  uint64_t idx __attribute__((unused)) = 0ULL;
   {
     while ((idx < s.len)) {
       s.data[idx] = (start + idx);
-      idx = (idx + 1);
+      idx = (idx + 1ULL);
     }
 
   }
 }
 
 void copy_add(forge_span_u64_t dst __attribute__((unused)), forge_span_u64_t src __attribute__((unused)), uint64_t delta __attribute__((unused))) {
-  uint64_t idx __attribute__((unused)) = 0;
+  uint64_t idx __attribute__((unused)) = 0ULL;
   {
     while ((idx < dst.len)) {
       dst.data[idx] = (src.data[idx] + delta);
-      idx = (idx + 1);
+      idx = (idx + 1ULL);
     }
 
   }
 }
 
 void zip_add(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t idx __attribute__((unused)) = 0;
+  uint64_t idx __attribute__((unused)) = 0ULL;
   {
     while ((idx < out.len)) {
       out.data[idx] = (a.data[idx] + b.data[idx]);
-      idx = (idx + 1);
+      idx = (idx + 1ULL);
     }
 
   }
 }
 
 void fill_inc_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t start __attribute__((unused))) {
-  uint64_t idx __attribute__((unused)) = 0;
+  uint64_t idx __attribute__((unused)) = 0ULL;
   {
     while ((idx < s.len)) {
       s.data[idx] = (start + idx);
-      idx = (idx + 1);
+      idx = (idx + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(42);
+  return (int)(42ULL);
 
 }
 

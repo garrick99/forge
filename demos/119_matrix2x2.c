@@ -32,7 +32,7 @@ Mat2 mat_new(uint64_t a00 __attribute__((unused)), uint64_t a01 __attribute__((u
 }
 
 Mat2 mat_identity() {
-  return (Mat2){ .a00 = 1, .a01 = 0, .a10 = 0, .a11 = 1 };
+  return (Mat2){ .a00 = 1ULL, .a01 = 0ULL, .a10 = 0ULL, .a11 = 1ULL };
 }
 
 Mat2 mat_add(Mat2 a __attribute__((unused)), Mat2 b __attribute__((unused))) {
@@ -59,9 +59,9 @@ uint64_t mul_identity(Mat2 m __attribute__((unused))) {
   Mat2 eye __attribute__((unused)) = mat_identity();
   Mat2 p __attribute__((unused)) = mat_mul(m, eye);
   if (((((p.a00 == m.a00) && (p.a01 == m.a01)) && (p.a10 == m.a10)) && (p.a11 == m.a11))) {
-    return 1;
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
@@ -71,25 +71,25 @@ uint64_t trace_additive(Mat2 a __attribute__((unused)), Mat2 b __attribute__((un
   uint64_t ta __attribute__((unused)) = mat_trace(a);
   uint64_t tb __attribute__((unused)) = mat_trace(b);
   if ((tc == (ta + tb))) {
-    return 1;
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 int main() {
-  Mat2 a __attribute__((unused)) = mat_new(1, 2, 3, 4);
-  Mat2 b __attribute__((unused)) = mat_new(5, 6, 7, 8);
+  Mat2 a __attribute__((unused)) = mat_new(1ULL, 2ULL, 3ULL, 4ULL);
+  Mat2 b __attribute__((unused)) = mat_new(5ULL, 6ULL, 7ULL, 8ULL);
   Mat2 c __attribute__((unused)) = mat_add(a, b);
   uint64_t tr_c __attribute__((unused)) = mat_trace(c);
-  Mat2 d __attribute__((unused)) = mat_scale(a, 3);
+  Mat2 d __attribute__((unused)) = mat_scale(a, 3ULL);
   uint64_t tr_d __attribute__((unused)) = mat_trace(d);
   Mat2 at __attribute__((unused)) = mat_transpose(a);
   uint64_t same_diag;
   if (((at.a00 == a.a00) && (at.a11 == a.a11))) {
-    same_diag = 1;
+    same_diag = 1ULL;
   } else {
-    same_diag = 0;
+    same_diag = 0ULL;
   }
   Mat2 p __attribute__((unused)) = mat_mul(a, b);
   uint64_t p00 __attribute__((unused)) = p.a00;

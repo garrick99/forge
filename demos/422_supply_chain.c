@@ -26,54 +26,54 @@ uint64_t batch_count();
 int main();
 
 SupplyChain sc_new(uint64_t raw __attribute__((unused))) {
-  return (SupplyChain){ .raw = raw, .in_process = 0, .finished = 0, .batches = 0 };
+  return (SupplyChain){ .raw = raw, .in_process = 0ULL, .finished = 0ULL, .batches = 0ULL };
 }
 
 void sc_process(SupplyChain* s __attribute__((unused)), uint64_t units __attribute__((unused))) {
   (*s).raw = ((*s).raw - units);
   (*s).in_process = ((*s).in_process + units);
-  (*s).batches = ((*s).batches + 1);
+  (*s).batches = ((*s).batches + 1ULL);
 }
 
 void sc_finish(SupplyChain* s __attribute__((unused)), uint64_t units __attribute__((unused))) {
   (*s).in_process = ((*s).in_process - units);
   (*s).finished = ((*s).finished + units);
-  (*s).batches = ((*s).batches + 1);
+  (*s).batches = ((*s).batches + 1ULL);
 }
 
 uint64_t process_30() {
-  SupplyChain s __attribute__((unused)) = sc_new(100);
-  sc_process((&s), 30);
+  SupplyChain s __attribute__((unused)) = sc_new(100ULL);
+  sc_process((&s), 30ULL);
   return s.raw;
 }
 
 uint64_t finish_20() {
-  SupplyChain s __attribute__((unused)) = sc_new(100);
-  sc_process((&s), 30);
-  sc_finish((&s), 20);
+  SupplyChain s __attribute__((unused)) = sc_new(100ULL);
+  sc_process((&s), 30ULL);
+  sc_finish((&s), 20ULL);
   return s.finished;
 }
 
 uint64_t conservation() {
-  SupplyChain s __attribute__((unused)) = sc_new(100);
-  sc_process((&s), 40);
-  sc_process((&s), 20);
-  sc_finish((&s), 30);
-  sc_finish((&s), 10);
+  SupplyChain s __attribute__((unused)) = sc_new(100ULL);
+  sc_process((&s), 40ULL);
+  sc_process((&s), 20ULL);
+  sc_finish((&s), 30ULL);
+  sc_finish((&s), 10ULL);
   return ((s.raw + s.in_process) + s.finished);
 }
 
 uint64_t batch_count() {
-  SupplyChain s __attribute__((unused)) = sc_new(100);
-  sc_process((&s), 40);
-  sc_process((&s), 20);
-  sc_finish((&s), 30);
-  sc_finish((&s), 10);
+  SupplyChain s __attribute__((unused)) = sc_new(100ULL);
+  sc_process((&s), 40ULL);
+  sc_process((&s), 20ULL);
+  sc_finish((&s), 30ULL);
+  sc_finish((&s), 10ULL);
   return s.batches;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

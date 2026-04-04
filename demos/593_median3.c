@@ -63,13 +63,13 @@ void sort3(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)
   uint64_t lo __attribute__((unused)) = min2(a, min2(b, c));
   uint64_t hi __attribute__((unused)) = max2(a, max2(b, c));
   uint64_t mid __attribute__((unused)) = median3(a, b, c);
-  out.data[0] = lo;
-  out.data[1] = mid;
-  out.data[2] = hi;
+  out.data[0ULL] = lo;
+  out.data[1ULL] = mid;
+  out.data[2ULL] = hi;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

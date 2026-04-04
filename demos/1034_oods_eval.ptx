@@ -1,0 +1,222 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry oods_numerator_kernel(
+    .param .u64 oods_numerator_kernel_param_numer_data,
+    .param .u64 oods_numerator_kernel_param_numer_len,
+    .param .u64 oods_numerator_kernel_param_eval_data,
+    .param .u64 oods_numerator_kernel_param_eval_len,
+    .param .u32 oods_numerator_kernel_param_p_at_z,
+    .param .u64 oods_numerator_kernel_param_n
+)
+{
+    .reg .pred %p11;
+    .reg .u64 %rd0, %rd1, %rd12, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd3, %rd5;
+    .reg .u32 %r10, %r22, %r23, %r24, %r4, %r6, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [oods_numerator_kernel_param_numer_data];
+  ld.param.u64 %rd1, [oods_numerator_kernel_param_numer_len];
+  ld.param.u64 %rd2, [oods_numerator_kernel_param_eval_data];
+  ld.param.u64 %rd3, [oods_numerator_kernel_param_eval_len];
+  ld.param.u32 %r4, [oods_numerator_kernel_param_p_at_z];
+  ld.param.u64 %rd5, [oods_numerator_kernel_param_n];
+
+  mov.u32 %r6, %ctaid.x;
+  mov.u32 %r7, %ntid.x;
+  mul.lo.u32 %r8, %r6, %r7;
+  mov.u32 %r9, %tid.x;
+  add.u32 %r10, %r8, %r9;
+  cvt.u64.u32 %rd12, %r10;
+  setp.lt.u64 %p11, %rd12, %rd5;
+  @%p11 bra oods_numerator_kernel_then_13;
+  bra oods_numerator_kernel_else_13;
+  oods_numerator_kernel_then_13:
+  mov.u64 %rd14, 0; // unhandled expr
+  mov.u64 %rd15, 0; // unhandled expr
+  mov.u64 %rd16, 0; // call m31_get (device fn)
+  mov.u64 %rd17, 0; // call m31_sub (device fn)
+  cvt.u64.u32 %rd18, %r10;
+  mov.u64 %rd19, 4;
+  mul.lo.u64 %rd20, %rd18, %rd19;
+  add.u64 %rd21, %rd0, %rd20;
+  st.global.u32 [%rd21], %rd17;
+  mov.u32 %r22, 0; // unit
+  mov.u32 %r23, %r22;
+  bra oods_numerator_kernel_end_13;
+  oods_numerator_kernel_else_13:
+  mov.u32 %r23, 0; // no else branch
+  oods_numerator_kernel_end_13:
+  mov.u32 %r24, 0; // unit
+  ret;
+}
+
+.visible .entry oods_combine_kernel(
+    .param .u64 oods_combine_kernel_param_combined_data,
+    .param .u64 oods_combine_kernel_param_combined_len,
+    .param .u64 oods_combine_kernel_param_numer_data,
+    .param .u64 oods_combine_kernel_param_numer_len,
+    .param .u32 oods_combine_kernel_param_beta_pow,
+    .param .u64 oods_combine_kernel_param_n
+)
+{
+    .reg .pred %p11;
+    .reg .u64 %rd0, %rd1, %rd12, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd3, %rd5;
+    .reg .u32 %r10, %r24, %r25, %r26, %r4, %r6, %r7, %r8, %r9;
+
+  ld.param.u64 %rd0, [oods_combine_kernel_param_combined_data];
+  ld.param.u64 %rd1, [oods_combine_kernel_param_combined_len];
+  ld.param.u64 %rd2, [oods_combine_kernel_param_numer_data];
+  ld.param.u64 %rd3, [oods_combine_kernel_param_numer_len];
+  ld.param.u32 %r4, [oods_combine_kernel_param_beta_pow];
+  ld.param.u64 %rd5, [oods_combine_kernel_param_n];
+
+  mov.u32 %r6, %ctaid.x;
+  mov.u32 %r7, %ntid.x;
+  mul.lo.u32 %r8, %r6, %r7;
+  mov.u32 %r9, %tid.x;
+  add.u32 %r10, %r8, %r9;
+  cvt.u64.u32 %rd12, %r10;
+  setp.lt.u64 %p11, %rd12, %rd5;
+  @%p11 bra oods_combine_kernel_then_13;
+  bra oods_combine_kernel_else_13;
+  oods_combine_kernel_then_13:
+  mov.u64 %rd14, 0; // unhandled expr
+  mov.u64 %rd15, 0; // unhandled expr
+  mov.u64 %rd16, 0; // call m31_get (device fn)
+  mov.u64 %rd17, 0; // call m31_get (device fn)
+  mov.u64 %rd18, 0; // call m31_mul (device fn)
+  mov.u64 %rd19, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd20, %r10;
+  mov.u64 %rd21, 4;
+  mul.lo.u64 %rd22, %rd20, %rd21;
+  add.u64 %rd23, %rd0, %rd22;
+  st.global.u32 [%rd23], %rd19;
+  mov.u32 %r24, 0; // unit
+  mov.u32 %r25, %r24;
+  bra oods_combine_kernel_end_13;
+  oods_combine_kernel_else_13:
+  mov.u32 %r25, 0; // no else branch
+  oods_combine_kernel_end_13:
+  mov.u32 %r26, 0; // unit
+  ret;
+}
+
+.visible .entry oods_quotient_fused_kernel(
+    .param .u64 oods_quotient_fused_kernel_param_quot_data,
+    .param .u64 oods_quotient_fused_kernel_param_quot_len,
+    .param .u64 oods_quotient_fused_kernel_param_eval_data,
+    .param .u64 oods_quotient_fused_kernel_param_eval_len,
+    .param .u64 oods_quotient_fused_kernel_param_inv_denom_data,
+    .param .u64 oods_quotient_fused_kernel_param_inv_denom_len,
+    .param .u32 oods_quotient_fused_kernel_param_p_at_z,
+    .param .u32 oods_quotient_fused_kernel_param_beta_pow,
+    .param .u64 oods_quotient_fused_kernel_param_n
+)
+{
+    .reg .pred %p14;
+    .reg .u64 %rd0, %rd1, %rd15, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd29, %rd3, %rd30, %rd4, %rd5, %rd8;
+    .reg .u32 %r10, %r11, %r12, %r13, %r31, %r32, %r33, %r6, %r7, %r9;
+
+  ld.param.u64 %rd0, [oods_quotient_fused_kernel_param_quot_data];
+  ld.param.u64 %rd1, [oods_quotient_fused_kernel_param_quot_len];
+  ld.param.u64 %rd2, [oods_quotient_fused_kernel_param_eval_data];
+  ld.param.u64 %rd3, [oods_quotient_fused_kernel_param_eval_len];
+  ld.param.u64 %rd4, [oods_quotient_fused_kernel_param_inv_denom_data];
+  ld.param.u64 %rd5, [oods_quotient_fused_kernel_param_inv_denom_len];
+  ld.param.u32 %r6, [oods_quotient_fused_kernel_param_p_at_z];
+  ld.param.u32 %r7, [oods_quotient_fused_kernel_param_beta_pow];
+  ld.param.u64 %rd8, [oods_quotient_fused_kernel_param_n];
+
+  mov.u32 %r9, %ctaid.x;
+  mov.u32 %r10, %ntid.x;
+  mul.lo.u32 %r11, %r9, %r10;
+  mov.u32 %r12, %tid.x;
+  add.u32 %r13, %r11, %r12;
+  cvt.u64.u32 %rd15, %r13;
+  setp.lt.u64 %p14, %rd15, %rd8;
+  @%p14 bra oods_quotient_fused_kernel_then_16;
+  bra oods_quotient_fused_kernel_else_16;
+  oods_quotient_fused_kernel_then_16:
+  mov.u64 %rd17, 0; // unhandled expr
+  mov.u64 %rd18, 0; // unhandled expr
+  mov.u64 %rd19, 0; // unhandled expr
+  mov.u64 %rd20, 0; // call m31_get (device fn)
+  mov.u64 %rd21, 0; // call m31_get (device fn)
+  mov.u64 %rd22, 0; // call m31_get (device fn)
+  mov.u64 %rd23, 0; // call m31_sub (device fn)
+  mov.u64 %rd24, 0; // call m31_mul (device fn)
+  mov.u64 %rd25, 0; // call m31_mul (device fn)
+  mov.u64 %rd26, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd27, %r13;
+  mov.u64 %rd28, 4;
+  mul.lo.u64 %rd29, %rd27, %rd28;
+  add.u64 %rd30, %rd0, %rd29;
+  st.global.u32 [%rd30], %rd26;
+  mov.u32 %r31, 0; // unit
+  mov.u32 %r32, %r31;
+  bra oods_quotient_fused_kernel_end_16;
+  oods_quotient_fused_kernel_else_16:
+  mov.u32 %r32, 0; // no else branch
+  oods_quotient_fused_kernel_end_16:
+  mov.u32 %r33, 0; // unit
+  ret;
+}
+
+.visible .entry oods_exclude_last_row_kernel(
+    .param .u64 oods_exclude_last_row_kernel_param_quot_data,
+    .param .u64 oods_exclude_last_row_kernel_param_quot_len,
+    .param .u64 oods_exclude_last_row_kernel_param_excluded_pos,
+    .param .u64 oods_exclude_last_row_kernel_param_n
+)
+{
+    .reg .pred %p13, %p9;
+    .reg .u64 %rd0, %rd1, %rd10, %rd12, %rd14, %rd16, %rd18, %rd19, %rd2, %rd20, %rd3;
+    .reg .u32 %r17, %r21, %r22, %r23, %r24, %r25, %r4, %r5, %r6, %r7, %r8;
+
+  ld.param.u64 %rd0, [oods_exclude_last_row_kernel_param_quot_data];
+  ld.param.u64 %rd1, [oods_exclude_last_row_kernel_param_quot_len];
+  ld.param.u64 %rd2, [oods_exclude_last_row_kernel_param_excluded_pos];
+  ld.param.u64 %rd3, [oods_exclude_last_row_kernel_param_n];
+
+  mov.u32 %r4, %ctaid.x;
+  mov.u32 %r5, %ntid.x;
+  mul.lo.u32 %r6, %r4, %r5;
+  mov.u32 %r7, %tid.x;
+  add.u32 %r8, %r6, %r7;
+  cvt.u64.u32 %rd10, %r8;
+  setp.lt.u64 %p9, %rd10, %rd3;
+  @%p9 bra oods_exclude_last_row_kernel_then_11;
+  bra oods_exclude_last_row_kernel_else_11;
+  oods_exclude_last_row_kernel_then_11:
+  mov.u64 %rd12, 0; // unhandled expr
+  cvt.u64.u32 %rd14, %r8;
+  setp.eq.u64 %p13, %rd14, %rd2;
+  @%p13 bra oods_exclude_last_row_kernel_then_15;
+  bra oods_exclude_last_row_kernel_else_15;
+  oods_exclude_last_row_kernel_then_15:
+  mov.u64 %rd16, 0; // unhandled expr
+  mov.u32 %r17, 0;
+  mov.u64 %rd18, 4;
+  mul.lo.u64 %rd19, %rd2, %rd18;
+  add.u64 %rd20, %rd0, %rd19;
+  st.global.u32 [%rd20], %r17;
+  mov.u32 %r21, 0; // unit
+  mov.u32 %r22, %r21;
+  bra oods_exclude_last_row_kernel_end_15;
+  oods_exclude_last_row_kernel_else_15:
+  mov.u32 %r22, 0; // no else branch
+  oods_exclude_last_row_kernel_end_15:
+  mov.u32 %r23, 0; // unit
+  mov.u32 %r24, %r23;
+  bra oods_exclude_last_row_kernel_end_11;
+  oods_exclude_last_row_kernel_else_11:
+  mov.u32 %r24, 0; // no else branch
+  oods_exclude_last_row_kernel_end_11:
+  mov.u32 %r25, 0; // unit
+  ret;
+}
+

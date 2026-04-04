@@ -16,17 +16,17 @@ uint64_t coin_change(forge_span_u64_t coins __attribute__((unused)), uint64_t n_
 int main();
 
 uint64_t coin_change(forge_span_u64_t coins __attribute__((unused)), uint64_t n_coins __attribute__((unused)), forge_span_u64_t dp __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t max_val __attribute__((unused)) = (target + 1);
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t max_val __attribute__((unused)) = (target + 1ULL);
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j <= target)) {
       dp.data[j] = max_val;
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
-  dp.data[0] = 0;
-  uint64_t c __attribute__((unused)) = 0;
+  dp.data[0ULL] = 0ULL;
+  uint64_t c __attribute__((unused)) = 0ULL;
   {
     while ((c < n_coins)) {
       uint64_t coin __attribute__((unused)) = coins.data[c];
@@ -36,20 +36,20 @@ uint64_t coin_change(forge_span_u64_t coins __attribute__((unused)), uint64_t n_
           while ((amt <= target)) {
             uint64_t prev __attribute__((unused)) = dp.data[(amt - coin)];
             if ((prev < max_val)) {
-              uint64_t candidate __attribute__((unused)) = (prev + 1);
+              uint64_t candidate __attribute__((unused)) = (prev + 1ULL);
               if ((candidate < dp.data[amt])) {
                 dp.data[amt] = candidate;
 
               }
 
             }
-            amt = (amt + 1);
+            amt = (amt + 1ULL);
           }
 
         }
 
       }
-      c = (c + 1);
+      c = (c + 1ULL);
     }
 
   }
@@ -57,7 +57,7 @@ uint64_t coin_change(forge_span_u64_t coins __attribute__((unused)), uint64_t n_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

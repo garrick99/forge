@@ -18,12 +18,12 @@ uint64_t dot_product(forge_span_u64_t s __attribute__((unused)), forge_span_u64_
 int main();
 
 uint64_t sum_n_natural(uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + i);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -31,12 +31,12 @@ uint64_t sum_n_natural(uint64_t n __attribute__((unused))) {
 }
 
 uint64_t sum_constant(uint64_t c __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + c);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -44,12 +44,12 @@ uint64_t sum_constant(uint64_t c __attribute__((unused)), uint64_t n __attribute
 }
 
 uint64_t dot_product(forge_span_u64_t s __attribute__((unused)), forge_span_u64_t t __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + (s.data[i] * t.data[i]));
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -57,7 +57,7 @@ uint64_t dot_product(forge_span_u64_t s __attribute__((unused)), forge_span_u64_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

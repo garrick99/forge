@@ -26,18 +26,18 @@ uint64_t total_sessions();
 int main();
 
 SessionTracker st_new() {
-  return (SessionTracker){ .active = 0, .total_sessions = 0, .total_duration = 0, .logouts = 0 };
+  return (SessionTracker){ .active = 0ULL, .total_sessions = 0ULL, .total_duration = 0ULL, .logouts = 0ULL };
 }
 
 void st_login(SessionTracker* s __attribute__((unused))) {
-  (*s).active = ((*s).active + 1);
-  (*s).total_sessions = ((*s).total_sessions + 1);
+  (*s).active = ((*s).active + 1ULL);
+  (*s).total_sessions = ((*s).total_sessions + 1ULL);
 }
 
 void st_logout(SessionTracker* s __attribute__((unused)), uint64_t duration __attribute__((unused))) {
-  (*s).active = ((*s).active - 1);
+  (*s).active = ((*s).active - 1ULL);
   (*s).total_duration = ((*s).total_duration + duration);
-  (*s).logouts = ((*s).logouts + 1);
+  (*s).logouts = ((*s).logouts + 1ULL);
 }
 
 uint64_t three_logins() {
@@ -51,7 +51,7 @@ uint64_t three_logins() {
 uint64_t login_logout() {
   SessionTracker s __attribute__((unused)) = st_new();
   st_login((&s));
-  st_logout((&s), 100);
+  st_logout((&s), 100ULL);
   return s.active;
 }
 
@@ -59,8 +59,8 @@ uint64_t duration_sum() {
   SessionTracker s __attribute__((unused)) = st_new();
   st_login((&s));
   st_login((&s));
-  st_logout((&s), 100);
-  st_logout((&s), 150);
+  st_logout((&s), 100ULL);
+  st_logout((&s), 150ULL);
   return s.total_duration;
 }
 
@@ -69,12 +69,12 @@ uint64_t total_sessions() {
   st_login((&s));
   st_login((&s));
   st_login((&s));
-  st_logout((&s), 60);
+  st_logout((&s), 60ULL);
   return s.total_sessions;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

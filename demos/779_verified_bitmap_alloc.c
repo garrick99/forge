@@ -19,15 +19,15 @@ int main();
 
 uint64_t bitmap_alloc(forge_span_u64_t bitmap __attribute__((unused)), uint64_t cap __attribute__((unused))) {
   uint64_t found __attribute__((unused)) = cap;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < cap)) {
-      if (((bitmap.data[i] == 0) && (found == cap))) {
-        bitmap.data[i] = 1;
+      if (((bitmap.data[i] == 0ULL) && (found == cap))) {
+        bitmap.data[i] = 1ULL;
         found = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -35,19 +35,19 @@ uint64_t bitmap_alloc(forge_span_u64_t bitmap __attribute__((unused)), uint64_t 
 }
 
 void bitmap_free(forge_span_u64_t bitmap __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t idx __attribute__((unused))) {
-  bitmap.data[idx] = 0;
+  bitmap.data[idx] = 0ULL;
 }
 
 uint64_t bitmap_count_free(forge_span_u64_t bitmap __attribute__((unused)), uint64_t cap __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < cap)) {
-      if ((bitmap.data[i] == 0)) {
-        count = (count + 1);
+      if ((bitmap.data[i] == 0ULL)) {
+        count = (count + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -55,7 +55,7 @@ uint64_t bitmap_count_free(forge_span_u64_t bitmap __attribute__((unused)), uint
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

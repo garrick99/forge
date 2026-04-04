@@ -17,17 +17,17 @@ uint64_t max_deadline(forge_span_u64_t deadline __attribute__((unused)), uint64_
 int main();
 
 uint64_t schedule_jobs(forge_span_u64_t start __attribute__((unused)), forge_span_u64_t finish __attribute__((unused)), forge_span_u64_t deadline __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t accepted __attribute__((unused)) = 0;
-  uint64_t cur_end __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t accepted __attribute__((unused)) = 0ULL;
+  uint64_t cur_end __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if (((start.data[i] >= cur_end) && (finish.data[i] <= deadline.data[i]))) {
-        accepted = (accepted + 1);
+        accepted = (accepted + 1ULL);
         cur_end = finish.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -35,15 +35,15 @@ uint64_t schedule_jobs(forge_span_u64_t start __attribute__((unused)), forge_spa
 }
 
 uint64_t max_deadline(forge_span_u64_t deadline __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t mx __attribute__((unused)) = deadline.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t mx __attribute__((unused)) = deadline.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((deadline.data[i] > mx)) {
         mx = deadline.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -51,7 +51,7 @@ uint64_t max_deadline(forge_span_u64_t deadline __attribute__((unused)), uint64_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

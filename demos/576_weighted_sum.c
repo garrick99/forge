@@ -19,12 +19,12 @@ uint64_t threshold_count(forge_span_u64_t weights __attribute__((unused)), uint6
 int main();
 
 uint64_t weighted_sum(forge_span_u64_t vals __attribute__((unused)), forge_span_u64_t weights __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t s __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t s __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s = (s + (vals.data[i] * weights.data[i]));
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -32,12 +32,12 @@ uint64_t weighted_sum(forge_span_u64_t vals __attribute__((unused)), forge_span_
 }
 
 uint64_t weight_sum(forge_span_u64_t weights __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t s __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t s __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s = (s + weights.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -45,15 +45,15 @@ uint64_t weight_sum(forge_span_u64_t weights __attribute__((unused)), uint64_t n
 }
 
 uint64_t max_weight_index(forge_span_u64_t weights __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t best __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t best __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((weights.data[i] > weights.data[best])) {
         best = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -61,15 +61,15 @@ uint64_t max_weight_index(forge_span_u64_t weights __attribute__((unused)), uint
 }
 
 uint64_t threshold_count(forge_span_u64_t weights __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t thresh __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((weights.data[i] >= thresh)) {
-        count = (count + 1);
+        count = (count + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -77,7 +77,7 @@ uint64_t threshold_count(forge_span_u64_t weights __attribute__((unused)), uint6
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

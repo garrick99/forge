@@ -44,7 +44,7 @@ uint64_t U64Box__Container__get(const U64Box* self __attribute__((unused))) {
 }
 
 uint64_t U64Box__Container__size(const U64Box* self __attribute__((unused))) {
-  return 1;
+  return 1ULL;
 }
 
 uint64_t U64Pair__Container__get(const U64Pair* self __attribute__((unused))) {
@@ -52,7 +52,7 @@ uint64_t U64Pair__Container__get(const U64Pair* self __attribute__((unused))) {
 }
 
 uint64_t U64Pair__Container__size(const U64Pair* self __attribute__((unused))) {
-  return 2;
+  return 2ULL;
 }
 
 uint64_t Sum2__Summable__total(const Sum2* self __attribute__((unused))) {
@@ -64,14 +64,14 @@ uint64_t Sum3__Summable__total(const Sum3* self __attribute__((unused))) {
 }
 
 int main() {
-  U64Box b __attribute__((unused)) = (U64Box){ .value = 42 };
-  U64Pair p __attribute__((unused)) = (U64Pair){ .first = 10, .second = 20 };
+  U64Box b __attribute__((unused)) = (U64Box){ .value = 42ULL };
+  U64Pair p __attribute__((unused)) = (U64Pair){ .first = 10ULL, .second = 20ULL };
   uint64_t v1 __attribute__((unused)) = U64Box__Container__get((&b));
   uint64_t v2 __attribute__((unused)) = U64Pair__Container__get((&p));
   uint64_t s1 __attribute__((unused)) = U64Box__Container__size((&b));
   uint64_t s2 __attribute__((unused)) = U64Pair__Container__size((&p));
-  Sum2 sum2 __attribute__((unused)) = (Sum2){ .a = 3, .b = 7 };
-  Sum3 sum3 __attribute__((unused)) = (Sum3){ .a = 1, .b = 2, .c = 4 };
+  Sum2 sum2 __attribute__((unused)) = (Sum2){ .a = 3ULL, .b = 7ULL };
+  Sum3 sum3 __attribute__((unused)) = (Sum3){ .a = 1ULL, .b = 2ULL, .c = 4ULL };
   uint64_t t2 __attribute__((unused)) = Sum2__Summable__total((&sum2));
   uint64_t t3 __attribute__((unused)) = Sum3__Summable__total((&sum3));
   return (int)((((((v1 + v2) + s1) + s2) + t2) + t3));

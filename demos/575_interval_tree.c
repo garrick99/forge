@@ -64,15 +64,15 @@ uint64_t interval_union_hi(Interval a __attribute__((unused)), Interval b __attr
 }
 
 uint64_t count_overlapping(forge_span_u64_t ivs_lo __attribute__((unused)), forge_span_u64_t ivs_hi __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t q_lo __attribute__((unused)), uint64_t q_hi __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if (((ivs_lo.data[i] < q_hi) && (q_lo < ivs_hi.data[i]))) {
-        count = (count + 1);
+        count = (count + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -80,7 +80,7 @@ uint64_t count_overlapping(forge_span_u64_t ivs_lo __attribute__((unused)), forg
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

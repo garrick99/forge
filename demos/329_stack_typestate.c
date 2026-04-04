@@ -27,19 +27,19 @@ uint64_t push3_clear(uint64_t cap __attribute__((unused)));
 int main();
 
 Stack stack_new(uint64_t cap __attribute__((unused))) {
-  return (Stack){ .size = 0, .cap = cap };
+  return (Stack){ .size = 0ULL, .cap = cap };
 }
 
 void stack_push(Stack* s __attribute__((unused))) {
-  (*s).size = ((*s).size + 1);
+  (*s).size = ((*s).size + 1ULL);
 }
 
 void stack_pop(Stack* s __attribute__((unused))) {
-  (*s).size = ((*s).size - 1);
+  (*s).size = ((*s).size - 1ULL);
 }
 
 void stack_clear(Stack* s __attribute__((unused))) {
-  (*s).size = 0;
+  (*s).size = 0ULL;
 }
 
 uint64_t new_is_empty(uint64_t cap __attribute__((unused))) {
@@ -86,7 +86,7 @@ uint64_t push3_clear(uint64_t cap __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

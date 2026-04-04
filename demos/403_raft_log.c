@@ -28,23 +28,23 @@ uint64_t term_advances();
 int main();
 
 RaftLog raft_new() {
-  return (RaftLog){ .current_term = 0, .last_log_index = 0, .commit_index = 0, .last_applied = 0 };
+  return (RaftLog){ .current_term = 0ULL, .last_log_index = 0ULL, .commit_index = 0ULL, .last_applied = 0ULL };
 }
 
 void raft_append(RaftLog* r __attribute__((unused))) {
-  (*r).last_log_index = ((*r).last_log_index + 1);
+  (*r).last_log_index = ((*r).last_log_index + 1ULL);
 }
 
 void raft_commit(RaftLog* r __attribute__((unused))) {
-  (*r).commit_index = ((*r).commit_index + 1);
+  (*r).commit_index = ((*r).commit_index + 1ULL);
 }
 
 void raft_apply(RaftLog* r __attribute__((unused))) {
-  (*r).last_applied = ((*r).last_applied + 1);
+  (*r).last_applied = ((*r).last_applied + 1ULL);
 }
 
 void raft_new_term(RaftLog* r __attribute__((unused))) {
-  (*r).current_term = ((*r).current_term + 1);
+  (*r).current_term = ((*r).current_term + 1ULL);
 }
 
 uint64_t append_three() {
@@ -87,7 +87,7 @@ uint64_t term_advances() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

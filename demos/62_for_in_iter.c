@@ -42,14 +42,14 @@ Option_u64 Counter__Iterator__next(Counter* self __attribute__((unused))) {
     return (Option_u64){ .tag = Option_u64_tag_None, .data.None = { ._dummy = 0 } };
   } else {
     uint64_t v __attribute__((unused)) = (*self).cur;
-    (*self).cur = ((*self).cur + 1);
+    (*self).cur = ((*self).cur + 1ULL);
     return (Option_u64){ .tag = Option_u64_tag_Some, .data.Some = { ._v0 = v } };
   }
 }
 
 uint64_t sum_to(uint64_t n __attribute__((unused))) {
-  Counter c __attribute__((unused)) = (Counter){ .cur = 0, .limit = n };
-  uint64_t acc __attribute__((unused)) = 0;
+  Counter c __attribute__((unused)) = (Counter){ .cur = 0ULL, .limit = n };
+  uint64_t acc __attribute__((unused)) = 0ULL;
   {
     { Counter __iter_x = c;
       for(;;) {
@@ -65,7 +65,7 @@ uint64_t sum_to(uint64_t n __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(sum_to(5));
+  return (int)(sum_to(5ULL));
 
 }
 

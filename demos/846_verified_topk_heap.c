@@ -17,19 +17,19 @@ void topk_tournament(forge_span_u64_t data __attribute__((unused)), uint64_t n _
 int main();
 
 void insert_sorted(forge_span_u64_t buf __attribute__((unused)), uint64_t k __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  if ((val > buf.data[0])) {
-    buf.data[0] = val;
-    uint64_t i __attribute__((unused)) = 0;
+  if ((val > buf.data[0ULL])) {
+    buf.data[0ULL] = val;
+    uint64_t i __attribute__((unused)) = 0ULL;
     {
-      while (((i + 1) < k)) {
-        if ((buf.data[i] > buf.data[(i + 1)])) {
+      while (((i + 1ULL) < k)) {
+        if ((buf.data[i] > buf.data[(i + 1ULL)])) {
           uint64_t tmp __attribute__((unused)) = buf.data[i];
-          buf.data[i] = buf.data[(i + 1)];
-          buf.data[(i + 1)] = tmp;
-          i = (i + 1);
+          buf.data[i] = buf.data[(i + 1ULL)];
+          buf.data[(i + 1ULL)] = tmp;
+          i = (i + 1ULL);
 
         } else {
-          i = (k - 1);
+          i = (k - 1ULL);
 
         }
       }
@@ -40,31 +40,31 @@ void insert_sorted(forge_span_u64_t buf __attribute__((unused)), uint64_t k __at
 }
 
 void topk_tournament(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t k __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < k)) {
       out.data[i] = data.data[i];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t pass __attribute__((unused)) = 0;
+  uint64_t pass __attribute__((unused)) = 0ULL;
   {
     while ((pass < k)) {
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
-        while (((j + 1) < k)) {
-          if ((out.data[j] > out.data[(j + 1)])) {
+        while (((j + 1ULL) < k)) {
+          if ((out.data[j] > out.data[(j + 1ULL)])) {
             uint64_t tmp __attribute__((unused)) = out.data[j];
-            out.data[j] = out.data[(j + 1)];
-            out.data[(j + 1)] = tmp;
+            out.data[j] = out.data[(j + 1ULL)];
+            out.data[(j + 1ULL)] = tmp;
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
-      pass = (pass + 1);
+      pass = (pass + 1ULL);
     }
 
   }
@@ -72,14 +72,14 @@ void topk_tournament(forge_span_u64_t data __attribute__((unused)), uint64_t n _
   {
     while ((idx < n)) {
       insert_sorted(out, k, data.data[idx]);
-      idx = (idx + 1);
+      idx = (idx + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

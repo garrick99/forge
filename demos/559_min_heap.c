@@ -22,15 +22,15 @@ _Bool heap_size_valid(uint64_t n __attribute__((unused)), uint64_t cap __attribu
 int main();
 
 uint64_t heap_parent(uint64_t i __attribute__((unused))) {
-  return ((i - 1) / 2);
+  return ((i - 1ULL) / 2ULL);
 }
 
 uint64_t heap_left(uint64_t i __attribute__((unused))) {
-  return ((2 * i) + 1);
+  return ((2ULL * i) + 1ULL);
 }
 
 uint64_t heap_right(uint64_t i __attribute__((unused))) {
-  return ((2 * i) + 2);
+  return ((2ULL * i) + 2ULL);
 }
 
 _Bool heap_is_valid_node(forge_span_u64_t h __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t i __attribute__((unused))) {
@@ -67,7 +67,7 @@ _Bool heap_size_valid(uint64_t n __attribute__((unused)), uint64_t cap __attribu
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

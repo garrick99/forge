@@ -17,15 +17,15 @@ int main();
 
 void scan_inplace(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
   {
-    for (uint64_t i = (uint64_t)(1); i < (uint64_t)(n); i++) {
-      s.data[i] = (s.data[i] + s.data[(i - 1)]);
+    for (uint64_t i = (uint64_t)(1ULL); i < (uint64_t)(n); i++) {
+      s.data[i] = (s.data[i] + s.data[(i - 1ULL)]);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

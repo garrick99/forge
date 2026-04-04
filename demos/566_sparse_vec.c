@@ -19,8 +19,8 @@ void sparse_scale(forge_span_u64_t vals __attribute__((unused)), uint64_t n __at
 int main();
 
 uint64_t sparse_dot(forge_span_u64_t idx __attribute__((unused)), forge_span_u64_t vals __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t dense __attribute__((unused)), uint64_t d_len __attribute__((unused))) {
-  uint64_t sum __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t sum __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t j __attribute__((unused)) = idx.data[i];
@@ -28,7 +28,7 @@ uint64_t sparse_dot(forge_span_u64_t idx __attribute__((unused)), forge_span_u64
         sum = (sum + (vals.data[i] * dense.data[j]));
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -36,15 +36,15 @@ uint64_t sparse_dot(forge_span_u64_t idx __attribute__((unused)), forge_span_u64
 }
 
 uint64_t sparse_count_valid(forge_span_u64_t idx __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t d_len __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((idx.data[i] < d_len)) {
-        count = (count + 1);
+        count = (count + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -52,15 +52,15 @@ uint64_t sparse_count_valid(forge_span_u64_t idx __attribute__((unused)), uint64
 }
 
 uint64_t sparse_max_index(forge_span_u64_t idx __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t m __attribute__((unused)) = idx.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t m __attribute__((unused)) = idx.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((idx.data[i] > m)) {
         m = idx.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -68,18 +68,18 @@ uint64_t sparse_max_index(forge_span_u64_t idx __attribute__((unused)), uint64_t
 }
 
 void sparse_scale(forge_span_u64_t vals __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t k __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       vals.data[i] = (vals.data[i] * k);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

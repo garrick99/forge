@@ -21,12 +21,12 @@ __forge_tuple_u64_u64_t fletcher_checksum(forge_span_u64_t data __attribute__((u
 int main();
 
 uint64_t checksum_add(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t sum __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t sum __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      sum = ((sum + data.data[i]) % 256);
-      i = (i + 1);
+      sum = ((sum + data.data[i]) % 256ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -34,12 +34,12 @@ uint64_t checksum_add(forge_span_u64_t data __attribute__((unused)), uint64_t n 
 }
 
 uint64_t checksum_xor(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t xor __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t xor __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       xor = (xor ^ data.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -47,14 +47,14 @@ uint64_t checksum_xor(forge_span_u64_t data __attribute__((unused)), uint64_t n 
 }
 
 __forge_tuple_u64_u64_t fletcher_checksum(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t sum1 __attribute__((unused)) = 0;
-  uint64_t sum2 __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t sum1 __attribute__((unused)) = 0ULL;
+  uint64_t sum2 __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      sum1 = ((sum1 + data.data[i]) % 256);
-      sum2 = ((sum2 + sum1) % 256);
-      i = (i + 1);
+      sum1 = ((sum1 + data.data[i]) % 256ULL);
+      sum2 = ((sum2 + sum1) % 256ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -62,7 +62,7 @@ __forge_tuple_u64_u64_t fletcher_checksum(forge_span_u64_t data __attribute__((u
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

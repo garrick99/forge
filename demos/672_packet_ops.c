@@ -22,47 +22,47 @@ uint64_t pkt_copy_payload(forge_span_u64_t src __attribute__((unused)), uint64_t
 int main();
 
 uint64_t pkt_read_u8(forge_span_u64_t buf __attribute__((unused)), uint64_t off __attribute__((unused))) {
-  return (buf.data[off] % 256);
+  return (buf.data[off] % 256ULL);
 }
 
 uint64_t pkt_read_u16_be(forge_span_u64_t buf __attribute__((unused)), uint64_t off __attribute__((unused))) {
-  return (((buf.data[off] % 256) * 256) + (buf.data[(off + 1)] % 256));
+  return (((buf.data[off] % 256ULL) * 256ULL) + (buf.data[(off + 1ULL)] % 256ULL));
 }
 
 uint64_t pkt_read_u32_be(forge_span_u64_t buf __attribute__((unused)), uint64_t off __attribute__((unused))) {
-  return (((((buf.data[off] % 256) * 16777216) + ((buf.data[(off + 1)] % 256) * 65536)) + ((buf.data[(off + 2)] % 256) * 256)) + (buf.data[(off + 3)] % 256));
+  return (((((buf.data[off] % 256ULL) * 16777216ULL) + ((buf.data[(off + 1ULL)] % 256ULL) * 65536ULL)) + ((buf.data[(off + 2ULL)] % 256ULL) * 256ULL)) + (buf.data[(off + 3ULL)] % 256ULL));
 }
 
 uint64_t pkt_write_u8(forge_span_u64_t buf __attribute__((unused)), uint64_t off __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  buf.data[off] = (val % 256);
-  return (off + 1);
+  buf.data[off] = (val % 256ULL);
+  return (off + 1ULL);
 }
 
 uint64_t pkt_write_u16_be(forge_span_u64_t buf __attribute__((unused)), uint64_t off __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  buf.data[off] = ((val / 256) % 256);
-  buf.data[(off + 1)] = (val % 256);
-  return (off + 2);
+  buf.data[off] = ((val / 256ULL) % 256ULL);
+  buf.data[(off + 1ULL)] = (val % 256ULL);
+  return (off + 2ULL);
 }
 
 uint64_t pkt_checksum(forge_span_u64_t buf __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t sum __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t sum __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      sum = (sum + (buf.data[i] % 256));
-      i = (i + 1);
+      sum = (sum + (buf.data[i] % 256ULL));
+      i = (i + 1ULL);
     }
 
   }
-  return (sum % 256);
+  return (sum % 256ULL);
 }
 
 uint64_t pkt_copy_payload(forge_span_u64_t src __attribute__((unused)), uint64_t src_off __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t dst_off __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      dst.data[(dst_off + i)] = (src.data[(src_off + i)] % 256);
-      i = (i + 1);
+      dst.data[(dst_off + i)] = (src.data[(src_off + i)] % 256ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -70,7 +70,7 @@ uint64_t pkt_copy_payload(forge_span_u64_t src __attribute__((unused)), uint64_t
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

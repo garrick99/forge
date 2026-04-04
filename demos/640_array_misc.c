@@ -21,11 +21,11 @@ _Bool array_all_eq(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t 
 int main();
 
 void array_iota(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t start __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = (start + i);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -42,22 +42,22 @@ void array_fill_range(forge_span_u64_t s __attribute__((unused)), uint64_t lo __
   {
     while ((i < hi)) {
       s.data[i] = val;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t array_count_zero(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((s.data[i] == 0)) {
-        cnt = (cnt + 1);
+      if ((s.data[i] == 0ULL)) {
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -66,14 +66,14 @@ uint64_t array_count_zero(forge_span_u64_t s __attribute__((unused)), uint64_t n
 
 _Bool array_any_eq(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
   _Bool found __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while (((i < n) && (!found))) {
       if ((a.data[i] == b.data[i])) {
         found = 1;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -82,14 +82,14 @@ _Bool array_any_eq(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t 
 
 _Bool array_all_eq(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
   _Bool ok __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while (((i < n) && ok)) {
       if ((a.data[i] != b.data[i])) {
         ok = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -97,7 +97,7 @@ _Bool array_all_eq(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

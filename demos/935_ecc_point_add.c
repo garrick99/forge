@@ -39,7 +39,7 @@ uint64_t ecc_add_x(uint64_t x1 __attribute__((unused)), uint64_t y1 __attribute_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -17,56 +17,56 @@ int main();
 uint64_t ext_gcd_steps(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t max_iter __attribute__((unused))) {
   uint64_t x __attribute__((unused)) = a;
   uint64_t y __attribute__((unused)) = b;
-  uint64_t steps __attribute__((unused)) = 0;
+  uint64_t steps __attribute__((unused)) = 0ULL;
   {
-    while (((y > 0) && (steps < max_iter))) {
+    while (((y > 0ULL) && (steps < max_iter))) {
       uint64_t tmp __attribute__((unused)) = y;
       y = (x % y);
       x = tmp;
-      steps = (steps + 1);
+      steps = (steps + 1ULL);
     }
 
   }
-  if ((x >= 1)) {
+  if ((x >= 1ULL)) {
     return x;
   } else {
-    return 1;
+    return 1ULL;
   }
 }
 
 uint64_t gcd_check(uint64_t a __attribute__((unused)), uint64_t m __attribute__((unused))) {
-  uint64_t g __attribute__((unused)) = ext_gcd_steps(a, m, 128);
-  if ((g == 1)) {
-    return 1;
+  uint64_t g __attribute__((unused)) = ext_gcd_steps(a, m, 128ULL);
+  if ((g == 1ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t mod_inverse_naive(uint64_t a __attribute__((unused)), uint64_t m __attribute__((unused))) {
-  uint64_t candidate __attribute__((unused)) = 1;
-  uint64_t found __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t candidate __attribute__((unused)) = 1ULL;
+  uint64_t found __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < m)) {
       uint64_t prod __attribute__((unused)) = ((a * i) % m);
-      if (((prod == 1) && (candidate == 1))) {
+      if (((prod == 1ULL) && (candidate == 1ULL))) {
         found = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
   if ((found < m)) {
     return found;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

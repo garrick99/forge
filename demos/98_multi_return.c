@@ -75,7 +75,7 @@ DivRem div_rem(uint64_t n __attribute__((unused)), uint64_t d __attribute__((unu
 
 Stats2 mean_and_spread(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t c __attribute__((unused)), uint64_t d __attribute__((unused))) {
   uint64_t sum __attribute__((unused)) = (((a + b) + c) + d);
-  uint64_t avg __attribute__((unused)) = (sum / 4);
+  uint64_t avg __attribute__((unused)) = (sum / 4ULL);
   uint64_t spread;
   if ((a > d)) {
     spread = (a - d);
@@ -86,13 +86,13 @@ Stats2 mean_and_spread(uint64_t a __attribute__((unused)), uint64_t b __attribut
 }
 
 int main() {
-  MinMax mm __attribute__((unused)) = min_max(7, 2, 9, 4);
+  MinMax mm __attribute__((unused)) = min_max(7ULL, 2ULL, 9ULL, 4ULL);
   uint64_t lo __attribute__((unused)) = mm.min;
   uint64_t hi __attribute__((unused)) = mm.max;
-  DivRem dr __attribute__((unused)) = div_rem(17, 5);
+  DivRem dr __attribute__((unused)) = div_rem(17ULL, 5ULL);
   uint64_t q __attribute__((unused)) = dr.quot;
   uint64_t r __attribute__((unused)) = dr.rem;
-  Stats2 st __attribute__((unused)) = mean_and_spread(10, 20, 30, 40);
+  Stats2 st __attribute__((unused)) = mean_and_spread(10ULL, 20ULL, 30ULL, 40ULL);
   uint64_t m __attribute__((unused)) = st.mean;
   uint64_t sp __attribute__((unused)) = st.variance_approx;
   return (int)((((((lo + hi) + q) + r) + m) + sp));

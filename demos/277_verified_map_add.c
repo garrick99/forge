@@ -25,7 +25,7 @@ void map_add(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

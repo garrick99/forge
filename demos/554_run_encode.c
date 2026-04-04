@@ -19,7 +19,7 @@ int main();
 
 uint64_t count_run(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t start __attribute__((unused))) {
   uint64_t val __attribute__((unused)) = s.data[start];
-  uint64_t len __attribute__((unused)) = 1;
+  uint64_t len __attribute__((unused)) = 1ULL;
   {
     while (((start + len) < n)) {
       if ((s.data[(start + len)] != val)) {
@@ -29,7 +29,7 @@ uint64_t count_run(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
         }
 
       }
-      len = (len + 1);
+      len = (len + 1ULL);
     }
 
   }
@@ -37,19 +37,19 @@ uint64_t count_run(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 }
 
 uint64_t rle_encode_count(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
+  if ((n == 0ULL)) {
     {
-      return 0;
+      return 0ULL;
 
     }
 
   }
-  uint64_t pos __attribute__((unused)) = 0;
-  uint64_t runs __attribute__((unused)) = 0;
+  uint64_t pos __attribute__((unused)) = 0ULL;
+  uint64_t runs __attribute__((unused)) = 0ULL;
   {
     while ((pos < n)) {
       uint64_t run_len __attribute__((unused)) = count_run(s, n, pos);
-      runs = (runs + 1);
+      runs = (runs + 1ULL);
       pos = (pos + run_len);
     }
 
@@ -58,11 +58,11 @@ uint64_t rle_encode_count(forge_span_u64_t s __attribute__((unused)), uint64_t n
 }
 
 uint64_t rle_first_run_len(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  return count_run(s, n, 0);
+  return count_run(s, n, 0ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

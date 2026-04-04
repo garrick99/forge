@@ -16,7 +16,7 @@ uint64_t optimal_bst_cost(forge_span_u64_t freq __attribute__((unused)), forge_s
 int main();
 
 uint64_t optimal_bst_cost(forge_span_u64_t freq __attribute__((unused)), forge_span_u64_t cost __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t idx __attribute__((unused)) = ((i * n) + i);
@@ -24,19 +24,19 @@ uint64_t optimal_bst_cost(forge_span_u64_t freq __attribute__((unused)), forge_s
         cost.data[idx] = freq.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t gap __attribute__((unused)) = 1;
+  uint64_t gap __attribute__((unused)) = 1ULL;
   {
     while ((gap < n)) {
-      uint64_t row __attribute__((unused)) = 0;
+      uint64_t row __attribute__((unused)) = 0ULL;
       {
         while (((row + gap) < n)) {
           uint64_t col __attribute__((unused)) = (row + gap);
           uint64_t idx __attribute__((unused)) = ((row * n) + col);
-          uint64_t fsum __attribute__((unused)) = 0;
+          uint64_t fsum __attribute__((unused)) = 0ULL;
           uint64_t k __attribute__((unused)) = row;
           {
             while ((k <= col)) {
@@ -44,7 +44,7 @@ uint64_t optimal_bst_cost(forge_span_u64_t freq __attribute__((unused)), forge_s
                 fsum = (fsum + freq.data[k]);
 
               }
-              k = (k + 1);
+              k = (k + 1ULL);
             }
 
           }
@@ -52,19 +52,19 @@ uint64_t optimal_bst_cost(forge_span_u64_t freq __attribute__((unused)), forge_s
             cost.data[idx] = fsum;
 
           }
-          row = (row + 1);
+          row = (row + 1ULL);
         }
 
       }
-      gap = (gap + 1);
+      gap = (gap + 1ULL);
     }
 
   }
-  return cost.data[((0 * n) + (n - 1))];
+  return cost.data[((0ULL * n) + (n - 1ULL))];
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

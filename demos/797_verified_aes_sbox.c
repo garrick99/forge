@@ -18,42 +18,42 @@ void add_round_key(forge_span_u64_t state __attribute__((unused)), forge_span_u6
 int main();
 
 void sbox_substitute(forge_span_u64_t block __attribute__((unused)), forge_span_u64_t sbox __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < 16)) {
-      uint64_t val __attribute__((unused)) = (block.data[i] % 256);
+    while ((i < 16ULL)) {
+      uint64_t val __attribute__((unused)) = (block.data[i] % 256ULL);
       block.data[i] = sbox.data[val];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void inv_sbox_substitute(forge_span_u64_t block __attribute__((unused)), forge_span_u64_t inv_sbox __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < 16)) {
-      uint64_t val __attribute__((unused)) = (block.data[i] % 256);
+    while ((i < 16ULL)) {
+      uint64_t val __attribute__((unused)) = (block.data[i] % 256ULL);
       block.data[i] = inv_sbox.data[val];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void add_round_key(forge_span_u64_t state __attribute__((unused)), forge_span_u64_t key __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < 16)) {
+    while ((i < 16ULL)) {
       state.data[i] = (state.data[i] ^ key.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

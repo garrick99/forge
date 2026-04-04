@@ -17,7 +17,7 @@ void bitonic_merge(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 int main();
 
 void bitonic_compare_swap(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t step __attribute__((unused)), _Bool ascending __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while (((i + step) < n)) {
       if (ascending) {
@@ -37,22 +37,22 @@ void bitonic_compare_swap(forge_span_u64_t s __attribute__((unused)), uint64_t n
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void bitonic_merge(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t step __attribute__((unused)) = (n / 2);
+  uint64_t step __attribute__((unused)) = (n / 2ULL);
   {
-    while ((step >= 1)) {
+    while ((step >= 1ULL)) {
       bitonic_compare_swap(s, n, step, 1);
-      if ((step == 1)) {
-        step = 0;
+      if ((step == 1ULL)) {
+        step = 0ULL;
 
       } else {
-        step = (step / 2);
+        step = (step / 2ULL);
 
       }
     }
@@ -61,7 +61,7 @@ void bitonic_merge(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

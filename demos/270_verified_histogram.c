@@ -19,14 +19,14 @@ void histogram(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribut
   {
     for (uint64_t i = 0; i < (uint64_t)(n); i++) {
       uint64_t bucket __attribute__((unused)) = (s.data[i] % buckets);
-      hist.data[bucket] = (hist.data[bucket] + 1);
+      hist.data[bucket] = (hist.data[bucket] + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

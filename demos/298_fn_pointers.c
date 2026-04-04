@@ -39,18 +39,18 @@ uint64_t apply_twice(forge_fn_u64_ret_u64_t f __attribute__((unused)), uint64_t 
 }
 
 void map_inplace(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_fn_u64_ret_u64_t f __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = f(s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

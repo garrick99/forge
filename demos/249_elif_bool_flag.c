@@ -16,7 +16,7 @@ void categorize(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
 int main();
 
 void categorize(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t threshold __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   _Bool any_below __attribute__((unused)) = 0;
   _Bool any_above __attribute__((unused)) = 0;
   {
@@ -28,7 +28,7 @@ void categorize(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
         any_above = 1;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -37,7 +37,7 @@ void categorize(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

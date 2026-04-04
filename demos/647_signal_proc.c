@@ -20,26 +20,26 @@ void scale_signal(forge_span_u64_t s __attribute__((unused)), uint64_t n __attri
 int main();
 
 void threshold_signal(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t thresh __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      s.data[i] = ((s.data[i] >= thresh) ? 1 : 0);
-      i = (i + 1);
+      s.data[i] = ((s.data[i] >= thresh) ? 1ULL : 0ULL);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t count_peaks(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
-    while (((i + 1) < n)) {
-      if (((s.data[i] > s.data[(i - 1)]) && (s.data[i] > s.data[(i + 1)]))) {
-        cnt = (cnt + 1);
+    while (((i + 1ULL) < n)) {
+      if (((s.data[i] > s.data[(i - 1ULL)]) && (s.data[i] > s.data[(i + 1ULL)]))) {
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -47,12 +47,12 @@ uint64_t count_peaks(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 }
 
 uint64_t signal_energy(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + (s.data[i] * s.data[i]));
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -60,12 +60,12 @@ uint64_t signal_energy(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 uint64_t dc_offset(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -73,18 +73,18 @@ uint64_t dc_offset(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 }
 
 void scale_signal(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t factor __attribute__((unused)), uint64_t divisor __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = ((s.data[i] * factor) / divisor);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

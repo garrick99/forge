@@ -17,11 +17,11 @@ void persistent_multi_set(forge_span_u64_t src __attribute__((unused)), forge_sp
 int main();
 
 void persistent_set(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t idx __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       dst.data[i] = src.data[i];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -29,15 +29,15 @@ void persistent_set(forge_span_u64_t src __attribute__((unused)), forge_span_u64
 }
 
 void persistent_multi_set(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t indices __attribute__((unused)), forge_span_u64_t vals __attribute__((unused)), uint64_t m __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       dst.data[i] = src.data[i];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < m)) {
       uint64_t idx __attribute__((unused)) = indices.data[j];
@@ -45,14 +45,14 @@ void persistent_multi_set(forge_span_u64_t src __attribute__((unused)), forge_sp
         dst.data[idx] = vals.data[j];
 
       }
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

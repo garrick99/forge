@@ -17,20 +17,20 @@ uint64_t count_colors(forge_span_u64_t colors __attribute__((unused)), uint64_t 
 int main();
 
 uint64_t check_coloring(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), forge_span_u64_t colors __attribute__((unused)), uint64_t nedges __attribute__((unused)), uint64_t nnodes __attribute__((unused))) {
-  uint64_t valid __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t valid __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nedges)) {
       uint64_t u __attribute__((unused)) = src.data[i];
       uint64_t v __attribute__((unused)) = dst.data[i];
       if (((u < nnodes) && (v < nnodes))) {
         if ((colors.data[u] == colors.data[v])) {
-          valid = 0;
+          valid = 0ULL;
 
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -38,23 +38,23 @@ uint64_t check_coloring(forge_span_u64_t src __attribute__((unused)), forge_span
 }
 
 uint64_t count_colors(forge_span_u64_t colors __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t mx __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t mx __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((colors.data[i] > mx)) {
         mx = colors.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
-  return (mx + 1);
+  return (mx + 1ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

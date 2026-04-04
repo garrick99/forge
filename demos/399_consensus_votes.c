@@ -27,23 +27,23 @@ uint64_t participants_preserved();
 int main();
 
 ConsensusRound cr_new(uint64_t participants __attribute__((unused))) {
-  return (ConsensusRound){ .yes = 0, .no = 0, .abstain = 0, .participants = participants };
+  return (ConsensusRound){ .yes = 0ULL, .no = 0ULL, .abstain = 0ULL, .participants = participants };
 }
 
 void cr_vote_yes(ConsensusRound* r __attribute__((unused))) {
-  (*r).yes = ((*r).yes + 1);
+  (*r).yes = ((*r).yes + 1ULL);
 }
 
 void cr_vote_no(ConsensusRound* r __attribute__((unused))) {
-  (*r).no = ((*r).no + 1);
+  (*r).no = ((*r).no + 1ULL);
 }
 
 void cr_vote_abstain(ConsensusRound* r __attribute__((unused))) {
-  (*r).abstain = ((*r).abstain + 1);
+  (*r).abstain = ((*r).abstain + 1ULL);
 }
 
 uint64_t three_yes() {
-  ConsensusRound r __attribute__((unused)) = cr_new(5);
+  ConsensusRound r __attribute__((unused)) = cr_new(5ULL);
   cr_vote_yes((&r));
   cr_vote_yes((&r));
   cr_vote_yes((&r));
@@ -51,7 +51,7 @@ uint64_t three_yes() {
 }
 
 uint64_t all_vote_total() {
-  ConsensusRound r __attribute__((unused)) = cr_new(5);
+  ConsensusRound r __attribute__((unused)) = cr_new(5ULL);
   cr_vote_yes((&r));
   cr_vote_yes((&r));
   cr_vote_yes((&r));
@@ -61,7 +61,7 @@ uint64_t all_vote_total() {
 }
 
 uint64_t no_count() {
-  ConsensusRound r __attribute__((unused)) = cr_new(5);
+  ConsensusRound r __attribute__((unused)) = cr_new(5ULL);
   cr_vote_yes((&r));
   cr_vote_no((&r));
   cr_vote_no((&r));
@@ -69,7 +69,7 @@ uint64_t no_count() {
 }
 
 uint64_t participants_preserved() {
-  ConsensusRound r __attribute__((unused)) = cr_new(7);
+  ConsensusRound r __attribute__((unused)) = cr_new(7ULL);
   cr_vote_yes((&r));
   cr_vote_yes((&r));
   cr_vote_no((&r));
@@ -77,7 +77,7 @@ uint64_t participants_preserved() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

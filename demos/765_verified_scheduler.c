@@ -16,18 +16,18 @@ uint64_t round_robin(forge_span_u64_t remaining __attribute__((unused)), uint64_
 int main();
 
 uint64_t round_robin(forge_span_u64_t remaining __attribute__((unused)), uint64_t ntasks __attribute__((unused)), uint64_t quantum __attribute__((unused))) {
-  uint64_t completed __attribute__((unused)) = 0;
-  uint64_t rounds __attribute__((unused)) = 0;
-  uint64_t max_rounds __attribute__((unused)) = (ntasks * 1000);
+  uint64_t completed __attribute__((unused)) = 0ULL;
+  uint64_t rounds __attribute__((unused)) = 0ULL;
+  uint64_t max_rounds __attribute__((unused)) = (ntasks * 1000ULL);
   {
     while (((completed < ntasks) && (rounds < max_rounds))) {
-      uint64_t i __attribute__((unused)) = 0;
+      uint64_t i __attribute__((unused)) = 0ULL;
       {
         while ((i < ntasks)) {
-          if ((remaining.data[i] > 0)) {
+          if ((remaining.data[i] > 0ULL)) {
             if ((remaining.data[i] <= quantum)) {
-              remaining.data[i] = 0;
-              completed = (completed + 1);
+              remaining.data[i] = 0ULL;
+              completed = (completed + 1ULL);
 
             } else {
               remaining.data[i] = (remaining.data[i] - quantum);
@@ -35,11 +35,11 @@ uint64_t round_robin(forge_span_u64_t remaining __attribute__((unused)), uint64_
             }
 
           }
-          i = (i + 1);
+          i = (i + 1ULL);
         }
 
       }
-      rounds = (rounds + 1);
+      rounds = (rounds + 1ULL);
     }
 
   }
@@ -47,7 +47,7 @@ uint64_t round_robin(forge_span_u64_t remaining __attribute__((unused)), uint64_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

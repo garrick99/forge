@@ -17,8 +17,8 @@ int main();
 
 void window_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t w __attribute__((unused))) {
   {
-    for (uint64_t i = 0; i < (uint64_t)(((n - w) + 1)); i++) {
-      uint64_t acc __attribute__((unused)) = 0;
+    for (uint64_t i = 0; i < (uint64_t)(((n - w) + 1ULL)); i++) {
+      uint64_t acc __attribute__((unused)) = 0ULL;
       {
         for (uint64_t j = (uint64_t)(i); j < (uint64_t)((i + w)); j++) {
           acc = (acc + s.data[j]);
@@ -32,7 +32,7 @@ void window_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

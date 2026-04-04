@@ -47,16 +47,16 @@ _Bool between(uint64_t x __attribute__((unused)), uint64_t lo __attribute__((unu
 }
 
 uint64_t midpoint(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  return (((a / 2) + (b / 2)) + ((a % 2) * (b % 2)));
+  return (((a / 2ULL) + (b / 2ULL)) + ((a % 2ULL) * (b % 2ULL)));
 }
 
 uint64_t log2_floor(uint64_t n __attribute__((unused))) {
   uint64_t x __attribute__((unused)) = n;
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
-    while ((x > 1)) {
-      x = (x / 2);
-      k = (k + 1);
+    while ((x > 1ULL)) {
+      x = (x / 2ULL);
+      k = (k + 1ULL);
     }
 
   }
@@ -64,12 +64,12 @@ uint64_t log2_floor(uint64_t n __attribute__((unused))) {
 }
 
 uint64_t pow10(uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      acc = (acc * 10);
-      i = (i + 1);
+      acc = (acc * 10ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -77,7 +77,7 @@ uint64_t pow10(uint64_t n __attribute__((unused))) {
 }
 
 uint64_t safe_div(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t default_val __attribute__((unused))) {
-  if ((b == 0)) {
+  if ((b == 0ULL)) {
     return default_val;
   } else {
     return (a / b);
@@ -85,7 +85,7 @@ uint64_t safe_div(uint64_t a __attribute__((unused)), uint64_t b __attribute__((
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

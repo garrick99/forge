@@ -27,11 +27,11 @@ uint64_t add3_inc(uint64_t limit __attribute__((unused)));
 int main();
 
 Counter ctr_new(uint64_t limit __attribute__((unused))) {
-  return (Counter){ .value = 0, .limit = limit };
+  return (Counter){ .value = 0ULL, .limit = limit };
 }
 
 void ctr_inc(Counter* c __attribute__((unused))) {
-  (*c).value = ((*c).value + 1);
+  (*c).value = ((*c).value + 1ULL);
 }
 
 void ctr_add(Counter* c __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -39,7 +39,7 @@ void ctr_add(Counter* c __attribute__((unused)), uint64_t n __attribute__((unuse
 }
 
 void ctr_reset(Counter* c __attribute__((unused))) {
-  (*c).value = 0;
+  (*c).value = 0ULL;
 }
 
 uint64_t starts_zero(uint64_t limit __attribute__((unused))) {
@@ -62,7 +62,7 @@ uint64_t inc_twice(uint64_t limit __attribute__((unused))) {
 
 uint64_t add_five(uint64_t limit __attribute__((unused))) {
   Counter c __attribute__((unused)) = ctr_new(limit);
-  ctr_add((&c), 5);
+  ctr_add((&c), 5ULL);
   return c.value;
 }
 
@@ -75,13 +75,13 @@ uint64_t inc_reset(uint64_t limit __attribute__((unused))) {
 
 uint64_t add3_inc(uint64_t limit __attribute__((unused))) {
   Counter c __attribute__((unused)) = ctr_new(limit);
-  ctr_add((&c), 3);
+  ctr_add((&c), 3ULL);
   ctr_inc((&c));
   return c.value;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

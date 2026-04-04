@@ -26,7 +26,7 @@ uint64_t reset_and_readvance(uint64_t limit __attribute__((unused)));
 int main();
 
 StreamCursor cursor_new(uint64_t limit __attribute__((unused))) {
-  return (StreamCursor){ .pos = 0, .mark = 0, .limit = limit };
+  return (StreamCursor){ .pos = 0ULL, .mark = 0ULL, .limit = limit };
 }
 
 void cursor_advance(StreamCursor* c __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -43,39 +43,39 @@ void cursor_reset_to_mark(StreamCursor* c __attribute__((unused))) {
 
 uint64_t advance_10(uint64_t limit __attribute__((unused))) {
   StreamCursor c __attribute__((unused)) = cursor_new(limit);
-  cursor_advance((&c), 10);
+  cursor_advance((&c), 10ULL);
   return c.pos;
 }
 
 uint64_t mark_at_5(uint64_t limit __attribute__((unused))) {
   StreamCursor c __attribute__((unused)) = cursor_new(limit);
-  cursor_advance((&c), 5);
+  cursor_advance((&c), 5ULL);
   cursor_set_mark((&c));
-  cursor_advance((&c), 3);
+  cursor_advance((&c), 3ULL);
   return c.mark;
 }
 
 uint64_t reset_to_mark(uint64_t limit __attribute__((unused))) {
   StreamCursor c __attribute__((unused)) = cursor_new(limit);
-  cursor_advance((&c), 5);
+  cursor_advance((&c), 5ULL);
   cursor_set_mark((&c));
-  cursor_advance((&c), 3);
+  cursor_advance((&c), 3ULL);
   cursor_reset_to_mark((&c));
   return c.pos;
 }
 
 uint64_t reset_and_readvance(uint64_t limit __attribute__((unused))) {
   StreamCursor c __attribute__((unused)) = cursor_new(limit);
-  cursor_advance((&c), 5);
+  cursor_advance((&c), 5ULL);
   cursor_set_mark((&c));
-  cursor_advance((&c), 3);
+  cursor_advance((&c), 3ULL);
   cursor_reset_to_mark((&c));
-  cursor_advance((&c), 2);
+  cursor_advance((&c), 2ULL);
   return c.pos;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

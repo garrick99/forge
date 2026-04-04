@@ -46,13 +46,13 @@ void butterfly(forge_span_u64_t poly __attribute__((unused)), uint64_t i __attri
 }
 
 void ntt_inplace(forge_span_u64_t poly __attribute__((unused)), forge_span_u64_t roots __attribute__((unused)), uint64_t q __attribute__((unused))) {
-  uint64_t len __attribute__((unused)) = 128;
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t len __attribute__((unused)) = 128ULL;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
-    while ((len >= 1)) {
-      uint64_t start __attribute__((unused)) = 0;
+    while ((len >= 1ULL)) {
+      uint64_t start __attribute__((unused)) = 0ULL;
       {
-        while (((start + (2 * len)) <= 256)) {
+        while (((start + (2ULL * len)) <= 256ULL)) {
           uint64_t zeta __attribute__((unused)) = roots.data[k];
           {
             for (uint64_t j = 0; j < (uint64_t)(len); j++) {
@@ -60,25 +60,25 @@ void ntt_inplace(forge_span_u64_t poly __attribute__((unused)), forge_span_u64_t
             }
 
           }
-          k = (k + 1);
-          start = (start + (2 * len));
+          k = (k + 1ULL);
+          start = (start + (2ULL * len));
         }
 
       }
-      len = (len / 2);
+      len = (len / 2ULL);
     }
 
   }
 }
 
 void intt_inplace(forge_span_u64_t poly __attribute__((unused)), forge_span_u64_t inv_roots __attribute__((unused)), uint64_t q __attribute__((unused))) {
-  uint64_t len __attribute__((unused)) = 1;
-  uint64_t k __attribute__((unused)) = 127;
+  uint64_t len __attribute__((unused)) = 1ULL;
+  uint64_t k __attribute__((unused)) = 127ULL;
   {
-    while ((len <= 128)) {
-      uint64_t start __attribute__((unused)) = 0;
+    while ((len <= 128ULL)) {
+      uint64_t start __attribute__((unused)) = 0ULL;
       {
-        while (((start + (2 * len)) <= 256)) {
+        while (((start + (2ULL * len)) <= 256ULL)) {
           uint64_t zeta __attribute__((unused)) = inv_roots.data[k];
           {
             for (uint64_t j = 0; j < (uint64_t)(len); j++) {
@@ -86,18 +86,18 @@ void intt_inplace(forge_span_u64_t poly __attribute__((unused)), forge_span_u64_
             }
 
           }
-          k = (k - 1);
-          start = (start + (2 * len));
+          k = (k - 1ULL);
+          start = (start + (2ULL * len));
         }
 
       }
-      len = (len * 2);
+      len = (len * 2ULL);
     }
 
   }
 }
 
 uint64_t run() {
-  return 42;
+  return 42ULL;
 }
 

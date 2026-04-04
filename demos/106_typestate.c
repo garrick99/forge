@@ -44,36 +44,36 @@ Connection conn_close(Connection c __attribute__((unused)));
 int main();
 
 Connection conn_new() {
-  return (Connection){ .state = 0, .local_port = 0, .remote_port = 0, .bytes_sent = 0 };
+  return (Connection){ .state = 0ULL, .local_port = 0ULL, .remote_port = 0ULL, .bytes_sent = 0ULL };
 }
 
 Connection conn_listen(Connection c __attribute__((unused)), uint64_t port __attribute__((unused))) {
-  return (Connection){ .state = 1, .local_port = port, .remote_port = 0, .bytes_sent = 0 };
+  return (Connection){ .state = 1ULL, .local_port = port, .remote_port = 0ULL, .bytes_sent = 0ULL };
 }
 
 Connection conn_accept(Connection c __attribute__((unused)), uint64_t remote __attribute__((unused))) {
-  return (Connection){ .state = 2, .local_port = c.local_port, .remote_port = remote, .bytes_sent = 0 };
+  return (Connection){ .state = 2ULL, .local_port = c.local_port, .remote_port = remote, .bytes_sent = 0ULL };
 }
 
 Connection conn_send(Connection c __attribute__((unused)), uint64_t nbytes __attribute__((unused))) {
-  return (Connection){ .state = 2, .local_port = c.local_port, .remote_port = c.remote_port, .bytes_sent = (c.bytes_sent + nbytes) };
+  return (Connection){ .state = 2ULL, .local_port = c.local_port, .remote_port = c.remote_port, .bytes_sent = (c.bytes_sent + nbytes) };
 }
 
 Connection conn_close(Connection c __attribute__((unused))) {
-  return (Connection){ .state = 0, .local_port = 0, .remote_port = 0, .bytes_sent = c.bytes_sent };
+  return (Connection){ .state = 0ULL, .local_port = 0ULL, .remote_port = 0ULL, .bytes_sent = c.bytes_sent };
 }
 
 int main() {
   Connection c0 __attribute__((unused)) = conn_new();
-  Connection c1 __attribute__((unused)) = conn_listen(c0, 8080);
-  Connection c2 __attribute__((unused)) = conn_accept(c1, 4444);
-  Connection c3 __attribute__((unused)) = conn_send(c2, 100);
-  Connection c4 __attribute__((unused)) = conn_send(c3, 50);
+  Connection c1 __attribute__((unused)) = conn_listen(c0, 8080ULL);
+  Connection c2 __attribute__((unused)) = conn_accept(c1, 4444ULL);
+  Connection c3 __attribute__((unused)) = conn_send(c2, 100ULL);
+  Connection c4 __attribute__((unused)) = conn_send(c3, 50ULL);
   Connection c5 __attribute__((unused)) = conn_close(c4);
   uint64_t port __attribute__((unused)) = c2.local_port;
   uint64_t sent __attribute__((unused)) = c4.bytes_sent;
   uint64_t closed __attribute__((unused)) = c5.state;
-  return (int)((((c2.local_port % 256) + sent) + closed));
+  return (int)((((c2.local_port % 256ULL) + sent) + closed));
 
 }
 

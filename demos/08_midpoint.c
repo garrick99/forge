@@ -13,10 +13,10 @@ uint64_t midpoint(uint64_t lo __attribute__((unused)), uint64_t hi __attribute__
 uint64_t avg_u64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 
 uint64_t midpoint(uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
-  return (lo + ((hi - lo) / 2));
+  return (lo + ((hi - lo) / 2ULL));
 }
 
 uint64_t avg_u64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  return (a + ((b - a) / 2));
+  return (a + ((b - a) / 2ULL));
 }
 

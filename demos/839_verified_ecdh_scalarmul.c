@@ -37,17 +37,17 @@ uint64_t mod_mul(uint64_t a __attribute__((unused)), uint64_t b __attribute__((u
 }
 
 uint64_t scalar_mul(uint64_t base __attribute__((unused)), uint64_t scalar __attribute__((unused)), uint64_t nbits __attribute__((unused)), uint64_t p __attribute__((unused))) {
-  uint64_t r0 __attribute__((unused)) = 0;
+  uint64_t r0 __attribute__((unused)) = 0ULL;
   uint64_t r1 __attribute__((unused)) = base;
   uint64_t i __attribute__((unused)) = nbits;
   {
-    while ((i > 0)) {
-      i = (i - 1);
-      uint64_t bit __attribute__((unused)) = ((scalar >> i) & 1);
+    while ((i > 0ULL)) {
+      i = (i - 1ULL);
+      uint64_t bit __attribute__((unused)) = ((scalar >> i) & 1ULL);
       uint64_t sum_r0r1 __attribute__((unused)) = mod_add(r0, r1, p);
       uint64_t dbl_r0 __attribute__((unused)) = mod_add(r0, r0, p);
       uint64_t dbl_r1 __attribute__((unused)) = mod_add(r1, r1, p);
-      if ((bit == 1)) {
+      if ((bit == 1ULL)) {
         r0 = sum_r0r1;
         r1 = dbl_r1;
 
@@ -63,7 +63,7 @@ uint64_t scalar_mul(uint64_t base __attribute__((unused)), uint64_t scalar __att
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

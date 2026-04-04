@@ -40,11 +40,11 @@ uint64_t clamp_sum(uint64_t a __attribute__((unused)), uint64_t b __attribute__(
 }
 
 void clamp_span(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = clamp(s.data[i], lo, hi);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -59,23 +59,23 @@ uint64_t range_width(uint64_t lo __attribute__((unused)), uint64_t hi __attribut
 }
 
 uint64_t range_midpoint(uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
-  return (lo + ((hi - lo) / 2));
+  return (lo + ((hi - lo) / 2ULL));
 }
 
 uint64_t check_clamp_mid() {
-  return clamp(5, 1, 10);
+  return clamp(5ULL, 1ULL, 10ULL);
 }
 
 uint64_t check_clamp_low() {
-  return clamp(0, 1, 10);
+  return clamp(0ULL, 1ULL, 10ULL);
 }
 
 uint64_t check_clamp_high() {
-  return clamp(99, 1, 10);
+  return clamp(99ULL, 1ULL, 10ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

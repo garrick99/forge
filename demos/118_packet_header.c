@@ -23,58 +23,58 @@ uint64_t pkt_df(uint64_t hdr __attribute__((unused)));
 int main();
 
 uint64_t pkt_version(uint64_t hdr __attribute__((unused))) {
-  return ((hdr >> 60) & 15);
+  return ((hdr >> 60ULL) & 15ULL);
 }
 
 uint64_t pkt_ihl(uint64_t hdr __attribute__((unused))) {
-  return ((hdr >> 56) & 15);
+  return ((hdr >> 56ULL) & 15ULL);
 }
 
 uint64_t pkt_dscp(uint64_t hdr __attribute__((unused))) {
-  return ((hdr >> 50) & 63);
+  return ((hdr >> 50ULL) & 63ULL);
 }
 
 uint64_t pkt_ecn(uint64_t hdr __attribute__((unused))) {
-  return ((hdr >> 48) & 3);
+  return ((hdr >> 48ULL) & 3ULL);
 }
 
 uint64_t pkt_total_len(uint64_t hdr __attribute__((unused))) {
-  return ((hdr >> 32) & 65535);
+  return ((hdr >> 32ULL) & 65535ULL);
 }
 
 uint64_t pkt_ident(uint64_t hdr __attribute__((unused))) {
-  return ((hdr >> 16) & 65535);
+  return ((hdr >> 16ULL) & 65535ULL);
 }
 
 uint64_t pkt_flags(uint64_t hdr __attribute__((unused))) {
-  return ((hdr >> 13) & 7);
+  return ((hdr >> 13ULL) & 7ULL);
 }
 
 uint64_t pkt_frag_offset(uint64_t hdr __attribute__((unused))) {
-  return (hdr & 8191);
+  return (hdr & 8191ULL);
 }
 
 uint64_t pkt_pack(uint64_t version __attribute__((unused)), uint64_t ihl __attribute__((unused)), uint64_t dscp __attribute__((unused)), uint64_t ecn __attribute__((unused)), uint64_t total_len __attribute__((unused)), uint64_t ident __attribute__((unused)), uint64_t flags __attribute__((unused)), uint64_t frag __attribute__((unused))) {
-  return ((((((((version << 60) | (ihl << 56)) | (dscp << 50)) | (ecn << 48)) | (total_len << 32)) | (ident << 16)) | (flags << 13)) | frag);
+  return ((((((((version << 60ULL) | (ihl << 56ULL)) | (dscp << 50ULL)) | (ecn << 48ULL)) | (total_len << 32ULL)) | (ident << 16ULL)) | (flags << 13ULL)) | frag);
 }
 
 uint64_t pkt_is_ipv4(uint64_t hdr __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = pkt_version(hdr);
   uint64_t ihl __attribute__((unused)) = pkt_ihl(hdr);
-  if (((v == 4) && (ihl >= 5))) {
-    return 1;
+  if (((v == 4ULL) && (ihl >= 5ULL))) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t pkt_df(uint64_t hdr __attribute__((unused))) {
   uint64_t f __attribute__((unused)) = pkt_flags(hdr);
-  return ((f >> 1) & 1);
+  return ((f >> 1ULL) & 1ULL);
 }
 
 int main() {
-  uint64_t hdr __attribute__((unused)) = pkt_pack(4, 5, 0, 0, 40, 1234, 2, 0);
+  uint64_t hdr __attribute__((unused)) = pkt_pack(4ULL, 5ULL, 0ULL, 0ULL, 40ULL, 1234ULL, 2ULL, 0ULL);
   uint64_t ver __attribute__((unused)) = pkt_version(hdr);
   uint64_t ihl __attribute__((unused)) = pkt_ihl(hdr);
   uint64_t tl __attribute__((unused)) = pkt_total_len(hdr);

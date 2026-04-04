@@ -20,18 +20,18 @@ uint64_t sched_max_work(forge_span_u64_t schedule __attribute__((unused)), uint6
 int main();
 
 uint64_t sched_next(uint64_t current __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  return ((current + 1) % n);
+  return ((current + 1ULL) % n);
 }
 
 uint64_t sched_run_steps(forge_span_u64_t schedule __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t steps __attribute__((unused))) {
-  uint64_t cur __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cur __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < steps)) {
-      schedule.data[cur] = (schedule.data[cur] + 1);
+      schedule.data[cur] = (schedule.data[cur] + 1ULL);
       uint64_t nc __attribute__((unused)) = sched_next(cur, n);
       cur = nc;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -39,17 +39,17 @@ uint64_t sched_run_steps(forge_span_u64_t schedule __attribute__((unused)), uint
 }
 
 uint64_t sched_find_idle(forge_span_u64_t schedule __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   uint64_t found __attribute__((unused)) = n;
   _Bool done __attribute__((unused)) = 0;
   {
     while (((i < n) && (!done))) {
-      if ((schedule.data[i] == 0)) {
+      if ((schedule.data[i] == 0ULL)) {
         found = i;
         done = 1;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -57,12 +57,12 @@ uint64_t sched_find_idle(forge_span_u64_t schedule __attribute__((unused)), uint
 }
 
 uint64_t sched_total_work(forge_span_u64_t schedule __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + schedule.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -70,15 +70,15 @@ uint64_t sched_total_work(forge_span_u64_t schedule __attribute__((unused)), uin
 }
 
 uint64_t sched_max_work(forge_span_u64_t schedule __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t best __attribute__((unused)) = schedule.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t best __attribute__((unused)) = schedule.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((schedule.data[i] > best)) {
         best = schedule.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -86,7 +86,7 @@ uint64_t sched_max_work(forge_span_u64_t schedule __attribute__((unused)), uint6
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

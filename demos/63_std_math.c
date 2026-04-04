@@ -13,7 +13,7 @@ uint64_t min64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unu
 uint64_t max64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 uint64_t clamp64(uint64_t v __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused)));
 uint64_t abs_diff(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
-uint64_t pow64(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused)));
+uint64_t pow64(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused)));
 uint64_t ceil_div(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 uint64_t round_up(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 uint64_t gcd64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
@@ -61,16 +61,16 @@ uint64_t abs_diff(uint64_t a __attribute__((unused)), uint64_t b __attribute__((
   }
 }
 
-uint64_t pow64(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused))) {
-  if ((exp == 0)) {
-    return 1;
+uint64_t pow64(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused))) {
+  if ((forge_exp == 0ULL)) {
+    return 1ULL;
   } else {
-    return (base * pow64(base, (exp - 1)));
+    return (base * pow64(base, (forge_exp - 1ULL)));
   }
 }
 
 uint64_t ceil_div(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  return (((a + b) - 1) / b);
+  return (((a + b) - 1ULL) / b);
 }
 
 uint64_t round_up(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
@@ -78,7 +78,7 @@ uint64_t round_up(uint64_t a __attribute__((unused)), uint64_t b __attribute__((
 }
 
 uint64_t gcd64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if ((b == 0)) {
+  if ((b == 0ULL)) {
     return a;
   } else {
     return gcd64(b, (a % b));
@@ -86,8 +86,8 @@ uint64_t gcd64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unu
 }
 
 uint64_t sat_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if ((a > (-1 - b))) {
-    return -1;
+  if ((a > (0xffffffffffffffffULL - b))) {
+    return 0xffffffffffffffffULL;
   } else {
     return (a + b);
   }
@@ -95,18 +95,18 @@ uint64_t sat_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((u
 
 uint64_t sat_sub(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
   if ((a < b)) {
-    return 0;
+    return 0ULL;
   } else {
     return (a - b);
   }
 }
 
 uint64_t sat_mul(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if ((b == 0)) {
-    return 0;
+  if ((b == 0ULL)) {
+    return 0ULL;
   } else {
-    if ((a > (-1 / b))) {
-      return -1;
+    if ((a > (0xffffffffffffffffULL / b))) {
+      return 0xffffffffffffffffULL;
     } else {
       return (a * b);
     }
@@ -114,31 +114,31 @@ uint64_t sat_mul(uint64_t a __attribute__((unused)), uint64_t b __attribute__((u
 }
 
 _Bool is_pow2(uint64_t n __attribute__((unused))) {
-  return ((n & (n - 1)) == 0);
+  return ((n & (n - 1ULL)) == 0ULL);
 }
 
 uint64_t popcount64(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return 0;
+  if ((n == 0ULL)) {
+    return 0ULL;
   } else {
-    return (1 + popcount64((n & (n - 1))));
+    return (1ULL + popcount64((n & (n - 1ULL))));
   }
 }
 
 uint64_t floor_log2(uint64_t n __attribute__((unused))) {
-  if ((n == 1)) {
-    return 0;
+  if ((n == 1ULL)) {
+    return 0ULL;
   } else {
-    return (1 + floor_log2((n / 2)));
+    return (1ULL + floor_log2((n / 2ULL)));
   }
 }
 
 int main() {
-  uint64_t d __attribute__((unused)) = abs_diff(10, 3);
-  uint64_t mn __attribute__((unused)) = min64(4, 9);
-  uint64_t mx __attribute__((unused)) = max64(4, 9);
-  uint64_t cl __attribute__((unused)) = clamp64(15, 0, 10);
-  uint64_t pw __attribute__((unused)) = pow64(2, 5);
+  uint64_t d __attribute__((unused)) = abs_diff(10ULL, 3ULL);
+  uint64_t mn __attribute__((unused)) = min64(4ULL, 9ULL);
+  uint64_t mx __attribute__((unused)) = max64(4ULL, 9ULL);
+  uint64_t cl __attribute__((unused)) = clamp64(15ULL, 0ULL, 10ULL);
+  uint64_t pw __attribute__((unused)) = pow64(2ULL, 5ULL);
   return (int)(((((d + mn) + mx) + cl) + pw));
 
 }

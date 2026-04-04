@@ -17,18 +17,18 @@ int main();
 
 uint64_t lomuto_partition(forge_span_u64_t s __attribute__((unused)), uint64_t hi __attribute__((unused))) {
   uint64_t pivot __attribute__((unused)) = s.data[hi];
-  uint64_t i __attribute__((unused)) = 0;
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < hi)) {
       if ((s.data[j] <= pivot)) {
         uint64_t tmp __attribute__((unused)) = s.data[i];
         s.data[i] = s.data[j];
         s.data[j] = tmp;
-        i = (i + 1);
+        i = (i + 1ULL);
 
       }
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
@@ -39,7 +39,7 @@ uint64_t lomuto_partition(forge_span_u64_t s __attribute__((unused)), uint64_t h
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

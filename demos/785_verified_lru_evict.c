@@ -21,21 +21,21 @@ void move_to_front(forge_span_u64_t cache __attribute__((unused)), uint64_t size
   uint64_t val __attribute__((unused)) = cache.data[pos];
   uint64_t i __attribute__((unused)) = pos;
   {
-    while ((i > 0)) {
-      cache.data[i] = cache.data[(i - 1)];
-      i = (i - 1);
+    while ((i > 0ULL)) {
+      cache.data[i] = cache.data[(i - 1ULL)];
+      i = (i - 1ULL);
     }
 
   }
-  cache.data[0] = val;
+  cache.data[0ULL] = val;
 }
 
 uint64_t evict_lru(forge_span_u64_t cache __attribute__((unused)), uint64_t size __attribute__((unused))) {
-  return cache.data[(size - 1)];
+  return cache.data[(size - 1ULL)];
 }
 
 uint64_t cache_find(forge_span_u64_t cache __attribute__((unused)), uint64_t size __attribute__((unused)), uint64_t key __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   uint64_t found __attribute__((unused)) = size;
   {
     while ((i < size)) {
@@ -44,7 +44,7 @@ uint64_t cache_find(forge_span_u64_t cache __attribute__((unused)), uint64_t siz
         i = size;
 
       } else {
-        i = (i + 1);
+        i = (i + 1ULL);
 
       }
     }
@@ -54,7 +54,7 @@ uint64_t cache_find(forge_span_u64_t cache __attribute__((unused)), uint64_t siz
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

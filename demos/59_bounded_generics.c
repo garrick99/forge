@@ -28,7 +28,7 @@ uint64_t Color__Hashable__hash(const Color* self __attribute__((unused)));
 int main();
 
 uint64_t Point__Hashable__hash(const Point* self __attribute__((unused))) {
-  return (((*self).x * 31) + (*self).y);
+  return (((*self).x * 31ULL) + (*self).y);
 }
 
 _Bool Point__Eq__eq(const Point* self __attribute__((unused)), const Point* other __attribute__((unused))) {
@@ -36,21 +36,21 @@ _Bool Point__Eq__eq(const Point* self __attribute__((unused)), const Point* othe
 }
 
 uint64_t Color__Hashable__hash(const Color* self __attribute__((unused))) {
-  return ((((*self).r * 1000003) + ((*self).g * 1009)) + (*self).b);
+  return ((((*self).r * 1000003ULL) + ((*self).g * 1009ULL)) + (*self).b);
 }
 
 int main() {
-  Point p1 __attribute__((unused)) = (Point){ .x = 3, .y = 7 };
-  Point p2 __attribute__((unused)) = (Point){ .x = 3, .y = 7 };
-  Color c __attribute__((unused)) = (Color){ .r = 255, .g = 128, .b = 0 };
+  Point p1 __attribute__((unused)) = (Point){ .x = 3ULL, .y = 7ULL };
+  Point p2 __attribute__((unused)) = (Point){ .x = 3ULL, .y = 7ULL };
+  Color c __attribute__((unused)) = (Color){ .r = 255ULL, .g = 128ULL, .b = 0ULL };
   uint64_t h1 __attribute__((unused)) = Point__Hashable__hash((&p1));
   uint64_t h2 __attribute__((unused)) = Color__Hashable__hash((&c));
   _Bool eq __attribute__((unused)) = Point__Eq__eq((&p1), (&p2));
   uint64_t eq_val;
   if (eq) {
-    eq_val = 1;
+    eq_val = 1ULL;
   } else {
-    eq_val = 0;
+    eq_val = 0ULL;
   }
   return (int)(((h1 + h2) + eq_val));
 

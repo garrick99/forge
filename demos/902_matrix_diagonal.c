@@ -26,21 +26,21 @@ uint64_t min_u64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((u
 
 void extract_diag(forge_span_u64_t mat __attribute__((unused)), forge_span_u64_t diag __attribute__((unused)), uint64_t rows __attribute__((unused)), uint64_t cols __attribute__((unused))) {
   uint64_t d __attribute__((unused)) = min_u64(rows, cols);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < d)) {
       if (((i < diag.len) && (((i * cols) + i) < mat.len))) {
         diag.data[i] = mat.data[((i * cols) + i)];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

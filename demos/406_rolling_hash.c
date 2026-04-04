@@ -27,58 +27,58 @@ uint64_t reset_clears();
 int main();
 
 RollingHash rh_new(uint64_t window_size __attribute__((unused)), uint64_t base __attribute__((unused))) {
-  return (RollingHash){ .hash_value = 0, .symbol_count = 0, .window_size = window_size, .base = base };
+  return (RollingHash){ .hash_value = 0ULL, .symbol_count = 0ULL, .window_size = window_size, .base = base };
 }
 
 void rh_add(RollingHash* r __attribute__((unused)), uint64_t symbol __attribute__((unused))) {
   (*r).hash_value = (((*r).hash_value * (*r).base) + symbol);
-  (*r).symbol_count = ((*r).symbol_count + 1);
+  (*r).symbol_count = ((*r).symbol_count + 1ULL);
 }
 
 void rh_reset(RollingHash* r __attribute__((unused))) {
-  (*r).hash_value = 0;
-  (*r).symbol_count = 0;
+  (*r).hash_value = 0ULL;
+  (*r).symbol_count = 0ULL;
 }
 
 uint64_t one_symbol() {
-  RollingHash r __attribute__((unused)) = rh_new(4, 10);
-  rh_add((&r), 5);
+  RollingHash r __attribute__((unused)) = rh_new(4ULL, 10ULL);
+  rh_add((&r), 5ULL);
   return r.hash_value;
 }
 
 uint64_t two_symbols() {
-  RollingHash r __attribute__((unused)) = rh_new(4, 10);
-  rh_add((&r), 1);
-  rh_add((&r), 2);
+  RollingHash r __attribute__((unused)) = rh_new(4ULL, 10ULL);
+  rh_add((&r), 1ULL);
+  rh_add((&r), 2ULL);
   return r.hash_value;
 }
 
 uint64_t three_symbols() {
-  RollingHash r __attribute__((unused)) = rh_new(4, 10);
-  rh_add((&r), 1);
-  rh_add((&r), 2);
-  rh_add((&r), 3);
+  RollingHash r __attribute__((unused)) = rh_new(4ULL, 10ULL);
+  rh_add((&r), 1ULL);
+  rh_add((&r), 2ULL);
+  rh_add((&r), 3ULL);
   return r.hash_value;
 }
 
 uint64_t symbol_count() {
-  RollingHash r __attribute__((unused)) = rh_new(4, 10);
-  rh_add((&r), 1);
-  rh_add((&r), 2);
-  rh_add((&r), 3);
+  RollingHash r __attribute__((unused)) = rh_new(4ULL, 10ULL);
+  rh_add((&r), 1ULL);
+  rh_add((&r), 2ULL);
+  rh_add((&r), 3ULL);
   return r.symbol_count;
 }
 
 uint64_t reset_clears() {
-  RollingHash r __attribute__((unused)) = rh_new(4, 10);
-  rh_add((&r), 5);
-  rh_add((&r), 7);
+  RollingHash r __attribute__((unused)) = rh_new(4ULL, 10ULL);
+  rh_add((&r), 5ULL);
+  rh_add((&r), 7ULL);
   rh_reset((&r));
   return (r.hash_value + r.symbol_count);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

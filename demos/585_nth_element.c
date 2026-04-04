@@ -19,15 +19,15 @@ uint64_t kth_smallest_three(uint64_t a __attribute__((unused)), uint64_t b __att
 int main();
 
 uint64_t min_index(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t best __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t best __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((s.data[i] < s.data[best])) {
         best = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -35,15 +35,15 @@ uint64_t min_index(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 }
 
 uint64_t max_index(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t best __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t best __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((s.data[i] > s.data[best])) {
         best = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -51,7 +51,7 @@ uint64_t max_index(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 }
 
 uint64_t kth_smallest_two(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t k __attribute__((unused))) {
-  if ((k == 1)) {
+  if ((k == 1ULL)) {
     if ((a <= b)) {
       return a;
     } else {
@@ -88,10 +88,10 @@ uint64_t kth_smallest_three(uint64_t a __attribute__((unused)), uint64_t b __att
     }
   }
   uint64_t mid __attribute__((unused)) = ((((a + b) + c) - lo) - hi);
-  if ((k == 1)) {
+  if ((k == 1ULL)) {
     return lo;
   } else {
-    if ((k == 3)) {
+    if ((k == 3ULL)) {
       return hi;
     } else {
       return mid;
@@ -100,7 +100,7 @@ uint64_t kth_smallest_three(uint64_t a __attribute__((unused)), uint64_t b __att
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

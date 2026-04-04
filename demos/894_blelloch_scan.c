@@ -17,11 +17,11 @@ void downsweep_zero(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 int main();
 
 void upsweep(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t stride __attribute__((unused)) = 2;
+  uint64_t stride __attribute__((unused)) = 2ULL;
   {
     while ((stride <= n)) {
-      uint64_t half __attribute__((unused)) = (stride / 2);
-      uint64_t i __attribute__((unused)) = (stride - 1);
+      uint64_t half __attribute__((unused)) = (stride / 2ULL);
+      uint64_t i __attribute__((unused)) = (stride - 1ULL);
       {
         while ((i < n)) {
           s.data[i] = (s.data[i] + s.data[(i - half)]);
@@ -33,9 +33,9 @@ void upsweep(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute_
         }
 
       }
-      stride = (stride * 2);
-      if ((stride == 0)) {
-        stride = (n + 1);
+      stride = (stride * 2ULL);
+      if ((stride == 0ULL)) {
+        stride = (n + 1ULL);
 
       }
     }
@@ -44,11 +44,11 @@ void upsweep(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute_
 }
 
 void downsweep_zero(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  s.data[(n - 1)] = 0;
+  s.data[(n - 1ULL)] = 0ULL;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

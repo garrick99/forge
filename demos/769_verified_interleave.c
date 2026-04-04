@@ -18,44 +18,44 @@ void transpose_2xn(forge_span_u64_t row0 __attribute__((unused)), forge_span_u64
 int main();
 
 void interleave(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       out.data[(i + i)] = a.data[i];
-      out.data[((i + i) + 1)] = b.data[i];
-      i = (i + 1);
+      out.data[((i + i) + 1ULL)] = b.data[i];
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void deinterleave(forge_span_u64_t input __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t even __attribute__((unused)), forge_span_u64_t odd __attribute__((unused))) {
-  uint64_t half __attribute__((unused)) = (n / 2);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t half __attribute__((unused)) = (n / 2ULL);
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < half)) {
       even.data[i] = input.data[(i + i)];
-      odd.data[i] = input.data[((i + i) + 1)];
-      i = (i + 1);
+      odd.data[i] = input.data[((i + i) + 1ULL)];
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void transpose_2xn(forge_span_u64_t row0 __attribute__((unused)), forge_span_u64_t row1 __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       out.data[(i + i)] = row0.data[i];
-      out.data[((i + i) + 1)] = row1.data[i];
-      i = (i + 1);
+      out.data[((i + i) + 1ULL)] = row1.data[i];
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

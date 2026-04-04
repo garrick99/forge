@@ -16,34 +16,34 @@ void matmul(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __att
 int main();
 
 void matmul(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t c __attribute__((unused)), uint64_t m __attribute__((unused)), uint64_t k __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < m)) {
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < n)) {
-          uint64_t acc __attribute__((unused)) = 0;
-          uint64_t p __attribute__((unused)) = 0;
+          uint64_t acc __attribute__((unused)) = 0ULL;
+          uint64_t p __attribute__((unused)) = 0ULL;
           {
             while ((p < k)) {
               acc = (acc + (a.data[((i * k) + p)] * b.data[((p * n) + j)]));
-              p = (p + 1);
+              p = (p + 1ULL);
             }
 
           }
           c.data[((i * n) + j)] = acc;
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

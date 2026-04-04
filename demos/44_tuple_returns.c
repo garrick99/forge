@@ -39,16 +39,16 @@ __forge_tuple_u64_u64_t split_at(uint64_t total __attribute__((unused)), uint64_
 }
 
 uint64_t run() {
-  __forge_tuple_u64_u64_t dm __attribute__((unused)) = divmod(10, 3);
+  __forge_tuple_u64_u64_t dm __attribute__((unused)) = divmod(10ULL, 3ULL);
   uint64_t q __attribute__((unused)) = (dm)._0;
   uint64_t r __attribute__((unused)) = (dm)._1;
-  __forge_tuple_u64_u64_t mm __attribute__((unused)) = minmax(7, 2);
+  __forge_tuple_u64_u64_t mm __attribute__((unused)) = minmax(7ULL, 2ULL);
   uint64_t lo __attribute__((unused)) = (mm)._0;
   uint64_t hi __attribute__((unused)) = (mm)._1;
-  __forge_tuple_u64_u64_t sw __attribute__((unused)) = swap(5, 9);
+  __forge_tuple_u64_u64_t sw __attribute__((unused)) = swap(5ULL, 9ULL);
   uint64_t a __attribute__((unused)) = (sw)._0;
   uint64_t b __attribute__((unused)) = (sw)._1;
-  __forge_tuple_u64_u64_t sp __attribute__((unused)) = split_at(20, 8);
+  __forge_tuple_u64_u64_t sp __attribute__((unused)) = split_at(20ULL, 8ULL);
   uint64_t left __attribute__((unused)) = (sp)._0;
   uint64_t right __attribute__((unused)) = (sp)._1;
   return (((((((q + r) + lo) + hi) + a) + b) + left) + right);

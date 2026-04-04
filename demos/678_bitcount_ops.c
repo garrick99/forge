@@ -22,11 +22,11 @@ int main();
 
 uint64_t popcount(uint64_t x __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = x;
-  uint64_t cnt __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
   {
-    while ((n > 0)) {
-      cnt = (cnt + (n % 2));
-      n = (n / 2);
+    while ((n > 0ULL)) {
+      cnt = (cnt + (n % 2ULL));
+      n = (n / 2ULL);
     }
 
   }
@@ -35,11 +35,11 @@ uint64_t popcount(uint64_t x __attribute__((unused))) {
 
 uint64_t count_leading_zeros(uint64_t x __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = x;
-  uint64_t cnt __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
   {
-    while (((n < -9223372036854775808) && (cnt < 63))) {
-      n = (n * 2);
-      cnt = (cnt + 1);
+    while (((n < 0x8000000000000000ULL) && (cnt < 63ULL))) {
+      n = (n * 2ULL);
+      cnt = (cnt + 1ULL);
     }
 
   }
@@ -47,20 +47,20 @@ uint64_t count_leading_zeros(uint64_t x __attribute__((unused))) {
 }
 
 uint64_t lowest_set_bit(uint64_t x __attribute__((unused))) {
-  return ((x - (((x - 1) / 2) * 2)) - ((x - 1) % 2));
+  return ((x - (((x - 1ULL) / 2ULL) * 2ULL)) - ((x - 1ULL) % 2ULL));
 }
 
 _Bool is_power_of_two(uint64_t x __attribute__((unused))) {
-  return (((x % 2) == 0) || (x == 1));
+  return (((x % 2ULL) == 0ULL) || (x == 1ULL));
 }
 
 uint64_t next_power_of_two(uint64_t x __attribute__((unused))) {
-  uint64_t p __attribute__((unused)) = 1;
-  uint64_t steps __attribute__((unused)) = 0;
+  uint64_t p __attribute__((unused)) = 1ULL;
+  uint64_t steps __attribute__((unused)) = 0ULL;
   {
-    while (((p < x) && (steps < 63))) {
-      p = (p * 2);
-      steps = (steps + 1);
+    while (((p < x) && (steps < 63ULL))) {
+      p = (p * 2ULL);
+      steps = (steps + 1ULL);
     }
 
   }
@@ -68,13 +68,13 @@ uint64_t next_power_of_two(uint64_t x __attribute__((unused))) {
 }
 
 uint64_t array_popcount_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t pc __attribute__((unused)) = popcount(s.data[i]);
       acc = (acc + pc);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -82,7 +82,7 @@ uint64_t array_popcount_sum(forge_span_u64_t s __attribute__((unused)), uint64_t
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

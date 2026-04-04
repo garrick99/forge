@@ -16,37 +16,37 @@ void bfs_levels(forge_span_u64_t adj_ptr __attribute__((unused)), forge_span_u64
 int main();
 
 void bfs_levels(forge_span_u64_t adj_ptr __attribute__((unused)), forge_span_u64_t adj_list __attribute__((unused)), uint64_t n_verts __attribute__((unused)), uint64_t n_edges __attribute__((unused)), uint64_t source __attribute__((unused)), forge_span_u64_t level __attribute__((unused)), forge_span_u64_t queue __attribute__((unused))) {
-  uint64_t sentinel __attribute__((unused)) = -1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t sentinel __attribute__((unused)) = 0xffffffffffffffffULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n_verts)) {
       level.data[i] = sentinel;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
-  level.data[source] = 0;
-  queue.data[0] = source;
-  uint64_t front __attribute__((unused)) = 0;
-  uint64_t back __attribute__((unused)) = 1;
+  level.data[source] = 0ULL;
+  queue.data[0ULL] = source;
+  uint64_t front __attribute__((unused)) = 0ULL;
+  uint64_t back __attribute__((unused)) = 1ULL;
   {
     while ((front < back)) {
       uint64_t u __attribute__((unused)) = queue.data[front];
-      front = (front + 1);
+      front = (front + 1ULL);
       if ((u < n_verts)) {
         uint64_t start __attribute__((unused)) = adj_ptr.data[u];
-        uint64_t end __attribute__((unused)) = adj_ptr.data[(u + 1)];
+        uint64_t end __attribute__((unused)) = adj_ptr.data[(u + 1ULL)];
         uint64_t e __attribute__((unused)) = start;
         {
           while ((e < end)) {
             uint64_t nb __attribute__((unused)) = adj_list.data[e];
             if (((level.data[nb] == sentinel) && (back < n_verts))) {
-              level.data[nb] = (level.data[u] + 1);
+              level.data[nb] = (level.data[u] + 1ULL);
               queue.data[back] = nb;
-              back = (back + 1);
+              back = (back + 1ULL);
 
             }
-            e = (e + 1);
+            e = (e + 1ULL);
           }
 
         }
@@ -58,7 +58,7 @@ void bfs_levels(forge_span_u64_t adj_ptr __attribute__((unused)), forge_span_u64
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

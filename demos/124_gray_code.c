@@ -19,46 +19,46 @@ uint64_t gray_injective4(uint64_t a __attribute__((unused)), uint64_t b __attrib
 int main();
 
 uint64_t gray_encode(uint64_t n __attribute__((unused))) {
-  return (n ^ (n >> 1));
+  return (n ^ (n >> 1ULL));
 }
 
 uint64_t gray_decode16(uint64_t g __attribute__((unused))) {
-  uint64_t p0 __attribute__((unused)) = (g ^ (g >> 8));
-  uint64_t p1 __attribute__((unused)) = (p0 ^ (p0 >> 4));
-  uint64_t p2 __attribute__((unused)) = (p1 ^ (p1 >> 2));
-  uint64_t p3 __attribute__((unused)) = (p2 ^ (p2 >> 1));
-  return (p3 & 65535);
+  uint64_t p0 __attribute__((unused)) = (g ^ (g >> 8ULL));
+  uint64_t p1 __attribute__((unused)) = (p0 ^ (p0 >> 4ULL));
+  uint64_t p2 __attribute__((unused)) = (p1 ^ (p1 >> 2ULL));
+  uint64_t p3 __attribute__((unused)) = (p2 ^ (p2 >> 1ULL));
+  return (p3 & 65535ULL);
 }
 
 uint64_t gray_xor_dist(uint64_t n __attribute__((unused))) {
   uint64_t g0 __attribute__((unused)) = gray_encode(n);
-  uint64_t g1 __attribute__((unused)) = gray_encode((n + 1));
+  uint64_t g1 __attribute__((unused)) = gray_encode((n + 1ULL));
   return (g0 ^ g1);
 }
 
 uint64_t is_pow2(uint64_t x __attribute__((unused))) {
-  if (((x & (x - 1)) == 0)) {
-    return 1;
+  if (((x & (x - 1ULL)) == 0ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t gray_check_dist(uint64_t n __attribute__((unused))) {
   uint64_t dist __attribute__((unused)) = gray_xor_dist(n);
-  if (((dist > 0) && ((dist & (dist - 1)) == 0))) {
-    return 1;
+  if (((dist > 0ULL) && ((dist & (dist - 1ULL)) == 0ULL))) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t gray_roundtrip8(uint64_t n __attribute__((unused))) {
   uint64_t g __attribute__((unused)) = gray_encode(n);
-  uint64_t p0 __attribute__((unused)) = (g ^ (g >> 4));
-  uint64_t p1 __attribute__((unused)) = (p0 ^ (p0 >> 2));
-  uint64_t p2 __attribute__((unused)) = (p1 ^ (p1 >> 1));
-  return (p2 & 255);
+  uint64_t p0 __attribute__((unused)) = (g ^ (g >> 4ULL));
+  uint64_t p1 __attribute__((unused)) = (p0 ^ (p0 >> 2ULL));
+  uint64_t p2 __attribute__((unused)) = (p1 ^ (p1 >> 1ULL));
+  return (p2 & 255ULL);
 }
 
 uint64_t gray_injective4(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
@@ -66,35 +66,35 @@ uint64_t gray_injective4(uint64_t a __attribute__((unused)), uint64_t b __attrib
   uint64_t gb __attribute__((unused)) = gray_encode(b);
   if ((ga == gb)) {
     if ((a == b)) {
-      return 1;
+      return 1ULL;
     } else {
-      return 0;
+      return 0ULL;
     }
   } else {
     if ((a != b)) {
-      return 1;
+      return 1ULL;
     } else {
-      return 0;
+      return 0ULL;
     }
   }
 }
 
 int main() {
-  uint64_t g0 __attribute__((unused)) = gray_encode(0);
-  uint64_t g1 __attribute__((unused)) = gray_encode(1);
-  uint64_t g2 __attribute__((unused)) = gray_encode(2);
-  uint64_t g3 __attribute__((unused)) = gray_encode(3);
-  uint64_t g4 __attribute__((unused)) = gray_encode(4);
-  uint64_t g5 __attribute__((unused)) = gray_encode(5);
-  uint64_t g6 __attribute__((unused)) = gray_encode(6);
-  uint64_t g7 __attribute__((unused)) = gray_encode(7);
-  uint64_t sb0 __attribute__((unused)) = gray_check_dist(0);
-  uint64_t sb3 __attribute__((unused)) = gray_check_dist(3);
-  uint64_t sb7 __attribute__((unused)) = gray_check_dist(7);
-  uint64_t rt0 __attribute__((unused)) = gray_roundtrip8(0);
-  uint64_t rt5 __attribute__((unused)) = gray_roundtrip8(5);
-  uint64_t rt255 __attribute__((unused)) = gray_roundtrip8(255);
-  uint64_t inj __attribute__((unused)) = gray_injective4(3, 5);
+  uint64_t g0 __attribute__((unused)) = gray_encode(0ULL);
+  uint64_t g1 __attribute__((unused)) = gray_encode(1ULL);
+  uint64_t g2 __attribute__((unused)) = gray_encode(2ULL);
+  uint64_t g3 __attribute__((unused)) = gray_encode(3ULL);
+  uint64_t g4 __attribute__((unused)) = gray_encode(4ULL);
+  uint64_t g5 __attribute__((unused)) = gray_encode(5ULL);
+  uint64_t g6 __attribute__((unused)) = gray_encode(6ULL);
+  uint64_t g7 __attribute__((unused)) = gray_encode(7ULL);
+  uint64_t sb0 __attribute__((unused)) = gray_check_dist(0ULL);
+  uint64_t sb3 __attribute__((unused)) = gray_check_dist(3ULL);
+  uint64_t sb7 __attribute__((unused)) = gray_check_dist(7ULL);
+  uint64_t rt0 __attribute__((unused)) = gray_roundtrip8(0ULL);
+  uint64_t rt5 __attribute__((unused)) = gray_roundtrip8(5ULL);
+  uint64_t rt255 __attribute__((unused)) = gray_roundtrip8(255ULL);
+  uint64_t inj __attribute__((unused)) = gray_injective4(3ULL, 5ULL);
   return (int)(((((((((((((((g0 + g1) + g2) + g3) + g4) + g5) + g6) + g7) + sb0) + sb3) + sb7) + rt0) + rt5) + rt255) + inj));
 
 }

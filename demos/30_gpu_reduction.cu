@@ -33,12 +33,12 @@ void fill_u64(forge_span_u64_t dst __attribute__((unused)), uint64_t val __attri
 __global__ void reduce_sum(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t num_blocks __attribute__((unused)), uint64_t block_size __attribute__((unused)));
 
 uint64_t sum_n(forge_span_u64_t src __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t k __attribute__((unused)) = 0;
-  uint64_t s __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
+  uint64_t s __attribute__((unused)) = 0ULL;
   {
     while ((k < n)) {
       s = (s + src.data[k]);
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
@@ -46,11 +46,11 @@ uint64_t sum_n(forge_span_u64_t src __attribute__((unused)), uint64_t n __attrib
 }
 
 void fill_u64(forge_span_u64_t dst __attribute__((unused)), uint64_t val __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while ((k < n)) {
       dst.data[k] = val;
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
@@ -66,21 +66,21 @@ __global__ void reduce_sum(forge_span_u64_t src __attribute__((unused)), forge_s
 
   }
   __syncthreads();
-  uint64_t stride __attribute__((unused)) = (block_size / 2);
+  uint64_t stride __attribute__((unused)) = (block_size / 2ULL);
   {
-    while ((stride > 0)) {
+    while ((stride > 0ULL)) {
       if ((tid < stride)) {
         smem[tid] = (smem[tid] + smem[(tid + stride)]);
 
       }
       __syncthreads();
-      stride = (stride / 2);
+      stride = (stride / 2ULL);
     }
 
   }
-  if ((tid == 0)) {
+  if ((tid == 0ULL)) {
     if ((bid < dst.len)) {
-      dst.data[bid] = smem[0];
+      dst.data[bid] = smem[0ULL];
 
     };
   }

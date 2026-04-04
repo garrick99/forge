@@ -34,8 +34,8 @@ _Bool __forge_lambda_1(uint64_t x __attribute__((unused)));
 uint64_t __forge_lambda_0(uint64_t x __attribute__((unused)));
 
 uint64_t clamp255(uint64_t x __attribute__((unused))) {
-  if ((x > 255)) {
-    return 255;
+  if ((x > 255ULL)) {
+    return 255ULL;
   } else {
     return x;
   }
@@ -46,7 +46,7 @@ uint64_t forge_double(uint64_t x __attribute__((unused))) {
 }
 
 _Bool is_nonzero(uint64_t x __attribute__((unused))) {
-  return (x != 0);
+  return (x != 0ULL);
 }
 
 uint64_t add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
@@ -54,22 +54,22 @@ uint64_t add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unuse
 }
 
 void map_span(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_fn_u64_ret_u64_t f __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = f(s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void map_clamp(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = clamp255(s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -77,11 +77,11 @@ void map_clamp(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribut
 
 uint64_t fold_span(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t init __attribute__((unused)), forge_fn_u64_u64_ret_u64_t f __attribute__((unused))) {
   uint64_t acc __attribute__((unused)) = init;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = f(acc, s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -89,12 +89,12 @@ uint64_t fold_span(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 }
 
 uint64_t sum_span(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -102,7 +102,7 @@ uint64_t sum_span(forge_span_u64_t s __attribute__((unused)), uint64_t n __attri
 }
 
 _Bool any_span(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_fn_u64_ret_bool_t pred __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   _Bool found __attribute__((unused)) = 0;
   {
     while ((i < n)) {
@@ -110,7 +110,7 @@ _Bool any_span(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribut
         found = 1;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -122,11 +122,11 @@ uint64_t compose_apply(forge_fn_u64_ret_u64_t f __attribute__((unused)), forge_f
 }
 
 void pipeline(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_fn_u64_ret_u64_t f __attribute__((unused)), forge_fn_u64_ret_u64_t g __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = g(f(s.data[i]));
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -135,24 +135,24 @@ void pipeline(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute
 uint64_t demo_higher_order(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
   map_span(s, n, forge_double);
   map_span(s, n, __forge_lambda_0);
-  uint64_t total __attribute__((unused)) = fold_span(s, n, 0, add);
+  uint64_t total __attribute__((unused)) = fold_span(s, n, 0ULL, add);
   _Bool _has_nonzero __attribute__((unused)) = any_span(s, n, is_nonzero);
   _Bool _has_large __attribute__((unused)) = any_span(s, n, __forge_lambda_1);
-  uint64_t _v __attribute__((unused)) = compose_apply(forge_double, clamp255, 200);
+  uint64_t _v __attribute__((unused)) = compose_apply(forge_double, clamp255, 200ULL);
   pipeline(s, n, forge_double, clamp255);
   return total;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 
 _Bool __forge_lambda_1(uint64_t x __attribute__((unused))) {
-  return (x > 100);
+  return (x > 100ULL);
 }
 
 uint64_t __forge_lambda_0(uint64_t x __attribute__((unused))) {
-  return (x + 1);
+  return (x + 1ULL);
 }
 

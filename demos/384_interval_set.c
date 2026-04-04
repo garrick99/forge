@@ -26,53 +26,53 @@ uint64_t initial_span();
 int main();
 
 Interval iv_new(uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
-  return (Interval){ .lo = lo, .hi = hi, .inserts = 0 };
+  return (Interval){ .lo = lo, .hi = hi, .inserts = 0ULL };
 }
 
 void iv_extend_hi(Interval* iv __attribute__((unused)), uint64_t new_hi __attribute__((unused))) {
   (*iv).hi = new_hi;
-  (*iv).inserts = ((*iv).inserts + 1);
+  (*iv).inserts = ((*iv).inserts + 1ULL);
 }
 
 void iv_extend_lo(Interval* iv __attribute__((unused)), uint64_t new_lo __attribute__((unused))) {
   (*iv).lo = new_lo;
-  (*iv).inserts = ((*iv).inserts + 1);
+  (*iv).inserts = ((*iv).inserts + 1ULL);
 }
 
 uint64_t extend_hi_to_20() {
-  Interval iv __attribute__((unused)) = iv_new(5, 10);
-  iv_extend_hi((&iv), 20);
+  Interval iv __attribute__((unused)) = iv_new(5ULL, 10ULL);
+  iv_extend_hi((&iv), 20ULL);
   return iv.hi;
 }
 
 uint64_t extend_lo_to_2() {
-  Interval iv __attribute__((unused)) = iv_new(5, 10);
-  iv_extend_lo((&iv), 2);
+  Interval iv __attribute__((unused)) = iv_new(5ULL, 10ULL);
+  iv_extend_lo((&iv), 2ULL);
   return iv.lo;
 }
 
 uint64_t extend_both_span() {
-  Interval iv __attribute__((unused)) = iv_new(5, 10);
-  iv_extend_hi((&iv), 25);
-  iv_extend_lo((&iv), 1);
+  Interval iv __attribute__((unused)) = iv_new(5ULL, 10ULL);
+  iv_extend_hi((&iv), 25ULL);
+  iv_extend_lo((&iv), 1ULL);
   return (iv.hi - iv.lo);
 }
 
 uint64_t insert_count() {
-  Interval iv __attribute__((unused)) = iv_new(10, 20);
-  iv_extend_hi((&iv), 30);
-  iv_extend_hi((&iv), 40);
-  iv_extend_lo((&iv), 5);
+  Interval iv __attribute__((unused)) = iv_new(10ULL, 20ULL);
+  iv_extend_hi((&iv), 30ULL);
+  iv_extend_hi((&iv), 40ULL);
+  iv_extend_lo((&iv), 5ULL);
   return iv.inserts;
 }
 
 uint64_t initial_span() {
-  Interval iv __attribute__((unused)) = iv_new(5, 15);
+  Interval iv __attribute__((unused)) = iv_new(5ULL, 15ULL);
   return (iv.hi - iv.lo);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

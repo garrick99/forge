@@ -17,29 +17,29 @@ uint64_t count_nonzero(forge_span_u64_t coeffs __attribute__((unused)), uint64_t
 int main();
 
 void threshold(forge_span_u64_t coeffs __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t thresh __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((coeffs.data[i] < thresh)) {
-        coeffs.data[i] = 0;
+        coeffs.data[i] = 0ULL;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t count_nonzero(forge_span_u64_t coeffs __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((coeffs.data[i] > 0)) {
-        cnt = (cnt + 1);
+      if ((coeffs.data[i] > 0ULL)) {
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -47,7 +47,7 @@ uint64_t count_nonzero(forge_span_u64_t coeffs __attribute__((unused)), uint64_t
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

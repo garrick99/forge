@@ -20,40 +20,40 @@ void transform_abs_diff_from(forge_span_u64_t s __attribute__((unused)), uint64_
 int main();
 
 void transform_scale(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t num __attribute__((unused)), uint64_t den __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = ((s.data[i] * num) / den);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void transform_offset(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t off __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = (s.data[i] + off);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void transform_normalize(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t new_max __attribute__((unused)), uint64_t old_max __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = ((s.data[i] * new_max) / old_max);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void transform_threshold(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t thresh __attribute__((unused)), uint64_t hi_val __attribute__((unused)), uint64_t lo_val __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((s.data[i] >= thresh)) {
@@ -63,14 +63,14 @@ void transform_threshold(forge_span_u64_t s __attribute__((unused)), uint64_t n 
         s.data[i] = lo_val;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void transform_abs_diff_from(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t ref_val __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((s.data[i] >= ref_val)) {
@@ -80,14 +80,14 @@ void transform_abs_diff_from(forge_span_u64_t s __attribute__((unused)), uint64_
         s.data[i] = (ref_val - s.data[i]);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

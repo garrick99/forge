@@ -19,13 +19,13 @@ int main();
 uint64_t max_stack_push(forge_span_u64_t stack __attribute__((unused)), uint64_t sp __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t val __attribute__((unused))) {
   uint64_t top __attribute__((unused)) = sp;
   {
-    while ((top > 0)) {
-      if ((stack.data[(top - 1)] < val)) {
-        top = (top - 1);
+    while ((top > 0ULL)) {
+      if ((stack.data[(top - 1ULL)] < val)) {
+        top = (top - 1ULL);
 
       } else {
         top = top;
-        top = 0;
+        top = 0ULL;
 
       }
     }
@@ -33,28 +33,28 @@ uint64_t max_stack_push(forge_span_u64_t stack __attribute__((unused)), uint64_t
   }
   if ((top < cap)) {
     stack.data[top] = val;
-    return (top + 1);
+    return (top + 1ULL);
   } else {
     return top;
   }
 }
 
 void prefix_min_stack(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t mins __attribute__((unused))) {
-  mins.data[0] = s.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  mins.data[0ULL] = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      uint64_t prev __attribute__((unused)) = mins.data[(i - 1)];
+      uint64_t prev __attribute__((unused)) = mins.data[(i - 1ULL)];
       uint64_t cur __attribute__((unused)) = s.data[i];
       mins.data[i] = ((prev <= cur) ? prev : cur);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

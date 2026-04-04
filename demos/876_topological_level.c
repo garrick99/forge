@@ -17,11 +17,11 @@ void propagate_level(forge_span_u64_t levels __attribute__((unused)), uint64_t n
 int main();
 
 uint64_t assign_levels(forge_span_u64_t levels __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      levels.data[i] = 0;
-      i = (i + 1);
+      levels.data[i] = 0ULL;
+      i = (i + 1ULL);
     }
 
   }
@@ -29,7 +29,7 @@ uint64_t assign_levels(forge_span_u64_t levels __attribute__((unused)), uint64_t
 }
 
 void propagate_level(forge_span_u64_t levels __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t src __attribute__((unused)), uint64_t dst __attribute__((unused))) {
-  uint64_t candidate __attribute__((unused)) = (levels.data[src] + 1);
+  uint64_t candidate __attribute__((unused)) = (levels.data[src] + 1ULL);
   if ((candidate > levels.data[dst])) {
     levels.data[dst] = candidate;
 
@@ -37,7 +37,7 @@ void propagate_level(forge_span_u64_t levels __attribute__((unused)), uint64_t n
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

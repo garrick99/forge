@@ -25,16 +25,16 @@ uint64_t two_flush_cycles(uint64_t cap __attribute__((unused)));
 int main();
 
 EventLog log_new(uint64_t cap __attribute__((unused))) {
-  return (EventLog){ .count = 0, .cap = cap, .flushes = 0 };
+  return (EventLog){ .count = 0ULL, .cap = cap, .flushes = 0ULL };
 }
 
 void log_append(EventLog* l __attribute__((unused))) {
-  (*l).count = ((*l).count + 1);
+  (*l).count = ((*l).count + 1ULL);
 }
 
 void log_flush(EventLog* l __attribute__((unused))) {
-  (*l).count = 0;
-  (*l).flushes = ((*l).flushes + 1);
+  (*l).count = 0ULL;
+  (*l).flushes = ((*l).flushes + 1ULL);
 }
 
 uint64_t five_appends(uint64_t cap __attribute__((unused))) {
@@ -76,7 +76,7 @@ uint64_t two_flush_cycles(uint64_t cap __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

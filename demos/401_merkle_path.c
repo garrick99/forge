@@ -25,16 +25,16 @@ uint64_t root_set_after_path();
 int main();
 
 MerklePath mp_new() {
-  return (MerklePath){ .depth = 0, .siblings = 0, .root_set = 0 };
+  return (MerklePath){ .depth = 0ULL, .siblings = 0ULL, .root_set = 0ULL };
 }
 
 void mp_descend(MerklePath* p __attribute__((unused))) {
-  (*p).depth = ((*p).depth + 1);
-  (*p).siblings = ((*p).siblings + 1);
+  (*p).depth = ((*p).depth + 1ULL);
+  (*p).siblings = ((*p).siblings + 1ULL);
 }
 
 void mp_set_root(MerklePath* p __attribute__((unused))) {
-  (*p).root_set = 1;
+  (*p).root_set = 1ULL;
 }
 
 uint64_t four_levels_depth() {
@@ -73,7 +73,7 @@ uint64_t root_set_after_path() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

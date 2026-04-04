@@ -19,16 +19,16 @@ void gather(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t idx _
 int main();
 
 uint64_t filter_lt(forge_span_u64_t src __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t threshold __attribute__((unused))) {
-  uint64_t wi __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t wi __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((src.data[i] < threshold)) {
         dst.data[wi] = src.data[i];
-        wi = (wi + 1);
+        wi = (wi + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -36,16 +36,16 @@ uint64_t filter_lt(forge_span_u64_t src __attribute__((unused)), uint64_t n __at
 }
 
 uint64_t filter_nonzero(forge_span_u64_t src __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t dst __attribute__((unused))) {
-  uint64_t wi __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t wi __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((src.data[i] != 0)) {
+      if ((src.data[i] != 0ULL)) {
         dst.data[wi] = src.data[i];
-        wi = (wi + 1);
+        wi = (wi + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -53,17 +53,17 @@ uint64_t filter_nonzero(forge_span_u64_t src __attribute__((unused)), uint64_t n
 }
 
 uint64_t filter_unique(forge_span_u64_t src __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t dst __attribute__((unused))) {
-  dst.data[0] = src.data[0];
-  uint64_t wi __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  dst.data[0ULL] = src.data[0ULL];
+  uint64_t wi __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      if ((src.data[i] != src.data[(i - 1)])) {
+      if ((src.data[i] != src.data[(i - 1ULL)])) {
         dst.data[wi] = src.data[i];
-        wi = (wi + 1);
+        wi = (wi + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -71,19 +71,19 @@ uint64_t filter_unique(forge_span_u64_t src __attribute__((unused)), uint64_t n 
 }
 
 void gather(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t idx __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t src_len __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t j __attribute__((unused)) = (idx.data[i] % src_len);
       dst.data[i] = src.data[j];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

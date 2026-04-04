@@ -17,38 +17,38 @@ uint64_t merge_total_elements(uint64_t na __attribute__((unused)), uint64_t nb _
 int main();
 
 void merge_sorted(forge_span_u64_t a __attribute__((unused)), uint64_t na __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t nb __attribute__((unused)), forge_span_u64_t out __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
-  uint64_t j __attribute__((unused)) = 0;
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
+  uint64_t j __attribute__((unused)) = 0ULL;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while (((i < na) && (j < nb))) {
       _Bool take_a __attribute__((unused)) = (a.data[i] <= b.data[j]);
       if (take_a) {
         out.data[k] = a.data[i];
-        i = (i + 1);
+        i = (i + 1ULL);
 
       } else {
         out.data[k] = b.data[j];
-        j = (j + 1);
+        j = (j + 1ULL);
 
       }
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
   {
     while ((i < na)) {
       out.data[k] = a.data[i];
-      i = (i + 1);
-      k = (k + 1);
+      i = (i + 1ULL);
+      k = (k + 1ULL);
     }
 
   }
   {
     while ((j < nb)) {
       out.data[k] = b.data[j];
-      j = (j + 1);
-      k = (k + 1);
+      j = (j + 1ULL);
+      k = (k + 1ULL);
     }
 
   }
@@ -59,7 +59,7 @@ uint64_t merge_total_elements(uint64_t na __attribute__((unused)), uint64_t nb _
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -26,16 +26,16 @@ uint64_t max_preserved(uint64_t max __attribute__((unused)));
 int main();
 
 RateLimit rl_new(uint64_t max_rps __attribute__((unused))) {
-  return (RateLimit){ .count = 0, .window = 0, .max_rps = max_rps };
+  return (RateLimit){ .count = 0ULL, .window = 0ULL, .max_rps = max_rps };
 }
 
 void rl_request(RateLimit* r __attribute__((unused))) {
-  (*r).count = ((*r).count + 1);
+  (*r).count = ((*r).count + 1ULL);
 }
 
 void rl_reset(RateLimit* r __attribute__((unused))) {
-  (*r).count = 0;
-  (*r).window = ((*r).window + 1);
+  (*r).count = 0ULL;
+  (*r).window = ((*r).window + 1ULL);
 }
 
 uint64_t three_requests(uint64_t max __attribute__((unused))) {
@@ -82,7 +82,7 @@ uint64_t max_preserved(uint64_t max __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

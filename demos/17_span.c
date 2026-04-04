@@ -16,12 +16,12 @@ uint64_t sum_span(forge_span_u64_t s __attribute__((unused)));
 uint64_t span_max(forge_span_u64_t s __attribute__((unused)));
 
 uint64_t sum_span(forge_span_u64_t s __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < s.len)) {
       acc = (acc + s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -29,15 +29,15 @@ uint64_t sum_span(forge_span_u64_t s __attribute__((unused))) {
 }
 
 uint64_t span_max(forge_span_u64_t s __attribute__((unused))) {
-  uint64_t m __attribute__((unused)) = s.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t m __attribute__((unused)) = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < s.len)) {
       if ((s.data[i] > m)) {
         m = s.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }

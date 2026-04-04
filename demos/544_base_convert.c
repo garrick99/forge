@@ -22,11 +22,11 @@ int main();
 
 uint64_t count_digits_base(uint64_t n __attribute__((unused)), uint64_t base __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = n;
-  uint64_t d __attribute__((unused)) = 0;
+  uint64_t d __attribute__((unused)) = 0ULL;
   {
-    while ((v > 0)) {
+    while ((v > 0ULL)) {
       v = (v / base);
-      d = (d + 1);
+      d = (d + 1ULL);
     }
 
   }
@@ -35,26 +35,26 @@ uint64_t count_digits_base(uint64_t n __attribute__((unused)), uint64_t base __a
 
 void digits_to_span(uint64_t n __attribute__((unused)), uint64_t base __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t len __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = n;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < len)) {
       out.data[i] = (v % base);
       v = (v / base);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t span_to_number(forge_span_u64_t digits __attribute__((unused)), uint64_t len __attribute__((unused)), uint64_t base __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
-  uint64_t place __attribute__((unused)) = 1;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
+  uint64_t place __attribute__((unused)) = 1ULL;
   {
     while ((i < len)) {
       acc = (acc + (digits.data[i] * place));
       place = (place * base);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -66,15 +66,15 @@ _Bool is_digit(uint64_t c __attribute__((unused)), uint64_t base __attribute__((
 }
 
 uint64_t check_count_bin() {
-  return count_digits_base(8, 2);
+  return count_digits_base(8ULL, 2ULL);
 }
 
 uint64_t check_count_dec() {
-  return count_digits_base(100, 10);
+  return count_digits_base(100ULL, 10ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

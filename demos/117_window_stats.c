@@ -71,7 +71,7 @@ uint64_t win_range(Win4 w __attribute__((unused))) {
 
 uint64_t win_avg(Win4 w __attribute__((unused))) {
   uint64_t s __attribute__((unused)) = win_sum(w);
-  return (s / 4);
+  return (s / 4ULL);
 }
 
 Win4 win_slide(Win4 w __attribute__((unused)), uint64_t new_val __attribute__((unused))) {
@@ -79,13 +79,13 @@ Win4 win_slide(Win4 w __attribute__((unused)), uint64_t new_val __attribute__((u
 }
 
 int main() {
-  Win4 w __attribute__((unused)) = win_new(4, 8, 2, 6);
+  Win4 w __attribute__((unused)) = win_new(4ULL, 8ULL, 2ULL, 6ULL);
   uint64_t s __attribute__((unused)) = win_sum(w);
   uint64_t mn __attribute__((unused)) = win_min(w);
   uint64_t mx __attribute__((unused)) = win_max(w);
   uint64_t rng __attribute__((unused)) = win_range(w);
   uint64_t avg __attribute__((unused)) = win_avg(w);
-  Win4 w2 __attribute__((unused)) = win_slide(w, 10);
+  Win4 w2 __attribute__((unused)) = win_slide(w, 10ULL);
   uint64_t s2 __attribute__((unused)) = win_sum(w2);
   return (int)((((((s + mn) + mx) + rng) + avg) + s2));
 

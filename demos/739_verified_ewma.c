@@ -17,43 +17,43 @@ void sma(forge_span_u64_t samples __attribute__((unused)), uint64_t n __attribut
 int main();
 
 void ewma_filter(forge_span_u64_t samples __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t alpha __attribute__((unused)), forge_span_u64_t output __attribute__((unused))) {
-  output.data[0] = samples.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  output.data[0ULL] = samples.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      uint64_t prev __attribute__((unused)) = output.data[(i - 1)];
+      uint64_t prev __attribute__((unused)) = output.data[(i - 1ULL)];
       uint64_t cur __attribute__((unused)) = samples.data[i];
-      output.data[i] = (((alpha * cur) + ((256 - alpha) * prev)) / 256);
-      i = (i + 1);
+      output.data[i] = (((alpha * cur) + ((256ULL - alpha) * prev)) / 256ULL);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void sma(forge_span_u64_t samples __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t w __attribute__((unused)), forge_span_u64_t output __attribute__((unused))) {
-  uint64_t sum __attribute__((unused)) = 0;
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t sum __attribute__((unused)) = 0ULL;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < w)) {
       sum = (sum + samples.data[j]);
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
-  output.data[(w - 1)] = (sum / w);
+  output.data[(w - 1ULL)] = (sum / w);
   uint64_t i __attribute__((unused)) = w;
   {
     while ((i < n)) {
       sum = ((sum + samples.data[i]) - samples.data[(i - w)]);
       output.data[i] = (sum / w);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

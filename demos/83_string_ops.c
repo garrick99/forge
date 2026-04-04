@@ -19,18 +19,18 @@ uint64_t total_len(forge_span_u8_t s1 __attribute__((unused)), forge_span_u8_t s
 int main();
 
 uint64_t first_or_zero(forge_span_u8_t s __attribute__((unused))) {
-  if ((s.len > 0)) {
-    return ((uint64_t)s.data[0]);
+  if ((s.len > 0ULL)) {
+    return ((uint64_t)s.data[0ULL]);
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t second_or_zero(forge_span_u8_t s __attribute__((unused))) {
-  if ((s.len > 1)) {
-    return ((uint64_t)s.data[1]);
+  if ((s.len > 1ULL)) {
+    return ((uint64_t)s.data[1ULL]);
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
@@ -62,15 +62,15 @@ int main() {
   uint64_t tot __attribute__((unused)) = total_len(s1, s2, s3);
   uint64_t eq1;
   if ((s1.data == s2.data && s1.len == s2.len)) {
-    eq1 = 0;
+    eq1 = 0ULL;
   } else {
-    eq1 = 1;
+    eq1 = 1ULL;
   }
   uint64_t eq2;
   if ((s2.data == s3.data && s2.len == s3.len)) {
-    eq2 = 1;
+    eq2 = 1ULL;
   } else {
-    eq2 = 0;
+    eq2 = 0ULL;
   }
   return (int)(((((((((((len_s1 + len_s2) + len_s3) + fb1) + fb2) + fb3) + sb1) + sb2) + lng) + eq1) + eq2));
 

@@ -21,54 +21,54 @@ uint64_t check_bit_reverse_0();
 int main();
 
 uint64_t extract_bits(uint64_t v __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t width __attribute__((unused))) {
-  return ((v >> lo) & ((1 << width) - 1));
+  return ((v >> lo) & ((1ULL << width) - 1ULL));
 }
 
 uint64_t insert_bits(uint64_t v __attribute__((unused)), uint64_t field __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t width __attribute__((unused))) {
-  uint64_t mask __attribute__((unused)) = (((1 << width) - 1) << lo);
+  uint64_t mask __attribute__((unused)) = (((1ULL << width) - 1ULL) << lo);
   return ((v & (~mask)) | ((field << lo) & mask));
 }
 
 uint64_t get_byte(uint64_t v __attribute__((unused)), uint64_t byte_idx __attribute__((unused))) {
-  return ((v >> (byte_idx * 8)) & 255);
+  return ((v >> (byte_idx * 8ULL)) & 255ULL);
 }
 
 uint64_t set_byte(uint64_t v __attribute__((unused)), uint64_t byte_idx __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t shift __attribute__((unused)) = (byte_idx * 8);
-  uint64_t mask __attribute__((unused)) = (255 << shift);
+  uint64_t shift __attribute__((unused)) = (byte_idx * 8ULL);
+  uint64_t mask __attribute__((unused)) = (255ULL << shift);
   return ((v & (~mask)) | (val << shift));
 }
 
 uint64_t get_nibble(uint64_t v __attribute__((unused)), uint64_t nibble_idx __attribute__((unused))) {
-  return ((v >> (nibble_idx * 4)) & 15);
+  return ((v >> (nibble_idx * 4ULL)) & 15ULL);
 }
 
 uint64_t bit_reverse_byte(uint64_t b __attribute__((unused))) {
-  uint64_t b0 __attribute__((unused)) = ((b >> 7) & 1);
-  uint64_t b1 __attribute__((unused)) = ((b >> 6) & 1);
-  uint64_t b2 __attribute__((unused)) = ((b >> 5) & 1);
-  uint64_t b3 __attribute__((unused)) = ((b >> 4) & 1);
-  uint64_t b4 __attribute__((unused)) = ((b >> 3) & 1);
-  uint64_t b5 __attribute__((unused)) = ((b >> 2) & 1);
-  uint64_t b6 __attribute__((unused)) = ((b >> 1) & 1);
-  uint64_t b7 __attribute__((unused)) = (b & 1);
-  return ((((((((b7 << 7) | (b6 << 6)) | (b5 << 5)) | (b4 << 4)) | (b3 << 3)) | (b2 << 2)) | (b1 << 1)) | b0);
+  uint64_t b0 __attribute__((unused)) = ((b >> 7ULL) & 1ULL);
+  uint64_t b1 __attribute__((unused)) = ((b >> 6ULL) & 1ULL);
+  uint64_t b2 __attribute__((unused)) = ((b >> 5ULL) & 1ULL);
+  uint64_t b3 __attribute__((unused)) = ((b >> 4ULL) & 1ULL);
+  uint64_t b4 __attribute__((unused)) = ((b >> 3ULL) & 1ULL);
+  uint64_t b5 __attribute__((unused)) = ((b >> 2ULL) & 1ULL);
+  uint64_t b6 __attribute__((unused)) = ((b >> 1ULL) & 1ULL);
+  uint64_t b7 __attribute__((unused)) = (b & 1ULL);
+  return ((((((((b7 << 7ULL) | (b6 << 6ULL)) | (b5 << 5ULL)) | (b4 << 4ULL)) | (b3 << 3ULL)) | (b2 << 2ULL)) | (b1 << 1ULL)) | b0);
 }
 
 uint64_t check_get_byte0() {
-  return get_byte(78187493547, 0);
+  return get_byte(78187493547ULL, 0ULL);
 }
 
 uint64_t check_get_nibble() {
-  return get_nibble(43981, 0);
+  return get_nibble(43981ULL, 0ULL);
 }
 
 uint64_t check_bit_reverse_0() {
-  return bit_reverse_byte(0);
+  return bit_reverse_byte(0ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

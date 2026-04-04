@@ -27,22 +27,22 @@ uint64_t total_ticks();
 int main();
 
 SeqGen sg_new(uint64_t step __attribute__((unused)), uint64_t wrap_at __attribute__((unused))) {
-  return (SeqGen){ .current = 0, .step = step, .wrap_at = wrap_at, .wraps = 0, .ticks = 0 };
+  return (SeqGen){ .current = 0ULL, .step = step, .wrap_at = wrap_at, .wraps = 0ULL, .ticks = 0ULL };
 }
 
 void sg_tick(SeqGen* s __attribute__((unused))) {
   (*s).current = ((*s).current + (*s).step);
-  (*s).ticks = ((*s).ticks + 1);
+  (*s).ticks = ((*s).ticks + 1ULL);
 }
 
 void sg_tick_wrap(SeqGen* s __attribute__((unused))) {
-  (*s).current = 0;
-  (*s).wraps = ((*s).wraps + 1);
-  (*s).ticks = ((*s).ticks + 1);
+  (*s).current = 0ULL;
+  (*s).wraps = ((*s).wraps + 1ULL);
+  (*s).ticks = ((*s).ticks + 1ULL);
 }
 
 uint64_t three_ticks() {
-  SeqGen s __attribute__((unused)) = sg_new(10, 100);
+  SeqGen s __attribute__((unused)) = sg_new(10ULL, 100ULL);
   sg_tick((&s));
   sg_tick((&s));
   sg_tick((&s));
@@ -50,7 +50,7 @@ uint64_t three_ticks() {
 }
 
 uint64_t wrap_resets() {
-  SeqGen s __attribute__((unused)) = sg_new(10, 30);
+  SeqGen s __attribute__((unused)) = sg_new(10ULL, 30ULL);
   sg_tick((&s));
   sg_tick((&s));
   sg_tick_wrap((&s));
@@ -58,7 +58,7 @@ uint64_t wrap_resets() {
 }
 
 uint64_t two_wraps() {
-  SeqGen s __attribute__((unused)) = sg_new(10, 20);
+  SeqGen s __attribute__((unused)) = sg_new(10ULL, 20ULL);
   sg_tick((&s));
   sg_tick_wrap((&s));
   sg_tick((&s));
@@ -67,7 +67,7 @@ uint64_t two_wraps() {
 }
 
 uint64_t total_ticks() {
-  SeqGen s __attribute__((unused)) = sg_new(10, 30);
+  SeqGen s __attribute__((unused)) = sg_new(10ULL, 30ULL);
   sg_tick((&s));
   sg_tick((&s));
   sg_tick_wrap((&s));
@@ -77,7 +77,7 @@ uint64_t total_ticks() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

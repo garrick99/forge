@@ -18,25 +18,25 @@ uint64_t checksum(forge_span_u64_t data __attribute__((unused)), uint64_t n __at
 int main();
 
 uint64_t fold16(uint64_t val __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = (val & 65535);
-  uint64_t hi __attribute__((unused)) = (val / 65536);
+  uint64_t lo __attribute__((unused)) = (val & 65535ULL);
+  uint64_t hi __attribute__((unused)) = (val / 65536ULL);
   uint64_t sum __attribute__((unused)) = (lo + hi);
-  if ((sum >= 65536)) {
-    return ((sum - 65536) + 1);
+  if ((sum >= 65536ULL)) {
+    return ((sum - 65536ULL) + 1ULL);
   } else {
     return sum;
   }
 }
 
 uint64_t ones_complement_sum(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t word __attribute__((unused)) = (data.data[i] & 65535);
+      uint64_t word __attribute__((unused)) = (data.data[i] & 65535ULL);
       uint64_t raw __attribute__((unused)) = (acc + word);
       acc = fold16(raw);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -45,20 +45,20 @@ uint64_t ones_complement_sum(forge_span_u64_t data __attribute__((unused)), uint
 
 uint64_t checksum(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused))) {
   uint64_t sum __attribute__((unused)) = ones_complement_sum(data, n);
-  if ((sum < 65536)) {
-    uint64_t inv __attribute__((unused)) = (65535 - sum);
-    if ((inv < 65536)) {
+  if ((sum < 65536ULL)) {
+    uint64_t inv __attribute__((unused)) = (65535ULL - sum);
+    if ((inv < 65536ULL)) {
       return inv;
     } else {
-      return 0;
+      return 0ULL;
     }
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

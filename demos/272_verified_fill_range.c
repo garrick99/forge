@@ -20,14 +20,14 @@ void fill_range(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
   {
     while ((i < hi)) {
       s.data[i] = val;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

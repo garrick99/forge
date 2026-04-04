@@ -16,11 +16,11 @@ void ryser_row_sums(forge_span_u64_t mat __attribute__((unused)), uint64_t n __a
 int main();
 
 void ryser_row_sums(forge_span_u64_t mat __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t subset __attribute__((unused)), uint64_t k __attribute__((unused)), forge_span_u64_t row_sums __attribute__((unused))) {
-  uint64_t r __attribute__((unused)) = 0;
+  uint64_t r __attribute__((unused)) = 0ULL;
   {
     while ((r < n)) {
-      uint64_t s __attribute__((unused)) = 0;
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t s __attribute__((unused)) = 0ULL;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < k)) {
           uint64_t col __attribute__((unused)) = subset.data[j];
@@ -39,19 +39,19 @@ void ryser_row_sums(forge_span_u64_t mat __attribute__((unused)), uint64_t n __a
             }
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
       row_sums.data[r] = s;
-      r = (r + 1);
+      r = (r + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -16,32 +16,32 @@ uint64_t topo_number(forge_span_u64_t in_deg __attribute__((unused)), forge_span
 int main();
 
 uint64_t topo_number(forge_span_u64_t in_deg __attribute__((unused)), forge_span_u64_t order __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t assigned __attribute__((unused)) = 0;
-  uint64_t pass __attribute__((unused)) = 0;
+  uint64_t assigned __attribute__((unused)) = 0ULL;
+  uint64_t pass __attribute__((unused)) = 0ULL;
   {
     while ((pass < n)) {
       uint64_t found __attribute__((unused)) = n;
-      uint64_t i __attribute__((unused)) = 0;
+      uint64_t i __attribute__((unused)) = 0ULL;
       {
         while ((i < n)) {
-          if ((in_deg.data[i] == 0)) {
+          if ((in_deg.data[i] == 0ULL)) {
             if ((found == n)) {
               found = i;
 
             }
 
           }
-          i = (i + 1);
+          i = (i + 1ULL);
         }
 
       }
       if ((found < n)) {
         order.data[found] = assigned;
-        in_deg.data[found] = (n + 1);
-        assigned = (assigned + 1);
+        in_deg.data[found] = (n + 1ULL);
+        assigned = (assigned + 1ULL);
 
       }
-      pass = (pass + 1);
+      pass = (pass + 1ULL);
     }
 
   }
@@ -49,7 +49,7 @@ uint64_t topo_number(forge_span_u64_t in_deg __attribute__((unused)), forge_span
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

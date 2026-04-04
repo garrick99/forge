@@ -16,15 +16,15 @@ uint64_t patricia_lookup(forge_span_u64_t left __attribute__((unused)), forge_sp
 int main();
 
 uint64_t patricia_lookup(forge_span_u64_t left __attribute__((unused)), forge_span_u64_t right __attribute__((unused)), uint64_t n_nodes __attribute__((unused)), uint64_t key __attribute__((unused)), uint64_t depth __attribute__((unused))) {
-  uint64_t node __attribute__((unused)) = 0;
-  uint64_t d __attribute__((unused)) = 0;
+  uint64_t node __attribute__((unused)) = 0ULL;
+  uint64_t d __attribute__((unused)) = 0ULL;
   uint64_t k __attribute__((unused)) = key;
   {
     while ((d < depth)) {
-      uint64_t bit __attribute__((unused)) = (k % 2);
-      k = (k / 2);
+      uint64_t bit __attribute__((unused)) = (k % 2ULL);
+      k = (k / 2ULL);
       uint64_t next;
-      if ((bit == 0)) {
+      if ((bit == 0ULL)) {
         next = left.data[node];
       } else {
         next = right.data[node];
@@ -33,7 +33,7 @@ uint64_t patricia_lookup(forge_span_u64_t left __attribute__((unused)), forge_sp
         node = next;
 
       }
-      d = (d + 1);
+      d = (d + 1ULL);
     }
 
   }
@@ -41,7 +41,7 @@ uint64_t patricia_lookup(forge_span_u64_t left __attribute__((unused)), forge_sp
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

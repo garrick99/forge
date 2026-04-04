@@ -27,6 +27,12 @@
 /* span<T> typedefs — fat pointers with proven bounds */
 typedef struct { uint32_t* data; uintptr_t len; } forge_span_u32_t;
 
+/* Function pointer typedefs */
+typedef uint64_t (*forge_fn_u64_u64_u64_ret_u64_t)(uint64_t, uint64_t, uint64_t);
+typedef uint64_t (*forge_fn_ptr_u64_u64_ret_u64_t)(uint64_t*, uint64_t);
+typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
+typedef uint64_t (*forge_fn__ret_u64_t)(void);
+
 uint64_t shfl_down_sync(uint64_t val, uint64_t delta, uint64_t width);  /* extern: forge_gpu */
 
 uint64_t shfl_xor_sync(uint64_t val, uint64_t mask, uint64_t width);  /* extern: forge_gpu */
@@ -45,13 +51,7 @@ uint64_t lane_id(void);  /* extern: forge_gpu */
 
 uint64_t warp_id(void);  /* extern: forge_gpu */
 
-static const uint32_t M31_P = 2147483647;
-
-/* Function pointer typedefs */
-typedef uint64_t (*forge_fn_u64_u64_u64_ret_u64_t)(uint64_t, uint64_t, uint64_t);
-typedef uint64_t (*forge_fn_ptr_u64_u64_ret_u64_t)(uint64_t*, uint64_t);
-typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
-typedef uint64_t (*forge_fn__ret_u64_t)(void);
+static const uint32_t M31_P = 2147483647ULL;
 
 /* Forward declarations */
 uint64_t warp_reduce_sum(uint64_t val __attribute__((unused)));
@@ -93,37 +93,37 @@ int main();
 
 uint64_t warp_reduce_sum(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
-  v = (v + __shfl_xor_sync(0xffffffff, v, 16, 32));
-  v = (v + __shfl_xor_sync(0xffffffff, v, 8, 32));
-  v = (v + __shfl_xor_sync(0xffffffff, v, 4, 32));
-  v = (v + __shfl_xor_sync(0xffffffff, v, 2, 32));
-  v = (v + __shfl_xor_sync(0xffffffff, v, 1, 32));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 8ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 4ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 2ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 1ULL, 32ULL));
   return v;
 }
 
 uint64_t warp_reduce_max(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
-  uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16, 32);
+  uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 8, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 8ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 4, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 4ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 2, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 2ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 1, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 1ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
@@ -133,27 +133,27 @@ uint64_t warp_reduce_max(uint64_t val __attribute__((unused))) {
 
 uint64_t warp_reduce_min(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
-  uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16, 32);
+  uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 8, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 8ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 4, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 4ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 2, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 2ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 1, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 1ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
@@ -170,7 +170,7 @@ uint64_t grid_stride_step(uint64_t block_dim __attribute__((unused)), uint64_t g
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 
@@ -207,8 +207,8 @@ uint32_t m31_mul(uint32_t a __attribute__((unused)), uint32_t b __attribute__((u
 }
 
 uint32_t m31_neg(uint32_t a __attribute__((unused))) {
-  if ((a == 0)) {
-    return 0;
+  if ((a == 0ULL)) {
+    return 0ULL;
   } else {
     return (M31_P - a);
   }
@@ -307,7 +307,7 @@ uint32_t qm31_sub_im_im(uint32_t a __attribute__((unused)), uint32_t b __attribu
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 
@@ -325,24 +325,24 @@ __device__ uint32_t m31_pow5(uint32_t x __attribute__((unused))) {
 __global__ void poseidon2_sbox_kernel(forge_span_u32_t state __attribute__((unused)), uint64_t n __attribute__((unused))) {
   uint64_t gid __attribute__((unused)) = ((blockIdx_x * blockDim_x) + threadIdx_x);
   if ((gid < n)) {
-    uint64_t base __attribute__((unused)) = (gid * 16);
+    uint64_t base __attribute__((unused)) = (gid * 16ULL);
     /* assert erased */;
-    uint32_t e0 __attribute__((unused)) = m31_get(state, (base + 0));
-    uint32_t e1 __attribute__((unused)) = m31_get(state, (base + 1));
-    uint32_t e2 __attribute__((unused)) = m31_get(state, (base + 2));
-    uint32_t e3 __attribute__((unused)) = m31_get(state, (base + 3));
-    uint32_t e4 __attribute__((unused)) = m31_get(state, (base + 4));
-    uint32_t e5 __attribute__((unused)) = m31_get(state, (base + 5));
-    uint32_t e6 __attribute__((unused)) = m31_get(state, (base + 6));
-    uint32_t e7 __attribute__((unused)) = m31_get(state, (base + 7));
-    uint32_t e8 __attribute__((unused)) = m31_get(state, (base + 8));
-    uint32_t e9 __attribute__((unused)) = m31_get(state, (base + 9));
-    uint32_t e10 __attribute__((unused)) = m31_get(state, (base + 10));
-    uint32_t e11 __attribute__((unused)) = m31_get(state, (base + 11));
-    uint32_t e12 __attribute__((unused)) = m31_get(state, (base + 12));
-    uint32_t e13 __attribute__((unused)) = m31_get(state, (base + 13));
-    uint32_t e14 __attribute__((unused)) = m31_get(state, (base + 14));
-    uint32_t e15 __attribute__((unused)) = m31_get(state, (base + 15));
+    uint32_t e0 __attribute__((unused)) = m31_get(state, (base + 0ULL));
+    uint32_t e1 __attribute__((unused)) = m31_get(state, (base + 1ULL));
+    uint32_t e2 __attribute__((unused)) = m31_get(state, (base + 2ULL));
+    uint32_t e3 __attribute__((unused)) = m31_get(state, (base + 3ULL));
+    uint32_t e4 __attribute__((unused)) = m31_get(state, (base + 4ULL));
+    uint32_t e5 __attribute__((unused)) = m31_get(state, (base + 5ULL));
+    uint32_t e6 __attribute__((unused)) = m31_get(state, (base + 6ULL));
+    uint32_t e7 __attribute__((unused)) = m31_get(state, (base + 7ULL));
+    uint32_t e8 __attribute__((unused)) = m31_get(state, (base + 8ULL));
+    uint32_t e9 __attribute__((unused)) = m31_get(state, (base + 9ULL));
+    uint32_t e10 __attribute__((unused)) = m31_get(state, (base + 10ULL));
+    uint32_t e11 __attribute__((unused)) = m31_get(state, (base + 11ULL));
+    uint32_t e12 __attribute__((unused)) = m31_get(state, (base + 12ULL));
+    uint32_t e13 __attribute__((unused)) = m31_get(state, (base + 13ULL));
+    uint32_t e14 __attribute__((unused)) = m31_get(state, (base + 14ULL));
+    uint32_t e15 __attribute__((unused)) = m31_get(state, (base + 15ULL));
     uint32_t s0 __attribute__((unused)) = m31_pow5(e0);
     uint32_t s1 __attribute__((unused)) = m31_pow5(e1);
     uint32_t s2 __attribute__((unused)) = m31_pow5(e2);
@@ -359,22 +359,22 @@ __global__ void poseidon2_sbox_kernel(forge_span_u32_t state __attribute__((unus
     uint32_t s13 __attribute__((unused)) = m31_pow5(e13);
     uint32_t s14 __attribute__((unused)) = m31_pow5(e14);
     uint32_t s15 __attribute__((unused)) = m31_pow5(e15);
-    state.data[(base + 0)] = s0;
-    state.data[(base + 1)] = s1;
-    state.data[(base + 2)] = s2;
-    state.data[(base + 3)] = s3;
-    state.data[(base + 4)] = s4;
-    state.data[(base + 5)] = s5;
-    state.data[(base + 6)] = s6;
-    state.data[(base + 7)] = s7;
-    state.data[(base + 8)] = s8;
-    state.data[(base + 9)] = s9;
-    state.data[(base + 10)] = s10;
-    state.data[(base + 11)] = s11;
-    state.data[(base + 12)] = s12;
-    state.data[(base + 13)] = s13;
-    state.data[(base + 14)] = s14;
-    state.data[(base + 15)] = s15;
+    state.data[(base + 0ULL)] = s0;
+    state.data[(base + 1ULL)] = s1;
+    state.data[(base + 2ULL)] = s2;
+    state.data[(base + 3ULL)] = s3;
+    state.data[(base + 4ULL)] = s4;
+    state.data[(base + 5ULL)] = s5;
+    state.data[(base + 6ULL)] = s6;
+    state.data[(base + 7ULL)] = s7;
+    state.data[(base + 8ULL)] = s8;
+    state.data[(base + 9ULL)] = s9;
+    state.data[(base + 10ULL)] = s10;
+    state.data[(base + 11ULL)] = s11;
+    state.data[(base + 12ULL)] = s12;
+    state.data[(base + 13ULL)] = s13;
+    state.data[(base + 14ULL)] = s14;
+    state.data[(base + 15ULL)] = s15;
 
   }
 }
@@ -382,56 +382,56 @@ __global__ void poseidon2_sbox_kernel(forge_span_u32_t state __attribute__((unus
 __global__ void poseidon2_add_rc_kernel(forge_span_u32_t state __attribute__((unused)), forge_span_u32_t rc __attribute__((unused)), uint64_t n __attribute__((unused))) {
   uint64_t gid __attribute__((unused)) = ((blockIdx_x * blockDim_x) + threadIdx_x);
   if ((gid < n)) {
-    uint64_t base __attribute__((unused)) = (gid * 16);
+    uint64_t base __attribute__((unused)) = (gid * 16ULL);
     /* assert erased */;
-    uint32_t e0 __attribute__((unused)) = m31_get(state, (base + 0));
-    uint32_t e1 __attribute__((unused)) = m31_get(state, (base + 1));
-    uint32_t e2 __attribute__((unused)) = m31_get(state, (base + 2));
-    uint32_t e3 __attribute__((unused)) = m31_get(state, (base + 3));
-    uint32_t e4 __attribute__((unused)) = m31_get(state, (base + 4));
-    uint32_t e5 __attribute__((unused)) = m31_get(state, (base + 5));
-    uint32_t e6 __attribute__((unused)) = m31_get(state, (base + 6));
-    uint32_t e7 __attribute__((unused)) = m31_get(state, (base + 7));
-    uint32_t e8 __attribute__((unused)) = m31_get(state, (base + 8));
-    uint32_t e9 __attribute__((unused)) = m31_get(state, (base + 9));
-    uint32_t e10 __attribute__((unused)) = m31_get(state, (base + 10));
-    uint32_t e11 __attribute__((unused)) = m31_get(state, (base + 11));
-    uint32_t e12 __attribute__((unused)) = m31_get(state, (base + 12));
-    uint32_t e13 __attribute__((unused)) = m31_get(state, (base + 13));
-    uint32_t e14 __attribute__((unused)) = m31_get(state, (base + 14));
-    uint32_t e15 __attribute__((unused)) = m31_get(state, (base + 15));
-    uint32_t r0 __attribute__((unused)) = m31_get(rc, 0);
-    uint32_t r1 __attribute__((unused)) = m31_get(rc, 1);
-    uint32_t r2 __attribute__((unused)) = m31_get(rc, 2);
-    uint32_t r3 __attribute__((unused)) = m31_get(rc, 3);
-    uint32_t r4 __attribute__((unused)) = m31_get(rc, 4);
-    uint32_t r5 __attribute__((unused)) = m31_get(rc, 5);
-    uint32_t r6 __attribute__((unused)) = m31_get(rc, 6);
-    uint32_t r7 __attribute__((unused)) = m31_get(rc, 7);
-    uint32_t r8 __attribute__((unused)) = m31_get(rc, 8);
-    uint32_t r9 __attribute__((unused)) = m31_get(rc, 9);
-    uint32_t r10 __attribute__((unused)) = m31_get(rc, 10);
-    uint32_t r11 __attribute__((unused)) = m31_get(rc, 11);
-    uint32_t r12 __attribute__((unused)) = m31_get(rc, 12);
-    uint32_t r13 __attribute__((unused)) = m31_get(rc, 13);
-    uint32_t r14 __attribute__((unused)) = m31_get(rc, 14);
-    uint32_t r15 __attribute__((unused)) = m31_get(rc, 15);
-    state.data[(base + 0)] = m31_add(e0, r0);
-    state.data[(base + 1)] = m31_add(e1, r1);
-    state.data[(base + 2)] = m31_add(e2, r2);
-    state.data[(base + 3)] = m31_add(e3, r3);
-    state.data[(base + 4)] = m31_add(e4, r4);
-    state.data[(base + 5)] = m31_add(e5, r5);
-    state.data[(base + 6)] = m31_add(e6, r6);
-    state.data[(base + 7)] = m31_add(e7, r7);
-    state.data[(base + 8)] = m31_add(e8, r8);
-    state.data[(base + 9)] = m31_add(e9, r9);
-    state.data[(base + 10)] = m31_add(e10, r10);
-    state.data[(base + 11)] = m31_add(e11, r11);
-    state.data[(base + 12)] = m31_add(e12, r12);
-    state.data[(base + 13)] = m31_add(e13, r13);
-    state.data[(base + 14)] = m31_add(e14, r14);
-    state.data[(base + 15)] = m31_add(e15, r15);
+    uint32_t e0 __attribute__((unused)) = m31_get(state, (base + 0ULL));
+    uint32_t e1 __attribute__((unused)) = m31_get(state, (base + 1ULL));
+    uint32_t e2 __attribute__((unused)) = m31_get(state, (base + 2ULL));
+    uint32_t e3 __attribute__((unused)) = m31_get(state, (base + 3ULL));
+    uint32_t e4 __attribute__((unused)) = m31_get(state, (base + 4ULL));
+    uint32_t e5 __attribute__((unused)) = m31_get(state, (base + 5ULL));
+    uint32_t e6 __attribute__((unused)) = m31_get(state, (base + 6ULL));
+    uint32_t e7 __attribute__((unused)) = m31_get(state, (base + 7ULL));
+    uint32_t e8 __attribute__((unused)) = m31_get(state, (base + 8ULL));
+    uint32_t e9 __attribute__((unused)) = m31_get(state, (base + 9ULL));
+    uint32_t e10 __attribute__((unused)) = m31_get(state, (base + 10ULL));
+    uint32_t e11 __attribute__((unused)) = m31_get(state, (base + 11ULL));
+    uint32_t e12 __attribute__((unused)) = m31_get(state, (base + 12ULL));
+    uint32_t e13 __attribute__((unused)) = m31_get(state, (base + 13ULL));
+    uint32_t e14 __attribute__((unused)) = m31_get(state, (base + 14ULL));
+    uint32_t e15 __attribute__((unused)) = m31_get(state, (base + 15ULL));
+    uint32_t r0 __attribute__((unused)) = m31_get(rc, 0ULL);
+    uint32_t r1 __attribute__((unused)) = m31_get(rc, 1ULL);
+    uint32_t r2 __attribute__((unused)) = m31_get(rc, 2ULL);
+    uint32_t r3 __attribute__((unused)) = m31_get(rc, 3ULL);
+    uint32_t r4 __attribute__((unused)) = m31_get(rc, 4ULL);
+    uint32_t r5 __attribute__((unused)) = m31_get(rc, 5ULL);
+    uint32_t r6 __attribute__((unused)) = m31_get(rc, 6ULL);
+    uint32_t r7 __attribute__((unused)) = m31_get(rc, 7ULL);
+    uint32_t r8 __attribute__((unused)) = m31_get(rc, 8ULL);
+    uint32_t r9 __attribute__((unused)) = m31_get(rc, 9ULL);
+    uint32_t r10 __attribute__((unused)) = m31_get(rc, 10ULL);
+    uint32_t r11 __attribute__((unused)) = m31_get(rc, 11ULL);
+    uint32_t r12 __attribute__((unused)) = m31_get(rc, 12ULL);
+    uint32_t r13 __attribute__((unused)) = m31_get(rc, 13ULL);
+    uint32_t r14 __attribute__((unused)) = m31_get(rc, 14ULL);
+    uint32_t r15 __attribute__((unused)) = m31_get(rc, 15ULL);
+    state.data[(base + 0ULL)] = m31_add(e0, r0);
+    state.data[(base + 1ULL)] = m31_add(e1, r1);
+    state.data[(base + 2ULL)] = m31_add(e2, r2);
+    state.data[(base + 3ULL)] = m31_add(e3, r3);
+    state.data[(base + 4ULL)] = m31_add(e4, r4);
+    state.data[(base + 5ULL)] = m31_add(e5, r5);
+    state.data[(base + 6ULL)] = m31_add(e6, r6);
+    state.data[(base + 7ULL)] = m31_add(e7, r7);
+    state.data[(base + 8ULL)] = m31_add(e8, r8);
+    state.data[(base + 9ULL)] = m31_add(e9, r9);
+    state.data[(base + 10ULL)] = m31_add(e10, r10);
+    state.data[(base + 11ULL)] = m31_add(e11, r11);
+    state.data[(base + 12ULL)] = m31_add(e12, r12);
+    state.data[(base + 13ULL)] = m31_add(e13, r13);
+    state.data[(base + 14ULL)] = m31_add(e14, r14);
+    state.data[(base + 15ULL)] = m31_add(e15, r15);
 
   }
 }
@@ -439,7 +439,7 @@ __global__ void poseidon2_add_rc_kernel(forge_span_u32_t state __attribute__((un
 __global__ void poseidon2_partial_sbox_kernel(forge_span_u32_t state __attribute__((unused)), uint64_t n __attribute__((unused))) {
   uint64_t gid __attribute__((unused)) = ((blockIdx_x * blockDim_x) + threadIdx_x);
   if ((gid < n)) {
-    uint64_t base __attribute__((unused)) = (gid * 16);
+    uint64_t base __attribute__((unused)) = (gid * 16ULL);
     /* assert erased */;
     uint32_t e0 __attribute__((unused)) = m31_get(state, base);
     state.data[base] = m31_pow5(e0);
@@ -448,7 +448,7 @@ __global__ void poseidon2_partial_sbox_kernel(forge_span_u32_t state __attribute
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

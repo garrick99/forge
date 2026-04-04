@@ -16,40 +16,40 @@ void cofactor_2x2(forge_span_u64_t mat __attribute__((unused)), forge_span_u64_t
 int main();
 
 void cofactor_2x2(forge_span_u64_t mat __attribute__((unused)), forge_span_u64_t minor __attribute__((unused)), uint64_t r __attribute__((unused)), uint64_t c __attribute__((unused))) {
-  uint64_t out __attribute__((unused)) = 0;
-  uint64_t row __attribute__((unused)) = 0;
+  uint64_t out __attribute__((unused)) = 0ULL;
+  uint64_t row __attribute__((unused)) = 0ULL;
   {
-    while ((row < 3)) {
+    while ((row < 3ULL)) {
       if ((row != r)) {
-        uint64_t col __attribute__((unused)) = 0;
+        uint64_t col __attribute__((unused)) = 0ULL;
         {
-          while ((col < 3)) {
+          while ((col < 3ULL)) {
             if ((col != c)) {
-              if ((out < 4)) {
-                uint64_t idx __attribute__((unused)) = ((row * 3) + col);
-                if ((idx < 9)) {
+              if ((out < 4ULL)) {
+                uint64_t idx __attribute__((unused)) = ((row * 3ULL) + col);
+                if ((idx < 9ULL)) {
                   minor.data[out] = mat.data[idx];
 
                 }
-                out = (out + 1);
+                out = (out + 1ULL);
 
               }
 
             }
-            col = (col + 1);
+            col = (col + 1ULL);
           }
 
         }
 
       }
-      row = (row + 1);
+      row = (row + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

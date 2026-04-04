@@ -18,14 +18,14 @@ uint64_t align_down(uint64_t n __attribute__((unused)), uint64_t align __attribu
 }
 
 uint64_t align_up(uint64_t n __attribute__((unused)), uint64_t align __attribute__((unused))) {
-  return ((((n + align) - 1) / align) * align);
+  return ((((n + align) - 1ULL) / align) * align);
 }
 
 uint64_t is_aligned(uint64_t n __attribute__((unused)), uint64_t align __attribute__((unused))) {
-  if (((n - ((n / align) * align)) == 0)) {
-    return 1;
+  if (((n - ((n / align) * align)) == 0ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 

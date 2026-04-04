@@ -16,14 +16,14 @@ uint64_t bandwidth(forge_span_u64_t mat __attribute__((unused)), uint64_t n __at
 int main();
 
 uint64_t bandwidth(forge_span_u64_t mat __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t bw __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t bw __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < n)) {
-          if (((((i * n) + j) < (n * n)) && (mat.data[((i * n) + j)] > 0))) {
+          if (((((i * n) + j) < (n * n)) && (mat.data[((i * n) + j)] > 0ULL))) {
             uint64_t diff;
             if ((i >= j)) {
               diff = (i - j);
@@ -36,11 +36,11 @@ uint64_t bandwidth(forge_span_u64_t mat __attribute__((unused)), uint64_t n __at
             }
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -48,7 +48,7 @@ uint64_t bandwidth(forge_span_u64_t mat __attribute__((unused)), uint64_t n __at
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

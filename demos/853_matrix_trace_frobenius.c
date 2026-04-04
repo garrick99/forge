@@ -17,8 +17,8 @@ uint64_t frobenius_sq(forge_span_u64_t m __attribute__((unused)), uint64_t total
 int main();
 
 uint64_t trace(forge_span_u64_t m __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t idx __attribute__((unused)) = ((i * n) + i);
@@ -26,7 +26,7 @@ uint64_t trace(forge_span_u64_t m __attribute__((unused)), uint64_t n __attribut
         acc = (acc + m.data[idx]);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -34,12 +34,12 @@ uint64_t trace(forge_span_u64_t m __attribute__((unused)), uint64_t n __attribut
 }
 
 uint64_t frobenius_sq(forge_span_u64_t m __attribute__((unused)), uint64_t total __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < total)) {
       acc = (acc + (m.data[i] * m.data[i]));
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -47,7 +47,7 @@ uint64_t frobenius_sq(forge_span_u64_t m __attribute__((unused)), uint64_t total
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

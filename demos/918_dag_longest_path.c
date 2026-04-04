@@ -16,32 +16,32 @@ void dag_relax(forge_span_u64_t dist __attribute__((unused)), forge_span_u64_t a
 int main();
 
 void dag_relax(forge_span_u64_t dist __attribute__((unused)), forge_span_u64_t adj __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t cap __attribute__((unused))) {
-  uint64_t u __attribute__((unused)) = 0;
+  uint64_t u __attribute__((unused)) = 0ULL;
   {
     while ((u < n)) {
-      uint64_t v __attribute__((unused)) = 0;
+      uint64_t v __attribute__((unused)) = 0ULL;
       {
         while ((v < n)) {
           if ((((u * n) + v) < (n * n))) {
             uint64_t w __attribute__((unused)) = adj.data[((u * n) + v)];
-            if ((((((w > 0) && (v < n)) && (u < n)) && ((dist.data[u] + w) > dist.data[v])) && ((dist.data[u] + w) <= cap))) {
+            if ((((((w > 0ULL) && (v < n)) && (u < n)) && ((dist.data[u] + w) > dist.data[v])) && ((dist.data[u] + w) <= cap))) {
               dist.data[v] = (dist.data[u] + w);
 
             }
 
           }
-          v = (v + 1);
+          v = (v + 1ULL);
         }
 
       }
-      u = (u + 1);
+      u = (u + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -18,11 +18,11 @@ void poly_derivative(forge_span_u64_t coeffs __attribute__((unused)), uint64_t n
 int main();
 
 uint64_t horner_eval(forge_span_u64_t coeffs __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t x __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = coeffs.data[(n - 1)];
-  uint64_t i __attribute__((unused)) = (n - 1);
+  uint64_t acc __attribute__((unused)) = coeffs.data[(n - 1ULL)];
+  uint64_t i __attribute__((unused)) = (n - 1ULL);
   {
-    while ((i > 0)) {
-      i = (i - 1);
+    while ((i > 0ULL)) {
+      i = (i - 1ULL);
       acc = ((acc * x) + coeffs.data[i]);
     }
 
@@ -37,18 +37,18 @@ uint64_t poly_add_eval(forge_span_u64_t a __attribute__((unused)), uint64_t na _
 }
 
 void poly_derivative(forge_span_u64_t coeffs __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t deriv __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while (((i + 1) < n)) {
-      deriv.data[i] = ((i + 1) * coeffs.data[(i + 1)]);
-      i = (i + 1);
+    while (((i + 1ULL) < n)) {
+      deriv.data[i] = ((i + 1ULL) * coeffs.data[(i + 1ULL)]);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

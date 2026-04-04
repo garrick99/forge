@@ -56,13 +56,13 @@ __forge_tuple_u64_u64_t inv_butterfly(uint64_t a __attribute__((unused)), uint64
 }
 
 uint64_t butterfly_layer(forge_span_u64_t poly __attribute__((unused)), uint64_t half __attribute__((unused)), uint64_t zeta __attribute__((unused)), uint64_t q __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < half)) {
       __forge_tuple_u64_u64_t bf __attribute__((unused)) = butterfly(poly.data[i], poly.data[(i + half)], zeta, q);
       poly.data[i] = (bf)._0;
       poly.data[(i + half)] = (bf)._1;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -70,10 +70,10 @@ uint64_t butterfly_layer(forge_span_u64_t poly __attribute__((unused)), uint64_t
 }
 
 uint64_t run() {
-  uint64_t q __attribute__((unused)) = 3329;
-  uint64_t zeta __attribute__((unused)) = 17;
-  uint64_t a __attribute__((unused)) = 100;
-  uint64_t b __attribute__((unused)) = 200;
+  uint64_t q __attribute__((unused)) = 3329ULL;
+  uint64_t zeta __attribute__((unused)) = 17ULL;
+  uint64_t a __attribute__((unused)) = 100ULL;
+  uint64_t b __attribute__((unused)) = 200ULL;
   __forge_tuple_u64_u64_t bf __attribute__((unused)) = butterfly(a, b, zeta, q);
   return ((bf)._0 + (bf)._1);
 }

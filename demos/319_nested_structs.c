@@ -47,7 +47,7 @@ uint64_t rect_area(Rect r __attribute__((unused))) {
 }
 
 uint64_t point_in_rect(Point p __attribute__((unused)), Rect r __attribute__((unused))) {
-  return 1;
+  return 1ULL;
 }
 
 uint64_t seg_length_x(Segment s __attribute__((unused))) {
@@ -59,7 +59,7 @@ uint64_t seg_length_y(Segment s __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

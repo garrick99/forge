@@ -53,47 +53,47 @@ uint64_t double_divide(uint64_t a __attribute__((unused)), uint64_t b __attribut
 uint64_t find_first(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)));
 
 Result_u64_u64 safe_div(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if ((b == 0)) {
-    return (Result_u64_u64){ .tag = Result_u64_u64_tag_Err, .data.Err = { ._v0 = 0 } };
+  if ((b == 0ULL)) {
+    return (Result_u64_u64){ .tag = Result_u64_u64_tag_Err, .data.Err = { ._v0 = 0ULL } };
   } else {
     return (Result_u64_u64){ .tag = Result_u64_u64_tag_Ok, .data.Ok = { ._v0 = (a / b) } };
   }
 }
 
 uint64_t divide_or_zero(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  uint64_t q __attribute__((unused)) = ({ Result_u64_u64 __or_tmp__ = safe_div(a, b); if (__or_tmp__.tag == Result_u64_u64_tag_Err) { return 0; } __or_tmp__.data.Ok._v0; });
-  return (q * 2);
+  uint64_t q __attribute__((unused)) = ({ Result_u64_u64 __or_tmp__ = safe_div(a, b); if (__or_tmp__.tag == Result_u64_u64_tag_Err) { return 0ULL; } __or_tmp__.data.Ok._v0; });
+  return (q * 2ULL);
 }
 
 uint64_t divide_assert(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  uint64_t q __attribute__((unused)) = ({ Result_u64_u64 __or_tmp__ = safe_div(a, b); if (__or_tmp__.tag == Result_u64_u64_tag_Err) { (void)(0); abort(); } __or_tmp__.data.Ok._v0; });
+  uint64_t q __attribute__((unused)) = ({ Result_u64_u64 __or_tmp__ = safe_div(a, b); if (__or_tmp__.tag == Result_u64_u64_tag_Err) { (void)(0ULL); abort(); } __or_tmp__.data.Ok._v0; });
   return q;
 }
 
 uint64_t double_divide(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t c __attribute__((unused))) {
-  uint64_t q1 __attribute__((unused)) = ({ Result_u64_u64 __or_tmp__ = safe_div(a, b); if (__or_tmp__.tag == Result_u64_u64_tag_Err) { return 0; } __or_tmp__.data.Ok._v0; });
+  uint64_t q1 __attribute__((unused)) = ({ Result_u64_u64 __or_tmp__ = safe_div(a, b); if (__or_tmp__.tag == Result_u64_u64_tag_Err) { return 0ULL; } __or_tmp__.data.Ok._v0; });
   uint64_t q2;
-  if ((q1 < 1000000)) {
-    q2 = ({ Result_u64_u64 __or_tmp__ = safe_div(q1, c); if (__or_tmp__.tag == Result_u64_u64_tag_Err) { return 0; } __or_tmp__.data.Ok._v0; });
+  if ((q1 < 1000000ULL)) {
+    q2 = ({ Result_u64_u64 __or_tmp__ = safe_div(q1, c); if (__or_tmp__.tag == Result_u64_u64_tag_Err) { return 0ULL; } __or_tmp__.data.Ok._v0; });
   } else {
-    q2 = 0;
+    q2 = 0ULL;
   }
   return (q1 + q2);
 }
 
 uint64_t find_first(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   Option_u64 found __attribute__((unused)) = (Option_u64){ .tag = Option_u64_tag_None, .data.None = { ._dummy = 0 } };
   {
     while ((i < n)) {
-      if ((s.data[i] > 0)) {
+      if ((s.data[i] > 0ULL)) {
         found = (Option_u64){ .tag = Option_u64_tag_Some, .data.Some = { ._v0 = s.data[i] } };
         i = n;
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
-  return ({ Option_u64 __or_tmp__ = found; if (__or_tmp__.tag == Option_u64_tag_None) { return 0; } __or_tmp__.data.Some._v0; });
+  return ({ Option_u64 __or_tmp__ = found; if (__or_tmp__.tag == Option_u64_tag_None) { return 0ULL; } __or_tmp__.data.Some._v0; });
 }
 

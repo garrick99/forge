@@ -20,7 +20,7 @@ int main();
 void zero_fill(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
   {
     for (uint64_t i = 0; i < (uint64_t)(n); i++) {
-      s.data[i] = 0;
+      s.data[i] = 0ULL;
     }
 
   }
@@ -36,7 +36,7 @@ void init_array(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

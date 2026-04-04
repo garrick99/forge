@@ -16,35 +16,35 @@ void assign_lengths(forge_span_u64_t freqs __attribute__((unused)), forge_span_u
 int main();
 
 void assign_lengths(forge_span_u64_t freqs __attribute__((unused)), forge_span_u64_t lengths __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      lengths.data[i] = 1;
-      i = (i + 1);
+      lengths.data[i] = 1ULL;
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t merges __attribute__((unused)) = 0;
+  uint64_t merges __attribute__((unused)) = 0ULL;
   {
-    while (((merges + 1) < n)) {
+    while (((merges + 1ULL) < n)) {
       uint64_t idx1 __attribute__((unused)) = merges;
-      uint64_t idx2 __attribute__((unused)) = (merges + 1);
+      uint64_t idx2 __attribute__((unused)) = (merges + 1ULL);
       if ((idx1 < n)) {
-        lengths.data[idx1] = (lengths.data[idx1] + 1);
+        lengths.data[idx1] = (lengths.data[idx1] + 1ULL);
 
       }
       if ((idx2 < n)) {
-        lengths.data[idx2] = (lengths.data[idx2] + 1);
+        lengths.data[idx2] = (lengths.data[idx2] + 1ULL);
 
       }
-      merges = (merges + 1);
+      merges = (merges + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

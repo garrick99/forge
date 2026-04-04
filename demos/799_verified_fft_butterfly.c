@@ -17,38 +17,38 @@ void ntt_forward(forge_span_u64_t data __attribute__((unused)), uint64_t n __att
 int main();
 
 void ntt_butterfly(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t step __attribute__((unused)), uint64_t q __attribute__((unused)), uint64_t twiddle __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while (((i + step) < n)) {
       uint64_t a __attribute__((unused)) = data.data[i];
       uint64_t b __attribute__((unused)) = ((data.data[(i + step)] * twiddle) % q);
       data.data[i] = ((a + b) % q);
       data.data[(i + step)] = (((a + q) - b) % q);
-      i = (i + (2 * step));
+      i = (i + (2ULL * step));
     }
 
   }
 }
 
 void ntt_forward(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t q __attribute__((unused)), forge_span_u64_t twiddles __attribute__((unused)), uint64_t n_twiddles __attribute__((unused))) {
-  uint64_t half __attribute__((unused)) = (n / 2);
-  uint64_t tw_idx __attribute__((unused)) = 0;
+  uint64_t half __attribute__((unused)) = (n / 2ULL);
+  uint64_t tw_idx __attribute__((unused)) = 0ULL;
   {
-    while ((half >= 1)) {
+    while ((half >= 1ULL)) {
       if ((tw_idx < n_twiddles)) {
         uint64_t tw __attribute__((unused)) = (twiddles.data[tw_idx] % q);
         ntt_butterfly(data, n, half, q, tw);
-        tw_idx = (tw_idx + 1);
+        tw_idx = (tw_idx + 1ULL);
 
       }
-      half = (half / 2);
+      half = (half / 2ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

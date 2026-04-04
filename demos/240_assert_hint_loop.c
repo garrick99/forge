@@ -16,7 +16,7 @@ uint64_t bounded_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 int main();
 
 uint64_t bounded_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t cap __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
   {
     for (uint64_t i = 0; i < (uint64_t)(n); i++) {
       /* assert erased */;
@@ -28,7 +28,7 @@ uint64_t bounded_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

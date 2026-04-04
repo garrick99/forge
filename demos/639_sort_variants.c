@@ -39,27 +39,27 @@ void shell_sort_gap(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 
       }
       s.data[j] = tmp;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void counting_sort_small(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t max_val __attribute__((unused)), forge_span_u64_t counts __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < max_val)) {
-      counts.data[i] = 0;
-      i = (i + 1);
+      counts.data[i] = 0ULL;
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < n)) {
       uint64_t v __attribute__((unused)) = (s.data[j] % max_val);
-      counts.data[v] = (counts.data[v] + 1);
-      j = (j + 1);
+      counts.data[v] = (counts.data[v] + 1ULL);
+      j = (j + 1ULL);
     }
 
   }
@@ -67,14 +67,14 @@ void counting_sort_small(forge_span_u64_t s __attribute__((unused)), uint64_t n 
 
 uint64_t find_min_index(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t start __attribute__((unused))) {
   uint64_t min_idx __attribute__((unused)) = start;
-  uint64_t i __attribute__((unused)) = (start + 1);
+  uint64_t i __attribute__((unused)) = (start + 1ULL);
   {
     while ((i < n)) {
       if ((s.data[i] < s.data[min_idx])) {
         min_idx = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -82,21 +82,21 @@ uint64_t find_min_index(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 }
 
 void selection_sort(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t m __attribute__((unused)) = find_min_index(s, n, i);
       uint64_t tmp __attribute__((unused)) = s.data[i];
       s.data[i] = s.data[m];
       s.data[m] = tmp;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

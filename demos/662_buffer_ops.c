@@ -21,28 +21,28 @@ int main();
 
 uint64_t buf_append(forge_span_u64_t buf __attribute__((unused)), uint64_t len __attribute__((unused)), uint64_t val __attribute__((unused))) {
   buf.data[len] = val;
-  return (len + 1);
+  return (len + 1ULL);
 }
 
 uint64_t buf_prepend(forge_span_u64_t buf __attribute__((unused)), uint64_t len __attribute__((unused)), uint64_t val __attribute__((unused))) {
   uint64_t i __attribute__((unused)) = len;
   {
-    while ((i >= 1)) {
-      buf.data[i] = buf.data[(i - 1)];
-      i = (i - 1);
+    while ((i >= 1ULL)) {
+      buf.data[i] = buf.data[(i - 1ULL)];
+      i = (i - 1ULL);
     }
 
   }
-  buf.data[0] = val;
-  return (len + 1);
+  buf.data[0ULL] = val;
+  return (len + 1ULL);
 }
 
 uint64_t buf_drain(forge_span_u64_t buf __attribute__((unused)), uint64_t len __attribute__((unused)), uint64_t k __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while (((i + k) < len)) {
       buf.data[i] = buf.data[(i + k)];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -50,16 +50,16 @@ uint64_t buf_drain(forge_span_u64_t buf __attribute__((unused)), uint64_t len __
 }
 
 uint64_t buf_compact(forge_span_u64_t buf __attribute__((unused)), uint64_t len __attribute__((unused)), uint64_t sentinel __attribute__((unused))) {
-  uint64_t w __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t w __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < len)) {
       if ((buf.data[i] != sentinel)) {
         buf.data[w] = buf.data[i];
-        w = (w + 1);
+        w = (w + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -67,7 +67,7 @@ uint64_t buf_compact(forge_span_u64_t buf __attribute__((unused)), uint64_t len 
 }
 
 uint64_t buf_find(forge_span_u64_t buf __attribute__((unused)), uint64_t len __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   uint64_t found __attribute__((unused)) = len;
   _Bool done __attribute__((unused)) = 0;
   {
@@ -77,7 +77,7 @@ uint64_t buf_find(forge_span_u64_t buf __attribute__((unused)), uint64_t len __a
         done = 1;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -85,7 +85,7 @@ uint64_t buf_find(forge_span_u64_t buf __attribute__((unused)), uint64_t len __a
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

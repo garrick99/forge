@@ -20,11 +20,11 @@ uint64_t strided_offset(uint64_t idx __attribute__((unused)), uint64_t stride __
 int main();
 
 uint64_t nibbles(uint64_t x __attribute__((unused))) {
-  return (x % 16);
+  return (x % 16ULL);
 }
 
 uint64_t upper4(uint64_t x __attribute__((unused))) {
-  return (x / 16);
+  return (x / 16ULL);
 }
 
 uint64_t hash_slot(uint64_t key __attribute__((unused)), uint64_t cap __attribute__((unused))) {
@@ -32,17 +32,17 @@ uint64_t hash_slot(uint64_t key __attribute__((unused)), uint64_t cap __attribut
 }
 
 uint64_t extract_byte_field(uint64_t word __attribute__((unused))) {
-  return (word % 256);
+  return (word % 256ULL);
 }
 
 uint64_t make_u16(uint8_t hi __attribute__((unused)), uint8_t lo __attribute__((unused))) {
   uint64_t h __attribute__((unused)) = ((uint64_t)hi);
   uint64_t l __attribute__((unused)) = ((uint64_t)lo);
-  return ((h * 256) + l);
+  return ((h * 256ULL) + l);
 }
 
 uint64_t low_byte(uint64_t word __attribute__((unused))) {
-  return (word % 256);
+  return (word % 256ULL);
 }
 
 uint64_t strided_base(uint64_t idx __attribute__((unused)), uint64_t stride __attribute__((unused))) {
@@ -54,7 +54,7 @@ uint64_t strided_offset(uint64_t idx __attribute__((unused)), uint64_t stride __
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

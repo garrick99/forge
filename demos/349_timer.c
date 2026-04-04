@@ -27,24 +27,24 @@ uint64_t tick_stop_reset_ticks();
 int main();
 
 Timer timer_new() {
-  return (Timer){ .elapsed = 0, .running = 0, .ticks = 0 };
+  return (Timer){ .elapsed = 0ULL, .running = 0ULL, .ticks = 0ULL };
 }
 
 void timer_start(Timer* t __attribute__((unused))) {
-  (*t).running = 1;
+  (*t).running = 1ULL;
 }
 
 void timer_stop(Timer* t __attribute__((unused))) {
-  (*t).running = 0;
+  (*t).running = 0ULL;
 }
 
 void timer_tick(Timer* t __attribute__((unused))) {
-  (*t).elapsed = ((*t).elapsed + 1);
-  (*t).ticks = ((*t).ticks + 1);
+  (*t).elapsed = ((*t).elapsed + 1ULL);
+  (*t).ticks = ((*t).ticks + 1ULL);
 }
 
 void timer_reset(Timer* t __attribute__((unused))) {
-  (*t).elapsed = 0;
+  (*t).elapsed = 0ULL;
 }
 
 uint64_t three_ticks() {
@@ -86,7 +86,7 @@ uint64_t tick_stop_reset_ticks() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -15,7 +15,7 @@ typedef struct { uint64_t* data; uintptr_t len; } forge_span_u64_t;
 uint64_t mod_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t m __attribute__((unused)));
 uint64_t mod_sub(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t m __attribute__((unused)));
 uint64_t mod_mul(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t m __attribute__((unused)));
-uint64_t mod_pow(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused)), uint64_t m __attribute__((unused)));
+uint64_t mod_pow(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused)), uint64_t m __attribute__((unused)));
 uint64_t mod_sum_array(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t m __attribute__((unused)));
 int main();
 
@@ -37,18 +37,18 @@ uint64_t mod_mul(uint64_t a __attribute__((unused)), uint64_t b __attribute__((u
   return (((a % m) * (b % m)) % m);
 }
 
-uint64_t mod_pow(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused)), uint64_t m __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = (1 % m);
+uint64_t mod_pow(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused)), uint64_t m __attribute__((unused))) {
+  uint64_t acc __attribute__((unused)) = (1ULL % m);
   uint64_t b __attribute__((unused)) = (base % m);
-  uint64_t e __attribute__((unused)) = exp;
+  uint64_t e __attribute__((unused)) = forge_exp;
   {
-    while ((e > 0)) {
-      if (((e % 2) == 1)) {
+    while ((e > 0ULL)) {
+      if (((e % 2ULL) == 1ULL)) {
         acc = ((acc * b) % m);
 
       }
       b = ((b * b) % m);
-      e = (e / 2);
+      e = (e / 2ULL);
     }
 
   }
@@ -56,12 +56,12 @@ uint64_t mod_pow(uint64_t base __attribute__((unused)), uint64_t exp __attribute
 }
 
 uint64_t mod_sum_array(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t m __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = ((acc + (s.data[i] % m)) % m);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -69,7 +69,7 @@ uint64_t mod_sum_array(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

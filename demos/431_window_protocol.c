@@ -26,11 +26,11 @@ uint64_t total_acked();
 int main();
 
 WindowProto wp_new(uint64_t window_size __attribute__((unused))) {
-  return (WindowProto){ .next_send = 0, .ack_base = 0, .window_size = window_size, .total_acked = 0 };
+  return (WindowProto){ .next_send = 0ULL, .ack_base = 0ULL, .window_size = window_size, .total_acked = 0ULL };
 }
 
 void wp_send(WindowProto* w __attribute__((unused))) {
-  (*w).next_send = ((*w).next_send + 1);
+  (*w).next_send = ((*w).next_send + 1ULL);
 }
 
 void wp_ack(WindowProto* w __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -39,7 +39,7 @@ void wp_ack(WindowProto* w __attribute__((unused)), uint64_t n __attribute__((un
 }
 
 uint64_t send_3() {
-  WindowProto w __attribute__((unused)) = wp_new(4);
+  WindowProto w __attribute__((unused)) = wp_new(4ULL);
   wp_send((&w));
   wp_send((&w));
   wp_send((&w));
@@ -47,34 +47,34 @@ uint64_t send_3() {
 }
 
 uint64_t inflight_after_ack() {
-  WindowProto w __attribute__((unused)) = wp_new(4);
+  WindowProto w __attribute__((unused)) = wp_new(4ULL);
   wp_send((&w));
   wp_send((&w));
-  wp_ack((&w), 1);
+  wp_ack((&w), 1ULL);
   return (w.next_send - w.ack_base);
 }
 
 uint64_t ack_base_advances() {
-  WindowProto w __attribute__((unused)) = wp_new(4);
+  WindowProto w __attribute__((unused)) = wp_new(4ULL);
   wp_send((&w));
   wp_send((&w));
   wp_send((&w));
-  wp_ack((&w), 2);
+  wp_ack((&w), 2ULL);
   return w.ack_base;
 }
 
 uint64_t total_acked() {
-  WindowProto w __attribute__((unused)) = wp_new(4);
+  WindowProto w __attribute__((unused)) = wp_new(4ULL);
   wp_send((&w));
   wp_send((&w));
   wp_send((&w));
-  wp_ack((&w), 1);
-  wp_ack((&w), 2);
+  wp_ack((&w), 1ULL);
+  wp_ack((&w), 2ULL);
   return w.total_acked;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

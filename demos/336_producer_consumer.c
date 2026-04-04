@@ -26,7 +26,7 @@ uint64_t drain_queue(uint64_t cap __attribute__((unused)));
 int main();
 
 Queue queue_new(uint64_t cap __attribute__((unused))) {
-  return (Queue){ .produced = 0, .consumed = 0, .cap = cap };
+  return (Queue){ .produced = 0ULL, .consumed = 0ULL, .cap = cap };
 }
 
 uint64_t queue_size(Queue* q __attribute__((unused))) {
@@ -34,11 +34,11 @@ uint64_t queue_size(Queue* q __attribute__((unused))) {
 }
 
 void queue_produce(Queue* q __attribute__((unused))) {
-  (*q).produced = ((*q).produced + 1);
+  (*q).produced = ((*q).produced + 1ULL);
 }
 
 void queue_consume(Queue* q __attribute__((unused))) {
-  (*q).consumed = ((*q).consumed + 1);
+  (*q).consumed = ((*q).consumed + 1ULL);
 }
 
 uint64_t one_produce(uint64_t cap __attribute__((unused))) {
@@ -75,7 +75,7 @@ uint64_t drain_queue(uint64_t cap __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

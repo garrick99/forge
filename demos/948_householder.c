@@ -17,12 +17,12 @@ void householder_apply(forge_span_u64_t col __attribute__((unused)), uint64_t n 
 int main();
 
 uint64_t dot_product(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + (a.data[i] * b.data[i]));
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -32,7 +32,7 @@ uint64_t dot_product(forge_span_u64_t a __attribute__((unused)), forge_span_u64_
 void householder_apply(forge_span_u64_t col __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t v __attribute__((unused)), uint64_t scale __attribute__((unused))) {
   uint64_t d __attribute__((unused)) = dot_product(v, col, n);
   uint64_t factor __attribute__((unused)) = (scale * d);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t sub __attribute__((unused)) = (v.data[i] * factor);
@@ -40,17 +40,17 @@ void householder_apply(forge_span_u64_t col __attribute__((unused)), uint64_t n 
         col.data[i] = (col.data[i] - sub);
 
       } else {
-        col.data[i] = 0;
+        col.data[i] = 0ULL;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

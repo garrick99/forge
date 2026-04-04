@@ -16,43 +16,43 @@ uint64_t interp_search(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 int main();
 
 uint64_t interp_search(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
-  uint64_t hi __attribute__((unused)) = (n - 1);
+  uint64_t lo __attribute__((unused)) = 0ULL;
+  uint64_t hi __attribute__((unused)) = (n - 1ULL);
   uint64_t found __attribute__((unused)) = n;
-  uint64_t steps __attribute__((unused)) = 0;
+  uint64_t steps __attribute__((unused)) = 0ULL;
   {
     while ((lo <= hi)) {
       if ((steps == n)) {
-        lo = (hi + 1);
+        lo = (hi + 1ULL);
 
       } else {
-        uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2));
+        uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2ULL));
         if ((mid < n)) {
           if ((s.data[mid] == target)) {
             found = mid;
-            lo = (hi + 1);
+            lo = (hi + 1ULL);
 
           } else if ((s.data[mid] < target)) {
-            lo = (mid + 1);
+            lo = (mid + 1ULL);
 
           } else {
-            if ((mid == 0)) {
-              lo = (hi + 1);
+            if ((mid == 0ULL)) {
+              lo = (hi + 1ULL);
 
             } else {
-              hi = (mid - 1);
+              hi = (mid - 1ULL);
 
             }
 
           }
 
         } else {
-          lo = (hi + 1);
+          lo = (hi + 1ULL);
 
         }
 
       }
-      steps = (steps + 1);
+      steps = (steps + 1ULL);
     }
 
   }
@@ -60,7 +60,7 @@ uint64_t interp_search(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

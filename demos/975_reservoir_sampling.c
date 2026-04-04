@@ -16,14 +16,14 @@ uint64_t reservoir_sample(forge_span_u64_t stream __attribute__((unused)), forge
 int main();
 
 uint64_t reservoir_sample(forge_span_u64_t stream __attribute__((unused)), forge_span_u64_t weights __attribute__((unused)), forge_span_u64_t reservoir __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t k __attribute__((unused)), uint64_t seed __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < k)) {
       if ((i < n)) {
         reservoir.data[i] = stream.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -31,13 +31,13 @@ uint64_t reservoir_sample(forge_span_u64_t stream __attribute__((unused)), forge
   uint64_t rng __attribute__((unused)) = seed;
   {
     while ((j < n)) {
-      rng = (((rng * 6364136223846793005) + 1) % 1000000007);
+      rng = (((rng * 6364136223846793005ULL) + 1ULL) % 1000000007ULL);
       uint64_t slot __attribute__((unused)) = (rng % k);
-      if ((weights.data[j] > (rng % 100))) {
+      if ((weights.data[j] > (rng % 100ULL))) {
         reservoir.data[slot] = stream.data[j];
 
       }
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
@@ -45,7 +45,7 @@ uint64_t reservoir_sample(forge_span_u64_t stream __attribute__((unused)), forge
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

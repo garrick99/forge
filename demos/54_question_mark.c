@@ -32,8 +32,8 @@ Result_u64_u64 div_twice(uint64_t a __attribute__((unused)), uint64_t b __attrib
 int main();
 
 Result_u64_u64 safe_div(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if ((b == 0)) {
-    return (Result_u64_u64){ .tag = Result_u64_u64_tag_Err, .data.Err = { ._v0 = 0 } };
+  if ((b == 0ULL)) {
+    return (Result_u64_u64){ .tag = Result_u64_u64_tag_Err, .data.Err = { ._v0 = 0ULL } };
   } else {
     return (Result_u64_u64){ .tag = Result_u64_u64_tag_Ok, .data.Ok = { ._v0 = (a / b) } };
   }
@@ -70,7 +70,7 @@ Result_u64_u64 div_twice(uint64_t a __attribute__((unused)), uint64_t b __attrib
 }
 
 int main() {
-  Result_u64_u64 r __attribute__((unused)) = div_twice(100, 5, 4);
+  Result_u64_u64 r __attribute__((unused)) = div_twice(100ULL, 5ULL, 4ULL);
   uint64_t __forge_main_result;
   switch (r.tag) {
     case Result_u64_u64_tag_Ok: {
@@ -79,7 +79,7 @@ int main() {
       break;
     }
     case Result_u64_u64_tag_Err: {
-      __forge_main_result = 999;
+      __forge_main_result = 999ULL;
       break;
     }
   }  return (int)(__forge_main_result);

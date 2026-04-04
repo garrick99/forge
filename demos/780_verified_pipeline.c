@@ -23,16 +23,16 @@ _Bool run_pipeline(forge_span_u64_t data __attribute__((unused)), uint64_t n __a
 int main();
 
 uint64_t filter_le(forge_span_u64_t src __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t dst __attribute__((unused)), uint64_t threshold __attribute__((unused))) {
-  uint64_t write __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t write __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((src.data[i] <= threshold)) {
         dst.data[write] = src.data[i];
-        write = (write + 1);
+        write = (write + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -40,20 +40,20 @@ uint64_t filter_le(forge_span_u64_t src __attribute__((unused)), uint64_t n __at
 }
 
 void double_all(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      s.data[i] = (s.data[i] * 2);
-      i = (i + 1);
+      s.data[i] = (s.data[i] * 2ULL);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 __forge_tuple_u64_u64_t aggregate(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t sum __attribute__((unused)) = 0;
-  uint64_t mx __attribute__((unused)) = s.data[0];
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t sum __attribute__((unused)) = 0ULL;
+  uint64_t mx __attribute__((unused)) = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       sum = (sum + s.data[i]);
@@ -61,7 +61,7 @@ __forge_tuple_u64_u64_t aggregate(forge_span_u64_t s __attribute__((unused)), ui
         mx = s.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -74,7 +74,7 @@ _Bool validate(uint64_t sum __attribute__((unused)), uint64_t budget __attribute
 
 _Bool run_pipeline(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t buf __attribute__((unused)), uint64_t threshold __attribute__((unused)), uint64_t budget __attribute__((unused))) {
   uint64_t filtered_n __attribute__((unused)) = filter_le(data, n, buf, threshold);
-  if ((filtered_n >= 1)) {
+  if ((filtered_n >= 1ULL)) {
     double_all(buf, filtered_n);
     __forge_tuple_u64_u64_t stats __attribute__((unused)) = aggregate(buf, filtered_n);
     return validate((stats)._0, budget);
@@ -84,7 +84,7 @@ _Bool run_pipeline(forge_span_u64_t data __attribute__((unused)), uint64_t n __a
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

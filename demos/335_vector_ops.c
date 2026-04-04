@@ -28,19 +28,19 @@ uint64_t cap_preserved(uint64_t cap __attribute__((unused)));
 int main();
 
 Vec vec_new(uint64_t cap __attribute__((unused))) {
-  return (Vec){ .len = 0, .cap = cap };
+  return (Vec){ .len = 0ULL, .cap = cap };
 }
 
 void vec_push(Vec* v __attribute__((unused))) {
-  (*v).len = ((*v).len + 1);
+  (*v).len = ((*v).len + 1ULL);
 }
 
 void vec_pop(Vec* v __attribute__((unused))) {
-  (*v).len = ((*v).len - 1);
+  (*v).len = ((*v).len - 1ULL);
 }
 
 void vec_clear(Vec* v __attribute__((unused))) {
-  (*v).len = 0;
+  (*v).len = 0ULL;
 }
 
 uint64_t vec_len(Vec* v __attribute__((unused))) {
@@ -96,7 +96,7 @@ uint64_t cap_preserved(uint64_t cap __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

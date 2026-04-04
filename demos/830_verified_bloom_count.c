@@ -25,36 +25,36 @@ uint64_t bloom_hash_a(uint64_t val __attribute__((unused)), uint64_t size __attr
 }
 
 uint64_t bloom_hash_b(uint64_t val __attribute__((unused)), uint64_t size __attribute__((unused))) {
-  return (((val * 2654435761) + 1) % size);
+  return (((val * 2654435761ULL) + 1ULL) % size);
 }
 
 uint64_t bloom_hash_c(uint64_t val __attribute__((unused)), uint64_t size __attribute__((unused))) {
-  return (((val * 40503) + 12345) % size);
+  return (((val * 40503ULL) + 12345ULL) % size);
 }
 
 void counting_bloom_insert(forge_span_u64_t counters __attribute__((unused)), uint64_t size __attribute__((unused)), uint64_t val __attribute__((unused))) {
   uint64_t h1 __attribute__((unused)) = bloom_hash_a(val, size);
   uint64_t h2 __attribute__((unused)) = bloom_hash_b(val, size);
   uint64_t h3 __attribute__((unused)) = bloom_hash_c(val, size);
-  counters.data[h1] = (counters.data[h1] + 1);
-  counters.data[h2] = (counters.data[h2] + 1);
-  counters.data[h3] = (counters.data[h3] + 1);
+  counters.data[h1] = (counters.data[h1] + 1ULL);
+  counters.data[h2] = (counters.data[h2] + 1ULL);
+  counters.data[h3] = (counters.data[h3] + 1ULL);
 }
 
 void counting_bloom_delete(forge_span_u64_t counters __attribute__((unused)), uint64_t size __attribute__((unused)), uint64_t val __attribute__((unused))) {
   uint64_t h1 __attribute__((unused)) = bloom_hash_a(val, size);
   uint64_t h2 __attribute__((unused)) = bloom_hash_b(val, size);
   uint64_t h3 __attribute__((unused)) = bloom_hash_c(val, size);
-  if ((counters.data[h1] > 0)) {
-    counters.data[h1] = (counters.data[h1] - 1);
+  if ((counters.data[h1] > 0ULL)) {
+    counters.data[h1] = (counters.data[h1] - 1ULL);
 
   }
-  if ((counters.data[h2] > 0)) {
-    counters.data[h2] = (counters.data[h2] - 1);
+  if ((counters.data[h2] > 0ULL)) {
+    counters.data[h2] = (counters.data[h2] - 1ULL);
 
   }
-  if ((counters.data[h3] > 0)) {
-    counters.data[h3] = (counters.data[h3] - 1);
+  if ((counters.data[h3] > 0ULL)) {
+    counters.data[h3] = (counters.data[h3] - 1ULL);
 
   }
 }
@@ -63,11 +63,11 @@ _Bool counting_bloom_query(forge_span_u64_t counters __attribute__((unused)), ui
   uint64_t h1 __attribute__((unused)) = bloom_hash_a(val, size);
   uint64_t h2 __attribute__((unused)) = bloom_hash_b(val, size);
   uint64_t h3 __attribute__((unused)) = bloom_hash_c(val, size);
-  return (((counters.data[h1] > 0) && (counters.data[h2] > 0)) && (counters.data[h3] > 0));
+  return (((counters.data[h1] > 0ULL) && (counters.data[h2] > 0ULL)) && (counters.data[h3] > 0ULL));
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

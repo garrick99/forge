@@ -20,7 +20,7 @@ uint64_t gcd(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unuse
   uint64_t x __attribute__((unused)) = a;
   uint64_t y __attribute__((unused)) = b;
   {
-    while ((y > 0)) {
+    while ((y > 0ULL)) {
       uint64_t t __attribute__((unused)) = y;
       y = (x % y);
       x = t;
@@ -32,12 +32,12 @@ uint64_t gcd(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unuse
 
 void rotate_left(forge_span_u64_t arr __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t d __attribute__((unused))) {
   uint64_t g __attribute__((unused)) = gcd(n, d);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < g)) {
       uint64_t tmp __attribute__((unused)) = arr.data[i];
       uint64_t j __attribute__((unused)) = i;
-      uint64_t steps __attribute__((unused)) = 0;
+      uint64_t steps __attribute__((unused)) = 0ULL;
       {
         while ((steps < n)) {
           uint64_t k __attribute__((unused)) = ((j + d) % n);
@@ -48,20 +48,20 @@ void rotate_left(forge_span_u64_t arr __attribute__((unused)), uint64_t n __attr
           } else {
             arr.data[j] = arr.data[k];
             j = k;
-            steps = (steps + 1);
+            steps = (steps + 1ULL);
 
           }
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

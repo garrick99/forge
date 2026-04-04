@@ -82,7 +82,7 @@ uint64_t compute(uint64_t x __attribute__((unused)), uint64_t y __attribute__((u
       return (x + y);
     }
     case Strategy_tag_Precise: {
-      return ((x * y) / ((x + y) + 1));
+      return ((x * y) / ((x + y) + 1ULL));
     }
     case Strategy_tag_Safe: {
       if ((x > y)) {
@@ -153,16 +153,16 @@ uint64_t reduce4(uint64_t a __attribute__((unused)), uint64_t b __attribute__((u
 uint64_t score(uint64_t x __attribute__((unused)), ScoreMode mode __attribute__((unused))) {
   switch (mode.tag) {
     case ScoreMode_tag_Linear: {
-      return (x * 10);
+      return (x * 10ULL);
     }
     case ScoreMode_tag_Quadratic: {
       return (x * x);
     }
     case ScoreMode_tag_Clamped: {
-      if ((x > 10)) {
-        return 100;
+      if ((x > 10ULL)) {
+        return 100ULL;
       } else {
-        return (x * 10);
+        return (x * 10ULL);
       }
     }
     default: __builtin_unreachable();
@@ -170,15 +170,15 @@ uint64_t score(uint64_t x __attribute__((unused)), ScoreMode mode __attribute__(
 }
 
 int main() {
-  uint64_t c1 __attribute__((unused)) = compute(10, 6, (Strategy){ .tag = Strategy_tag_Fast, .data.Fast = { ._dummy = 0 } });
-  uint64_t c2 __attribute__((unused)) = compute(10, 6, (Strategy){ .tag = Strategy_tag_Safe, .data.Safe = { ._dummy = 0 } });
-  uint64_t r1 __attribute__((unused)) = reduce4(7, 3, 9, 1, (Reducer){ .tag = Reducer_tag_Min, .data.Min = { ._dummy = 0 } });
-  uint64_t r2 __attribute__((unused)) = reduce4(7, 3, 9, 1, (Reducer){ .tag = Reducer_tag_Max, .data.Max = { ._dummy = 0 } });
-  uint64_t r3 __attribute__((unused)) = reduce4(7, 3, 9, 1, (Reducer){ .tag = Reducer_tag_Sum, .data.Sum = { ._dummy = 0 } });
-  uint64_t s1 __attribute__((unused)) = score(5, (ScoreMode){ .tag = ScoreMode_tag_Linear, .data.Linear = { ._dummy = 0 } });
-  uint64_t s2 __attribute__((unused)) = score(5, (ScoreMode){ .tag = ScoreMode_tag_Quadratic, .data.Quadratic = { ._dummy = 0 } });
-  uint64_t s3 __attribute__((unused)) = score(15, (ScoreMode){ .tag = ScoreMode_tag_Clamped, .data.Clamped = { ._dummy = 0 } });
-  uint64_t s4 __attribute__((unused)) = score(7, (ScoreMode){ .tag = ScoreMode_tag_Clamped, .data.Clamped = { ._dummy = 0 } });
+  uint64_t c1 __attribute__((unused)) = compute(10ULL, 6ULL, (Strategy){ .tag = Strategy_tag_Fast, .data.Fast = { ._dummy = 0 } });
+  uint64_t c2 __attribute__((unused)) = compute(10ULL, 6ULL, (Strategy){ .tag = Strategy_tag_Safe, .data.Safe = { ._dummy = 0 } });
+  uint64_t r1 __attribute__((unused)) = reduce4(7ULL, 3ULL, 9ULL, 1ULL, (Reducer){ .tag = Reducer_tag_Min, .data.Min = { ._dummy = 0 } });
+  uint64_t r2 __attribute__((unused)) = reduce4(7ULL, 3ULL, 9ULL, 1ULL, (Reducer){ .tag = Reducer_tag_Max, .data.Max = { ._dummy = 0 } });
+  uint64_t r3 __attribute__((unused)) = reduce4(7ULL, 3ULL, 9ULL, 1ULL, (Reducer){ .tag = Reducer_tag_Sum, .data.Sum = { ._dummy = 0 } });
+  uint64_t s1 __attribute__((unused)) = score(5ULL, (ScoreMode){ .tag = ScoreMode_tag_Linear, .data.Linear = { ._dummy = 0 } });
+  uint64_t s2 __attribute__((unused)) = score(5ULL, (ScoreMode){ .tag = ScoreMode_tag_Quadratic, .data.Quadratic = { ._dummy = 0 } });
+  uint64_t s3 __attribute__((unused)) = score(15ULL, (ScoreMode){ .tag = ScoreMode_tag_Clamped, .data.Clamped = { ._dummy = 0 } });
+  uint64_t s4 __attribute__((unused)) = score(7ULL, (ScoreMode){ .tag = ScoreMode_tag_Clamped, .data.Clamped = { ._dummy = 0 } });
   return (int)(((((((((c1 + c2) + r1) + r2) + r3) + s1) + s2) + s3) + s4));
 
 }

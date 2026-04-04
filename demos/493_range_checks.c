@@ -30,7 +30,7 @@ _Bool in_range_u64(uint64_t v __attribute__((unused)), uint64_t lo __attribute__
 
 uint64_t saturating_inc(uint64_t v __attribute__((unused)), uint64_t max __attribute__((unused))) {
   if ((v < max)) {
-    return (v + 1);
+    return (v + 1ULL);
   } else {
     return max;
   }
@@ -38,17 +38,17 @@ uint64_t saturating_inc(uint64_t v __attribute__((unused)), uint64_t max __attri
 
 uint64_t saturating_dec(uint64_t v __attribute__((unused)), uint64_t min __attribute__((unused))) {
   if ((v > min)) {
-    return (v - 1);
+    return (v - 1ULL);
   } else {
     return min;
   }
 }
 
 uint64_t wrap_inc(uint64_t v __attribute__((unused)), uint64_t bound __attribute__((unused))) {
-  if (((v + 1) < bound)) {
-    return (v + 1);
+  if (((v + 1ULL) < bound)) {
+    return (v + 1ULL);
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
@@ -57,39 +57,39 @@ uint64_t bounded_mul(uint64_t a __attribute__((unused)), uint64_t b __attribute_
 }
 
 _Bool check_in_range_true() {
-  return in_range_u64(5, 1, 10);
+  return in_range_u64(5ULL, 1ULL, 10ULL);
 }
 
 _Bool check_in_range_false() {
-  return in_range_u64(15, 1, 10);
+  return in_range_u64(15ULL, 1ULL, 10ULL);
 }
 
 uint64_t check_sat_inc_mid() {
-  return saturating_inc(5, 10);
+  return saturating_inc(5ULL, 10ULL);
 }
 
 uint64_t check_sat_inc_top() {
-  return saturating_inc(10, 10);
+  return saturating_inc(10ULL, 10ULL);
 }
 
 uint64_t check_sat_dec_mid() {
-  return saturating_dec(5, 0);
+  return saturating_dec(5ULL, 0ULL);
 }
 
 uint64_t check_sat_dec_bot() {
-  return saturating_dec(0, 0);
+  return saturating_dec(0ULL, 0ULL);
 }
 
 uint64_t check_wrap_inc_mid() {
-  return wrap_inc(2, 10);
+  return wrap_inc(2ULL, 10ULL);
 }
 
 uint64_t check_wrap_inc_top() {
-  return wrap_inc(9, 10);
+  return wrap_inc(9ULL, 10ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

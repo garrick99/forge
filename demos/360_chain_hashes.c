@@ -23,49 +23,49 @@ uint64_t height_is_appends();
 int main();
 
 Chain chain_new() {
-  return (Chain){ .height = 0, .tx_count = 0 };
+  return (Chain){ .height = 0ULL, .tx_count = 0ULL };
 }
 
 void chain_append(Chain* c __attribute__((unused)), uint64_t txs __attribute__((unused))) {
-  (*c).height = ((*c).height + 1);
+  (*c).height = ((*c).height + 1ULL);
   (*c).tx_count = ((*c).tx_count + txs);
 }
 
 uint64_t three_blocks_height() {
   Chain c __attribute__((unused)) = chain_new();
-  chain_append((&c), 1);
-  chain_append((&c), 1);
-  chain_append((&c), 1);
+  chain_append((&c), 1ULL);
+  chain_append((&c), 1ULL);
+  chain_append((&c), 1ULL);
   return c.height;
 }
 
 uint64_t three_blocks_txs() {
   Chain c __attribute__((unused)) = chain_new();
-  chain_append((&c), 1);
-  chain_append((&c), 1);
-  chain_append((&c), 1);
+  chain_append((&c), 1ULL);
+  chain_append((&c), 1ULL);
+  chain_append((&c), 1ULL);
   return c.tx_count;
 }
 
 uint64_t varying_txs() {
   Chain c __attribute__((unused)) = chain_new();
-  chain_append((&c), 5);
-  chain_append((&c), 10);
-  chain_append((&c), 3);
+  chain_append((&c), 5ULL);
+  chain_append((&c), 10ULL);
+  chain_append((&c), 3ULL);
   return c.tx_count;
 }
 
 uint64_t height_is_appends() {
   Chain c __attribute__((unused)) = chain_new();
-  chain_append((&c), 5);
-  chain_append((&c), 10);
-  chain_append((&c), 3);
-  chain_append((&c), 7);
+  chain_append((&c), 5ULL);
+  chain_append((&c), 10ULL);
+  chain_append((&c), 3ULL);
+  chain_append((&c), 7ULL);
   return c.height;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -17,12 +17,12 @@ uint64_t count_matches(forge_span_u64_t text __attribute__((unused)), uint64_t n
 int main();
 
 uint64_t string_search(forge_span_u64_t text __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t pattern __attribute__((unused)), uint64_t m __attribute__((unused))) {
-  uint64_t limit __attribute__((unused)) = ((n - m) + 1);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t limit __attribute__((unused)) = ((n - m) + 1ULL);
+  uint64_t i __attribute__((unused)) = 0ULL;
   uint64_t found __attribute__((unused)) = n;
   {
     while ((i < limit)) {
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t j __attribute__((unused)) = 0ULL;
       _Bool match_ __attribute__((unused)) = 1;
       {
         while (((j < m) && match_)) {
@@ -30,7 +30,7 @@ uint64_t string_search(forge_span_u64_t text __attribute__((unused)), uint64_t n
             match_ = 0;
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
@@ -38,7 +38,7 @@ uint64_t string_search(forge_span_u64_t text __attribute__((unused)), uint64_t n
         found = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -46,12 +46,12 @@ uint64_t string_search(forge_span_u64_t text __attribute__((unused)), uint64_t n
 }
 
 uint64_t count_matches(forge_span_u64_t text __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t pattern __attribute__((unused)), uint64_t m __attribute__((unused))) {
-  uint64_t limit __attribute__((unused)) = ((n - m) + 1);
-  uint64_t count __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t limit __attribute__((unused)) = ((n - m) + 1ULL);
+  uint64_t count __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < limit)) {
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t j __attribute__((unused)) = 0ULL;
       _Bool match_ __attribute__((unused)) = 1;
       {
         while (((j < m) && match_)) {
@@ -59,15 +59,15 @@ uint64_t count_matches(forge_span_u64_t text __attribute__((unused)), uint64_t n
             match_ = 0;
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
       if (match_) {
-        count = (count + 1);
+        count = (count + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -75,7 +75,7 @@ uint64_t count_matches(forge_span_u64_t text __attribute__((unused)), uint64_t n
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -50,13 +50,13 @@ uint64_t sorted_sum(uint64_t x __attribute__((unused)), uint64_t y __attribute__
 }
 
 uint64_t run() {
-  __forge_tuple_u64_u64_t __tup_62_4 __attribute__((unused)) = divmod(17, 5);
+  __forge_tuple_u64_u64_t __tup_62_4 __attribute__((unused)) = divmod(17ULL, 5ULL);
   uint64_t q __attribute__((unused)) = (__tup_62_4)._0;
   uint64_t r __attribute__((unused)) = (__tup_62_4)._1;
-  __forge_tuple_u64_u64_t __tup_66_4 __attribute__((unused)) = minmax(9, 4);
+  __forge_tuple_u64_u64_t __tup_66_4 __attribute__((unused)) = minmax(9ULL, 4ULL);
   uint64_t lo __attribute__((unused)) = (__tup_66_4)._0;
   uint64_t hi __attribute__((unused)) = (__tup_66_4)._1;
-  __forge_tuple_u64_u64_t __tup_70_4 __attribute__((unused)) = swap(10, 20);
+  __forge_tuple_u64_u64_t __tup_70_4 __attribute__((unused)) = swap(10ULL, 20ULL);
   uint64_t a __attribute__((unused)) = (__tup_70_4)._0;
   uint64_t b __attribute__((unused)) = (__tup_70_4)._1;
   __forge_tuple_u64_u64_t __tup_74_4 __attribute__((unused)) = minmax(q, r);

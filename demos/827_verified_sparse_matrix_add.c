@@ -16,32 +16,32 @@ uint64_t coo_add(forge_span_u64_t a_row __attribute__((unused)), forge_span_u64_
 int main();
 
 uint64_t coo_add(forge_span_u64_t a_row __attribute__((unused)), forge_span_u64_t a_col __attribute__((unused)), forge_span_u64_t a_val __attribute__((unused)), uint64_t na __attribute__((unused)), forge_span_u64_t b_row __attribute__((unused)), forge_span_u64_t b_col __attribute__((unused)), forge_span_u64_t b_val __attribute__((unused)), uint64_t nb __attribute__((unused)), forge_span_u64_t c_row __attribute__((unused)), forge_span_u64_t c_col __attribute__((unused)), forge_span_u64_t c_val __attribute__((unused)), uint64_t nc_cap __attribute__((unused))) {
-  uint64_t ia __attribute__((unused)) = 0;
-  uint64_t ib __attribute__((unused)) = 0;
-  uint64_t ic __attribute__((unused)) = 0;
+  uint64_t ia __attribute__((unused)) = 0ULL;
+  uint64_t ib __attribute__((unused)) = 0ULL;
+  uint64_t ic __attribute__((unused)) = 0ULL;
   {
     while ((((ia < na) && (ib < nb)) && (ic < nc_cap))) {
       if (((a_row.data[ia] < b_row.data[ib]) || ((a_row.data[ia] == b_row.data[ib]) && (a_col.data[ia] < b_col.data[ib])))) {
         c_row.data[ic] = a_row.data[ia];
         c_col.data[ic] = a_col.data[ia];
         c_val.data[ic] = a_val.data[ia];
-        ia = (ia + 1);
-        ic = (ic + 1);
+        ia = (ia + 1ULL);
+        ic = (ic + 1ULL);
 
       } else if (((b_row.data[ib] < a_row.data[ia]) || ((a_row.data[ia] == b_row.data[ib]) && (b_col.data[ib] < a_col.data[ia])))) {
         c_row.data[ic] = b_row.data[ib];
         c_col.data[ic] = b_col.data[ib];
         c_val.data[ic] = b_val.data[ib];
-        ib = (ib + 1);
-        ic = (ic + 1);
+        ib = (ib + 1ULL);
+        ic = (ic + 1ULL);
 
       } else {
         c_row.data[ic] = a_row.data[ia];
         c_col.data[ic] = a_col.data[ia];
         c_val.data[ic] = (a_val.data[ia] + b_val.data[ib]);
-        ia = (ia + 1);
-        ib = (ib + 1);
-        ic = (ic + 1);
+        ia = (ia + 1ULL);
+        ib = (ib + 1ULL);
+        ic = (ic + 1ULL);
 
       }
     }
@@ -52,8 +52,8 @@ uint64_t coo_add(forge_span_u64_t a_row __attribute__((unused)), forge_span_u64_
       c_row.data[ic] = a_row.data[ia];
       c_col.data[ic] = a_col.data[ia];
       c_val.data[ic] = a_val.data[ia];
-      ia = (ia + 1);
-      ic = (ic + 1);
+      ia = (ia + 1ULL);
+      ic = (ic + 1ULL);
     }
 
   }
@@ -62,8 +62,8 @@ uint64_t coo_add(forge_span_u64_t a_row __attribute__((unused)), forge_span_u64_
       c_row.data[ic] = b_row.data[ib];
       c_col.data[ic] = b_col.data[ib];
       c_val.data[ic] = b_val.data[ib];
-      ib = (ib + 1);
-      ic = (ic + 1);
+      ib = (ib + 1ULL);
+      ic = (ic + 1ULL);
     }
 
   }
@@ -71,7 +71,7 @@ uint64_t coo_add(forge_span_u64_t a_row __attribute__((unused)), forge_span_u64_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

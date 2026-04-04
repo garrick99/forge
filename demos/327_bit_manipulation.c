@@ -23,55 +23,55 @@ uint64_t bswap16(uint64_t x __attribute__((unused)));
 int main();
 
 uint64_t set_bit(uint64_t x __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  return (x | (1 << n));
+  return (x | (1ULL << n));
 }
 
 uint64_t clear_bit(uint64_t x __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  return (x & (~(1 << n)));
+  return (x & (~(1ULL << n)));
 }
 
 uint64_t test_bit(uint64_t x __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  return ((x >> n) & 1);
+  return ((x >> n) & 1ULL);
 }
 
 uint64_t extract_nibble(uint64_t x __attribute__((unused)), uint64_t lo __attribute__((unused))) {
-  return ((x >> lo) & 15);
+  return ((x >> lo) & 15ULL);
 }
 
 uint64_t extract_byte(uint64_t x __attribute__((unused)), uint64_t lo __attribute__((unused))) {
-  return ((x >> lo) & 255);
+  return ((x >> lo) & 255ULL);
 }
 
 uint64_t low_nibble(uint64_t x __attribute__((unused))) {
-  return (x & 15);
+  return (x & 15ULL);
 }
 
 uint64_t high_nibble(uint64_t x __attribute__((unused))) {
-  return ((x >> 4) & 15);
+  return ((x >> 4ULL) & 15ULL);
 }
 
 uint64_t is_power_of_two(uint64_t x __attribute__((unused))) {
-  if (((x & (x - 1)) == 0)) {
-    return 1;
+  if (((x & (x - 1ULL)) == 0ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t lowest_set_bit(uint64_t x __attribute__((unused))) {
-  return (x & (0 - x));
+  return (x & (0ULL - x));
 }
 
 uint64_t clear_lowest_bit(uint64_t x __attribute__((unused))) {
-  return (x & (x - 1));
+  return (x & (x - 1ULL));
 }
 
 uint64_t bswap16(uint64_t x __attribute__((unused))) {
-  return (((x & 255) << 8) | ((x >> 8) & 255));
+  return (((x & 255ULL) << 8ULL) | ((x >> 8ULL) & 255ULL));
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -17,13 +17,13 @@ void extract_diagonal(forge_span_u64_t mat __attribute__((unused)), forge_span_u
 int main();
 
 uint64_t column_norm_sq(forge_span_u64_t mat __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t col __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t v __attribute__((unused)) = mat.data[((i * n) + col)];
       acc = (acc + (v * v));
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -31,18 +31,18 @@ uint64_t column_norm_sq(forge_span_u64_t mat __attribute__((unused)), uint64_t n
 }
 
 void extract_diagonal(forge_span_u64_t mat __attribute__((unused)), forge_span_u64_t diag __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       diag.data[i] = mat.data[((i * n) + i)];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

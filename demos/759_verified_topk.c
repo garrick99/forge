@@ -22,53 +22,53 @@ uint64_t top_k(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribut
   } else {
     limit = n;
   }
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < limit)) {
       out.data[i] = s.data[i];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t a __attribute__((unused)) = 1;
+  uint64_t a __attribute__((unused)) = 1ULL;
   {
     while ((a < limit)) {
       uint64_t b __attribute__((unused)) = a;
       {
-        while ((b > 0)) {
-          if ((out.data[b] > out.data[(b - 1)])) {
+        while ((b > 0ULL)) {
+          if ((out.data[b] > out.data[(b - 1ULL)])) {
             uint64_t tmp __attribute__((unused)) = out.data[b];
-            out.data[b] = out.data[(b - 1)];
-            out.data[(b - 1)] = tmp;
-            b = (b - 1);
+            out.data[b] = out.data[(b - 1ULL)];
+            out.data[(b - 1ULL)] = tmp;
+            b = (b - 1ULL);
 
           } else {
-            b = 0;
+            b = 0ULL;
 
           }
         }
 
       }
-      a = (a + 1);
+      a = (a + 1ULL);
     }
 
   }
   uint64_t j __attribute__((unused)) = limit;
   {
     while ((j < n)) {
-      if ((s.data[j] > out.data[(limit - 1)])) {
-        out.data[(limit - 1)] = s.data[j];
-        uint64_t p __attribute__((unused)) = (limit - 1);
+      if ((s.data[j] > out.data[(limit - 1ULL)])) {
+        out.data[(limit - 1ULL)] = s.data[j];
+        uint64_t p __attribute__((unused)) = (limit - 1ULL);
         {
-          while ((p > 0)) {
-            if ((out.data[p] > out.data[(p - 1)])) {
+          while ((p > 0ULL)) {
+            if ((out.data[p] > out.data[(p - 1ULL)])) {
               uint64_t tmp __attribute__((unused)) = out.data[p];
-              out.data[p] = out.data[(p - 1)];
-              out.data[(p - 1)] = tmp;
-              p = (p - 1);
+              out.data[p] = out.data[(p - 1ULL)];
+              out.data[(p - 1ULL)] = tmp;
+              p = (p - 1ULL);
 
             } else {
-              p = 0;
+              p = 0ULL;
 
             }
           }
@@ -76,7 +76,7 @@ uint64_t top_k(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribut
         }
 
       }
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
@@ -84,7 +84,7 @@ uint64_t top_k(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribut
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -36,14 +36,14 @@ void bucket_fill(Bucket* b __attribute__((unused)), uint64_t n __attribute__((un
 
 uint64_t consume_three(uint64_t cap __attribute__((unused))) {
   Bucket b __attribute__((unused)) = bucket_new(cap);
-  bucket_consume((&b), 3);
+  bucket_consume((&b), 3ULL);
   return b.tokens;
 }
 
 uint64_t consume2_fill1(uint64_t cap __attribute__((unused))) {
   Bucket b __attribute__((unused)) = bucket_new(cap);
-  bucket_consume((&b), 2);
-  bucket_fill((&b), 1);
+  bucket_consume((&b), 2ULL);
+  bucket_fill((&b), 1ULL);
   return b.tokens;
 }
 
@@ -54,7 +54,7 @@ uint64_t drain(uint64_t cap __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

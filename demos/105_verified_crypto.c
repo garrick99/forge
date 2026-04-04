@@ -44,26 +44,26 @@ uint64_t mod_mul_small(uint64_t a __attribute__((unused)), uint64_t b __attribut
 }
 
 uint64_t is_pow2(uint64_t m __attribute__((unused))) {
-  if (((m & (m - 1)) == 0)) {
-    return 1;
+  if (((m & (m - 1ULL)) == 0ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t mod_pow2(uint64_t a __attribute__((unused)), uint64_t m __attribute__((unused))) {
-  return (a & (m - 1));
+  return (a & (m - 1ULL));
 }
 
 int main() {
-  uint64_t m __attribute__((unused)) = 17;
-  uint64_t a1 __attribute__((unused)) = mod_add(10, 12, m);
-  uint64_t a2 __attribute__((unused)) = mod_sub(5, 11, m);
-  uint64_t a3 __attribute__((unused)) = mod_double(9, m);
-  uint64_t a4 __attribute__((unused)) = mod_mul_small(6, 7, m);
-  uint64_t p1 __attribute__((unused)) = is_pow2(16);
-  uint64_t p2 __attribute__((unused)) = is_pow2(12);
-  uint64_t p3 __attribute__((unused)) = mod_pow2(255, 16);
+  uint64_t m __attribute__((unused)) = 17ULL;
+  uint64_t a1 __attribute__((unused)) = mod_add(10ULL, 12ULL, m);
+  uint64_t a2 __attribute__((unused)) = mod_sub(5ULL, 11ULL, m);
+  uint64_t a3 __attribute__((unused)) = mod_double(9ULL, m);
+  uint64_t a4 __attribute__((unused)) = mod_mul_small(6ULL, 7ULL, m);
+  uint64_t p1 __attribute__((unused)) = is_pow2(16ULL);
+  uint64_t p2 __attribute__((unused)) = is_pow2(12ULL);
+  uint64_t p3 __attribute__((unused)) = mod_pow2(255ULL, 16ULL);
   return (int)(((((((a1 + a2) + a3) + a4) + p1) + p2) + p3));
 
 }

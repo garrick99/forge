@@ -17,53 +17,53 @@ void haar_inverse(forge_span_u64_t s __attribute__((unused)), uint64_t n __attri
 int main();
 
 void haar_forward(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t tmp __attribute__((unused))) {
-  uint64_t half __attribute__((unused)) = (n / 2);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t half __attribute__((unused)) = (n / 2ULL);
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < half)) {
       uint64_t a __attribute__((unused)) = s.data[(i + i)];
-      uint64_t b __attribute__((unused)) = s.data[((i + i) + 1)];
-      tmp.data[i] = ((a + b) / 2);
-      tmp.data[(half + i)] = ((a - b) / 2);
-      i = (i + 1);
+      uint64_t b __attribute__((unused)) = s.data[((i + i) + 1ULL)];
+      tmp.data[i] = ((a + b) / 2ULL);
+      tmp.data[(half + i)] = ((a - b) / 2ULL);
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < n)) {
       s.data[j] = tmp.data[j];
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
 }
 
 void haar_inverse(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t tmp __attribute__((unused))) {
-  uint64_t half __attribute__((unused)) = (n / 2);
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t half __attribute__((unused)) = (n / 2ULL);
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < half)) {
       uint64_t avg __attribute__((unused)) = s.data[i];
       uint64_t det __attribute__((unused)) = s.data[(half + i)];
       tmp.data[(i + i)] = (avg + det);
-      tmp.data[((i + i) + 1)] = (avg - det);
-      i = (i + 1);
+      tmp.data[((i + i) + 1ULL)] = (avg - det);
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j < n)) {
       s.data[j] = tmp.data[j];
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

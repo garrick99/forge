@@ -56,34 +56,34 @@ Interval interval_intersect(Interval a __attribute__((unused)), Interval b __att
 
 uint64_t interval_contains(Interval iv __attribute__((unused)), uint64_t x __attribute__((unused))) {
   if (((x >= iv.lo) && (x <= iv.hi))) {
-    return 1;
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t interval_subset(Interval a __attribute__((unused)), Interval b __attribute__((unused))) {
   if (((a.lo >= b.lo) && (a.hi <= b.hi))) {
-    return 1;
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 int main() {
-  Interval iv1 __attribute__((unused)) = interval_new(10, 20);
-  Interval iv2 __attribute__((unused)) = interval_new(15, 30);
-  Interval iv3 __attribute__((unused)) = interval_new(5, 12);
+  Interval iv1 __attribute__((unused)) = interval_new(10ULL, 20ULL);
+  Interval iv2 __attribute__((unused)) = interval_new(15ULL, 30ULL);
+  Interval iv3 __attribute__((unused)) = interval_new(5ULL, 12ULL);
   uint64_t w1 __attribute__((unused)) = interval_width(iv1);
   uint64_t w2 __attribute__((unused)) = interval_width(iv2);
-  Interval iv4 __attribute__((unused)) = interval_shift(iv1, 5);
+  Interval iv4 __attribute__((unused)) = interval_shift(iv1, 5ULL);
   uint64_t w4 __attribute__((unused)) = interval_width(iv4);
   Interval ix12 __attribute__((unused)) = interval_intersect(iv1, iv2);
   uint64_t w12 __attribute__((unused)) = interval_width(ix12);
   Interval ix13 __attribute__((unused)) = interval_intersect(iv1, iv3);
   uint64_t w13 __attribute__((unused)) = interval_width(ix13);
-  uint64_t c1 __attribute__((unused)) = interval_contains(iv1, 15);
-  uint64_t c2 __attribute__((unused)) = interval_contains(iv1, 25);
+  uint64_t c1 __attribute__((unused)) = interval_contains(iv1, 15ULL);
+  uint64_t c2 __attribute__((unused)) = interval_contains(iv1, 25ULL);
   uint64_t sub1 __attribute__((unused)) = interval_subset(ix12, iv1);
   uint64_t sub2 __attribute__((unused)) = interval_subset(iv2, iv1);
   return (int)(((((((((w1 + w2) + w4) + w12) + w13) + c1) + c2) + sub1) + sub2));

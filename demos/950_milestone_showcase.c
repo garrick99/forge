@@ -23,27 +23,27 @@ uint64_t lis_length(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 void xor_cipher(forge_span_u64_t data __attribute__((unused)), forge_span_u64_t key __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t klen __attribute__((unused)));
 uint64_t stack_push(forge_span_u64_t stk __attribute__((unused)), uint64_t top __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t val __attribute__((unused)));
 __forge_tuple_u64_u64_t stack_pop(forge_span_u64_t stk __attribute__((unused)), uint64_t top __attribute__((unused)));
-uint64_t mod_pow(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused)), uint64_t m __attribute__((unused)));
+uint64_t mod_pow(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused)), uint64_t m __attribute__((unused)));
 int main();
 
 void fill(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = val;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t sum_array(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -51,24 +51,24 @@ uint64_t sum_array(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 }
 
 uint64_t factorial(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return 1;
+  if ((n == 0ULL)) {
+    return 1ULL;
   } else {
-    uint64_t prev __attribute__((unused)) = factorial((n - 1));
+    uint64_t prev __attribute__((unused)) = factorial((n - 1ULL));
     return (n * prev);
   }
 }
 
 uint64_t bfs_levels(forge_span_u64_t adj __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t visited __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((visited.data[i] > 0)) {
-        cnt = (cnt + 1);
+      if ((visited.data[i] > 0ULL)) {
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -76,19 +76,19 @@ uint64_t bfs_levels(forge_span_u64_t adj __attribute__((unused)), uint64_t n __a
 }
 
 uint64_t lis_length(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t dp __attribute__((unused))) {
-  uint64_t best __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t best __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      dp.data[i] = 1;
-      uint64_t j __attribute__((unused)) = 0;
+      dp.data[i] = 1ULL;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < i)) {
-          if (((s.data[j] < s.data[i]) && ((dp.data[j] + 1) > dp.data[i]))) {
-            dp.data[i] = (dp.data[j] + 1);
+          if (((s.data[j] < s.data[i]) && ((dp.data[j] + 1ULL) > dp.data[i]))) {
+            dp.data[i] = (dp.data[j] + 1ULL);
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
@@ -100,7 +100,7 @@ uint64_t lis_length(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
         best = n;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -108,11 +108,11 @@ uint64_t lis_length(forge_span_u64_t s __attribute__((unused)), uint64_t n __att
 }
 
 void xor_cipher(forge_span_u64_t data __attribute__((unused)), forge_span_u64_t key __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t klen __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       out.data[i] = (data.data[i] ^ key.data[(i % klen)]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -120,26 +120,26 @@ void xor_cipher(forge_span_u64_t data __attribute__((unused)), forge_span_u64_t 
 
 uint64_t stack_push(forge_span_u64_t stk __attribute__((unused)), uint64_t top __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t val __attribute__((unused))) {
   stk.data[top] = val;
-  return (top + 1);
+  return (top + 1ULL);
 }
 
 __forge_tuple_u64_u64_t stack_pop(forge_span_u64_t stk __attribute__((unused)), uint64_t top __attribute__((unused))) {
-  uint64_t val __attribute__((unused)) = stk.data[(top - 1)];
-  return (__forge_tuple_u64_u64_t){ ._0 = val, ._1 = (top - 1) };
+  uint64_t val __attribute__((unused)) = stk.data[(top - 1ULL)];
+  return (__forge_tuple_u64_u64_t){ ._0 = val, ._1 = (top - 1ULL) };
 }
 
-uint64_t mod_pow(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused)), uint64_t m __attribute__((unused))) {
+uint64_t mod_pow(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused)), uint64_t m __attribute__((unused))) {
   uint64_t b __attribute__((unused)) = base;
-  uint64_t e __attribute__((unused)) = exp;
-  uint64_t acc __attribute__((unused)) = 1;
+  uint64_t e __attribute__((unused)) = forge_exp;
+  uint64_t acc __attribute__((unused)) = 1ULL;
   {
-    while ((e > 0)) {
-      if (((e % 2) == 1)) {
+    while ((e > 0ULL)) {
+      if (((e % 2ULL) == 1ULL)) {
         acc = ((acc * b) % m);
 
       }
       b = ((b * b) % m);
-      e = (e / 2);
+      e = (e / 2ULL);
     }
 
   }
@@ -147,7 +147,7 @@ uint64_t mod_pow(uint64_t base __attribute__((unused)), uint64_t exp __attribute
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

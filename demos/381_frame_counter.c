@@ -26,22 +26,22 @@ uint64_t total_ticks_tracked();
 int main();
 
 FrameCounter fc_new(uint64_t subframes_per __attribute__((unused))) {
-  return (FrameCounter){ .frame = 0, .subframe = 0, .subframes_per = subframes_per, .total_ticks = 0 };
+  return (FrameCounter){ .frame = 0ULL, .subframe = 0ULL, .subframes_per = subframes_per, .total_ticks = 0ULL };
 }
 
 void fc_tick(FrameCounter* f __attribute__((unused))) {
-  (*f).subframe = ((*f).subframe + 1);
-  (*f).total_ticks = ((*f).total_ticks + 1);
+  (*f).subframe = ((*f).subframe + 1ULL);
+  (*f).total_ticks = ((*f).total_ticks + 1ULL);
 }
 
 void fc_frame_advance(FrameCounter* f __attribute__((unused))) {
-  (*f).frame = ((*f).frame + 1);
-  (*f).subframe = 0;
-  (*f).total_ticks = ((*f).total_ticks + 1);
+  (*f).frame = ((*f).frame + 1ULL);
+  (*f).subframe = 0ULL;
+  (*f).total_ticks = ((*f).total_ticks + 1ULL);
 }
 
 uint64_t three_ticks() {
-  FrameCounter f __attribute__((unused)) = fc_new(5);
+  FrameCounter f __attribute__((unused)) = fc_new(5ULL);
   fc_tick((&f));
   fc_tick((&f));
   fc_tick((&f));
@@ -49,7 +49,7 @@ uint64_t three_ticks() {
 }
 
 uint64_t one_full_frame_frame() {
-  FrameCounter f __attribute__((unused)) = fc_new(5);
+  FrameCounter f __attribute__((unused)) = fc_new(5ULL);
   fc_tick((&f));
   fc_tick((&f));
   fc_tick((&f));
@@ -59,7 +59,7 @@ uint64_t one_full_frame_frame() {
 }
 
 uint64_t one_full_frame_subframe() {
-  FrameCounter f __attribute__((unused)) = fc_new(5);
+  FrameCounter f __attribute__((unused)) = fc_new(5ULL);
   fc_tick((&f));
   fc_tick((&f));
   fc_tick((&f));
@@ -69,7 +69,7 @@ uint64_t one_full_frame_subframe() {
 }
 
 uint64_t total_ticks_tracked() {
-  FrameCounter f __attribute__((unused)) = fc_new(5);
+  FrameCounter f __attribute__((unused)) = fc_new(5ULL);
   fc_tick((&f));
   fc_tick((&f));
   fc_tick((&f));
@@ -79,7 +79,7 @@ uint64_t total_ticks_tracked() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

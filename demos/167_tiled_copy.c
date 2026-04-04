@@ -30,7 +30,7 @@ void tiled_copy(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t d
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -27,6 +27,12 @@
 /* span<T> typedefs — fat pointers with proven bounds */
 typedef struct { uint32_t* data; uintptr_t len; } forge_span_u32_t;
 
+/* Function pointer typedefs */
+typedef uint64_t (*forge_fn_u64_u64_u64_ret_u64_t)(uint64_t, uint64_t, uint64_t);
+typedef uint64_t (*forge_fn_ptr_u64_u64_ret_u64_t)(uint64_t*, uint64_t);
+typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
+typedef uint64_t (*forge_fn__ret_u64_t)(void);
+
 uint64_t shfl_down_sync(uint64_t val, uint64_t delta, uint64_t width);  /* extern: forge_gpu */
 
 uint64_t shfl_xor_sync(uint64_t val, uint64_t mask, uint64_t width);  /* extern: forge_gpu */
@@ -48,12 +54,6 @@ uint64_t warp_id(void);  /* extern: forge_gpu */
 /* Tuple typedefs */
 typedef struct { uint32_t _0; uint32_t _1; uint32_t _2; uint32_t _3; } __forge_tuple_u32_u32_u32_u32_t;
 
-/* Function pointer typedefs */
-typedef uint64_t (*forge_fn_u64_u64_u64_ret_u64_t)(uint64_t, uint64_t, uint64_t);
-typedef uint64_t (*forge_fn_ptr_u64_u64_ret_u64_t)(uint64_t*, uint64_t);
-typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
-typedef uint64_t (*forge_fn__ret_u64_t)(void);
-
 /* Forward declarations */
 uint64_t warp_reduce_sum(uint64_t val __attribute__((unused)));
 uint64_t warp_reduce_max(uint64_t val __attribute__((unused)));
@@ -69,37 +69,37 @@ int main();
 
 uint64_t warp_reduce_sum(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
-  v = (v + __shfl_xor_sync(0xffffffff, v, 16, 32));
-  v = (v + __shfl_xor_sync(0xffffffff, v, 8, 32));
-  v = (v + __shfl_xor_sync(0xffffffff, v, 4, 32));
-  v = (v + __shfl_xor_sync(0xffffffff, v, 2, 32));
-  v = (v + __shfl_xor_sync(0xffffffff, v, 1, 32));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 8ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 4ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 2ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 1ULL, 32ULL));
   return v;
 }
 
 uint64_t warp_reduce_max(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
-  uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16, 32);
+  uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 8, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 8ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 4, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 4ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 2, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 2ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 1, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 1ULL, 32ULL);
   if ((s > v)) {
     v = s;
 
@@ -109,27 +109,27 @@ uint64_t warp_reduce_max(uint64_t val __attribute__((unused))) {
 
 uint64_t warp_reduce_min(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
-  uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16, 32);
+  uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 8, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 8ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 4, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 4ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 2, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 2ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
   }
-  s = __shfl_xor_sync(0xffffffff, v, 1, 32);
+  s = __shfl_xor_sync(0xffffffff, v, 1ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
@@ -146,43 +146,43 @@ uint64_t grid_stride_step(uint64_t block_dim __attribute__((unused)), uint64_t g
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 
 uint32_t rotr32(uint32_t x __attribute__((unused)), uint32_t n __attribute__((unused))) {
-  return ((x >> n) | (x << (32 - n)));
+  return ((x >> n) | (x << (32ULL - n)));
 }
 
 __forge_tuple_u32_u32_u32_u32_t blake2s_g(uint32_t a __attribute__((unused)), uint32_t b __attribute__((unused)), uint32_t c __attribute__((unused)), uint32_t d __attribute__((unused)), uint32_t x __attribute__((unused)), uint32_t y __attribute__((unused))) {
   uint32_t a1 __attribute__((unused)) = ((a + b) + x);
-  uint32_t d1 __attribute__((unused)) = rotr32((d ^ a1), 16);
+  uint32_t d1 __attribute__((unused)) = rotr32((d ^ a1), 16ULL);
   uint32_t c1 __attribute__((unused)) = (c + d1);
-  uint32_t b1 __attribute__((unused)) = rotr32((b ^ c1), 12);
+  uint32_t b1 __attribute__((unused)) = rotr32((b ^ c1), 12ULL);
   uint32_t a2 __attribute__((unused)) = ((a1 + b1) + y);
-  uint32_t d2 __attribute__((unused)) = rotr32((d1 ^ a2), 8);
+  uint32_t d2 __attribute__((unused)) = rotr32((d1 ^ a2), 8ULL);
   uint32_t c2 __attribute__((unused)) = (c1 + d2);
-  uint32_t b2 __attribute__((unused)) = rotr32((b1 ^ c2), 7);
+  uint32_t b2 __attribute__((unused)) = rotr32((b1 ^ c2), 7ULL);
   return (__forge_tuple_u32_u32_u32_u32_t){ ._0 = a2, ._1 = b2, ._2 = c2, ._3 = d2 };
 }
 
 void blake2s_round(forge_span_u32_t v __attribute__((unused)), forge_span_u32_t m __attribute__((unused)), uint64_t s0 __attribute__((unused)), uint64_t s1 __attribute__((unused)), uint64_t s2 __attribute__((unused)), uint64_t s3 __attribute__((unused)), uint64_t s4 __attribute__((unused)), uint64_t s5 __attribute__((unused)), uint64_t s6 __attribute__((unused)), uint64_t s7 __attribute__((unused)), uint64_t s8 __attribute__((unused)), uint64_t s9 __attribute__((unused)), uint64_t s10 __attribute__((unused)), uint64_t s11 __attribute__((unused)), uint64_t s12 __attribute__((unused)), uint64_t s13 __attribute__((unused)), uint64_t s14 __attribute__((unused)), uint64_t s15 __attribute__((unused)), forge_span_u32_t out __attribute__((unused))) {
-  __forge_tuple_u32_u32_u32_u32_t __tup_77_4 __attribute__((unused)) = blake2s_g(v.data[0], v.data[4], v.data[8], v.data[12], m.data[s0], m.data[s1]);
+  __forge_tuple_u32_u32_u32_u32_t __tup_77_4 __attribute__((unused)) = blake2s_g(v.data[0ULL], v.data[4ULL], v.data[8ULL], v.data[12ULL], m.data[s0], m.data[s1]);
   uint32_t a0 __attribute__((unused)) = (__tup_77_4)._0;
   uint32_t b0 __attribute__((unused)) = (__tup_77_4)._1;
   uint32_t c0 __attribute__((unused)) = (__tup_77_4)._2;
   uint32_t d0 __attribute__((unused)) = (__tup_77_4)._3;
-  __forge_tuple_u32_u32_u32_u32_t __tup_78_4 __attribute__((unused)) = blake2s_g(v.data[1], v.data[5], v.data[9], v.data[13], m.data[s2], m.data[s3]);
+  __forge_tuple_u32_u32_u32_u32_t __tup_78_4 __attribute__((unused)) = blake2s_g(v.data[1ULL], v.data[5ULL], v.data[9ULL], v.data[13ULL], m.data[s2], m.data[s3]);
   uint32_t a1 __attribute__((unused)) = (__tup_78_4)._0;
   uint32_t b1 __attribute__((unused)) = (__tup_78_4)._1;
   uint32_t c1 __attribute__((unused)) = (__tup_78_4)._2;
   uint32_t d1 __attribute__((unused)) = (__tup_78_4)._3;
-  __forge_tuple_u32_u32_u32_u32_t __tup_79_4 __attribute__((unused)) = blake2s_g(v.data[2], v.data[6], v.data[10], v.data[14], m.data[s4], m.data[s5]);
+  __forge_tuple_u32_u32_u32_u32_t __tup_79_4 __attribute__((unused)) = blake2s_g(v.data[2ULL], v.data[6ULL], v.data[10ULL], v.data[14ULL], m.data[s4], m.data[s5]);
   uint32_t a2 __attribute__((unused)) = (__tup_79_4)._0;
   uint32_t b2 __attribute__((unused)) = (__tup_79_4)._1;
   uint32_t c2 __attribute__((unused)) = (__tup_79_4)._2;
   uint32_t d2 __attribute__((unused)) = (__tup_79_4)._3;
-  __forge_tuple_u32_u32_u32_u32_t __tup_80_4 __attribute__((unused)) = blake2s_g(v.data[3], v.data[7], v.data[11], v.data[15], m.data[s6], m.data[s7]);
+  __forge_tuple_u32_u32_u32_u32_t __tup_80_4 __attribute__((unused)) = blake2s_g(v.data[3ULL], v.data[7ULL], v.data[11ULL], v.data[15ULL], m.data[s6], m.data[s7]);
   uint32_t a3 __attribute__((unused)) = (__tup_80_4)._0;
   uint32_t b3 __attribute__((unused)) = (__tup_80_4)._1;
   uint32_t c3 __attribute__((unused)) = (__tup_80_4)._2;
@@ -207,22 +207,22 @@ void blake2s_round(forge_span_u32_t v __attribute__((unused)), forge_span_u32_t 
   uint32_t b7 __attribute__((unused)) = (__tup_86_4)._1;
   uint32_t c7 __attribute__((unused)) = (__tup_86_4)._2;
   uint32_t d7 __attribute__((unused)) = (__tup_86_4)._3;
-  out.data[0] = a4;
-  out.data[1] = a5;
-  out.data[2] = a6;
-  out.data[3] = a7;
-  out.data[4] = b7;
-  out.data[5] = b4;
-  out.data[6] = b5;
-  out.data[7] = b6;
-  out.data[8] = c6;
-  out.data[9] = c7;
-  out.data[10] = c4;
-  out.data[11] = c5;
-  out.data[12] = d5;
-  out.data[13] = d6;
-  out.data[14] = d7;
-  out.data[15] = d4;
+  out.data[0ULL] = a4;
+  out.data[1ULL] = a5;
+  out.data[2ULL] = a6;
+  out.data[3ULL] = a7;
+  out.data[4ULL] = b7;
+  out.data[5ULL] = b4;
+  out.data[6ULL] = b5;
+  out.data[7ULL] = b6;
+  out.data[8ULL] = c6;
+  out.data[9ULL] = c7;
+  out.data[10ULL] = c4;
+  out.data[11ULL] = c5;
+  out.data[12ULL] = d5;
+  out.data[13ULL] = d6;
+  out.data[14ULL] = d7;
+  out.data[15ULL] = d4;
 }
 
 __global__ void blake2s_leaf_hash(forge_span_u32_t output __attribute__((unused)), forge_span_u32_t input __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -235,7 +235,7 @@ __global__ void blake2s_leaf_hash(forge_span_u32_t output __attribute__((unused)
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

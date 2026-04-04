@@ -17,9 +17,9 @@ uint64_t find_min(forge_span_u64_t s __attribute__((unused)), uint64_t n __attri
 int main();
 
 uint64_t max_subarray_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t best __attribute__((unused)) = s.data[0];
-  uint64_t current __attribute__((unused)) = s.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t best __attribute__((unused)) = s.data[0ULL];
+  uint64_t current __attribute__((unused)) = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       current = (current + s.data[i]);
@@ -27,7 +27,7 @@ uint64_t max_subarray_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n
         best = current;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -35,15 +35,15 @@ uint64_t max_subarray_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n
 }
 
 uint64_t find_min(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t m __attribute__((unused)) = s.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t m __attribute__((unused)) = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((s.data[i] < m)) {
         m = s.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -51,7 +51,7 @@ uint64_t find_min(forge_span_u64_t s __attribute__((unused)), uint64_t n __attri
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -19,7 +19,7 @@ uint64_t find_nonzero(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
   uint64_t found __attribute__((unused)) = n;
   {
     for (uint64_t i = 0; i < (uint64_t)(n); i++) {
-      if (((s.data[i] > 0) && (found == n))) {
+      if (((s.data[i] > 0ULL) && (found == n))) {
         found = i;
 
       }
@@ -30,7 +30,7 @@ uint64_t find_nonzero(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

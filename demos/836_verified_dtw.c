@@ -17,44 +17,44 @@ int main();
 
 uint64_t dtw_distance(forge_span_u64_t a __attribute__((unused)), uint64_t m __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t dp __attribute__((unused))) {
   uint64_t diff00;
-  if ((a.data[0] >= b.data[0])) {
-    diff00 = (a.data[0] - b.data[0]);
+  if ((a.data[0ULL] >= b.data[0ULL])) {
+    diff00 = (a.data[0ULL] - b.data[0ULL]);
   } else {
-    diff00 = (b.data[0] - a.data[0]);
+    diff00 = (b.data[0ULL] - a.data[0ULL]);
   }
-  dp.data[0] = diff00;
-  uint64_t j __attribute__((unused)) = 1;
+  dp.data[0ULL] = diff00;
+  uint64_t j __attribute__((unused)) = 1ULL;
   {
     while ((j < n)) {
       uint64_t diff;
-      if ((a.data[0] >= b.data[j])) {
-        diff = (a.data[0] - b.data[j]);
+      if ((a.data[0ULL] >= b.data[j])) {
+        diff = (a.data[0ULL] - b.data[j]);
       } else {
-        diff = (b.data[j] - a.data[0]);
+        diff = (b.data[j] - a.data[0ULL]);
       }
-      dp.data[j] = (dp.data[(j - 1)] + diff);
-      j = (j + 1);
+      dp.data[j] = (dp.data[(j - 1ULL)] + diff);
+      j = (j + 1ULL);
     }
 
   }
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < m)) {
       uint64_t diff;
-      if ((a.data[i] >= b.data[0])) {
-        diff = (a.data[i] - b.data[0]);
+      if ((a.data[i] >= b.data[0ULL])) {
+        diff = (a.data[i] - b.data[0ULL]);
       } else {
-        diff = (b.data[0] - a.data[i]);
+        diff = (b.data[0ULL] - a.data[i]);
       }
-      dp.data[(i * n)] = (dp.data[((i - 1) * n)] + diff);
-      i = (i + 1);
+      dp.data[(i * n)] = (dp.data[((i - 1ULL) * n)] + diff);
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t i2 __attribute__((unused)) = 1;
+  uint64_t i2 __attribute__((unused)) = 1ULL;
   {
     while ((i2 < m)) {
-      uint64_t j2 __attribute__((unused)) = 1;
+      uint64_t j2 __attribute__((unused)) = 1ULL;
       {
         while ((j2 < n)) {
           uint64_t diff;
@@ -63,9 +63,9 @@ uint64_t dtw_distance(forge_span_u64_t a __attribute__((unused)), uint64_t m __a
           } else {
             diff = (b.data[j2] - a.data[i2]);
           }
-          uint64_t d1 __attribute__((unused)) = dp.data[(((i2 - 1) * n) + j2)];
-          uint64_t d2 __attribute__((unused)) = dp.data[((i2 * n) + (j2 - 1))];
-          uint64_t d3 __attribute__((unused)) = dp.data[(((i2 - 1) * n) + (j2 - 1))];
+          uint64_t d1 __attribute__((unused)) = dp.data[(((i2 - 1ULL) * n) + j2)];
+          uint64_t d2 __attribute__((unused)) = dp.data[((i2 * n) + (j2 - 1ULL))];
+          uint64_t d3 __attribute__((unused)) = dp.data[(((i2 - 1ULL) * n) + (j2 - 1ULL))];
           uint64_t mn;
           if ((d1 <= d2)) {
             mn = d1;
@@ -79,19 +79,19 @@ uint64_t dtw_distance(forge_span_u64_t a __attribute__((unused)), uint64_t m __a
             mn2 = d3;
           }
           dp.data[((i2 * n) + j2)] = (mn2 + diff);
-          j2 = (j2 + 1);
+          j2 = (j2 + 1ULL);
         }
 
       }
-      i2 = (i2 + 1);
+      i2 = (i2 + 1ULL);
     }
 
   }
-  return dp.data[(((m - 1) * n) + (n - 1))];
+  return dp.data[(((m - 1ULL) * n) + (n - 1ULL))];
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

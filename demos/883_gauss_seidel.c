@@ -17,36 +17,36 @@ uint64_t converged(forge_span_u64_t x_old __attribute__((unused)), forge_span_u6
 int main();
 
 void gauss_seidel_step(forge_span_u64_t x __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t diag __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((diag.data[i] > 0)) {
+      if ((diag.data[i] > 0ULL)) {
         x.data[i] = (b.data[i] / diag.data[i]);
 
       } else {
-        x.data[i] = 0;
+        x.data[i] = 0ULL;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t converged(forge_span_u64_t x_old __attribute__((unused)), forge_span_u64_t x_new __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t tol __attribute__((unused))) {
-  uint64_t ok __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t ok __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((x_new.data[i] > (x_old.data[i] + tol))) {
-        ok = 0;
+        ok = 0ULL;
 
       }
       if ((x_old.data[i] > (x_new.data[i] + tol))) {
-        ok = 0;
+        ok = 0ULL;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -54,7 +54,7 @@ uint64_t converged(forge_span_u64_t x_old __attribute__((unused)), forge_span_u6
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

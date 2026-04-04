@@ -26,20 +26,20 @@ uint64_t two_cycles();
 int main();
 
 Barrier barrier_new(uint64_t target __attribute__((unused))) {
-  return (Barrier){ .arrivals = 0, .target = target, .cycles = 0 };
+  return (Barrier){ .arrivals = 0ULL, .target = target, .cycles = 0ULL };
 }
 
 void barrier_arrive(Barrier* b __attribute__((unused))) {
-  (*b).arrivals = ((*b).arrivals + 1);
+  (*b).arrivals = ((*b).arrivals + 1ULL);
 }
 
 void barrier_reset(Barrier* b __attribute__((unused))) {
-  (*b).arrivals = 0;
-  (*b).cycles = ((*b).cycles + 1);
+  (*b).arrivals = 0ULL;
+  (*b).cycles = ((*b).cycles + 1ULL);
 }
 
 uint64_t three_arrive() {
-  Barrier b __attribute__((unused)) = barrier_new(4);
+  Barrier b __attribute__((unused)) = barrier_new(4ULL);
   barrier_arrive((&b));
   barrier_arrive((&b));
   barrier_arrive((&b));
@@ -47,7 +47,7 @@ uint64_t three_arrive() {
 }
 
 uint64_t all_arrive() {
-  Barrier b __attribute__((unused)) = barrier_new(3);
+  Barrier b __attribute__((unused)) = barrier_new(3ULL);
   barrier_arrive((&b));
   barrier_arrive((&b));
   barrier_arrive((&b));
@@ -55,7 +55,7 @@ uint64_t all_arrive() {
 }
 
 uint64_t arrive_reset_arrivals() {
-  Barrier b __attribute__((unused)) = barrier_new(3);
+  Barrier b __attribute__((unused)) = barrier_new(3ULL);
   barrier_arrive((&b));
   barrier_arrive((&b));
   barrier_arrive((&b));
@@ -64,7 +64,7 @@ uint64_t arrive_reset_arrivals() {
 }
 
 uint64_t arrive_reset_cycles() {
-  Barrier b __attribute__((unused)) = barrier_new(3);
+  Barrier b __attribute__((unused)) = barrier_new(3ULL);
   barrier_arrive((&b));
   barrier_arrive((&b));
   barrier_arrive((&b));
@@ -73,7 +73,7 @@ uint64_t arrive_reset_cycles() {
 }
 
 uint64_t two_cycles() {
-  Barrier b __attribute__((unused)) = barrier_new(2);
+  Barrier b __attribute__((unused)) = barrier_new(2ULL);
   barrier_arrive((&b));
   barrier_arrive((&b));
   barrier_reset((&b));
@@ -84,7 +84,7 @@ uint64_t two_cycles() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

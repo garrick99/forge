@@ -24,19 +24,19 @@ uint64_t digit_product2(uint64_t n __attribute__((unused)));
 int main();
 
 uint64_t digit0(uint64_t n __attribute__((unused))) {
-  return (n % 10);
+  return (n % 10ULL);
 }
 
 uint64_t digit1(uint64_t n __attribute__((unused))) {
-  return ((n / 10) % 10);
+  return ((n / 10ULL) % 10ULL);
 }
 
 uint64_t digit2(uint64_t n __attribute__((unused))) {
-  return ((n / 100) % 10);
+  return ((n / 100ULL) % 10ULL);
 }
 
 uint64_t digit3(uint64_t n __attribute__((unused))) {
-  return ((n / 1000) % 10);
+  return ((n / 1000ULL) % 10ULL);
 }
 
 uint64_t digit_sum4(uint64_t n __attribute__((unused))) {
@@ -48,30 +48,30 @@ uint64_t digit_sum4(uint64_t n __attribute__((unused))) {
 }
 
 uint64_t is_ascii_digit(uint64_t c __attribute__((unused))) {
-  if (((c >= 48) && (c <= 57))) {
-    return 1;
+  if (((c >= 48ULL) && (c <= 57ULL))) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t ascii_digit_val(uint64_t c __attribute__((unused))) {
-  return (c - 48);
+  return (c - 48ULL);
 }
 
 uint64_t reverse2(uint64_t n __attribute__((unused))) {
-  uint64_t tens __attribute__((unused)) = (n / 10);
-  uint64_t ones __attribute__((unused)) = (n % 10);
-  return ((ones * 10) + tens);
+  uint64_t tens __attribute__((unused)) = (n / 10ULL);
+  uint64_t ones __attribute__((unused)) = (n % 10ULL);
+  return ((ones * 10ULL) + tens);
 }
 
 uint64_t is_palindrome2(uint64_t n __attribute__((unused))) {
-  uint64_t tens __attribute__((unused)) = (n / 10);
-  uint64_t ones __attribute__((unused)) = (n % 10);
+  uint64_t tens __attribute__((unused)) = (n / 10ULL);
+  uint64_t ones __attribute__((unused)) = (n % 10ULL);
   if ((tens == ones)) {
-    return 1;
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
@@ -87,27 +87,27 @@ uint64_t double_reverse2(uint64_t n __attribute__((unused))) {
 }
 
 uint64_t digit_product2(uint64_t n __attribute__((unused))) {
-  uint64_t tens __attribute__((unused)) = (n / 10);
-  uint64_t ones __attribute__((unused)) = (n % 10);
+  uint64_t tens __attribute__((unused)) = (n / 10ULL);
+  uint64_t ones __attribute__((unused)) = (n % 10ULL);
   return (tens * ones);
 }
 
 int main() {
-  uint64_t d0 __attribute__((unused)) = digit0(1234);
-  uint64_t d1 __attribute__((unused)) = digit1(1234);
-  uint64_t d2 __attribute__((unused)) = digit2(1234);
-  uint64_t d3 __attribute__((unused)) = digit3(1234);
-  uint64_t ds __attribute__((unused)) = digit_sum4(1234);
-  uint64_t ad1 __attribute__((unused)) = is_ascii_digit(48);
-  uint64_t ad2 __attribute__((unused)) = is_ascii_digit(57);
-  uint64_t ad3 __attribute__((unused)) = is_ascii_digit(65);
-  uint64_t av __attribute__((unused)) = ascii_digit_val(53);
-  uint64_t rv1 __attribute__((unused)) = reverse2(42);
-  uint64_t rv2 __attribute__((unused)) = reverse2(10);
-  uint64_t p1 __attribute__((unused)) = is_palindrome2(33);
-  uint64_t p2 __attribute__((unused)) = is_palindrome2(34);
-  uint64_t dr __attribute__((unused)) = double_reverse2(73);
-  uint64_t dp __attribute__((unused)) = digit_product2(39);
+  uint64_t d0 __attribute__((unused)) = digit0(1234ULL);
+  uint64_t d1 __attribute__((unused)) = digit1(1234ULL);
+  uint64_t d2 __attribute__((unused)) = digit2(1234ULL);
+  uint64_t d3 __attribute__((unused)) = digit3(1234ULL);
+  uint64_t ds __attribute__((unused)) = digit_sum4(1234ULL);
+  uint64_t ad1 __attribute__((unused)) = is_ascii_digit(48ULL);
+  uint64_t ad2 __attribute__((unused)) = is_ascii_digit(57ULL);
+  uint64_t ad3 __attribute__((unused)) = is_ascii_digit(65ULL);
+  uint64_t av __attribute__((unused)) = ascii_digit_val(53ULL);
+  uint64_t rv1 __attribute__((unused)) = reverse2(42ULL);
+  uint64_t rv2 __attribute__((unused)) = reverse2(10ULL);
+  uint64_t p1 __attribute__((unused)) = is_palindrome2(33ULL);
+  uint64_t p2 __attribute__((unused)) = is_palindrome2(34ULL);
+  uint64_t dr __attribute__((unused)) = double_reverse2(73ULL);
+  uint64_t dp __attribute__((unused)) = digit_product2(39ULL);
   return (int)(((((((((((((((d0 + d1) + d2) + d3) + ds) + ad1) + ad2) + ad3) + av) + rv1) + rv2) + p1) + p2) + dr) + dp));
 
 }

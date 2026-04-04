@@ -15,7 +15,7 @@ uint64_t lcm(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unuse
 int main();
 
 uint64_t gcd(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if ((b == 0)) {
+  if ((b == 0ULL)) {
     return a;
   } else {
     return gcd(b, (a % b));
@@ -26,7 +26,7 @@ uint64_t gcd_iter(uint64_t a __attribute__((unused)), uint64_t b __attribute__((
   uint64_t x __attribute__((unused)) = a;
   uint64_t y __attribute__((unused)) = b;
   {
-    while ((y > 0)) {
+    while ((y > 0ULL)) {
       uint64_t tmp __attribute__((unused)) = y;
       y = (x % y);
       x = tmp;
@@ -42,7 +42,7 @@ uint64_t lcm(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unuse
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

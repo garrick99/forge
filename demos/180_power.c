@@ -9,21 +9,21 @@
 #endif
 
 /* Forward declarations */
-uint64_t pow(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused)));
+uint64_t forge_pow(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused)));
 int main();
 
-uint64_t pow(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused))) {
+uint64_t forge_pow(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused))) {
   uint64_t b __attribute__((unused)) = base;
-  uint64_t e __attribute__((unused)) = exp;
-  uint64_t acc __attribute__((unused)) = 1;
+  uint64_t e __attribute__((unused)) = forge_exp;
+  uint64_t acc __attribute__((unused)) = 1ULL;
   {
-    while ((e > 0)) {
-      if (((e % 2) == 1)) {
+    while ((e > 0ULL)) {
+      if (((e % 2ULL) == 1ULL)) {
         acc = (acc * b);
 
       }
       b = (b * b);
-      e = (e / 2);
+      e = (e / 2ULL);
     }
 
   }
@@ -31,7 +31,7 @@ uint64_t pow(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

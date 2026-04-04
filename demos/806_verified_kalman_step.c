@@ -28,7 +28,7 @@ uint64_t kalman_update(uint64_t predicted __attribute__((unused)), uint64_t meas
   } else {
     diff = (predicted - measurement);
   }
-  uint64_t correction __attribute__((unused)) = ((gain * diff) / 1024);
+  uint64_t correction __attribute__((unused)) = ((gain * diff) / 1024ULL);
   if ((measurement >= predicted)) {
     return (predicted + correction);
   } else {
@@ -37,21 +37,21 @@ uint64_t kalman_update(uint64_t predicted __attribute__((unused)), uint64_t meas
 }
 
 void kalman_filter(forge_span_u64_t measurements __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t gain __attribute__((unused)), forge_span_u64_t output __attribute__((unused))) {
-  output.data[0] = measurements.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  output.data[0ULL] = measurements.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      uint64_t predicted __attribute__((unused)) = output.data[(i - 1)];
+      uint64_t predicted __attribute__((unused)) = output.data[(i - 1ULL)];
       uint64_t updated __attribute__((unused)) = kalman_update(predicted, measurements.data[i], gain);
       output.data[i] = updated;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

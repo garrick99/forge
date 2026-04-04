@@ -28,20 +28,20 @@ Semaphore sem_new(uint64_t cap __attribute__((unused))) {
 }
 
 void sem_down(Semaphore* s __attribute__((unused))) {
-  (*s).count = ((*s).count - 1);
+  (*s).count = ((*s).count - 1ULL);
 }
 
 void sem_up(Semaphore* s __attribute__((unused))) {
-  (*s).count = ((*s).count + 1);
+  (*s).count = ((*s).count + 1ULL);
 }
 
 uint64_t initial_count() {
-  Semaphore s __attribute__((unused)) = sem_new(3);
+  Semaphore s __attribute__((unused)) = sem_new(3ULL);
   return s.count;
 }
 
 uint64_t three_downs() {
-  Semaphore s __attribute__((unused)) = sem_new(3);
+  Semaphore s __attribute__((unused)) = sem_new(3ULL);
   sem_down((&s));
   sem_down((&s));
   sem_down((&s));
@@ -49,7 +49,7 @@ uint64_t three_downs() {
 }
 
 uint64_t down_up() {
-  Semaphore s __attribute__((unused)) = sem_new(5);
+  Semaphore s __attribute__((unused)) = sem_new(5ULL);
   sem_down((&s));
   sem_up((&s));
   return s.count;
@@ -64,7 +64,7 @@ uint64_t two_down_one_up(uint64_t cap __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

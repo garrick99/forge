@@ -26,18 +26,18 @@ uint64_t reopen_cycle(uint64_t size __attribute__((unused)));
 int main();
 
 Handle handle_new() {
-  return (Handle){ .state = 0, .pos = 0, .size = 0 };
+  return (Handle){ .state = 0ULL, .pos = 0ULL, .size = 0ULL };
 }
 
 void handle_open_read(Handle* h __attribute__((unused)), uint64_t size __attribute__((unused))) {
-  (*h).state = 1;
-  (*h).pos = 0;
+  (*h).state = 1ULL;
+  (*h).pos = 0ULL;
   (*h).size = size;
 }
 
 void handle_open_write(Handle* h __attribute__((unused))) {
-  (*h).state = 2;
-  (*h).pos = 0;
+  (*h).state = 2ULL;
+  (*h).pos = 0ULL;
 }
 
 void handle_write(Handle* h __attribute__((unused)), uint64_t nbytes __attribute__((unused))) {
@@ -45,7 +45,7 @@ void handle_write(Handle* h __attribute__((unused)), uint64_t nbytes __attribute
 }
 
 void handle_close(Handle* h __attribute__((unused))) {
-  (*h).state = 0;
+  (*h).state = 0ULL;
 }
 
 uint64_t read_cycle(uint64_t size __attribute__((unused))) {
@@ -73,7 +73,7 @@ uint64_t reopen_cycle(uint64_t size __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

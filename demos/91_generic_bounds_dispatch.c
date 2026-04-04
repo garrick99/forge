@@ -45,7 +45,7 @@ uint64_t Point2D__Metric__distance(const Point2D* self __attribute__((unused)), 
 }
 
 uint64_t Point2D__Metric__zero() {
-  return 0;
+  return 0ULL;
 }
 
 uint64_t Point1D__Metric__distance(const Point1D* self __attribute__((unused)), const Point1D* other __attribute__((unused))) {
@@ -57,7 +57,7 @@ uint64_t Point1D__Metric__distance(const Point1D* self __attribute__((unused)), 
 }
 
 uint64_t Point1D__Metric__zero() {
-  return 0;
+  return 0ULL;
 }
 
 uint64_t Point2D__Weighted__weight(const Point2D* self __attribute__((unused))) {
@@ -69,13 +69,13 @@ uint64_t Point1D__Weighted__weight(const Point1D* self __attribute__((unused))) 
 }
 
 int main() {
-  Point2D p1 __attribute__((unused)) = (Point2D){ .x = 3, .y = 4 };
-  Point2D p2 __attribute__((unused)) = (Point2D){ .x = 7, .y = 1 };
+  Point2D p1 __attribute__((unused)) = (Point2D){ .x = 3ULL, .y = 4ULL };
+  Point2D p2 __attribute__((unused)) = (Point2D){ .x = 7ULL, .y = 1ULL };
   uint64_t d2 __attribute__((unused)) = Point2D__Metric__distance((&p1), (&p2));
   uint64_t w1 __attribute__((unused)) = Point2D__Weighted__weight((&p1));
   uint64_t w2 __attribute__((unused)) = Point2D__Weighted__weight((&p2));
-  Point1D q1 __attribute__((unused)) = (Point1D){ .x = 10 };
-  Point1D q2 __attribute__((unused)) = (Point1D){ .x = 3 };
+  Point1D q1 __attribute__((unused)) = (Point1D){ .x = 10ULL };
+  Point1D q2 __attribute__((unused)) = (Point1D){ .x = 3ULL };
   uint64_t d1 __attribute__((unused)) = Point1D__Metric__distance((&q1), (&q2));
   uint64_t wq1 __attribute__((unused)) = Point1D__Weighted__weight((&q1));
   return (int)(((((d2 + w1) + w2) + d1) + wq1));

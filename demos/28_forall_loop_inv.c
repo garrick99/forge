@@ -17,34 +17,34 @@ void fill_offset(forge_span_u64_t s __attribute__((unused)), uint64_t offset __a
 uint64_t count_elements(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)));
 
 void fill(forge_span_u64_t s __attribute__((unused)), uint64_t val __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while ((k < n)) {
       s.data[k] = val;
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
 }
 
 void fill_offset(forge_span_u64_t s __attribute__((unused)), uint64_t offset __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while ((k < n)) {
       s.data[k] = (k + offset);
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
 }
 
 uint64_t count_elements(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t k __attribute__((unused)) = 0;
-  uint64_t c __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
+  uint64_t c __attribute__((unused)) = 0ULL;
   {
     while ((k < n)) {
-      c = (c + 1);
-      k = (k + 1);
+      c = (c + 1ULL);
+      k = (k + 1ULL);
     }
 
   }

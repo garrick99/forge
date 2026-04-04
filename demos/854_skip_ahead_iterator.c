@@ -17,11 +17,11 @@ uint64_t sum_every_k(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 int main();
 
 uint64_t count_every_k(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t k __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      count = (count + 1);
+      count = (count + 1ULL);
       if (((i + k) >= n)) {
         i = n;
 
@@ -36,8 +36,8 @@ uint64_t count_every_k(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 uint64_t sum_every_k(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t k __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + s.data[i]);
@@ -55,7 +55,7 @@ uint64_t sum_every_k(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -17,14 +17,14 @@ uint64_t sum_of_uniform(forge_span_u64_t s __attribute__((unused)), uint64_t val
 uint64_t prefix_max_is_first(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)));
 
 uint64_t get_pair_sum(forge_span_u64_t s __attribute__((unused))) {
-  return (s.data[0] + s.data[1]);
+  return (s.data[0ULL] + s.data[1ULL]);
 }
 
 uint64_t sum_of_uniform(forge_span_u64_t s __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  return (s.data[0] + s.data[1]);
+  return (s.data[0ULL] + s.data[1ULL]);
 }
 
 uint64_t prefix_max_is_first(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  return s.data[0];
+  return s.data[0ULL];
 }
 

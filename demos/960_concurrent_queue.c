@@ -17,16 +17,16 @@ int main();
 
 uint64_t enqueue_batch(forge_span_u64_t buf __attribute__((unused)), uint64_t cap __attribute__((unused)), forge_span_u64_t items __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t head __attribute__((unused))) {
   uint64_t tail __attribute__((unused)) = head;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t next __attribute__((unused)) = ((tail + 1) % cap);
+      uint64_t next __attribute__((unused)) = ((tail + 1ULL) % cap);
       if ((next != head)) {
         buf.data[tail] = items.data[i];
         tail = next;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -34,7 +34,7 @@ uint64_t enqueue_batch(forge_span_u64_t buf __attribute__((unused)), uint64_t ca
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

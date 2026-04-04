@@ -17,23 +17,23 @@ int main();
 
 void prefix_sum(forge_span_u64_t s __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t max_elem __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = s.len;
-  out.data[0] = 0;
-  uint64_t acc __attribute__((unused)) = 0;
-
-  uint64_t k __attribute__((unused)) = 0;
+  out.data[0ULL] = 0ULL;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t gacc __attribute__((unused)) = 0ULL;
+  uint64_t k __attribute__((unused)) = 0ULL;
   {
     while ((k < n)) {
       acc = (acc + s.data[k]);
-
-      out.data[(k + 1)] = acc;
-      k = (k + 1);
+      gacc = (gacc + s.data[k]);
+      out.data[(k + 1ULL)] = acc;
+      k = (k + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

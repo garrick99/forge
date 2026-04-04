@@ -24,19 +24,19 @@ uint64_t check_aligned();
 int main();
 
 _Bool is_even(uint64_t n __attribute__((unused))) {
-  return ((n % 2) == 0);
+  return ((n % 2ULL) == 0ULL);
 }
 
 _Bool is_odd(uint64_t n __attribute__((unused))) {
-  return ((n % 2) == 1);
+  return ((n % 2ULL) == 1ULL);
 }
 
 _Bool is_aligned(uint64_t addr __attribute__((unused)), uint64_t align __attribute__((unused))) {
-  return ((addr % align) == 0);
+  return ((addr % align) == 0ULL);
 }
 
 uint64_t next_aligned(uint64_t addr __attribute__((unused)), uint64_t align __attribute__((unused))) {
-  if (((addr % align) == 0)) {
+  if (((addr % align) == 0ULL)) {
     return addr;
   } else {
     return (addr + (align - (addr % align)));
@@ -48,12 +48,12 @@ uint64_t align_down(uint64_t addr __attribute__((unused)), uint64_t align __attr
 }
 
 uint64_t parity_span(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t p __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t p __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      p = ((p + s.data[i]) % 2);
-      i = (i + 1);
+      p = ((p + s.data[i]) % 2ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -61,19 +61,19 @@ uint64_t parity_span(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 }
 
 _Bool check_even() {
-  return is_even(42);
+  return is_even(42ULL);
 }
 
 _Bool check_odd() {
-  return is_odd(7);
+  return is_odd(7ULL);
 }
 
 uint64_t check_aligned() {
-  return next_aligned(13, 4);
+  return next_aligned(13ULL, 4ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

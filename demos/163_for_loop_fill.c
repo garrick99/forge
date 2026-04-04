@@ -26,7 +26,7 @@ void for_fill(forge_span_u64_t s __attribute__((unused)), uint64_t val __attribu
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

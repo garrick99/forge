@@ -22,11 +22,11 @@ int main();
 
 __forge_tuple_u64_u64_t gap_insert(forge_span_u64_t buf __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t gap_start __attribute__((unused)), uint64_t gap_end __attribute__((unused)), uint64_t ch __attribute__((unused))) {
   buf.data[gap_start] = ch;
-  return (__forge_tuple_u64_u64_t){ ._0 = (gap_start + 1), ._1 = gap_end };
+  return (__forge_tuple_u64_u64_t){ ._0 = (gap_start + 1ULL), ._1 = gap_end };
 }
 
 __forge_tuple_u64_u64_t gap_delete(uint64_t gap_start __attribute__((unused)), uint64_t gap_end __attribute__((unused)), uint64_t cap __attribute__((unused))) {
-  return (__forge_tuple_u64_u64_t){ ._0 = (gap_start - 1), ._1 = gap_end };
+  return (__forge_tuple_u64_u64_t){ ._0 = (gap_start - 1ULL), ._1 = gap_end };
 }
 
 __forge_tuple_u64_u64_t gap_move(forge_span_u64_t buf __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t gap_start __attribute__((unused)), uint64_t gap_end __attribute__((unused)), uint64_t pos __attribute__((unused))) {
@@ -35,8 +35,8 @@ __forge_tuple_u64_u64_t gap_move(forge_span_u64_t buf __attribute__((unused)), u
   uint64_t ge __attribute__((unused)) = gap_end;
   {
     while ((gs > pos)) {
-      ge = (ge - 1);
-      gs = (gs - 1);
+      ge = (ge - 1ULL);
+      gs = (gs - 1ULL);
       buf.data[ge] = buf.data[gs];
     }
 
@@ -44,8 +44,8 @@ __forge_tuple_u64_u64_t gap_move(forge_span_u64_t buf __attribute__((unused)), u
   {
     while (((gs < pos) && (ge < cap))) {
       buf.data[gs] = buf.data[ge];
-      gs = (gs + 1);
-      ge = (ge + 1);
+      gs = (gs + 1ULL);
+      ge = (ge + 1ULL);
     }
 
   }
@@ -53,7 +53,7 @@ __forge_tuple_u64_u64_t gap_move(forge_span_u64_t buf __attribute__((unused)), u
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

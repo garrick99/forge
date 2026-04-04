@@ -16,7 +16,7 @@ uint64_t lcp(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __at
 int main();
 
 uint64_t lcp(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t na __attribute__((unused)), uint64_t nb __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   _Bool done __attribute__((unused)) = 0;
   uint64_t limit;
   if ((na <= nb)) {
@@ -27,7 +27,7 @@ uint64_t lcp(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __at
   {
     while ((i < limit)) {
       if (((done == 0) && (a.data[i] == b.data[i]))) {
-        i = (i + 1);
+        i = (i + 1ULL);
 
       } else {
         done = 1;
@@ -45,7 +45,7 @@ uint64_t lcp(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __at
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

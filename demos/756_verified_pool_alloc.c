@@ -21,29 +21,29 @@ uint64_t pool_free(forge_span_u64_t free_list __attribute__((unused)), uint64_t 
 int main();
 
 void pool_init(forge_span_u64_t free_list __attribute__((unused)), uint64_t pool_size __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < pool_size)) {
       free_list.data[i] = i;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 __forge_tuple_u64_u64_t pool_alloc(forge_span_u64_t free_list __attribute__((unused)), uint64_t pool_size __attribute__((unused)), uint64_t free_count __attribute__((unused))) {
-  uint64_t new_count __attribute__((unused)) = (free_count - 1);
+  uint64_t new_count __attribute__((unused)) = (free_count - 1ULL);
   uint64_t block __attribute__((unused)) = free_list.data[new_count];
   return (__forge_tuple_u64_u64_t){ ._0 = block, ._1 = new_count };
 }
 
 uint64_t pool_free(forge_span_u64_t free_list __attribute__((unused)), uint64_t pool_size __attribute__((unused)), uint64_t free_count __attribute__((unused)), uint64_t block __attribute__((unused))) {
   free_list.data[free_count] = block;
-  return (free_count + 1);
+  return (free_count + 1ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

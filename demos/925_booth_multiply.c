@@ -13,19 +13,19 @@ uint64_t booth_mul(uint64_t a __attribute__((unused)), uint64_t b __attribute__(
 int main();
 
 uint64_t booth_mul(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t bits __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
   uint64_t shifted __attribute__((unused)) = a;
   uint64_t rem __attribute__((unused)) = b;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < bits)) {
-      if (((rem & 1) == 1)) {
+      if (((rem & 1ULL) == 1ULL)) {
         acc = (acc + shifted);
 
       }
-      shifted = (shifted * 2);
-      rem = (rem / 2);
-      i = (i + 1);
+      shifted = (shifted * 2ULL);
+      rem = (rem / 2ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -33,7 +33,7 @@ uint64_t booth_mul(uint64_t a __attribute__((unused)), uint64_t b __attribute__(
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

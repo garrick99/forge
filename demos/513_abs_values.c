@@ -99,7 +99,7 @@ int64_t check_sign_zero() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

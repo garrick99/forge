@@ -26,7 +26,7 @@ uint64_t snapshot_count();
 int main();
 
 LogCompaction lc_new() {
-  return (LogCompaction){ .total_appended = 0, .compacted = 0, .live_entries = 0, .snapshots = 0 };
+  return (LogCompaction){ .total_appended = 0ULL, .compacted = 0ULL, .live_entries = 0ULL, .snapshots = 0ULL };
 }
 
 void lc_append(LogCompaction* l __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -37,40 +37,40 @@ void lc_append(LogCompaction* l __attribute__((unused)), uint64_t n __attribute_
 void lc_compact(LogCompaction* l __attribute__((unused)), uint64_t n __attribute__((unused))) {
   (*l).compacted = ((*l).compacted + n);
   (*l).live_entries = ((*l).live_entries - n);
-  (*l).snapshots = ((*l).snapshots + 1);
+  (*l).snapshots = ((*l).snapshots + 1ULL);
 }
 
 uint64_t append_10() {
   LogCompaction l __attribute__((unused)) = lc_new();
-  lc_append((&l), 10);
+  lc_append((&l), 10ULL);
   return l.live_entries;
 }
 
 uint64_t compact_4() {
   LogCompaction l __attribute__((unused)) = lc_new();
-  lc_append((&l), 10);
-  lc_compact((&l), 4);
+  lc_append((&l), 10ULL);
+  lc_compact((&l), 4ULL);
   return l.live_entries;
 }
 
 uint64_t live_invariant() {
   LogCompaction l __attribute__((unused)) = lc_new();
-  lc_append((&l), 20);
-  lc_compact((&l), 8);
-  lc_append((&l), 5);
+  lc_append((&l), 20ULL);
+  lc_compact((&l), 8ULL);
+  lc_append((&l), 5ULL);
   return (l.live_entries - (l.total_appended - l.compacted));
 }
 
 uint64_t snapshot_count() {
   LogCompaction l __attribute__((unused)) = lc_new();
-  lc_append((&l), 20);
-  lc_compact((&l), 10);
-  lc_compact((&l), 5);
+  lc_append((&l), 20ULL);
+  lc_compact((&l), 10ULL);
+  lc_compact((&l), 5ULL);
   return l.snapshots;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

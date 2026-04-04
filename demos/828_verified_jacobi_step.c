@@ -17,11 +17,11 @@ uint64_t residual_norm(forge_span_u64_t a __attribute__((unused)), forge_span_u6
 int main();
 
 void jacobi_step(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t x_old __attribute__((unused)), forge_span_u64_t x_new __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t sigma __attribute__((unused)) = 0;
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t sigma __attribute__((unused)) = 0ULL;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < n)) {
           if ((j != i)) {
@@ -29,35 +29,35 @@ void jacobi_step(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b 
             sigma = (sigma + (aij * x_old.data[j]));
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
       uint64_t diag __attribute__((unused)) = a.data[((i * n) + i)];
-      if ((diag > 0)) {
+      if ((diag > 0ULL)) {
         x_new.data[i] = ((b.data[i] - sigma) / diag);
 
       } else {
-        x_new.data[i] = 0;
+        x_new.data[i] = 0ULL;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t residual_norm(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t x __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t norm __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t norm __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t ax_i __attribute__((unused)) = 0;
-      uint64_t j __attribute__((unused)) = 0;
+      uint64_t ax_i __attribute__((unused)) = 0ULL;
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
         while ((j < n)) {
           ax_i = (ax_i + (a.data[((i * n) + j)] * x.data[j]));
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
@@ -68,7 +68,7 @@ uint64_t residual_norm(forge_span_u64_t a __attribute__((unused)), forge_span_u6
         diff = (b.data[i] - ax_i);
       }
       norm = (norm + diff);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -76,7 +76,7 @@ uint64_t residual_norm(forge_span_u64_t a __attribute__((unused)), forge_span_u6
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -29,27 +29,27 @@ uint64_t sparse_set_insert(forge_span_u64_t dense __attribute__((unused)), forge
   } else {
     dense.data[count] = val;
     sparse.data[val] = count;
-    return (count + 1);
+    return (count + 1ULL);
   }
 }
 
 uint64_t sparse_set_remove(forge_span_u64_t dense __attribute__((unused)), forge_span_u64_t sparse __attribute__((unused)), uint64_t count __attribute__((unused)), uint64_t cap __attribute__((unused)), uint64_t val __attribute__((unused))) {
   uint64_t idx __attribute__((unused)) = sparse.data[val];
   if (((idx < count) && (dense.data[idx] == val))) {
-    uint64_t last __attribute__((unused)) = dense.data[(count - 1)];
+    uint64_t last __attribute__((unused)) = dense.data[(count - 1ULL)];
     dense.data[idx] = last;
     if ((last < cap)) {
       sparse.data[last] = idx;
 
     }
-    return (count - 1);
+    return (count - 1ULL);
   } else {
     return count;
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

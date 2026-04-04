@@ -25,18 +25,18 @@ uint64_t two_write_swap_cycles();
 int main();
 
 DoubleBuffer db_new() {
-  return (DoubleBuffer){ .front_ver = 0, .back_ver = 0, .swaps = 0 };
+  return (DoubleBuffer){ .front_ver = 0ULL, .back_ver = 0ULL, .swaps = 0ULL };
 }
 
 void db_write(DoubleBuffer* d __attribute__((unused))) {
-  (*d).back_ver = ((*d).back_ver + 1);
+  (*d).back_ver = ((*d).back_ver + 1ULL);
 }
 
 void db_swap(DoubleBuffer* d __attribute__((unused))) {
   uint64_t tmp __attribute__((unused)) = (*d).front_ver;
   (*d).front_ver = (*d).back_ver;
   (*d).back_ver = tmp;
-  (*d).swaps = ((*d).swaps + 1);
+  (*d).swaps = ((*d).swaps + 1ULL);
 }
 
 uint64_t write3_swap_front() {
@@ -76,7 +76,7 @@ uint64_t two_write_swap_cycles() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

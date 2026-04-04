@@ -17,16 +17,16 @@ uint64_t count_black(forge_span_u64_t colors __attribute__((unused)), uint64_t n
 int main();
 
 uint64_t check_no_red_red(forge_span_u64_t colors __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t valid __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t valid __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
-      uint64_t parent __attribute__((unused)) = ((i - 1) / 2);
-      if ((((parent < n) && (colors.data[i] == 1)) && (colors.data[parent] == 1))) {
-        valid = 0;
+      uint64_t parent __attribute__((unused)) = ((i - 1ULL) / 2ULL);
+      if ((((parent < n) && (colors.data[i] == 1ULL)) && (colors.data[parent] == 1ULL))) {
+        valid = 0ULL;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -34,15 +34,15 @@ uint64_t check_no_red_red(forge_span_u64_t colors __attribute__((unused)), uint6
 }
 
 uint64_t count_black(forge_span_u64_t colors __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((colors.data[i] == 0)) {
-        count = (count + 1);
+      if ((colors.data[i] == 0ULL)) {
+        count = (count + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -50,7 +50,7 @@ uint64_t count_black(forge_span_u64_t colors __attribute__((unused)), uint64_t n
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

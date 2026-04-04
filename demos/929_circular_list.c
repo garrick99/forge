@@ -17,8 +17,8 @@ int main();
 
 uint64_t traverse(forge_span_u64_t next __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t start __attribute__((unused))) {
   uint64_t cur __attribute__((unused)) = next.data[start];
-  uint64_t cnt __attribute__((unused)) = 1;
-  uint64_t steps __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 1ULL;
+  uint64_t steps __attribute__((unused)) = 0ULL;
   {
     while ((cur != start)) {
       if ((steps >= n)) {
@@ -26,12 +26,12 @@ uint64_t traverse(forge_span_u64_t next __attribute__((unused)), uint64_t n __at
 
       } else {
         cur = next.data[cur];
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
         if ((cnt > n)) {
           cnt = n;
 
         }
-        steps = (steps + 1);
+        steps = (steps + 1ULL);
 
       }
     }
@@ -41,7 +41,7 @@ uint64_t traverse(forge_span_u64_t next __attribute__((unused)), uint64_t n __at
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

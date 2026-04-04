@@ -26,19 +26,19 @@ uint64_t three_full_cycles();
 int main();
 
 Pipeline pipe_new() {
-  return (Pipeline){ .fetched = 0, .decoded = 0, .executed = 0 };
+  return (Pipeline){ .fetched = 0ULL, .decoded = 0ULL, .executed = 0ULL };
 }
 
 void pipe_fetch(Pipeline* p __attribute__((unused))) {
-  (*p).fetched = ((*p).fetched + 1);
+  (*p).fetched = ((*p).fetched + 1ULL);
 }
 
 void pipe_decode(Pipeline* p __attribute__((unused))) {
-  (*p).decoded = ((*p).decoded + 1);
+  (*p).decoded = ((*p).decoded + 1ULL);
 }
 
 void pipe_execute(Pipeline* p __attribute__((unused))) {
-  (*p).executed = ((*p).executed + 1);
+  (*p).executed = ((*p).executed + 1ULL);
 }
 
 uint64_t fetch_three() {
@@ -83,7 +83,7 @@ uint64_t three_full_cycles() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

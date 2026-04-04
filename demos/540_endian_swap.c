@@ -23,58 +23,58 @@ uint64_t check_bswap32_bounds();
 int main();
 
 uint64_t bswap16(uint64_t v __attribute__((unused))) {
-  return (((v & 255) << 8) | ((v >> 8) & 255));
+  return (((v & 255ULL) << 8ULL) | ((v >> 8ULL) & 255ULL));
 }
 
 uint64_t bswap32(uint64_t v __attribute__((unused))) {
-  uint64_t b0 __attribute__((unused)) = (v & 255);
-  uint64_t b1 __attribute__((unused)) = ((v >> 8) & 255);
-  uint64_t b2 __attribute__((unused)) = ((v >> 16) & 255);
-  uint64_t b3 __attribute__((unused)) = ((v >> 24) & 255);
-  return ((((b0 << 24) | (b1 << 16)) | (b2 << 8)) | b3);
+  uint64_t b0 __attribute__((unused)) = (v & 255ULL);
+  uint64_t b1 __attribute__((unused)) = ((v >> 8ULL) & 255ULL);
+  uint64_t b2 __attribute__((unused)) = ((v >> 16ULL) & 255ULL);
+  uint64_t b3 __attribute__((unused)) = ((v >> 24ULL) & 255ULL);
+  return ((((b0 << 24ULL) | (b1 << 16ULL)) | (b2 << 8ULL)) | b3);
 }
 
 uint64_t bswap64(uint64_t v __attribute__((unused))) {
-  uint64_t b0 __attribute__((unused)) = (v & 255);
-  uint64_t b1 __attribute__((unused)) = ((v >> 8) & 255);
-  uint64_t b2 __attribute__((unused)) = ((v >> 16) & 255);
-  uint64_t b3 __attribute__((unused)) = ((v >> 24) & 255);
-  uint64_t b4 __attribute__((unused)) = ((v >> 32) & 255);
-  uint64_t b5 __attribute__((unused)) = ((v >> 40) & 255);
-  uint64_t b6 __attribute__((unused)) = ((v >> 48) & 255);
-  uint64_t b7 __attribute__((unused)) = ((v >> 56) & 255);
-  return ((((((((b0 << 56) | (b1 << 48)) | (b2 << 40)) | (b3 << 32)) | (b4 << 24)) | (b5 << 16)) | (b6 << 8)) | b7);
+  uint64_t b0 __attribute__((unused)) = (v & 255ULL);
+  uint64_t b1 __attribute__((unused)) = ((v >> 8ULL) & 255ULL);
+  uint64_t b2 __attribute__((unused)) = ((v >> 16ULL) & 255ULL);
+  uint64_t b3 __attribute__((unused)) = ((v >> 24ULL) & 255ULL);
+  uint64_t b4 __attribute__((unused)) = ((v >> 32ULL) & 255ULL);
+  uint64_t b5 __attribute__((unused)) = ((v >> 40ULL) & 255ULL);
+  uint64_t b6 __attribute__((unused)) = ((v >> 48ULL) & 255ULL);
+  uint64_t b7 __attribute__((unused)) = ((v >> 56ULL) & 255ULL);
+  return ((((((((b0 << 56ULL) | (b1 << 48ULL)) | (b2 << 40ULL)) | (b3 << 32ULL)) | (b4 << 24ULL)) | (b5 << 16ULL)) | (b6 << 8ULL)) | b7);
 }
 
 void bswap_span(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = bswap64(s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t check_bswap16_zero() {
-  return bswap16(0);
+  return bswap16(0ULL);
 }
 
 uint64_t check_bswap32_zero() {
-  return bswap32(0);
+  return bswap32(0ULL);
 }
 
 uint64_t check_bswap16_bounds() {
-  return bswap16(4660);
+  return bswap16(4660ULL);
 }
 
 uint64_t check_bswap32_bounds() {
-  return bswap32(305419896);
+  return bswap32(305419896ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

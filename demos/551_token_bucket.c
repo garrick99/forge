@@ -56,7 +56,7 @@ _Bool bucket_is_full(const TokenBucket* b __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

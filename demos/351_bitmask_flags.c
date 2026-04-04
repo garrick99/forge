@@ -27,69 +27,69 @@ uint64_t change_count();
 int main();
 
 Flags flags_new() {
-  return (Flags){ .bits = 0, .changes = 0 };
+  return (Flags){ .bits = 0ULL, .changes = 0ULL };
 }
 
 void flags_set(Flags* f __attribute__((unused)), uint64_t mask __attribute__((unused))) {
   (*f).bits = ((*f).bits | mask);
-  (*f).changes = ((*f).changes + 1);
+  (*f).changes = ((*f).changes + 1ULL);
 }
 
 void flags_toggle(Flags* f __attribute__((unused)), uint64_t mask __attribute__((unused))) {
   (*f).bits = ((*f).bits ^ mask);
-  (*f).changes = ((*f).changes + 1);
+  (*f).changes = ((*f).changes + 1ULL);
 }
 
 void flags_and(Flags* f __attribute__((unused)), uint64_t mask __attribute__((unused))) {
   (*f).bits = ((*f).bits & mask);
-  (*f).changes = ((*f).changes + 1);
+  (*f).changes = ((*f).changes + 1ULL);
 }
 
 uint64_t set_bit0() {
   Flags f __attribute__((unused)) = flags_new();
-  flags_set((&f), 1);
+  flags_set((&f), 1ULL);
   return f.bits;
 }
 
 uint64_t set_two_bits() {
   Flags f __attribute__((unused)) = flags_new();
-  flags_set((&f), 1);
-  flags_set((&f), 2);
+  flags_set((&f), 1ULL);
+  flags_set((&f), 2ULL);
   return f.bits;
 }
 
 uint64_t set7_and5() {
   Flags f __attribute__((unused)) = flags_new();
-  flags_set((&f), 7);
-  flags_and((&f), 5);
+  flags_set((&f), 7ULL);
+  flags_and((&f), 5ULL);
   return f.bits;
 }
 
 uint64_t set3_toggle1() {
   Flags f __attribute__((unused)) = flags_new();
-  flags_set((&f), 3);
-  flags_toggle((&f), 1);
+  flags_set((&f), 3ULL);
+  flags_toggle((&f), 1ULL);
   return f.bits;
 }
 
 uint64_t double_toggle() {
   Flags f __attribute__((unused)) = flags_new();
-  flags_set((&f), 5);
-  flags_toggle((&f), 2);
-  flags_toggle((&f), 2);
+  flags_set((&f), 5ULL);
+  flags_toggle((&f), 2ULL);
+  flags_toggle((&f), 2ULL);
   return f.bits;
 }
 
 uint64_t change_count() {
   Flags f __attribute__((unused)) = flags_new();
-  flags_set((&f), 1);
-  flags_set((&f), 2);
-  flags_toggle((&f), 1);
+  flags_set((&f), 1ULL);
+  flags_set((&f), 2ULL);
+  flags_toggle((&f), 1ULL);
   return f.changes;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

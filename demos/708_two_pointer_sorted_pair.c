@@ -16,8 +16,8 @@ uint64_t two_pointer_pair(forge_span_u64_t s __attribute__((unused)), uint64_t n
 int main();
 
 uint64_t two_pointer_pair(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
-  uint64_t hi __attribute__((unused)) = (n - 1);
+  uint64_t lo __attribute__((unused)) = 0ULL;
+  uint64_t hi __attribute__((unused)) = (n - 1ULL);
   uint64_t found_lo __attribute__((unused)) = n;
   uint64_t found_hi __attribute__((unused)) = n;
   {
@@ -28,10 +28,10 @@ uint64_t two_pointer_pair(forge_span_u64_t s __attribute__((unused)), uint64_t n
         lo = hi;
 
       } else if (((s.data[lo] + s.data[hi]) < target)) {
-        lo = (lo + 1);
+        lo = (lo + 1ULL);
 
       } else {
-        hi = (hi - 1);
+        hi = (hi - 1ULL);
 
       }
     }
@@ -45,7 +45,7 @@ uint64_t two_pointer_pair(forge_span_u64_t s __attribute__((unused)), uint64_t n
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

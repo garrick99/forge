@@ -26,52 +26,52 @@ uint64_t expected_preserved();
 int main();
 
 ReassemblyBuf rb_new(uint64_t expected __attribute__((unused))) {
-  return (ReassemblyBuf){ .fragments_received = 0, .fragments_expected = expected, .bytes_received = 0, .complete = 0 };
+  return (ReassemblyBuf){ .fragments_received = 0ULL, .fragments_expected = expected, .bytes_received = 0ULL, .complete = 0ULL };
 }
 
 void rb_receive(ReassemblyBuf* r __attribute__((unused)), uint64_t bytes __attribute__((unused))) {
-  (*r).fragments_received = ((*r).fragments_received + 1);
+  (*r).fragments_received = ((*r).fragments_received + 1ULL);
   (*r).bytes_received = ((*r).bytes_received + bytes);
 }
 
 void rb_complete(ReassemblyBuf* r __attribute__((unused))) {
-  (*r).complete = 1;
+  (*r).complete = 1ULL;
 }
 
 uint64_t receive_three() {
-  ReassemblyBuf r __attribute__((unused)) = rb_new(5);
-  rb_receive((&r), 100);
-  rb_receive((&r), 200);
-  rb_receive((&r), 150);
+  ReassemblyBuf r __attribute__((unused)) = rb_new(5ULL);
+  rb_receive((&r), 100ULL);
+  rb_receive((&r), 200ULL);
+  rb_receive((&r), 150ULL);
   return r.fragments_received;
 }
 
 uint64_t total_bytes() {
-  ReassemblyBuf r __attribute__((unused)) = rb_new(5);
-  rb_receive((&r), 100);
-  rb_receive((&r), 200);
-  rb_receive((&r), 150);
+  ReassemblyBuf r __attribute__((unused)) = rb_new(5ULL);
+  rb_receive((&r), 100ULL);
+  rb_receive((&r), 200ULL);
+  rb_receive((&r), 150ULL);
   return r.bytes_received;
 }
 
 uint64_t all_received_complete() {
-  ReassemblyBuf r __attribute__((unused)) = rb_new(3);
-  rb_receive((&r), 100);
-  rb_receive((&r), 200);
-  rb_receive((&r), 300);
+  ReassemblyBuf r __attribute__((unused)) = rb_new(3ULL);
+  rb_receive((&r), 100ULL);
+  rb_receive((&r), 200ULL);
+  rb_receive((&r), 300ULL);
   rb_complete((&r));
   return r.complete;
 }
 
 uint64_t expected_preserved() {
-  ReassemblyBuf r __attribute__((unused)) = rb_new(4);
-  rb_receive((&r), 128);
-  rb_receive((&r), 256);
+  ReassemblyBuf r __attribute__((unused)) = rb_new(4ULL);
+  rb_receive((&r), 128ULL);
+  rb_receive((&r), 256ULL);
   return r.fragments_expected;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

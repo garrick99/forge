@@ -27,22 +27,22 @@ uint64_t total_grows();
 int main();
 
 TxLog txlog_new() {
-  return (TxLog){ .open = 0, .committed = 0, .aborted = 0, .total = 0 };
+  return (TxLog){ .open = 0ULL, .committed = 0ULL, .aborted = 0ULL, .total = 0ULL };
 }
 
 void txlog_begin(TxLog* t __attribute__((unused))) {
-  (*t).open = ((*t).open + 1);
-  (*t).total = ((*t).total + 1);
+  (*t).open = ((*t).open + 1ULL);
+  (*t).total = ((*t).total + 1ULL);
 }
 
 void txlog_commit(TxLog* t __attribute__((unused))) {
-  (*t).committed = ((*t).committed + 1);
-  (*t).open = ((*t).open - 1);
+  (*t).committed = ((*t).committed + 1ULL);
+  (*t).open = ((*t).open - 1ULL);
 }
 
 void txlog_abort(TxLog* t __attribute__((unused))) {
-  (*t).aborted = ((*t).aborted + 1);
-  (*t).open = ((*t).open - 1);
+  (*t).aborted = ((*t).aborted + 1ULL);
+  (*t).open = ((*t).open - 1ULL);
 }
 
 uint64_t begin_three_open() {
@@ -85,7 +85,7 @@ uint64_t total_grows() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

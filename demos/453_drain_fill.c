@@ -28,53 +28,53 @@ uint64_t fill_drain_count();
 int main();
 
 DrainFill df_new(uint64_t capacity __attribute__((unused)), uint64_t initial __attribute__((unused))) {
-  return (DrainFill){ .level = initial, .capacity = capacity, .cycles = 0, .fills = 0, .drains = 0 };
+  return (DrainFill){ .level = initial, .capacity = capacity, .cycles = 0ULL, .fills = 0ULL, .drains = 0ULL };
 }
 
 void df_fill(DrainFill* d __attribute__((unused)), uint64_t n __attribute__((unused))) {
   (*d).level = ((*d).level + n);
-  (*d).fills = ((*d).fills + 1);
+  (*d).fills = ((*d).fills + 1ULL);
 }
 
 void df_drain(DrainFill* d __attribute__((unused)), uint64_t n __attribute__((unused))) {
   (*d).level = ((*d).level - n);
-  (*d).drains = ((*d).drains + 1);
+  (*d).drains = ((*d).drains + 1ULL);
 }
 
 void df_complete_cycle(DrainFill* d __attribute__((unused))) {
-  (*d).cycles = ((*d).cycles + 1);
+  (*d).cycles = ((*d).cycles + 1ULL);
 }
 
 uint64_t fill_30() {
-  DrainFill d __attribute__((unused)) = df_new(100, 0);
-  df_fill((&d), 30);
+  DrainFill d __attribute__((unused)) = df_new(100ULL, 0ULL);
+  df_fill((&d), 30ULL);
   return d.level;
 }
 
 uint64_t fill_drain() {
-  DrainFill d __attribute__((unused)) = df_new(100, 0);
-  df_fill((&d), 50);
-  df_drain((&d), 20);
+  DrainFill d __attribute__((unused)) = df_new(100ULL, 0ULL);
+  df_fill((&d), 50ULL);
+  df_drain((&d), 20ULL);
   return d.level;
 }
 
 uint64_t two_cycles() {
-  DrainFill d __attribute__((unused)) = df_new(100, 50);
+  DrainFill d __attribute__((unused)) = df_new(100ULL, 50ULL);
   df_complete_cycle((&d));
   df_complete_cycle((&d));
   return d.cycles;
 }
 
 uint64_t fill_drain_count() {
-  DrainFill d __attribute__((unused)) = df_new(100, 0);
-  df_fill((&d), 30);
-  df_fill((&d), 20);
-  df_drain((&d), 10);
+  DrainFill d __attribute__((unused)) = df_new(100ULL, 0ULL);
+  df_fill((&d), 30ULL);
+  df_fill((&d), 20ULL);
+  df_drain((&d), 10ULL);
   return (d.fills + d.drains);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

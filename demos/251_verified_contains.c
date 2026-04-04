@@ -16,7 +16,7 @@ _Bool contains(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribut
 int main();
 
 _Bool contains(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
   _Bool found __attribute__((unused)) = 0;
   {
     while ((k < n)) {
@@ -24,7 +24,7 @@ _Bool contains(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribut
         found = 1;
 
       }
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
@@ -32,7 +32,7 @@ _Bool contains(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribut
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

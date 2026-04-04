@@ -17,37 +17,37 @@ uint64_t medians_of_fives(forge_span_u64_t s __attribute__((unused)), uint64_t n
 int main();
 
 void sort5(forge_span_u64_t s __attribute__((unused)), uint64_t base __attribute__((unused))) {
-  uint64_t pass __attribute__((unused)) = 0;
+  uint64_t pass __attribute__((unused)) = 0ULL;
   {
-    while ((pass < 4)) {
-      uint64_t j __attribute__((unused)) = 0;
+    while ((pass < 4ULL)) {
+      uint64_t j __attribute__((unused)) = 0ULL;
       {
-        while ((j < (4 - pass))) {
-          if ((s.data[(base + j)] > s.data[((base + j) + 1)])) {
+        while ((j < (4ULL - pass))) {
+          if ((s.data[(base + j)] > s.data[((base + j) + 1ULL)])) {
             uint64_t tmp __attribute__((unused)) = s.data[(base + j)];
-            s.data[(base + j)] = s.data[((base + j) + 1)];
-            s.data[((base + j) + 1)] = tmp;
+            s.data[(base + j)] = s.data[((base + j) + 1ULL)];
+            s.data[((base + j) + 1ULL)] = tmp;
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
-      pass = (pass + 1);
+      pass = (pass + 1ULL);
     }
 
   }
 }
 
 uint64_t medians_of_fives(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t medians __attribute__((unused))) {
-  uint64_t n_groups __attribute__((unused)) = (n / 5);
-  uint64_t g __attribute__((unused)) = 0;
+  uint64_t n_groups __attribute__((unused)) = (n / 5ULL);
+  uint64_t g __attribute__((unused)) = 0ULL;
   {
     while ((g < n_groups)) {
-      uint64_t base __attribute__((unused)) = (g * 5);
+      uint64_t base __attribute__((unused)) = (g * 5ULL);
       sort5(s, base);
-      medians.data[g] = s.data[(base + 2)];
-      g = (g + 1);
+      medians.data[g] = s.data[(base + 2ULL)];
+      g = (g + 1ULL);
     }
 
   }
@@ -55,7 +55,7 @@ uint64_t medians_of_fives(forge_span_u64_t s __attribute__((unused)), uint64_t n
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

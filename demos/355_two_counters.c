@@ -39,38 +39,38 @@ void tc_transfer_b_to_a(TwoCounters* t __attribute__((unused)), uint64_t amount 
 }
 
 uint64_t transfer_atob_a() {
-  TwoCounters t __attribute__((unused)) = tc_new(10, 10);
-  tc_transfer_a_to_b((&t), 3);
+  TwoCounters t __attribute__((unused)) = tc_new(10ULL, 10ULL);
+  tc_transfer_a_to_b((&t), 3ULL);
   return t.a;
 }
 
 uint64_t transfer_atob_b() {
-  TwoCounters t __attribute__((unused)) = tc_new(10, 10);
-  tc_transfer_a_to_b((&t), 3);
+  TwoCounters t __attribute__((unused)) = tc_new(10ULL, 10ULL);
+  tc_transfer_a_to_b((&t), 3ULL);
   return t.b;
 }
 
 uint64_t sum_preserved() {
-  TwoCounters t __attribute__((unused)) = tc_new(10, 10);
-  tc_transfer_a_to_b((&t), 3);
-  tc_transfer_b_to_a((&t), 5);
+  TwoCounters t __attribute__((unused)) = tc_new(10ULL, 10ULL);
+  tc_transfer_a_to_b((&t), 3ULL);
+  tc_transfer_b_to_a((&t), 5ULL);
   return (t.a + t.b);
 }
 
 uint64_t drain_a() {
-  TwoCounters t __attribute__((unused)) = tc_new(8, 2);
-  tc_transfer_a_to_b((&t), 8);
+  TwoCounters t __attribute__((unused)) = tc_new(8ULL, 2ULL);
+  tc_transfer_a_to_b((&t), 8ULL);
   return t.a;
 }
 
 uint64_t drain_a_b() {
-  TwoCounters t __attribute__((unused)) = tc_new(8, 2);
-  tc_transfer_a_to_b((&t), 8);
+  TwoCounters t __attribute__((unused)) = tc_new(8ULL, 2ULL);
+  tc_transfer_a_to_b((&t), 8ULL);
   return t.b;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -26,22 +26,22 @@ uint64_t total_ticks();
 int main();
 
 IntervalTimer itimer_new(uint64_t period __attribute__((unused))) {
-  return (IntervalTimer){ .count = period, .period = period, .reloads = 0, .ticks = 0 };
+  return (IntervalTimer){ .count = period, .period = period, .reloads = 0ULL, .ticks = 0ULL };
 }
 
 void itimer_tick(IntervalTimer* t __attribute__((unused))) {
-  (*t).count = ((*t).count - 1);
-  (*t).ticks = ((*t).ticks + 1);
+  (*t).count = ((*t).count - 1ULL);
+  (*t).ticks = ((*t).ticks + 1ULL);
 }
 
 void itimer_expire_reload(IntervalTimer* t __attribute__((unused))) {
   (*t).count = (*t).period;
-  (*t).reloads = ((*t).reloads + 1);
-  (*t).ticks = ((*t).ticks + 1);
+  (*t).reloads = ((*t).reloads + 1ULL);
+  (*t).ticks = ((*t).ticks + 1ULL);
 }
 
 uint64_t three_ticks() {
-  IntervalTimer t __attribute__((unused)) = itimer_new(5);
+  IntervalTimer t __attribute__((unused)) = itimer_new(5ULL);
   itimer_tick((&t));
   itimer_tick((&t));
   itimer_tick((&t));
@@ -49,7 +49,7 @@ uint64_t three_ticks() {
 }
 
 uint64_t expire_reload() {
-  IntervalTimer t __attribute__((unused)) = itimer_new(5);
+  IntervalTimer t __attribute__((unused)) = itimer_new(5ULL);
   itimer_tick((&t));
   itimer_tick((&t));
   itimer_tick((&t));
@@ -59,7 +59,7 @@ uint64_t expire_reload() {
 }
 
 uint64_t reload_count() {
-  IntervalTimer t __attribute__((unused)) = itimer_new(3);
+  IntervalTimer t __attribute__((unused)) = itimer_new(3ULL);
   itimer_tick((&t));
   itimer_tick((&t));
   itimer_expire_reload((&t));
@@ -70,7 +70,7 @@ uint64_t reload_count() {
 }
 
 uint64_t total_ticks() {
-  IntervalTimer t __attribute__((unused)) = itimer_new(3);
+  IntervalTimer t __attribute__((unused)) = itimer_new(3ULL);
   itimer_tick((&t));
   itimer_tick((&t));
   itimer_expire_reload((&t));
@@ -81,7 +81,7 @@ uint64_t total_ticks() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -43,7 +43,7 @@ Option_u64 Range__Iterator__next(Range* self __attribute__((unused))) {
     return (Option_u64){ .tag = Option_u64_tag_None, .data.None = { ._dummy = 0 } };
   } else {
     uint64_t v __attribute__((unused)) = (*self).cur;
-    (*self).cur = ((*self).cur + 1);
+    (*self).cur = ((*self).cur + 1ULL);
     return (Option_u64){ .tag = Option_u64_tag_Some, .data.Some = { ._v0 = v } };
   }
 }
@@ -54,7 +54,7 @@ Range range(uint64_t start __attribute__((unused)), uint64_t end_ __attribute__(
 
 uint64_t range_sum(uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
   Range r __attribute__((unused)) = range(lo, hi);
-  uint64_t acc __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
   {
     { Range __iter_x = r;
       for(;;) {
@@ -70,7 +70,7 @@ uint64_t range_sum(uint64_t lo __attribute__((unused)), uint64_t hi __attribute_
 }
 
 int main() {
-  return (int)((range_sum(1, 6) + range_sum(0, 4)));
+  return (int)((range_sum(1ULL, 6ULL) + range_sum(0ULL, 4ULL)));
 
 }
 

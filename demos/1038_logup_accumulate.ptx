@@ -1,0 +1,390 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry logup_trace_term_kernel(
+    .param .u64 logup_trace_term_kernel_param_acc_rr_data,
+    .param .u64 logup_trace_term_kernel_param_acc_rr_len,
+    .param .u64 logup_trace_term_kernel_param_acc_ri_data,
+    .param .u64 logup_trace_term_kernel_param_acc_ri_len,
+    .param .u64 logup_trace_term_kernel_param_acc_ir_data,
+    .param .u64 logup_trace_term_kernel_param_acc_ir_len,
+    .param .u64 logup_trace_term_kernel_param_acc_ii_data,
+    .param .u64 logup_trace_term_kernel_param_acc_ii_len,
+    .param .u64 logup_trace_term_kernel_param_inv_rr_data,
+    .param .u64 logup_trace_term_kernel_param_inv_rr_len,
+    .param .u64 logup_trace_term_kernel_param_inv_ri_data,
+    .param .u64 logup_trace_term_kernel_param_inv_ri_len,
+    .param .u64 logup_trace_term_kernel_param_inv_ir_data,
+    .param .u64 logup_trace_term_kernel_param_inv_ir_len,
+    .param .u64 logup_trace_term_kernel_param_inv_ii_data,
+    .param .u64 logup_trace_term_kernel_param_inv_ii_len,
+    .param .u64 logup_trace_term_kernel_param_n
+)
+{
+    .reg .pred %p22;
+    .reg .u64 %rd0, %rd1, %rd10, %rd11, %rd12, %rd13, %rd14, %rd15, %rd16, %rd2, %rd23, %rd25, %rd26, %rd27, %rd28, %rd29, %rd3, %rd30, %rd31, %rd32, %rd33, %rd34, %rd35, %rd36, %rd37, %rd38, %rd39, %rd4, %rd40, %rd41, %rd42, %rd43, %rd44, %rd45, %rd46, %rd47, %rd48, %rd49, %rd5, %rd50, %rd51, %rd52, %rd53, %rd54, %rd55, %rd56, %rd57, %rd58, %rd59, %rd6, %rd60, %rd7, %rd8, %rd9;
+    .reg .u32 %r17, %r18, %r19, %r20, %r21, %r61, %r62, %r63;
+
+  ld.param.u64 %rd0, [logup_trace_term_kernel_param_acc_rr_data];
+  ld.param.u64 %rd1, [logup_trace_term_kernel_param_acc_rr_len];
+  ld.param.u64 %rd2, [logup_trace_term_kernel_param_acc_ri_data];
+  ld.param.u64 %rd3, [logup_trace_term_kernel_param_acc_ri_len];
+  ld.param.u64 %rd4, [logup_trace_term_kernel_param_acc_ir_data];
+  ld.param.u64 %rd5, [logup_trace_term_kernel_param_acc_ir_len];
+  ld.param.u64 %rd6, [logup_trace_term_kernel_param_acc_ii_data];
+  ld.param.u64 %rd7, [logup_trace_term_kernel_param_acc_ii_len];
+  ld.param.u64 %rd8, [logup_trace_term_kernel_param_inv_rr_data];
+  ld.param.u64 %rd9, [logup_trace_term_kernel_param_inv_rr_len];
+  ld.param.u64 %rd10, [logup_trace_term_kernel_param_inv_ri_data];
+  ld.param.u64 %rd11, [logup_trace_term_kernel_param_inv_ri_len];
+  ld.param.u64 %rd12, [logup_trace_term_kernel_param_inv_ir_data];
+  ld.param.u64 %rd13, [logup_trace_term_kernel_param_inv_ir_len];
+  ld.param.u64 %rd14, [logup_trace_term_kernel_param_inv_ii_data];
+  ld.param.u64 %rd15, [logup_trace_term_kernel_param_inv_ii_len];
+  ld.param.u64 %rd16, [logup_trace_term_kernel_param_n];
+
+  mov.u32 %r17, %ctaid.x;
+  mov.u32 %r18, %ntid.x;
+  mul.lo.u32 %r19, %r17, %r18;
+  mov.u32 %r20, %tid.x;
+  add.u32 %r21, %r19, %r20;
+  cvt.u64.u32 %rd23, %r21;
+  setp.lt.u64 %p22, %rd23, %rd16;
+  @%p22 bra logup_trace_term_kernel_then_24;
+  bra logup_trace_term_kernel_else_24;
+  logup_trace_term_kernel_then_24:
+  mov.u64 %rd25, 0; // unhandled expr
+  mov.u64 %rd26, 0; // unhandled expr
+  mov.u64 %rd27, 0; // unhandled expr
+  mov.u64 %rd28, 0; // unhandled expr
+  mov.u64 %rd29, 0; // unhandled expr
+  mov.u64 %rd30, 0; // unhandled expr
+  mov.u64 %rd31, 0; // unhandled expr
+  mov.u64 %rd32, 0; // unhandled expr
+  mov.u64 %rd33, 0; // call m31_get (device fn)
+  mov.u64 %rd34, 0; // call m31_get (device fn)
+  mov.u64 %rd35, 0; // call m31_get (device fn)
+  mov.u64 %rd36, 0; // call m31_get (device fn)
+  mov.u64 %rd37, 0; // call m31_get (device fn)
+  mov.u64 %rd38, 0; // call m31_get (device fn)
+  mov.u64 %rd39, 0; // call m31_get (device fn)
+  mov.u64 %rd40, 0; // call m31_get (device fn)
+  mov.u64 %rd41, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd42, %r21;
+  mov.u64 %rd43, 4;
+  mul.lo.u64 %rd44, %rd42, %rd43;
+  add.u64 %rd45, %rd0, %rd44;
+  st.global.u32 [%rd45], %rd41;
+  mov.u64 %rd46, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd47, %r21;
+  mov.u64 %rd48, 4;
+  mul.lo.u64 %rd49, %rd47, %rd48;
+  add.u64 %rd50, %rd2, %rd49;
+  st.global.u32 [%rd50], %rd46;
+  mov.u64 %rd51, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd52, %r21;
+  mov.u64 %rd53, 4;
+  mul.lo.u64 %rd54, %rd52, %rd53;
+  add.u64 %rd55, %rd4, %rd54;
+  st.global.u32 [%rd55], %rd51;
+  mov.u64 %rd56, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd57, %r21;
+  mov.u64 %rd58, 4;
+  mul.lo.u64 %rd59, %rd57, %rd58;
+  add.u64 %rd60, %rd6, %rd59;
+  st.global.u32 [%rd60], %rd56;
+  mov.u32 %r61, 0; // unit
+  mov.u32 %r62, %r61;
+  bra logup_trace_term_kernel_end_24;
+  logup_trace_term_kernel_else_24:
+  mov.u32 %r62, 0; // no else branch
+  logup_trace_term_kernel_end_24:
+  mov.u32 %r63, 0; // unit
+  ret;
+}
+
+.visible .entry logup_table_subtract_kernel(
+    .param .u64 logup_table_subtract_kernel_param_acc_rr_data,
+    .param .u64 logup_table_subtract_kernel_param_acc_rr_len,
+    .param .u64 logup_table_subtract_kernel_param_acc_ri_data,
+    .param .u64 logup_table_subtract_kernel_param_acc_ri_len,
+    .param .u64 logup_table_subtract_kernel_param_acc_ir_data,
+    .param .u64 logup_table_subtract_kernel_param_acc_ir_len,
+    .param .u64 logup_table_subtract_kernel_param_acc_ii_data,
+    .param .u64 logup_table_subtract_kernel_param_acc_ii_len,
+    .param .u64 logup_table_subtract_kernel_param_inv_rr_data,
+    .param .u64 logup_table_subtract_kernel_param_inv_rr_len,
+    .param .u64 logup_table_subtract_kernel_param_inv_ri_data,
+    .param .u64 logup_table_subtract_kernel_param_inv_ri_len,
+    .param .u64 logup_table_subtract_kernel_param_inv_ir_data,
+    .param .u64 logup_table_subtract_kernel_param_inv_ir_len,
+    .param .u64 logup_table_subtract_kernel_param_inv_ii_data,
+    .param .u64 logup_table_subtract_kernel_param_inv_ii_len,
+    .param .u64 logup_table_subtract_kernel_param_mult_data,
+    .param .u64 logup_table_subtract_kernel_param_mult_len,
+    .param .u64 logup_table_subtract_kernel_param_n
+)
+{
+    .reg .pred %p24;
+    .reg .u64 %rd0, %rd1, %rd10, %rd11, %rd12, %rd13, %rd14, %rd15, %rd16, %rd17, %rd18, %rd2, %rd25, %rd27, %rd28, %rd29, %rd3, %rd30, %rd31, %rd32, %rd33, %rd34, %rd35, %rd36, %rd37, %rd38, %rd39, %rd4, %rd40, %rd41, %rd42, %rd43, %rd44, %rd45, %rd46, %rd47, %rd48, %rd49, %rd5, %rd50, %rd51, %rd52, %rd53, %rd54, %rd55, %rd56, %rd57, %rd58, %rd59, %rd6, %rd60, %rd61, %rd62, %rd7, %rd8, %rd9;
+    .reg .u32 %r19, %r20, %r21, %r22, %r23, %r63, %r64, %r65;
+
+  ld.param.u64 %rd0, [logup_table_subtract_kernel_param_acc_rr_data];
+  ld.param.u64 %rd1, [logup_table_subtract_kernel_param_acc_rr_len];
+  ld.param.u64 %rd2, [logup_table_subtract_kernel_param_acc_ri_data];
+  ld.param.u64 %rd3, [logup_table_subtract_kernel_param_acc_ri_len];
+  ld.param.u64 %rd4, [logup_table_subtract_kernel_param_acc_ir_data];
+  ld.param.u64 %rd5, [logup_table_subtract_kernel_param_acc_ir_len];
+  ld.param.u64 %rd6, [logup_table_subtract_kernel_param_acc_ii_data];
+  ld.param.u64 %rd7, [logup_table_subtract_kernel_param_acc_ii_len];
+  ld.param.u64 %rd8, [logup_table_subtract_kernel_param_inv_rr_data];
+  ld.param.u64 %rd9, [logup_table_subtract_kernel_param_inv_rr_len];
+  ld.param.u64 %rd10, [logup_table_subtract_kernel_param_inv_ri_data];
+  ld.param.u64 %rd11, [logup_table_subtract_kernel_param_inv_ri_len];
+  ld.param.u64 %rd12, [logup_table_subtract_kernel_param_inv_ir_data];
+  ld.param.u64 %rd13, [logup_table_subtract_kernel_param_inv_ir_len];
+  ld.param.u64 %rd14, [logup_table_subtract_kernel_param_inv_ii_data];
+  ld.param.u64 %rd15, [logup_table_subtract_kernel_param_inv_ii_len];
+  ld.param.u64 %rd16, [logup_table_subtract_kernel_param_mult_data];
+  ld.param.u64 %rd17, [logup_table_subtract_kernel_param_mult_len];
+  ld.param.u64 %rd18, [logup_table_subtract_kernel_param_n];
+
+  mov.u32 %r19, %ctaid.x;
+  mov.u32 %r20, %ntid.x;
+  mul.lo.u32 %r21, %r19, %r20;
+  mov.u32 %r22, %tid.x;
+  add.u32 %r23, %r21, %r22;
+  cvt.u64.u32 %rd25, %r23;
+  setp.lt.u64 %p24, %rd25, %rd18;
+  @%p24 bra logup_table_subtract_kernel_then_26;
+  bra logup_table_subtract_kernel_else_26;
+  logup_table_subtract_kernel_then_26:
+  mov.u64 %rd27, 0; // unhandled expr
+  mov.u64 %rd28, 0; // unhandled expr
+  mov.u64 %rd29, 0; // unhandled expr
+  mov.u64 %rd30, 0; // call m31_get (device fn)
+  mov.u64 %rd31, 0; // call m31_get (device fn)
+  mov.u64 %rd32, 0; // call m31_get (device fn)
+  mov.u64 %rd33, 0; // call m31_get (device fn)
+  mov.u64 %rd34, 0; // call m31_get (device fn)
+  mov.u64 %rd35, 0; // call m31_get (device fn)
+  mov.u64 %rd36, 0; // call m31_get (device fn)
+  mov.u64 %rd37, 0; // call m31_get (device fn)
+  mov.u64 %rd38, 0; // call m31_get (device fn)
+  mov.u64 %rd39, 0; // call m31_mul (device fn)
+  mov.u64 %rd40, 0; // call m31_mul (device fn)
+  mov.u64 %rd41, 0; // call m31_mul (device fn)
+  mov.u64 %rd42, 0; // call m31_mul (device fn)
+  mov.u64 %rd43, 0; // call m31_sub (device fn)
+  cvt.u64.u32 %rd44, %r23;
+  mov.u64 %rd45, 4;
+  mul.lo.u64 %rd46, %rd44, %rd45;
+  add.u64 %rd47, %rd0, %rd46;
+  st.global.u32 [%rd47], %rd43;
+  mov.u64 %rd48, 0; // call m31_sub (device fn)
+  cvt.u64.u32 %rd49, %r23;
+  mov.u64 %rd50, 4;
+  mul.lo.u64 %rd51, %rd49, %rd50;
+  add.u64 %rd52, %rd2, %rd51;
+  st.global.u32 [%rd52], %rd48;
+  mov.u64 %rd53, 0; // call m31_sub (device fn)
+  cvt.u64.u32 %rd54, %r23;
+  mov.u64 %rd55, 4;
+  mul.lo.u64 %rd56, %rd54, %rd55;
+  add.u64 %rd57, %rd4, %rd56;
+  st.global.u32 [%rd57], %rd53;
+  mov.u64 %rd58, 0; // call m31_sub (device fn)
+  cvt.u64.u32 %rd59, %r23;
+  mov.u64 %rd60, 4;
+  mul.lo.u64 %rd61, %rd59, %rd60;
+  add.u64 %rd62, %rd6, %rd61;
+  st.global.u32 [%rd62], %rd58;
+  mov.u32 %r63, 0; // unit
+  mov.u32 %r64, %r63;
+  bra logup_table_subtract_kernel_end_26;
+  logup_table_subtract_kernel_else_26:
+  mov.u32 %r64, 0; // no else branch
+  logup_table_subtract_kernel_end_26:
+  mov.u32 %r65, 0; // unit
+  ret;
+}
+
+.visible .entry logup_reduce_kernel(
+    .param .u64 logup_reduce_kernel_param_acc_rr_data,
+    .param .u64 logup_reduce_kernel_param_acc_rr_len,
+    .param .u64 logup_reduce_kernel_param_acc_ri_data,
+    .param .u64 logup_reduce_kernel_param_acc_ri_len,
+    .param .u64 logup_reduce_kernel_param_acc_ir_data,
+    .param .u64 logup_reduce_kernel_param_acc_ir_len,
+    .param .u64 logup_reduce_kernel_param_acc_ii_data,
+    .param .u64 logup_reduce_kernel_param_acc_ii_len,
+    .param .u64 logup_reduce_kernel_param_half
+)
+{
+    .reg .pred %p14;
+    .reg .u64 %rd0, %rd1, %rd15, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd29, %rd3, %rd30, %rd31, %rd32, %rd33, %rd34, %rd35, %rd36, %rd37, %rd38, %rd39, %rd4, %rd40, %rd41, %rd42, %rd43, %rd44, %rd45, %rd46, %rd5, %rd6, %rd7, %rd8;
+    .reg .u32 %r10, %r11, %r12, %r13, %r47, %r48, %r49, %r9;
+
+  ld.param.u64 %rd0, [logup_reduce_kernel_param_acc_rr_data];
+  ld.param.u64 %rd1, [logup_reduce_kernel_param_acc_rr_len];
+  ld.param.u64 %rd2, [logup_reduce_kernel_param_acc_ri_data];
+  ld.param.u64 %rd3, [logup_reduce_kernel_param_acc_ri_len];
+  ld.param.u64 %rd4, [logup_reduce_kernel_param_acc_ir_data];
+  ld.param.u64 %rd5, [logup_reduce_kernel_param_acc_ir_len];
+  ld.param.u64 %rd6, [logup_reduce_kernel_param_acc_ii_data];
+  ld.param.u64 %rd7, [logup_reduce_kernel_param_acc_ii_len];
+  ld.param.u64 %rd8, [logup_reduce_kernel_param_half];
+
+  mov.u32 %r9, %ctaid.x;
+  mov.u32 %r10, %ntid.x;
+  mul.lo.u32 %r11, %r9, %r10;
+  mov.u32 %r12, %tid.x;
+  add.u32 %r13, %r11, %r12;
+  cvt.u64.u32 %rd15, %r13;
+  setp.lt.u64 %p14, %rd15, %rd8;
+  @%p14 bra logup_reduce_kernel_then_16;
+  bra logup_reduce_kernel_else_16;
+  logup_reduce_kernel_then_16:
+  mov.u64 %rd17, 0; // unhandled expr
+  mov.u64 %rd18, 0; // unhandled expr
+  mov.u64 %rd19, 0; // call m31_get (device fn)
+  mov.u64 %rd20, 0; // call m31_get (device fn)
+  mov.u64 %rd21, 0; // call m31_get (device fn)
+  mov.u64 %rd22, 0; // call m31_get (device fn)
+  mov.u64 %rd23, 0; // call m31_get (device fn)
+  mov.u64 %rd24, 0; // call m31_get (device fn)
+  mov.u64 %rd25, 0; // call m31_get (device fn)
+  mov.u64 %rd26, 0; // call m31_get (device fn)
+  mov.u64 %rd27, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd28, %r13;
+  mov.u64 %rd29, 4;
+  mul.lo.u64 %rd30, %rd28, %rd29;
+  add.u64 %rd31, %rd0, %rd30;
+  st.global.u32 [%rd31], %rd27;
+  mov.u64 %rd32, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd33, %r13;
+  mov.u64 %rd34, 4;
+  mul.lo.u64 %rd35, %rd33, %rd34;
+  add.u64 %rd36, %rd2, %rd35;
+  st.global.u32 [%rd36], %rd32;
+  mov.u64 %rd37, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd38, %r13;
+  mov.u64 %rd39, 4;
+  mul.lo.u64 %rd40, %rd38, %rd39;
+  add.u64 %rd41, %rd4, %rd40;
+  st.global.u32 [%rd41], %rd37;
+  mov.u64 %rd42, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd43, %r13;
+  mov.u64 %rd44, 4;
+  mul.lo.u64 %rd45, %rd43, %rd44;
+  add.u64 %rd46, %rd6, %rd45;
+  st.global.u32 [%rd46], %rd42;
+  mov.u32 %r47, 0; // unit
+  mov.u32 %r48, %r47;
+  bra logup_reduce_kernel_end_16;
+  logup_reduce_kernel_else_16:
+  mov.u32 %r48, 0; // no else branch
+  logup_reduce_kernel_end_16:
+  mov.u32 %r49, 0; // unit
+  ret;
+}
+
+.visible .entry logup_zero_check_kernel(
+    .param .u64 logup_zero_check_kernel_param_acc_rr_data,
+    .param .u64 logup_zero_check_kernel_param_acc_rr_len,
+    .param .u64 logup_zero_check_kernel_param_acc_ri_data,
+    .param .u64 logup_zero_check_kernel_param_acc_ri_len,
+    .param .u64 logup_zero_check_kernel_param_acc_ir_data,
+    .param .u64 logup_zero_check_kernel_param_acc_ir_len,
+    .param .u64 logup_zero_check_kernel_param_acc_ii_data,
+    .param .u64 logup_zero_check_kernel_param_acc_ii_len,
+    .param .u64 logup_zero_check_kernel_param_out_data,
+    .param .u64 logup_zero_check_kernel_param_out_len
+)
+{
+    .reg .pred %p16, %p40, %p42, %p43, %p45, %p46, %p48, %p49;
+    .reg .u64 %rd0, %rd1, %rd15, %rd17, %rd19, %rd2, %rd20, %rd21, %rd22, %rd24, %rd25, %rd26, %rd27, %rd29, %rd3, %rd30, %rd31, %rd32, %rd34, %rd35, %rd36, %rd37, %rd4, %rd5, %rd54, %rd55, %rd56, %rd57, %rd6, %rd7, %rd8, %rd9;
+    .reg .u32 %r10, %r11, %r12, %r13, %r14, %r23, %r28, %r33, %r38, %r39, %r41, %r44, %r47, %r51, %r52, %r53, %r58, %r59, %r60;
+
+  ld.param.u64 %rd0, [logup_zero_check_kernel_param_acc_rr_data];
+  ld.param.u64 %rd1, [logup_zero_check_kernel_param_acc_rr_len];
+  ld.param.u64 %rd2, [logup_zero_check_kernel_param_acc_ri_data];
+  ld.param.u64 %rd3, [logup_zero_check_kernel_param_acc_ri_len];
+  ld.param.u64 %rd4, [logup_zero_check_kernel_param_acc_ir_data];
+  ld.param.u64 %rd5, [logup_zero_check_kernel_param_acc_ir_len];
+  ld.param.u64 %rd6, [logup_zero_check_kernel_param_acc_ii_data];
+  ld.param.u64 %rd7, [logup_zero_check_kernel_param_acc_ii_len];
+  ld.param.u64 %rd8, [logup_zero_check_kernel_param_out_data];
+  ld.param.u64 %rd9, [logup_zero_check_kernel_param_out_len];
+
+  mov.u32 %r10, %ctaid.x;
+  mov.u32 %r11, %ntid.x;
+  mul.lo.u32 %r12, %r10, %r11;
+  mov.u32 %r13, %tid.x;
+  add.u32 %r14, %r12, %r13;
+  mov.u64 %rd15, 0;
+  cvt.u64.u32 %rd17, %r14;
+  setp.eq.u64 %p16, %rd17, %rd15;
+  @%p16 bra logup_zero_check_kernel_then_18;
+  bra logup_zero_check_kernel_else_18;
+  logup_zero_check_kernel_then_18:
+  mov.u64 %rd19, 0;
+  mov.u64 %rd20, 4;
+  mul.lo.u64 %rd21, %rd19, %rd20;
+  add.u64 %rd22, %rd0, %rd21;
+  ld.global.u32 %r23, [%rd22];
+  mov.u64 %rd24, 0;
+  mov.u64 %rd25, 4;
+  mul.lo.u64 %rd26, %rd24, %rd25;
+  add.u64 %rd27, %rd2, %rd26;
+  ld.global.u32 %r28, [%rd27];
+  mov.u64 %rd29, 0;
+  mov.u64 %rd30, 4;
+  mul.lo.u64 %rd31, %rd29, %rd30;
+  add.u64 %rd32, %rd4, %rd31;
+  ld.global.u32 %r33, [%rd32];
+  mov.u64 %rd34, 0;
+  mov.u64 %rd35, 4;
+  mul.lo.u64 %rd36, %rd34, %rd35;
+  add.u64 %rd37, %rd6, %rd36;
+  ld.global.u32 %r38, [%rd37];
+  mov.u32 %r39, 0;
+  setp.eq.u32 %p40, %r23, %r39;
+  mov.u32 %r41, 0;
+  setp.eq.u32 %p42, %r28, %r41;
+  and.b16 %p43, %p40, %p42;
+  mov.u32 %r44, 0;
+  setp.eq.u32 %p45, %r33, %r44;
+  and.b16 %p46, %p43, %p45;
+  mov.u32 %r47, 0;
+  setp.eq.u32 %p48, %r38, %r47;
+  and.b16 %p49, %p46, %p48;
+  @%p49 bra logup_zero_check_kernel_then_50;
+  bra logup_zero_check_kernel_else_50;
+  logup_zero_check_kernel_then_50:
+  mov.u32 %r51, 1;
+  mov.u32 %r52, %r51;
+  bra logup_zero_check_kernel_end_50;
+  logup_zero_check_kernel_else_50:
+  mov.u32 %r53, 0;
+  mov.u32 %r52, %r53;
+  logup_zero_check_kernel_end_50:
+  mov.u64 %rd54, 0;
+  mov.u64 %rd55, 4;
+  mul.lo.u64 %rd56, %rd54, %rd55;
+  add.u64 %rd57, %rd8, %rd56;
+  st.global.u32 [%rd57], %r52;
+  mov.u32 %r58, 0; // unit
+  mov.u32 %r59, %r58;
+  bra logup_zero_check_kernel_end_18;
+  logup_zero_check_kernel_else_18:
+  mov.u32 %r59, 0; // no else branch
+  logup_zero_check_kernel_end_18:
+  mov.u32 %r60, 0; // unit
+  ret;
+}
+

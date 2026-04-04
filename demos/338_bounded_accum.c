@@ -26,58 +26,58 @@ uint64_t reset_count(uint64_t bound __attribute__((unused)));
 int main();
 
 Accum accum_new(uint64_t bound __attribute__((unused))) {
-  return (Accum){ .sum = 0, .count = 0, .bound = bound };
+  return (Accum){ .sum = 0ULL, .count = 0ULL, .bound = bound };
 }
 
 void accum_add(Accum* a __attribute__((unused)), uint64_t v __attribute__((unused))) {
   (*a).sum = ((*a).sum + v);
-  (*a).count = ((*a).count + 1);
+  (*a).count = ((*a).count + 1ULL);
 }
 
 void accum_reset(Accum* a __attribute__((unused))) {
-  (*a).sum = 0;
-  (*a).count = 0;
+  (*a).sum = 0ULL;
+  (*a).count = 0ULL;
 }
 
 uint64_t add_10(uint64_t bound __attribute__((unused))) {
   Accum a __attribute__((unused)) = accum_new(bound);
-  accum_add((&a), 10);
+  accum_add((&a), 10ULL);
   return a.sum;
 }
 
 uint64_t add_three_values(uint64_t bound __attribute__((unused))) {
   Accum a __attribute__((unused)) = accum_new(bound);
-  accum_add((&a), 3);
-  accum_add((&a), 5);
-  accum_add((&a), 2);
+  accum_add((&a), 3ULL);
+  accum_add((&a), 5ULL);
+  accum_add((&a), 2ULL);
   return a.sum;
 }
 
 uint64_t three_adds_count(uint64_t bound __attribute__((unused))) {
   Accum a __attribute__((unused)) = accum_new(bound);
-  accum_add((&a), 3);
-  accum_add((&a), 5);
-  accum_add((&a), 2);
+  accum_add((&a), 3ULL);
+  accum_add((&a), 5ULL);
+  accum_add((&a), 2ULL);
   return a.count;
 }
 
 uint64_t add_reset(uint64_t bound __attribute__((unused))) {
   Accum a __attribute__((unused)) = accum_new(bound);
-  accum_add((&a), 5);
+  accum_add((&a), 5ULL);
   accum_reset((&a));
   return a.sum;
 }
 
 uint64_t reset_count(uint64_t bound __attribute__((unused))) {
   Accum a __attribute__((unused)) = accum_new(bound);
-  accum_add((&a), 3);
-  accum_add((&a), 2);
+  accum_add((&a), 3ULL);
+  accum_add((&a), 2ULL);
   accum_reset((&a));
   return a.count;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

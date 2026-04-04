@@ -16,27 +16,27 @@ void insertion_sort_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t 
 int main();
 
 void insertion_sort_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       uint64_t key __attribute__((unused)) = s.data[i];
       uint64_t j __attribute__((unused)) = i;
       {
-        while (((j >= 1) && (s.data[(j - 1)] > key))) {
-          s.data[j] = s.data[(j - 1)];
-          j = (j - 1);
+        while (((j >= 1ULL) && (s.data[(j - 1ULL)] > key))) {
+          s.data[j] = s.data[(j - 1ULL)];
+          j = (j - 1ULL);
         }
 
       }
       s.data[j] = key;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

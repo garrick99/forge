@@ -27,21 +27,21 @@ uint64_t rejected_not_processed();
 int main();
 
 DataPipeline dp_new() {
-  return (DataPipeline){ .ingested = 0, .accepted = 0, .rejected = 0, .processed = 0 };
+  return (DataPipeline){ .ingested = 0ULL, .accepted = 0ULL, .rejected = 0ULL, .processed = 0ULL };
 }
 
 void dp_ingest_accept(DataPipeline* d __attribute__((unused))) {
-  (*d).ingested = ((*d).ingested + 1);
-  (*d).accepted = ((*d).accepted + 1);
+  (*d).ingested = ((*d).ingested + 1ULL);
+  (*d).accepted = ((*d).accepted + 1ULL);
 }
 
 void dp_ingest_reject(DataPipeline* d __attribute__((unused))) {
-  (*d).ingested = ((*d).ingested + 1);
-  (*d).rejected = ((*d).rejected + 1);
+  (*d).ingested = ((*d).ingested + 1ULL);
+  (*d).rejected = ((*d).rejected + 1ULL);
 }
 
 void dp_process(DataPipeline* d __attribute__((unused))) {
-  (*d).processed = ((*d).processed + 1);
+  (*d).processed = ((*d).processed + 1ULL);
 }
 
 uint64_t ingest_count() {
@@ -81,7 +81,7 @@ uint64_t rejected_not_processed() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

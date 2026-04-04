@@ -16,11 +16,11 @@ uint64_t count_in_bounds(forge_span_u64_t s __attribute__((unused)), uint64_t n 
 int main();
 
 uint64_t count_in_bounds(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t lo_val __attribute__((unused)), uint64_t hi_val __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
   {
     for (uint64_t i = 0; i < (uint64_t)(n); i++) {
       if (((s.data[i] >= lo_val) && (s.data[i] <= hi_val))) {
-        count = (count + 1);
+        count = (count + 1ULL);
 
       }
     }
@@ -30,7 +30,7 @@ uint64_t count_in_bounds(forge_span_u64_t s __attribute__((unused)), uint64_t n 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

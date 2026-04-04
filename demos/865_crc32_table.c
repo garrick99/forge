@@ -18,16 +18,16 @@ int main();
 
 uint64_t crc32_update(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t table __attribute__((unused)), uint64_t crc_init __attribute__((unused))) {
   uint64_t crc __attribute__((unused)) = crc_init;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t byte_val __attribute__((unused)) = (data.data[i] & 255);
-      uint64_t idx __attribute__((unused)) = ((crc ^ byte_val) & 255);
-      if ((idx < 256)) {
-        crc = ((crc / 256) ^ table.data[idx]);
+      uint64_t byte_val __attribute__((unused)) = (data.data[i] & 255ULL);
+      uint64_t idx __attribute__((unused)) = ((crc ^ byte_val) & 255ULL);
+      if ((idx < 256ULL)) {
+        crc = ((crc / 256ULL) ^ table.data[idx]);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -35,12 +35,12 @@ uint64_t crc32_update(forge_span_u64_t data __attribute__((unused)), uint64_t n 
 }
 
 uint64_t crc32_final(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t table __attribute__((unused))) {
-  uint64_t crc __attribute__((unused)) = crc32_update(data, n, table, 4294967295);
-  return (crc ^ 4294967295);
+  uint64_t crc __attribute__((unused)) = crc32_update(data, n, table, 4294967295ULL);
+  return (crc ^ 4294967295ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

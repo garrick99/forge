@@ -20,13 +20,13 @@ uint64_t sparse_count_nonzero(forge_span_u64_t vals __attribute__((unused)), uin
 int main();
 
 uint64_t sparse_dot(forge_span_u64_t idx __attribute__((unused)), forge_span_u64_t vals __attribute__((unused)), uint64_t nnz __attribute__((unused)), forge_span_u64_t dense __attribute__((unused)), uint64_t dense_len __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nnz)) {
       uint64_t col __attribute__((unused)) = (idx.data[i] % dense_len);
       acc = (acc + (vals.data[i] * dense.data[col]));
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -34,23 +34,23 @@ uint64_t sparse_dot(forge_span_u64_t idx __attribute__((unused)), forge_span_u64
 }
 
 void sparse_scale(forge_span_u64_t vals __attribute__((unused)), uint64_t nnz __attribute__((unused)), uint64_t s __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nnz)) {
       vals.data[i] = (vals.data[i] * s);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t sparse_sum(forge_span_u64_t vals __attribute__((unused)), uint64_t nnz __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nnz)) {
       acc = (acc + vals.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -58,15 +58,15 @@ uint64_t sparse_sum(forge_span_u64_t vals __attribute__((unused)), uint64_t nnz 
 }
 
 uint64_t sparse_max(forge_span_u64_t vals __attribute__((unused)), uint64_t nnz __attribute__((unused))) {
-  uint64_t mx __attribute__((unused)) = vals.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t mx __attribute__((unused)) = vals.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < nnz)) {
       if ((vals.data[i] > mx)) {
         mx = vals.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -74,15 +74,15 @@ uint64_t sparse_max(forge_span_u64_t vals __attribute__((unused)), uint64_t nnz 
 }
 
 uint64_t sparse_count_nonzero(forge_span_u64_t vals __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((vals.data[i] != 0)) {
-        cnt = (cnt + 1);
+      if ((vals.data[i] != 0ULL)) {
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -90,7 +90,7 @@ uint64_t sparse_count_nonzero(forge_span_u64_t vals __attribute__((unused)), uin
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

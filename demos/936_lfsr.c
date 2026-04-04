@@ -14,21 +14,21 @@ int main();
 
 uint64_t lfsr_step(uint64_t init __attribute__((unused)), uint64_t taps __attribute__((unused)), uint64_t n __attribute__((unused))) {
   uint64_t state __attribute__((unused)) = init;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      uint64_t bit __attribute__((unused)) = (state & 1);
-      state = (state / 2);
-      if ((bit == 1)) {
+      uint64_t bit __attribute__((unused)) = (state & 1ULL);
+      state = (state / 2ULL);
+      if ((bit == 1ULL)) {
         state = (state ^ taps);
 
       }
-      state = (state & 65535);
-      if ((state == 0)) {
-        state = 1;
+      state = (state & 65535ULL);
+      if ((state == 0ULL)) {
+        state = 1ULL;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -36,7 +36,7 @@ uint64_t lfsr_step(uint64_t init __attribute__((unused)), uint64_t taps __attrib
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

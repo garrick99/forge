@@ -24,23 +24,23 @@ uint64_t __forge_lambda_1(uint64_t x __attribute__((unused)));
 uint64_t __forge_lambda_0(uint64_t x __attribute__((unused)));
 
 void map_inplace(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_fn_u64_ret_u64_t f __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = f(s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t apply_all(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), forge_fn_u64_ret_u64_t f __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + f(s.data[i]));
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -58,12 +58,12 @@ uint64_t demo_lambdas(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 
 uint64_t __forge_lambda_1(uint64_t x __attribute__((unused))) {
-  return (x * 2);
+  return (x * 2ULL);
 }
 
 uint64_t __forge_lambda_0(uint64_t x __attribute__((unused))) {

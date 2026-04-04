@@ -28,7 +28,7 @@ uint64_t karatsuba_step(uint64_t a_lo __attribute__((unused)), uint64_t a_hi __a
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

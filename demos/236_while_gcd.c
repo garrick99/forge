@@ -16,7 +16,7 @@ uint64_t gcd(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unuse
   uint64_t x __attribute__((unused)) = a;
   uint64_t y __attribute__((unused)) = b;
   {
-    while ((y > 0)) {
+    while ((y > 0ULL)) {
       uint64_t t __attribute__((unused)) = y;
       y = (x % y);
       x = t;
@@ -27,7 +27,7 @@ uint64_t gcd(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unuse
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

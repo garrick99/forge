@@ -23,12 +23,12 @@ uint64_t seq_equals_count();
 int main();
 
 SeqState seq_init() {
-  return (SeqState){ .next_seq = 0, .sent = 0 };
+  return (SeqState){ .next_seq = 0ULL, .sent = 0ULL };
 }
 
 void seq_send(SeqState* s __attribute__((unused))) {
-  (*s).next_seq = ((*s).next_seq + 1);
-  (*s).sent = ((*s).sent + 1);
+  (*s).next_seq = ((*s).next_seq + 1ULL);
+  (*s).sent = ((*s).sent + 1ULL);
 }
 
 uint64_t one_send_seq() {
@@ -59,7 +59,7 @@ uint64_t seq_equals_count() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -17,19 +17,19 @@ uint64_t trie_count_active(forge_span_u64_t marks __attribute__((unused)), uint6
 int main();
 
 void trie_delete(forge_span_u64_t marks __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t key __attribute__((unused))) {
-  marks.data[key] = 0;
+  marks.data[key] = 0ULL;
 }
 
 uint64_t trie_count_active(forge_span_u64_t marks __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((marks.data[i] > 0)) {
-        cnt = (cnt + 1);
+      if ((marks.data[i] > 0ULL)) {
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -37,7 +37,7 @@ uint64_t trie_count_active(forge_span_u64_t marks __attribute__((unused)), uint6
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

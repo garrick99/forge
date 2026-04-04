@@ -16,22 +16,22 @@ void reverse(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute_
 int main();
 
 void reverse(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
-  uint64_t hi __attribute__((unused)) = (n - 1);
+  uint64_t lo __attribute__((unused)) = 0ULL;
+  uint64_t hi __attribute__((unused)) = (n - 1ULL);
   {
     while ((lo < hi)) {
       uint64_t tmp __attribute__((unused)) = s.data[lo];
       s.data[lo] = s.data[hi];
       s.data[hi] = tmp;
-      lo = (lo + 1);
-      hi = (hi - 1);
+      lo = (lo + 1ULL);
+      hi = (hi - 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

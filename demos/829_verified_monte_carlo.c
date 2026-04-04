@@ -15,11 +15,11 @@ int main();
 
 uint64_t xorshift(uint64_t state __attribute__((unused))) {
   uint64_t s __attribute__((unused)) = state;
-  s = (s ^ (s << 13));
-  s = (s ^ (s >> 7));
-  s = (s ^ (s << 17));
-  if ((s == 0)) {
-    return 1;
+  s = (s ^ (s << 13ULL));
+  s = (s ^ (s >> 7ULL));
+  s = (s ^ (s << 17ULL));
+  if ((s == 0ULL)) {
+    return 1ULL;
   } else {
     return s;
   }
@@ -27,9 +27,9 @@ uint64_t xorshift(uint64_t state __attribute__((unused))) {
 
 uint64_t monte_carlo_pi(uint64_t n_samples __attribute__((unused)), uint64_t radius __attribute__((unused)), uint64_t seed __attribute__((unused))) {
   uint64_t r2 __attribute__((unused)) = (radius * radius);
-  uint64_t inside __attribute__((unused)) = 0;
+  uint64_t inside __attribute__((unused)) = 0ULL;
   uint64_t state __attribute__((unused)) = seed;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n_samples)) {
       uint64_t ns1 __attribute__((unused)) = xorshift(state);
@@ -39,10 +39,10 @@ uint64_t monte_carlo_pi(uint64_t n_samples __attribute__((unused)), uint64_t rad
       state = ns2;
       uint64_t y __attribute__((unused)) = (state % radius);
       if ((((x * x) + (y * y)) <= r2)) {
-        inside = (inside + 1);
+        inside = (inside + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -50,7 +50,7 @@ uint64_t monte_carlo_pi(uint64_t n_samples __attribute__((unused)), uint64_t rad
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

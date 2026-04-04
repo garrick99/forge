@@ -43,7 +43,7 @@ MPS speed(Meters dist __attribute__((unused)), Seconds time __attribute__((unuse
 }
 
 Newtons force(Grams mass __attribute__((unused)), uint64_t accel __attribute__((unused))) {
-  return ((mass * accel) / 1000);
+  return ((mass * accel) / 1000ULL);
 }
 
 Point make_point(uint64_t x __attribute__((unused)), uint64_t y __attribute__((unused))) {
@@ -67,28 +67,28 @@ uint64_t manhattan(Point p __attribute__((unused)), Point q __attribute__((unuse
 }
 
 RGB rgb(uint64_t r __attribute__((unused)), uint64_t g __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  return ((((r & 255) << 16) | ((g & 255) << 8)) | (b & 255));
+  return ((((r & 255ULL) << 16ULL) | ((g & 255ULL) << 8ULL)) | (b & 255ULL));
 }
 
 uint64_t red_channel(RGB c __attribute__((unused))) {
-  return ((c >> 16) & 255);
+  return ((c >> 16ULL) & 255ULL);
 }
 
 uint64_t green_channel(RGB c __attribute__((unused))) {
-  return ((c >> 8) & 255);
+  return ((c >> 8ULL) & 255ULL);
 }
 
 uint64_t blue_channel(RGB c __attribute__((unused))) {
-  return (c & 255);
+  return (c & 255ULL);
 }
 
 int main() {
-  MPS v1 __attribute__((unused)) = speed(100, 5);
-  MPS v2 __attribute__((unused)) = speed(60, 3);
-  Point p1 __attribute__((unused)) = make_point(1, 2);
-  Point p2 __attribute__((unused)) = make_point(4, 6);
+  MPS v1 __attribute__((unused)) = speed(100ULL, 5ULL);
+  MPS v2 __attribute__((unused)) = speed(60ULL, 3ULL);
+  Point p1 __attribute__((unused)) = make_point(1ULL, 2ULL);
+  Point p2 __attribute__((unused)) = make_point(4ULL, 6ULL);
   uint64_t dist __attribute__((unused)) = manhattan(p1, p2);
-  RGB color __attribute__((unused)) = rgb(255, 128, 0);
+  RGB color __attribute__((unused)) = rgb(255ULL, 128ULL, 0ULL);
   uint64_t r __attribute__((unused)) = red_channel(color);
   uint64_t g __attribute__((unused)) = green_channel(color);
   uint64_t b __attribute__((unused)) = blue_channel(color);

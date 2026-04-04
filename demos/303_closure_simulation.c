@@ -11,6 +11,10 @@
 /* span<T> typedefs — fat pointers with proven bounds */
 typedef struct { uint64_t* data; uintptr_t len; } forge_span_u64_t;
 
+/* Function pointer typedefs */
+typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
+typedef _Bool (*forge_fn_u64_u64_ret_bool_t)(uint64_t, uint64_t);
+
 typedef struct AdderClosure {
   uint64_t addend;
 } AdderClosure;
@@ -24,10 +28,6 @@ typedef struct ThresholdCounter {
   uint64_t threshold;
   forge_fn_u64_u64_ret_bool_t pred;
 } ThresholdCounter;
-
-/* Function pointer typedefs */
-typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
-typedef _Bool (*forge_fn_u64_u64_ret_bool_t)(uint64_t, uint64_t);
 
 /* Forward declarations */
 uint64_t adder_call(const AdderClosure* c __attribute__((unused)), uint64_t x __attribute__((unused)));
@@ -45,42 +45,42 @@ uint64_t adder_call(const AdderClosure* c __attribute__((unused)), uint64_t x __
 }
 
 void apply_adder(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), const AdderClosure* c __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = adder_call(c, s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t scaled_map_call(const ScaledMapper* c __attribute__((unused)), uint64_t x __attribute__((unused))) {
-  uint64_t v __attribute__((unused)) = ScaledMapper__f((&(*c)), x);
+  uint64_t v __attribute__((unused)) = (*c).f(x);
   return (v * (*c).scale);
 }
 
 void apply_scaled_mapper(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), const ScaledMapper* c __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       s.data[i] = scaled_map_call(c, s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t count_matching(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), const ThresholdCounter* c __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if (ThresholdCounter__pred((&(*c)), s.data[i], (*c).threshold)) {
-        count = (count + 1);
+      if ((*c).pred(s.data[i], (*c).threshold)) {
+        count = (count + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -88,8 +88,8 @@ uint64_t count_matching(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 }
 
 uint64_t clamp255(uint64_t x __attribute__((unused))) {
-  if ((x > 255)) {
-    return 255;
+  if ((x > 255ULL)) {
+    return 255ULL;
   } else {
     return x;
   }
@@ -100,16 +100,16 @@ _Bool gt_threshold(uint64_t x __attribute__((unused)), uint64_t thresh __attribu
 }
 
 uint64_t demo(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  AdderClosure adder __attribute__((unused)) = (AdderClosure){ .addend = 10 };
+  AdderClosure adder __attribute__((unused)) = (AdderClosure){ .addend = 10ULL };
   apply_adder(s, n, (&adder));
-  ScaledMapper mapper __attribute__((unused)) = (ScaledMapper){ .scale = 2, .f = clamp255 };
+  ScaledMapper mapper __attribute__((unused)) = (ScaledMapper){ .scale = 2ULL, .f = clamp255 };
   apply_scaled_mapper(s, n, (&mapper));
-  ThresholdCounter counter __attribute__((unused)) = (ThresholdCounter){ .threshold = 100, .pred = gt_threshold };
+  ThresholdCounter counter __attribute__((unused)) = (ThresholdCounter){ .threshold = 100ULL, .pred = gt_threshold };
   return count_matching(s, n, (&counter));
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

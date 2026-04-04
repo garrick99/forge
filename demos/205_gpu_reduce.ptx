@@ -13,8 +13,8 @@
 )
 {
     .reg .pred %p7;
-    .reg .u64 %rd0, %rd1, %rd10, %rd11, %rd12, %rd13, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd3, %rd4, %rd6, %rd8, %rd9;
-    .reg .u32 %r21;
+    .reg .u64 %rd0, %rd1, %rd10, %rd11, %rd12, %rd13, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd3, %rd4, %rd6, %rd8, %rd9;
+    .reg .u32 %r24;
 
   ld.param.u64 %rd0, [reduce_step_param_s_data];
   ld.param.u64 %rd1, [reduce_step_param_s_len];
@@ -26,23 +26,27 @@
   add.u64 %rd6, %rd4, %rd3;
   setp.lt.u64 %p7, %rd6, %rd2;
   @!%p7 bra reduce_step_loop_end_5;
-  mul.lo.u64 %rd8, %rd4, 8;
-  add.u64 %rd9, %rd0, %rd8;
-  ld.global.u64 %rd10, [%rd9];
-  add.u64 %rd11, %rd4, %rd3;
-  mul.lo.u64 %rd12, %rd11, 8;
-  add.u64 %rd13, %rd0, %rd12;
-  ld.global.u64 %rd14, [%rd13];
-  add.u64 %rd15, %rd10, %rd14;
-  mul.lo.u64 %rd16, %rd4, 8;
-  add.u64 %rd17, %rd0, %rd16;
-  st.global.u64 [%rd17], %rd15;
-  mov.u64 %rd18, 2;
-  mul.lo.u64 %rd19, %rd3, %rd18;
-  add.u64 %rd20, %rd4, %rd19;
+  mov.u64 %rd8, 8;
+  mul.lo.u64 %rd9, %rd4, %rd8;
+  add.u64 %rd10, %rd0, %rd9;
+  ld.global.u64 %rd11, [%rd10];
+  add.u64 %rd12, %rd4, %rd3;
+  mov.u64 %rd13, 8;
+  mul.lo.u64 %rd14, %rd12, %rd13;
+  add.u64 %rd15, %rd0, %rd14;
+  ld.global.u64 %rd16, [%rd15];
+  add.u64 %rd17, %rd11, %rd16;
+  mov.u64 %rd18, 8;
+  mul.lo.u64 %rd19, %rd4, %rd18;
+  add.u64 %rd20, %rd0, %rd19;
+  st.global.u64 [%rd20], %rd17;
+  mov.u64 %rd21, 2;
+  mul.lo.u64 %rd22, %rd3, %rd21;
+  add.u64 %rd23, %rd4, %rd22;
+  mov.u64 %rd4, %rd23; // loop wb: i
   bra reduce_step_loop_5;
   reduce_step_loop_end_5:
-  mov.u32 %r21, 0; // unit
+  mov.u32 %r24, 0; // unit
   ret;
 }
 

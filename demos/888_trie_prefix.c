@@ -16,29 +16,29 @@ uint64_t trie_lookup(forge_span_u64_t children __attribute__((unused)), uint64_t
 int main();
 
 uint64_t trie_lookup(forge_span_u64_t children __attribute__((unused)), uint64_t trie_size __attribute__((unused)), forge_span_u64_t query __attribute__((unused)), uint64_t qlen __attribute__((unused))) {
-  uint64_t alpha __attribute__((unused)) = 4;
-  uint64_t node __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
-  uint64_t found __attribute__((unused)) = 1;
+  uint64_t alpha __attribute__((unused)) = 4ULL;
+  uint64_t node __attribute__((unused)) = 1ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
+  uint64_t found __attribute__((unused)) = 1ULL;
   {
     while ((i < qlen)) {
-      if (((found == 1) && (node > 0))) {
+      if (((found == 1ULL) && (node > 0ULL))) {
         uint64_t c __attribute__((unused)) = query.data[i];
         uint64_t idx __attribute__((unused)) = ((node * alpha) + c);
         if ((idx < trie_size)) {
           node = children.data[idx];
-          if ((node == 0)) {
-            found = 0;
+          if ((node == 0ULL)) {
+            found = 0ULL;
 
           }
 
         } else {
-          found = 0;
+          found = 0ULL;
 
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -46,7 +46,7 @@ uint64_t trie_lookup(forge_span_u64_t children __attribute__((unused)), uint64_t
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

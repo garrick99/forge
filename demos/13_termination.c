@@ -14,15 +14,15 @@ uint64_t gcd(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unuse
 uint64_t isqrt_step(uint64_t n __attribute__((unused)), uint64_t acc __attribute__((unused)));
 
 uint64_t countdown(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return 0;
+  if ((n == 0ULL)) {
+    return 0ULL;
   } else {
-    return countdown((n - 1));
+    return countdown((n - 1ULL));
   }
 }
 
 uint64_t gcd(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if (((a - ((a / b) * b)) == 0)) {
+  if (((a - ((a / b) * b)) == 0ULL)) {
     return b;
   } else {
     return gcd(b, (a - ((a / b) * b)));
@@ -30,10 +30,10 @@ uint64_t gcd(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unuse
 }
 
 uint64_t isqrt_step(uint64_t n __attribute__((unused)), uint64_t acc __attribute__((unused))) {
-  if ((n == 0)) {
+  if ((n == 0ULL)) {
     return acc;
   } else {
-    return isqrt_step((n - 1), (acc + 1));
+    return isqrt_step((n - 1ULL), (acc + 1ULL));
   }
 }
 

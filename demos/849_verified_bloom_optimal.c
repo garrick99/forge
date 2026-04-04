@@ -14,28 +14,28 @@ uint64_t approx_fpr(uint64_t m_bits __attribute__((unused)), uint64_t n_elements
 int main();
 
 uint64_t optimal_k(uint64_t m_bits __attribute__((unused)), uint64_t n_elements __attribute__((unused))) {
-  uint64_t k __attribute__((unused)) = ((m_bits * 45) / (n_elements * 65));
-  if ((k == 0)) {
-    return 1;
+  uint64_t k __attribute__((unused)) = ((m_bits * 45ULL) / (n_elements * 65ULL));
+  if ((k == 0ULL)) {
+    return 1ULL;
   } else {
     return k;
   }
 }
 
 uint64_t approx_fpr(uint64_t m_bits __attribute__((unused)), uint64_t n_elements __attribute__((unused)), uint64_t k __attribute__((unused))) {
-  uint64_t fill __attribute__((unused)) = (((k * n_elements) * 1000) / m_bits);
+  uint64_t fill __attribute__((unused)) = (((k * n_elements) * 1000ULL) / m_bits);
   uint64_t remain;
-  if ((fill >= 1000)) {
-    remain = 0;
+  if ((fill >= 1000ULL)) {
+    remain = 0ULL;
   } else {
-    remain = (1000 - fill);
+    remain = (1000ULL - fill);
   }
   uint64_t fpr __attribute__((unused)) = remain;
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < k)) {
-      fpr = ((fpr * remain) / 1000);
-      i = (i + 1);
+      fpr = ((fpr * remain) / 1000ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -43,7 +43,7 @@ uint64_t approx_fpr(uint64_t m_bits __attribute__((unused)), uint64_t n_elements
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

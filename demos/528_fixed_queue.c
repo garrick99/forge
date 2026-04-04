@@ -29,11 +29,11 @@ uint64_t queue_size(const Queue* q __attribute__((unused)));
 int main();
 
 Queue queue_new(forge_span_u64_t buf __attribute__((unused)), uint64_t cap __attribute__((unused))) {
-  return (Queue){ .data = buf, .head = 0, .tail = 0, .size = 0, .cap = cap };
+  return (Queue){ .data = buf, .head = 0ULL, .tail = 0ULL, .size = 0ULL, .cap = cap };
 }
 
 _Bool queue_is_empty(const Queue* q __attribute__((unused))) {
-  return ((*q).size == 0);
+  return ((*q).size == 0ULL);
 }
 
 _Bool queue_is_full(const Queue* q __attribute__((unused))) {
@@ -42,14 +42,14 @@ _Bool queue_is_full(const Queue* q __attribute__((unused))) {
 
 void queue_enqueue(Queue* q __attribute__((unused)), uint64_t v __attribute__((unused))) {
   (*q).data.data[(*q).tail] = v;
-  (*q).tail = (((*q).tail + 1) % (*q).cap);
-  (*q).size = ((*q).size + 1);
+  (*q).tail = (((*q).tail + 1ULL) % (*q).cap);
+  (*q).size = ((*q).size + 1ULL);
 }
 
 uint64_t queue_dequeue(Queue* q __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = (*q).data.data[(*q).head];
-  (*q).head = (((*q).head + 1) % (*q).cap);
-  (*q).size = ((*q).size - 1);
+  (*q).head = (((*q).head + 1ULL) % (*q).cap);
+  (*q).size = ((*q).size - 1ULL);
   return v;
 }
 
@@ -58,7 +58,7 @@ uint64_t queue_size(const Queue* q __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -18,7 +18,7 @@ uint64_t fp_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((un
 }
 
 uint64_t fp_floor(uint64_t n __attribute__((unused))) {
-  return ((n / 65536) * 65536);
+  return ((n / 65536ULL) * 65536ULL);
 }
 
 uint64_t fp_scale(uint64_t n __attribute__((unused)), uint64_t num __attribute__((unused)), uint64_t den __attribute__((unused))) {

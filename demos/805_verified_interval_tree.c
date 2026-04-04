@@ -17,15 +17,15 @@ uint64_t first_after(forge_span_u64_t starts __attribute__((unused)), uint64_t n
 int main();
 
 uint64_t count_overlapping(forge_span_u64_t starts __attribute__((unused)), forge_span_u64_t ends __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t qlo __attribute__((unused)), uint64_t qhi __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if (((starts.data[i] <= qhi) && (ends.data[i] >= qlo))) {
-        count = (count + 1);
+        count = (count + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -33,13 +33,13 @@ uint64_t count_overlapping(forge_span_u64_t starts __attribute__((unused)), forg
 }
 
 uint64_t first_after(forge_span_u64_t starts __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t qhi __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
   uint64_t hi __attribute__((unused)) = n;
   {
     while ((lo < hi)) {
-      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2));
+      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2ULL));
       if ((starts.data[mid] <= qhi)) {
-        lo = (mid + 1);
+        lo = (mid + 1ULL);
 
       } else {
         hi = mid;
@@ -52,7 +52,7 @@ uint64_t first_after(forge_span_u64_t starts __attribute__((unused)), uint64_t n
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

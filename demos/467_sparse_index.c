@@ -29,26 +29,26 @@ uint64_t lookups_independent();
 int main();
 
 SparseIndex si_new() {
-  return (SparseIndex){ .bucket_a = 0, .bucket_b = 0, .bucket_c = 0, .total_inserts = 0, .total_lookups = 0 };
+  return (SparseIndex){ .bucket_a = 0ULL, .bucket_b = 0ULL, .bucket_c = 0ULL, .total_inserts = 0ULL, .total_lookups = 0ULL };
 }
 
 void si_insert_a(SparseIndex* s __attribute__((unused))) {
-  (*s).bucket_a = ((*s).bucket_a + 1);
-  (*s).total_inserts = ((*s).total_inserts + 1);
+  (*s).bucket_a = ((*s).bucket_a + 1ULL);
+  (*s).total_inserts = ((*s).total_inserts + 1ULL);
 }
 
 void si_insert_b(SparseIndex* s __attribute__((unused))) {
-  (*s).bucket_b = ((*s).bucket_b + 1);
-  (*s).total_inserts = ((*s).total_inserts + 1);
+  (*s).bucket_b = ((*s).bucket_b + 1ULL);
+  (*s).total_inserts = ((*s).total_inserts + 1ULL);
 }
 
 void si_insert_c(SparseIndex* s __attribute__((unused))) {
-  (*s).bucket_c = ((*s).bucket_c + 1);
-  (*s).total_inserts = ((*s).total_inserts + 1);
+  (*s).bucket_c = ((*s).bucket_c + 1ULL);
+  (*s).total_inserts = ((*s).total_inserts + 1ULL);
 }
 
 void si_lookup(SparseIndex* s __attribute__((unused))) {
-  (*s).total_lookups = ((*s).total_lookups + 1);
+  (*s).total_lookups = ((*s).total_lookups + 1ULL);
 }
 
 uint64_t bucket_a_3() {
@@ -89,7 +89,7 @@ uint64_t lookups_independent() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

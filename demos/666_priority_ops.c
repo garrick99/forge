@@ -20,19 +20,19 @@ uint64_t pq_size_after_pop(uint64_t n __attribute__((unused)));
 int main();
 
 uint64_t pq_peek(forge_span_u64_t h __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  return h.data[0];
+  return h.data[0ULL];
 }
 
 void pq_sift_up(forge_span_u64_t h __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = (n - 1);
+  uint64_t i __attribute__((unused)) = (n - 1ULL);
   _Bool done __attribute__((unused)) = 0;
   {
     while ((!done)) {
-      if ((i == 0)) {
+      if ((i == 0ULL)) {
         done = 1;
 
       } else {
-        uint64_t p __attribute__((unused)) = ((i - 1) / 2);
+        uint64_t p __attribute__((unused)) = ((i - 1ULL) / 2ULL);
         if ((h.data[i] < h.data[p])) {
           uint64_t tmp __attribute__((unused)) = h.data[i];
           h.data[i] = h.data[p];
@@ -51,12 +51,12 @@ void pq_sift_up(forge_span_u64_t h __attribute__((unused)), uint64_t n __attribu
 }
 
 void pq_sift_down(forge_span_u64_t h __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t cur __attribute__((unused)) = 0;
+  uint64_t cur __attribute__((unused)) = 0ULL;
   _Bool done __attribute__((unused)) = 0;
   {
     while ((!done)) {
-      uint64_t l __attribute__((unused)) = ((2 * cur) + 1);
-      uint64_t r __attribute__((unused)) = ((2 * cur) + 2);
+      uint64_t l __attribute__((unused)) = ((2ULL * cur) + 1ULL);
+      uint64_t r __attribute__((unused)) = ((2ULL * cur) + 2ULL);
       uint64_t smallest __attribute__((unused)) = cur;
       uint64_t min_val __attribute__((unused)) = h.data[cur];
       if ((l < n)) {
@@ -90,15 +90,15 @@ void pq_sift_down(forge_span_u64_t h __attribute__((unused)), uint64_t n __attri
 }
 
 uint64_t pq_size_after_push(uint64_t n __attribute__((unused))) {
-  return (n + 1);
+  return (n + 1ULL);
 }
 
 uint64_t pq_size_after_pop(uint64_t n __attribute__((unused))) {
-  return (n - 1);
+  return (n - 1ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

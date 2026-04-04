@@ -16,15 +16,15 @@ _Bool all_positive(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 int main();
 
 _Bool all_positive(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t k __attribute__((unused)) = 0;
+  uint64_t k __attribute__((unused)) = 0ULL;
   _Bool ok __attribute__((unused)) = 1;
   {
     while ((k < n)) {
-      if ((s.data[k] == 0)) {
+      if ((s.data[k] == 0ULL)) {
         ok = 0;
 
       }
-      k = (k + 1);
+      k = (k + 1ULL);
     }
 
   }
@@ -32,7 +32,7 @@ _Bool all_positive(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

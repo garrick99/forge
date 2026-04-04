@@ -11,22 +11,22 @@
 /* Forward declarations */
 uint64_t isqrt(uint64_t n __attribute__((unused)));
 uint64_t ilog2(uint64_t n __attribute__((unused)));
-uint64_t ipow(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused)));
+uint64_t ipow(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused)));
 uint64_t divides(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 uint64_t is_perfect_square(uint64_t n __attribute__((unused)));
 int main();
 
 uint64_t isqrt(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return 0;
+  if ((n == 0ULL)) {
+    return 0ULL;
   } else {
-    uint64_t x0 __attribute__((unused)) = ((n / 2) + 1);
-    uint64_t x1 __attribute__((unused)) = ((x0 + (n / x0)) / 2);
-    uint64_t x2 __attribute__((unused)) = ((x1 + (n / x1)) / 2);
-    uint64_t x3 __attribute__((unused)) = ((x2 + (n / x2)) / 2);
-    uint64_t x4 __attribute__((unused)) = ((x3 + (n / x3)) / 2);
-    uint64_t x5 __attribute__((unused)) = ((x4 + (n / x4)) / 2);
-    uint64_t x6 __attribute__((unused)) = ((x5 + (n / x5)) / 2);
+    uint64_t x0 __attribute__((unused)) = ((n / 2ULL) + 1ULL);
+    uint64_t x1 __attribute__((unused)) = ((x0 + (n / x0)) / 2ULL);
+    uint64_t x2 __attribute__((unused)) = ((x1 + (n / x1)) / 2ULL);
+    uint64_t x3 __attribute__((unused)) = ((x2 + (n / x2)) / 2ULL);
+    uint64_t x4 __attribute__((unused)) = ((x3 + (n / x3)) / 2ULL);
+    uint64_t x5 __attribute__((unused)) = ((x4 + (n / x4)) / 2ULL);
+    uint64_t x6 __attribute__((unused)) = ((x5 + (n / x5)) / 2ULL);
     if ((x6 <= x5)) {
       return x6;
     } else {
@@ -36,100 +36,100 @@ uint64_t isqrt(uint64_t n __attribute__((unused))) {
 }
 
 uint64_t ilog2(uint64_t n __attribute__((unused))) {
-  if ((n >= 2147483648)) {
-    return 31;
+  if ((n >= 2147483648ULL)) {
+    return 31ULL;
   } else {
-    if ((n >= 1073741824)) {
-      return 30;
+    if ((n >= 1073741824ULL)) {
+      return 30ULL;
     } else {
-      if ((n >= 536870912)) {
-        return 29;
+      if ((n >= 536870912ULL)) {
+        return 29ULL;
       } else {
-        if ((n >= 268435456)) {
-          return 28;
+        if ((n >= 268435456ULL)) {
+          return 28ULL;
         } else {
-          if ((n >= 134217728)) {
-            return 27;
+          if ((n >= 134217728ULL)) {
+            return 27ULL;
           } else {
-            if ((n >= 67108864)) {
-              return 26;
+            if ((n >= 67108864ULL)) {
+              return 26ULL;
             } else {
-              if ((n >= 33554432)) {
-                return 25;
+              if ((n >= 33554432ULL)) {
+                return 25ULL;
               } else {
-                if ((n >= 16777216)) {
-                  return 24;
+                if ((n >= 16777216ULL)) {
+                  return 24ULL;
                 } else {
-                  if ((n >= 8388608)) {
-                    return 23;
+                  if ((n >= 8388608ULL)) {
+                    return 23ULL;
                   } else {
-                    if ((n >= 4194304)) {
-                      return 22;
+                    if ((n >= 4194304ULL)) {
+                      return 22ULL;
                     } else {
-                      if ((n >= 2097152)) {
-                        return 21;
+                      if ((n >= 2097152ULL)) {
+                        return 21ULL;
                       } else {
-                        if ((n >= 1048576)) {
-                          return 20;
+                        if ((n >= 1048576ULL)) {
+                          return 20ULL;
                         } else {
-                          if ((n >= 524288)) {
-                            return 19;
+                          if ((n >= 524288ULL)) {
+                            return 19ULL;
                           } else {
-                            if ((n >= 262144)) {
-                              return 18;
+                            if ((n >= 262144ULL)) {
+                              return 18ULL;
                             } else {
-                              if ((n >= 131072)) {
-                                return 17;
+                              if ((n >= 131072ULL)) {
+                                return 17ULL;
                               } else {
-                                if ((n >= 65536)) {
-                                  return 16;
+                                if ((n >= 65536ULL)) {
+                                  return 16ULL;
                                 } else {
-                                  if ((n >= 32768)) {
-                                    return 15;
+                                  if ((n >= 32768ULL)) {
+                                    return 15ULL;
                                   } else {
-                                    if ((n >= 16384)) {
-                                      return 14;
+                                    if ((n >= 16384ULL)) {
+                                      return 14ULL;
                                     } else {
-                                      if ((n >= 8192)) {
-                                        return 13;
+                                      if ((n >= 8192ULL)) {
+                                        return 13ULL;
                                       } else {
-                                        if ((n >= 4096)) {
-                                          return 12;
+                                        if ((n >= 4096ULL)) {
+                                          return 12ULL;
                                         } else {
-                                          if ((n >= 2048)) {
-                                            return 11;
+                                          if ((n >= 2048ULL)) {
+                                            return 11ULL;
                                           } else {
-                                            if ((n >= 1024)) {
-                                              return 10;
+                                            if ((n >= 1024ULL)) {
+                                              return 10ULL;
                                             } else {
-                                              if ((n >= 512)) {
-                                                return 9;
+                                              if ((n >= 512ULL)) {
+                                                return 9ULL;
                                               } else {
-                                                if ((n >= 256)) {
-                                                  return 8;
+                                                if ((n >= 256ULL)) {
+                                                  return 8ULL;
                                                 } else {
-                                                  if ((n >= 128)) {
-                                                    return 7;
+                                                  if ((n >= 128ULL)) {
+                                                    return 7ULL;
                                                   } else {
-                                                    if ((n >= 64)) {
-                                                      return 6;
+                                                    if ((n >= 64ULL)) {
+                                                      return 6ULL;
                                                     } else {
-                                                      if ((n >= 32)) {
-                                                        return 5;
+                                                      if ((n >= 32ULL)) {
+                                                        return 5ULL;
                                                       } else {
-                                                        if ((n >= 16)) {
-                                                          return 4;
+                                                        if ((n >= 16ULL)) {
+                                                          return 4ULL;
                                                         } else {
-                                                          if ((n >= 8)) {
-                                                            return 3;
+                                                          if ((n >= 8ULL)) {
+                                                            return 3ULL;
                                                           } else {
-                                                            if ((n >= 4)) {
-                                                              return 2;
+                                                            if ((n >= 4ULL)) {
+                                                              return 2ULL;
                                                             } else {
-                                                              if ((n >= 2)) {
-                                                                return 1;
+                                                              if ((n >= 2ULL)) {
+                                                                return 1ULL;
                                                               } else {
-                                                                return 0;
+                                                                return 0ULL;
                                                               }
                                                             }
                                                           }
@@ -163,17 +163,17 @@ uint64_t ilog2(uint64_t n __attribute__((unused))) {
   }
 }
 
-uint64_t ipow(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused))) {
-  if ((exp == 0)) {
-    return 1;
+uint64_t ipow(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused))) {
+  if ((forge_exp == 0ULL)) {
+    return 1ULL;
   } else {
-    if ((exp == 1)) {
+    if ((forge_exp == 1ULL)) {
       return base;
     } else {
-      if ((exp == 2)) {
+      if ((forge_exp == 2ULL)) {
         return (base * base);
       } else {
-        if ((exp == 3)) {
+        if ((forge_exp == 3ULL)) {
           return ((base * base) * base);
         } else {
           return (((base * base) * base) * base);
@@ -184,39 +184,39 @@ uint64_t ipow(uint64_t base __attribute__((unused)), uint64_t exp __attribute__(
 }
 
 uint64_t divides(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  if (((b % a) == 0)) {
-    return 1;
+  if (((b % a) == 0ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t is_perfect_square(uint64_t n __attribute__((unused))) {
   uint64_t r __attribute__((unused)) = isqrt(n);
   if (((r * r) == n)) {
-    return 1;
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 int main() {
-  uint64_t r0 __attribute__((unused)) = isqrt(0);
-  uint64_t r1 __attribute__((unused)) = isqrt(1);
-  uint64_t r4 __attribute__((unused)) = isqrt(4);
-  uint64_t r9 __attribute__((unused)) = isqrt(9);
-  uint64_t r16 __attribute__((unused)) = isqrt(16);
-  uint64_t r10 __attribute__((unused)) = isqrt(10);
-  uint64_t l1 __attribute__((unused)) = ilog2(1);
-  uint64_t l2 __attribute__((unused)) = ilog2(2);
-  uint64_t l4 __attribute__((unused)) = ilog2(4);
-  uint64_t l256 __attribute__((unused)) = ilog2(256);
-  uint64_t p2 __attribute__((unused)) = ipow(2, 4);
-  uint64_t p3 __attribute__((unused)) = ipow(3, 3);
-  uint64_t d1 __attribute__((unused)) = divides(3, 9);
-  uint64_t d2 __attribute__((unused)) = divides(3, 7);
-  uint64_t ps1 __attribute__((unused)) = is_perfect_square(25);
-  uint64_t ps2 __attribute__((unused)) = is_perfect_square(26);
+  uint64_t r0 __attribute__((unused)) = isqrt(0ULL);
+  uint64_t r1 __attribute__((unused)) = isqrt(1ULL);
+  uint64_t r4 __attribute__((unused)) = isqrt(4ULL);
+  uint64_t r9 __attribute__((unused)) = isqrt(9ULL);
+  uint64_t r16 __attribute__((unused)) = isqrt(16ULL);
+  uint64_t r10 __attribute__((unused)) = isqrt(10ULL);
+  uint64_t l1 __attribute__((unused)) = ilog2(1ULL);
+  uint64_t l2 __attribute__((unused)) = ilog2(2ULL);
+  uint64_t l4 __attribute__((unused)) = ilog2(4ULL);
+  uint64_t l256 __attribute__((unused)) = ilog2(256ULL);
+  uint64_t p2 __attribute__((unused)) = ipow(2ULL, 4ULL);
+  uint64_t p3 __attribute__((unused)) = ipow(3ULL, 3ULL);
+  uint64_t d1 __attribute__((unused)) = divides(3ULL, 9ULL);
+  uint64_t d2 __attribute__((unused)) = divides(3ULL, 7ULL);
+  uint64_t ps1 __attribute__((unused)) = is_perfect_square(25ULL);
+  uint64_t ps2 __attribute__((unused)) = is_perfect_square(26ULL);
   return (int)((((((((((((((((r0 + r1) + r4) + r9) + r16) + r10) + l1) + l2) + l4) + l256) + p2) + p3) + d1) + d2) + ps1) + ps2));
 
 }

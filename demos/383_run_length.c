@@ -26,21 +26,21 @@ uint64_t initial_state();
 int main();
 
 RunState rs_new(uint64_t first_symbol __attribute__((unused))) {
-  return (RunState){ .current_symbol = first_symbol, .current_run_len = 1, .run_count = 1 };
+  return (RunState){ .current_symbol = first_symbol, .current_run_len = 1ULL, .run_count = 1ULL };
 }
 
 void rs_extend(RunState* r __attribute__((unused))) {
-  (*r).current_run_len = ((*r).current_run_len + 1);
+  (*r).current_run_len = ((*r).current_run_len + 1ULL);
 }
 
 void rs_new_run(RunState* r __attribute__((unused)), uint64_t symbol __attribute__((unused))) {
   (*r).current_symbol = symbol;
-  (*r).current_run_len = 1;
-  (*r).run_count = ((*r).run_count + 1);
+  (*r).current_run_len = 1ULL;
+  (*r).run_count = ((*r).run_count + 1ULL);
 }
 
 uint64_t extend_three() {
-  RunState r __attribute__((unused)) = rs_new(5);
+  RunState r __attribute__((unused)) = rs_new(5ULL);
   rs_extend((&r));
   rs_extend((&r));
   rs_extend((&r));
@@ -48,36 +48,36 @@ uint64_t extend_three() {
 }
 
 uint64_t new_run_length() {
-  RunState r __attribute__((unused)) = rs_new(5);
+  RunState r __attribute__((unused)) = rs_new(5ULL);
   rs_extend((&r));
   rs_extend((&r));
-  rs_new_run((&r), 7);
+  rs_new_run((&r), 7ULL);
   return r.current_run_len;
 }
 
 uint64_t new_run_symbol() {
-  RunState r __attribute__((unused)) = rs_new(5);
+  RunState r __attribute__((unused)) = rs_new(5ULL);
   rs_extend((&r));
-  rs_new_run((&r), 7);
+  rs_new_run((&r), 7ULL);
   return r.current_symbol;
 }
 
 uint64_t run_count() {
-  RunState r __attribute__((unused)) = rs_new(1);
+  RunState r __attribute__((unused)) = rs_new(1ULL);
   rs_extend((&r));
-  rs_new_run((&r), 2);
+  rs_new_run((&r), 2ULL);
   rs_extend((&r));
-  rs_new_run((&r), 1);
+  rs_new_run((&r), 1ULL);
   return r.run_count;
 }
 
 uint64_t initial_state() {
-  RunState r __attribute__((unused)) = rs_new(42);
+  RunState r __attribute__((unused)) = rs_new(42ULL);
   return r.run_count;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

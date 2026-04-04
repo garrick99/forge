@@ -17,12 +17,12 @@ uint64_t extract_min(forge_span_u64_t heap __attribute__((unused)), uint64_t n _
 int main();
 
 void sift_down(forge_span_u64_t heap __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   _Bool done __attribute__((unused)) = 0;
   {
     while ((done == 0)) {
-      uint64_t left __attribute__((unused)) = ((2 * i) + 1);
-      uint64_t right __attribute__((unused)) = ((2 * i) + 2);
+      uint64_t left __attribute__((unused)) = ((2ULL * i) + 1ULL);
+      uint64_t right __attribute__((unused)) = ((2ULL * i) + 2ULL);
       if ((left >= n)) {
         done = 1;
 
@@ -38,7 +38,7 @@ void sift_down(forge_span_u64_t heap __attribute__((unused)), uint64_t n __attri
           heap.data[i] = heap.data[child];
           heap.data[child] = tmp;
           i = child;
-          if ((((2 * i) + 1) >= n)) {
+          if ((((2ULL * i) + 1ULL) >= n)) {
             done = 1;
 
           }
@@ -55,17 +55,17 @@ void sift_down(forge_span_u64_t heap __attribute__((unused)), uint64_t n __attri
 }
 
 uint64_t extract_min(forge_span_u64_t heap __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t min_val __attribute__((unused)) = heap.data[0];
-  heap.data[0] = heap.data[(n - 1)];
-  if ((n > 1)) {
-    sift_down(heap, (n - 1));
+  uint64_t min_val __attribute__((unused)) = heap.data[0ULL];
+  heap.data[0ULL] = heap.data[(n - 1ULL)];
+  if ((n > 1ULL)) {
+    sift_down(heap, (n - 1ULL));
 
   }
   return min_val;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

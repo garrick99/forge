@@ -16,12 +16,12 @@ uint64_t zeros();
 uint64_t run();
 
 uint64_t array_sum(uint64_t* a __attribute__((unused))) {
-  uint64_t s __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t s __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < 8)) {
+    while ((i < 8ULL)) {
       s = (s + a[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -29,12 +29,12 @@ uint64_t array_sum(uint64_t* a __attribute__((unused))) {
 }
 
 uint64_t dot8(uint64_t* a __attribute__((unused)), uint64_t* b __attribute__((unused))) {
-  uint64_t s __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t s __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < 8)) {
+    while ((i < 8ULL)) {
       s = (s + (a[i] * b[i]));
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -46,17 +46,17 @@ uint64_t ct_table_lookup(uint64_t* tbl __attribute__((unused)), uint64_t idx __a
 }
 
 uint64_t zeros() {
-  uint64_t z[16] = { 0 };
-  return (z[0] + z[15]);
+  uint64_t z[16] __attribute__((unused)) = { 0 };
+  return (z[0ULL] + z[15ULL]);
 }
 
 uint64_t run() {
-  uint64_t a[8] = { 1, 2, 3, 4, 5, 6, 7, 8 };
-  uint64_t b[8] = { 2, 2, 2, 2, 2, 2, 2, 2 };
+  uint64_t a[8] __attribute__((unused)) = { 1ULL, 2ULL, 3ULL, 4ULL, 5ULL, 6ULL, 7ULL, 8ULL };
+  uint64_t b[8] __attribute__((unused)) = { 2ULL, 2ULL, 2ULL, 2ULL, 2ULL, 2ULL, 2ULL, 2ULL };
   uint64_t s __attribute__((unused)) = array_sum(a);
   uint64_t d __attribute__((unused)) = dot8(a, b);
-  uint64_t tbl[4] = { 10, 20, 30, 40 };
-  uint64_t v __attribute__((unused)) = ct_table_lookup(tbl, 2);
+  uint64_t tbl[4] __attribute__((unused)) = { 10ULL, 20ULL, 30ULL, 40ULL };
+  uint64_t v __attribute__((unused)) = ct_table_lookup(tbl, 2ULL);
   uint64_t z __attribute__((unused)) = zeros();
   return (((s + d) + v) + z);
 }

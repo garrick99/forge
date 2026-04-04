@@ -24,7 +24,7 @@ void range_fill(forge_span_u64_t s __attribute__((unused)), uint64_t lo __attrib
   {
     while ((i < hi)) {
       s.data[i] = val;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -35,19 +35,19 @@ void range_copy(forge_span_u64_t src __attribute__((unused)), forge_span_u64_t d
   {
     while ((i < hi)) {
       dst.data[i] = src.data[i];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t range_sum(forge_span_u64_t s __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
   uint64_t i __attribute__((unused)) = lo;
   {
     while ((i < hi)) {
       acc = (acc + s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -56,14 +56,14 @@ uint64_t range_sum(forge_span_u64_t s __attribute__((unused)), uint64_t lo __att
 
 uint64_t range_max(forge_span_u64_t s __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
   uint64_t mx __attribute__((unused)) = s.data[lo];
-  uint64_t i __attribute__((unused)) = (lo + 1);
+  uint64_t i __attribute__((unused)) = (lo + 1ULL);
   {
     while ((i < hi)) {
       if ((s.data[i] > mx)) {
         mx = s.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -71,15 +71,15 @@ uint64_t range_max(forge_span_u64_t s __attribute__((unused)), uint64_t lo __att
 }
 
 uint64_t range_count_eq(forge_span_u64_t s __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
   uint64_t i __attribute__((unused)) = lo;
   {
     while ((i < hi)) {
       if ((s.data[i] == val)) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -87,7 +87,7 @@ uint64_t range_count_eq(forge_span_u64_t s __attribute__((unused)), uint64_t lo 
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

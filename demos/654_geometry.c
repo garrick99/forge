@@ -79,15 +79,15 @@ uint64_t chebyshev_dist(uint64_t ax __attribute__((unused)), uint64_t ay __attri
 }
 
 uint64_t count_points_in_box(forge_span_u64_t xs __attribute__((unused)), forge_span_u64_t ys __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t x_lo __attribute__((unused)), uint64_t x_hi __attribute__((unused)), uint64_t y_lo __attribute__((unused)), uint64_t y_hi __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if (((((xs.data[i] >= x_lo) && (xs.data[i] <= x_hi)) && (ys.data[i] >= y_lo)) && (ys.data[i] <= y_hi))) {
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -95,7 +95,7 @@ uint64_t count_points_in_box(forge_span_u64_t xs __attribute__((unused)), forge_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

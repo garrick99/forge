@@ -22,7 +22,7 @@ int main();
 __forge_tuple_u64_u64_t arena_alloc(uint64_t cursor __attribute__((unused)), uint64_t size __attribute__((unused)), uint64_t align __attribute__((unused)), uint64_t capacity __attribute__((unused))) {
   uint64_t rem __attribute__((unused)) = (cursor % align);
   uint64_t aligned;
-  if ((rem == 0)) {
+  if ((rem == 0ULL)) {
     aligned = cursor;
   } else {
     aligned = ((cursor + align) - rem);
@@ -36,13 +36,13 @@ __forge_tuple_u64_u64_t arena_alloc(uint64_t cursor __attribute__((unused)), uin
 
 uint64_t arena_alloc_n(uint64_t cursor __attribute__((unused)), uint64_t obj_size __attribute__((unused)), uint64_t align __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t capacity __attribute__((unused)), forge_span_u64_t offsets __attribute__((unused))) {
   uint64_t cur __attribute__((unused)) = cursor;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       __forge_tuple_u64_u64_t alloc __attribute__((unused)) = arena_alloc(cur, obj_size, align, capacity);
       offsets.data[i] = (alloc)._0;
       cur = (alloc)._1;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -50,7 +50,7 @@ uint64_t arena_alloc_n(uint64_t cursor __attribute__((unused)), uint64_t obj_siz
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

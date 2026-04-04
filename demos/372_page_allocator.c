@@ -26,22 +26,22 @@ uint64_t balance_check(uint64_t total __attribute__((unused)));
 int main();
 
 PageAlloc pgalloc_new(uint64_t total __attribute__((unused))) {
-  return (PageAlloc){ .free_pages = total, .used_pages = 0, .total_pages = total, .alloc_count = 0 };
+  return (PageAlloc){ .free_pages = total, .used_pages = 0ULL, .total_pages = total, .alloc_count = 0ULL };
 }
 
 void pgalloc_alloc(PageAlloc* p __attribute__((unused))) {
-  (*p).free_pages = ((*p).free_pages - 1);
-  (*p).used_pages = ((*p).used_pages + 1);
-  (*p).alloc_count = ((*p).alloc_count + 1);
+  (*p).free_pages = ((*p).free_pages - 1ULL);
+  (*p).used_pages = ((*p).used_pages + 1ULL);
+  (*p).alloc_count = ((*p).alloc_count + 1ULL);
 }
 
 void pgalloc_free(PageAlloc* p __attribute__((unused))) {
-  (*p).used_pages = ((*p).used_pages - 1);
-  (*p).free_pages = ((*p).free_pages + 1);
+  (*p).used_pages = ((*p).used_pages - 1ULL);
+  (*p).free_pages = ((*p).free_pages + 1ULL);
 }
 
 uint64_t alloc_four_used() {
-  PageAlloc p __attribute__((unused)) = pgalloc_new(8);
+  PageAlloc p __attribute__((unused)) = pgalloc_new(8ULL);
   pgalloc_alloc((&p));
   pgalloc_alloc((&p));
   pgalloc_alloc((&p));
@@ -50,7 +50,7 @@ uint64_t alloc_four_used() {
 }
 
 uint64_t alloc_count() {
-  PageAlloc p __attribute__((unused)) = pgalloc_new(8);
+  PageAlloc p __attribute__((unused)) = pgalloc_new(8ULL);
   pgalloc_alloc((&p));
   pgalloc_alloc((&p));
   pgalloc_alloc((&p));
@@ -59,7 +59,7 @@ uint64_t alloc_count() {
 }
 
 uint64_t alloc3_free2() {
-  PageAlloc p __attribute__((unused)) = pgalloc_new(8);
+  PageAlloc p __attribute__((unused)) = pgalloc_new(8ULL);
   pgalloc_alloc((&p));
   pgalloc_alloc((&p));
   pgalloc_alloc((&p));
@@ -78,7 +78,7 @@ uint64_t balance_check(uint64_t total __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

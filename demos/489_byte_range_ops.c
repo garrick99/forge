@@ -26,67 +26,67 @@ uint8_t check_mirror_50();
 int main();
 
 uint8_t high_nibble(uint8_t b __attribute__((unused))) {
-  return (b / 16);
+  return (b / 16ULL);
 }
 
 uint8_t low_nibble(uint8_t b __attribute__((unused))) {
-  return (b % 16);
+  return (b % 16ULL);
 }
 
 _Bool is_printable(uint8_t b __attribute__((unused))) {
-  return ((b >= 32) && (b <= 126));
+  return ((b >= 32ULL) && (b <= 126ULL));
 }
 
 _Bool is_hex_digit(uint8_t b __attribute__((unused))) {
-  return ((((b >= 48) && (b <= 57)) || ((b >= 65) && (b <= 70))) || ((b >= 97) && (b <= 102)));
+  return ((((b >= 48ULL) && (b <= 57ULL)) || ((b >= 65ULL) && (b <= 70ULL))) || ((b >= 97ULL) && (b <= 102ULL)));
 }
 
 uint8_t byte_complement(uint8_t b __attribute__((unused))) {
-  return (255 - b);
+  return (255ULL - b);
 }
 
 uint8_t byte_mirror(uint8_t b __attribute__((unused))) {
-  if ((b <= 127)) {
+  if ((b <= 127ULL)) {
     return (b + b);
   } else {
-    return 255;
+    return 255ULL;
   }
 }
 
 uint8_t check_high_nibble_0xAB() {
-  return high_nibble(171);
+  return high_nibble(171ULL);
 }
 
 uint8_t check_low_nibble_0xAB() {
-  return low_nibble(171);
+  return low_nibble(171ULL);
 }
 
 _Bool check_printable_space() {
-  return is_printable(32);
+  return is_printable(32ULL);
 }
 
 _Bool check_not_printable_del() {
-  return is_printable(127);
+  return is_printable(127ULL);
 }
 
 _Bool check_hex_digit_A() {
-  return is_hex_digit(65);
+  return is_hex_digit(65ULL);
 }
 
 uint8_t check_complement_zero() {
-  return byte_complement(0);
+  return byte_complement(0ULL);
 }
 
 uint8_t check_complement_255() {
-  return byte_complement(255);
+  return byte_complement(255ULL);
 }
 
 uint8_t check_mirror_50() {
-  return byte_mirror(50);
+  return byte_mirror(50ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -17,13 +17,13 @@ int main();
 
 uint64_t popcount(uint64_t x __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = x;
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < 64)) {
-      cnt = (cnt + (n % 2));
-      n = (n / 2);
-      i = (i + 1);
+    while ((i < 64ULL)) {
+      cnt = (cnt + (n % 2ULL));
+      n = (n / 2ULL);
+      i = (i + 1ULL);
     }
 
   }
@@ -32,11 +32,11 @@ uint64_t popcount(uint64_t x __attribute__((unused))) {
 
 uint64_t count_trailing_zeros(uint64_t x __attribute__((unused))) {
   uint64_t n __attribute__((unused)) = x;
-  uint64_t cnt __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
   {
-    while (((n % 2) == 0)) {
-      n = (n / 2);
-      cnt = (cnt + 1);
+    while (((n % 2ULL) == 0ULL)) {
+      n = (n / 2ULL);
+      cnt = (cnt + 1ULL);
     }
 
   }
@@ -44,14 +44,14 @@ uint64_t count_trailing_zeros(uint64_t x __attribute__((unused))) {
 }
 
 _Bool is_power_of_two(uint64_t x __attribute__((unused))) {
-  return ((x & (x - 1)) == 0);
+  return ((x & (x - 1ULL)) == 0ULL);
 }
 
 uint64_t next_power_of_two(uint64_t x __attribute__((unused))) {
-  uint64_t p __attribute__((unused)) = 1;
+  uint64_t p __attribute__((unused)) = 1ULL;
   {
     while ((p < x)) {
-      p = (p * 2);
+      p = (p * 2ULL);
     }
 
   }
@@ -59,7 +59,7 @@ uint64_t next_power_of_two(uint64_t x __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

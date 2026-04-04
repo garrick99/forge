@@ -17,39 +17,39 @@ uint64_t extract_16(uint64_t packed __attribute__((unused)), uint64_t k __attrib
 int main();
 
 uint64_t pack_2x32(uint64_t hi __attribute__((unused)), uint64_t lo __attribute__((unused))) {
-  return ((hi * 4294967296) + lo);
+  return ((hi * 4294967296ULL) + lo);
 }
 
 uint64_t unpack_hi32(uint64_t packed __attribute__((unused))) {
-  return (packed / 4294967296);
+  return (packed / 4294967296ULL);
 }
 
 uint64_t unpack_lo32(uint64_t packed __attribute__((unused))) {
-  return (packed % 4294967296);
+  return (packed % 4294967296ULL);
 }
 
 uint64_t pack_4x16(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t c __attribute__((unused)), uint64_t d __attribute__((unused))) {
-  return ((((((a * 65536) * 65536) * 65536) + ((b * 65536) * 65536)) + (c * 65536)) + d);
+  return ((((((a * 65536ULL) * 65536ULL) * 65536ULL) + ((b * 65536ULL) * 65536ULL)) + (c * 65536ULL)) + d);
 }
 
 uint64_t extract_16(uint64_t packed __attribute__((unused)), uint64_t k __attribute__((unused))) {
-  if ((k == 0)) {
-    return (packed % 65536);
+  if ((k == 0ULL)) {
+    return (packed % 65536ULL);
   } else {
-    if ((k == 1)) {
-      return ((packed / 65536) % 65536);
+    if ((k == 1ULL)) {
+      return ((packed / 65536ULL) % 65536ULL);
     } else {
-      if ((k == 2)) {
-        return ((packed / (65536 * 65536)) % 65536);
+      if ((k == 2ULL)) {
+        return ((packed / (65536ULL * 65536ULL)) % 65536ULL);
       } else {
-        return ((packed / ((65536 * 65536) * 65536)) % 65536);
+        return ((packed / ((65536ULL * 65536ULL) * 65536ULL)) % 65536ULL);
       }
     }
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

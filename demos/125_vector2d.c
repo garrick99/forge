@@ -80,10 +80,10 @@ uint64_t vec_chebyshev(Vec2 a __attribute__((unused)), Vec2 b __attribute__((unu
 }
 
 uint64_t vec_is_axis(Vec2 v __attribute__((unused))) {
-  if (((v.x == 0) || (v.y == 0))) {
-    return 1;
+  if (((v.x == 0ULL) || (v.y == 0ULL))) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
@@ -123,9 +123,9 @@ uint64_t add_commutative(Vec2 a __attribute__((unused)), Vec2 b __attribute__((u
   Vec2 ab __attribute__((unused)) = vec_add(a, b);
   Vec2 ba __attribute__((unused)) = vec_add(b, a);
   if (((ab.x == ba.x) && (ab.y == ba.y))) {
-    return 1;
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
@@ -137,19 +137,19 @@ uint64_t scale_distrib(Vec2 a __attribute__((unused)), Vec2 b __attribute__((unu
   uint64_t lhs __attribute__((unused)) = sab.x;
   uint64_t rhs __attribute__((unused)) = (sa.x + sb.x);
   if ((lhs == rhs)) {
-    return 1;
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 int main() {
-  Vec2 a __attribute__((unused)) = vec_new(3, 4);
-  Vec2 b __attribute__((unused)) = vec_new(1, 2);
+  Vec2 a __attribute__((unused)) = vec_new(3ULL, 4ULL);
+  Vec2 b __attribute__((unused)) = vec_new(1ULL, 2ULL);
   Vec2 c __attribute__((unused)) = vec_add(a, b);
   uint64_t cx __attribute__((unused)) = c.x;
   uint64_t cy __attribute__((unused)) = c.y;
-  Vec2 sc __attribute__((unused)) = vec_scale(a, 2);
+  Vec2 sc __attribute__((unused)) = vec_scale(a, 2ULL);
   uint64_t scx __attribute__((unused)) = sc.x;
   uint64_t dot __attribute__((unused)) = vec_dot(a, b);
   uint64_t man __attribute__((unused)) = vec_manhattan(a, b);
@@ -158,9 +158,9 @@ int main() {
   Vec2 mx __attribute__((unused)) = vec_max(a, b);
   uint64_t mnx __attribute__((unused)) = mn.x;
   uint64_t mxy __attribute__((unused)) = mx.y;
-  uint64_t ax __attribute__((unused)) = vec_is_axis(vec_new(0, 7));
+  uint64_t ax __attribute__((unused)) = vec_is_axis(vec_new(0ULL, 7ULL));
   uint64_t comm __attribute__((unused)) = add_commutative(a, b);
-  uint64_t dist __attribute__((unused)) = scale_distrib(a, b, 3);
+  uint64_t dist __attribute__((unused)) = scale_distrib(a, b, 3ULL);
   return (int)(((((((((((cx + cy) + scx) + dot) + man) + cheb) + mnx) + mxy) + ax) + comm) + dist));
 
 }

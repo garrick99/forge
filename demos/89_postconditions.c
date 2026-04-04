@@ -54,23 +54,23 @@ uint64_t abs_diff(uint64_t a __attribute__((unused)), uint64_t b __attribute__((
 }
 
 uint64_t ceil_div(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
-  return (((a + b) - 1) / b);
+  return (((a + b) - 1ULL) / b);
 }
 
 uint64_t round_up_to_pow2(uint64_t x __attribute__((unused))) {
-  if ((x <= 1)) {
-    return 1;
+  if ((x <= 1ULL)) {
+    return 1ULL;
   } else {
-    if ((x <= 2)) {
-      return 2;
+    if ((x <= 2ULL)) {
+      return 2ULL;
     } else {
-      if ((x <= 4)) {
-        return 4;
+      if ((x <= 4ULL)) {
+        return 4ULL;
       } else {
-        if ((x <= 8)) {
-          return 8;
+        if ((x <= 8ULL)) {
+          return 8ULL;
         } else {
-          return 16;
+          return 16ULL;
         }
       }
     }
@@ -78,14 +78,14 @@ uint64_t round_up_to_pow2(uint64_t x __attribute__((unused))) {
 }
 
 int main() {
-  uint64_t a __attribute__((unused)) = max(7, 3);
-  uint64_t b __attribute__((unused)) = min(7, 3);
-  uint64_t c __attribute__((unused)) = clamp(15, 0, 10);
-  uint64_t d __attribute__((unused)) = clamp(5, 0, 10);
-  uint64_t e __attribute__((unused)) = abs_diff(10, 4);
-  uint64_t f __attribute__((unused)) = ceil_div(10, 3);
-  uint64_t g __attribute__((unused)) = round_up_to_pow2(5);
-  uint64_t h __attribute__((unused)) = round_up_to_pow2(8);
+  uint64_t a __attribute__((unused)) = max(7ULL, 3ULL);
+  uint64_t b __attribute__((unused)) = min(7ULL, 3ULL);
+  uint64_t c __attribute__((unused)) = clamp(15ULL, 0ULL, 10ULL);
+  uint64_t d __attribute__((unused)) = clamp(5ULL, 0ULL, 10ULL);
+  uint64_t e __attribute__((unused)) = abs_diff(10ULL, 4ULL);
+  uint64_t f __attribute__((unused)) = ceil_div(10ULL, 3ULL);
+  uint64_t g __attribute__((unused)) = round_up_to_pow2(5ULL);
+  uint64_t h __attribute__((unused)) = round_up_to_pow2(8ULL);
   return (int)((((((((a + b) + c) + d) + e) + f) + g) + h));
 
 }

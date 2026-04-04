@@ -23,13 +23,13 @@ void merge_halves(forge_span_u64_t src __attribute__((unused)), uint64_t lo __at
     while (((i < mid) && (j < hi))) {
       if ((src.data[i] <= src.data[j])) {
         tmp.data[k] = src.data[i];
-        i = (i + 1);
-        k = (k + 1);
+        i = (i + 1ULL);
+        k = (k + 1ULL);
 
       } else {
         tmp.data[k] = src.data[j];
-        j = (j + 1);
-        k = (k + 1);
+        j = (j + 1ULL);
+        k = (k + 1ULL);
 
       }
     }
@@ -38,16 +38,16 @@ void merge_halves(forge_span_u64_t src __attribute__((unused)), uint64_t lo __at
   {
     while ((i < mid)) {
       tmp.data[k] = src.data[i];
-      i = (i + 1);
-      k = (k + 1);
+      i = (i + 1ULL);
+      k = (k + 1ULL);
     }
 
   }
   {
     while ((j < hi)) {
       tmp.data[k] = src.data[j];
-      j = (j + 1);
-      k = (k + 1);
+      j = (j + 1ULL);
+      k = (k + 1ULL);
     }
 
   }
@@ -55,14 +55,14 @@ void merge_halves(forge_span_u64_t src __attribute__((unused)), uint64_t lo __at
   {
     while ((c < hi)) {
       src.data[c] = tmp.data[c];
-      c = (c + 1);
+      c = (c + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -30,12 +30,12 @@ int main();
 
 uint64_t cmp_u64(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
   if ((a < b)) {
-    return 0;
+    return 0ULL;
   } else {
     if ((a == b)) {
-      return 1;
+      return 1ULL;
     } else {
-      return 2;
+      return 2ULL;
     }
   }
 }
@@ -77,55 +77,55 @@ uint64_t abs_diff_u64(uint64_t a __attribute__((unused)), uint64_t b __attribute
 }
 
 uint64_t check_cmp_lt() {
-  return cmp_u64(3, 5);
+  return cmp_u64(3ULL, 5ULL);
 }
 
 uint64_t check_cmp_eq() {
-  return cmp_u64(5, 5);
+  return cmp_u64(5ULL, 5ULL);
 }
 
 uint64_t check_cmp_gt() {
-  return cmp_u64(7, 5);
+  return cmp_u64(7ULL, 5ULL);
 }
 
 uint64_t check_max_ab() {
-  return max_u64(10, 3);
+  return max_u64(10ULL, 3ULL);
 }
 
 uint64_t check_max_ba() {
-  return max_u64(3, 10);
+  return max_u64(3ULL, 10ULL);
 }
 
 uint64_t check_min_ab() {
-  return min_u64(3, 10);
+  return min_u64(3ULL, 10ULL);
 }
 
 uint64_t check_min_ba() {
-  return min_u64(10, 3);
+  return min_u64(10ULL, 3ULL);
 }
 
 uint64_t check_clamp_in() {
-  return clamp_u64(5, 1, 10);
+  return clamp_u64(5ULL, 1ULL, 10ULL);
 }
 
 uint64_t check_clamp_low() {
-  return clamp_u64(0, 1, 10);
+  return clamp_u64(0ULL, 1ULL, 10ULL);
 }
 
 uint64_t check_clamp_hi() {
-  return clamp_u64(15, 1, 10);
+  return clamp_u64(15ULL, 1ULL, 10ULL);
 }
 
 uint64_t check_abs_diff_5_3() {
-  return abs_diff_u64(5, 3);
+  return abs_diff_u64(5ULL, 3ULL);
 }
 
 uint64_t check_abs_diff_3_5() {
-  return abs_diff_u64(3, 5);
+  return abs_diff_u64(3ULL, 5ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

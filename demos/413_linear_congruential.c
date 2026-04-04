@@ -26,29 +26,29 @@ uint64_t increment_lcg();
 int main();
 
 LCG lcg_new(uint64_t seed __attribute__((unused)), uint64_t a __attribute__((unused)), uint64_t c __attribute__((unused))) {
-  return (LCG){ .state = seed, .a = a, .c = c, .steps = 0 };
+  return (LCG){ .state = seed, .a = a, .c = c, .steps = 0ULL };
 }
 
 void lcg_step(LCG* g __attribute__((unused))) {
   (*g).state = (((*g).a * (*g).state) + (*g).c);
-  (*g).steps = ((*g).steps + 1);
+  (*g).steps = ((*g).steps + 1ULL);
 }
 
 uint64_t one_step_state() {
-  LCG g __attribute__((unused)) = lcg_new(1, 5, 8);
+  LCG g __attribute__((unused)) = lcg_new(1ULL, 5ULL, 8ULL);
   lcg_step((&g));
   return g.state;
 }
 
 uint64_t two_steps_state() {
-  LCG g __attribute__((unused)) = lcg_new(1, 5, 8);
+  LCG g __attribute__((unused)) = lcg_new(1ULL, 5ULL, 8ULL);
   lcg_step((&g));
   lcg_step((&g));
   return g.state;
 }
 
 uint64_t step_count() {
-  LCG g __attribute__((unused)) = lcg_new(0, 3, 1);
+  LCG g __attribute__((unused)) = lcg_new(0ULL, 3ULL, 1ULL);
   lcg_step((&g));
   lcg_step((&g));
   lcg_step((&g));
@@ -57,14 +57,14 @@ uint64_t step_count() {
 }
 
 uint64_t params_preserved() {
-  LCG g __attribute__((unused)) = lcg_new(0, 7, 3);
+  LCG g __attribute__((unused)) = lcg_new(0ULL, 7ULL, 3ULL);
   lcg_step((&g));
   lcg_step((&g));
   return g.a;
 }
 
 uint64_t increment_lcg() {
-  LCG g __attribute__((unused)) = lcg_new(0, 1, 1);
+  LCG g __attribute__((unused)) = lcg_new(0ULL, 1ULL, 1ULL);
   lcg_step((&g));
   lcg_step((&g));
   lcg_step((&g));
@@ -74,7 +74,7 @@ uint64_t increment_lcg() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

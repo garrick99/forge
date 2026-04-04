@@ -42,15 +42,15 @@ uint64_t Vec3__Scalable__magnitude(const Vec3* self __attribute__((unused))) {
 }
 
 uint64_t Rgb__Printable__describe(const Rgb* self __attribute__((unused))) {
-  return ((((*self).r * 2) + ((*self).g * 4)) + (*self).b);
+  return ((((*self).r * 2ULL) + ((*self).g * 4ULL)) + (*self).b);
 }
 
 int main() {
-  Vec3 v __attribute__((unused)) = (Vec3){ .x = 1, .y = 2, .z = 3 };
-  Rgb c __attribute__((unused)) = (Rgb){ .r = 10, .g = 5, .b = 2 };
+  Vec3 v __attribute__((unused)) = (Vec3){ .x = 1ULL, .y = 2ULL, .z = 3ULL };
+  Rgb c __attribute__((unused)) = (Rgb){ .r = 10ULL, .g = 5ULL, .b = 2ULL };
   uint64_t d1 __attribute__((unused)) = Vec3__Printable__describe((&v));
   uint64_t d2 __attribute__((unused)) = Rgb__Printable__describe((&c));
-  Vec3 v2 __attribute__((unused)) = Vec3__Scalable__scale((&v), 3);
+  Vec3 v2 __attribute__((unused)) = Vec3__Scalable__scale((&v), 3ULL);
   uint64_t mag __attribute__((unused)) = Vec3__Scalable__magnitude((&v2));
   return (int)(((d1 + d2) + mag));
 

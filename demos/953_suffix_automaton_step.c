@@ -17,7 +17,7 @@ int main();
 
 uint64_t sa_follow(forge_span_u64_t table __attribute__((unused)), uint64_t n_states __attribute__((unused)), uint64_t alpha __attribute__((unused)), uint64_t state __attribute__((unused)), forge_span_u64_t input __attribute__((unused)), uint64_t len __attribute__((unused))) {
   uint64_t st __attribute__((unused)) = state;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < len)) {
       uint64_t ch __attribute__((unused)) = input.data[i];
@@ -33,7 +33,7 @@ uint64_t sa_follow(forge_span_u64_t table __attribute__((unused)), uint64_t n_st
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -41,7 +41,7 @@ uint64_t sa_follow(forge_span_u64_t table __attribute__((unused)), uint64_t n_st
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

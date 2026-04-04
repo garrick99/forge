@@ -16,11 +16,11 @@ uint64_t count_nonzero(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 int main();
 
 uint64_t count_nonzero(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
   {
     for (uint64_t i = 0; i < (uint64_t)(n); i++) {
-      if ((s.data[i] > 0)) {
-        count = (count + 1);
+      if ((s.data[i] > 0ULL)) {
+        count = (count + 1ULL);
 
       }
     }
@@ -30,7 +30,7 @@ uint64_t count_nonzero(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

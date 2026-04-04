@@ -28,19 +28,19 @@ __forge_tuple_u64_u64_t lz_find_match(forge_span_u64_t data __attribute__((unuse
   if ((pos >= window)) {
     start = (pos - window);
   } else {
-    start = 0;
+    start = 0ULL;
   }
-  uint64_t best_off __attribute__((unused)) = 0;
-  uint64_t best_len __attribute__((unused)) = 0;
+  uint64_t best_off __attribute__((unused)) = 0ULL;
+  uint64_t best_len __attribute__((unused)) = 0ULL;
   uint64_t s __attribute__((unused)) = start;
   {
     while ((s < pos)) {
-      uint64_t len __attribute__((unused)) = 0;
+      uint64_t len __attribute__((unused)) = 0ULL;
       _Bool ok __attribute__((unused)) = 1;
       {
         while (((((len < max_len) && ((pos + len) < data_len)) && ((s + len) < data_len)) && ok)) {
           if ((data.data[(s + len)] == data.data[(pos + len)])) {
-            len = (len + 1);
+            len = (len + 1ULL);
 
           } else {
             ok = 0;
@@ -54,7 +54,7 @@ __forge_tuple_u64_u64_t lz_find_match(forge_span_u64_t data __attribute__((unuse
         best_len = len;
 
       }
-      s = (s + 1);
+      s = (s + 1ULL);
     }
 
   }
@@ -62,30 +62,30 @@ __forge_tuple_u64_u64_t lz_find_match(forge_span_u64_t data __attribute__((unuse
 }
 
 uint64_t lz_compress(forge_span_u64_t data __attribute__((unused)), uint64_t data_len __attribute__((unused)), forge_span_u64_t output __attribute__((unused)), uint64_t out_cap __attribute__((unused))) {
-  uint64_t window __attribute__((unused)) = 4096;
-  uint64_t min_match __attribute__((unused)) = 3;
-  uint64_t max_match __attribute__((unused)) = 258;
-  uint64_t pos __attribute__((unused)) = 0;
-  uint64_t oi __attribute__((unused)) = 0;
+  uint64_t window __attribute__((unused)) = 4096ULL;
+  uint64_t min_match __attribute__((unused)) = 3ULL;
+  uint64_t max_match __attribute__((unused)) = 258ULL;
+  uint64_t pos __attribute__((unused)) = 0ULL;
+  uint64_t oi __attribute__((unused)) = 0ULL;
   {
     while ((pos < data_len)) {
-      if (((oi + 3) > out_cap)) {
+      if (((oi + 3ULL) > out_cap)) {
         pos = data_len;
 
       } else {
         __forge_tuple_u64_u64_t m __attribute__((unused)) = lz_find_match(data, data_len, pos, window, max_match);
         if ((((m)._1 >= min_match) && ((pos + (m)._1) <= data_len))) {
-          output.data[oi] = 1;
-          output.data[(oi + 1)] = (m)._0;
-          output.data[(oi + 2)] = (m)._1;
-          oi = (oi + 3);
+          output.data[oi] = 1ULL;
+          output.data[(oi + 1ULL)] = (m)._0;
+          output.data[(oi + 2ULL)] = (m)._1;
+          oi = (oi + 3ULL);
           pos = (pos + (m)._1);
 
         } else {
-          output.data[oi] = 0;
-          output.data[(oi + 1)] = data.data[pos];
-          oi = (oi + 2);
-          pos = (pos + 1);
+          output.data[oi] = 0ULL;
+          output.data[(oi + 1ULL)] = data.data[pos];
+          oi = (oi + 2ULL);
+          pos = (pos + 1ULL);
 
         }
 
@@ -97,32 +97,32 @@ uint64_t lz_compress(forge_span_u64_t data __attribute__((unused)), uint64_t dat
 }
 
 uint64_t lz_decompress(forge_span_u64_t tokens __attribute__((unused)), uint64_t token_len __attribute__((unused)), forge_span_u64_t output __attribute__((unused)), uint64_t out_cap __attribute__((unused))) {
-  uint64_t ti __attribute__((unused)) = 0;
-  uint64_t oi __attribute__((unused)) = 0;
+  uint64_t ti __attribute__((unused)) = 0ULL;
+  uint64_t oi __attribute__((unused)) = 0ULL;
   {
     while ((ti < token_len)) {
       uint64_t tag __attribute__((unused)) = tokens.data[ti];
-      if ((((tag == 0) && ((ti + 1) < token_len)) && (oi < out_cap))) {
-        output.data[oi] = tokens.data[(ti + 1)];
-        oi = (oi + 1);
-        ti = (ti + 2);
+      if ((((tag == 0ULL) && ((ti + 1ULL) < token_len)) && (oi < out_cap))) {
+        output.data[oi] = tokens.data[(ti + 1ULL)];
+        oi = (oi + 1ULL);
+        ti = (ti + 2ULL);
 
-      } else if (((tag == 1) && ((ti + 2) < token_len))) {
-        uint64_t offset __attribute__((unused)) = tokens.data[(ti + 1)];
-        uint64_t length __attribute__((unused)) = tokens.data[(ti + 2)];
-        uint64_t k __attribute__((unused)) = 0;
+      } else if (((tag == 1ULL) && ((ti + 2ULL) < token_len))) {
+        uint64_t offset __attribute__((unused)) = tokens.data[(ti + 1ULL)];
+        uint64_t length __attribute__((unused)) = tokens.data[(ti + 2ULL)];
+        uint64_t k __attribute__((unused)) = 0ULL;
         {
           while (((k < length) && (oi < out_cap))) {
             if ((oi >= offset)) {
               output.data[oi] = output.data[(oi - offset)];
 
             }
-            oi = (oi + 1);
-            k = (k + 1);
+            oi = (oi + 1ULL);
+            k = (k + 1ULL);
           }
 
         }
-        ti = (ti + 3);
+        ti = (ti + 3ULL);
 
       } else {
         ti = token_len;
@@ -135,18 +135,18 @@ uint64_t lz_decompress(forge_span_u64_t tokens __attribute__((unused)), uint64_t
 }
 
 uint64_t lz_count_literals(forge_span_u64_t tokens __attribute__((unused)), uint64_t token_len __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
-  uint64_t ti __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
+  uint64_t ti __attribute__((unused)) = 0ULL;
   {
     while ((ti < token_len)) {
       uint64_t tag __attribute__((unused)) = tokens.data[ti];
       uint64_t step __attribute__((unused)) = (token_len - ti);
-      if ((tag == 0)) {
-        count = (count + 1);
-        step = 2;
+      if ((tag == 0ULL)) {
+        count = (count + 1ULL);
+        step = 2ULL;
 
-      } else if ((tag == 1)) {
-        step = 3;
+      } else if ((tag == 1ULL)) {
+        step = 3ULL;
 
       }
       if (((ti + step) <= token_len)) {
@@ -163,18 +163,18 @@ uint64_t lz_count_literals(forge_span_u64_t tokens __attribute__((unused)), uint
 }
 
 uint64_t lz_count_refs(forge_span_u64_t tokens __attribute__((unused)), uint64_t token_len __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
-  uint64_t ti __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
+  uint64_t ti __attribute__((unused)) = 0ULL;
   {
     while ((ti < token_len)) {
       uint64_t tag __attribute__((unused)) = tokens.data[ti];
       uint64_t step __attribute__((unused)) = (token_len - ti);
-      if ((tag == 0)) {
-        step = 2;
+      if ((tag == 0ULL)) {
+        step = 2ULL;
 
-      } else if ((tag == 1)) {
-        count = (count + 1);
-        step = 3;
+      } else if ((tag == 1ULL)) {
+        count = (count + 1ULL);
+        step = 3ULL;
 
       }
       if (((ti + step) <= token_len)) {
@@ -202,7 +202,7 @@ uint64_t roundtrip(forge_span_u64_t data __attribute__((unused)), uint64_t n __a
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

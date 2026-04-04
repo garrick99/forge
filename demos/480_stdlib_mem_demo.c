@@ -51,40 +51,40 @@ uint64_t check_min_single(forge_span_u64_t s __attribute__((unused)));
 int main();
 
 void span_fill_u8(forge_span_u8_t dst __attribute__((unused)), uint8_t v __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       dst.data[i] = v;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void span_zero_u8(forge_span_u8_t dst __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      dst.data[i] = 0;
-      i = (i + 1);
+      dst.data[i] = 0ULL;
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void span_copy_u8(forge_span_u8_t dst __attribute__((unused)), forge_span_u8_t src __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       dst.data[i] = src.data[i];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 _Bool span_eq_u8(forge_span_u8_t a __attribute__((unused)), forge_span_u8_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   _Bool equal __attribute__((unused)) = 1;
   {
     while (((i < n) && equal)) {
@@ -92,7 +92,7 @@ _Bool span_eq_u8(forge_span_u8_t a __attribute__((unused)), forge_span_u8_t b __
         equal = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -100,34 +100,34 @@ _Bool span_eq_u8(forge_span_u8_t a __attribute__((unused)), forge_span_u8_t b __
 }
 
 void span_fill_u64(forge_span_u64_t dst __attribute__((unused)), uint64_t v __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       dst.data[i] = v;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void span_copy_u64(forge_span_u64_t dst __attribute__((unused)), forge_span_u64_t src __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       dst.data[i] = src.data[i];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t span_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + s.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -135,15 +135,15 @@ uint64_t span_sum(forge_span_u64_t s __attribute__((unused)), uint64_t n __attri
 }
 
 uint64_t span_max(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t m __attribute__((unused)) = s.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t m __attribute__((unused)) = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((s.data[i] > m)) {
         m = s.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -151,15 +151,15 @@ uint64_t span_max(forge_span_u64_t s __attribute__((unused)), uint64_t n __attri
 }
 
 uint64_t span_min(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t m __attribute__((unused)) = s.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t m __attribute__((unused)) = s.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < n)) {
       if ((s.data[i] < m)) {
         m = s.data[i];
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -167,7 +167,7 @@ uint64_t span_min(forge_span_u64_t s __attribute__((unused)), uint64_t n __attri
 }
 
 _Bool check_fill(forge_span_u8_t dst __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  span_fill_u8(dst, 42, n);
+  span_fill_u8(dst, 42ULL, n);
   return 1;
 }
 
@@ -177,19 +177,19 @@ _Bool check_zero(forge_span_u8_t dst __attribute__((unused)), uint64_t n __attri
 }
 
 uint64_t check_sum_empty(forge_span_u64_t s __attribute__((unused))) {
-  return span_sum(s, 0);
+  return span_sum(s, 0ULL);
 }
 
 uint64_t check_max_single(forge_span_u64_t s __attribute__((unused))) {
-  return span_max(s, 1);
+  return span_max(s, 1ULL);
 }
 
 uint64_t check_min_single(forge_span_u64_t s __attribute__((unused))) {
-  return span_min(s, 1);
+  return span_min(s, 1ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

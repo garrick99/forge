@@ -75,13 +75,13 @@ Achievement classify_player(Player p __attribute__((unused))) {
 uint64_t achievement_bonus(Achievement a __attribute__((unused))) {
   switch (a.tag) {
     case Achievement_tag_NewPlayer: {
-      return 0;
+      return 0ULL;
     }
     case Achievement_tag_Veteran: {
-      return 50;
+      return 50ULL;
     }
     case Achievement_tag_Champion: {
-      return 200;
+      return 200ULL;
     }
     default: __builtin_unreachable();
   }
@@ -92,12 +92,12 @@ uint64_t replicate_n(uint64_t N __attribute__((unused)), uint64_t val __attribut
 }
 
 uint64_t sum_scores(forge_span_u64_t scores __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + scores.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -105,8 +105,8 @@ uint64_t sum_scores(forge_span_u64_t scores __attribute__((unused)), uint64_t n 
 }
 
 int main() {
-  Player p1 __attribute__((unused)) = (Player){ .name_len = 5, .score = 85, .level = 12 };
-  Player p2 __attribute__((unused)) = (Player){ .name_len = 8, .score = 92, .level = 55 };
+  Player p1 __attribute__((unused)) = (Player){ .name_len = 5ULL, .score = 85ULL, .level = 12ULL };
+  Player p2 __attribute__((unused)) = (Player){ .name_len = 8ULL, .score = 92ULL, .level = 55ULL };
   uint64_t nl1 __attribute__((unused)) = Player__Named__name_len((&p1));
   uint64_t sc1 __attribute__((unused)) = Player__Scored__score((&p1));
   uint64_t gr1 __attribute__((unused)) = Player__Scored__grade((&p1));
@@ -117,29 +117,29 @@ int main() {
   Achievement a2 __attribute__((unused)) = classify_player(p2);
   uint64_t b1 __attribute__((unused)) = achievement_bonus(a1);
   uint64_t b2 __attribute__((unused)) = achievement_bonus(a2);
-  uint64_t triple __attribute__((unused)) = replicate_n(3, 7);
+  uint64_t triple __attribute__((unused)) = replicate_n(3ULL, 7ULL);
   return (int)((((((((nl1 + sc1) + gr1) + gr2) + v) + b1) + b2) + triple));
 
 }
 
 uint64_t Player__Scored__grade(const Player* self __attribute__((unused))) {
   uint64_t s __attribute__((unused)) = Player__Scored__score((&(*self)));
-  if ((s >= 90)) {
-    return 4;
+  if ((s >= 90ULL)) {
+    return 4ULL;
   } else {
-    if ((s >= 80)) {
-      return 3;
+    if ((s >= 80ULL)) {
+      return 3ULL;
     } else {
-      if ((s >= 70)) {
-        return 2;
+      if ((s >= 70ULL)) {
+        return 2ULL;
       } else {
-        return 1;
+        return 1ULL;
       }
     }
   }
 }
 
 uint64_t Player__Named__version() {
-  return 1;
+  return 1ULL;
 }
 

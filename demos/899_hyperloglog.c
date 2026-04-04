@@ -19,18 +19,18 @@ int main();
 
 uint64_t leading_zeros_approx(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
-  uint64_t cnt __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
   {
-    while (((v > 0) && (cnt < 64))) {
-      v = (v / 2);
-      cnt = (cnt + 1);
+    while (((v > 0ULL) && (cnt < 64ULL))) {
+      v = (v / 2ULL);
+      cnt = (cnt + 1ULL);
     }
 
   }
-  if ((val == 0)) {
-    return 64;
+  if ((val == 0ULL)) {
+    return 64ULL;
   } else {
-    return (64 - cnt);
+    return (64ULL - cnt);
   }
 }
 
@@ -44,12 +44,12 @@ void hll_add(forge_span_u64_t registers __attribute__((unused)), uint64_t m __at
 }
 
 uint64_t hll_estimate(forge_span_u64_t registers __attribute__((unused)), uint64_t m __attribute__((unused))) {
-  uint64_t sum __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t sum __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < m)) {
       sum = (sum + registers.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -57,7 +57,7 @@ uint64_t hll_estimate(forge_span_u64_t registers __attribute__((unused)), uint64
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

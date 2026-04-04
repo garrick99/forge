@@ -21,15 +21,15 @@ uint64_t heap_min(forge_span_u64_t h __attribute__((unused)), uint64_t n __attri
 int main();
 
 uint64_t heap_parent(uint64_t i __attribute__((unused))) {
-  return ((i - 1) / 2);
+  return ((i - 1ULL) / 2ULL);
 }
 
 uint64_t heap_left(uint64_t i __attribute__((unused))) {
-  return ((2 * i) + 1);
+  return ((2ULL * i) + 1ULL);
 }
 
 uint64_t heap_right(uint64_t i __attribute__((unused))) {
-  return ((2 * i) + 2);
+  return ((2ULL * i) + 2ULL);
 }
 
 void heap_sift_down(forge_span_u64_t h __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t i __attribute__((unused))) {
@@ -75,7 +75,7 @@ void heap_sift_up(forge_span_u64_t h __attribute__((unused)), uint64_t n __attri
   uint64_t cur __attribute__((unused)) = i;
   _Bool done __attribute__((unused)) = 0;
   {
-    while (((cur >= 1) && (!done))) {
+    while (((cur >= 1ULL) && (!done))) {
       uint64_t p __attribute__((unused)) = heap_parent(cur);
       if ((h.data[cur] < h.data[p])) {
         uint64_t tmp __attribute__((unused)) = h.data[cur];
@@ -93,11 +93,11 @@ void heap_sift_up(forge_span_u64_t h __attribute__((unused)), uint64_t n __attri
 }
 
 uint64_t heap_min(forge_span_u64_t h __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  return h.data[0];
+  return h.data[0ULL];
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

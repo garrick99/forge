@@ -23,25 +23,25 @@ uint64_t counter_value(const Counter* c __attribute__((unused)));
 int main();
 
 Counter counter_new(uint64_t max __attribute__((unused))) {
-  return (Counter){ .value = 0, .max = max };
+  return (Counter){ .value = 0ULL, .max = max };
 }
 
 void counter_inc(Counter* c __attribute__((unused))) {
   if (((*c).value < (*c).max)) {
-    (*c).value = ((*c).value + 1);
+    (*c).value = ((*c).value + 1ULL);
 
   }
 }
 
 void counter_dec(Counter* c __attribute__((unused))) {
-  if (((*c).value > 0)) {
-    (*c).value = ((*c).value - 1);
+  if (((*c).value > 0ULL)) {
+    (*c).value = ((*c).value - 1ULL);
 
   }
 }
 
 void counter_reset(Counter* c __attribute__((unused))) {
-  (*c).value = 0;
+  (*c).value = 0ULL;
 }
 
 _Bool counter_at_max(const Counter* c __attribute__((unused))) {
@@ -53,7 +53,7 @@ uint64_t counter_value(const Counter* c __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

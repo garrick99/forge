@@ -27,22 +27,22 @@ uint64_t total_preserved();
 int main();
 
 AlarmManager am_new() {
-  return (AlarmManager){ .armed = 0, .triggered = 0, .silenced = 0, .total = 0 };
+  return (AlarmManager){ .armed = 0ULL, .triggered = 0ULL, .silenced = 0ULL, .total = 0ULL };
 }
 
 void am_arm(AlarmManager* a __attribute__((unused))) {
-  (*a).armed = ((*a).armed + 1);
-  (*a).total = ((*a).total + 1);
+  (*a).armed = ((*a).armed + 1ULL);
+  (*a).total = ((*a).total + 1ULL);
 }
 
 void am_trigger(AlarmManager* a __attribute__((unused))) {
-  (*a).armed = ((*a).armed - 1);
-  (*a).triggered = ((*a).triggered + 1);
+  (*a).armed = ((*a).armed - 1ULL);
+  (*a).triggered = ((*a).triggered + 1ULL);
 }
 
 void am_silence(AlarmManager* a __attribute__((unused))) {
-  (*a).triggered = ((*a).triggered - 1);
-  (*a).silenced = ((*a).silenced + 1);
+  (*a).triggered = ((*a).triggered - 1ULL);
+  (*a).silenced = ((*a).silenced + 1ULL);
 }
 
 uint64_t arm_3() {
@@ -80,7 +80,7 @@ uint64_t total_preserved() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

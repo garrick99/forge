@@ -16,15 +16,15 @@ uint64_t hamming_distance(forge_span_u64_t a __attribute__((unused)), forge_span
 int main();
 
 uint64_t hamming_distance(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t dist __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t dist __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((a.data[i] != b.data[i])) {
-        dist = (dist + 1);
+        dist = (dist + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -32,7 +32,7 @@ uint64_t hamming_distance(forge_span_u64_t a __attribute__((unused)), forge_span
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

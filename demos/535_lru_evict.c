@@ -25,18 +25,18 @@ uint64_t lru_clock(const LRU* lru __attribute__((unused)));
 int main();
 
 LRU lru_new(forge_span_u64_t buf __attribute__((unused)), uint64_t cap __attribute__((unused))) {
-  return (LRU){ .timestamps = buf, .cap = cap, .clock = 0 };
+  return (LRU){ .timestamps = buf, .cap = cap, .clock = 0ULL };
 }
 
 void lru_touch(LRU* lru __attribute__((unused)), uint64_t slot __attribute__((unused))) {
   (*lru).timestamps.data[slot] = (*lru).clock;
-  (*lru).clock = ((*lru).clock + 1);
+  (*lru).clock = ((*lru).clock + 1ULL);
 }
 
 uint64_t lru_find_oldest(const LRU* lru __attribute__((unused))) {
-  uint64_t oldest __attribute__((unused)) = 0;
-  uint64_t min_ts __attribute__((unused)) = (*lru).timestamps.data[0];
-  uint64_t i __attribute__((unused)) = 1;
+  uint64_t oldest __attribute__((unused)) = 0ULL;
+  uint64_t min_ts __attribute__((unused)) = (*lru).timestamps.data[0ULL];
+  uint64_t i __attribute__((unused)) = 1ULL;
   {
     while ((i < (*lru).cap)) {
       uint64_t ts_i __attribute__((unused)) = (*lru).timestamps.data[i];
@@ -46,7 +46,7 @@ uint64_t lru_find_oldest(const LRU* lru __attribute__((unused))) {
         oldest = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -58,7 +58,7 @@ uint64_t lru_clock(const LRU* lru __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

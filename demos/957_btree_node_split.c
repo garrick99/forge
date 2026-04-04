@@ -16,17 +16,17 @@ uint64_t btree_split(forge_span_u64_t keys __attribute__((unused)), forge_span_u
 int main();
 
 uint64_t btree_split(forge_span_u64_t keys __attribute__((unused)), forge_span_u64_t new_node __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t mid __attribute__((unused)) = (n / 2);
-  uint64_t j __attribute__((unused)) = 0;
-  uint64_t src __attribute__((unused)) = (mid + 1);
+  uint64_t mid __attribute__((unused)) = (n / 2ULL);
+  uint64_t j __attribute__((unused)) = 0ULL;
+  uint64_t src __attribute__((unused)) = (mid + 1ULL);
   {
     while ((src < n)) {
       if ((j < n)) {
         new_node.data[j] = keys.data[src];
 
       }
-      j = (j + 1);
-      src = (src + 1);
+      j = (j + 1ULL);
+      src = (src + 1ULL);
     }
 
   }
@@ -34,7 +34,7 @@ uint64_t btree_split(forge_span_u64_t keys __attribute__((unused)), forge_span_u
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

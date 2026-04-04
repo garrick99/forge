@@ -28,40 +28,40 @@ uint64_t success_resets_delay();
 int main();
 
 RetryState retry_new(uint64_t initial_delay __attribute__((unused)), uint64_t max_delay __attribute__((unused))) {
-  return (RetryState){ .retries = 0, .delay = initial_delay, .max_delay = max_delay, .successes = 0 };
+  return (RetryState){ .retries = 0ULL, .delay = initial_delay, .max_delay = max_delay, .successes = 0ULL };
 }
 
 void retry_fail(RetryState* r __attribute__((unused))) {
-  (*r).retries = ((*r).retries + 1);
-  (*r).delay = ((*r).delay * 2);
+  (*r).retries = ((*r).retries + 1ULL);
+  (*r).delay = ((*r).delay * 2ULL);
 }
 
 void retry_fail_capped(RetryState* r __attribute__((unused))) {
-  (*r).retries = ((*r).retries + 1);
+  (*r).retries = ((*r).retries + 1ULL);
   (*r).delay = (*r).max_delay;
 }
 
 void retry_success(RetryState* r __attribute__((unused)), uint64_t initial_delay __attribute__((unused))) {
-  (*r).successes = ((*r).successes + 1);
-  (*r).retries = 0;
+  (*r).successes = ((*r).successes + 1ULL);
+  (*r).retries = 0ULL;
   (*r).delay = initial_delay;
 }
 
 uint64_t one_fail_delay() {
-  RetryState r __attribute__((unused)) = retry_new(1, 16);
+  RetryState r __attribute__((unused)) = retry_new(1ULL, 16ULL);
   retry_fail((&r));
   return r.delay;
 }
 
 uint64_t two_fail_delay() {
-  RetryState r __attribute__((unused)) = retry_new(1, 16);
+  RetryState r __attribute__((unused)) = retry_new(1ULL, 16ULL);
   retry_fail((&r));
   retry_fail((&r));
   return r.delay;
 }
 
 uint64_t three_fail_delay() {
-  RetryState r __attribute__((unused)) = retry_new(1, 16);
+  RetryState r __attribute__((unused)) = retry_new(1ULL, 16ULL);
   retry_fail((&r));
   retry_fail((&r));
   retry_fail((&r));
@@ -69,24 +69,24 @@ uint64_t three_fail_delay() {
 }
 
 uint64_t success_resets() {
-  RetryState r __attribute__((unused)) = retry_new(1, 16);
+  RetryState r __attribute__((unused)) = retry_new(1ULL, 16ULL);
   retry_fail((&r));
   retry_fail((&r));
-  retry_success((&r), 1);
+  retry_success((&r), 1ULL);
   return r.retries;
 }
 
 uint64_t success_resets_delay() {
-  RetryState r __attribute__((unused)) = retry_new(1, 16);
+  RetryState r __attribute__((unused)) = retry_new(1ULL, 16ULL);
   retry_fail((&r));
   retry_fail((&r));
   retry_fail((&r));
-  retry_success((&r), 1);
+  retry_success((&r), 1ULL);
   return r.delay;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

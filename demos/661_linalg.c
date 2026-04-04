@@ -21,12 +21,12 @@ void vec_hadamard(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b
 int main();
 
 uint64_t vec_dot(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + (a.data[i] * b.data[i]));
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -34,12 +34,12 @@ uint64_t vec_dot(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b 
 }
 
 uint64_t vec_norm_sq(forge_span_u64_t a __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t acc __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t acc __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       acc = (acc + (a.data[i] * a.data[i]));
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -47,51 +47,51 @@ uint64_t vec_norm_sq(forge_span_u64_t a __attribute__((unused)), uint64_t n __at
 }
 
 void vec_add(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       out.data[i] = (a.data[i] + b.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void vec_scale(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t s __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       out.data[i] = (a.data[i] * s);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void vec_axpy(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t alpha __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       out.data[i] = ((alpha * a.data[i]) + b.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void vec_hadamard(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       out.data[i] = (a.data[i] * b.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

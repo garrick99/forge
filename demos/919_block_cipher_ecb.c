@@ -17,29 +17,29 @@ void ecb_decrypt(forge_span_u64_t cipher __attribute__((unused)), forge_span_u64
 int main();
 
 void ecb_encrypt(forge_span_u64_t plain __attribute__((unused)), forge_span_u64_t cipher __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t key __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       cipher.data[i] = (plain.data[i] ^ key);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void ecb_decrypt(forge_span_u64_t cipher __attribute__((unused)), forge_span_u64_t plain __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t key __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       plain.data[i] = (cipher.data[i] ^ key);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

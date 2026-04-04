@@ -19,16 +19,16 @@ uint64_t copy_if_odd(forge_span_u64_t src __attribute__((unused)), uint64_t n __
 int main();
 
 uint64_t copy_if_nonzero(forge_span_u64_t src __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t dst __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
-  uint64_t cnt __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((src.data[i] != 0)) {
+      if ((src.data[i] != 0ULL)) {
         dst.data[cnt] = src.data[i];
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -36,16 +36,16 @@ uint64_t copy_if_nonzero(forge_span_u64_t src __attribute__((unused)), uint64_t 
 }
 
 uint64_t copy_if_ge(forge_span_u64_t src __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t threshold __attribute__((unused)), forge_span_u64_t dst __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
-  uint64_t cnt __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((src.data[i] >= threshold)) {
         dst.data[cnt] = src.data[i];
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -53,16 +53,16 @@ uint64_t copy_if_ge(forge_span_u64_t src __attribute__((unused)), uint64_t n __a
 }
 
 uint64_t copy_if_even(forge_span_u64_t src __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t dst __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
-  uint64_t cnt __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if (((src.data[i] % 2) == 0)) {
+      if (((src.data[i] % 2ULL) == 0ULL)) {
         dst.data[cnt] = src.data[i];
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -70,16 +70,16 @@ uint64_t copy_if_even(forge_span_u64_t src __attribute__((unused)), uint64_t n _
 }
 
 uint64_t copy_if_odd(forge_span_u64_t src __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t dst __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
-  uint64_t cnt __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if (((src.data[i] % 2) != 0)) {
+      if (((src.data[i] % 2ULL) != 0ULL)) {
         dst.data[cnt] = src.data[i];
-        cnt = (cnt + 1);
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -87,7 +87,7 @@ uint64_t copy_if_odd(forge_span_u64_t src __attribute__((unused)), uint64_t n __
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

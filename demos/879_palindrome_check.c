@@ -16,16 +16,16 @@ uint64_t is_palindrome(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 int main();
 
 uint64_t is_palindrome(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
-  uint64_t half __attribute__((unused)) = (n / 2);
-  uint64_t ok __attribute__((unused)) = 1;
+  uint64_t i __attribute__((unused)) = 0ULL;
+  uint64_t half __attribute__((unused)) = (n / 2ULL);
+  uint64_t ok __attribute__((unused)) = 1ULL;
   {
     while ((i < half)) {
-      if ((s.data[i] != s.data[((n - 1) - i)])) {
-        ok = 0;
+      if ((s.data[i] != s.data[((n - 1ULL) - i)])) {
+        ok = 0ULL;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -33,7 +33,7 @@ uint64_t is_palindrome(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

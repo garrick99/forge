@@ -23,18 +23,18 @@ __forge_tuple_u64_u64_t find_longest_match(forge_span_u64_t data __attribute__((
   if ((pos >= window_size)) {
     start = (pos - window_size);
   } else {
-    start = 0;
+    start = 0ULL;
   }
-  uint64_t best_offset __attribute__((unused)) = 0;
-  uint64_t best_length __attribute__((unused)) = 0;
+  uint64_t best_offset __attribute__((unused)) = 0ULL;
+  uint64_t best_length __attribute__((unused)) = 0ULL;
   uint64_t s __attribute__((unused)) = start;
   {
     while ((s < pos)) {
-      uint64_t len __attribute__((unused)) = 0;
+      uint64_t len __attribute__((unused)) = 0ULL;
       {
         while ((((len < max_match) && ((pos + len) < n)) && ((s + len) < pos))) {
           if ((data.data[(s + len)] == data.data[(pos + len)])) {
-            len = (len + 1);
+            len = (len + 1ULL);
 
           } else {
             len = max_match;
@@ -47,14 +47,14 @@ __forge_tuple_u64_u64_t find_longest_match(forge_span_u64_t data __attribute__((
       if ((len <= max_match)) {
         actual_len = len;
       } else {
-        actual_len = 0;
+        actual_len = 0ULL;
       }
       if ((actual_len > best_length)) {
         best_offset = (pos - s);
         best_length = actual_len;
 
       }
-      s = (s + 1);
+      s = (s + 1ULL);
     }
 
   }
@@ -62,7 +62,7 @@ __forge_tuple_u64_u64_t find_longest_match(forge_span_u64_t data __attribute__((
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

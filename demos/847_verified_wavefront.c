@@ -16,60 +16,60 @@ void wavefront_fill(forge_span_u64_t grid __attribute__((unused)), uint64_t rows
 int main();
 
 void wavefront_fill(forge_span_u64_t grid __attribute__((unused)), uint64_t rows __attribute__((unused)), uint64_t cols __attribute__((unused))) {
-  uint64_t c __attribute__((unused)) = 0;
+  uint64_t c __attribute__((unused)) = 0ULL;
   {
     while ((c < cols)) {
       grid.data[c] = c;
-      c = (c + 1);
+      c = (c + 1ULL);
     }
 
   }
-  uint64_t r __attribute__((unused)) = 1;
+  uint64_t r __attribute__((unused)) = 1ULL;
   {
     while ((r < rows)) {
       grid.data[(r * cols)] = r;
-      r = (r + 1);
+      r = (r + 1ULL);
     }
 
   }
-  uint64_t total_diags __attribute__((unused)) = ((rows + cols) - 1);
-  uint64_t d __attribute__((unused)) = 2;
+  uint64_t total_diags __attribute__((unused)) = ((rows + cols) - 1ULL);
+  uint64_t d __attribute__((unused)) = 2ULL;
   {
     while ((d < total_diags)) {
       uint64_t r_start;
       if ((d >= cols)) {
-        r_start = ((d - cols) + 1);
+        r_start = ((d - cols) + 1ULL);
       } else {
-        r_start = 1;
+        r_start = 1ULL;
       }
       uint64_t r_end;
       if ((d < rows)) {
         r_end = d;
       } else {
-        r_end = (rows - 1);
+        r_end = (rows - 1ULL);
       }
       uint64_t ri __attribute__((unused)) = r_start;
       {
         while ((ri <= r_end)) {
           uint64_t ci __attribute__((unused)) = (d - ri);
-          if ((((ci > 0) && (ci < cols)) && (ri < rows))) {
-            uint64_t up __attribute__((unused)) = grid.data[(((ri - 1) * cols) + ci)];
-            uint64_t left __attribute__((unused)) = grid.data[((ri * cols) + (ci - 1))];
+          if ((((ci > 0ULL) && (ci < cols)) && (ri < rows))) {
+            uint64_t up __attribute__((unused)) = grid.data[(((ri - 1ULL) * cols) + ci)];
+            uint64_t left __attribute__((unused)) = grid.data[((ri * cols) + (ci - 1ULL))];
             grid.data[((ri * cols) + ci)] = (up + left);
 
           }
-          ri = (ri + 1);
+          ri = (ri + 1ULL);
         }
 
       }
-      d = (d + 1);
+      d = (d + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

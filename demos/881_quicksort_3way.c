@@ -16,23 +16,23 @@ uint64_t partition_3way(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 int main();
 
 uint64_t partition_3way(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t pivot __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
-  uint64_t eq __attribute__((unused)) = 0;
-  uint64_t hi __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
+  uint64_t eq __attribute__((unused)) = 0ULL;
+  uint64_t hi __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((s.data[i] < pivot)) {
-        lo = (lo + 1);
+        lo = (lo + 1ULL);
 
       } else if ((s.data[i] == pivot)) {
-        eq = (eq + 1);
+        eq = (eq + 1ULL);
 
       } else {
-        hi = (hi + 1);
+        hi = (hi + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -40,7 +40,7 @@ uint64_t partition_3way(forge_span_u64_t s __attribute__((unused)), uint64_t n _
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

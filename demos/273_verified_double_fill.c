@@ -21,19 +21,19 @@ void fill_range(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
   {
     while ((i < hi)) {
       s.data[i] = val;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 void double_fill(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t mid __attribute__((unused)), uint64_t v1 __attribute__((unused)), uint64_t v2 __attribute__((unused))) {
-  fill_range(s, n, 0, mid, v1);
+  fill_range(s, n, 0ULL, mid, v1);
   fill_range(s, n, mid, n, v2);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

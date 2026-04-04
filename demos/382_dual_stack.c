@@ -27,23 +27,23 @@ uint64_t cap_preserved(uint64_t cap __attribute__((unused)));
 int main();
 
 DualStack ds_new(uint64_t cap __attribute__((unused))) {
-  return (DualStack){ .size_a = 0, .size_b = 0, .cap = cap };
+  return (DualStack){ .size_a = 0ULL, .size_b = 0ULL, .cap = cap };
 }
 
 void ds_push_a(DualStack* d __attribute__((unused))) {
-  (*d).size_a = ((*d).size_a + 1);
+  (*d).size_a = ((*d).size_a + 1ULL);
 }
 
 void ds_push_b(DualStack* d __attribute__((unused))) {
-  (*d).size_b = ((*d).size_b + 1);
+  (*d).size_b = ((*d).size_b + 1ULL);
 }
 
 void ds_pop_a(DualStack* d __attribute__((unused))) {
-  (*d).size_a = ((*d).size_a - 1);
+  (*d).size_a = ((*d).size_a - 1ULL);
 }
 
 void ds_pop_b(DualStack* d __attribute__((unused))) {
-  (*d).size_b = ((*d).size_b - 1);
+  (*d).size_b = ((*d).size_b - 1ULL);
 }
 
 uint64_t push3_a(uint64_t cap __attribute__((unused))) {
@@ -82,7 +82,7 @@ uint64_t cap_preserved(uint64_t cap __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -19,14 +19,14 @@ int main();
 
 uint64_t find_min_index(forge_span_u64_t s __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t n __attribute__((unused))) {
   uint64_t min_idx __attribute__((unused)) = lo;
-  uint64_t i __attribute__((unused)) = (lo + 1);
+  uint64_t i __attribute__((unused)) = (lo + 1ULL);
   {
     while ((i < n)) {
       if ((s.data[i] < s.data[min_idx])) {
         min_idx = i;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -40,19 +40,19 @@ void swap(forge_span_u64_t s __attribute__((unused)), uint64_t a __attribute__((
 }
 
 void selection_sort(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       uint64_t m __attribute__((unused)) = find_min_index(s, i, n);
       swap(s, i, m);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

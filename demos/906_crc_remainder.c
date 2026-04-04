@@ -16,27 +16,27 @@ uint64_t crc_step(forge_span_u64_t data __attribute__((unused)), uint64_t n __at
 int main();
 
 uint64_t crc_step(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t poly __attribute__((unused))) {
-  uint64_t rem __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t rem __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       rem = (rem ^ data.data[i]);
-      uint64_t bit __attribute__((unused)) = 0;
+      uint64_t bit __attribute__((unused)) = 0ULL;
       {
-        while ((bit < 8)) {
-          if (((rem / 128) > 0)) {
-            rem = ((rem * 2) ^ poly);
+        while ((bit < 8ULL)) {
+          if (((rem / 128ULL) > 0ULL)) {
+            rem = ((rem * 2ULL) ^ poly);
 
           } else {
-            rem = (rem * 2);
+            rem = (rem * 2ULL);
 
           }
-          rem = (rem & 65535);
-          bit = (bit + 1);
+          rem = (rem & 65535ULL);
+          bit = (bit + 1ULL);
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -44,7 +44,7 @@ uint64_t crc_step(forge_span_u64_t data __attribute__((unused)), uint64_t n __at
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

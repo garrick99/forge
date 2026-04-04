@@ -18,7 +18,7 @@ int main();
 void matvec(forge_span_u64_t A __attribute__((unused)), forge_span_u64_t x __attribute__((unused)), forge_span_u64_t out __attribute__((unused)), uint64_t rows __attribute__((unused)), uint64_t cols __attribute__((unused))) {
   {
     for (uint64_t i = 0; i < (uint64_t)(rows); i++) {
-      uint64_t acc __attribute__((unused)) = 0;
+      uint64_t acc __attribute__((unused)) = 0ULL;
       {
         for (uint64_t j = 0; j < (uint64_t)(cols); j++) {
           acc = (acc + (A.data[((i * cols) + j)] * x.data[j]));
@@ -32,7 +32,7 @@ void matvec(forge_span_u64_t A __attribute__((unused)), forge_span_u64_t x __att
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

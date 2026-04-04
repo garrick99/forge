@@ -18,15 +18,15 @@ void map_double_clamp(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
 int main();
 
 uint64_t clamp255(uint64_t x __attribute__((unused))) {
-  if ((x > 255)) {
-    return 255;
+  if ((x > 255ULL)) {
+    return 255ULL;
   } else {
     return x;
   }
 }
 
 uint64_t double_clamp(uint64_t x __attribute__((unused))) {
-  return clamp255((x * 2));
+  return clamp255((x * 2ULL));
 }
 
 void map_double_clamp(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -39,7 +39,7 @@ void map_double_clamp(forge_span_u64_t s __attribute__((unused)), uint64_t n __a
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

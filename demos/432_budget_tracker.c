@@ -28,7 +28,7 @@ uint64_t food_independent();
 int main();
 
 Budget budget_new(uint64_t amount __attribute__((unused))) {
-  return (Budget){ .remaining = amount, .spent_food = 0, .spent_transport = 0, .spent_other = 0, .total_spent = 0 };
+  return (Budget){ .remaining = amount, .spent_food = 0ULL, .spent_transport = 0ULL, .spent_other = 0ULL, .total_spent = 0ULL };
 }
 
 void budget_spend_food(Budget* b __attribute__((unused)), uint64_t n __attribute__((unused))) {
@@ -50,36 +50,36 @@ void budget_spend_other(Budget* b __attribute__((unused)), uint64_t n __attribut
 }
 
 uint64_t food_spend() {
-  Budget b __attribute__((unused)) = budget_new(100);
-  budget_spend_food((&b), 30);
+  Budget b __attribute__((unused)) = budget_new(100ULL);
+  budget_spend_food((&b), 30ULL);
   return b.remaining;
 }
 
 uint64_t mixed_total() {
-  Budget b __attribute__((unused)) = budget_new(100);
-  budget_spend_food((&b), 20);
-  budget_spend_transport((&b), 15);
-  budget_spend_other((&b), 15);
+  Budget b __attribute__((unused)) = budget_new(100ULL);
+  budget_spend_food((&b), 20ULL);
+  budget_spend_transport((&b), 15ULL);
+  budget_spend_other((&b), 15ULL);
   return b.total_spent;
 }
 
 uint64_t categories_sum() {
-  Budget b __attribute__((unused)) = budget_new(100);
-  budget_spend_food((&b), 20);
-  budget_spend_transport((&b), 15);
-  budget_spend_other((&b), 10);
+  Budget b __attribute__((unused)) = budget_new(100ULL);
+  budget_spend_food((&b), 20ULL);
+  budget_spend_transport((&b), 15ULL);
+  budget_spend_other((&b), 10ULL);
   return (((b.total_spent - b.spent_food) - b.spent_transport) - b.spent_other);
 }
 
 uint64_t food_independent() {
-  Budget b __attribute__((unused)) = budget_new(100);
-  budget_spend_food((&b), 20);
-  budget_spend_transport((&b), 30);
+  Budget b __attribute__((unused)) = budget_new(100ULL);
+  budget_spend_food((&b), 20ULL);
+  budget_spend_transport((&b), 30ULL);
   return b.spent_food;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

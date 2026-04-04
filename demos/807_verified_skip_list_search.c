@@ -17,12 +17,12 @@ int main();
 
 uint64_t skip_search(forge_span_u64_t next __attribute__((unused)), forge_span_u64_t values __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t max_level __attribute__((unused)), uint64_t target __attribute__((unused))) {
   uint64_t sentinel __attribute__((unused)) = n;
-  uint64_t cur __attribute__((unused)) = 0;
+  uint64_t cur __attribute__((unused)) = 0ULL;
   uint64_t lev __attribute__((unused)) = max_level;
   {
-    while ((lev > 0)) {
-      lev = (lev - 1);
-      uint64_t steps __attribute__((unused)) = 0;
+    while ((lev > 0ULL)) {
+      lev = (lev - 1ULL);
+      uint64_t steps __attribute__((unused)) = 0ULL;
       {
         while ((steps < n)) {
           if ((cur < n)) {
@@ -31,7 +31,7 @@ uint64_t skip_search(forge_span_u64_t next __attribute__((unused)), forge_span_u
               uint64_t nxt __attribute__((unused)) = next.data[nxt_idx];
               if (((nxt < n) && (values.data[nxt] <= target))) {
                 cur = nxt;
-                steps = (steps + 1);
+                steps = (steps + 1ULL);
 
               } else {
                 steps = n;
@@ -61,7 +61,7 @@ uint64_t skip_search(forge_span_u64_t next __attribute__((unused)), forge_span_u
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

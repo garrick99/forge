@@ -51,7 +51,7 @@ uint64_t frame_check(forge_span_u64_t s __attribute__((unused)), uint64_t i __at
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

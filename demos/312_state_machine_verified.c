@@ -25,25 +25,25 @@ uint64_t transition_listen_ok(uint64_t port __attribute__((unused)));
 int main();
 
 Connection conn_new() {
-  return (Connection){ .state = 0, .port = 0 };
+  return (Connection){ .state = 0ULL, .port = 0ULL };
 }
 
 Connection conn_listen(uint64_t state __attribute__((unused)), uint64_t port __attribute__((unused))) {
-  return (Connection){ .state = 1, .port = port };
+  return (Connection){ .state = 1ULL, .port = port };
 }
 
 Connection conn_accept(uint64_t state __attribute__((unused)), uint64_t port __attribute__((unused))) {
-  return (Connection){ .state = 2, .port = port };
+  return (Connection){ .state = 2ULL, .port = port };
 }
 
 Connection conn_close(uint64_t state __attribute__((unused))) {
   (void)(state);
-  return (Connection){ .state = 0, .port = 0 };
+  return (Connection){ .state = 0ULL, .port = 0ULL };
 }
 
 Connection conn_error(uint64_t state __attribute__((unused)), uint64_t port __attribute__((unused))) {
   (void)(state);
-  return (Connection){ .state = 3, .port = port };
+  return (Connection){ .state = 3ULL, .port = port };
 }
 
 uint64_t conn_full_cycle(uint64_t port __attribute__((unused))) {
@@ -68,7 +68,7 @@ uint64_t transition_listen_ok(uint64_t port __attribute__((unused))) {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

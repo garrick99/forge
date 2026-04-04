@@ -27,27 +27,27 @@ uint64_t resume_from_s1();
 int main();
 
 PowerState ps_new() {
-  return (PowerState){ .state = 0, .transitions = 0 };
+  return (PowerState){ .state = 0ULL, .transitions = 0ULL };
 }
 
 void ps_to_s1(PowerState* p __attribute__((unused))) {
-  (*p).state = 1;
-  (*p).transitions = ((*p).transitions + 1);
+  (*p).state = 1ULL;
+  (*p).transitions = ((*p).transitions + 1ULL);
 }
 
 void ps_to_s2(PowerState* p __attribute__((unused))) {
-  (*p).state = 2;
-  (*p).transitions = ((*p).transitions + 1);
+  (*p).state = 2ULL;
+  (*p).transitions = ((*p).transitions + 1ULL);
 }
 
 void ps_to_s3(PowerState* p __attribute__((unused))) {
-  (*p).state = 3;
-  (*p).transitions = ((*p).transitions + 1);
+  (*p).state = 3ULL;
+  (*p).transitions = ((*p).transitions + 1ULL);
 }
 
 void ps_resume(PowerState* p __attribute__((unused))) {
-  (*p).state = 0;
-  (*p).transitions = ((*p).transitions + 1);
+  (*p).state = 0ULL;
+  (*p).transitions = ((*p).transitions + 1ULL);
 }
 
 uint64_t enter_s1() {
@@ -90,7 +90,7 @@ uint64_t resume_from_s1() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -24,37 +24,37 @@ uint64_t net_zero(uint64_t initial __attribute__((unused)), uint64_t x __attribu
 int main();
 
 Account acct_new(uint64_t initial __attribute__((unused))) {
-  return (Account){ .balance = initial, .txns = 0 };
+  return (Account){ .balance = initial, .txns = 0ULL };
 }
 
 void acct_deposit(Account* a __attribute__((unused)), uint64_t amount __attribute__((unused))) {
   (*a).balance = ((*a).balance + amount);
-  (*a).txns = ((*a).txns + 1);
+  (*a).txns = ((*a).txns + 1ULL);
 }
 
 void acct_withdraw(Account* a __attribute__((unused)), uint64_t amount __attribute__((unused))) {
   (*a).balance = ((*a).balance - amount);
-  (*a).txns = ((*a).txns + 1);
+  (*a).txns = ((*a).txns + 1ULL);
 }
 
 uint64_t deposit_100() {
-  Account a __attribute__((unused)) = acct_new(0);
-  acct_deposit((&a), 100);
+  Account a __attribute__((unused)) = acct_new(0ULL);
+  acct_deposit((&a), 100ULL);
   return a.balance;
 }
 
 uint64_t deposit_withdraw() {
-  Account a __attribute__((unused)) = acct_new(0);
-  acct_deposit((&a), 100);
-  acct_withdraw((&a), 30);
+  Account a __attribute__((unused)) = acct_new(0ULL);
+  acct_deposit((&a), 100ULL);
+  acct_withdraw((&a), 30ULL);
   return a.balance;
 }
 
 uint64_t three_txns() {
-  Account a __attribute__((unused)) = acct_new(50);
-  acct_deposit((&a), 10);
-  acct_deposit((&a), 20);
-  acct_withdraw((&a), 5);
+  Account a __attribute__((unused)) = acct_new(50ULL);
+  acct_deposit((&a), 10ULL);
+  acct_deposit((&a), 20ULL);
+  acct_withdraw((&a), 5ULL);
   return a.txns;
 }
 
@@ -66,7 +66,7 @@ uint64_t net_zero(uint64_t initial __attribute__((unused)), uint64_t x __attribu
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

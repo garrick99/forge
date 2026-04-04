@@ -17,11 +17,11 @@ uint64_t lerp_eval(forge_span_u64_t xs __attribute__((unused)), forge_span_u64_t
 int main();
 
 uint64_t find_segment(forge_span_u64_t xs __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t x __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
-  uint64_t hi __attribute__((unused)) = (n - 1);
+  uint64_t lo __attribute__((unused)) = 0ULL;
+  uint64_t hi __attribute__((unused)) = (n - 1ULL);
   {
-    while (((lo + 1) < hi)) {
-      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2));
+    while (((lo + 1ULL) < hi)) {
+      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2ULL));
       if ((xs.data[mid] <= x)) {
         lo = mid;
 
@@ -38,9 +38,9 @@ uint64_t find_segment(forge_span_u64_t xs __attribute__((unused)), uint64_t n __
 uint64_t lerp_eval(forge_span_u64_t xs __attribute__((unused)), forge_span_u64_t ys __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t x __attribute__((unused))) {
   uint64_t seg __attribute__((unused)) = find_segment(xs, n, x);
   uint64_t x0 __attribute__((unused)) = xs.data[seg];
-  uint64_t x1 __attribute__((unused)) = xs.data[(seg + 1)];
+  uint64_t x1 __attribute__((unused)) = xs.data[(seg + 1ULL)];
   uint64_t y0 __attribute__((unused)) = ys.data[seg];
-  uint64_t y1 __attribute__((unused)) = ys.data[(seg + 1)];
+  uint64_t y1 __attribute__((unused)) = ys.data[(seg + 1ULL)];
   if ((x1 == x0)) {
     return y0;
   } else {
@@ -49,7 +49,7 @@ uint64_t lerp_eval(forge_span_u64_t xs __attribute__((unused)), forge_span_u64_t
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

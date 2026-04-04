@@ -28,22 +28,22 @@ uint64_t commit_count();
 int main();
 
 WAL wal_new() {
-  return (WAL){ .write_lsn = 0, .commit_lsn = 0, .commits = 0, .rollbacks = 0, .entries = 0 };
+  return (WAL){ .write_lsn = 0ULL, .commit_lsn = 0ULL, .commits = 0ULL, .rollbacks = 0ULL, .entries = 0ULL };
 }
 
 void wal_write(WAL* w __attribute__((unused))) {
-  (*w).write_lsn = ((*w).write_lsn + 1);
-  (*w).entries = ((*w).entries + 1);
+  (*w).write_lsn = ((*w).write_lsn + 1ULL);
+  (*w).entries = ((*w).entries + 1ULL);
 }
 
 void wal_commit(WAL* w __attribute__((unused))) {
   (*w).commit_lsn = (*w).write_lsn;
-  (*w).commits = ((*w).commits + 1);
+  (*w).commits = ((*w).commits + 1ULL);
 }
 
 void wal_rollback(WAL* w __attribute__((unused))) {
   (*w).write_lsn = (*w).commit_lsn;
-  (*w).rollbacks = ((*w).rollbacks + 1);
+  (*w).rollbacks = ((*w).rollbacks + 1ULL);
 }
 
 uint64_t write_3() {
@@ -84,7 +84,7 @@ uint64_t commit_count() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -56,6 +56,6 @@ __global__ void fma_f32(forge_span_f32_t a __attribute__((unused)), forge_span_f
 }
 
 uint64_t run() {
-  return 42;
+  return 42ULL;
 }
 

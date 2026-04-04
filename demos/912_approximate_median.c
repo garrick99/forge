@@ -19,20 +19,20 @@ __forge_tuple_u64_u64_t approx_median(forge_span_u64_t s __attribute__((unused))
 int main();
 
 __forge_tuple_u64_u64_t approx_median(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t pivot __attribute__((unused)) = s.data[(n / 2)];
-  uint64_t lo __attribute__((unused)) = 0;
-  uint64_t hi __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t pivot __attribute__((unused)) = s.data[(n / 2ULL)];
+  uint64_t lo __attribute__((unused)) = 0ULL;
+  uint64_t hi __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       if ((s.data[i] < pivot)) {
-        lo = (lo + 1);
+        lo = (lo + 1ULL);
 
       } else if ((s.data[i] > pivot)) {
-        hi = (hi + 1);
+        hi = (hi + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -40,7 +40,7 @@ __forge_tuple_u64_u64_t approx_median(forge_span_u64_t s __attribute__((unused))
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

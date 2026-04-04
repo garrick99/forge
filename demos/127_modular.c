@@ -37,8 +37,8 @@ uint64_t mod_mul(uint64_t a __attribute__((unused)), uint64_t b __attribute__((u
 }
 
 uint64_t mod_neg(uint64_t a __attribute__((unused)), uint64_t m __attribute__((unused))) {
-  if ((a == 0)) {
-    return 0;
+  if ((a == 0ULL)) {
+    return 0ULL;
   } else {
     return (m - a);
   }
@@ -59,43 +59,43 @@ uint64_t mod_add_comm(uint64_t a __attribute__((unused)), uint64_t b __attribute
   uint64_t ab __attribute__((unused)) = mod_add(a, b, m);
   uint64_t ba __attribute__((unused)) = mod_add(b, a, m);
   if ((ab == ba)) {
-    return 1;
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t gcd8(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
   uint64_t r0 __attribute__((unused)) = (a % b);
-  if ((r0 == 0)) {
+  if ((r0 == 0ULL)) {
     return b;
   } else {
     uint64_t r1 __attribute__((unused)) = (b % r0);
-    if ((r1 == 0)) {
+    if ((r1 == 0ULL)) {
       return r0;
     } else {
       uint64_t r2 __attribute__((unused)) = (r0 % r1);
-      if ((r2 == 0)) {
+      if ((r2 == 0ULL)) {
         return r1;
       } else {
         uint64_t r3 __attribute__((unused)) = (r1 % r2);
-        if ((r3 == 0)) {
+        if ((r3 == 0ULL)) {
           return r2;
         } else {
           uint64_t r4 __attribute__((unused)) = (r2 % r3);
-          if ((r4 == 0)) {
+          if ((r4 == 0ULL)) {
             return r3;
           } else {
             uint64_t r5 __attribute__((unused)) = (r3 % r4);
-            if ((r5 == 0)) {
+            if ((r5 == 0ULL)) {
               return r4;
             } else {
               uint64_t r6 __attribute__((unused)) = (r4 % r5);
-              if ((r6 == 0)) {
+              if ((r6 == 0ULL)) {
                 return r5;
               } else {
                 uint64_t r7 __attribute__((unused)) = (r5 % r6);
-                if ((r7 == 0)) {
+                if ((r7 == 0ULL)) {
                   return r6;
                 } else {
                   return r6;
@@ -111,29 +111,29 @@ uint64_t gcd8(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unus
 
 uint64_t coprime(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused))) {
   uint64_t g __attribute__((unused)) = gcd8(a, b);
-  if ((g == 1)) {
-    return 1;
+  if ((g == 1ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 int main() {
-  uint64_t ma1 __attribute__((unused)) = mod_add(3, 4, 7);
-  uint64_t ma2 __attribute__((unused)) = mod_add(5, 5, 7);
-  uint64_t ms1 __attribute__((unused)) = mod_sub(5, 3, 7);
-  uint64_t ms2 __attribute__((unused)) = mod_sub(1, 3, 7);
-  uint64_t mm1 __attribute__((unused)) = mod_mul(3, 4, 7);
-  uint64_t mm2 __attribute__((unused)) = mod_mul(6, 6, 7);
-  uint64_t mn1 __attribute__((unused)) = mod_neg(3, 7);
-  uint64_t mn0 __attribute__((unused)) = mod_neg(0, 7);
-  uint64_t ck1 __attribute__((unused)) = mod_add_neg(3, 7);
-  uint64_t ck2 __attribute__((unused)) = mod_add_neg(0, 7);
-  uint64_t g1 __attribute__((unused)) = gcd8(12, 8);
-  uint64_t g2 __attribute__((unused)) = gcd8(7, 13);
-  uint64_t g3 __attribute__((unused)) = gcd8(48, 18);
-  uint64_t cp1 __attribute__((unused)) = coprime(7, 13);
-  uint64_t cp2 __attribute__((unused)) = coprime(4, 6);
+  uint64_t ma1 __attribute__((unused)) = mod_add(3ULL, 4ULL, 7ULL);
+  uint64_t ma2 __attribute__((unused)) = mod_add(5ULL, 5ULL, 7ULL);
+  uint64_t ms1 __attribute__((unused)) = mod_sub(5ULL, 3ULL, 7ULL);
+  uint64_t ms2 __attribute__((unused)) = mod_sub(1ULL, 3ULL, 7ULL);
+  uint64_t mm1 __attribute__((unused)) = mod_mul(3ULL, 4ULL, 7ULL);
+  uint64_t mm2 __attribute__((unused)) = mod_mul(6ULL, 6ULL, 7ULL);
+  uint64_t mn1 __attribute__((unused)) = mod_neg(3ULL, 7ULL);
+  uint64_t mn0 __attribute__((unused)) = mod_neg(0ULL, 7ULL);
+  uint64_t ck1 __attribute__((unused)) = mod_add_neg(3ULL, 7ULL);
+  uint64_t ck2 __attribute__((unused)) = mod_add_neg(0ULL, 7ULL);
+  uint64_t g1 __attribute__((unused)) = gcd8(12ULL, 8ULL);
+  uint64_t g2 __attribute__((unused)) = gcd8(7ULL, 13ULL);
+  uint64_t g3 __attribute__((unused)) = gcd8(48ULL, 18ULL);
+  uint64_t cp1 __attribute__((unused)) = coprime(7ULL, 13ULL);
+  uint64_t cp2 __attribute__((unused)) = coprime(4ULL, 6ULL);
   return (int)(((((((((((((((ma1 + ma2) + ms1) + ms2) + mm1) + mm2) + mn1) + mn0) + ck1) + ck2) + g1) + g2) + g3) + cp1) + cp2));
 
 }

@@ -39,12 +39,12 @@ uint64_t poly_eval(Poly3 p __attribute__((unused)), uint64_t x __attribute__((un
 }
 
 uint64_t poly_eval_zero(Poly3 p __attribute__((unused))) {
-  uint64_t v __attribute__((unused)) = poly_eval(p, 0);
+  uint64_t v __attribute__((unused)) = poly_eval(p, 0ULL);
   return v;
 }
 
 uint64_t poly_eval_one(Poly3 p __attribute__((unused))) {
-  uint64_t v __attribute__((unused)) = poly_eval(p, 1);
+  uint64_t v __attribute__((unused)) = poly_eval(p, 1ULL);
   return v;
 }
 
@@ -57,7 +57,7 @@ Poly3 poly_scale(Poly3 p __attribute__((unused)), uint64_t s __attribute__((unus
 }
 
 Poly3 poly_zero() {
-  return (Poly3){ .a0 = 0, .a1 = 0, .a2 = 0, .a3 = 0 };
+  return (Poly3){ .a0 = 0ULL, .a1 = 0ULL, .a2 = 0ULL, .a3 = 0ULL };
 }
 
 uint64_t zero_eval(uint64_t x __attribute__((unused))) {
@@ -68,25 +68,25 @@ uint64_t zero_eval(uint64_t x __attribute__((unused))) {
 
 uint64_t eval_additive(Poly3 p __attribute__((unused)), Poly3 q __attribute__((unused))) {
   Poly3 r __attribute__((unused)) = poly_add(p, q);
-  uint64_t er __attribute__((unused)) = poly_eval(r, 2);
-  uint64_t ep __attribute__((unused)) = poly_eval(p, 2);
-  uint64_t eq __attribute__((unused)) = poly_eval(q, 2);
+  uint64_t er __attribute__((unused)) = poly_eval(r, 2ULL);
+  uint64_t ep __attribute__((unused)) = poly_eval(p, 2ULL);
+  uint64_t eq __attribute__((unused)) = poly_eval(q, 2ULL);
   if ((er == (ep + eq))) {
-    return 1;
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 int main() {
-  Poly3 p __attribute__((unused)) = poly_new(2, 3, 1, 1);
+  Poly3 p __attribute__((unused)) = poly_new(2ULL, 3ULL, 1ULL, 1ULL);
   uint64_t v0 __attribute__((unused)) = poly_eval_zero(p);
   uint64_t v1 __attribute__((unused)) = poly_eval_one(p);
-  uint64_t v2 __attribute__((unused)) = poly_eval(p, 2);
-  uint64_t z_val __attribute__((unused)) = zero_eval(5);
-  Poly3 q __attribute__((unused)) = poly_new(1, 1, 1, 1);
+  uint64_t v2 __attribute__((unused)) = poly_eval(p, 2ULL);
+  uint64_t z_val __attribute__((unused)) = zero_eval(5ULL);
+  Poly3 q __attribute__((unused)) = poly_new(1ULL, 1ULL, 1ULL, 1ULL);
   uint64_t add_prop __attribute__((unused)) = eval_additive(p, q);
-  Poly3 sp __attribute__((unused)) = poly_scale(p, 2);
+  Poly3 sp __attribute__((unused)) = poly_scale(p, 2ULL);
   uint64_t sv1 __attribute__((unused)) = poly_eval_one(sp);
   return (int)((((((v0 + v1) + v2) + z_val) + add_prop) + sv1));
 

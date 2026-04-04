@@ -32,7 +32,7 @@ uint8_t safe_sub_u8(uint8_t a __attribute__((unused)), uint8_t b __attribute__((
 }
 
 uint8_t half_u8(uint8_t v __attribute__((unused))) {
-  return (v / 2);
+  return (v / 2ULL);
 }
 
 uint8_t triple_clamped(uint8_t v __attribute__((unused))) {
@@ -48,35 +48,35 @@ uint8_t distance_u8(uint8_t a __attribute__((unused)), uint8_t b __attribute__((
 }
 
 uint8_t avg_u8(uint8_t a __attribute__((unused)), uint8_t b __attribute__((unused))) {
-  return ((a / 2) + (b / 2));
+  return ((a / 2ULL) + (b / 2ULL));
 }
 
 uint8_t check_safe_add() {
-  return safe_add_u8(150, 50);
+  return safe_add_u8(150ULL, 50ULL);
 }
 
 uint8_t check_safe_sub() {
-  return safe_sub_u8(200, 100);
+  return safe_sub_u8(200ULL, 100ULL);
 }
 
 uint8_t check_half_200() {
-  return half_u8(200);
+  return half_u8(200ULL);
 }
 
 uint8_t check_triple_50() {
-  return triple_clamped(50);
+  return triple_clamped(50ULL);
 }
 
 uint8_t check_distance_10_5() {
-  return distance_u8(10, 5);
+  return distance_u8(10ULL, 5ULL);
 }
 
 uint8_t check_distance_5_10() {
-  return distance_u8(5, 10);
+  return distance_u8(5ULL, 10ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

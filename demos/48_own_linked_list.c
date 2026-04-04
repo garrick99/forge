@@ -30,7 +30,7 @@ uint64_t node_sum2(Node* p1 __attribute__((unused)), Node* p2 __attribute__((unu
 uint64_t run();
 
 Node* node_new(uint64_t v __attribute__((unused))) {
-  Node n __attribute__((unused)) = (Node){ .val = v, .next = 0 };
+  Node n __attribute__((unused)) = (Node){ .val = v, .next = 0ULL };
   return __forge_own_alloc_Node(n);
 }
 
@@ -57,8 +57,8 @@ uint64_t node_sum2(Node* p1 __attribute__((unused)), Node* p2 __attribute__((unu
 }
 
 uint64_t run() {
-  Node* a __attribute__((unused)) = node_new(10);
-  Node* b __attribute__((unused)) = node_new(32);
+  Node* a __attribute__((unused)) = node_new(10ULL);
+  Node* b __attribute__((unused)) = node_new(32ULL);
   __forge_tuple_u64_own_Node_t __tup_67_4 __attribute__((unused)) = node_val(a);
   uint64_t va __attribute__((unused)) = (__tup_67_4)._0;
   Node* a2 __attribute__((unused)) = (__tup_67_4)._1;

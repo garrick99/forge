@@ -20,14 +20,14 @@ int main();
 
 _Bool is_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
   _Bool ok __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((((i + 1) < n) && ok)) {
-      if ((s.data[(i + 1)] < s.data[i])) {
+    while ((((i + 1ULL) < n) && ok)) {
+      if ((s.data[(i + 1ULL)] < s.data[i])) {
         ok = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -36,14 +36,14 @@ _Bool is_sorted(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribu
 
 _Bool is_sorted_strict(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
   _Bool ok __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((((i + 1) < n) && ok)) {
-      if ((s.data[(i + 1)] <= s.data[i])) {
+    while ((((i + 1ULL) < n) && ok)) {
+      if ((s.data[(i + 1ULL)] <= s.data[i])) {
         ok = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -54,15 +54,15 @@ void sorted_insert(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
   s.data[n] = val;
   uint64_t i __attribute__((unused)) = n;
   {
-    while ((i >= 1)) {
-      if ((s.data[i] < s.data[(i - 1)])) {
+    while ((i >= 1ULL)) {
+      if ((s.data[i] < s.data[(i - 1ULL)])) {
         uint64_t tmp __attribute__((unused)) = s.data[i];
-        s.data[i] = s.data[(i - 1)];
-        s.data[(i - 1)] = tmp;
-        i = (i - 1);
+        s.data[i] = s.data[(i - 1ULL)];
+        s.data[(i - 1ULL)] = tmp;
+        i = (i - 1ULL);
 
       } else {
-        i = 0;
+        i = 0ULL;
 
       }
     }
@@ -71,12 +71,12 @@ void sorted_insert(forge_span_u64_t s __attribute__((unused)), uint64_t n __attr
 }
 
 uint64_t count_sorted_run(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   _Bool done __attribute__((unused)) = 0;
   {
-    while ((((i + 1) < n) && (!done))) {
-      if ((s.data[(i + 1)] >= s.data[i])) {
-        i = (i + 1);
+    while ((((i + 1ULL) < n) && (!done))) {
+      if ((s.data[(i + 1ULL)] >= s.data[i])) {
+        i = (i + 1ULL);
 
       } else {
         done = 1;
@@ -85,11 +85,11 @@ uint64_t count_sorted_run(forge_span_u64_t s __attribute__((unused)), uint64_t n
     }
 
   }
-  return (i + 1);
+  return (i + 1ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

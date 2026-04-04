@@ -19,71 +19,71 @@ uint64_t popcount8(uint64_t x __attribute__((unused)));
 int main();
 
 uint64_t next_pow2(uint64_t x __attribute__((unused))) {
-  uint64_t a __attribute__((unused)) = (x - 1);
-  uint64_t b __attribute__((unused)) = (a | (a >> 1));
-  uint64_t c __attribute__((unused)) = (b | (b >> 2));
-  uint64_t d __attribute__((unused)) = (c | (c >> 4));
-  uint64_t e __attribute__((unused)) = (d | (d >> 8));
-  uint64_t f __attribute__((unused)) = (e | (e >> 16));
-  uint64_t g __attribute__((unused)) = (f | (f >> 32));
-  return (g + 1);
+  uint64_t a __attribute__((unused)) = (x - 1ULL);
+  uint64_t b __attribute__((unused)) = (a | (a >> 1ULL));
+  uint64_t c __attribute__((unused)) = (b | (b >> 2ULL));
+  uint64_t d __attribute__((unused)) = (c | (c >> 4ULL));
+  uint64_t e __attribute__((unused)) = (d | (d >> 8ULL));
+  uint64_t f __attribute__((unused)) = (e | (e >> 16ULL));
+  uint64_t g __attribute__((unused)) = (f | (f >> 32ULL));
+  return (g + 1ULL);
 }
 
 uint64_t is_pow2(uint64_t x __attribute__((unused))) {
-  if (((x & (x - 1)) == 0)) {
-    return 1;
+  if (((x & (x - 1ULL)) == 0ULL)) {
+    return 1ULL;
   } else {
-    return 0;
+    return 0ULL;
   }
 }
 
 uint64_t reverse8(uint64_t x __attribute__((unused))) {
-  uint64_t a __attribute__((unused)) = (x & 170);
-  uint64_t b __attribute__((unused)) = (x & 85);
-  uint64_t step1 __attribute__((unused)) = (((a >> 1) | (b << 1)) & 255);
-  uint64_t c __attribute__((unused)) = (step1 & 204);
-  uint64_t dd __attribute__((unused)) = (step1 & 51);
-  uint64_t step2 __attribute__((unused)) = (((c >> 2) | (dd << 2)) & 255);
-  uint64_t e __attribute__((unused)) = (step2 & 240);
-  uint64_t f __attribute__((unused)) = (step2 & 15);
-  return (((e >> 4) | (f << 4)) & 255);
+  uint64_t a __attribute__((unused)) = (x & 170ULL);
+  uint64_t b __attribute__((unused)) = (x & 85ULL);
+  uint64_t step1 __attribute__((unused)) = (((a >> 1ULL) | (b << 1ULL)) & 255ULL);
+  uint64_t c __attribute__((unused)) = (step1 & 204ULL);
+  uint64_t dd __attribute__((unused)) = (step1 & 51ULL);
+  uint64_t step2 __attribute__((unused)) = (((c >> 2ULL) | (dd << 2ULL)) & 255ULL);
+  uint64_t e __attribute__((unused)) = (step2 & 240ULL);
+  uint64_t f __attribute__((unused)) = (step2 & 15ULL);
+  return (((e >> 4ULL) | (f << 4ULL)) & 255ULL);
 }
 
 uint64_t swap_bytes16(uint64_t x __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = (x & 255);
-  uint64_t hi __attribute__((unused)) = ((x >> 8) & 255);
-  return ((lo << 8) | hi);
+  uint64_t lo __attribute__((unused)) = (x & 255ULL);
+  uint64_t hi __attribute__((unused)) = ((x >> 8ULL) & 255ULL);
+  return ((lo << 8ULL) | hi);
 }
 
 uint64_t extract_bits(uint64_t x __attribute__((unused)), uint64_t start __attribute__((unused)), uint64_t len __attribute__((unused))) {
-  uint64_t mask __attribute__((unused)) = ((1 << len) - 1);
+  uint64_t mask __attribute__((unused)) = ((1ULL << len) - 1ULL);
   return ((x >> start) & mask);
 }
 
 uint64_t low_bits_mask(uint64_t n __attribute__((unused))) {
-  return ((1 << n) - 1);
+  return ((1ULL << n) - 1ULL);
 }
 
 uint64_t popcount8(uint64_t x __attribute__((unused))) {
-  uint64_t a __attribute__((unused)) = ((x & 85) + ((x >> 1) & 85));
-  uint64_t b __attribute__((unused)) = ((a & 51) + ((a >> 2) & 51));
-  uint64_t c __attribute__((unused)) = ((b & 15) + ((b >> 4) & 15));
+  uint64_t a __attribute__((unused)) = ((x & 85ULL) + ((x >> 1ULL) & 85ULL));
+  uint64_t b __attribute__((unused)) = ((a & 51ULL) + ((a >> 2ULL) & 51ULL));
+  uint64_t c __attribute__((unused)) = ((b & 15ULL) + ((b >> 4ULL) & 15ULL));
   return c;
 }
 
 int main() {
-  uint64_t np1 __attribute__((unused)) = next_pow2(1);
-  uint64_t np5 __attribute__((unused)) = next_pow2(5);
-  uint64_t np8 __attribute__((unused)) = next_pow2(8);
-  uint64_t np9 __attribute__((unused)) = next_pow2(9);
-  uint64_t ip1 __attribute__((unused)) = is_pow2(8);
-  uint64_t ip2 __attribute__((unused)) = is_pow2(9);
-  uint64_t rv __attribute__((unused)) = reverse8(176);
-  uint64_t sw __attribute__((unused)) = swap_bytes16(258);
-  uint64_t ex __attribute__((unused)) = extract_bits(240, 4, 4);
-  uint64_t lm __attribute__((unused)) = low_bits_mask(3);
-  uint64_t pc1 __attribute__((unused)) = popcount8(255);
-  uint64_t pc2 __attribute__((unused)) = popcount8(170);
+  uint64_t np1 __attribute__((unused)) = next_pow2(1ULL);
+  uint64_t np5 __attribute__((unused)) = next_pow2(5ULL);
+  uint64_t np8 __attribute__((unused)) = next_pow2(8ULL);
+  uint64_t np9 __attribute__((unused)) = next_pow2(9ULL);
+  uint64_t ip1 __attribute__((unused)) = is_pow2(8ULL);
+  uint64_t ip2 __attribute__((unused)) = is_pow2(9ULL);
+  uint64_t rv __attribute__((unused)) = reverse8(176ULL);
+  uint64_t sw __attribute__((unused)) = swap_bytes16(258ULL);
+  uint64_t ex __attribute__((unused)) = extract_bits(240ULL, 4ULL, 4ULL);
+  uint64_t lm __attribute__((unused)) = low_bits_mask(3ULL);
+  uint64_t pc1 __attribute__((unused)) = popcount8(255ULL);
+  uint64_t pc2 __attribute__((unused)) = popcount8(170ULL);
   return (int)((((((((((((np1 + np5) + np8) + np9) + ip1) + ip2) + rv) + sw) + ex) + lm) + pc1) + pc2));
 
 }

@@ -22,28 +22,28 @@ uint64_t adj_get(forge_span_u64_t adj __attribute__((unused)), uint64_t n __attr
 }
 
 uint64_t bfs_level(forge_span_u64_t adj __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t visited __attribute__((unused)), forge_span_u64_t frontier __attribute__((unused)), uint64_t nf __attribute__((unused)), forge_span_u64_t next_frontier __attribute__((unused))) {
-  uint64_t nn __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t nn __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < nf)) {
       uint64_t u __attribute__((unused)) = (frontier.data[i] % n);
-      uint64_t v __attribute__((unused)) = 0;
+      uint64_t v __attribute__((unused)) = 0ULL;
       {
         while ((v < n)) {
-          if (((adj_get(adj, n, u, v) > 0) && (visited.data[v] == 0))) {
+          if (((adj_get(adj, n, u, v) > 0ULL) && (visited.data[v] == 0ULL))) {
             if ((nn < n)) {
               next_frontier.data[nn] = v;
-              visited.data[v] = 1;
-              nn = (nn + 1);
+              visited.data[v] = 1ULL;
+              nn = (nn + 1ULL);
 
             }
 
           }
-          v = (v + 1);
+          v = (v + 1ULL);
         }
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -51,15 +51,15 @@ uint64_t bfs_level(forge_span_u64_t adj __attribute__((unused)), uint64_t n __at
 }
 
 uint64_t count_reachable(forge_span_u64_t visited __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((visited.data[i] > 0)) {
-        cnt = (cnt + 1);
+      if ((visited.data[i] > 0ULL)) {
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -67,7 +67,7 @@ uint64_t count_reachable(forge_span_u64_t visited __attribute__((unused)), uint6
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

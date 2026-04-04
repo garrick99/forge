@@ -18,14 +18,14 @@ uint64_t binary_search(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 int main();
 
 uint64_t lower_bound(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
   uint64_t hi __attribute__((unused)) = n;
   {
     while ((lo < hi)) {
-      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2));
+      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2ULL));
       _Bool cond __attribute__((unused)) = (s.data[mid] < target);
       if (cond) {
-        lo = (mid + 1);
+        lo = (mid + 1ULL);
 
       } else {
         hi = mid;
@@ -38,17 +38,17 @@ uint64_t lower_bound(forge_span_u64_t s __attribute__((unused)), uint64_t n __at
 }
 
 uint64_t upper_bound(forge_span_u64_t s __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t target __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = 0;
+  uint64_t lo __attribute__((unused)) = 0ULL;
   uint64_t hi __attribute__((unused)) = n;
   {
     while ((lo < hi)) {
-      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2));
+      uint64_t mid __attribute__((unused)) = (lo + ((hi - lo) / 2ULL));
       _Bool cond __attribute__((unused)) = (s.data[mid] > target);
       if (cond) {
         hi = mid;
 
       } else {
-        lo = (mid + 1);
+        lo = (mid + 1ULL);
 
       }
     }
@@ -71,7 +71,7 @@ uint64_t binary_search(forge_span_u64_t s __attribute__((unused)), uint64_t n __
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

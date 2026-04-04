@@ -12,45 +12,45 @@
 typedef struct { uint64_t* data; uintptr_t len; } forge_span_u64_t;
 
 /* Forward declarations */
-void memset(forge_span_u64_t buf __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused)));
-void memcpy(forge_span_u64_t dst __attribute__((unused)), forge_span_u64_t src __attribute__((unused)), uint64_t n __attribute__((unused)));
-_Bool memcmp(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused)));
+void forge_memset(forge_span_u64_t buf __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused)));
+void forge_memcpy(forge_span_u64_t dst __attribute__((unused)), forge_span_u64_t src __attribute__((unused)), uint64_t n __attribute__((unused)));
+_Bool forge_memcmp(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused)));
 void memzero(forge_span_u64_t buf __attribute__((unused)), uint64_t n __attribute__((unused)));
 uint64_t mem_count_nonzero(forge_span_u64_t buf __attribute__((unused)), uint64_t n __attribute__((unused)));
 int main();
 
-void memset(forge_span_u64_t buf __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+void forge_memset(forge_span_u64_t buf __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t val __attribute__((unused))) {
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       buf.data[i] = val;
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
-void memcpy(forge_span_u64_t dst __attribute__((unused)), forge_span_u64_t src __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+void forge_memcpy(forge_span_u64_t dst __attribute__((unused)), forge_span_u64_t src __attribute__((unused)), uint64_t n __attribute__((unused))) {
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       dst.data[i] = src.data[i];
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
-_Bool memcmp(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
+_Bool forge_memcmp(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused))) {
   _Bool eq __attribute__((unused)) = 1;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while (((i < n) && eq)) {
       if ((a.data[i] != b.data[i])) {
         eq = 0;
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -58,26 +58,26 @@ _Bool memcmp(forge_span_u64_t a __attribute__((unused)), forge_span_u64_t b __at
 }
 
 void memzero(forge_span_u64_t buf __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      buf.data[i] = 0;
-      i = (i + 1);
+      buf.data[i] = 0ULL;
+      i = (i + 1ULL);
     }
 
   }
 }
 
 uint64_t mem_count_nonzero(forge_span_u64_t buf __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t cnt __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t cnt __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((buf.data[i] != 0)) {
-        cnt = (cnt + 1);
+      if ((buf.data[i] != 0ULL)) {
+        cnt = (cnt + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -85,7 +85,7 @@ uint64_t mem_count_nonzero(forge_span_u64_t buf __attribute__((unused)), uint64_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

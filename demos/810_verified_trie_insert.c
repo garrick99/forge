@@ -16,28 +16,28 @@ uint64_t trie_insert(forge_span_u64_t trie __attribute__((unused)), uint64_t max
 int main();
 
 uint64_t trie_insert(forge_span_u64_t trie __attribute__((unused)), uint64_t max_nodes __attribute__((unused)), forge_span_u64_t key __attribute__((unused)), uint64_t key_len __attribute__((unused)), uint64_t next_node __attribute__((unused))) {
-  uint64_t cur __attribute__((unused)) = 0;
+  uint64_t cur __attribute__((unused)) = 0ULL;
   uint64_t alloc __attribute__((unused)) = next_node;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < key_len)) {
-      uint64_t child_slot __attribute__((unused)) = ((cur * 5) + key.data[i]);
-      if ((child_slot < (max_nodes * 5))) {
+      uint64_t child_slot __attribute__((unused)) = ((cur * 5ULL) + key.data[i]);
+      if ((child_slot < (max_nodes * 5ULL))) {
         uint64_t child __attribute__((unused)) = trie.data[child_slot];
-        if (((child > 0) && (child < max_nodes))) {
+        if (((child > 0ULL) && (child < max_nodes))) {
           cur = child;
 
         } else if ((alloc < max_nodes)) {
-          uint64_t new_base __attribute__((unused)) = (alloc * 5);
-          if (((new_base + 4) < (max_nodes * 5))) {
-            trie.data[new_base] = 0;
-            trie.data[(new_base + 1)] = 0;
-            trie.data[(new_base + 2)] = 0;
-            trie.data[(new_base + 3)] = 0;
-            trie.data[(new_base + 4)] = 0;
+          uint64_t new_base __attribute__((unused)) = (alloc * 5ULL);
+          if (((new_base + 4ULL) < (max_nodes * 5ULL))) {
+            trie.data[new_base] = 0ULL;
+            trie.data[(new_base + 1ULL)] = 0ULL;
+            trie.data[(new_base + 2ULL)] = 0ULL;
+            trie.data[(new_base + 3ULL)] = 0ULL;
+            trie.data[(new_base + 4ULL)] = 0ULL;
             trie.data[child_slot] = alloc;
             cur = alloc;
-            alloc = (alloc + 1);
+            alloc = (alloc + 1ULL);
 
           } else {
             i = key_len;
@@ -53,12 +53,12 @@ uint64_t trie_insert(forge_span_u64_t trie __attribute__((unused)), uint64_t max
         i = key_len;
 
       }
-      uint64_t count_slot __attribute__((unused)) = ((cur * 5) + 4);
-      if ((count_slot < (max_nodes * 5))) {
-        trie.data[count_slot] = (trie.data[count_slot] + 1);
+      uint64_t count_slot __attribute__((unused)) = ((cur * 5ULL) + 4ULL);
+      if ((count_slot < (max_nodes * 5ULL))) {
+        trie.data[count_slot] = (trie.data[count_slot] + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -66,7 +66,7 @@ uint64_t trie_insert(forge_span_u64_t trie __attribute__((unused)), uint64_t max
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -16,44 +16,44 @@ uint64_t lcs_length(forge_span_u64_t a __attribute__((unused)), uint64_t m __att
 int main();
 
 uint64_t lcs_length(forge_span_u64_t a __attribute__((unused)), uint64_t m __attribute__((unused)), forge_span_u64_t b __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t dp __attribute__((unused))) {
-  uint64_t cols __attribute__((unused)) = (n + 1);
-  uint64_t j __attribute__((unused)) = 0;
+  uint64_t cols __attribute__((unused)) = (n + 1ULL);
+  uint64_t j __attribute__((unused)) = 0ULL;
   {
     while ((j <= n)) {
-      dp.data[j] = 0;
-      j = (j + 1);
+      dp.data[j] = 0ULL;
+      j = (j + 1ULL);
     }
 
   }
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i <= m)) {
-      dp.data[(i * cols)] = 0;
-      i = (i + 1);
+      dp.data[(i * cols)] = 0ULL;
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t i2 __attribute__((unused)) = 1;
+  uint64_t i2 __attribute__((unused)) = 1ULL;
   {
     while ((i2 <= m)) {
-      uint64_t j2 __attribute__((unused)) = 1;
+      uint64_t j2 __attribute__((unused)) = 1ULL;
       {
         while ((j2 <= n)) {
           uint64_t curr __attribute__((unused)) = ((i2 * cols) + j2);
-          if ((a.data[(i2 - 1)] == b.data[(j2 - 1)])) {
-            dp.data[curr] = (dp.data[(((i2 - 1) * cols) + (j2 - 1))] + 1);
+          if ((a.data[(i2 - 1ULL)] == b.data[(j2 - 1ULL)])) {
+            dp.data[curr] = (dp.data[(((i2 - 1ULL) * cols) + (j2 - 1ULL))] + 1ULL);
 
           } else {
-            uint64_t up __attribute__((unused)) = dp.data[(((i2 - 1) * cols) + j2)];
-            uint64_t left __attribute__((unused)) = dp.data[((i2 * cols) + (j2 - 1))];
+            uint64_t up __attribute__((unused)) = dp.data[(((i2 - 1ULL) * cols) + j2)];
+            uint64_t left __attribute__((unused)) = dp.data[((i2 * cols) + (j2 - 1ULL))];
             dp.data[curr] = ((up >= left) ? up : left);
 
           }
-          j2 = (j2 + 1);
+          j2 = (j2 + 1ULL);
         }
 
       }
-      i2 = (i2 + 1);
+      i2 = (i2 + 1ULL);
     }
 
   }
@@ -61,7 +61,7 @@ uint64_t lcs_length(forge_span_u64_t a __attribute__((unused)), uint64_t m __att
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

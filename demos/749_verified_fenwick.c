@@ -18,7 +18,7 @@ uint64_t fenwick_query(forge_span_u64_t tree __attribute__((unused)), uint64_t n
 int main();
 
 uint64_t lsb(uint64_t i __attribute__((unused))) {
-  return (i & ((i - 1) ^ -1));
+  return (i & ((i - 1ULL) ^ 0xffffffffffffffffULL));
 }
 
 void fenwick_update(forge_span_u64_t tree __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t pos __attribute__((unused)), uint64_t delta __attribute__((unused))) {
@@ -26,7 +26,7 @@ void fenwick_update(forge_span_u64_t tree __attribute__((unused)), uint64_t n __
   {
     while ((i <= n)) {
       if ((i <= n)) {
-        tree.data[(i - 1)] = (tree.data[(i - 1)] + delta);
+        tree.data[(i - 1ULL)] = (tree.data[(i - 1ULL)] + delta);
 
       }
       uint64_t step __attribute__((unused)) = lsb(i);
@@ -37,17 +37,17 @@ void fenwick_update(forge_span_u64_t tree __attribute__((unused)), uint64_t n __
 }
 
 uint64_t fenwick_query(forge_span_u64_t tree __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t pos __attribute__((unused))) {
-  uint64_t sum __attribute__((unused)) = 0;
+  uint64_t sum __attribute__((unused)) = 0ULL;
   uint64_t i __attribute__((unused)) = pos;
   {
-    while ((i >= 1)) {
-      sum = (sum + tree.data[(i - 1)]);
+    while ((i >= 1ULL)) {
+      sum = (sum + tree.data[(i - 1ULL)]);
       uint64_t step __attribute__((unused)) = lsb(i);
       if ((step <= i)) {
         i = (i - step);
 
       } else {
-        i = 0;
+        i = 0ULL;
 
       }
     }
@@ -57,7 +57,7 @@ uint64_t fenwick_query(forge_span_u64_t tree __attribute__((unused)), uint64_t n
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

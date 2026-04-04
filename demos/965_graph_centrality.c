@@ -16,34 +16,34 @@ uint64_t degree_centrality(forge_span_u64_t edges_u __attribute__((unused)), for
 int main();
 
 uint64_t degree_centrality(forge_span_u64_t edges_u __attribute__((unused)), forge_span_u64_t edges_v __attribute__((unused)), forge_span_u64_t deg __attribute__((unused)), uint64_t n_nodes __attribute__((unused)), uint64_t n_edges __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n_nodes)) {
-      deg.data[i] = 0;
-      i = (i + 1);
+      deg.data[i] = 0ULL;
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t e __attribute__((unused)) = 0;
+  uint64_t e __attribute__((unused)) = 0ULL;
   {
     while ((e < n_edges)) {
       uint64_t u __attribute__((unused)) = edges_u.data[e];
       uint64_t v __attribute__((unused)) = edges_v.data[e];
       if ((u < n_nodes)) {
-        deg.data[u] = (deg.data[u] + 1);
+        deg.data[u] = (deg.data[u] + 1ULL);
 
       }
       if ((v < n_nodes)) {
-        deg.data[v] = (deg.data[v] + 1);
+        deg.data[v] = (deg.data[v] + 1ULL);
 
       }
-      e = (e + 1);
+      e = (e + 1ULL);
     }
 
   }
-  uint64_t best __attribute__((unused)) = 0;
-  uint64_t best_d __attribute__((unused)) = deg.data[0];
-  uint64_t j __attribute__((unused)) = 1;
+  uint64_t best __attribute__((unused)) = 0ULL;
+  uint64_t best_d __attribute__((unused)) = deg.data[0ULL];
+  uint64_t j __attribute__((unused)) = 1ULL;
   {
     while ((j < n_nodes)) {
       if ((deg.data[j] > best_d)) {
@@ -51,7 +51,7 @@ uint64_t degree_centrality(forge_span_u64_t edges_u __attribute__((unused)), for
         best_d = deg.data[j];
 
       }
-      j = (j + 1);
+      j = (j + 1ULL);
     }
 
   }
@@ -59,7 +59,7 @@ uint64_t degree_centrality(forge_span_u64_t edges_u __attribute__((unused)), for
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

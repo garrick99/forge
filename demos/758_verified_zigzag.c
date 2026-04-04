@@ -18,36 +18,36 @@ void zigzag_encode_array(forge_span_u64_t input __attribute__((unused)), uint64_
 int main();
 
 uint64_t zigzag_encode(uint64_t val __attribute__((unused))) {
-  if ((val < -9223372036854775808)) {
-    return (val * 2);
+  if ((val < 0x8000000000000000ULL)) {
+    return (val * 2ULL);
   } else {
-    uint64_t neg __attribute__((unused)) = ((-1 - val) + 1);
-    return ((neg * 2) - 1);
+    uint64_t neg __attribute__((unused)) = ((0xffffffffffffffffULL - val) + 1ULL);
+    return ((neg * 2ULL) - 1ULL);
   }
 }
 
 uint64_t zigzag_decode(uint64_t encoded __attribute__((unused))) {
-  if (((encoded % 2) == 0)) {
-    return (encoded / 2);
+  if (((encoded % 2ULL) == 0ULL)) {
+    return (encoded / 2ULL);
   } else {
-    uint64_t pos __attribute__((unused)) = ((encoded + 1) / 2);
-    return ((-1 - pos) + 1);
+    uint64_t pos __attribute__((unused)) = ((encoded + 1ULL) / 2ULL);
+    return ((0xffffffffffffffffULL - pos) + 1ULL);
   }
 }
 
 void zigzag_encode_array(forge_span_u64_t input __attribute__((unused)), uint64_t n __attribute__((unused)), forge_span_u64_t output __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
       output.data[i] = zigzag_encode(input.data[i]);
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -27,60 +27,60 @@ uint64_t shift_count();
 int main();
 
 ShiftReg sr_new() {
-  return (ShiftReg){ .s0 = 0, .s1 = 0, .s2 = 0, .shifts = 0 };
+  return (ShiftReg){ .s0 = 0ULL, .s1 = 0ULL, .s2 = 0ULL, .shifts = 0ULL };
 }
 
 void sr_shift(ShiftReg* r __attribute__((unused)), uint64_t v __attribute__((unused))) {
   (*r).s2 = (*r).s1;
   (*r).s1 = (*r).s0;
   (*r).s0 = v;
-  (*r).shifts = ((*r).shifts + 1);
+  (*r).shifts = ((*r).shifts + 1ULL);
 }
 
 uint64_t shift_in_7_s0() {
   ShiftReg r __attribute__((unused)) = sr_new();
-  sr_shift((&r), 7);
+  sr_shift((&r), 7ULL);
   return r.s0;
 }
 
 uint64_t shift_in_7_s1() {
   ShiftReg r __attribute__((unused)) = sr_new();
-  sr_shift((&r), 7);
+  sr_shift((&r), 7ULL);
   return r.s1;
 }
 
 uint64_t two_shifts_s0() {
   ShiftReg r __attribute__((unused)) = sr_new();
-  sr_shift((&r), 5);
-  sr_shift((&r), 9);
+  sr_shift((&r), 5ULL);
+  sr_shift((&r), 9ULL);
   return r.s0;
 }
 
 uint64_t two_shifts_s1() {
   ShiftReg r __attribute__((unused)) = sr_new();
-  sr_shift((&r), 5);
-  sr_shift((&r), 9);
+  sr_shift((&r), 5ULL);
+  sr_shift((&r), 9ULL);
   return r.s1;
 }
 
 uint64_t three_shifts_s2() {
   ShiftReg r __attribute__((unused)) = sr_new();
-  sr_shift((&r), 1);
-  sr_shift((&r), 2);
-  sr_shift((&r), 3);
+  sr_shift((&r), 1ULL);
+  sr_shift((&r), 2ULL);
+  sr_shift((&r), 3ULL);
   return r.s2;
 }
 
 uint64_t shift_count() {
   ShiftReg r __attribute__((unused)) = sr_new();
-  sr_shift((&r), 1);
-  sr_shift((&r), 2);
-  sr_shift((&r), 3);
+  sr_shift((&r), 1ULL);
+  sr_shift((&r), 2ULL);
+  sr_shift((&r), 3ULL);
   return r.shifts;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

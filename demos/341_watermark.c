@@ -25,55 +25,55 @@ uint64_t update_reset_updates();
 int main();
 
 Watermark wm_new() {
-  return (Watermark){ .mark = 0, .updates = 0 };
+  return (Watermark){ .mark = 0ULL, .updates = 0ULL };
 }
 
 void wm_update(Watermark* w __attribute__((unused)), uint64_t v __attribute__((unused))) {
   (*w).mark = v;
-  (*w).updates = ((*w).updates + 1);
+  (*w).updates = ((*w).updates + 1ULL);
 }
 
 void wm_reset(Watermark* w __attribute__((unused))) {
-  (*w).mark = 0;
+  (*w).mark = 0ULL;
 }
 
 uint64_t update_to_5() {
   Watermark w __attribute__((unused)) = wm_new();
-  wm_update((&w), 5);
+  wm_update((&w), 5ULL);
   return w.mark;
 }
 
 uint64_t three_updates() {
   Watermark w __attribute__((unused)) = wm_new();
-  wm_update((&w), 10);
-  wm_update((&w), 20);
-  wm_update((&w), 30);
+  wm_update((&w), 10ULL);
+  wm_update((&w), 20ULL);
+  wm_update((&w), 30ULL);
   return w.mark;
 }
 
 uint64_t update_count() {
   Watermark w __attribute__((unused)) = wm_new();
-  wm_update((&w), 7);
-  wm_update((&w), 15);
+  wm_update((&w), 7ULL);
+  wm_update((&w), 15ULL);
   return w.updates;
 }
 
 uint64_t update_reset_mark() {
   Watermark w __attribute__((unused)) = wm_new();
-  wm_update((&w), 42);
+  wm_update((&w), 42ULL);
   wm_reset((&w));
   return w.mark;
 }
 
 uint64_t update_reset_updates() {
   Watermark w __attribute__((unused)) = wm_new();
-  wm_update((&w), 42);
+  wm_update((&w), 42ULL);
   wm_reset((&w));
   return w.updates;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

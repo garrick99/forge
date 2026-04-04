@@ -30,60 +30,60 @@ uint64_t reads_tracked();
 int main();
 
 RegisterFile rf_new() {
-  return (RegisterFile){ .r0 = 0, .r1 = 0, .r2 = 0, .r3 = 0, .writes_total = 0, .reads_total = 0 };
+  return (RegisterFile){ .r0 = 0ULL, .r1 = 0ULL, .r2 = 0ULL, .r3 = 0ULL, .writes_total = 0ULL, .reads_total = 0ULL };
 }
 
 void rf_write_r0(RegisterFile* r __attribute__((unused)), uint64_t v __attribute__((unused))) {
   (*r).r0 = v;
-  (*r).writes_total = ((*r).writes_total + 1);
+  (*r).writes_total = ((*r).writes_total + 1ULL);
 }
 
 void rf_write_r1(RegisterFile* r __attribute__((unused)), uint64_t v __attribute__((unused))) {
   (*r).r1 = v;
-  (*r).writes_total = ((*r).writes_total + 1);
+  (*r).writes_total = ((*r).writes_total + 1ULL);
 }
 
 void rf_write_r2(RegisterFile* r __attribute__((unused)), uint64_t v __attribute__((unused))) {
   (*r).r2 = v;
-  (*r).writes_total = ((*r).writes_total + 1);
+  (*r).writes_total = ((*r).writes_total + 1ULL);
 }
 
 void rf_read(RegisterFile* r __attribute__((unused))) {
-  (*r).reads_total = ((*r).reads_total + 1);
+  (*r).reads_total = ((*r).reads_total + 1ULL);
 }
 
 uint64_t write_r0() {
   RegisterFile r __attribute__((unused)) = rf_new();
-  rf_write_r0((&r), 42);
+  rf_write_r0((&r), 42ULL);
   return r.r0;
 }
 
 uint64_t r0_independent() {
   RegisterFile r __attribute__((unused)) = rf_new();
-  rf_write_r0((&r), 10);
-  rf_write_r1((&r), 20);
-  rf_write_r2((&r), 30);
+  rf_write_r0((&r), 10ULL);
+  rf_write_r1((&r), 20ULL);
+  rf_write_r2((&r), 30ULL);
   return r.r0;
 }
 
 uint64_t writes_total() {
   RegisterFile r __attribute__((unused)) = rf_new();
-  rf_write_r0((&r), 1);
-  rf_write_r1((&r), 2);
-  rf_write_r2((&r), 3);
+  rf_write_r0((&r), 1ULL);
+  rf_write_r1((&r), 2ULL);
+  rf_write_r2((&r), 3ULL);
   return r.writes_total;
 }
 
 uint64_t reads_tracked() {
   RegisterFile r __attribute__((unused)) = rf_new();
-  rf_write_r0((&r), 5);
+  rf_write_r0((&r), 5ULL);
   rf_read((&r));
   rf_read((&r));
   return r.reads_total;
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

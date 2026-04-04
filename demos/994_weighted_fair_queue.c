@@ -16,21 +16,21 @@ uint64_t wfq_schedule(forge_span_u64_t queues __attribute__((unused)), forge_spa
 int main();
 
 uint64_t wfq_schedule(forge_span_u64_t queues __attribute__((unused)), forge_span_u64_t weights __attribute__((unused)), forge_span_u64_t dispatched __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t budget __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      dispatched.data[i] = 0;
-      i = (i + 1);
+      dispatched.data[i] = 0ULL;
+      i = (i + 1ULL);
     }
 
   }
-  uint64_t total __attribute__((unused)) = 0;
-  uint64_t round __attribute__((unused)) = 0;
+  uint64_t total __attribute__((unused)) = 0ULL;
+  uint64_t round __attribute__((unused)) = 0ULL;
   {
     while ((round < budget)) {
-      uint64_t best __attribute__((unused)) = 0;
-      uint64_t best_score __attribute__((unused)) = dispatched.data[0];
-      uint64_t j __attribute__((unused)) = 1;
+      uint64_t best __attribute__((unused)) = 0ULL;
+      uint64_t best_score __attribute__((unused)) = dispatched.data[0ULL];
+      uint64_t j __attribute__((unused)) = 1ULL;
       {
         while ((j < n)) {
           if ((dispatched.data[j] < best_score)) {
@@ -38,17 +38,17 @@ uint64_t wfq_schedule(forge_span_u64_t queues __attribute__((unused)), forge_spa
             best_score = dispatched.data[j];
 
           }
-          j = (j + 1);
+          j = (j + 1ULL);
         }
 
       }
-      if ((queues.data[best] > 0)) {
-        dispatched.data[best] = (dispatched.data[best] + 1);
-        queues.data[best] = (queues.data[best] - 1);
-        total = (total + 1);
+      if ((queues.data[best] > 0ULL)) {
+        dispatched.data[best] = (dispatched.data[best] + 1ULL);
+        queues.data[best] = (queues.data[best] - 1ULL);
+        total = (total + 1ULL);
 
       }
-      round = (round + 1);
+      round = (round + 1ULL);
     }
 
   }
@@ -56,7 +56,7 @@ uint64_t wfq_schedule(forge_span_u64_t queues __attribute__((unused)), forge_spa
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

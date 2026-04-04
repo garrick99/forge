@@ -28,38 +28,38 @@ uint64_t sum_invariant();
 int main();
 
 ConnPool cp_new(uint64_t initial __attribute__((unused))) {
-  return (ConnPool){ .idle = initial, .active = 0, .total = initial };
+  return (ConnPool){ .idle = initial, .active = 0ULL, .total = initial };
 }
 
 void cp_checkout(ConnPool* p __attribute__((unused))) {
-  (*p).idle = ((*p).idle - 1);
-  (*p).active = ((*p).active + 1);
+  (*p).idle = ((*p).idle - 1ULL);
+  (*p).active = ((*p).active + 1ULL);
 }
 
 void cp_checkin(ConnPool* p __attribute__((unused))) {
-  (*p).active = ((*p).active - 1);
-  (*p).idle = ((*p).idle + 1);
+  (*p).active = ((*p).active - 1ULL);
+  (*p).idle = ((*p).idle + 1ULL);
 }
 
 void cp_open(ConnPool* p __attribute__((unused))) {
-  (*p).total = ((*p).total + 1);
-  (*p).idle = ((*p).idle + 1);
+  (*p).total = ((*p).total + 1ULL);
+  (*p).idle = ((*p).idle + 1ULL);
 }
 
 void cp_close(ConnPool* p __attribute__((unused))) {
-  (*p).total = ((*p).total - 1);
-  (*p).idle = ((*p).idle - 1);
+  (*p).total = ((*p).total - 1ULL);
+  (*p).idle = ((*p).idle - 1ULL);
 }
 
 uint64_t checkout_two() {
-  ConnPool p __attribute__((unused)) = cp_new(5);
+  ConnPool p __attribute__((unused)) = cp_new(5ULL);
   cp_checkout((&p));
   cp_checkout((&p));
   return p.active;
 }
 
 uint64_t checkout2_checkin1() {
-  ConnPool p __attribute__((unused)) = cp_new(5);
+  ConnPool p __attribute__((unused)) = cp_new(5ULL);
   cp_checkout((&p));
   cp_checkout((&p));
   cp_checkin((&p));
@@ -67,7 +67,7 @@ uint64_t checkout2_checkin1() {
 }
 
 uint64_t total_preserved() {
-  ConnPool p __attribute__((unused)) = cp_new(5);
+  ConnPool p __attribute__((unused)) = cp_new(5ULL);
   cp_checkout((&p));
   cp_checkout((&p));
   cp_checkin((&p));
@@ -75,13 +75,13 @@ uint64_t total_preserved() {
 }
 
 uint64_t open_grows_total() {
-  ConnPool p __attribute__((unused)) = cp_new(5);
+  ConnPool p __attribute__((unused)) = cp_new(5ULL);
   cp_open((&p));
   return p.total;
 }
 
 uint64_t sum_invariant() {
-  ConnPool p __attribute__((unused)) = cp_new(5);
+  ConnPool p __attribute__((unused)) = cp_new(5ULL);
   cp_checkout((&p));
   cp_checkout((&p));
   cp_checkin((&p));
@@ -91,7 +91,7 @@ uint64_t sum_invariant() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

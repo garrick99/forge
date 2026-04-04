@@ -17,46 +17,46 @@ uint64_t count_primes(forge_span_u64_t is_prime __attribute__((unused)), uint64_
 int main();
 
 void sieve(forge_span_u64_t is_prime __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  is_prime.data[0] = 0;
-  is_prime.data[1] = 0;
-  uint64_t k __attribute__((unused)) = 2;
+  is_prime.data[0ULL] = 0ULL;
+  is_prime.data[1ULL] = 0ULL;
+  uint64_t k __attribute__((unused)) = 2ULL;
   {
     while ((k < n)) {
-      is_prime.data[k] = 1;
-      k = (k + 1);
+      is_prime.data[k] = 1ULL;
+      k = (k + 1ULL);
     }
 
   }
-  uint64_t p __attribute__((unused)) = 2;
+  uint64_t p __attribute__((unused)) = 2ULL;
   {
     while (((p * p) < n)) {
-      if ((is_prime.data[p] == 1)) {
+      if ((is_prime.data[p] == 1ULL)) {
         uint64_t m __attribute__((unused)) = (p * p);
         {
           while ((m < n)) {
-            is_prime.data[m] = 0;
+            is_prime.data[m] = 0ULL;
             m = (m + p);
           }
 
         }
 
       }
-      p = (p + 1);
+      p = (p + 1ULL);
     }
 
   }
 }
 
 uint64_t count_primes(forge_span_u64_t is_prime __attribute__((unused)), uint64_t n __attribute__((unused))) {
-  uint64_t count __attribute__((unused)) = 0;
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t count __attribute__((unused)) = 0ULL;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < n)) {
-      if ((is_prime.data[i] == 1)) {
-        count = (count + 1);
+      if ((is_prime.data[i] == 1ULL)) {
+        count = (count + 1ULL);
 
       }
-      i = (i + 1);
+      i = (i + 1ULL);
     }
 
   }
@@ -64,7 +64,7 @@ uint64_t count_primes(forge_span_u64_t is_prime __attribute__((unused)), uint64_
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

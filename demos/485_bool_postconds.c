@@ -23,7 +23,7 @@ uint64_t check_clamp_high();
 int main();
 
 _Bool is_even(uint64_t n __attribute__((unused))) {
-  return ((n % 2) == 0);
+  return ((n % 2ULL) == 0ULL);
 }
 
 _Bool is_in_range(uint64_t n __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused))) {
@@ -43,39 +43,39 @@ uint64_t clamp_check(uint64_t n __attribute__((unused)), uint64_t lo __attribute
 }
 
 _Bool check_even_zero() {
-  return is_even(0);
+  return is_even(0ULL);
 }
 
 _Bool check_even_four() {
-  return is_even(4);
+  return is_even(4ULL);
 }
 
 _Bool check_odd_three() {
-  return is_even(3);
+  return is_even(3ULL);
 }
 
 _Bool check_in_range() {
-  return is_in_range(5, 1, 10);
+  return is_in_range(5ULL, 1ULL, 10ULL);
 }
 
 _Bool check_out_of_range() {
-  return is_in_range(15, 1, 10);
+  return is_in_range(15ULL, 1ULL, 10ULL);
 }
 
 uint64_t check_clamp_mid() {
-  return clamp_check(7, 1, 10);
+  return clamp_check(7ULL, 1ULL, 10ULL);
 }
 
 uint64_t check_clamp_low() {
-  return clamp_check(0, 1, 10);
+  return clamp_check(0ULL, 1ULL, 10ULL);
 }
 
 uint64_t check_clamp_high() {
-  return clamp_check(100, 1, 10);
+  return clamp_check(100ULL, 1ULL, 10ULL);
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 

@@ -26,19 +26,19 @@ uint64_t total_fails_preserved();
 int main();
 
 HealthMonitor hm_new() {
-  return (HealthMonitor){ .consecutive_fails = 0, .total_checks = 0, .total_fails = 0, .passes = 0 };
+  return (HealthMonitor){ .consecutive_fails = 0ULL, .total_checks = 0ULL, .total_fails = 0ULL, .passes = 0ULL };
 }
 
 void hm_fail(HealthMonitor* h __attribute__((unused))) {
-  (*h).consecutive_fails = ((*h).consecutive_fails + 1);
-  (*h).total_checks = ((*h).total_checks + 1);
-  (*h).total_fails = ((*h).total_fails + 1);
+  (*h).consecutive_fails = ((*h).consecutive_fails + 1ULL);
+  (*h).total_checks = ((*h).total_checks + 1ULL);
+  (*h).total_fails = ((*h).total_fails + 1ULL);
 }
 
 void hm_pass(HealthMonitor* h __attribute__((unused))) {
-  (*h).consecutive_fails = 0;
-  (*h).total_checks = ((*h).total_checks + 1);
-  (*h).passes = ((*h).passes + 1);
+  (*h).consecutive_fails = 0ULL;
+  (*h).total_checks = ((*h).total_checks + 1ULL);
+  (*h).passes = ((*h).passes + 1ULL);
 }
 
 uint64_t three_fails() {
@@ -77,7 +77,7 @@ uint64_t total_fails_preserved() {
 }
 
 int main() {
-  return (int)(0);
+  return (int)(0ULL);
 
 }
 
