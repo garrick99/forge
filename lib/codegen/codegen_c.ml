@@ -677,29 +677,54 @@ let rec emit_expr depth e =
         (emit_expr depth v) (emit_expr depth lane) (emit_expr depth width)
   | ECall ({ expr_desc = EVar id; _ }, [ptr; v])
       when id.name = "atom_add" ->
-      Printf.sprintf "atomicAdd((unsigned long long*)%s, %s)"
-        (emit_expr depth ptr) (emit_expr depth v)
+      (* Choose the correct CUDA atomicAdd overload based on the pointer element type.
+         Casting to the wrong pointer type (e.g. unsigned long long* for a u32) is UB. *)
+      let cast = match ptr.expr_ty with
+        | Some (TRaw (TPrim (TUint U32)))   | Some (TRef (TPrim (TUint U32)))
+        | Some (TRaw (TRefined (TUint U32,_,_))) -> "(unsigned int*)"
+        | Some (TRaw (TPrim (TFloat F32)))  | Some (TRef (TPrim (TFloat F32))) -> "(float*)"
+        | Some (TRaw (TPrim (TFloat F64)))  | Some (TRef (TPrim (TFloat F64))) -> "(double*)"
+        | _ -> "(unsigned long long*)"
+      in
+      Printf.sprintf "atomicAdd(%s%s, %s)" cast (emit_expr depth ptr) (emit_expr depth v)
   | ECall ({ expr_desc = EVar id; _ }, [ptr; v])
       when id.name = "atom_cas" ->
-      Printf.sprintf "atomicCAS((unsigned long long*)%s, 0, %s)"
-        (emit_expr depth ptr) (emit_expr depth v)
+      let cast = match ptr.expr_ty with
+        | Some (TRaw (TPrim (TUint U32)))   | Some (TRef (TPrim (TUint U32)))
+        | Some (TRaw (TRefined (TUint U32,_,_))) -> "(unsigned int*)"
+        | _ -> "(unsigned long long*)"
+      in
+      Printf.sprintf "atomicCAS(%s%s, 0, %s)" cast (emit_expr depth ptr) (emit_expr depth v)
   | ECall ({ expr_desc = EVar id; _ }, [ptr; v])
       when id.name = "atom_max" ->
-      Printf.sprintf "atomicMax((unsigned long long*)%s, %s)"
-        (emit_expr depth ptr) (emit_expr depth v)
+      let cast = match ptr.expr_ty with
+        | Some (TRaw (TPrim (TUint U32)))   | Some (TRef (TPrim (TUint U32)))
+        | Some (TRaw (TRefined (TUint U32,_,_))) -> "(unsigned int*)"
+        | Some (TRaw (TPrim (TInt I32)))    | Some (TRef (TPrim (TInt I32))) -> "(int*)"
+        | _ -> "(unsigned long long*)"
+      in
+      Printf.sprintf "atomicMax(%s%s, %s)" cast (emit_expr depth ptr) (emit_expr depth v)
   | ECall ({ expr_desc = EVar id; _ }, [ptr; v])
       when id.name = "atom_min" ->
-      Printf.sprintf "atomicMin((unsigned long long*)%s, %s)"
-        (emit_expr depth ptr) (emit_expr depth v)
+      let cast = match ptr.expr_ty with
+        | Some (TRaw (TPrim (TUint U32)))   | Some (TRef (TPrim (TUint U32)))
+        | Some (TRaw (TRefined (TUint U32,_,_))) -> "(unsigned int*)"
+        | Some (TRaw (TPrim (TInt I32)))    | Some (TRef (TPrim (TInt I32))) -> "(int*)"
+        | _ -> "(unsigned long long*)"
+      in
+      Printf.sprintf "atomicMin(%s%s, %s)" cast (emit_expr depth ptr) (emit_expr depth v)
   | ECall ({ expr_desc = EVar id; _ }, [pred])
       when id.name = "ballot_sync" ->
       Printf.sprintf "__ballot_sync(0xffffffff, %s)" (emit_expr depth pred)
   | ECall ({ expr_desc = EVar id; _ }, [])
       when id.name = "lane_id" ->
-      "(threadIdx.x & 31)"
+      (* Static assertion: warp primitives assume 32-thread warps (NVIDIA/CUDA).
+         blockDim.x must be a multiple of 32; if not, lane_id/warp_id are wrong.
+         Use __builtin_expect to keep the assert off the hot path. *)
+      "(__builtin_expect(blockDim.x % 32 == 0, 1) ? (threadIdx.x & 31) : (__builtin_trap(), 0))"
   | ECall ({ expr_desc = EVar id; _ }, [])
       when id.name = "warp_id" ->
-      "(threadIdx.x >> 5)"
+      "(__builtin_expect(blockDim.x % 32 == 0, 1) ? (threadIdx.x >> 5) : (__builtin_trap(), 0))"
   (* ---- Shared memory intrinsics ---- *)
   | ECall ({ expr_desc = EVar id; _ }, [arr; idx])
       when id.name = "shared_load" ->
@@ -2301,7 +2326,7 @@ let emit_program prog =
       Buffer.add_string buf
         (Printf.sprintf
            "static inline %s* __forge_own_alloc_%s(%s __val) \
-            { %s* __p = (%s*)malloc(sizeof(%s)); *__p = __val; return __p; }\n"
+            { %s* __p = (%s*)malloc(sizeof(%s)); if (!__p) { abort(); } *__p = __val; return __p; }\n"
            ty_str key ty_str   ty_str ty_str ty_str);
       Buffer.add_string buf
         (Printf.sprintf

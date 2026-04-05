@@ -10,6 +10,86 @@
 
 /* Monomorphized generic types */
 typedef enum {
+  Option_T_tag_Some = 0,
+  Option_T_tag_None = 1,
+} Option_T_tag_t;
+typedef struct Option_T {
+  Option_T_tag_t tag;
+  union {
+    struct {
+      T _v0;
+    } Some;
+    struct {
+      char _dummy;
+    } None;
+  } data;
+} Option_T;
+
+typedef enum {
+  Option_U_tag_Some = 0,
+  Option_U_tag_None = 1,
+} Option_U_tag_t;
+typedef struct Option_U {
+  Option_U_tag_t tag;
+  union {
+    struct {
+      U _v0;
+    } Some;
+    struct {
+      char _dummy;
+    } None;
+  } data;
+} Option_U;
+
+typedef enum {
+  Result_T_E_tag_Ok = 0,
+  Result_T_E_tag_Err = 1,
+} Result_T_E_tag_t;
+typedef struct Result_T_E {
+  Result_T_E_tag_t tag;
+  union {
+    struct {
+      T _v0;
+    } Ok;
+    struct {
+      E _v0;
+    } Err;
+  } data;
+} Result_T_E;
+
+typedef enum {
+  Result_U_E_tag_Ok = 0,
+  Result_U_E_tag_Err = 1,
+} Result_U_E_tag_t;
+typedef struct Result_U_E {
+  Result_U_E_tag_t tag;
+  union {
+    struct {
+      U _v0;
+    } Ok;
+    struct {
+      E _v0;
+    } Err;
+  } data;
+} Result_U_E;
+
+typedef enum {
+  Result_T_F_tag_Ok = 0,
+  Result_T_F_tag_Err = 1,
+} Result_T_F_tag_t;
+typedef struct Result_T_F {
+  Result_T_F_tag_t tag;
+  union {
+    struct {
+      T _v0;
+    } Ok;
+    struct {
+      F _v0;
+    } Err;
+  } data;
+} Result_T_F;
+
+typedef enum {
   Option_u64_tag_Some = 0,
   Option_u64_tag_None = 1,
 } Option_u64_tag_t;
@@ -42,12 +122,197 @@ typedef struct Result_u64_u64 {
 } Result_u64_u64;
 
 
+/* Function pointer typedefs */
+typedef U (*forge_fn_T_ret_U_t)(T);
+typedef Option_U (*forge_fn_T_ret_Option_U_t)(T);
+typedef F (*forge_fn_E_ret_F_t)(E);
+typedef Result_U_E (*forge_fn_T_ret_Result_U_E_t)(T);
+
 /* Forward declarations */
+_Bool is_some(Option_T opt __attribute__((unused)));
+_Bool is_none(Option_T opt __attribute__((unused)));
+void unwrap_or(Option_T opt __attribute__((unused)), void forge_default __attribute__((unused)));
+Option_U map(Option_T opt __attribute__((unused)), forge_fn_T_ret_U_t f __attribute__((unused)));
+Option_U and_then(Option_T opt __attribute__((unused)), forge_fn_T_ret_Option_U_t f __attribute__((unused)));
+Option_T or_else(Option_T opt __attribute__((unused)), Option_T forge_default __attribute__((unused)));
+int main();
+_Bool is_ok(Result_T_E r __attribute__((unused)));
+_Bool is_err(Result_T_E r __attribute__((unused)));
+void unwrap_or(Result_T_E r __attribute__((unused)), void forge_default __attribute__((unused)));
+Result_U_E map(Result_T_E r __attribute__((unused)), forge_fn_T_ret_U_t f __attribute__((unused)));
+Result_T_F map_err(Result_T_E r __attribute__((unused)), forge_fn_E_ret_F_t f __attribute__((unused)));
+Result_U_E and_then(Result_T_E r __attribute__((unused)), forge_fn_T_ret_Result_U_E_t f __attribute__((unused)));
+int main();
 uint64_t option_unwrap_or(Option_u64 opt __attribute__((unused)), uint64_t forge_default __attribute__((unused)));
 Option_u64 safe_sqrt(uint64_t n __attribute__((unused)));
 Result_u64_u64 safe_div(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 Result_u64_u64 div_chain(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t c __attribute__((unused)));
 int main();
+
+_Bool is_some(Option_T opt __attribute__((unused))) {
+  switch (opt.tag) {
+    case Option_T_tag_Some: {
+      return 1;
+    }
+    case Option_T_tag_None: {
+      return 0;
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+_Bool is_none(Option_T opt __attribute__((unused))) {
+  switch (opt.tag) {
+    case Option_T_tag_Some: {
+      return 0;
+    }
+    case Option_T_tag_None: {
+      return 1;
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+void unwrap_or(Option_T opt __attribute__((unused)), void forge_default __attribute__((unused))) {
+  switch (opt.tag) {
+    case Option_T_tag_Some: {
+      void v __attribute__((unused)) = opt.data.Some._v0;
+      return v;
+    }
+    case Option_T_tag_None: {
+      return forge_default;
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+Option_U map(Option_T opt __attribute__((unused)), forge_fn_T_ret_U_t f __attribute__((unused))) {
+  switch (opt.tag) {
+    case Option_T_tag_Some: {
+      void v __attribute__((unused)) = opt.data.Some._v0;
+      return (Option_U){ .tag = Option_U_tag_Some, .data.Some = { ._v0 = f(v) } };
+    }
+    case Option_T_tag_None: {
+      return (Option_T){ .tag = Option_T_tag_None, .data.None = { ._dummy = 0 } };
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+Option_U and_then(Option_T opt __attribute__((unused)), forge_fn_T_ret_Option_U_t f __attribute__((unused))) {
+  switch (opt.tag) {
+    case Option_T_tag_Some: {
+      void v __attribute__((unused)) = opt.data.Some._v0;
+      return f(v);
+    }
+    case Option_T_tag_None: {
+      return (Option_T){ .tag = Option_T_tag_None, .data.None = { ._dummy = 0 } };
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+Option_T or_else(Option_T opt __attribute__((unused)), Option_T forge_default __attribute__((unused))) {
+  switch (opt.tag) {
+    case Option_T_tag_Some: {
+      void v __attribute__((unused)) = opt.data.Some._v0;
+      return (Option_T){ .tag = Option_T_tag_Some, .data.Some = { ._v0 = v } };
+    }
+    case Option_T_tag_None: {
+      return forge_default;
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+int main() {
+  return (int)(0ULL);
+
+}
+
+_Bool is_ok(Result_T_E r __attribute__((unused))) {
+  switch (r.tag) {
+    case Result_T_E_tag_Ok: {
+      return 1;
+    }
+    case Result_T_E_tag_Err: {
+      return 0;
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+_Bool is_err(Result_T_E r __attribute__((unused))) {
+  switch (r.tag) {
+    case Result_T_E_tag_Ok: {
+      return 0;
+    }
+    case Result_T_E_tag_Err: {
+      return 1;
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+void unwrap_or(Result_T_E r __attribute__((unused)), void forge_default __attribute__((unused))) {
+  switch (r.tag) {
+    case Result_T_E_tag_Ok: {
+      void v __attribute__((unused)) = r.data.Ok._v0;
+      return v;
+    }
+    case Result_T_E_tag_Err: {
+      return forge_default;
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+Result_U_E map(Result_T_E r __attribute__((unused)), forge_fn_T_ret_U_t f __attribute__((unused))) {
+  switch (r.tag) {
+    case Result_T_E_tag_Ok: {
+      void v __attribute__((unused)) = r.data.Ok._v0;
+      return (Result_U_E){ .tag = Result_U_E_tag_Ok, .data.Ok = { ._v0 = f(v) } };
+    }
+    case Result_T_E_tag_Err: {
+      void e __attribute__((unused)) = r.data.Err._v0;
+      return (Result_U_E){ .tag = Result_U_E_tag_Err, .data.Err = { ._v0 = e } };
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+Result_T_F map_err(Result_T_E r __attribute__((unused)), forge_fn_E_ret_F_t f __attribute__((unused))) {
+  switch (r.tag) {
+    case Result_T_E_tag_Ok: {
+      void v __attribute__((unused)) = r.data.Ok._v0;
+      return (Result_T_F){ .tag = Result_T_F_tag_Ok, .data.Ok = { ._v0 = v } };
+    }
+    case Result_T_E_tag_Err: {
+      void e __attribute__((unused)) = r.data.Err._v0;
+      return (Result_T_F){ .tag = Result_T_F_tag_Err, .data.Err = { ._v0 = f(e) } };
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+Result_U_E and_then(Result_T_E r __attribute__((unused)), forge_fn_T_ret_Result_U_E_t f __attribute__((unused))) {
+  switch (r.tag) {
+    case Result_T_E_tag_Ok: {
+      void v __attribute__((unused)) = r.data.Ok._v0;
+      return f(v);
+    }
+    case Result_T_E_tag_Err: {
+      void e __attribute__((unused)) = r.data.Err._v0;
+      return (Result_U_E){ .tag = Result_U_E_tag_Err, .data.Err = { ._v0 = e } };
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+int main() {
+  return (int)(0ULL);
+
+}
 
 uint64_t option_unwrap_or(Option_u64 opt __attribute__((unused)), uint64_t forge_default __attribute__((unused))) {
   switch (opt.tag) {
@@ -82,26 +347,26 @@ Result_u64_u64 safe_div(uint64_t a __attribute__((unused)), uint64_t b __attribu
 Result_u64_u64 div_chain(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t c __attribute__((unused))) {
   uint64_t x;
   switch (safe_div(a, b).tag) {
-    case Result_u64_u64_tag_Ok: {
-      uint64_t __qok_4900017 __attribute__((unused)) = safe_div(a, b).data.Ok._v0;
+    case Result_T_E_tag_Ok: {
+      T __qok_4900017 __attribute__((unused)) = safe_div(a, b).data.Ok._v0;
       x = __qok_4900017;
       break;
     }
-    case Result_u64_u64_tag_Err: {
-      uint64_t __qerr_4900017 __attribute__((unused)) = safe_div(a, b).data.Err._v0;
+    case Result_T_E_tag_Err: {
+      E __qerr_4900017 __attribute__((unused)) = safe_div(a, b).data.Err._v0;
       return (Result_u64_u64){ .tag = Result_u64_u64_tag_Err, .data.Err = { ._v0 = __qerr_4900017 } };
 
     }
   }
   uint64_t y;
   switch (safe_div(x, c).tag) {
-    case Result_u64_u64_tag_Ok: {
-      uint64_t __qok_5000017 __attribute__((unused)) = safe_div(x, c).data.Ok._v0;
+    case Result_T_E_tag_Ok: {
+      T __qok_5000017 __attribute__((unused)) = safe_div(x, c).data.Ok._v0;
       y = __qok_5000017;
       break;
     }
-    case Result_u64_u64_tag_Err: {
-      uint64_t __qerr_5000017 __attribute__((unused)) = safe_div(x, c).data.Err._v0;
+    case Result_T_E_tag_Err: {
+      E __qerr_5000017 __attribute__((unused)) = safe_div(x, c).data.Err._v0;
       return (Result_u64_u64){ .tag = Result_u64_u64_tag_Err, .data.Err = { ._v0 = __qerr_5000017 } };
 
     }
@@ -117,12 +382,12 @@ int main() {
   Result_u64_u64 r __attribute__((unused)) = div_chain(200ULL, 10ULL, 4ULL);
   uint64_t rv;
   switch (r.tag) {
-    case Result_u64_u64_tag_Ok: {
-      uint64_t v __attribute__((unused)) = r.data.Ok._v0;
+    case Result_T_E_tag_Ok: {
+      T v __attribute__((unused)) = r.data.Ok._v0;
       rv = v;
       break;
     }
-    case Result_u64_u64_tag_Err: {
+    case Result_T_E_tag_Err: {
       rv = 0ULL;
       break;
     }

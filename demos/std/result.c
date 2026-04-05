@@ -8,3 +8,151 @@
 #  define __attribute__(x)
 #endif
 
+/* Monomorphized generic types */
+typedef enum {
+  Result_T_E_tag_Ok = 0,
+  Result_T_E_tag_Err = 1,
+} Result_T_E_tag_t;
+typedef struct Result_T_E {
+  Result_T_E_tag_t tag;
+  union {
+    struct {
+      T _v0;
+    } Ok;
+    struct {
+      E _v0;
+    } Err;
+  } data;
+} Result_T_E;
+
+typedef enum {
+  Result_U_E_tag_Ok = 0,
+  Result_U_E_tag_Err = 1,
+} Result_U_E_tag_t;
+typedef struct Result_U_E {
+  Result_U_E_tag_t tag;
+  union {
+    struct {
+      U _v0;
+    } Ok;
+    struct {
+      E _v0;
+    } Err;
+  } data;
+} Result_U_E;
+
+typedef enum {
+  Result_T_F_tag_Ok = 0,
+  Result_T_F_tag_Err = 1,
+} Result_T_F_tag_t;
+typedef struct Result_T_F {
+  Result_T_F_tag_t tag;
+  union {
+    struct {
+      T _v0;
+    } Ok;
+    struct {
+      F _v0;
+    } Err;
+  } data;
+} Result_T_F;
+
+
+/* Function pointer typedefs */
+typedef U (*forge_fn_T_ret_U_t)(T);
+typedef F (*forge_fn_E_ret_F_t)(E);
+typedef Result_U_E (*forge_fn_T_ret_Result_U_E_t)(T);
+
+/* Forward declarations */
+_Bool is_ok(Result_T_E r __attribute__((unused)));
+_Bool is_err(Result_T_E r __attribute__((unused)));
+void unwrap_or(Result_T_E r __attribute__((unused)), void forge_default __attribute__((unused)));
+Result_U_E map(Result_T_E r __attribute__((unused)), forge_fn_T_ret_U_t f __attribute__((unused)));
+Result_T_F map_err(Result_T_E r __attribute__((unused)), forge_fn_E_ret_F_t f __attribute__((unused)));
+Result_U_E and_then(Result_T_E r __attribute__((unused)), forge_fn_T_ret_Result_U_E_t f __attribute__((unused)));
+int main();
+
+_Bool is_ok(Result_T_E r __attribute__((unused))) {
+  switch (r.tag) {
+    case Result_T_E_tag_Ok: {
+      return 1;
+    }
+    case Result_T_E_tag_Err: {
+      return 0;
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+_Bool is_err(Result_T_E r __attribute__((unused))) {
+  switch (r.tag) {
+    case Result_T_E_tag_Ok: {
+      return 0;
+    }
+    case Result_T_E_tag_Err: {
+      return 1;
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+void unwrap_or(Result_T_E r __attribute__((unused)), void forge_default __attribute__((unused))) {
+  switch (r.tag) {
+    case Result_T_E_tag_Ok: {
+      void v __attribute__((unused)) = r.data.Ok._v0;
+      return v;
+    }
+    case Result_T_E_tag_Err: {
+      return forge_default;
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+Result_U_E map(Result_T_E r __attribute__((unused)), forge_fn_T_ret_U_t f __attribute__((unused))) {
+  switch (r.tag) {
+    case Result_T_E_tag_Ok: {
+      void v __attribute__((unused)) = r.data.Ok._v0;
+      return (Result_U_E){ .tag = Result_U_E_tag_Ok, .data.Ok = { ._v0 = f(v) } };
+    }
+    case Result_T_E_tag_Err: {
+      void e __attribute__((unused)) = r.data.Err._v0;
+      return (Result_U_E){ .tag = Result_U_E_tag_Err, .data.Err = { ._v0 = e } };
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+Result_T_F map_err(Result_T_E r __attribute__((unused)), forge_fn_E_ret_F_t f __attribute__((unused))) {
+  switch (r.tag) {
+    case Result_T_E_tag_Ok: {
+      void v __attribute__((unused)) = r.data.Ok._v0;
+      return (Result_T_F){ .tag = Result_T_F_tag_Ok, .data.Ok = { ._v0 = v } };
+    }
+    case Result_T_E_tag_Err: {
+      void e __attribute__((unused)) = r.data.Err._v0;
+      return (Result_T_F){ .tag = Result_T_F_tag_Err, .data.Err = { ._v0 = f(e) } };
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+Result_U_E and_then(Result_T_E r __attribute__((unused)), forge_fn_T_ret_Result_U_E_t f __attribute__((unused))) {
+  switch (r.tag) {
+    case Result_T_E_tag_Ok: {
+      void v __attribute__((unused)) = r.data.Ok._v0;
+      return f(v);
+    }
+    case Result_T_E_tag_Err: {
+      void e __attribute__((unused)) = r.data.Err._v0;
+      return (Result_U_E){ .tag = Result_U_E_tag_Err, .data.Err = { ._v0 = e } };
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+int main() {
+  return (int)(0ULL);
+
+}
+

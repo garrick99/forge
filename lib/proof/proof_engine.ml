@@ -56,6 +56,7 @@ let rec pred_to_string = function
   | PVar id -> id.name
   | PInt n -> if n >= 0L then Int64.to_string n
               else Printf.sprintf "(-%s)" (Int64.to_string (Int64.neg n))
+  | PFloat f -> Printf.sprintf "%.17g" f
   | PBool true -> "true" | PBool false -> "false"
   | PTrue -> "true" | PFalse -> "false"
   | PBinop (op, l, r) ->
@@ -105,16 +106,18 @@ module Z3Bridge = struct
     | Unsat                      (* formula is unsatisfiable — negation proves original *)
     | Unknown of string          (* Z3 gave up — escalate to Tier 2 *)
 
-  (* SMT sort — tracks whether a variable/expression is Int, Bool, or BitVec *)
+  (* SMT sort — tracks whether a variable/expression is Int, Bool, BitVec, or Real *)
   type smt_sort =
     | SInt
     | SBool
     | SBV of int * bool   (* width, is_signed *)
+    | SReal               (* f32/f64 — encoded as Real (not FP theory; no NaN/Inf) *)
 
   let sort_to_smt = function
     | SInt        -> "Int"
     | SBool       -> "Bool"
     | SBV (n, _)  -> Printf.sprintf "(_ BitVec %d)" n
+    | SReal       -> "Real"
 
   (* Map a FORGE type to its SMT sort *)
   let rec ty_to_sort = function
@@ -136,10 +139,11 @@ module Z3Bridge = struct
     | TRefined (TUint U64, _, _) -> SBV (64, false)
     | TRefined (TInt  I32, _, _) -> SBV (32, true)
     | TRefined (TInt  I64, _, _) -> SBV (64, true)
-    | TPrim TBool -> SBool
-    | TSecret t   -> ty_to_sort t   (* secret<T> has same SMT sort as T *)
-    | TQual (_, t) -> ty_to_sort t  (* varying/uniform qualifier: same SMT sort as T *)
-    | _           -> SInt
+    | TPrim TBool            -> SBool
+    | TPrim (TFloat _)       -> SReal   (* f32/f64 → Real (approximation; no NaN/Inf) *)
+    | TSecret t              -> ty_to_sort t
+    | TQual (_, t)           -> ty_to_sort t
+    | _                      -> SInt
 
   (* Detect auto-generated array-init frame axioms — forall (__oi_k_N ...) body.
      These are injected by env_array_init to model initial array values and are
@@ -263,11 +267,18 @@ module Z3Bridge = struct
     | PVar id        -> id.name
     | PInt n         ->
         if bv then emit_int_lit hint_sort n
+        else if hint_sort = SReal then
+          (* In Real context, emit integer values as exact rationals (e.g. "0.0"). *)
+          Printf.sprintf "%Ld.0" n
         else if Int64.compare n 0L < 0 then
-          (* Negative Int64 bit-pattern from a u64 literal >= 2^63.
-             Emit as unsigned decimal so Z3 Int arithmetic sees the correct value. *)
           Printf.sprintf "%Lu" n
         else Int64.to_string n
+    | PFloat f       ->
+        (* Real sort: emit as SMT-LIB decimal literal.
+           Note: Z3's Real theory has no NaN/Inf — this is an approximation
+           that is sound for finite arithmetic proofs. *)
+        if Float.is_nan f || Float.is_infinite f then "0.0"
+        else Printf.sprintf "%.17g" f
     | PBool b        -> string_of_bool b
     | PBinop (op, l, r) ->
         (* In BV mode: determine sort from operand types.
@@ -365,6 +376,7 @@ module Z3Bridge = struct
           | PForall (_, _, inner) -> collect_triggers acc inner
           | PExists (_, _, inner) -> collect_triggers acc inner
           | PApp (_, args)        -> List.fold_left collect_triggers acc args
+          | PField (inner, _)     -> collect_triggers acc inner  (* recurse through field access *)
           | _                     -> acc
         in
         let triggers = collect_triggers [] body in
@@ -408,6 +420,12 @@ module Z3Bridge = struct
         (match p with
          | PIndex (PVar id, idx) ->
              Printf.sprintf "(select __%s_init %s)" id.name (pred_to_smtlib ~bv ctx idx)
+         | PField (PIndex (PVar id, idx), f) ->
+             (* old(span[i].field) → (select __span_init__field i)
+                Requires __span_init__field to be declared as (Array Int T)
+                by the span<Struct> snapshot injection in typecheck. *)
+             Printf.sprintf "(select __%s_init__%s %s)"
+               id.name f (pred_to_smtlib ~bv ctx idx)
          | PField (PVar id, f) ->
              Printf.sprintf "__%s_init__%s" id.name f
          | _ ->
@@ -442,6 +460,16 @@ module Z3Bridge = struct
           | PIte (cond, t, e) ->
               Printf.sprintf "(ite %s %s %s)"
                 (pred_to_smtlib ~bv ctx cond) (do_field t) (do_field e)
+          | PIndex (arr, idx) ->
+              (* arr[i].field — struct-of-arrays encoding: (select arr__field i).
+                 Each field of span<Struct> is encoded as a separate SMT array.
+                 This is the only way to express field access in array elements in
+                 SMT-LIB2 without algebraic datatypes. *)
+              let arr_field = match arr with
+                | PVar id -> id.name ^ "__" ^ f
+                | _       -> (pred_to_smtlib ~bv ctx arr) ^ "__" ^ f
+              in
+              Printf.sprintf "(select %s %s)" arr_field (pred_to_smtlib ~bv ctx idx)
           | PVar id  -> id.name ^ "__" ^ f
           | PResult  -> "result____" ^ f
           | _        -> (pred_to_smtlib ~bv ctx inner) ^ "__" ^ f
@@ -523,10 +551,18 @@ module Z3Bridge = struct
     | PApp (_, args) -> List.fold_left collect_array_var_names acc args
     | PForall (_, _, p) | PExists (_, _, p) -> collect_array_var_names acc p
     | PLex ps -> List.fold_left collect_array_var_names acc ps
+    | PField (PIndex (PVar id, idx), f) ->
+        (* arr[i].field — struct-of-arrays: arr__field is an (Array Int Int) *)
+        let arr_field = id.name ^ "__" ^ f in
+        collect_array_var_names (arr_field :: acc) idx
     | PField (p, _) -> collect_array_var_names acc p
     | POld (PIndex (PVar id, idx)) ->
         (* old(arr[i]) encodes as __arr_init — register it as an array variable *)
         collect_array_var_names (("__" ^ id.name ^ "_init") :: acc) idx
+    | POld (PField (PIndex (PVar id, idx), f)) ->
+        (* old(span[i].field) encodes as __span_init__field array *)
+        let arr_name = "__" ^ id.name ^ "_init__" ^ f in
+        collect_array_var_names (arr_name :: acc) idx
     | POld p -> collect_array_var_names acc p
     | PStruct (_, fields) ->
         List.fold_left (fun a (_, p) -> collect_array_var_names a p) acc fields
@@ -566,31 +602,52 @@ module Z3Bridge = struct
       let assume_avs = List.concat_map (collect_array_var_names []) ctx.pc_assumes in
       List.sort_uniq String.compare (goal_avs @ assume_avs)
     in
-    (* Variable declarations — BV sort when in BV mode, Int/Bool otherwise.
+    (* Variable declarations — BV sort in BV mode, Real for floats, Int/Bool otherwise.
        Bool-typed variables must be declared as Bool (not Int) so that
-       facts like (= sorted true) are well-sorted in Z3. *)
+       facts like (= sorted true) are well-sorted in Z3.
+       Float-typed variables use Real sort (approximation: no NaN/Inf semantics). *)
     let decl_sort name ty =
       if List.mem name array_var_names then
         if use_bv then "(Array (_ BitVec 64) (_ BitVec 64))" else "(Array Int Int)"
       else if use_bv then sort_to_smt (ty_to_sort ty)
-      else (match ty with TPrim TBool -> "Bool" | _ -> "Int")
+      else (match ty with
+        | TPrim TBool               -> "Bool"
+        | TPrim (TFloat _)          -> "Real"
+        | TQual (_, TPrim (TFloat _)) -> "Real"
+        | _                         -> "Int")
     in
     let decls = List.map (fun (name, ty) ->
       Printf.sprintf "(declare-const %s %s)" name (decl_sort name ty)
     ) ctx.pc_vars in
-    let free_decls = List.map (fun name ->
-      (* In BV mode QF_BV does not allow Int sort — use (_ BitVec 64) for unknowns.
-         In Int mode, free variables are plain Int. *)
-      if use_bv then Printf.sprintf "(declare-const %s (_ BitVec 64))" name
-      else Printf.sprintf "(declare-const %s Int)" name
+    (* Declare virtual struct-of-array variables (e.g. pairs__fst) that appear in
+       array_var_names but are not in pc_vars and are not returned by pred_vars.
+       These arise from PField(PIndex(PVar id, idx), f) which the SMT encoder emits as
+       (select id__f idx).  Without explicit declarations Z3 reports "unknown constant"
+       and returns a spurious sat.  Filter out names already in pc_vars to avoid re-decl. *)
+    let arr_sort_str =
+      if use_bv then "(Array (_ BitVec 64) (_ BitVec 64))" else "(Array Int Int)" in
+    let extra_array_decls =
+      let known = List.map fst ctx.pc_vars in
+      List.filter_map (fun name ->
+        if List.mem name known then None
+        else Some (Printf.sprintf "(declare-const %s %s)" name arr_sort_str)
+      ) array_var_names
+    in
+    let free_decls = List.filter_map (fun name ->
+      (* Skip names already covered by extra_array_decls — they need Array sort, not Int. *)
+      if List.mem name array_var_names then None
+      else if use_bv then Some (Printf.sprintf "(declare-const %s (_ BitVec 64))" name)
+      else Some (Printf.sprintf "(declare-const %s Int)" name)
     ) free_vars in
     (* Range constraints for free variables (struct field accesses, etc.).
        In FORGE all numeric types are unsigned, so free Int vars default to >= 0.
        Without this, Z3 can explore negative values and spuriously fail proofs. *)
     let free_range_constraints =
       if use_bv then []
-      else List.map (fun name ->
-        Printf.sprintf "(assert (>= %s 0))" name
+      else List.filter_map (fun name ->
+        (* Array-typed free vars are already excluded from free_decls; no scalar constraint. *)
+        if List.mem name array_var_names then None
+        else Some (Printf.sprintf "(assert (>= %s 0))" name)
       ) free_vars
     in
     (* In Int mode: add non-negativity and upper-bound constraints for unsigned types.
@@ -798,7 +855,7 @@ module Z3Bridge = struct
     in
     (* QF_BV logic hint helps Z3 pick the right solver tactic for bitwise queries *)
     let logic_decl = if use_bv then ["(set-logic QF_BV)"] else [] in
-    String.concat "\n" (logic_decl @ decls @ free_decls @ range_constraints @ free_range_constraints @ uint_array_nonneg @ nonlinear_hints @ effective_assumes @ lemma_asserts @ [negated; check])
+    String.concat "\n" (logic_decl @ decls @ extra_array_decls @ free_decls @ range_constraints @ free_range_constraints @ uint_array_nonneg @ nonlinear_hints @ effective_assumes @ lemma_asserts @ [negated; check])
 
   (* Build a consistency check query — same Int/BV mode detection *)
   let build_consistency_query ctx =

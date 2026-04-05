@@ -251,6 +251,12 @@ let env_array_write env (arr_id : ident) (idx_pred : pred) (rhs_pred : pred) =
   let new_arr  = PVar arr_id in
   let rec rename_pred pred = match pred with
     | PVar id when id.name = arr_id.name -> old_arr
+    | PField (PIndex (PVar base_id, idx), field_name)
+        when base_id.name ^ "__" ^ field_name = arr_id.name ->
+        (* struct-of-arrays: PField(PIndex(PVar "arr", idx), "field") encodes as
+           (select arr__field idx) in SMT — same variable as arr_id "arr__field".
+           Rename it to (select __arr__field_pN idx) so SSA stays consistent. *)
+        PIndex (old_arr, rename_pred idx)
     | PBinop (op, l, r) -> PBinop (op, rename_pred l, rename_pred r)
     | PUnop (op, p)     -> PUnop (op, rename_pred p)
     | PIte (c, t, e)    -> PIte (rename_pred c, rename_pred t, rename_pred e)
@@ -433,6 +439,18 @@ let rec ty_eq t1 t2 =
       ty_eq fty1.ret fty2.ret &&
       List.length fty1.params = List.length fty2.params &&
       List.for_all2 (fun (_, t1) (_, t2) -> ty_eq t1 t2) fty1.params fty2.params
+  | TDepArr (_, dom1, cod1), TDepArr (_, dom2, cod2) ->
+      (* Structural equality on domain and codomain; binder name is irrelevant *)
+      ty_eq dom1 dom2 && ty_eq cod1 cod2
+  | TDepArr (_, dom, cod), TFn fty ->
+      (* TDepArr is compatible with an anonymous TFn of the same domain/codomain *)
+      (match fty.params with
+       | [(_, p)] -> ty_eq dom p && ty_eq cod fty.ret
+       | _        -> false)
+  | TFn fty, TDepArr (_, dom, cod) ->
+      (match fty.params with
+       | [(_, p)] -> ty_eq p dom && ty_eq fty.ret cod
+       | _        -> false)
   | _ -> false
 
 (* Numeric coercion: integer literals default to u64, but when used alongside a
@@ -537,8 +555,9 @@ let rec pattern_to_cond_pred scrut_pred pat =
    used by check_division / check_bounds / check_preconditions below *)
 let rec expr_to_pred_simple e =
   match e.expr_desc with
-  | ELit (LInt (n, _))  -> PInt n
-  | ELit (LBool b)      -> PBool b
+  | ELit (LInt (n, _))    -> PInt n
+  | ELit (LFloat (f, _))  -> PFloat f
+  | ELit (LBool b)        -> PBool b
   | EVar id             -> PVar id
   | EBinop (op, l, r)   -> PBinop (op, expr_to_pred_simple l, expr_to_pred_simple r)
   | EUnop (op, e)       -> PUnop (op, expr_to_pred_simple e)
@@ -1268,6 +1287,16 @@ and stmt_final_env env stmt =
                 (match deref_inner.expr_desc with
                  | EVar v -> env_assign_var env v (expr_to_pred_simple rhs)
                  | _      -> env)
+            (* Field assignment inside an array element: arr[i].field = rhs.
+               Struct-of-arrays encoding: treat as a write to the virtual field array
+               arr__field[i] = rhs.  env_array_write creates SSA rename + frame facts
+               for the virtual array, which are later resolved by the SMT encoder's
+               PField(PIndex(...)) → (select arr__field i) translation. *)
+            | EField ({ expr_desc = EIndex ({ expr_desc = EVar arr_id; _ }, idx); _ }, fld) ->
+                let idx_pred = expr_to_pred_simple idx in
+                let rhs_pred = expr_to_pred_simple rhs in
+                let virtual_field_id = { arr_id with name = arr_id.name ^ "__" ^ fld.name } in
+                env_array_write env virtual_field_id idx_pred rhs_pred
             (* Field assignment: c.field = rhs, or deref-then-field = rhs *)
             | EField (outer, fld) ->
                 let base_pred = match outer.expr_desc with
@@ -2005,6 +2034,24 @@ and infer_expr env expr : ty =
                      else subst_ty extra partial_ret
                  | None -> partial_ret)
             | _ -> partial_ret)
+       | TDepArr (param_id, dom_ty, cod_ty) ->
+           (* Dependent function type call: (x: dom) -> cod applied to one argument. *)
+           (match args with
+            | [arg] ->
+                let arg_ty = check_expr env arg in
+                if not (ty_compatible dom_ty arg_ty) then
+                  fail expr.expr_loc
+                    (Printf.sprintf "argument type mismatch: expected %s"
+                      (format_ty dom_ty));
+                (* Substitute the argument value into the codomain type.
+                   Full dependent substitution is left as future work;
+                   the unsubstituted codomain is returned as an approximation. *)
+                ignore param_id;
+                cod_ty
+            | _ ->
+                report_error (ArityMismatch (expr.expr_loc, "dependent function", 1,
+                  List.length args));
+                cod_ty)
        | _ ->
            (* EVar lookup returns sig_.fs_ret directly for zero-param functions.
               If sig_opt has the signature, use it to dispatch the call. *)
@@ -3287,6 +3334,31 @@ let check_fn env fn =
                let init_var   = PVar { name = init_name; loc = id.loc } in
                let e3 = env_add_var e2 init_name (normalize_ty fty) Unr id.loc in
                env_add_fact e3 (PBinop (Eq, init_var, field_pred))
+             ) e sd.sd_fields
+         | None -> e)
+    | _ -> e
+  ) env' fn.fn_params in
+  (* Init-snapshot for span<Struct> params: enables old(s[i].field) in postconditions.
+     For each span<S> param p, and for each field f of S, add __p_init__f of type
+     span<f_ty> with forall k, __p_init__f[k] == p[k].f.
+     The SMT encoder handles old(p[i].f) as (select __p_init__f i). *)
+  let env' = List.fold_left (fun e (id, ty) ->
+    match normalize_ty ty with
+    | TSpan (TNamed (s_id, [])) ->
+        (match List.assoc_opt s_id.name e.structs with
+         | Some sd ->
+             List.fold_left (fun e2 (fid, fty) ->
+               let arr_name = "__" ^ id.name ^ "_init__" ^ fid.name in
+               let k_name = Printf.sprintf "__oi_k_%d" !fresh_counter in
+               incr fresh_counter;
+               let k_id = { name = k_name; loc = id.loc } in
+               let arr_var   = PVar { name = arr_name; loc = id.loc } in
+               let param_var = PVar id in
+               let elem_field = PField (PIndex (param_var, PVar k_id), fid.name) in
+               let eq_fact = PForall (k_id, TPrim (TUint U64),
+                 PBinop (Eq, PIndex (arr_var, PVar k_id), elem_field)) in
+               let e3 = env_add_var e2 arr_name (TSpan (normalize_ty fty)) Unr id.loc in
+               env_add_fact e3 eq_fact
              ) e sd.sd_fields
          | None -> e)
     | _ -> e

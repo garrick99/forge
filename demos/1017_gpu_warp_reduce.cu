@@ -159,7 +159,7 @@ __global__ void reduce_sum(forge_span_u64_t data __attribute__((unused)), uint64
 
   }
   uint64_t reduced __attribute__((unused)) = warp_reduce_sum(acc);
-  uint64_t lid __attribute__((unused)) = (threadIdx.x & 31);
+  uint64_t lid __attribute__((unused)) = (__builtin_expect(blockDim.x % 32 == 0, 1) ? (threadIdx.x & 31) : (__builtin_trap(), 0));
   if ((lid == 0ULL)) {
     uint64_t _old __attribute__((unused)) = atomicAdd((unsigned long long*)result_ptr, reduced);
 
@@ -174,7 +174,7 @@ __global__ void reduce_max(forge_span_u64_t data __attribute__((unused)), uint64
 
   }
   uint64_t reduced __attribute__((unused)) = warp_reduce_max(val);
-  uint64_t lid __attribute__((unused)) = (threadIdx.x & 31);
+  uint64_t lid __attribute__((unused)) = (__builtin_expect(blockDim.x % 32 == 0, 1) ? (threadIdx.x & 31) : (__builtin_trap(), 0));
   if ((lid == 0ULL)) {
     uint64_t _old __attribute__((unused)) = atomicMax((unsigned long long*)result_ptr, reduced);
 

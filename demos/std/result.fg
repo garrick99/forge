@@ -9,3 +9,47 @@ enum Result<T, E> {
     Ok(T),
     Err(E),
 }
+
+fn is_ok<T, E>(r: Result<T, E>) -> bool {
+    match r {
+        Ok(_)  => true,
+        Err(_) => false,
+    }
+}
+
+fn is_err<T, E>(r: Result<T, E>) -> bool {
+    match r {
+        Ok(_)  => false,
+        Err(_) => true,
+    }
+}
+
+fn unwrap_or<T, E>(r: Result<T, E>, default: T) -> T {
+    match r {
+        Ok(v)  => v,
+        Err(_) => default,
+    }
+}
+
+fn map<T, U, E>(r: Result<T, E>, f: fn(T) -> U) -> Result<U, E> {
+    match r {
+        Ok(v)  => Ok(f(v)),
+        Err(e) => Err(e),
+    }
+}
+
+fn map_err<T, E, F>(r: Result<T, E>, f: fn(E) -> F) -> Result<T, F> {
+    match r {
+        Ok(v)  => Ok(v),
+        Err(e) => Err(f(e)),
+    }
+}
+
+fn and_then<T, U, E>(r: Result<T, E>, f: fn(T) -> Result<U, E>) -> Result<U, E> {
+    match r {
+        Ok(v)  => f(v),
+        Err(e) => Err(e),
+    }
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,39 @@
+// expected: 0
+// Demo 1045: old(span[i].field) — init snapshot for span<Struct> params.
+//
+// Before this fix, old(arr[i].field) hit the POld wildcard and was encoded
+// as a flat constant "old__arr__field", losing the index — so every element
+// of the span appeared to have the same pre-state value.
+//
+// After this fix:
+//   - typecheck.ml injects __arr_init__field: span<T> for each span<S> param
+//     with forall k, __arr_init__field[k] == arr[k].field  (at function entry)
+//   - proof_engine.ml POld match handles PField(PIndex(PVar id, idx), f)
+//     and emits (select __id_init__f idx)
+//   - collect_array_var_names recognizes the new pattern
+//   - collect_triggers recurses through PField to find the select pattern
+
+struct Pair {
+    fst: u64,
+    snd: u64,
+}
+
+// Increments the fst field of every element in place.
+// Postcondition: for all k, new fst[k] == old fst[k] + 1.
+fn increment_fst(pairs: span<Pair>, n: u64)
+    requires n <= pairs.len
+    ensures  forall k: u64, k < n ==> pairs[k].fst == old(pairs[k].fst) + 1u64
+{
+    let mut i: u64 = 0u64;
+    while i < n
+        invariant i <= n
+        invariant forall k: u64, k < i ==>
+            pairs[k].fst == old(pairs[k].fst) + 1u64
+        decreases n - i
+    {
+        pairs[i].fst = pairs[i].fst + 1u64;
+        i = i + 1u64;
+    }
+}
+
+fn main() -> u64 { 0u64 }

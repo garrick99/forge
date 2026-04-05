@@ -18,7 +18,7 @@ typedef struct { uint64_t _0; Node* _1; } __forge_tuple_u64_own_Node_t;
 typedef struct { Node _0; Node* _1; } __forge_tuple_Node_own_Node_t;
 
 /* own<T> heap helpers (linear ownership) */
-static inline Node* __forge_own_alloc_Node(Node __val) { Node* __p = (Node*)malloc(sizeof(Node)); *__p = __val; return __p; }
+static inline Node* __forge_own_alloc_Node(Node __val) { Node* __p = (Node*)malloc(sizeof(Node)); if (!__p) { abort(); } *__p = __val; return __p; }
 static inline Node  __forge_own_into_Node(Node* __p) { Node __v = *__p; free(__p); return __v; }
 static inline __forge_tuple_Node_own_Node_t __forge_own_get_Node(Node* __p) { return (__forge_tuple_Node_own_Node_t){ ._0 = *__p, ._1 = __p }; }
 

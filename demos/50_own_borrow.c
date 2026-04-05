@@ -20,7 +20,7 @@ typedef struct { Point _0; Point* _1; } __forge_tuple_Point_own_Point_t;
 typedef struct { Point* _0; Point* _1; } __forge_tuple_refmut_Point_own_Point_t;
 
 /* own<T> heap helpers (linear ownership) */
-static inline Point* __forge_own_alloc_Point(Point __val) { Point* __p = (Point*)malloc(sizeof(Point)); *__p = __val; return __p; }
+static inline Point* __forge_own_alloc_Point(Point __val) { Point* __p = (Point*)malloc(sizeof(Point)); if (!__p) { abort(); } *__p = __val; return __p; }
 static inline Point  __forge_own_into_Point(Point* __p) { Point __v = *__p; free(__p); return __v; }
 static inline __forge_tuple_Point_own_Point_t __forge_own_get_Point(Point* __p) { return (__forge_tuple_Point_own_Point_t){ ._0 = *__p, ._1 = __p }; }
 static inline __forge_tuple_ref_Point_own_Point_t __forge_own_borrow_Point(Point* __p) { return (__forge_tuple_ref_Point_own_Point_t){ ._0 = __p, ._1 = __p }; }

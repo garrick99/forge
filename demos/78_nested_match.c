@@ -10,6 +10,38 @@
 
 /* Monomorphized generic types */
 typedef enum {
+  Option_T_tag_Some = 0,
+  Option_T_tag_None = 1,
+} Option_T_tag_t;
+typedef struct Option_T {
+  Option_T_tag_t tag;
+  union {
+    struct {
+      T _v0;
+    } Some;
+    struct {
+      char _dummy;
+    } None;
+  } data;
+} Option_T;
+
+typedef enum {
+  Option_U_tag_Some = 0,
+  Option_U_tag_None = 1,
+} Option_U_tag_t;
+typedef struct Option_U {
+  Option_U_tag_t tag;
+  union {
+    struct {
+      U _v0;
+    } Some;
+    struct {
+      char _dummy;
+    } None;
+  } data;
+} Option_U;
+
+typedef enum {
   Option_u64_tag_Some = 0,
   Option_u64_tag_None = 1,
 } Option_u64_tag_t;
@@ -25,6 +57,10 @@ typedef struct Option_u64 {
   } data;
 } Option_u64;
 
+
+/* Function pointer typedefs */
+typedef U (*forge_fn_T_ret_U_t)(T);
+typedef Option_U (*forge_fn_T_ret_Option_U_t)(T);
 
 typedef enum {
   ParseResult_tag_Good = 0,
@@ -43,11 +79,99 @@ typedef struct ParseResult {
 } ParseResult;
 
 /* Forward declarations */
+_Bool is_some(Option_T opt __attribute__((unused)));
+_Bool is_none(Option_T opt __attribute__((unused)));
+void unwrap_or(Option_T opt __attribute__((unused)), void forge_default __attribute__((unused)));
+Option_U map(Option_T opt __attribute__((unused)), forge_fn_T_ret_U_t f __attribute__((unused)));
+Option_U and_then(Option_T opt __attribute__((unused)), forge_fn_T_ret_Option_U_t f __attribute__((unused)));
+Option_T or_else(Option_T opt __attribute__((unused)), Option_T forge_default __attribute__((unused)));
+int main();
 ParseResult parse_even(uint64_t n __attribute__((unused)));
 uint64_t double_if_good(ParseResult r __attribute__((unused)));
 uint64_t handle_opt(Option_u64 o __attribute__((unused)));
 uint64_t classify_pair(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 int main();
+
+_Bool is_some(Option_T opt __attribute__((unused))) {
+  switch (opt.tag) {
+    case Option_T_tag_Some: {
+      return 1;
+    }
+    case Option_T_tag_None: {
+      return 0;
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+_Bool is_none(Option_T opt __attribute__((unused))) {
+  switch (opt.tag) {
+    case Option_T_tag_Some: {
+      return 0;
+    }
+    case Option_T_tag_None: {
+      return 1;
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+void unwrap_or(Option_T opt __attribute__((unused)), void forge_default __attribute__((unused))) {
+  switch (opt.tag) {
+    case Option_T_tag_Some: {
+      void v __attribute__((unused)) = opt.data.Some._v0;
+      return v;
+    }
+    case Option_T_tag_None: {
+      return forge_default;
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+Option_U map(Option_T opt __attribute__((unused)), forge_fn_T_ret_U_t f __attribute__((unused))) {
+  switch (opt.tag) {
+    case Option_T_tag_Some: {
+      void v __attribute__((unused)) = opt.data.Some._v0;
+      return (Option_U){ .tag = Option_U_tag_Some, .data.Some = { ._v0 = f(v) } };
+    }
+    case Option_T_tag_None: {
+      return (Option_T){ .tag = Option_T_tag_None, .data.None = { ._dummy = 0 } };
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+Option_U and_then(Option_T opt __attribute__((unused)), forge_fn_T_ret_Option_U_t f __attribute__((unused))) {
+  switch (opt.tag) {
+    case Option_T_tag_Some: {
+      void v __attribute__((unused)) = opt.data.Some._v0;
+      return f(v);
+    }
+    case Option_T_tag_None: {
+      return (Option_T){ .tag = Option_T_tag_None, .data.None = { ._dummy = 0 } };
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+Option_T or_else(Option_T opt __attribute__((unused)), Option_T forge_default __attribute__((unused))) {
+  switch (opt.tag) {
+    case Option_T_tag_Some: {
+      void v __attribute__((unused)) = opt.data.Some._v0;
+      return (Option_T){ .tag = Option_T_tag_Some, .data.Some = { ._v0 = v } };
+    }
+    case Option_T_tag_None: {
+      return forge_default;
+    }
+    default: __builtin_unreachable();
+  }
+}
+
+int main() {
+  return (int)(0ULL);
+
+}
 
 ParseResult parse_even(uint64_t n __attribute__((unused))) {
   if (((n % 2ULL) == 0ULL)) {
@@ -73,8 +197,8 @@ uint64_t double_if_good(ParseResult r __attribute__((unused))) {
 uint64_t handle_opt(Option_u64 o __attribute__((unused))) {
   uint64_t inner;
   switch (o.tag) {
-    case Option_u64_tag_Some: {
-      uint64_t v __attribute__((unused)) = o.data.Some._v0;
+    case Option_T_tag_Some: {
+      T v __attribute__((unused)) = o.data.Some._v0;
       inner = v;
       break;
     }

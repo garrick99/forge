@@ -51,6 +51,7 @@ type pred =
   | PFalse
   | PVar    of ident                        (* bound variable *)
   | PInt    of int64                        (* integer literal *)
+  | PFloat  of float                        (* float literal — Real sort in SMT *)
   | PBool   of bool
   | PBinop  of binop * pred * pred
   | PUnop   of unop * pred

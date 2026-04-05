@@ -517,6 +517,12 @@ ty:
       | _  -> TNamed (name, args)
     }
 
+  (* Dependent function type: (x: T) -> U
+     The `x` can appear free in U to express length-indexed or value-dependent types.
+     Disambiguated from parenthesized type by the COLON lookahead after the binder. *)
+  | LPAREN name = ident COLON dom = ty RPAREN ARROW cod = ty
+    { TDepArr (name, dom, cod) }
+
   (* Parenthesized type *)
   | LPAREN t = ty RPAREN
     { t }
@@ -612,6 +618,8 @@ pred:
   (* Typed integer literals (8u64, 4294967296u64, etc.) are valid in pred position;
      the type suffix is informational only — the value is used as PInt. *)
   | ns = INT_SUFF     { let (n, _) = ns in PInt n }
+  (* Float literals in pred position — emitted as Real in SMT *)
+  | f = FLOAT         { PFloat f }
   | name = ident LPAREN args = separated_list(COMMA, pred) RPAREN
     { PApp (name, args) }
   | name = ident

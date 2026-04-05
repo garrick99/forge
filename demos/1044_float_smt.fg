@@ -1,0 +1,34 @@
+// expected: 0
+// Demo 1044: Float variables in SMT — Real sort (not Int approximation).
+//
+// Before this fix, float-typed variables were declared as `Int` in Z3,
+// so comparisons like `x > 0.5` could be proved by integer reasoning
+// (x >= 1 ← integer logic, rather than real arithmetic).
+//
+// After: TFloat → SReal → Z3 `Real` sort. Float literals (PFloat) emit
+// as decimal reals. Proofs about float bounds use real arithmetic, which
+// is an approximation (no NaN, no Inf) but far more sound than integers.
+
+// A function that computes a sum and proves it's positive.
+// The key test: `result > 0.0` is discharged by Z3's Real theory,
+// not by integer arithmetic on the bit representation.
+fn float_scale(x: f32, y: f32) -> f32
+    requires x > 0.0
+    requires y > 0.0
+    ensures  result > 0.0
+{
+    x * y
+}
+
+// TDepArr type syntax test: (n: u64) -> u64.
+// Verifies the parser produces TDepArr and typecheck handles call sites.
+fn apply_dep(f: (n: u64) -> u64, v: u64) -> u64 {
+    f(v)
+}
+
+fn double(x: u64) -> u64 { x * 2u64 }
+
+fn main() -> u64 {
+    let r = apply_dep(double, 5u64);
+    r
+}
