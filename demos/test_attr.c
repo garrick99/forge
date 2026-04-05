@@ -12,6 +12,6 @@
 uint64_t foo(uint64_t x __attribute__((unused)));
 
 uint64_t foo(uint64_t x __attribute__((unused))) {
-  return (x + 1);
+  return (x + 1ULL);
 }
 

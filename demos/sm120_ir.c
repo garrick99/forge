@@ -141,10 +141,10 @@ uint64_t reg_index(RegKind r __attribute__((unused))) {
       return i;
     }
     case RegKind_tag_RZ: {
-      return 255;
+      return 255ULL;
     }
     case RegKind_tag_PT: {
-      return 7;
+      return 7ULL;
     }
     default: __builtin_unreachable();
   }
@@ -167,26 +167,26 @@ uint64_t operand_as_byte(Operand op __attribute__((unused))) {
     case Operand_tag_OpReg: {
       RegKind r __attribute__((unused)) = op.data.OpReg._v0;
       uint64_t idx __attribute__((unused)) = reg_index(r);
-      if ((idx < 256)) {
+      if ((idx < 256ULL)) {
         return idx;
       } else {
-        return 255;
+        return 255ULL;
       }
     }
     case Operand_tag_OpImm: {
       uint64_t v __attribute__((unused)) = op.data.OpImm._v0;
-      if ((v < 256)) {
+      if ((v < 256ULL)) {
         return v;
       } else {
-        return (v % 256);
+        return (v % 256ULL);
       }
     }
     case Operand_tag_OpSR: {
       uint64_t code __attribute__((unused)) = op.data.OpSR._v0;
-      if ((code < 256)) {
+      if ((code < 256ULL)) {
         return code;
       } else {
-        return (code % 256);
+        return (code % 256ULL);
       }
     }
     default: __builtin_unreachable();
@@ -259,34 +259,34 @@ _Bool insn_writes_gpr(Insn insn __attribute__((unused))) {
 uint64_t insn_opcode_lo(Insn insn __attribute__((unused))) {
   switch (insn.tag) {
     case Insn_tag_Nop: {
-      return 24;
+      return 24ULL;
     }
     case Insn_tag_Exit: {
-      return 77;
+      return 77ULL;
     }
     case Insn_tag_Mov: {
-      return 2;
+      return 2ULL;
     }
     case Insn_tag_S2R: {
-      return 25;
+      return 25ULL;
     }
     case Insn_tag_IADD3: {
-      return 16;
+      return 16ULL;
     }
     case Insn_tag_FADD: {
-      return 21;
+      return 21ULL;
     }
     case Insn_tag_LDG: {
-      return 129;
+      return 129ULL;
     }
     case Insn_tag_STG: {
-      return 133;
+      return 133ULL;
     }
     case Insn_tag_SETP: {
-      return 12;
+      return 12ULL;
     }
     case Insn_tag_BRA: {
-      return 47;
+      return 47ULL;
     }
     default: __builtin_unreachable();
   }
@@ -295,34 +295,34 @@ uint64_t insn_opcode_lo(Insn insn __attribute__((unused))) {
 uint64_t insn_opcode_hi(Insn insn __attribute__((unused))) {
   switch (insn.tag) {
     case Insn_tag_Nop: {
-      return 121;
+      return 121ULL;
     }
     case Insn_tag_Exit: {
-      return 121;
+      return 121ULL;
     }
     case Insn_tag_Mov: {
-      return 121;
+      return 121ULL;
     }
     case Insn_tag_S2R: {
-      return 121;
+      return 121ULL;
     }
     case Insn_tag_IADD3: {
-      return 120;
+      return 120ULL;
     }
     case Insn_tag_FADD: {
-      return 122;
+      return 122ULL;
     }
     case Insn_tag_LDG: {
-      return 120;
+      return 120ULL;
     }
     case Insn_tag_STG: {
-      return 120;
+      return 120ULL;
     }
     case Insn_tag_SETP: {
-      return 122;
+      return 122ULL;
     }
     case Insn_tag_BRA: {
-      return 121;
+      return 121ULL;
     }
     default: __builtin_unreachable();
   }
@@ -331,34 +331,34 @@ uint64_t insn_opcode_hi(Insn insn __attribute__((unused))) {
 uint64_t insn_wdep(Insn insn __attribute__((unused))) {
   switch (insn.tag) {
     case Insn_tag_Nop: {
-      return 63;
+      return 63ULL;
     }
     case Insn_tag_Exit: {
-      return 63;
+      return 63ULL;
     }
     case Insn_tag_Mov: {
-      return 62;
+      return 62ULL;
     }
     case Insn_tag_S2R: {
-      return 49;
+      return 49ULL;
     }
     case Insn_tag_IADD3: {
-      return 62;
+      return 62ULL;
     }
     case Insn_tag_FADD: {
-      return 62;
+      return 62ULL;
     }
     case Insn_tag_LDG: {
-      return 53;
+      return 53ULL;
     }
     case Insn_tag_STG: {
-      return 63;
+      return 63ULL;
     }
     case Insn_tag_SETP: {
-      return 62;
+      return 62ULL;
     }
     case Insn_tag_BRA: {
-      return 63;
+      return 63ULL;
     }
     default: __builtin_unreachable();
   }
@@ -366,9 +366,9 @@ uint64_t insn_wdep(Insn insn __attribute__((unused))) {
 
 int main() {
   Insn nop __attribute__((unused)) = (Insn){ .tag = Insn_tag_Nop, .data.Nop = { ._dummy = 0 } };
-  Insn mov __attribute__((unused)) = (Insn){ .tag = Insn_tag_Mov, .data.Mov = { ._v0 = (RegKind){ .tag = RegKind_tag_GPR, .data.GPR = { ._v0 = 5 } }, ._v1 = (RegKind){ .tag = RegKind_tag_GPR, .data.GPR = { ._v0 = 3 } } } };
-  Insn add __attribute__((unused)) = (Insn){ .tag = Insn_tag_IADD3, .data.IADD3 = { ._v0 = (RegKind){ .tag = RegKind_tag_GPR, .data.GPR = { ._v0 = 4 } }, ._v1 = (RegKind){ .tag = RegKind_tag_GPR, .data.GPR = { ._v0 = 2 } }, ._v2 = (RegKind){ .tag = RegKind_tag_GPR, .data.GPR = { ._v0 = 3 } }, ._v3 = (RegKind){ .tag = RegKind_tag_RZ, .data.RZ = { ._dummy = 0 } } } };
-  Insn load __attribute__((unused)) = (Insn){ .tag = Insn_tag_LDG, .data.LDG = { ._v0 = (RegKind){ .tag = RegKind_tag_GPR, .data.GPR = { ._v0 = 6 } }, ._v1 = (RegKind){ .tag = RegKind_tag_GPR, .data.GPR = { ._v0 = 0 } } } };
+  Insn mov __attribute__((unused)) = (Insn){ .tag = Insn_tag_Mov, .data.Mov = { ._v0 = (RegKind){ .tag = RegKind_tag_GPR, .data.GPR = { ._v0 = 5ULL } }, ._v1 = (RegKind){ .tag = RegKind_tag_GPR, .data.GPR = { ._v0 = 3ULL } } } };
+  Insn add __attribute__((unused)) = (Insn){ .tag = Insn_tag_IADD3, .data.IADD3 = { ._v0 = (RegKind){ .tag = RegKind_tag_GPR, .data.GPR = { ._v0 = 4ULL } }, ._v1 = (RegKind){ .tag = RegKind_tag_GPR, .data.GPR = { ._v0 = 2ULL } }, ._v2 = (RegKind){ .tag = RegKind_tag_GPR, .data.GPR = { ._v0 = 3ULL } }, ._v3 = (RegKind){ .tag = RegKind_tag_RZ, .data.RZ = { ._dummy = 0 } } } };
+  Insn load __attribute__((unused)) = (Insn){ .tag = Insn_tag_LDG, .data.LDG = { ._v0 = (RegKind){ .tag = RegKind_tag_GPR, .data.GPR = { ._v0 = 6ULL } }, ._v1 = (RegKind){ .tag = RegKind_tag_GPR, .data.GPR = { ._v0 = 0ULL } } } };
   uint64_t nop_opc __attribute__((unused)) = insn_opcode_lo(nop);
   RegKind mov_dest __attribute__((unused)) = insn_dest(mov);
   uint64_t add_wdep __attribute__((unused)) = insn_wdep(add);

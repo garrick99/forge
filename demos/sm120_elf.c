@@ -39,155 +39,155 @@ uint64_t strtab_add_byte(forge_span_u8_t buf __attribute__((unused)), uint64_t o
 int main();
 
 uint8_t ELF_MAGIC_0() {
-  return 127;
+  return 127ULL;
 }
 
 uint8_t ELF_MAGIC_1() {
-  return 69;
+  return 69ULL;
 }
 
 uint8_t ELF_MAGIC_2() {
-  return 76;
+  return 76ULL;
 }
 
 uint8_t ELF_MAGIC_3() {
-  return 70;
+  return 70ULL;
 }
 
 uint8_t ELFCLASS64() {
-  return 2;
+  return 2ULL;
 }
 
 uint8_t ELFDATA2LSB() {
-  return 1;
+  return 1ULL;
 }
 
 uint8_t EV_CURRENT() {
-  return 1;
+  return 1ULL;
 }
 
 uint64_t ET_EXEC() {
-  return 2;
+  return 2ULL;
 }
 
 uint64_t EM_CUDA() {
-  return 190;
+  return 190ULL;
 }
 
 uint64_t ELF_HEADER_SIZE() {
-  return 64;
+  return 64ULL;
 }
 
 uint64_t SH_ENTRY_SIZE() {
-  return 64;
+  return 64ULL;
 }
 
 uint64_t PH_ENTRY_SIZE() {
-  return 56;
+  return 56ULL;
 }
 
 uint64_t byte0(uint64_t val __attribute__((unused))) {
-  return (val % 256);
+  return (val % 256ULL);
 }
 
 uint64_t byte1(uint64_t val __attribute__((unused))) {
-  return ((val / 256) % 256);
+  return ((val / 256ULL) % 256ULL);
 }
 
 uint64_t byte2(uint64_t val __attribute__((unused))) {
-  return ((val / 65536) % 256);
+  return ((val / 65536ULL) % 256ULL);
 }
 
 uint64_t byte3(uint64_t val __attribute__((unused))) {
-  return ((val / 16777216) % 256);
+  return ((val / 16777216ULL) % 256ULL);
 }
 
 void write_u16_le(forge_span_u8_t buf __attribute__((unused)), uint64_t off __attribute__((unused)), uint64_t val __attribute__((unused))) {
   buf.data[off] = ((uint8_t)byte0(val));
-  buf.data[(off + 1)] = ((uint8_t)byte1(val));
+  buf.data[(off + 1ULL)] = ((uint8_t)byte1(val));
 }
 
 void write_u32_le(forge_span_u8_t buf __attribute__((unused)), uint64_t off __attribute__((unused)), uint64_t val __attribute__((unused))) {
   buf.data[off] = ((uint8_t)byte0(val));
-  buf.data[(off + 1)] = ((uint8_t)byte1(val));
-  buf.data[(off + 2)] = ((uint8_t)byte2(val));
-  buf.data[(off + 3)] = ((uint8_t)byte3(val));
+  buf.data[(off + 1ULL)] = ((uint8_t)byte1(val));
+  buf.data[(off + 2ULL)] = ((uint8_t)byte2(val));
+  buf.data[(off + 3ULL)] = ((uint8_t)byte3(val));
 }
 
 void write_u64_le(forge_span_u8_t buf __attribute__((unused)), uint64_t off __attribute__((unused)), uint64_t val __attribute__((unused))) {
-  write_u32_le(buf, off, (val & 4294967295));
-  write_u32_le(buf, (off + 4), (val / 4294967296));
+  write_u32_le(buf, off, (val & 4294967295ULL));
+  write_u32_le(buf, (off + 4ULL), (val / 4294967296ULL));
 }
 
 void write_elf_header(forge_span_u8_t buf __attribute__((unused)), uint64_t e_type __attribute__((unused)), uint64_t e_machine __attribute__((unused)), uint64_t e_flags __attribute__((unused)), uint64_t e_phoff __attribute__((unused)), uint64_t e_shoff __attribute__((unused)), uint64_t e_phnum __attribute__((unused)), uint64_t e_shnum __attribute__((unused)), uint64_t e_shstrndx __attribute__((unused))) {
-  buf.data[0] = ELF_MAGIC_0();
-  buf.data[1] = ELF_MAGIC_1();
-  buf.data[2] = ELF_MAGIC_2();
-  buf.data[3] = ELF_MAGIC_3();
-  buf.data[4] = ELFCLASS64();
-  buf.data[5] = ELFDATA2LSB();
-  buf.data[6] = EV_CURRENT();
-  buf.data[7] = 51;
-  buf.data[8] = 7;
-  uint64_t i __attribute__((unused)) = 9;
+  buf.data[0ULL] = ELF_MAGIC_0();
+  buf.data[1ULL] = ELF_MAGIC_1();
+  buf.data[2ULL] = ELF_MAGIC_2();
+  buf.data[3ULL] = ELF_MAGIC_3();
+  buf.data[4ULL] = ELFCLASS64();
+  buf.data[5ULL] = ELFDATA2LSB();
+  buf.data[6ULL] = EV_CURRENT();
+  buf.data[7ULL] = 51ULL;
+  buf.data[8ULL] = 7ULL;
+  uint64_t i __attribute__((unused)) = 9ULL;
   {
-    while ((i < 16)) {
-      buf.data[i] = 0;
-      i = (i + 1);
+    while ((i < 16ULL)) {
+      buf.data[i] = 0ULL;
+      i = (i + 1ULL);
     }
 
   }
-  write_u16_le(buf, 16, e_type);
-  write_u16_le(buf, 18, e_machine);
-  write_u32_le(buf, 20, 1);
-  write_u64_le(buf, 24, 0);
-  write_u64_le(buf, 32, e_phoff);
-  write_u64_le(buf, 40, e_shoff);
-  write_u32_le(buf, 48, e_flags);
-  write_u16_le(buf, 52, 64);
-  write_u16_le(buf, 54, 56);
-  write_u16_le(buf, 56, e_phnum);
-  write_u16_le(buf, 58, 64);
-  write_u16_le(buf, 60, e_shnum);
-  write_u16_le(buf, 62, e_shstrndx);
+  write_u16_le(buf, 16ULL, e_type);
+  write_u16_le(buf, 18ULL, e_machine);
+  write_u32_le(buf, 20ULL, 1ULL);
+  write_u64_le(buf, 24ULL, 0ULL);
+  write_u64_le(buf, 32ULL, e_phoff);
+  write_u64_le(buf, 40ULL, e_shoff);
+  write_u32_le(buf, 48ULL, e_flags);
+  write_u16_le(buf, 52ULL, 64ULL);
+  write_u16_le(buf, 54ULL, 56ULL);
+  write_u16_le(buf, 56ULL, e_phnum);
+  write_u16_le(buf, 58ULL, 64ULL);
+  write_u16_le(buf, 60ULL, e_shnum);
+  write_u16_le(buf, 62ULL, e_shstrndx);
 }
 
 void write_section_header(forge_span_u8_t buf __attribute__((unused)), uint64_t base __attribute__((unused)), uint64_t sh_name __attribute__((unused)), uint64_t sh_type __attribute__((unused)), uint64_t sh_flags __attribute__((unused)), uint64_t sh_addr __attribute__((unused)), uint64_t sh_offset __attribute__((unused)), uint64_t sh_size __attribute__((unused)), uint64_t sh_link __attribute__((unused)), uint64_t sh_info __attribute__((unused)), uint64_t sh_addralign __attribute__((unused)), uint64_t sh_entsize __attribute__((unused))) {
   write_u32_le(buf, base, sh_name);
-  write_u32_le(buf, (base + 4), sh_type);
-  write_u64_le(buf, (base + 8), sh_flags);
-  write_u64_le(buf, (base + 16), sh_addr);
-  write_u64_le(buf, (base + 24), sh_offset);
-  write_u64_le(buf, (base + 32), sh_size);
-  write_u32_le(buf, (base + 40), sh_link);
-  write_u32_le(buf, (base + 44), sh_info);
-  write_u64_le(buf, (base + 48), sh_addralign);
-  write_u64_le(buf, (base + 56), sh_entsize);
+  write_u32_le(buf, (base + 4ULL), sh_type);
+  write_u64_le(buf, (base + 8ULL), sh_flags);
+  write_u64_le(buf, (base + 16ULL), sh_addr);
+  write_u64_le(buf, (base + 24ULL), sh_offset);
+  write_u64_le(buf, (base + 32ULL), sh_size);
+  write_u32_le(buf, (base + 40ULL), sh_link);
+  write_u32_le(buf, (base + 44ULL), sh_info);
+  write_u64_le(buf, (base + 48ULL), sh_addralign);
+  write_u64_le(buf, (base + 56ULL), sh_entsize);
 }
 
 void write_program_header(forge_span_u8_t buf __attribute__((unused)), uint64_t base __attribute__((unused)), uint64_t p_type __attribute__((unused)), uint64_t p_flags __attribute__((unused)), uint64_t p_offset __attribute__((unused)), uint64_t p_vaddr __attribute__((unused)), uint64_t p_paddr __attribute__((unused)), uint64_t p_filesz __attribute__((unused)), uint64_t p_memsz __attribute__((unused)), uint64_t p_align __attribute__((unused))) {
   write_u32_le(buf, base, p_type);
-  write_u32_le(buf, (base + 4), p_flags);
-  write_u64_le(buf, (base + 8), p_offset);
-  write_u64_le(buf, (base + 16), p_vaddr);
-  write_u64_le(buf, (base + 24), p_paddr);
-  write_u64_le(buf, (base + 32), p_filesz);
-  write_u64_le(buf, (base + 40), p_memsz);
-  write_u64_le(buf, (base + 48), p_align);
+  write_u32_le(buf, (base + 4ULL), p_flags);
+  write_u64_le(buf, (base + 8ULL), p_offset);
+  write_u64_le(buf, (base + 16ULL), p_vaddr);
+  write_u64_le(buf, (base + 24ULL), p_paddr);
+  write_u64_le(buf, (base + 32ULL), p_filesz);
+  write_u64_le(buf, (base + 40ULL), p_memsz);
+  write_u64_le(buf, (base + 48ULL), p_align);
 }
 
 void write_symbol(forge_span_u8_t buf __attribute__((unused)), uint64_t base __attribute__((unused)), uint64_t st_name __attribute__((unused)), uint64_t st_info __attribute__((unused)), uint64_t st_other __attribute__((unused)), uint64_t st_shndx __attribute__((unused)), uint64_t st_value __attribute__((unused)), uint64_t st_size __attribute__((unused))) {
   write_u32_le(buf, base, st_name);
-  buf.data[(base + 4)] = ((uint8_t)st_info);
-  buf.data[(base + 5)] = ((uint8_t)st_other);
-  write_u16_le(buf, (base + 6), st_shndx);
-  write_u64_le(buf, (base + 8), st_value);
-  write_u64_le(buf, (base + 16), st_size);
+  buf.data[(base + 4ULL)] = ((uint8_t)st_info);
+  buf.data[(base + 5ULL)] = ((uint8_t)st_other);
+  write_u16_le(buf, (base + 6ULL), st_shndx);
+  write_u64_le(buf, (base + 8ULL), st_value);
+  write_u64_le(buf, (base + 16ULL), st_size);
 }
 
 uint64_t strtab_add_byte(forge_span_u8_t buf __attribute__((unused)), uint64_t off __attribute__((unused)), uint8_t byte __attribute__((unused))) {
   buf.data[off] = byte;
-  return (off + 1);
+  return (off + 1ULL);
 }
 
 int main() {

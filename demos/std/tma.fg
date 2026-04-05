@@ -1,0 +1,166 @@
+// std/tma.fg — TMA (Tensor Memory Accelerator) for SM_90+ / SM_120
+//
+// TMA is NVIDIA's hardware-accelerated async bulk tensor copy engine,
+// available on Hopper (SM_90) and Blackwell (SM_120). A single thread
+// issues a copy via a 128-byte CUTensorMap descriptor; the GPU DMA engine
+// performs the transfer asynchronously and signals an mbarrier in shared
+// memory on completion.
+//
+// Canonical double-buffered GEMM tile loop:
+//
+//   let bar: shared<u64>[1] = [0u64; 1u64];
+//   let mut phase: u64 = 0u64;
+//
+//   // Thread 0 — init and issue first tile
+//   if tid == 0u64 {
+//       mbarrier_init(bar_ptr, 1u64);
+//       fence_proxy_async();
+//       tma_issue_2d(smem, desc, bar_ptr, c0, c1, smem_cap, TILE_BYTES);
+//   };
+//   syncthreads();
+//
+//   // All threads — wait then compute, then advance
+//   for k in 0..num_tiles {
+//       while !mbarrier_try_wait(bar_ptr, phase) {};
+//       phase = next_phase(phase);
+//       // ... use smem tile ...
+//       if k + 1 < num_tiles {
+//           if tid == 0u64 {
+//               tma_issue_2d(smem, desc, bar_ptr, c0_next, c1_next, smem_cap, TILE_BYTES);
+//           };
+//           syncthreads();
+//       }
+//   }
+//
+// Include with:  use std::tma;
+//
+// Z3-verified postconditions:
+//   — next_phase: result <= 1  (bitvector mode)
+//   — mbarrier_init_safe: wraps mbarrier_init with expect > 0 precondition
+//   — tma_issue_2d: requires smem buffer suffices for tile (smem_cap >= tile_bytes)
+
+// ---- Mbarrier raw primitives -------------------------------------------------
+//
+// An mbarrier is a 64-bit object allocated in shared memory (8-byte aligned).
+// The hardware DMA engine arrives at it on transfer completion.
+
+// Initialize an mbarrier to expect `expect` arrivals before signaling.
+// UNSAFE: Caller must ensure `bar` is a valid shared-memory pointer.
+extern fn mbarrier_init(bar: raw<u64>, expect: u64) = "forge_gpu";
+
+// Arrive at an mbarrier, declaring that `tx_bytes` of DMA data will follow.
+// Returns the current phase token (0 or 1) for subsequent wait calls.
+// The TMA engine counts down tx_bytes; when zero, the phase flips.
+extern fn mbarrier_arrive_tx(bar: raw<u64>, tx_bytes: u64) -> u64 = "forge_gpu";
+
+// Non-blocking test for mbarrier completion.
+// Returns true if the barrier has reached phase `phase` (all arrivals done).
+// Spin pattern:  while !mbarrier_try_wait(bar, phase) {};
+extern fn mbarrier_try_wait(bar: raw<u64>, phase: u64) -> bool = "forge_gpu";
+
+// ---- Fence -------------------------------------------------------------------
+
+// Memory fence for async shared-memory proxy operations (TMA + mbarrier).
+// Required after mbarrier_init and before the first TMA load to ensure
+// the initialized mbarrier is visible to the TMA engine.
+extern fn fence_proxy_async() = "forge_gpu";
+
+// Memory fence for TMA stores: flush store pipeline before arrive/sync.
+// Required after tma_store_2d and before the next grid/block synchronization.
+extern fn tma_store_fence() = "forge_gpu";
+
+// ---- TMA async load ----------------------------------------------------------
+
+// 1D async tile load: copy from global tensor (at coordinate c0) to smem_dst.
+// tile_bytes = box_dim[0] * sizeof(element).
+// The mbarrier at `bar` is signaled when the transfer completes.
+extern fn tma_load_1d(
+    smem_dst: raw<u8>,
+    tma_desc: raw<u8>,
+    bar: raw<u64>,
+    c0: u64
+) = "forge_gpu";
+
+// 2D async tile load: copy from global tensor at (c0, c1) to smem_dst.
+// tile_bytes = box_dim[0] * box_dim[1] * sizeof(element).
+// c0 = column (fast dimension), c1 = row (slow dimension).
+extern fn tma_load_2d(
+    smem_dst: raw<u8>,
+    tma_desc: raw<u8>,
+    bar: raw<u64>,
+    c0: u64, c1: u64
+) = "forge_gpu";
+
+// ---- TMA async store ---------------------------------------------------------
+
+// 2D async tile store: copy smem_src back to global tensor at (c0, c1).
+// Call tma_store_fence() after the last store in a wave before synchronizing.
+extern fn tma_store_2d(
+    smem_src: raw<u8>,
+    tma_desc: raw<u8>,
+    c0: u64, c1: u64
+) = "forge_gpu";
+
+// ---- Verified helpers --------------------------------------------------------
+
+// Phase flip: given current phase (0 or 1), return the next phase (1 or 0).
+//
+// mbarrier phases alternate: 0 → 1 → 0 → ...
+// Track this in a loop counter to know which phase to pass to mbarrier_try_wait.
+//
+// Proven: result <= 1u8  (Z3 bitvector; case split: phase==0 → 1, else → 0)
+//   combined with requires phase <= 1u64 → both branches ≤ 1.
+fn next_phase(phase: u64) -> u64
+    requires phase <= 1u64
+    ensures  result <= 1u64
+{
+    if phase == 0u64 { 1u64 } else { 0u64 }
+}
+
+// Safe mbarrier initialization: wraps mbarrier_init with a liveness check.
+//
+// A barrier initialized with expect == 0 would complete immediately on init
+// but deadlock any subsequent wait in the same phase (no arrival needed yet
+// phase already flipped). Requiring expect > 0 prevents this misuse.
+//
+// Proven: precondition expect > 0u64 propagated to call site by Z3.
+fn mbarrier_init_safe(bar: raw<u64>, expect: u64)
+    requires expect > 0u64
+{
+    mbarrier_init(bar, expect)
+}
+
+// Issue a 2D TMA async load with a verified shared-memory capacity check.
+//
+// This is the canonical "thread 0 issues a tile fetch" operation:
+//   1. Arrives at the mbarrier with the expected byte count (tx_bytes = tile_bytes).
+//   2. Issues the async copy; hardware DMA begins the transfer.
+//
+// The smem buffer must be large enough to hold the entire tile:
+//   smem_cap >= tile_bytes
+// This prevents the TMA engine from writing beyond the smem allocation.
+//
+// Note: caller must also call fence_proxy_async() before invoking this
+// function on the first tile (after mbarrier_init_safe).
+//
+// Proven: smem_cap >= tile_bytes (by precondition; Z3 trivially discharges).
+//         tile_bytes > 0 prevents a zero-byte arrive on the mbarrier.
+fn tma_issue_2d(
+    smem_dst: raw<u8>,
+    tma_desc: raw<u8>,
+    bar: raw<u64>,
+    c0: u64, c1: u64,
+    smem_cap: u64,
+    tile_bytes: u64
+)
+    requires smem_cap >= tile_bytes
+    requires tile_bytes > 0u64
+{
+    // Arrive at the mbarrier and declare the expected byte count.
+    // TMA hardware counts down from tile_bytes; signals bar when zero.
+    let _tok: u64 = mbarrier_arrive_tx(bar, tile_bytes);
+    // Issue the 2D async copy from global tensor to shared memory.
+    tma_load_2d(smem_dst, tma_desc, bar, c0, c1)
+}
+
+fn main() -> u64 { 0u64 }

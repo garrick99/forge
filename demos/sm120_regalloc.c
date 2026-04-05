@@ -24,44 +24,44 @@ uint64_t linear_scan(forge_span_u64_t assignment __attribute__((unused)), forge_
 int main();
 
 uint64_t align_up_2(uint64_t n __attribute__((unused))) {
-  if (((n % 2) == 0)) {
+  if (((n % 2ULL) == 0ULL)) {
     return n;
   } else {
-    return (n + 1);
+    return (n + 1ULL);
   }
 }
 
 void freelist_init(forge_span_u64_t list __attribute__((unused)), forge_span_u64_t count __attribute__((unused))) {
-  count.data[0] = 0;
+  count.data[0ULL] = 0ULL;
 }
 
 void freelist_push(forge_span_u64_t list __attribute__((unused)), forge_span_u64_t count __attribute__((unused)), uint64_t reg __attribute__((unused))) {
-  uint64_t c __attribute__((unused)) = count.data[0];
+  uint64_t c __attribute__((unused)) = count.data[0ULL];
   list.data[c] = reg;
-  count.data[0] = (c + 1);
+  count.data[0ULL] = (c + 1ULL);
 }
 
 uint64_t freelist_pop(forge_span_u64_t list __attribute__((unused)), forge_span_u64_t count __attribute__((unused))) {
-  uint64_t c __attribute__((unused)) = (count.data[0] - 1);
-  count.data[0] = c;
+  uint64_t c __attribute__((unused)) = (count.data[0ULL] - 1ULL);
+  count.data[0ULL] = c;
   uint64_t reg __attribute__((unused)) = list.data[c];
-  if ((reg < 255)) {
+  if ((reg < 255ULL)) {
     return reg;
   } else {
-    return 254;
+    return 254ULL;
   }
 }
 
 _Bool freelist_empty(forge_span_u64_t count __attribute__((unused))) {
-  return (count.data[0] == 0);
+  return (count.data[0ULL] == 0ULL);
 }
 
 void alloc_init(forge_span_u64_t assignment __attribute__((unused)), uint64_t max_vregs __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
     while ((i < max_vregs)) {
-      assignment.data[i] = 255;
-      i = (i + 1);
+      assignment.data[i] = 255ULL;
+      i = (i + 1ULL);
     }
 
   }
@@ -79,71 +79,71 @@ uint64_t linear_scan(forge_span_u64_t assignment __attribute__((unused)), forge_
   alloc_init(assignment, n_vregs);
   freelist_init(free32, free32_count);
   freelist_init(free64, free64_count);
-  uint64_t next_gpr __attribute__((unused)) = 2;
-  uint64_t vi __attribute__((unused)) = 0;
+  uint64_t next_gpr __attribute__((unused)) = 2ULL;
+  uint64_t vi __attribute__((unused)) = 0ULL;
   {
     while ((vi < n_vregs)) {
       uint64_t def_point __attribute__((unused)) = first_def.data[vi];
-      _Bool want_64 __attribute__((unused)) = (is_64.data[vi] == 1);
-      uint64_t ei __attribute__((unused)) = 0;
+      _Bool want_64 __attribute__((unused)) = (is_64.data[vi] == 1ULL);
+      uint64_t ei __attribute__((unused)) = 0ULL;
       {
         while ((ei < vi)) {
           uint64_t phys __attribute__((unused)) = assignment.data[ei];
-          if ((phys < 255)) {
+          if ((phys < 255ULL)) {
             if ((last_use.data[ei] < def_point)) {
-              if ((is_64.data[ei] == 1)) {
-                if ((free64_count.data[0] < 128)) {
+              if ((is_64.data[ei] == 1ULL)) {
+                if ((free64_count.data[0ULL] < 128ULL)) {
                   freelist_push(free64, free64_count, phys);
 
                 }
 
               } else {
-                if ((free32_count.data[0] < 128)) {
+                if ((free32_count.data[0ULL] < 128ULL)) {
                   freelist_push(free32, free32_count, phys);
 
                 }
 
               }
-              assignment.data[ei] = 255;
+              assignment.data[ei] = 255ULL;
 
             }
 
           }
-          ei = (ei + 1);
+          ei = (ei + 1ULL);
         }
 
       }
       if (want_64) {
-        if (((free64_count.data[0] > 0) && (free64_count.data[0] <= 128))) {
+        if (((free64_count.data[0ULL] > 0ULL) && (free64_count.data[0ULL] <= 128ULL))) {
           uint64_t phys __attribute__((unused)) = freelist_pop(free64, free64_count);
           alloc_assign(assignment, vi, phys);
 
         } else {
           uint64_t aligned __attribute__((unused)) = align_up_2(next_gpr);
-          if ((aligned < 253)) {
+          if ((aligned < 253ULL)) {
             alloc_assign(assignment, vi, aligned);
-            next_gpr = (aligned + 2);
+            next_gpr = (aligned + 2ULL);
 
           }
 
         }
 
       } else {
-        if (((free32_count.data[0] > 0) && (free32_count.data[0] <= 128))) {
+        if (((free32_count.data[0ULL] > 0ULL) && (free32_count.data[0ULL] <= 128ULL))) {
           uint64_t phys __attribute__((unused)) = freelist_pop(free32, free32_count);
           alloc_assign(assignment, vi, phys);
 
         } else {
-          if ((next_gpr < 254)) {
+          if ((next_gpr < 254ULL)) {
             alloc_assign(assignment, vi, next_gpr);
-            next_gpr = (next_gpr + 1);
+            next_gpr = (next_gpr + 1ULL);
 
           }
 
         }
 
       }
-      vi = (vi + 1);
+      vi = (vi + 1ULL);
     }
 
   }

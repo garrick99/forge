@@ -44,7 +44,7 @@ double abs_diff(double a __attribute__((unused)), double b __attribute__((unused
 }
 
 double circle_area(double r __attribute__((unused))) {
-  return ((r * r) * 3.14159);
+  return ((r * r) * 3.14159265358979);
 }
 
 double magnitude3(double x __attribute__((unused)), double y __attribute__((unused)), double z __attribute__((unused))) {

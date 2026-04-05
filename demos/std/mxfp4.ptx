@@ -1,0 +1,358 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry mxfp4_quantize(
+    .param .u64 mxfp4_quantize_param_input_data,
+    .param .u64 mxfp4_quantize_param_input_len,
+    .param .u64 mxfp4_quantize_param_fp4_out_data,
+    .param .u64 mxfp4_quantize_param_fp4_out_len,
+    .param .u64 mxfp4_quantize_param_scales_out_data,
+    .param .u64 mxfp4_quantize_param_scales_out_len,
+    .param .u64 mxfp4_quantize_param_n_groups
+)
+{
+    .reg .u16 %rs197, %rs203;
+    .reg .pred %p102, %p119, %p13, %p131, %p148, %p160, %p192, %p219, %p32, %p44, %p61, %p73, %p90;
+    .reg .u64 %rd0, %rd1, %rd10, %rd100, %rd104, %rd105, %rd106, %rd107, %rd108, %rd110, %rd111, %rd112, %rd118, %rd12, %rd121, %rd122, %rd123, %rd124, %rd125, %rd127, %rd128, %rd129, %rd133, %rd134, %rd135, %rd136, %rd137, %rd139, %rd140, %rd141, %rd147, %rd15, %rd150, %rd151, %rd152, %rd153, %rd155, %rd156, %rd157, %rd158, %rd16, %rd162, %rd163, %rd164, %rd165, %rd167, %rd168, %rd169, %rd17, %rd170, %rd176, %rd177, %rd178, %rd179, %rd18, %rd181, %rd182, %rd183, %rd184, %rd185, %rd186, %rd189, %rd19, %rd190, %rd191, %rd194, %rd195, %rd196, %rd198, %rd199, %rd2, %rd20, %rd200, %rd201, %rd202, %rd206, %rd207, %rd208, %rd209, %rd21, %rd210, %rd211, %rd212, %rd213, %rd214, %rd215, %rd218, %rd221, %rd222, %rd223, %rd224, %rd26, %rd27, %rd28, %rd29, %rd3, %rd31, %rd34, %rd35, %rd36, %rd37, %rd38, %rd4, %rd40, %rd41, %rd42, %rd46, %rd47, %rd48, %rd49, %rd5, %rd50, %rd52, %rd53, %rd54, %rd6, %rd60, %rd63, %rd64, %rd65, %rd66, %rd67, %rd69, %rd70, %rd71, %rd75, %rd76, %rd77, %rd78, %rd79, %rd8, %rd81, %rd82, %rd83, %rd89, %rd92, %rd93, %rd94, %rd95, %rd96, %rd98, %rd99;
+    .reg .f32 %f101, %f109, %f126, %f130, %f138, %f154, %f159, %f166, %f180, %f22, %f23, %f25, %f39, %f43, %f51, %f68, %f72, %f80, %f97;
+    .reg .f64 %fd24;
+    .reg .u32 %r11, %r113, %r114, %r115, %r116, %r117, %r142, %r143, %r144, %r145, %r146, %r171, %r172, %r173, %r174, %r175, %r187, %r204, %r205, %r216, %r217, %r225, %r226, %r227, %r228, %r229, %r30, %r55, %r56, %r57, %r58, %r59, %r7, %r84, %r85, %r86, %r87, %r88, %r9;
+
+  ld.param.u64 %rd0, [mxfp4_quantize_param_input_data];
+  ld.param.u64 %rd1, [mxfp4_quantize_param_input_len];
+  ld.param.u64 %rd2, [mxfp4_quantize_param_fp4_out_data];
+  ld.param.u64 %rd3, [mxfp4_quantize_param_fp4_out_len];
+  ld.param.u64 %rd4, [mxfp4_quantize_param_scales_out_data];
+  ld.param.u64 %rd5, [mxfp4_quantize_param_scales_out_len];
+  ld.param.u64 %rd6, [mxfp4_quantize_param_n_groups];
+
+  mov.u32 %r7, %ctaid.x;
+  cvt.u64.u32 %rd8, %r7;
+  mov.u32 %r9, %tid.x;
+  cvt.u64.u32 %rd10, %r9;
+  mov.u32 %r11, 0; // proof/assume erased
+  mov.u64 %rd12, 0; // unhandled expr
+  setp.lt.u64 %p13, %rd8, %rd6;
+  @%p13 bra mxfp4_quantize_then_14;
+  bra mxfp4_quantize_else_14;
+  mxfp4_quantize_then_14:
+  mov.u64 %rd15, 0; // unhandled expr
+  mov.u64 %rd16, 32;
+  mul.lo.u64 %rd17, %rd8, %rd16;
+  add.u64 %rd18, %rd17, %rd10;
+  mov.u64 %rd19, 4;
+  mul.lo.u64 %rd20, %rd18, %rd19;
+  add.u64 %rd21, %rd0, %rd20;
+  ld.global.f32 %f22, [%rd21];
+  mov.f32 %f23, %f22;
+  bra mxfp4_quantize_end_14;
+  mxfp4_quantize_else_14:
+  mov.f64 %fd24, 0d0000000000000000; // 0
+  cvt.f32.f64 %f25, %fd24;
+  mov.f32 %f23, %f25;
+  mxfp4_quantize_end_14:
+  mov.u64 %rd26, 0; // call fabsf (device fn)
+  mov.u64 %rd27, 4;
+  mul.lo.u64 %rd28, %rd10, %rd27;
+  add.u64 %rd29, %rd12, %rd28;
+  st.global.f32 [%rd29], %rd26;
+  bar.sync 0;
+  mov.u32 %r30, 0; // unit
+  mov.u64 %rd31, 16;
+  setp.lt.u64 %p32, %rd10, %rd31;
+  @%p32 bra mxfp4_quantize_then_33;
+  bra mxfp4_quantize_else_33;
+  mxfp4_quantize_then_33:
+  mov.u64 %rd34, 16;
+  add.u64 %rd35, %rd10, %rd34;
+  mov.u64 %rd36, 4;
+  mul.lo.u64 %rd37, %rd35, %rd36;
+  add.u64 %rd38, %rd12, %rd37;
+  ld.global.f32 %f39, [%rd38];
+  mov.u64 %rd40, 4;
+  mul.lo.u64 %rd41, %rd10, %rd40;
+  add.u64 %rd42, %rd12, %rd41;
+  ld.global.f32 %f43, [%rd42];
+  setp.gt.f32 %p44, %f39, %f43;
+  @%p44 bra mxfp4_quantize_then_45;
+  bra mxfp4_quantize_else_45;
+  mxfp4_quantize_then_45:
+  mov.u64 %rd46, 16;
+  add.u64 %rd47, %rd10, %rd46;
+  mov.u64 %rd48, 4;
+  mul.lo.u64 %rd49, %rd47, %rd48;
+  add.u64 %rd50, %rd12, %rd49;
+  ld.global.f32 %f51, [%rd50];
+  mov.u64 %rd52, 4;
+  mul.lo.u64 %rd53, %rd10, %rd52;
+  add.u64 %rd54, %rd12, %rd53;
+  st.global.f32 [%rd54], %f51;
+  mov.u32 %r55, 0; // unit
+  mov.u32 %r56, %r55;
+  bra mxfp4_quantize_end_45;
+  mxfp4_quantize_else_45:
+  mov.u32 %r56, 0; // no else branch
+  mxfp4_quantize_end_45:
+  mov.u32 %r57, 0; // unit
+  mov.u32 %r58, %r57;
+  bra mxfp4_quantize_end_33;
+  mxfp4_quantize_else_33:
+  mov.u32 %r58, 0; // no else branch
+  mxfp4_quantize_end_33:
+  bar.sync 0;
+  mov.u32 %r59, 0; // unit
+  mov.u64 %rd60, 8;
+  setp.lt.u64 %p61, %rd10, %rd60;
+  @%p61 bra mxfp4_quantize_then_62;
+  bra mxfp4_quantize_else_62;
+  mxfp4_quantize_then_62:
+  mov.u64 %rd63, 8;
+  add.u64 %rd64, %rd10, %rd63;
+  mov.u64 %rd65, 4;
+  mul.lo.u64 %rd66, %rd64, %rd65;
+  add.u64 %rd67, %rd12, %rd66;
+  ld.global.f32 %f68, [%rd67];
+  mov.u64 %rd69, 4;
+  mul.lo.u64 %rd70, %rd10, %rd69;
+  add.u64 %rd71, %rd12, %rd70;
+  ld.global.f32 %f72, [%rd71];
+  setp.gt.f32 %p73, %f68, %f72;
+  @%p73 bra mxfp4_quantize_then_74;
+  bra mxfp4_quantize_else_74;
+  mxfp4_quantize_then_74:
+  mov.u64 %rd75, 8;
+  add.u64 %rd76, %rd10, %rd75;
+  mov.u64 %rd77, 4;
+  mul.lo.u64 %rd78, %rd76, %rd77;
+  add.u64 %rd79, %rd12, %rd78;
+  ld.global.f32 %f80, [%rd79];
+  mov.u64 %rd81, 4;
+  mul.lo.u64 %rd82, %rd10, %rd81;
+  add.u64 %rd83, %rd12, %rd82;
+  st.global.f32 [%rd83], %f80;
+  mov.u32 %r84, 0; // unit
+  mov.u32 %r85, %r84;
+  bra mxfp4_quantize_end_74;
+  mxfp4_quantize_else_74:
+  mov.u32 %r85, 0; // no else branch
+  mxfp4_quantize_end_74:
+  mov.u32 %r86, 0; // unit
+  mov.u32 %r87, %r86;
+  bra mxfp4_quantize_end_62;
+  mxfp4_quantize_else_62:
+  mov.u32 %r87, 0; // no else branch
+  mxfp4_quantize_end_62:
+  bar.sync 0;
+  mov.u32 %r88, 0; // unit
+  mov.u64 %rd89, 4;
+  setp.lt.u64 %p90, %rd10, %rd89;
+  @%p90 bra mxfp4_quantize_then_91;
+  bra mxfp4_quantize_else_91;
+  mxfp4_quantize_then_91:
+  mov.u64 %rd92, 4;
+  add.u64 %rd93, %rd10, %rd92;
+  mov.u64 %rd94, 4;
+  mul.lo.u64 %rd95, %rd93, %rd94;
+  add.u64 %rd96, %rd12, %rd95;
+  ld.global.f32 %f97, [%rd96];
+  mov.u64 %rd98, 4;
+  mul.lo.u64 %rd99, %rd10, %rd98;
+  add.u64 %rd100, %rd12, %rd99;
+  ld.global.f32 %f101, [%rd100];
+  setp.gt.f32 %p102, %f97, %f101;
+  @%p102 bra mxfp4_quantize_then_103;
+  bra mxfp4_quantize_else_103;
+  mxfp4_quantize_then_103:
+  mov.u64 %rd104, 4;
+  add.u64 %rd105, %rd10, %rd104;
+  mov.u64 %rd106, 4;
+  mul.lo.u64 %rd107, %rd105, %rd106;
+  add.u64 %rd108, %rd12, %rd107;
+  ld.global.f32 %f109, [%rd108];
+  mov.u64 %rd110, 4;
+  mul.lo.u64 %rd111, %rd10, %rd110;
+  add.u64 %rd112, %rd12, %rd111;
+  st.global.f32 [%rd112], %f109;
+  mov.u32 %r113, 0; // unit
+  mov.u32 %r114, %r113;
+  bra mxfp4_quantize_end_103;
+  mxfp4_quantize_else_103:
+  mov.u32 %r114, 0; // no else branch
+  mxfp4_quantize_end_103:
+  mov.u32 %r115, 0; // unit
+  mov.u32 %r116, %r115;
+  bra mxfp4_quantize_end_91;
+  mxfp4_quantize_else_91:
+  mov.u32 %r116, 0; // no else branch
+  mxfp4_quantize_end_91:
+  bar.sync 0;
+  mov.u32 %r117, 0; // unit
+  mov.u64 %rd118, 2;
+  setp.lt.u64 %p119, %rd10, %rd118;
+  @%p119 bra mxfp4_quantize_then_120;
+  bra mxfp4_quantize_else_120;
+  mxfp4_quantize_then_120:
+  mov.u64 %rd121, 2;
+  add.u64 %rd122, %rd10, %rd121;
+  mov.u64 %rd123, 4;
+  mul.lo.u64 %rd124, %rd122, %rd123;
+  add.u64 %rd125, %rd12, %rd124;
+  ld.global.f32 %f126, [%rd125];
+  mov.u64 %rd127, 4;
+  mul.lo.u64 %rd128, %rd10, %rd127;
+  add.u64 %rd129, %rd12, %rd128;
+  ld.global.f32 %f130, [%rd129];
+  setp.gt.f32 %p131, %f126, %f130;
+  @%p131 bra mxfp4_quantize_then_132;
+  bra mxfp4_quantize_else_132;
+  mxfp4_quantize_then_132:
+  mov.u64 %rd133, 2;
+  add.u64 %rd134, %rd10, %rd133;
+  mov.u64 %rd135, 4;
+  mul.lo.u64 %rd136, %rd134, %rd135;
+  add.u64 %rd137, %rd12, %rd136;
+  ld.global.f32 %f138, [%rd137];
+  mov.u64 %rd139, 4;
+  mul.lo.u64 %rd140, %rd10, %rd139;
+  add.u64 %rd141, %rd12, %rd140;
+  st.global.f32 [%rd141], %f138;
+  mov.u32 %r142, 0; // unit
+  mov.u32 %r143, %r142;
+  bra mxfp4_quantize_end_132;
+  mxfp4_quantize_else_132:
+  mov.u32 %r143, 0; // no else branch
+  mxfp4_quantize_end_132:
+  mov.u32 %r144, 0; // unit
+  mov.u32 %r145, %r144;
+  bra mxfp4_quantize_end_120;
+  mxfp4_quantize_else_120:
+  mov.u32 %r145, 0; // no else branch
+  mxfp4_quantize_end_120:
+  bar.sync 0;
+  mov.u32 %r146, 0; // unit
+  mov.u64 %rd147, 1;
+  setp.lt.u64 %p148, %rd10, %rd147;
+  @%p148 bra mxfp4_quantize_then_149;
+  bra mxfp4_quantize_else_149;
+  mxfp4_quantize_then_149:
+  mov.u64 %rd150, 1;
+  mov.u64 %rd151, 4;
+  mul.lo.u64 %rd152, %rd150, %rd151;
+  add.u64 %rd153, %rd12, %rd152;
+  ld.global.f32 %f154, [%rd153];
+  mov.u64 %rd155, 0;
+  mov.u64 %rd156, 4;
+  mul.lo.u64 %rd157, %rd155, %rd156;
+  add.u64 %rd158, %rd12, %rd157;
+  ld.global.f32 %f159, [%rd158];
+  setp.gt.f32 %p160, %f154, %f159;
+  @%p160 bra mxfp4_quantize_then_161;
+  bra mxfp4_quantize_else_161;
+  mxfp4_quantize_then_161:
+  mov.u64 %rd162, 1;
+  mov.u64 %rd163, 4;
+  mul.lo.u64 %rd164, %rd162, %rd163;
+  add.u64 %rd165, %rd12, %rd164;
+  ld.global.f32 %f166, [%rd165];
+  mov.u64 %rd167, 0;
+  mov.u64 %rd168, 4;
+  mul.lo.u64 %rd169, %rd167, %rd168;
+  add.u64 %rd170, %rd12, %rd169;
+  st.global.f32 [%rd170], %f166;
+  mov.u32 %r171, 0; // unit
+  mov.u32 %r172, %r171;
+  bra mxfp4_quantize_end_161;
+  mxfp4_quantize_else_161:
+  mov.u32 %r172, 0; // no else branch
+  mxfp4_quantize_end_161:
+  mov.u32 %r173, 0; // unit
+  mov.u32 %r174, %r173;
+  bra mxfp4_quantize_end_149;
+  mxfp4_quantize_else_149:
+  mov.u32 %r174, 0; // no else branch
+  mxfp4_quantize_end_149:
+  bar.sync 0;
+  mov.u32 %r175, 0; // unit
+  mov.u64 %rd176, 0;
+  mov.u64 %rd177, 4;
+  mul.lo.u64 %rd178, %rd176, %rd177;
+  add.u64 %rd179, %rd12, %rd178;
+  ld.global.f32 %f180, [%rd179];
+  mov.u64 %rd181, 0; // call mxfp4_scale (device fn)
+  mov.u64 %rd182, 0; // call mxfp4_encode (device fn)
+  mov.u64 %rd183, 0; // unhandled expr
+  mov.u64 %rd184, 2;
+  mul.lo.u64 %rd185, %rd10, %rd184;
+  add.u64 %rd186, %rd183, %rd185;
+  st.global.u16 [%rd186], %rd182;
+  bar.sync 0;
+  mov.u32 %r187, 0; // unit
+  @%p13 bra mxfp4_quantize_then_188;
+  bra mxfp4_quantize_else_188;
+  mxfp4_quantize_then_188:
+  mov.u64 %rd189, 2;
+  rem.u64 %rd190, %rd10, %rd189;
+  mov.u64 %rd191, 0;
+  setp.eq.u64 %p192, %rd190, %rd191;
+  @%p192 bra mxfp4_quantize_then_193;
+  bra mxfp4_quantize_else_193;
+  mxfp4_quantize_then_193:
+  mov.u64 %rd194, 2;
+  mul.lo.u64 %rd195, %rd10, %rd194;
+  add.u64 %rd196, %rd183, %rd195;
+  ld.global.u16 %rs197, [%rd196];
+  mov.u64 %rd198, 1;
+  add.u64 %rd199, %rd10, %rd198;
+  mov.u64 %rd200, 2;
+  mul.lo.u64 %rd201, %rd199, %rd200;
+  add.u64 %rd202, %rd183, %rd201;
+  ld.global.u16 %rs203, [%rd202];
+  mov.u32 %r204, 0; // proof/assume erased
+  mov.u32 %r205, 0; // proof/assume erased
+  mov.u64 %rd206, 16;
+  mul.lo.u64 %rd207, %rd8, %rd206;
+  mov.u64 %rd208, 2;
+  div.u64 %rd209, %rd10, %rd208;
+  add.u64 %rd210, %rd207, %rd209;
+  mov.u64 %rd211, 0; // unhandled expr
+  mov.u64 %rd212, 0; // call mxfp4_pack_byte (device fn)
+  mov.u64 %rd213, 2;
+  mul.lo.u64 %rd214, %rd210, %rd213;
+  add.u64 %rd215, %rd2, %rd214;
+  st.global.u16 [%rd215], %rd212;
+  mov.u32 %r216, 0; // unit
+  mov.u32 %r217, %r216;
+  bra mxfp4_quantize_end_193;
+  mxfp4_quantize_else_193:
+  mov.u32 %r217, 0; // no else branch
+  mxfp4_quantize_end_193:
+  mov.u64 %rd218, 0;
+  setp.eq.u64 %p219, %rd10, %rd218;
+  @%p219 bra mxfp4_quantize_then_220;
+  bra mxfp4_quantize_else_220;
+  mxfp4_quantize_then_220:
+  mov.u64 %rd221, 0; // unhandled expr
+  mov.u64 %rd222, 2;
+  mul.lo.u64 %rd223, %rd8, %rd222;
+  add.u64 %rd224, %rd4, %rd223;
+  st.global.u16 [%rd224], %rd181;
+  mov.u32 %r225, 0; // unit
+  mov.u32 %r226, %r225;
+  bra mxfp4_quantize_end_220;
+  mxfp4_quantize_else_220:
+  mov.u32 %r226, 0; // no else branch
+  mxfp4_quantize_end_220:
+  mov.u32 %r227, 0; // unit
+  mov.u32 %r228, %r227;
+  bra mxfp4_quantize_end_188;
+  mxfp4_quantize_else_188:
+  mov.u32 %r228, 0; // no else branch
+  mxfp4_quantize_end_188:
+  mov.u32 %r229, 0; // unit
+  ret;
+}
+

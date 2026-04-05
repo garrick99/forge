@@ -3436,7 +3436,12 @@ let rec check_item env item =
       if not (ty_compatible actual_ty ty) then
         fail name.loc (Printf.sprintf "const '%s': declared type %s doesn't match value type %s"
           name.name (format_ty ty) (format_ty actual_ty));
-      env_add_var env name.name ty Unr name.loc
+      (* Add const value as a proof fact so Z3 knows its concrete value.
+         e.g. `const A_TILE_BYTES: u64 = 1024u64;` injects
+         fact: A_TILE_BYTES == 1024  into all subsequent proof queries. *)
+      let env1 = env_add_var env name.name ty Unr name.loc in
+      let val_pred = expr_to_pred_simple expr in
+      env_add_fact env1 (PBinop (Eq, PVar name, val_pred))
   | IType td ->
       (* Register in global alias table so normalize_ty can unfold it *)
       type_aliases := (td.td_name.name, td.td_ty) :: !type_aliases;

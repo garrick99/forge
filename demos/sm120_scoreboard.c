@@ -40,72 +40,72 @@ uint64_t ctrl_for_stg(forge_span_u64_t state __attribute__((unused)), uint64_t a
 int main();
 
 uint64_t make_ctrl(uint64_t stall __attribute__((unused)), uint64_t yield_hint __attribute__((unused)), uint64_t wbar __attribute__((unused)), uint64_t rbar __attribute__((unused)), uint64_t wdep __attribute__((unused)), uint64_t misc __attribute__((unused))) {
-  uint64_t ctrl __attribute__((unused)) = ((((((stall * 131072) + (yield_hint * 65536)) + (wbar * 32768)) + (rbar * 1024)) + (wdep * 16)) + misc);
+  uint64_t ctrl __attribute__((unused)) = ((((((stall * 131072ULL) + (yield_hint * 65536ULL)) + (wbar * 32768ULL)) + (rbar * 1024ULL)) + (wdep * 16ULL)) + misc);
   return ctrl;
 }
 
 uint64_t ctrl_stall(uint64_t ctrl __attribute__((unused))) {
-  return ((ctrl / 131072) & 63);
+  return ((ctrl / 131072ULL) & 63ULL);
 }
 
 uint64_t ctrl_rbar(uint64_t ctrl __attribute__((unused))) {
-  return ((ctrl / 1024) & 31);
+  return ((ctrl / 1024ULL) & 31ULL);
 }
 
 uint64_t ctrl_wdep(uint64_t ctrl __attribute__((unused))) {
-  return ((ctrl / 16) & 63);
+  return ((ctrl / 16ULL) & 63ULL);
 }
 
 uint64_t ctrl_misc(uint64_t ctrl __attribute__((unused))) {
-  return (ctrl & 15);
+  return (ctrl & 15ULL);
 }
 
 uint64_t WDEP_LDC() {
-  return 49;
+  return 49ULL;
 }
 
 uint64_t WDEP_LDS() {
-  return 51;
+  return 51ULL;
 }
 
 uint64_t WDEP_LDG() {
-  return 53;
+  return 53ULL;
 }
 
 uint64_t WDEP_LDG2() {
-  return 55;
+  return 55ULL;
 }
 
 uint64_t WDEP_ALU() {
-  return 62;
+  return 62ULL;
 }
 
 uint64_t WDEP_NONE() {
-  return 63;
+  return 63ULL;
 }
 
 uint64_t RBAR_BASE() {
-  return 1;
+  return 1ULL;
 }
 
 uint64_t RBAR_LDC() {
-  return 3;
+  return 3ULL;
 }
 
 uint64_t RBAR_LDS() {
-  return 5;
+  return 5ULL;
 }
 
 uint64_t RBAR_LDG() {
-  return 9;
+  return 9ULL;
 }
 
 void scoreboard_init(forge_span_u64_t state __attribute__((unused))) {
-  uint64_t i __attribute__((unused)) = 0;
+  uint64_t i __attribute__((unused)) = 0ULL;
   {
-    while ((i < 256)) {
-      state.data[i] = 63;
-      i = (i + 1);
+    while ((i < 256ULL)) {
+      state.data[i] = 63ULL;
+      i = (i + 1ULL);
     }
 
   }
@@ -116,26 +116,26 @@ void scoreboard_write(forge_span_u64_t state __attribute__((unused)), uint64_t r
 }
 
 void scoreboard_clear(forge_span_u64_t state __attribute__((unused)), uint64_t reg __attribute__((unused))) {
-  state.data[reg] = 63;
+  state.data[reg] = 63ULL;
 }
 
 uint64_t wdep_to_rbar_bit(uint64_t wdep __attribute__((unused))) {
-  if ((wdep == 49)) {
-    return 3;
+  if ((wdep == 49ULL)) {
+    return 3ULL;
   } else {
-    if ((wdep == 51)) {
-      return 5;
+    if ((wdep == 51ULL)) {
+      return 5ULL;
     } else {
-      if ((wdep == 53)) {
-        return 9;
+      if ((wdep == 53ULL)) {
+        return 9ULL;
       } else {
-        if ((wdep == 55)) {
-          return 9;
+        if ((wdep == 55ULL)) {
+          return 9ULL;
         } else {
-          if ((wdep == 62)) {
-            return 1;
+          if ((wdep == 62ULL)) {
+            return 1ULL;
           } else {
-            return 1;
+            return 1ULL;
           }
         }
       }
@@ -145,25 +145,25 @@ uint64_t wdep_to_rbar_bit(uint64_t wdep __attribute__((unused))) {
 
 uint64_t scoreboard_read_barrier(forge_span_u64_t state __attribute__((unused)), uint64_t reg __attribute__((unused))) {
   uint64_t pending __attribute__((unused)) = state.data[reg];
-  if ((pending == 63)) {
-    return 1;
+  if ((pending == 63ULL)) {
+    return 1ULL;
   } else {
-    if ((pending == 49)) {
-      return 3;
+    if ((pending == 49ULL)) {
+      return 3ULL;
     } else {
-      if ((pending == 51)) {
-        return 5;
+      if ((pending == 51ULL)) {
+        return 5ULL;
       } else {
-        if ((pending == 53)) {
-          return 9;
+        if ((pending == 53ULL)) {
+          return 9ULL;
         } else {
-          if ((pending == 55)) {
-            return 9;
+          if ((pending == 55ULL)) {
+            return 9ULL;
           } else {
-            if ((pending == 62)) {
-              return 1;
+            if ((pending == 62ULL)) {
+              return 1ULL;
             } else {
-              return 1;
+              return 1ULL;
             }
           }
         }
@@ -187,21 +187,21 @@ uint64_t scoreboard_read3(forge_span_u64_t state __attribute__((unused)), uint64
 
 uint64_t ctrl_for_alu(forge_span_u64_t state __attribute__((unused)), uint64_t dest __attribute__((unused)), uint64_t src0 __attribute__((unused)), uint64_t src1 __attribute__((unused)), uint64_t misc __attribute__((unused))) {
   uint64_t rbar __attribute__((unused)) = scoreboard_read2(state, src0, src1);
-  uint64_t ctrl __attribute__((unused)) = make_ctrl(0, 0, 0, rbar, 62, misc);
-  scoreboard_write(state, dest, 62);
+  uint64_t ctrl __attribute__((unused)) = make_ctrl(0ULL, 0ULL, 0ULL, rbar, 62ULL, misc);
+  scoreboard_write(state, dest, 62ULL);
   return ctrl;
 }
 
 uint64_t ctrl_for_ldg(forge_span_u64_t state __attribute__((unused)), uint64_t dest __attribute__((unused)), uint64_t addr_reg __attribute__((unused))) {
   uint64_t rbar __attribute__((unused)) = scoreboard_read_barrier(state, addr_reg);
-  uint64_t ctrl __attribute__((unused)) = make_ctrl(0, 0, 0, rbar, 53, 5);
-  scoreboard_write(state, dest, 53);
+  uint64_t ctrl __attribute__((unused)) = make_ctrl(0ULL, 0ULL, 0ULL, rbar, 53ULL, 5ULL);
+  scoreboard_write(state, dest, 53ULL);
   return ctrl;
 }
 
 uint64_t ctrl_for_stg(forge_span_u64_t state __attribute__((unused)), uint64_t addr_reg __attribute__((unused)), uint64_t data_reg __attribute__((unused))) {
   uint64_t rbar __attribute__((unused)) = scoreboard_read2(state, addr_reg, data_reg);
-  return make_ctrl(0, 0, 0, rbar, 63, 5);
+  return make_ctrl(0ULL, 0ULL, 0ULL, rbar, 63ULL, 5ULL);
 }
 
 int main() {

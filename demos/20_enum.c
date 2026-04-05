@@ -66,7 +66,7 @@ double area(Shape s __attribute__((unused))) {
   switch (s.tag) {
     case Shape_tag_Circle: {
       double r __attribute__((unused)) = s.data.Circle._v0;
-      return ((r * r) * 3.14159);
+      return ((r * r) * 3.1415926500000002);
     }
     case Shape_tag_Rect: {
       double w __attribute__((unused)) = s.data.Rect._v0;

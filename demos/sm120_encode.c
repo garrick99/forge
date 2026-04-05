@@ -31,94 +31,94 @@ void patch_pred(forge_span_u8_t insn __attribute__((unused)), uint64_t pred __at
 int main();
 
 uint64_t ctrl_byte13(uint64_t ctrl __attribute__((unused))) {
-  uint64_t raw24 __attribute__((unused)) = ((ctrl & 8388607) * 2);
-  return (raw24 & 255);
+  uint64_t raw24 __attribute__((unused)) = ((ctrl & 8388607ULL) * 2ULL);
+  return (raw24 & 255ULL);
 }
 
 uint64_t ctrl_byte14(uint64_t ctrl __attribute__((unused))) {
-  uint64_t raw24 __attribute__((unused)) = ((ctrl & 8388607) * 2);
-  return ((raw24 / 256) & 255);
+  uint64_t raw24 __attribute__((unused)) = ((ctrl & 8388607ULL) * 2ULL);
+  return ((raw24 / 256ULL) & 255ULL);
 }
 
 uint64_t ctrl_byte15(uint64_t ctrl __attribute__((unused))) {
-  uint64_t raw24 __attribute__((unused)) = ((ctrl & 8388607) * 2);
-  return ((raw24 / 65536) & 255);
+  uint64_t raw24 __attribute__((unused)) = ((ctrl & 8388607ULL) * 2ULL);
+  return ((raw24 / 65536ULL) & 255ULL);
 }
 
 void build_insn(forge_span_u8_t out __attribute__((unused)), uint64_t b0 __attribute__((unused)), uint64_t b1 __attribute__((unused)), uint64_t dest __attribute__((unused)), uint64_t src0 __attribute__((unused)), uint64_t src1_or_imm __attribute__((unused)), uint64_t src2 __attribute__((unused)), uint64_t mod9 __attribute__((unused)), uint64_t mod10 __attribute__((unused)), uint64_t mod11 __attribute__((unused)), uint64_t ctrl __attribute__((unused)), uint64_t b15_fixed __attribute__((unused))) {
-  out.data[0] = ((uint8_t)b0);
-  out.data[1] = ((uint8_t)b1);
-  out.data[2] = ((uint8_t)dest);
-  out.data[3] = ((uint8_t)src0);
-  out.data[4] = ((uint8_t)src1_or_imm);
-  out.data[5] = 0;
-  out.data[6] = 0;
-  out.data[7] = 0;
-  out.data[8] = ((uint8_t)src2);
-  out.data[9] = ((uint8_t)mod9);
-  out.data[10] = ((uint8_t)mod10);
-  out.data[11] = ((uint8_t)mod11);
-  out.data[12] = 0;
-  out.data[13] = ((uint8_t)ctrl_byte13(ctrl));
-  out.data[14] = ((uint8_t)ctrl_byte14(ctrl));
-  out.data[15] = ((uint8_t)(ctrl_byte15(ctrl) | b15_fixed));
+  out.data[0ULL] = ((uint8_t)b0);
+  out.data[1ULL] = ((uint8_t)b1);
+  out.data[2ULL] = ((uint8_t)dest);
+  out.data[3ULL] = ((uint8_t)src0);
+  out.data[4ULL] = ((uint8_t)src1_or_imm);
+  out.data[5ULL] = 0ULL;
+  out.data[6ULL] = 0ULL;
+  out.data[7ULL] = 0ULL;
+  out.data[8ULL] = ((uint8_t)src2);
+  out.data[9ULL] = ((uint8_t)mod9);
+  out.data[10ULL] = ((uint8_t)mod10);
+  out.data[11ULL] = ((uint8_t)mod11);
+  out.data[12ULL] = 0ULL;
+  out.data[13ULL] = ((uint8_t)ctrl_byte13(ctrl));
+  out.data[14ULL] = ((uint8_t)ctrl_byte14(ctrl));
+  out.data[15ULL] = ((uint8_t)(ctrl_byte15(ctrl) | b15_fixed));
 }
 
 void encode_nop(forge_span_u8_t out __attribute__((unused)), uint64_t ctrl __attribute__((unused))) {
-  build_insn(out, 24, 121, 0, 0, 0, 0, 0, 0, 0, ctrl, 0);
+  build_insn(out, 24ULL, 121ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, ctrl, 0ULL);
 }
 
 void encode_exit(forge_span_u8_t out __attribute__((unused)), uint64_t ctrl __attribute__((unused))) {
-  build_insn(out, 77, 121, 0, 0, 0, 0, 0, 128, 3, ctrl, 0);
+  build_insn(out, 77ULL, 121ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 128ULL, 3ULL, ctrl, 0ULL);
 }
 
 void encode_s2r(forge_span_u8_t out __attribute__((unused)), uint64_t dest __attribute__((unused)), uint64_t sr_code __attribute__((unused)), uint64_t ctrl __attribute__((unused))) {
-  build_insn(out, 25, 121, dest, 0, sr_code, 0, 0, 0, 0, ctrl, 0);
+  build_insn(out, 25ULL, 121ULL, dest, 0ULL, sr_code, 0ULL, 0ULL, 0ULL, 0ULL, ctrl, 0ULL);
 }
 
 void encode_mov(forge_span_u8_t out __attribute__((unused)), uint64_t dest __attribute__((unused)), uint64_t src __attribute__((unused)), uint64_t ctrl __attribute__((unused))) {
-  build_insn(out, 2, 121, dest, src, 0, 0, 0, 0, 0, ctrl, 0);
+  build_insn(out, 2ULL, 121ULL, dest, src, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, ctrl, 0ULL);
 }
 
 void encode_iadd3(forge_span_u8_t out __attribute__((unused)), uint64_t dest __attribute__((unused)), uint64_t src0 __attribute__((unused)), uint64_t src1 __attribute__((unused)), uint64_t ctrl __attribute__((unused))) {
-  build_insn(out, 16, 120, dest, src0, src1, 255, 0, 0, 0, ctrl, 0);
+  build_insn(out, 16ULL, 120ULL, dest, src0, src1, 255ULL, 0ULL, 0ULL, 0ULL, ctrl, 0ULL);
 }
 
 void encode_imad_wide(forge_span_u8_t out __attribute__((unused)), uint64_t dest __attribute__((unused)), uint64_t src0 __attribute__((unused)), uint64_t src1 __attribute__((unused)), uint64_t src2 __attribute__((unused)), uint64_t ctrl __attribute__((unused))) {
-  build_insn(out, 36, 122, dest, src0, src1, src2, 0, 16, 0, ctrl, 0);
+  build_insn(out, 36ULL, 122ULL, dest, src0, src1, src2, 0ULL, 16ULL, 0ULL, ctrl, 0ULL);
 }
 
 void encode_ldg_32(forge_span_u8_t out __attribute__((unused)), uint64_t dest __attribute__((unused)), uint64_t addr_reg __attribute__((unused)), uint64_t ctrl __attribute__((unused))) {
-  build_insn(out, 129, 120, dest, addr_reg, 0, 0, 0, 32, 0, ctrl, 0);
+  build_insn(out, 129ULL, 120ULL, dest, addr_reg, 0ULL, 0ULL, 0ULL, 32ULL, 0ULL, ctrl, 0ULL);
 }
 
 void encode_stg_32(forge_span_u8_t out __attribute__((unused)), uint64_t addr_reg __attribute__((unused)), uint64_t src __attribute__((unused)), uint64_t ctrl __attribute__((unused))) {
-  build_insn(out, 133, 120, src, addr_reg, 0, 0, 0, 32, 0, ctrl, 0);
+  build_insn(out, 133ULL, 120ULL, src, addr_reg, 0ULL, 0ULL, 0ULL, 32ULL, 0ULL, ctrl, 0ULL);
 }
 
 void encode_fadd(forge_span_u8_t out __attribute__((unused)), uint64_t dest __attribute__((unused)), uint64_t src0 __attribute__((unused)), uint64_t src1 __attribute__((unused)), uint64_t ctrl __attribute__((unused))) {
-  build_insn(out, 21, 122, dest, src0, src1, 0, 0, 0, 0, ctrl, 0);
+  build_insn(out, 21ULL, 122ULL, dest, src0, src1, 0ULL, 0ULL, 0ULL, 0ULL, ctrl, 0ULL);
 }
 
 void encode_setp_lt_s32(forge_span_u8_t out __attribute__((unused)), uint64_t pred_dest __attribute__((unused)), uint64_t src0 __attribute__((unused)), uint64_t src1 __attribute__((unused)), uint64_t ctrl __attribute__((unused))) {
-  build_insn(out, 12, 122, pred_dest, src0, src1, 0, 1, 0, 0, ctrl, 0);
+  build_insn(out, 12ULL, 122ULL, pred_dest, src0, src1, 0ULL, 1ULL, 0ULL, 0ULL, ctrl, 0ULL);
 }
 
 void encode_bra(forge_span_u8_t out __attribute__((unused)), uint64_t offset __attribute__((unused)), uint64_t ctrl __attribute__((unused))) {
-  uint64_t lo __attribute__((unused)) = (offset & 255);
-  uint64_t hi __attribute__((unused)) = ((offset / 256) & 255);
-  build_insn(out, 47, 121, 0, 0, lo, hi, 0, 0, 0, ctrl, 0);
+  uint64_t lo __attribute__((unused)) = (offset & 255ULL);
+  uint64_t hi __attribute__((unused)) = ((offset / 256ULL) & 255ULL);
+  build_insn(out, 47ULL, 121ULL, 0ULL, 0ULL, lo, hi, 0ULL, 0ULL, 0ULL, ctrl, 0ULL);
 }
 
 void patch_pred(forge_span_u8_t insn __attribute__((unused)), uint64_t pred __attribute__((unused)), uint8_t negate __attribute__((unused))) {
   uint64_t code;
-  if ((negate == 1)) {
-    code = (pred | 8);
+  if ((negate == 1ULL)) {
+    code = (pred | 8ULL);
   } else {
     code = pred;
   }
-  uint64_t lo_nibble __attribute__((unused)) = (((uint64_t)insn.data[1]) & 15);
-  insn.data[1] = ((uint8_t)(lo_nibble | (code * 16)));
+  uint64_t lo_nibble __attribute__((unused)) = (((uint64_t)insn.data[1ULL]) & 15ULL);
+  insn.data[1ULL] = ((uint8_t)(lo_nibble | (code * 16ULL)));
 }
 
 int main() {

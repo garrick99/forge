@@ -36,11 +36,11 @@ __global__ void vector_fma(forge_span_f32_t a __attribute__((unused)), forge_spa
 
 __device__ uint32_t warp_reduce_add(uint32_t v __attribute__((unused))) {
   uint32_t x __attribute__((unused)) = v;
-  x = (x + __shfl_down_sync(0xffffffff, x, 16, 32));
-  x = (x + __shfl_down_sync(0xffffffff, x, 8, 32));
-  x = (x + __shfl_down_sync(0xffffffff, x, 4, 32));
-  x = (x + __shfl_down_sync(0xffffffff, x, 2, 32));
-  x = (x + __shfl_down_sync(0xffffffff, x, 1, 32));
+  x = (x + __shfl_down_sync(0xffffffff, x, 16ULL, 32ULL));
+  x = (x + __shfl_down_sync(0xffffffff, x, 8ULL, 32ULL));
+  x = (x + __shfl_down_sync(0xffffffff, x, 4ULL, 32ULL));
+  x = (x + __shfl_down_sync(0xffffffff, x, 2ULL, 32ULL));
+  x = (x + __shfl_down_sync(0xffffffff, x, 1ULL, 32ULL));
   return x;
 }
 

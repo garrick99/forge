@@ -37,24 +37,24 @@ __global__ void vector_add_smem(forge_span_f32_t a __attribute__((unused)), forg
 
 __device__ uint32_t warp_reduce_add(uint32_t v __attribute__((unused))) {
   uint32_t x __attribute__((unused)) = v;
-  x = (x + __shfl_down_sync(0xffffffff, x, 16, 32));
-  x = (x + __shfl_down_sync(0xffffffff, x, 8, 32));
-  x = (x + __shfl_down_sync(0xffffffff, x, 4, 32));
-  x = (x + __shfl_down_sync(0xffffffff, x, 2, 32));
-  x = (x + __shfl_down_sync(0xffffffff, x, 1, 32));
+  x = (x + __shfl_down_sync(0xffffffff, x, 16ULL, 32ULL));
+  x = (x + __shfl_down_sync(0xffffffff, x, 8ULL, 32ULL));
+  x = (x + __shfl_down_sync(0xffffffff, x, 4ULL, 32ULL));
+  x = (x + __shfl_down_sync(0xffffffff, x, 2ULL, 32ULL));
+  x = (x + __shfl_down_sync(0xffffffff, x, 1ULL, 32ULL));
   return x;
 }
 
 __global__ void reduce_sum(forge_span_u32_t input __attribute__((unused)), forge_span_u32_t output __attribute__((unused)), uint64_t n __attribute__((unused))) {
   uint32_t tid __attribute__((unused)) = threadIdx_x;
   uint64_t gid __attribute__((unused)) = ((((uint64_t)blockIdx_x) * ((uint64_t)blockDim_x)) + ((uint64_t)tid));
-  uint32_t val __attribute__((unused)) = 0;
+  uint32_t val __attribute__((unused)) = 0ULL;
   if ((gid < n)) {
     val = input.data[gid];
 
   }
   uint32_t reduced __attribute__((unused)) = warp_reduce_add(val);
-  if ((tid == 0)) {
+  if ((tid == 0ULL)) {
     uint64_t bid __attribute__((unused)) = ((uint64_t)blockIdx_x);
     if ((bid < output.len)) {
       output.data[bid] = reduced;
@@ -75,8 +75,8 @@ __global__ void vector_fma(forge_span_f32_t a __attribute__((unused)), forge_spa
 __global__ void relu(forge_span_u32_t data __attribute__((unused)), uint64_t n __attribute__((unused))) {
   uint64_t gid __attribute__((unused)) = ((((uint64_t)blockIdx_x) * ((uint64_t)blockDim_x)) + ((uint64_t)threadIdx_x));
   if ((gid < n)) {
-    if ((data.data[gid] > 2147483647)) {
-      data.data[gid] = 0;
+    if ((data.data[gid] > 2147483647ULL)) {
+      data.data[gid] = 0ULL;
 
     }
 
@@ -87,7 +87,7 @@ __global__ void vector_add_smem(forge_span_f32_t a __attribute__((unused)), forg
   __shared__ float sa[256];
   __shared__ float sb[256];
   uint64_t tid __attribute__((unused)) = ((uint64_t)threadIdx_x);
-  uint64_t gid __attribute__((unused)) = ((((uint64_t)blockIdx_x) * 256) + tid);
+  uint64_t gid __attribute__((unused)) = ((((uint64_t)blockIdx_x) * 256ULL) + tid);
   if ((gid < n)) {
     sa[tid] = a.data[gid];
     sb[tid] = b.data[gid];

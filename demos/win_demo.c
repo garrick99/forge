@@ -11,7 +11,7 @@
 /* Forward declarations */
 uint64_t mod_add(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t m __attribute__((unused)));
 uint64_t mod_mul(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)), uint64_t m __attribute__((unused)));
-uint64_t mod_exp(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused)), uint64_t m __attribute__((unused)));
+uint64_t mod_exp(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused)), uint64_t m __attribute__((unused)));
 uint64_t clamp(uint64_t val __attribute__((unused)), uint64_t lo __attribute__((unused)), uint64_t hi __attribute__((unused)));
 uint64_t abs_diff(uint64_t a __attribute__((unused)), uint64_t b __attribute__((unused)));
 uint64_t fibonacci(uint64_t n __attribute__((unused)));
@@ -30,18 +30,18 @@ uint64_t mod_mul(uint64_t a __attribute__((unused)), uint64_t b __attribute__((u
   return ((a * b) % m);
 }
 
-uint64_t mod_exp(uint64_t base __attribute__((unused)), uint64_t exp __attribute__((unused)), uint64_t m __attribute__((unused))) {
+uint64_t mod_exp(uint64_t base __attribute__((unused)), uint64_t forge_exp __attribute__((unused)), uint64_t m __attribute__((unused))) {
   uint64_t b __attribute__((unused)) = base;
-  uint64_t e __attribute__((unused)) = exp;
-  uint64_t acc __attribute__((unused)) = 1;
+  uint64_t e __attribute__((unused)) = forge_exp;
+  uint64_t acc __attribute__((unused)) = 1ULL;
   {
-    while ((e > 0)) {
-      if (((e % 2) == 1)) {
+    while ((e > 0ULL)) {
+      if (((e % 2ULL) == 1ULL)) {
         acc = ((acc * b) % m);
 
       }
       b = ((b * b) % m);
-      e = (e / 2);
+      e = (e / 2ULL);
     }
 
   }
@@ -69,24 +69,24 @@ uint64_t abs_diff(uint64_t a __attribute__((unused)), uint64_t b __attribute__((
 }
 
 uint64_t fibonacci(uint64_t n __attribute__((unused))) {
-  if ((n == 0)) {
-    return 0;
+  if ((n == 0ULL)) {
+    return 0ULL;
   } else {
-    if ((n == 1)) {
-      return 1;
+    if ((n == 1ULL)) {
+      return 1ULL;
     } else {
-      return (fibonacci((n - 1)) + fibonacci((n - 2)));
+      return (fibonacci((n - 1ULL)) + fibonacci((n - 2ULL)));
     }
   }
 }
 
 int main() {
-  uint64_t r __attribute__((unused)) = mod_exp(3, 10, 101);
-  uint64_t x __attribute__((unused)) = mod_add(50, 60, 101);
-  uint64_t y __attribute__((unused)) = mod_mul(x, 7, 101);
-  uint64_t c __attribute__((unused)) = clamp(500, 0, 255);
-  uint64_t d __attribute__((unused)) = abs_diff(42, 99);
-  uint64_t f __attribute__((unused)) = fibonacci(10);
+  uint64_t r __attribute__((unused)) = mod_exp(3ULL, 10ULL, 101ULL);
+  uint64_t x __attribute__((unused)) = mod_add(50ULL, 60ULL, 101ULL);
+  uint64_t y __attribute__((unused)) = mod_mul(x, 7ULL, 101ULL);
+  uint64_t c __attribute__((unused)) = clamp(500ULL, 0ULL, 255ULL);
+  uint64_t d __attribute__((unused)) = abs_diff(42ULL, 99ULL);
+  uint64_t f __attribute__((unused)) = fibonacci(10ULL);
   return (int)(0);
 
 }

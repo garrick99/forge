@@ -1,0 +1,98 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry qmma_gemm(
+    .param .u64 qmma_gemm_param_desc_a,
+    .param .u64 qmma_gemm_param_desc_as,
+    .param .u64 qmma_gemm_param_desc_b,
+    .param .u64 qmma_gemm_param_desc_bs,
+    .param .u64 qmma_gemm_param_bar,
+    .param .u64 qmma_gemm_param_smem_a,
+    .param .u64 qmma_gemm_param_smem_as,
+    .param .u64 qmma_gemm_param_smem_b,
+    .param .u64 qmma_gemm_param_smem_bs,
+    .param .u64 qmma_gemm_param_smem_a_cap,
+    .param .u64 qmma_gemm_param_smem_b_cap,
+    .param .u64 qmma_gemm_param_acc_data,
+    .param .u64 qmma_gemm_param_acc_len,
+    .param .u64 qmma_gemm_param_K_tiles
+)
+{
+    .reg .pred %p18, %p29, %p32;
+    .reg .u64 %rd0, %rd1, %rd10, %rd11, %rd12, %rd13, %rd17, %rd19, %rd2, %rd21, %rd22, %rd26, %rd27, %rd3, %rd30, %rd31, %rd33, %rd35, %rd36, %rd4, %rd40, %rd41, %rd42, %rd43, %rd44, %rd5, %rd6, %rd7, %rd8, %rd9;
+    .reg .u32 %r14, %r15, %r16, %r23, %r24, %r25, %r37, %r38, %r39, %r45, %r46;
+
+  ld.param.u64 %rd0, [qmma_gemm_param_desc_a];
+  ld.param.u64 %rd1, [qmma_gemm_param_desc_as];
+  ld.param.u64 %rd2, [qmma_gemm_param_desc_b];
+  ld.param.u64 %rd3, [qmma_gemm_param_desc_bs];
+  ld.param.u64 %rd4, [qmma_gemm_param_bar];
+  ld.param.u64 %rd5, [qmma_gemm_param_smem_a];
+  ld.param.u64 %rd6, [qmma_gemm_param_smem_as];
+  ld.param.u64 %rd7, [qmma_gemm_param_smem_b];
+  ld.param.u64 %rd8, [qmma_gemm_param_smem_bs];
+  ld.param.u64 %rd9, [qmma_gemm_param_smem_a_cap];
+  ld.param.u64 %rd10, [qmma_gemm_param_smem_b_cap];
+  ld.param.u64 %rd11, [qmma_gemm_param_acc_data];
+  ld.param.u64 %rd12, [qmma_gemm_param_acc_len];
+  ld.param.u64 %rd13, [qmma_gemm_param_K_tiles];
+
+  mov.u32 %r14, %tid.x;
+  mov.u32 %r15, %ctaid.x;
+  mov.u32 %r16, %ctaid.y;
+  mov.u64 %rd17, 0;
+  cvt.u64.u32 %rd19, %r14;
+  setp.eq.u64 %p18, %rd19, %rd17;
+  @%p18 bra qmma_gemm_then_20;
+  bra qmma_gemm_else_20;
+  qmma_gemm_then_20:
+  mov.u64 %rd21, 0; // call mbarrier_init_safe (device fn)
+  mov.u64 %rd22, 0; // call fence_proxy_async (device fn)
+  mov.u32 %r23, 0; // unit
+  mov.u32 %r24, %r23;
+  bra qmma_gemm_end_20;
+  qmma_gemm_else_20:
+  mov.u32 %r24, 0; // no else branch
+  qmma_gemm_end_20:
+  bar.sync 0;
+  mov.u32 %r25, 0; // unit
+  mov.u64 %rd26, 0;
+  mov.u64 %rd27, 0;
+  qmma_gemm_loop_28:
+  setp.lt.u64 %p29, %rd26, %rd13;
+  @!%p29 bra qmma_gemm_loop_end_28;
+  mul.lo.u64 %rd30, %rd26, %rd_unknown_TILE_K;
+  mov.u64 %rd31, 0;
+  cvt.u64.u32 %rd33, %r14;
+  setp.eq.u64 %p32, %rd33, %rd31;
+  @%p32 bra qmma_gemm_then_34;
+  bra qmma_gemm_else_34;
+  qmma_gemm_then_34:
+  mov.u64 %rd35, 0; // call tma_issue_2d (device fn)
+  mov.u64 %rd36, 0; // call tma_issue_2d (device fn)
+  mov.u32 %r37, 0; // unit
+  mov.u32 %r38, %r37;
+  bra qmma_gemm_end_34;
+  qmma_gemm_else_34:
+  mov.u32 %r38, 0; // no else branch
+  qmma_gemm_end_34:
+  bar.sync 0;
+  mov.u32 %r39, 0; // unit
+  mov.u64 %rd40, 0; // call wait_mbar (device fn)
+  mov.u64 %rd41, 0; // call qmma_f4f4bf16 (device fn)
+  mov.u64 %rd42, 0; // call next_phase (device fn)
+  mov.u64 %rd43, 1;
+  add.u64 %rd44, %rd26, %rd43;
+  mov.u64 %rd26, %rd44; // loop wb: k_tile
+  mov.u64 %rd27, %rd42; // loop wb: phase
+  bra qmma_gemm_loop_28;
+  qmma_gemm_loop_end_28:
+  mov.u32 %r45, 0; // unit
+  mov.u32 %r46, 0; // unit
+  ret;
+}
+

@@ -504,7 +504,7 @@ let rec emit_expr depth e =
         Int64.to_string n ^ "ULL"
       else
         Int64.to_string n
-  | ELit (LFloat (f, _))  -> Printf.sprintf "%g" f
+  | ELit (LFloat (f, _))  -> Printf.sprintf "%.17g" f
   | ELit (LBool true)     -> "1"
   | ELit (LBool false)    -> "0"
   | ELit LUnit            -> "/* unit */"
