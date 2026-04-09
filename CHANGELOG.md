@@ -2,6 +2,65 @@
 
 All notable changes to Forge are documented here.
 
+## [0.3.0] — 2026-04-09
+
+### FB-0: Verified Parity Baseline
+
+**1062 verified demos. 5/5 benchmark kernels. 44 proofs. 0 assumes. SASS parity with nvcc.**
+
+Forge-generated CUDA C compiles to identical machine code as hand-written CUDA across
+five kernel classes (reduction, GEMM, convolution, attention, tiled shared memory) while
+carrying formal proof metadata.
+
+### GPU Stdlib Expansion (6 new/expanded modules)
+
+- **`std::gpu`** — +6 atomics (`atom_or`, `atom_xor`, `atom_and`, `atom_sub`, `atom_exch`), `shfl_up_sync`
+- **`std::fp16`** — FP16/BF16 conversion + arithmetic via u16 wrappers (19 extern fns, 2 verified helpers, 6 constants)
+- **`std::tensor_core`** — QMMA (FP4), HMMA (FP16/BF16/TF32), IMMA (INT8), FP8 MMA wrappers + tile size helpers
+- **`std::threadfence`** — `threadfence()`, `threadfence_block()`, `threadfence_system()`
+- **`std::async_copy`** — `cp_async_cg`, `cp_async_commit`, `cp_async_wait_group` (SM_80+) with verified capacity helper
+- **`std::coop_groups`** — `cluster_sync`, `cluster_dim_x`, `cluster_rank`, `cluster_map_shared` (SM_90+)
+
+### Compiler Improvements
+
+- **40+ GPU intrinsic mappings** across `codegen_cuda.ml`, `codegen_ptx.ml`, `codegen_c.ml`
+- **Inline assembly with operands** — `asm("template" : out = "=r" : in1 = "r", in2 = "r")` GCC-style syntax; new AST node `EAsm`, parser rule, typecheck, all 3 codegens
+- **Bitfields** — `field: u32 : 5` syntax in struct definitions, emits C bitfield
+- **f32 literal suffix** — `0.0f32` and `1.5f64` parse with explicit float width via `FLOAT_SUFF` token
+- **Shared memory model** — bounds check (`idx < smem_size`) replaces per-thread ownership partitioning; fixes 2D kernels and tiled patterns; `threadIdx_x` direct access auto-verified
+- **Grid-stride termination** — while-loop termination measure checked with loop condition in scope; `blockDim_{x,y,z} > 0` and `gridDim_{x,y,z} > 0` axioms injected for all kernels
+- **`__device__` propagation** — transitive closure of functions called from kernels; extern prototypes also annotated when in device call graph
+- **FP16/BF16 codegen** — `__half`/`__nv_bfloat16` casts for overload disambiguation; `<cuda_fp16.h>` and `<cuda_bf16.h>` includes in CUDA mode
+
+### New Demos (6 verified GPU kernels)
+
+| Demo | Kernel | Proofs | Description |
+|------|--------|--------|-------------|
+| 1046 | `reduce_sum` | 3 | Warp-level butterfly reduction |
+| 1047 | `fp16_gemm` | 5 | FP16 GEMM with `fp16_fma` |
+| 1048 | `conv2d` | 7 | 2D convolution with zero-padding |
+| 1049 | `flash_attention` | 18 | Online softmax attention kernel |
+| 1050 | `tiled_gemm` | 11 | Tiled GEMM with shared memory (2D kernel) |
+| 1051 | `asm_add_test` | 0 | Inline assembly with register operands |
+
+### ForgeBench
+
+- Python harness (`benchmarks/forgebench.py`): Forge build + nvcc compilation + cubin analysis
+- Per-kernel report: register count, instruction count, proof count, assumes
+- FB-0 baseline frozen in `benchmarks/fb0_baseline/` with MANIFEST, cubin hashes, SASS dumps
+- JSON + text report output
+
+### Testing
+
+```
+Proof verification:   1062 / 1062 pass
+GCC compilation:      1021 / 1021 pass   (-Wall -Wextra -Werror)
+Runtime execution:     879 /  879 pass
+Error cases:            20 /   20 pass
+```
+
+---
+
 ## [0.2.0] — 2026-04-03
 
 ### VortexSTARK GPU Kernel Suite
