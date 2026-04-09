@@ -1,0 +1,146 @@
+// FB-3.0 conv2d: looped PTX — same semantics as unrolled, different liveness shape.
+// 3x3 convolution with zero-padding, u64 arithmetic.
+// Two nested loops (ky=0..2, kx=0..2) replace 9 unrolled tap blocks.
+
+.version 9.0
+.target sm_120
+.address_size 64
+
+.visible .entry conv2d(
+    .param .u64 input_ptr,
+    .param .u64 input_len,
+    .param .u64 output_ptr,
+    .param .u64 output_len,
+    .param .u64 filter_ptr,
+    .param .u64 filter_len,
+    .param .u64 p_width,
+    .param .u64 p_height)
+{
+    .reg .b32 %r<8>;
+    .reg .b64 %rd<16>;
+    .reg .pred %p<1>;
+
+    // Load params
+    ld.param.u64 %rd0, [input_ptr];
+    ld.param.u64 %rd1, [input_len];
+    ld.param.u64 %rd2, [output_ptr];
+    ld.param.u64 %rd3, [output_len];
+    ld.param.u64 %rd4, [filter_ptr];
+    ld.param.u64 %rd5, [filter_len];
+    ld.param.u64 %rd6, [p_width];
+    ld.param.u64 %rd7, [p_height];
+
+    // ox = blockIdx.x * blockDim.x + threadIdx.x
+    mov.u32 %r0, %tid.x;
+    mov.u32 %r1, %ctaid.x;
+    mov.u32 %r2, %ntid.x;
+    mul.lo.u32 %r3, %r1, %r2;
+    add.u32 %r3, %r3, %r0;
+    cvt.u64.u32 %rd8, %r3;        // ox
+
+    // oy = blockIdx.y * blockDim.y + threadIdx.y
+    mov.u32 %r4, %tid.y;
+    mov.u32 %r5, %ctaid.y;
+    mov.u32 %r6, %ntid.y;
+    mul.lo.u32 %r7, %r5, %r6;
+    add.u32 %r7, %r7, %r4;
+    cvt.u64.u32 %rd9, %r7;        // oy
+
+    // if (ox >= width || oy >= height) return
+    setp.ge.u64 %p0, %rd8, %rd6;
+    @%p0 ret;
+    setp.ge.u64 %p0, %rd9, %rd7;
+    @%p0 ret;
+
+    // acc = 0
+    mov.u64 %rd10, 0;
+
+    // ky = 0 (outer loop counter)
+    mov.u64 %rd11, 0;
+    // f_idx_base = 0 (ky * 3, incremented by 3 each outer iteration)
+    mov.u64 %rd12, 0;
+
+KY_LOOP:
+    setp.ge.u64 %p0, %rd11, 3;
+    @%p0 bra STORE;
+
+    // kx = 0 (inner loop counter)
+    mov.u64 %rd13, 0;
+
+KX_LOOP:
+    setp.ge.u64 %p0, %rd13, 3;
+    @%p0 bra KY_NEXT;
+
+    // ix = ox + kx
+    add.u64 %rd14, %rd8, %rd13;
+    // iy = oy + ky
+    add.u64 %rd15, %rd9, %rd11;
+
+    // Bounds check: ix >= 1 (KERNEL_RADIUS)
+    setp.lt.u64 %p0, %rd14, 1;
+    @%p0 bra KX_NEXT;
+    // iy >= 1
+    setp.lt.u64 %p0, %rd15, 1;
+    @%p0 bra KX_NEXT;
+
+    // sx = ix - 1, sy = iy - 1
+    sub.u64 %rd14, %rd14, 1;
+    sub.u64 %rd15, %rd15, 1;
+
+    // sx < width
+    setp.ge.u64 %p0, %rd14, %rd6;
+    @%p0 bra KX_NEXT;
+    // sy < height
+    setp.ge.u64 %p0, %rd15, %rd7;
+    @%p0 bra KX_NEXT;
+
+    // in_idx = sy * width + sx
+    mul.lo.u64 %rd15, %rd15, %rd6;
+    add.u64 %rd15, %rd15, %rd14;
+
+    // bounds check: in_idx < input_len
+    setp.ge.u64 %p0, %rd15, %rd1;
+    @%p0 bra KX_NEXT;
+
+    // Load input[in_idx]
+    shl.b64 %rd15, %rd15, 3;
+    add.u64 %rd15, %rd0, %rd15;
+    ld.global.u64 %rd14, [%rd15];
+
+    // f_idx = f_idx_base + kx
+    add.u64 %rd15, %rd12, %rd13;
+    // bounds check: f_idx < filter_len
+    setp.ge.u64 %p0, %rd15, %rd5;
+    @%p0 bra KX_NEXT;
+
+    // Load filter[f_idx]
+    shl.b64 %rd15, %rd15, 3;
+    add.u64 %rd15, %rd4, %rd15;
+    ld.global.u64 %rd15, [%rd15];
+
+    // acc += input * filter
+    mul.lo.u64 %rd15, %rd14, %rd15;
+    add.u64 %rd10, %rd10, %rd15;
+
+KX_NEXT:
+    // kx++
+    add.u64 %rd13, %rd13, 1;
+    bra KX_LOOP;
+
+KY_NEXT:
+    // ky++, f_idx_base += 3
+    add.u64 %rd11, %rd11, 1;
+    add.u64 %rd12, %rd12, 3;
+    bra KY_LOOP;
+
+STORE:
+    // out_idx = oy * width + ox
+    mul.lo.u64 %rd14, %rd9, %rd6;
+    add.u64 %rd14, %rd14, %rd8;
+    setp.ge.u64 %p0, %rd14, %rd3;
+    @%p0 ret;
+    shl.b64 %rd14, %rd14, 3;
+    add.u64 %rd14, %rd2, %rd14;
+    st.global.u64 [%rd14], %rd10;
+    ret;
+}
