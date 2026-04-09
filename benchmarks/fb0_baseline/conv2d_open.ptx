@@ -1,0 +1,305 @@
+// FB-1.2 conv2d: hand-written PTX matching Forge CUDA C semantics.
+// 3x3 convolution with zero-padding, u64 arithmetic.
+// Params flattened from forge_span: input_ptr, input_len, output_ptr, output_len,
+//   filter_ptr, filter_len, width, height
+// Grid: (ceil(W/blockDim.x), ceil(H/blockDim.y), 1), Block: (16, 16, 1)
+
+.version 9.0
+.target sm_120
+.address_size 64
+
+.visible .entry conv2d(
+    .param .u64 input_ptr,
+    .param .u64 input_len,
+    .param .u64 output_ptr,
+    .param .u64 output_len,
+    .param .u64 filter_ptr,
+    .param .u64 filter_len,
+    .param .u64 p_width,
+    .param .u64 p_height)
+{
+    .reg .b32 %r<16>;
+    .reg .b64 %rd<20>;
+    .reg .pred %p<2>;
+
+    // Load params
+    ld.param.u64 %rd0, [input_ptr];
+    ld.param.u64 %rd1, [input_len];
+    ld.param.u64 %rd2, [output_ptr];
+    ld.param.u64 %rd3, [output_len];
+    ld.param.u64 %rd4, [filter_ptr];
+    ld.param.u64 %rd5, [filter_len];
+    ld.param.u64 %rd6, [p_width];
+    ld.param.u64 %rd7, [p_height];
+
+    // ox = blockIdx.x * blockDim.x + threadIdx.x
+    mov.u32 %r0, %tid.x;
+    mov.u32 %r1, %ctaid.x;
+    mov.u32 %r2, %ntid.x;
+    mul.lo.u32 %r3, %r1, %r2;
+    add.u32 %r3, %r3, %r0;
+    cvt.u64.u32 %rd8, %r3;        // ox
+
+    // oy = blockIdx.y * blockDim.y + threadIdx.y
+    mov.u32 %r4, %tid.y;
+    mov.u32 %r5, %ctaid.y;
+    mov.u32 %r6, %ntid.y;
+    mul.lo.u32 %r7, %r5, %r6;
+    add.u32 %r7, %r7, %r4;
+    cvt.u64.u32 %rd9, %r7;        // oy
+
+    // if (ox >= width || oy >= height) return
+    setp.ge.u64 %p0, %rd8, %rd6;
+    @%p0 ret;
+    setp.ge.u64 %p0, %rd9, %rd7;
+    @%p0 ret;
+
+    // acc = 0
+    mov.u64 %rd10, 0;
+
+    // Unrolled 3x3 loop: ky=0..2, kx=0..2
+    // For each (ky, kx): compute ix=ox+kx, iy=oy+ky
+    // If ix>=1 && iy>=1 && ix-1<width && iy-1<height:
+    //   in_idx = (iy-1)*width + (ix-1)
+    //   f_idx = ky*3 + kx
+    //   acc += input[in_idx] * filter[f_idx]
+
+    // Macro-like pattern for one tap. Using %rd11 as ix, %rd12 as iy,
+    // %rd13 as sx, %rd14 as sy, %rd15 as in_idx, %rd16 as f_idx,
+    // %rd17 as loaded input, %rd18 as loaded filter, %rd19 as product.
+
+    // ky=0, kx=0: ix=ox+0, iy=oy+0, f_idx=0
+    add.u64 %rd11, %rd8, 0;       // ix = ox + 0
+    add.u64 %rd12, %rd9, 0;       // iy = oy + 0
+    setp.lt.u64 %p0, %rd11, 1;    // ix < 1 (KERNEL_RADIUS) → skip
+    @%p0 bra TAP01;
+    setp.lt.u64 %p0, %rd12, 1;    // iy < 1 → skip
+    @%p0 bra TAP01;
+    sub.u64 %rd13, %rd11, 1;      // sx = ix - 1
+    sub.u64 %rd14, %rd12, 1;      // sy = iy - 1
+    setp.ge.u64 %p0, %rd13, %rd6; // sx >= width → skip
+    @%p0 bra TAP01;
+    setp.ge.u64 %p0, %rd14, %rd7; // sy >= height → skip
+    @%p0 bra TAP01;
+    mul.lo.u64 %rd15, %rd14, %rd6; // in_idx = sy * width
+    add.u64 %rd15, %rd15, %rd13;   // + sx
+    setp.ge.u64 %p0, %rd15, %rd1;  // >= input_len → skip
+    @%p0 bra TAP01;
+    shl.b64 %rd16, %rd15, 3;
+    add.u64 %rd16, %rd0, %rd16;
+    ld.global.u64 %rd17, [%rd16];   // input[in_idx]
+    ld.global.u64 %rd18, [%rd4];    // filter[0] (f_idx=0, offset=0)
+    mul.lo.u64 %rd19, %rd17, %rd18;
+    add.u64 %rd10, %rd10, %rd19;
+
+TAP01:
+    // ky=0, kx=1: ix=ox+1, iy=oy+0, f_idx=1
+    add.u64 %rd11, %rd8, 1;
+    setp.lt.u64 %p0, %rd11, 1;
+    @%p0 bra TAP02;
+    setp.lt.u64 %p0, %rd12, 1;  // iy still = oy+0
+    @%p0 bra TAP02;
+    sub.u64 %rd13, %rd11, 1;
+    setp.ge.u64 %p0, %rd13, %rd6;
+    @%p0 bra TAP02;
+    setp.ge.u64 %p0, %rd14, %rd7; // sy still = oy-1
+    @%p0 bra TAP02;
+    mul.lo.u64 %rd15, %rd14, %rd6;
+    add.u64 %rd15, %rd15, %rd13;
+    setp.ge.u64 %p0, %rd15, %rd1;
+    @%p0 bra TAP02;
+    shl.b64 %rd16, %rd15, 3;
+    add.u64 %rd16, %rd0, %rd16;
+    ld.global.u64 %rd17, [%rd16];
+    add.u64 %rd16, %rd4, 8;       // filter[1]
+    ld.global.u64 %rd18, [%rd16];
+    mul.lo.u64 %rd19, %rd17, %rd18;
+    add.u64 %rd10, %rd10, %rd19;
+
+TAP02:
+    // ky=0, kx=2: ix=ox+2, iy=oy+0, f_idx=2
+    add.u64 %rd11, %rd8, 2;
+    setp.lt.u64 %p0, %rd11, 1;
+    @%p0 bra TAP10;
+    setp.lt.u64 %p0, %rd12, 1;
+    @%p0 bra TAP10;
+    sub.u64 %rd13, %rd11, 1;
+    setp.ge.u64 %p0, %rd13, %rd6;
+    @%p0 bra TAP10;
+    setp.ge.u64 %p0, %rd14, %rd7;
+    @%p0 bra TAP10;
+    mul.lo.u64 %rd15, %rd14, %rd6;
+    add.u64 %rd15, %rd15, %rd13;
+    setp.ge.u64 %p0, %rd15, %rd1;
+    @%p0 bra TAP10;
+    shl.b64 %rd16, %rd15, 3;
+    add.u64 %rd16, %rd0, %rd16;
+    ld.global.u64 %rd17, [%rd16];
+    add.u64 %rd16, %rd4, 16;      // filter[2]
+    ld.global.u64 %rd18, [%rd16];
+    mul.lo.u64 %rd19, %rd17, %rd18;
+    add.u64 %rd10, %rd10, %rd19;
+
+TAP10:
+    // ky=1, kx=0: ix=ox+0, iy=oy+1, f_idx=3
+    add.u64 %rd11, %rd8, 0;
+    add.u64 %rd12, %rd9, 1;
+    setp.lt.u64 %p0, %rd11, 1;
+    @%p0 bra TAP11;
+    setp.lt.u64 %p0, %rd12, 1;
+    @%p0 bra TAP11;
+    sub.u64 %rd13, %rd11, 1;
+    sub.u64 %rd14, %rd12, 1;
+    setp.ge.u64 %p0, %rd13, %rd6;
+    @%p0 bra TAP11;
+    setp.ge.u64 %p0, %rd14, %rd7;
+    @%p0 bra TAP11;
+    mul.lo.u64 %rd15, %rd14, %rd6;
+    add.u64 %rd15, %rd15, %rd13;
+    setp.ge.u64 %p0, %rd15, %rd1;
+    @%p0 bra TAP11;
+    shl.b64 %rd16, %rd15, 3;
+    add.u64 %rd16, %rd0, %rd16;
+    ld.global.u64 %rd17, [%rd16];
+    add.u64 %rd16, %rd4, 24;      // filter[3]
+    ld.global.u64 %rd18, [%rd16];
+    mul.lo.u64 %rd19, %rd17, %rd18;
+    add.u64 %rd10, %rd10, %rd19;
+
+TAP11:
+    // ky=1, kx=1: ix=ox+1, iy=oy+1, f_idx=4 (CENTER TAP)
+    add.u64 %rd11, %rd8, 1;
+    add.u64 %rd12, %rd9, 1;
+    setp.lt.u64 %p0, %rd11, 1;
+    @%p0 bra TAP12;
+    setp.lt.u64 %p0, %rd12, 1;
+    @%p0 bra TAP12;
+    sub.u64 %rd13, %rd11, 1;
+    sub.u64 %rd14, %rd12, 1;
+    setp.ge.u64 %p0, %rd13, %rd6;
+    @%p0 bra TAP12;
+    setp.ge.u64 %p0, %rd14, %rd7;
+    @%p0 bra TAP12;
+    mul.lo.u64 %rd15, %rd14, %rd6;
+    add.u64 %rd15, %rd15, %rd13;
+    setp.ge.u64 %p0, %rd15, %rd1;
+    @%p0 bra TAP12;
+    shl.b64 %rd16, %rd15, 3;
+    add.u64 %rd16, %rd0, %rd16;
+    ld.global.u64 %rd17, [%rd16];
+    add.u64 %rd16, %rd4, 32;      // filter[4]
+    ld.global.u64 %rd18, [%rd16];
+    mul.lo.u64 %rd19, %rd17, %rd18;
+    add.u64 %rd10, %rd10, %rd19;
+
+TAP12:
+    // ky=1, kx=2: ix=ox+2, iy=oy+1, f_idx=5
+    add.u64 %rd11, %rd8, 2;
+    setp.lt.u64 %p0, %rd11, 1;
+    @%p0 bra TAP20;
+    setp.lt.u64 %p0, %rd12, 1;
+    @%p0 bra TAP20;
+    sub.u64 %rd13, %rd11, 1;
+    setp.ge.u64 %p0, %rd13, %rd6;
+    @%p0 bra TAP20;
+    setp.ge.u64 %p0, %rd14, %rd7;
+    @%p0 bra TAP20;
+    mul.lo.u64 %rd15, %rd14, %rd6;
+    add.u64 %rd15, %rd15, %rd13;
+    setp.ge.u64 %p0, %rd15, %rd1;
+    @%p0 bra TAP20;
+    shl.b64 %rd16, %rd15, 3;
+    add.u64 %rd16, %rd0, %rd16;
+    ld.global.u64 %rd17, [%rd16];
+    add.u64 %rd16, %rd4, 40;      // filter[5]
+    ld.global.u64 %rd18, [%rd16];
+    mul.lo.u64 %rd19, %rd17, %rd18;
+    add.u64 %rd10, %rd10, %rd19;
+
+TAP20:
+    // ky=2, kx=0: ix=ox+0, iy=oy+2, f_idx=6
+    add.u64 %rd11, %rd8, 0;
+    add.u64 %rd12, %rd9, 2;
+    setp.lt.u64 %p0, %rd11, 1;
+    @%p0 bra TAP21;
+    setp.lt.u64 %p0, %rd12, 1;
+    @%p0 bra TAP21;
+    sub.u64 %rd13, %rd11, 1;
+    sub.u64 %rd14, %rd12, 1;
+    setp.ge.u64 %p0, %rd13, %rd6;
+    @%p0 bra TAP21;
+    setp.ge.u64 %p0, %rd14, %rd7;
+    @%p0 bra TAP21;
+    mul.lo.u64 %rd15, %rd14, %rd6;
+    add.u64 %rd15, %rd15, %rd13;
+    setp.ge.u64 %p0, %rd15, %rd1;
+    @%p0 bra TAP21;
+    shl.b64 %rd16, %rd15, 3;
+    add.u64 %rd16, %rd0, %rd16;
+    ld.global.u64 %rd17, [%rd16];
+    add.u64 %rd16, %rd4, 48;      // filter[6]
+    ld.global.u64 %rd18, [%rd16];
+    mul.lo.u64 %rd19, %rd17, %rd18;
+    add.u64 %rd10, %rd10, %rd19;
+
+TAP21:
+    // ky=2, kx=1: ix=ox+1, iy=oy+2, f_idx=7
+    add.u64 %rd11, %rd8, 1;
+    setp.lt.u64 %p0, %rd11, 1;
+    @%p0 bra TAP22;
+    setp.lt.u64 %p0, %rd12, 1;
+    @%p0 bra TAP22;
+    sub.u64 %rd13, %rd11, 1;
+    setp.ge.u64 %p0, %rd13, %rd6;
+    @%p0 bra TAP22;
+    setp.ge.u64 %p0, %rd14, %rd7;
+    @%p0 bra TAP22;
+    mul.lo.u64 %rd15, %rd14, %rd6;
+    add.u64 %rd15, %rd15, %rd13;
+    setp.ge.u64 %p0, %rd15, %rd1;
+    @%p0 bra TAP22;
+    shl.b64 %rd16, %rd15, 3;
+    add.u64 %rd16, %rd0, %rd16;
+    ld.global.u64 %rd17, [%rd16];
+    add.u64 %rd16, %rd4, 56;      // filter[7]
+    ld.global.u64 %rd18, [%rd16];
+    mul.lo.u64 %rd19, %rd17, %rd18;
+    add.u64 %rd10, %rd10, %rd19;
+
+TAP22:
+    // ky=2, kx=2: ix=ox+2, iy=oy+2, f_idx=8
+    add.u64 %rd11, %rd8, 2;
+    add.u64 %rd12, %rd9, 2;
+    setp.lt.u64 %p0, %rd11, 1;
+    @%p0 bra STORE;
+    setp.lt.u64 %p0, %rd12, 1;
+    @%p0 bra STORE;
+    sub.u64 %rd13, %rd11, 1;
+    sub.u64 %rd14, %rd12, 1;
+    setp.ge.u64 %p0, %rd13, %rd6;
+    @%p0 bra STORE;
+    setp.ge.u64 %p0, %rd14, %rd7;
+    @%p0 bra STORE;
+    mul.lo.u64 %rd15, %rd14, %rd6;
+    add.u64 %rd15, %rd15, %rd13;
+    setp.ge.u64 %p0, %rd15, %rd1;
+    @%p0 bra STORE;
+    shl.b64 %rd16, %rd15, 3;
+    add.u64 %rd16, %rd0, %rd16;
+    ld.global.u64 %rd17, [%rd16];
+    add.u64 %rd16, %rd4, 64;      // filter[8]
+    ld.global.u64 %rd18, [%rd16];
+    mul.lo.u64 %rd19, %rd17, %rd18;
+    add.u64 %rd10, %rd10, %rd19;
+
+STORE:
+    // out_idx = oy * width + ox
+    mul.lo.u64 %rd15, %rd9, %rd6;
+    add.u64 %rd15, %rd15, %rd8;
+    setp.ge.u64 %p0, %rd15, %rd3;  // >= output_len → skip
+    @%p0 ret;
+    shl.b64 %rd15, %rd15, 3;
+    add.u64 %rd15, %rd2, %rd15;
+    st.global.u64 [%rd15], %rd10;
+    ret;
+}

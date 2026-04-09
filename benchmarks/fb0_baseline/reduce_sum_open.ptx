@@ -1,0 +1,91 @@
+.version 9.0
+.target sm_120
+.address_size 64
+
+// FB-1 reduce_sum: hand-written PTX matching Forge CUDA C semantics.
+// Kernel: warp butterfly reduction of u64 values.
+// Params: data_ptr (u64*), data_len (u64), output_ptr (u64*), output_len (u64), n (u64)
+// Forge span<u64> = {u64* data, uintptr_t len} — flattened to ptr + len params.
+
+.visible .entry reduce_sum(
+    .param .u64 data_ptr,
+    .param .u64 data_len,
+    .param .u64 output_ptr,
+    .param .u64 output_len,
+    .param .u64 n)
+{
+    .reg .b32 %r<24>;
+    .reg .b64 %rd<12>;
+    .reg .pred %p<2>;
+
+    // Load params
+    ld.param.u64 %rd0, [data_ptr];
+    ld.param.u64 %rd1, [output_ptr];
+    ld.param.u64 %rd2, [n];
+
+    // tid, gid
+    mov.u32 %r0, %tid.x;
+    mov.u32 %r1, %ctaid.x;
+    mov.u32 %r2, %ntid.x;
+    mul.lo.u32 %r3, %r1, %r2;
+    add.u32 %r3, %r3, %r0;
+    cvt.u64.u32 %rd3, %r0;       // tid as u64
+    cvt.u64.u32 %rd4, %r3;       // gid as u64
+
+    // val = (gid < n) ? data[gid] : 0
+    mov.u64 %rd5, 0;
+    setp.lt.u64 %p0, %rd4, %rd2;
+    @!%p0 bra REDUCE;
+    shl.b64 %rd6, %rd4, 3;       // gid * 8
+    add.u64 %rd6, %rd0, %rd6;
+    ld.global.u64 %rd5, [%rd6];
+
+REDUCE:
+    // warp_reduce_sum: 5 butterfly stages on u64 (paired 32-bit shuffles)
+    mov.b64 {%r4, %r5}, %rd5;
+
+    shfl.sync.bfly.b32 %r6, %r4, 16, 31, 0xffffffff;
+    shfl.sync.bfly.b32 %r7, %r5, 16, 31, 0xffffffff;
+    mov.b64 %rd6, {%r6, %r7};
+    add.u64 %rd5, %rd5, %rd6;
+    mov.b64 {%r4, %r5}, %rd5;
+
+    shfl.sync.bfly.b32 %r8, %r4, 8, 31, 0xffffffff;
+    shfl.sync.bfly.b32 %r9, %r5, 8, 31, 0xffffffff;
+    mov.b64 %rd6, {%r8, %r9};
+    add.u64 %rd5, %rd5, %rd6;
+    mov.b64 {%r4, %r5}, %rd5;
+
+    shfl.sync.bfly.b32 %r10, %r4, 4, 31, 0xffffffff;
+    shfl.sync.bfly.b32 %r11, %r5, 4, 31, 0xffffffff;
+    mov.b64 %rd6, {%r10, %r11};
+    add.u64 %rd5, %rd5, %rd6;
+    mov.b64 {%r4, %r5}, %rd5;
+
+    shfl.sync.bfly.b32 %r12, %r4, 2, 31, 0xffffffff;
+    shfl.sync.bfly.b32 %r13, %r5, 2, 31, 0xffffffff;
+    mov.b64 %rd6, {%r12, %r13};
+    add.u64 %rd5, %rd5, %rd6;
+    mov.b64 {%r4, %r5}, %rd5;
+
+    shfl.sync.bfly.b32 %r14, %r4, 1, 31, 0xffffffff;
+    shfl.sync.bfly.b32 %r15, %r5, 1, 31, 0xffffffff;
+    mov.b64 %rd6, {%r14, %r15};
+    add.u64 %rd5, %rd5, %rd6;
+
+    // lane = tid % 32, wid = tid / 32
+    and.b32 %r16, %r0, 31;
+    shr.u32 %r17, %r0, 5;
+
+    // if (lane == 0 && wid == 0) output[blockIdx_x] = val
+    setp.ne.u32 %p0, %r16, 0;
+    @%p0 ret;
+    setp.ne.u32 %p1, %r17, 0;
+    @%p1 ret;
+
+    cvt.u64.u32 %rd7, %r1;       // blockIdx_x as u64
+    shl.b64 %rd7, %rd7, 3;       // * 8
+    add.u64 %rd7, %rd1, %rd7;
+    st.global.u64 [%rd7], %rd5;
+    ret;
+}
