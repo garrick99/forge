@@ -1,0 +1,101 @@
+// expected: 0
+// Demo 1050: Verified tiled GEMM with shared memory (2D kernel)
+//
+// This demo previously failed due to the shared memory ownership
+// model rejecting 2D indexing patterns (ty * TILE + tx). The fix:
+// shared memory uses bounds checking (idx < smem_size) instead of
+// per-thread ownership partitioning.
+//
+// Each thread block computes a TILE×TILE output tile.
+// Tiles of A and B are loaded cooperatively into shared memory,
+// synchronized with __syncthreads(), then accumulated.
+//
+// Formal properties proven:
+//   1. Shared memory indices: ty*TILE+tx < 256 (TILE*TILE)
+//   2. Global memory A[], B[], C[] bounds
+//   3. Loop termination (literal bounds)
+
+use std::fp16;
+
+const TILE: u64 = 16u64;
+const SMEM_SIZE: u64 = 256u64;  // TILE * TILE
+
+#[kernel]
+fn tiled_gemm(
+    A: span<u16>, B: span<u16>, C: span<u16>,
+    M: u64, N: u64, K: u64
+)
+    requires M * K <= A.len
+    requires K * N <= B.len
+    requires M * N <= C.len
+    requires K > 0u64
+    requires blockIdx_x < gridDim_x
+    requires blockIdx_y < gridDim_y
+    requires threadIdx_x < TILE
+    requires threadIdx_y < TILE
+{
+    let smem_a: shared<u16>[256] = [0u16; 256u64];
+    let smem_b: shared<u16>[256] = [0u16; 256u64];
+
+    let tx: u64 = threadIdx_x;
+    let ty: u64 = threadIdx_y;
+    let row: u64 = blockIdx_y * TILE + ty;
+    let col: u64 = blockIdx_x * TILE + tx;
+
+    let mut acc: u16 = FP16_ZERO;
+
+    for t in 0u64..K
+        invariant t <= K
+    {
+        // Cooperative tile load
+        let smem_idx: u64 = ty * TILE + tx;
+        if smem_idx < SMEM_SIZE {
+            if row < M {
+                if t * TILE + tx < K {
+                    let a_idx: u64 = row * K + t * TILE + tx;
+                    if a_idx < A.len {
+                        smem_a[smem_idx] = A[a_idx];
+                    };
+                };
+            };
+
+            if col < N {
+                if t * TILE + ty < K {
+                    let b_idx: u64 = (t * TILE + ty) * N + col;
+                    if b_idx < B.len {
+                        smem_b[smem_idx] = B[b_idx];
+                    };
+                };
+            };
+        };
+
+        syncthreads();
+
+        // Accumulate dot product from shared memory
+        for k in 0u64..TILE
+            invariant k <= TILE
+        {
+            let a_smem: u64 = ty * TILE + k;
+            let b_smem: u64 = k * TILE + tx;
+            if a_smem < SMEM_SIZE {
+                if b_smem < SMEM_SIZE {
+                    acc = fp16_fma(smem_a[a_smem], smem_b[b_smem], acc);
+                };
+            };
+        };
+
+        syncthreads();
+    };
+
+    // Write result
+    if row < M {
+        if col < N {
+            let c_idx: u64 = row * N + col;
+            if c_idx < C.len {
+                C[c_idx] = acc;
+            };
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }

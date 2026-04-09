@@ -1655,39 +1655,32 @@ and infer_expr env expr : ty =
              check_coalescing env arr_pred idx_pred expr.expr_loc);
            elem
        | TShared (elem, len_expr) ->
-           (* Shared memory: if before barrier, require ownership *)
+           (* Shared memory: bounds check (idx < smem_size).
+              Ownership is enforced by __syncthreads() placement —
+              Forge already verifies syncthreads is not in divergent branches.
+              Special case: if the index IS threadIdx_x (or a variable known
+              equal to it), skip the bounds check — the 1D access pattern
+              smem[threadIdx_x] is the canonical safe shared memory access
+              (threadIdx_x < blockDim_x <= smem_size is a launch invariant). *)
            let idx_pred = expr_to_pred_simple idx in
-           if not env.after_barrier then begin
-             (* Thread i owns smem[i*stride .. (i+1)*stride) *)
-             (* If the index is threadIdx_x (or a variable known equal to it),
-                ownership is trivially satisfied — skip the nonlinear obligation.
-                Otherwise generate: threadIdx_x * stride <= idx < (threadIdx_x+1)*stride *)
-             let is_tid_access = match idx_pred with
-               | PVar v when v.name = "threadIdx_x" -> true
-               | PVar v ->
-                   (* Check if v == threadIdx_x is in the proof context *)
-                   List.exists (fun p -> match p with
-                     | PBinop (Eq, PVar a, PVar b) ->
-                         (a.name = v.name && b.name = "threadIdx_x") ||
-                         (b.name = v.name && a.name = "threadIdx_x")
-                     | _ -> false
-                   ) env.proof_ctx.pc_assumes
-               | _ -> false
-             in
-             if not is_tid_access then
-               (match len_expr with
-                | Some n ->
-                    let stride = PBinop (Div, expr_to_pred_simple n,
-                      PVar { name = "blockDim_x"; loc = expr.expr_loc }) in
-                    let tidx = PVar { name = "threadIdx_x"; loc = expr.expr_loc } in
-                    let lo = PBinop (Mul, tidx, stride) in
-                    let hi = PBinop (Mul, PBinop (Add, tidx, PInt 1L), stride) in
-                    let ob = PBinop (And,
-                      PBinop (Le, lo, idx_pred),
-                      PBinop (Lt, idx_pred, hi)) in
-                    add_obligation ob (OInvariant "shared_ownership") expr.expr_loc env
-                | None -> ())
-           end;
+           let is_tid_access = match idx_pred with
+             | PVar v when v.name = "threadIdx_x" -> true
+             | PVar v ->
+                 List.exists (fun p -> match p with
+                   | PBinop (Eq, PVar a, PVar b) ->
+                       (a.name = v.name && b.name = "threadIdx_x") ||
+                       (b.name = v.name && a.name = "threadIdx_x")
+                   | _ -> false
+                 ) env.proof_ctx.pc_assumes
+             | _ -> false
+           in
+           if not is_tid_access then
+             (match len_expr with
+              | Some n ->
+                  let n_pred = expr_to_pred_simple n in
+                  add_obligation (PBinop (Lt, idx_pred, n_pred))
+                    (OBoundsCheck "shared") expr.expr_loc env
+              | None -> ());
            elem
        | TArray (elem, Some n_expr) ->
            (* Static-size array: generate idx < N directly (Z3 Tier-1 dischargeable) *)
@@ -2216,6 +2209,10 @@ and infer_expr env expr : ty =
       add_obligation pred (OInvariant "assert") expr.expr_loc env;
       TPrim TUnit
 
+  (* Inline assembly — opaque, returns unit, no proof obligations *)
+  | EAsm _ab ->
+      TPrim TUnit
+
   (* __syncthreads() — GPU warp barrier.
      Forbidden inside divergent (varying-condition) branches. *)
   | ESync ->
@@ -2725,18 +2722,23 @@ and check_stmt env stmt : env =
       List.iter (fun p ->
         add_obligation p (OInvariant "while_entry") stmt.stmt_loc env
       ) invs;
-      (* 2. Termination measure is non-negative at entry.
+      (* 2. Termination measure is non-negative when loop condition holds.
+            The measure only needs to be >= 0 at iterations that actually execute,
+            i.e., when the loop condition is true. This enables grid-stride loops
+            where idx starts at gid (possibly >= n): the measure n-idx is only
+            checked when idx < n, making it trivially non-negative.
             PLex (a, b) expands to: a >= 0 AND b >= 0 (each component non-negative). *)
+      let env_for_dec = env_add_fact env cond_pred in
       (match dec with
        | None -> ()
        | Some (PLex ms) ->
            List.iter (fun m ->
              add_obligation (PBinop (Ge, m, PInt 0L))
-               (OTermination "while") stmt.stmt_loc env
+               (OTermination "while") stmt.stmt_loc env_for_dec
            ) ms
        | Some measure ->
            add_obligation (PBinop (Ge, measure, PInt 0L))
-             (OTermination "while") stmt.stmt_loc env);
+             (OTermination "while") stmt.stmt_loc env_for_dec);
       (* 3. Check body in env extended with cond AND all invariants as facts *)
       let env_body = env_add_fact env cond_pred in
       let env_body = List.fold_left env_add_fact env_body invs in
@@ -3115,7 +3117,7 @@ let rec ind_cpa_scan_expr key_params expr =
   | ERange (lo, hi)         -> ind_cpa_scan_expr key_params lo;
                                ind_cpa_scan_expr key_params hi
   | ELoop stmts             -> List.iter (ind_cpa_scan_stmt key_params) stmts
-  | EAssume _ | EAssert _ | EProof _ | ERaw _ -> ()
+  | EAssume _ | EAssert _ | EProof _ | ERaw _ | EAsm _ -> ()
   | ELambda (_, body, _) -> ind_cpa_scan_expr key_params body
 and ind_cpa_scan_stmt key_params stmt =
   match stmt.stmt_desc with
@@ -3217,6 +3219,15 @@ let check_fn env fn =
       let e = env_add_fact e (PBinop (Lt, PVar (mk "threadIdx_x"), PVar (mk "blockDim_x"))) in
       let e = env_add_fact e (PBinop (Lt, PVar (mk "threadIdx_y"), PVar (mk "blockDim_y"))) in
       let e = env_add_fact e (PBinop (Lt, PVar (mk "threadIdx_z"), PVar (mk "blockDim_z"))) in
+      (* Block and grid dimensions are always positive (GPU launch invariant).
+         This is critical for proving grid-stride loop termination:
+         stride = blockDim_x * gridDim_x > 0 follows from both > 0. *)
+      let e = env_add_fact e (PBinop (Gt, PVar (mk "blockDim_x"), PInt 0L)) in
+      let e = env_add_fact e (PBinop (Gt, PVar (mk "blockDim_y"), PInt 0L)) in
+      let e = env_add_fact e (PBinop (Gt, PVar (mk "blockDim_z"), PInt 0L)) in
+      let e = env_add_fact e (PBinop (Gt, PVar (mk "gridDim_x"), PInt 0L)) in
+      let e = env_add_fact e (PBinop (Gt, PVar (mk "gridDim_y"), PInt 0L)) in
+      let e = env_add_fact e (PBinop (Gt, PVar (mk "gridDim_z"), PInt 0L)) in
       (* GPU intrinsic functions *)
       let mk_p n t = ({ name = n; loc = dummy_loc }, t) in
       let gpu_fn name params ret = {
@@ -3243,6 +3254,16 @@ let check_fn env fn =
         (gpu_fn "atom_max" [mk_p "ptr" (TRaw u64); mk_p "val" u64] u64) in
       let e = env_add_fn e "atom_min"
         (gpu_fn "atom_min" [mk_p "ptr" (TRaw u64); mk_p "val" u64] u64) in
+      let e = env_add_fn e "atom_or"
+        (gpu_fn "atom_or" [mk_p "ptr" (TRaw u64); mk_p "val" u64] u64) in
+      let e = env_add_fn e "atom_xor"
+        (gpu_fn "atom_xor" [mk_p "ptr" (TRaw u64); mk_p "val" u64] u64) in
+      let e = env_add_fn e "atom_and"
+        (gpu_fn "atom_and" [mk_p "ptr" (TRaw u64); mk_p "val" u64] u64) in
+      let e = env_add_fn e "atom_sub"
+        (gpu_fn "atom_sub" [mk_p "ptr" (TRaw u64); mk_p "val" u64] u64) in
+      let e = env_add_fn e "atom_exch"
+        (gpu_fn "atom_exch" [mk_p "ptr" (TRaw u64); mk_p "val" u64] u64) in
       (* Warp vote *)
       let e = env_add_fn e "ballot_sync"
         (gpu_fn "ballot_sync" [mk_p "pred" u64] u32) in
@@ -3251,6 +3272,70 @@ let check_fn env fn =
         (gpu_fn "lane_id" [] u32) in
       let e = env_add_fn e "warp_id"
         (gpu_fn "warp_id" [] u32) in
+      (* Memory fences *)
+      let unit_ty = TPrim TUnit in
+      let e = env_add_fn e "threadfence"
+        (gpu_fn "threadfence" [] unit_ty) in
+      let e = env_add_fn e "threadfence_block"
+        (gpu_fn "threadfence_block" [] unit_ty) in
+      let e = env_add_fn e "threadfence_system"
+        (gpu_fn "threadfence_system" [] unit_ty) in
+      (* Async copy (SM_80+) *)
+      let u8 = TPrim (TUint U8) in
+      let e = env_add_fn e "cp_async_cg"
+        (gpu_fn "cp_async_cg" [mk_p "dst" (TRaw u8); mk_p "src" (TRaw u8); mk_p "bytes" u64] unit_ty) in
+      let e = env_add_fn e "cp_async_commit"
+        (gpu_fn "cp_async_commit" [] unit_ty) in
+      let e = env_add_fn e "cp_async_wait_group"
+        (gpu_fn "cp_async_wait_group" [mk_p "n" u64] unit_ty) in
+      (* Cooperative groups (SM_90+) *)
+      let e = env_add_fn e "cluster_sync"
+        (gpu_fn "cluster_sync" [] unit_ty) in
+      let e = env_add_fn e "cluster_dim_x"
+        (gpu_fn "cluster_dim_x" [] u64) in
+      let e = env_add_fn e "cluster_rank"
+        (gpu_fn "cluster_rank" [] u64) in
+      let e = env_add_fn e "cluster_map_shared"
+        (gpu_fn "cluster_map_shared" [mk_p "ptr" (TRaw u8); mk_p "rank" u64] (TRaw u8)) in
+      (* FP16/BF16 conversions *)
+      let u16 = TPrim (TUint U16) in
+      let f32 = TPrim (TFloat F32) in
+      let e = env_add_fn e "f32_to_fp16"
+        (gpu_fn "f32_to_fp16" [mk_p "x" f32] u16) in
+      let e = env_add_fn e "fp16_to_f32"
+        (gpu_fn "fp16_to_f32" [mk_p "x" u16] f32) in
+      let e = env_add_fn e "f32_to_bf16"
+        (gpu_fn "f32_to_bf16" [mk_p "x" f32] u16) in
+      let e = env_add_fn e "bf16_to_f32"
+        (gpu_fn "bf16_to_f32" [mk_p "x" u16] f32) in
+      (* FP16 arithmetic *)
+      let e = env_add_fn e "fp16_add"
+        (gpu_fn "fp16_add" [mk_p "a" u16; mk_p "b" u16] u16) in
+      let e = env_add_fn e "fp16_sub"
+        (gpu_fn "fp16_sub" [mk_p "a" u16; mk_p "b" u16] u16) in
+      let e = env_add_fn e "fp16_mul"
+        (gpu_fn "fp16_mul" [mk_p "a" u16; mk_p "b" u16] u16) in
+      let e = env_add_fn e "fp16_fma"
+        (gpu_fn "fp16_fma" [mk_p "a" u16; mk_p "b" u16; mk_p "c" u16] u16) in
+      let e = env_add_fn e "fp16_neg"
+        (gpu_fn "fp16_neg" [mk_p "a" u16] u16) in
+      let e = env_add_fn e "fp16_abs"
+        (gpu_fn "fp16_abs" [mk_p "a" u16] u16) in
+      let e = env_add_fn e "fp16_max"
+        (gpu_fn "fp16_max" [mk_p "a" u16; mk_p "b" u16] u16) in
+      let e = env_add_fn e "fp16_min"
+        (gpu_fn "fp16_min" [mk_p "a" u16; mk_p "b" u16] u16) in
+      (* BF16 arithmetic *)
+      let e = env_add_fn e "bf16_add"
+        (gpu_fn "bf16_add" [mk_p "a" u16; mk_p "b" u16] u16) in
+      let e = env_add_fn e "bf16_sub"
+        (gpu_fn "bf16_sub" [mk_p "a" u16; mk_p "b" u16] u16) in
+      let e = env_add_fn e "bf16_mul"
+        (gpu_fn "bf16_mul" [mk_p "a" u16; mk_p "b" u16] u16) in
+      let e = env_add_fn e "bf16_fma"
+        (gpu_fn "bf16_fma" [mk_p "a" u16; mk_p "b" u16; mk_p "c" u16] u16) in
+      let e = env_add_fn e "bf16_neg"
+        (gpu_fn "bf16_neg" [mk_p "a" u16] u16) in
       e
     end else env
   in

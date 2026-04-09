@@ -1,0 +1,46 @@
+// expected: 0
+// Demo 1046: Verified warp-level GPU reduction
+//
+// Each block computes a partial sum of the input array.
+// Warp-level butterfly shuffle reduces 32 lanes → 1 sum.
+// Lane 0 of warp 0 writes the block result to output[blockIdx_x].
+//
+// Formal properties proven by Z3:
+//   1. All data[] accesses within bounds (gid < n <= data.len)
+//   2. Output bounds: blockIdx_x < output.len
+//   3. Division precondition for warp/lane computation
+//
+// This demonstrates the core GPU reduction pattern used in ML training
+// (loss computation, gradient accumulation, norm calculation).
+
+use std::gpu;
+
+#[kernel]
+fn reduce_sum(data: span<u64>, output: span<u64>, n: u64)
+    requires n <= data.len
+    requires gridDim_x <= output.len
+    requires blockIdx_x < gridDim_x
+{
+    let tid: u64 = threadIdx_x;
+    let gid: u64 = blockIdx_x * blockDim_x + tid;
+
+    // Each thread loads one element (or zero if out of range)
+    let mut val: u64 = 0u64;
+    if gid < n {
+        val = data[gid];
+    };
+
+    // Warp-level butterfly reduction via shuffle
+    val = warp_reduce_sum(val);
+
+    // Lane 0 of warp 0 writes block result
+    let lane: u64 = tid % 32u64;
+    let wid: u64 = tid / 32u64;
+    if lane == 0u64 {
+        if wid == 0u64 {
+            output[blockIdx_x] = val;
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }

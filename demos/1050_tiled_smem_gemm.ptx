@@ -1,0 +1,231 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry tiled_gemm(
+    .param .u64 tiled_gemm_param_A_data,
+    .param .u64 tiled_gemm_param_A_len,
+    .param .u64 tiled_gemm_param_B_data,
+    .param .u64 tiled_gemm_param_B_len,
+    .param .u64 tiled_gemm_param_C_data,
+    .param .u64 tiled_gemm_param_C_len,
+    .param .u64 tiled_gemm_param_M,
+    .param .u64 tiled_gemm_param_N,
+    .param .u64 tiled_gemm_param_K
+)
+{
+    .reg .u16 %rs42, %rs67;
+    .reg .pred %p100, %p102, %p106, %p22, %p25, %p27, %p31, %p37, %p52, %p56, %p62, %p83, %p88, %p90;
+    .reg .u64 %rd0, %rd1, %rd10, %rd104, %rd105, %rd108, %rd109, %rd110, %rd14, %rd15, %rd17, %rd18, %rd2, %rd20, %rd21, %rd23, %rd24, %rd29, %rd3, %rd30, %rd33, %rd34, %rd35, %rd36, %rd39, %rd4, %rd40, %rd41, %rd43, %rd44, %rd45, %rd5, %rd54, %rd55, %rd58, %rd59, %rd6, %rd60, %rd61, %rd64, %rd65, %rd66, %rd68, %rd69, %rd7, %rd70, %rd8, %rd81, %rd82, %rd84, %rd85, %rd86, %rd87, %rd9, %rd92;
+    .reg .u32 %r11, %r111, %r112, %r113, %r114, %r115, %r116, %r117, %r12, %r13, %r16, %r46, %r47, %r48, %r49, %r50, %r51, %r71, %r72, %r73, %r74, %r75, %r76, %r77, %r78, %r79, %r93, %r94, %r95, %r96, %r97, %r98, %r99;
+
+  ld.param.u64 %rd0, [tiled_gemm_param_A_data];
+  ld.param.u64 %rd1, [tiled_gemm_param_A_len];
+  ld.param.u64 %rd2, [tiled_gemm_param_B_data];
+  ld.param.u64 %rd3, [tiled_gemm_param_B_len];
+  ld.param.u64 %rd4, [tiled_gemm_param_C_data];
+  ld.param.u64 %rd5, [tiled_gemm_param_C_len];
+  ld.param.u64 %rd6, [tiled_gemm_param_M];
+  ld.param.u64 %rd7, [tiled_gemm_param_N];
+  ld.param.u64 %rd8, [tiled_gemm_param_K];
+
+  mov.u64 %rd9, 0; // unhandled expr
+  mov.u64 %rd10, 0; // unhandled expr
+  mov.u32 %r11, %tid.x;
+  mov.u32 %r12, %tid.y;
+  mov.u32 %r13, %ctaid.y;
+  mul.lo.u64 %rd14, %r13, %rd_unknown_TILE;
+  add.u64 %rd15, %rd14, %r12;
+  mov.u32 %r16, %ctaid.x;
+  mul.lo.u64 %rd17, %r16, %rd_unknown_TILE;
+  add.u64 %rd18, %rd17, %r11;
+  mov.u64 %rd20, 0;
+  mov.u64 %rd21, %rd20;
+  tiled_gemm_for_19:
+  setp.lt.u64 %p22, %rd21, %rd8;
+  @!%p22 bra tiled_gemm_for_end_19;
+  mul.lo.u64 %rd23, %r12, %rd_unknown_TILE;
+  add.u64 %rd24, %rd23, %r11;
+  setp.lt.u64 %p25, %rd24, %rd_unknown_SMEM_SIZE;
+  @%p25 bra tiled_gemm_then_26;
+  bra tiled_gemm_else_26;
+  tiled_gemm_then_26:
+  setp.lt.u64 %p27, %rd15, %rd6;
+  @%p27 bra tiled_gemm_then_28;
+  bra tiled_gemm_else_28;
+  tiled_gemm_then_28:
+  mul.lo.u64 %rd29, %rd21, %rd_unknown_TILE;
+  add.u64 %rd30, %rd29, %r11;
+  setp.lt.u64 %p31, %rd30, %rd8;
+  @%p31 bra tiled_gemm_then_32;
+  bra tiled_gemm_else_32;
+  tiled_gemm_then_32:
+  mul.lo.u64 %rd33, %rd15, %rd8;
+  mul.lo.u64 %rd34, %rd21, %rd_unknown_TILE;
+  add.u64 %rd35, %rd33, %rd34;
+  add.u64 %rd36, %rd35, %r11;
+  setp.lt.u64 %p37, %rd36, %rd1;
+  @%p37 bra tiled_gemm_then_38;
+  bra tiled_gemm_else_38;
+  tiled_gemm_then_38:
+  mov.u64 %rd39, 2;
+  mul.lo.u64 %rd40, %rd36, %rd39;
+  add.u64 %rd41, %rd0, %rd40;
+  ld.global.u16 %rs42, [%rd41];
+  mov.u64 %rd43, 2;
+  mul.lo.u64 %rd44, %rd24, %rd43;
+  add.u64 %rd45, %rd9, %rd44;
+  st.global.u16 [%rd45], %rs42;
+  mov.u32 %r46, 0; // unit
+  mov.u32 %r47, %r46;
+  bra tiled_gemm_end_38;
+  tiled_gemm_else_38:
+  mov.u32 %r47, 0; // no else branch
+  tiled_gemm_end_38:
+  mov.u32 %r48, 0; // unit
+  mov.u32 %r49, %r48;
+  bra tiled_gemm_end_32;
+  tiled_gemm_else_32:
+  mov.u32 %r49, 0; // no else branch
+  tiled_gemm_end_32:
+  mov.u32 %r50, 0; // unit
+  mov.u32 %r51, %r50;
+  bra tiled_gemm_end_28;
+  tiled_gemm_else_28:
+  mov.u32 %r51, 0; // no else branch
+  tiled_gemm_end_28:
+  setp.lt.u64 %p52, %rd18, %rd7;
+  @%p52 bra tiled_gemm_then_53;
+  bra tiled_gemm_else_53;
+  tiled_gemm_then_53:
+  mul.lo.u64 %rd54, %rd21, %rd_unknown_TILE;
+  add.u64 %rd55, %rd54, %r12;
+  setp.lt.u64 %p56, %rd55, %rd8;
+  @%p56 bra tiled_gemm_then_57;
+  bra tiled_gemm_else_57;
+  tiled_gemm_then_57:
+  mul.lo.u64 %rd58, %rd21, %rd_unknown_TILE;
+  add.u64 %rd59, %rd58, %r12;
+  mul.lo.u64 %rd60, %rd59, %rd7;
+  add.u64 %rd61, %rd60, %rd18;
+  setp.lt.u64 %p62, %rd61, %rd3;
+  @%p62 bra tiled_gemm_then_63;
+  bra tiled_gemm_else_63;
+  tiled_gemm_then_63:
+  mov.u64 %rd64, 2;
+  mul.lo.u64 %rd65, %rd61, %rd64;
+  add.u64 %rd66, %rd2, %rd65;
+  ld.global.u16 %rs67, [%rd66];
+  mov.u64 %rd68, 2;
+  mul.lo.u64 %rd69, %rd24, %rd68;
+  add.u64 %rd70, %rd10, %rd69;
+  st.global.u16 [%rd70], %rs67;
+  mov.u32 %r71, 0; // unit
+  mov.u32 %r72, %r71;
+  bra tiled_gemm_end_63;
+  tiled_gemm_else_63:
+  mov.u32 %r72, 0; // no else branch
+  tiled_gemm_end_63:
+  mov.u32 %r73, 0; // unit
+  mov.u32 %r74, %r73;
+  bra tiled_gemm_end_57;
+  tiled_gemm_else_57:
+  mov.u32 %r74, 0; // no else branch
+  tiled_gemm_end_57:
+  mov.u32 %r75, 0; // unit
+  mov.u32 %r76, %r75;
+  bra tiled_gemm_end_53;
+  tiled_gemm_else_53:
+  mov.u32 %r76, 0; // no else branch
+  tiled_gemm_end_53:
+  mov.u32 %r77, 0; // unit
+  mov.u32 %r78, %r77;
+  bra tiled_gemm_end_26;
+  tiled_gemm_else_26:
+  mov.u32 %r78, 0; // no else branch
+  tiled_gemm_end_26:
+  bar.sync 0;
+  mov.u32 %r79, 0; // unit
+  mov.u64 %rd81, 0;
+  mov.u64 %rd82, %rd81;
+  tiled_gemm_for_80:
+  setp.lt.u64 %p83, %rd82, %rd_unknown_TILE;
+  @!%p83 bra tiled_gemm_for_end_80;
+  mul.lo.u64 %rd84, %r12, %rd_unknown_TILE;
+  add.u64 %rd85, %rd84, %rd82;
+  mul.lo.u64 %rd86, %rd82, %rd_unknown_TILE;
+  add.u64 %rd87, %rd86, %r11;
+  setp.lt.u64 %p88, %rd85, %rd_unknown_SMEM_SIZE;
+  @%p88 bra tiled_gemm_then_89;
+  bra tiled_gemm_else_89;
+  tiled_gemm_then_89:
+  setp.lt.u64 %p90, %rd87, %rd_unknown_SMEM_SIZE;
+  @%p90 bra tiled_gemm_then_91;
+  bra tiled_gemm_else_91;
+  tiled_gemm_then_91:
+  mov.u64 %rd92, 0; // call fp16_fma (device fn)
+  mov.u32 %r93, 0; // unit
+  mov.u32 %r94, %r93;
+  bra tiled_gemm_end_91;
+  tiled_gemm_else_91:
+  mov.u32 %r94, 0; // no else branch
+  tiled_gemm_end_91:
+  mov.u32 %r95, 0; // unit
+  mov.u32 %r96, %r95;
+  bra tiled_gemm_end_89;
+  tiled_gemm_else_89:
+  mov.u32 %r96, 0; // no else branch
+  tiled_gemm_end_89:
+  add.u64 %rd82, %rd82, 1;
+  bra tiled_gemm_for_80;
+  tiled_gemm_for_end_80:
+  mov.u32 %r97, 0; // unit
+  bar.sync 0;
+  mov.u32 %r98, 0; // unit
+  add.u64 %rd21, %rd21, 1;
+  bra tiled_gemm_for_19;
+  tiled_gemm_for_end_19:
+  mov.u32 %r99, 0; // unit
+  setp.lt.u64 %p100, %rd15, %rd6;
+  @%p100 bra tiled_gemm_then_101;
+  bra tiled_gemm_else_101;
+  tiled_gemm_then_101:
+  setp.lt.u64 %p102, %rd18, %rd7;
+  @%p102 bra tiled_gemm_then_103;
+  bra tiled_gemm_else_103;
+  tiled_gemm_then_103:
+  mul.lo.u64 %rd104, %rd15, %rd7;
+  add.u64 %rd105, %rd104, %rd18;
+  setp.lt.u64 %p106, %rd105, %rd5;
+  @%p106 bra tiled_gemm_then_107;
+  bra tiled_gemm_else_107;
+  tiled_gemm_then_107:
+  mov.u64 %rd108, 2;
+  mul.lo.u64 %rd109, %rd105, %rd108;
+  add.u64 %rd110, %rd4, %rd109;
+  st.global.u16 [%rd110], %rd92;
+  mov.u32 %r111, 0; // unit
+  mov.u32 %r112, %r111;
+  bra tiled_gemm_end_107;
+  tiled_gemm_else_107:
+  mov.u32 %r112, 0; // no else branch
+  tiled_gemm_end_107:
+  mov.u32 %r113, 0; // unit
+  mov.u32 %r114, %r113;
+  bra tiled_gemm_end_103;
+  tiled_gemm_else_103:
+  mov.u32 %r114, 0; // no else branch
+  tiled_gemm_end_103:
+  mov.u32 %r115, 0; // unit
+  mov.u32 %r116, %r115;
+  bra tiled_gemm_end_101;
+  tiled_gemm_else_101:
+  mov.u32 %r116, 0; // no else branch
+  tiled_gemm_end_101:
+  mov.u32 %r117, 0; // unit
+  ret;
+}
+

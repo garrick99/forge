@@ -1,0 +1,101 @@
+// std/tensor_core.fg — Tensor core MMA intrinsics for SM_120
+//
+// Include with:  use std::tensor_core;
+//
+// Warp-level matrix multiply-accumulate (MMA) operations using
+// NVIDIA tensor cores. Each operation computes D = A * B + C
+// where A, B are stored in registers across warp lanes.
+//
+// For SM_120 (Blackwell) QMMA (FP4×FP4→BF16), see demo 1043.
+// For FP16/BF16 types, see std/fp16.fg.
+// For TMA tile loading, see std/tma.fg.
+
+// ---- SM_120 QMMA (FP4 × FP4 → BF16) --------------------------------------
+
+// Quantized warp-group MMA: FP4 inputs with E8M0 scales, BF16 accumulator.
+// A: FP4 tile in shared memory (BLOCK_M × TILE_K / 2 bytes, nibble-packed)
+// A_scale: E8M0 scales in shared memory
+// B: FP4 tile in shared memory (TILE_K × BLOCK_N / 2 bytes)
+// B_scale: E8M0 scales in shared memory
+// acc: BF16 accumulator tile in registers (span<u16>, BLOCK_M × BLOCK_N)
+extern fn qmma_f4f4bf16(
+    smem_a: raw<u8>, smem_a_scale: raw<u8>,
+    smem_b: raw<u8>, smem_b_scale: raw<u8>,
+    acc: span<u16>
+) = "forge_gpu";
+
+// ---- SM_90+ HMMA (FP16 × FP16 → F32) --------------------------------------
+
+// Warp MMA: m16n8k16 shape.
+// A: FP16 fragment (4 u16 per thread, 8 threads × 2 = 16 rows × 16 cols)
+// B: FP16 fragment (2 u16 per thread)
+// C/D: F32 accumulator (4 f32 per thread)
+extern fn mma_m16n8k16_fp16(
+    a: span<u16>,
+    b: span<u16>,
+    c: span<f32>
+) = "forge_gpu";
+
+// ---- SM_90+ HMMA (BF16 × BF16 → F32) --------------------------------------
+
+// Warp MMA: m16n8k16 shape with BF16 inputs.
+extern fn mma_m16n8k16_bf16(
+    a: span<u16>,
+    b: span<u16>,
+    c: span<f32>
+) = "forge_gpu";
+
+// ---- SM_90+ HMMA (TF32 × TF32 → F32) --------------------------------------
+
+// Warp MMA: m16n8k8 shape with TensorFloat32 inputs.
+// TF32 uses f32 storage but only 10 mantissa bits (19-bit total).
+// Hardware truncates f32 inputs to TF32 precision automatically.
+extern fn mma_m16n8k8_tf32(
+    a: span<f32>,
+    b: span<f32>,
+    c: span<f32>
+) = "forge_gpu";
+
+// ---- SM_120 HMMA (FP8 × FP8 → F32) ----------------------------------------
+
+// Warp MMA: m16n8k32 shape with FP8 (E4M3) inputs.
+// A, B stored as u8 (FP8 E4M3 encoding).
+extern fn mma_m16n8k32_e4m3(
+    a: span<u8>,
+    b: span<u8>,
+    c: span<f32>
+) = "forge_gpu";
+
+// Warp MMA: m16n8k32 shape with FP8 (E5M2) inputs.
+extern fn mma_m16n8k32_e5m2(
+    a: span<u8>,
+    b: span<u8>,
+    c: span<f32>
+) = "forge_gpu";
+
+// ---- Verified tile-size helpers --------------------------------------------
+
+// Compute number of elements in an MMA tile.
+fn mma_tile_elements(m: u64, n: u64) -> u64
+    ensures result == m * n
+{
+    m * n
+}
+
+// Compute A-fragment size in bytes for fp16 m16n8k16.
+// Each thread holds 8 fp16 values = 16 bytes.
+fn mma_fp16_a_frag_bytes() -> u64
+    ensures result == 16u64
+{
+    16u64
+}
+
+// Compute shared memory requirement for a tiled GEMM.
+// A tile: M×K elements, B tile: K×N elements.
+fn tile_smem_bytes_fp16(tile_m: u64, tile_k: u64, tile_n: u64) -> u64
+    ensures result == (tile_m * tile_k + tile_k * tile_n) * 2u64
+{
+    (tile_m * tile_k + tile_k * tile_n) * 2u64
+}
+
+fn main() -> u64 { 0u64 }

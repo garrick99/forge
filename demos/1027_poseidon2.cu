@@ -2,6 +2,8 @@
    All proof obligations discharged. This code is correct by construction. */
 
 #include <cuda_runtime.h>
+#include <cuda_fp16.h>
+#include <cuda_bf16.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -45,6 +47,18 @@ uint64_t atom_max(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
 
 uint64_t atom_min(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
 
+uint64_t shfl_up_sync(uint64_t val, uint64_t delta, uint64_t width);  /* extern: forge_gpu */
+
+uint64_t atom_or(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
+
+uint64_t atom_xor(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
+
+uint64_t atom_and(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
+
+uint64_t atom_sub(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
+
+uint64_t atom_exch(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
+
 uint64_t ballot_sync(uint64_t pred);  /* extern: forge_gpu */
 
 uint64_t lane_id(void);  /* extern: forge_gpu */
@@ -62,7 +76,7 @@ uint64_t grid_stride_step(uint64_t block_dim __attribute__((unused)), uint64_t g
 int main();
 __device__ uint32_t m31_add(uint32_t a __attribute__((unused)), uint32_t b __attribute__((unused)));
 uint32_t m31_sub(uint32_t a __attribute__((unused)), uint32_t b __attribute__((unused)));
-uint32_t m31_mul(uint32_t a __attribute__((unused)), uint32_t b __attribute__((unused)));
+__device__ uint32_t m31_mul(uint32_t a __attribute__((unused)), uint32_t b __attribute__((unused)));
 uint32_t m31_neg(uint32_t a __attribute__((unused)));
 uint32_t m31_double(uint32_t a __attribute__((unused)));
 uint32_t cm31_mul_re(uint32_t a_re __attribute__((unused)), uint32_t a_im __attribute__((unused)), uint32_t b_re __attribute__((unused)), uint32_t b_im __attribute__((unused)));
@@ -199,7 +213,7 @@ uint32_t m31_sub(uint32_t a __attribute__((unused)), uint32_t b __attribute__((u
   return ((uint32_t)r);
 }
 
-uint32_t m31_mul(uint32_t a __attribute__((unused)), uint32_t b __attribute__((unused))) {
+__device__ uint32_t m31_mul(uint32_t a __attribute__((unused)), uint32_t b __attribute__((unused))) {
   uint64_t prod __attribute__((unused)) = (((uint64_t)a) * ((uint64_t)b));
   uint64_t p __attribute__((unused)) = ((uint64_t)M31_P);
   uint64_t r __attribute__((unused)) = (prod % p);

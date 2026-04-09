@@ -2,6 +2,8 @@
    All proof obligations discharged. This code is correct by construction. */
 
 #include <cuda_runtime.h>
+#include <cuda_fp16.h>
+#include <cuda_bf16.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -35,19 +37,31 @@ typedef uint64_t (*forge_fn__ret_u64_t)(void);
 
 uint64_t shfl_down_sync(uint64_t val, uint64_t delta, uint64_t width);  /* extern: forge_gpu */
 
-uint64_t shfl_xor_sync(uint64_t val, uint64_t mask, uint64_t width);  /* extern: forge_gpu */
+__device__ uint64_t shfl_xor_sync(uint64_t val, uint64_t mask, uint64_t width);  /* extern: forge_gpu */
 
-uint64_t atom_add(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
+__device__ uint64_t atom_add(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
 
 uint64_t atom_cas(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
 
-uint64_t atom_max(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
+__device__ uint64_t atom_max(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
 
 uint64_t atom_min(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
 
+uint64_t shfl_up_sync(uint64_t val, uint64_t delta, uint64_t width);  /* extern: forge_gpu */
+
+uint64_t atom_or(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
+
+uint64_t atom_xor(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
+
+uint64_t atom_and(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
+
+uint64_t atom_sub(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
+
+uint64_t atom_exch(uint64_t* ptr, uint64_t val);  /* extern: forge_gpu */
+
 uint64_t ballot_sync(uint64_t pred);  /* extern: forge_gpu */
 
-uint64_t lane_id(void);  /* extern: forge_gpu */
+__device__ uint64_t lane_id(void);  /* extern: forge_gpu */
 
 uint64_t warp_id(void);  /* extern: forge_gpu */
 

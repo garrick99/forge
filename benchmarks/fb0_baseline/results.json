@@ -1,0 +1,62 @@
+[
+  {
+    "name": "reduce_sum",
+    "forge_compiled": true,
+    "forge_registers": 18,
+    "forge_instructions": 169,
+    "nvcc_compiled": true,
+    "nvcc_registers": 18,
+    "nvcc_instructions": 169,
+    "proof_total": 3,
+    "proof_assumes": 0,
+    "properties": []
+  },
+  {
+    "name": "fp16_gemm",
+    "forge_compiled": true,
+    "forge_registers": 40,
+    "forge_instructions": 460,
+    "nvcc_compiled": true,
+    "nvcc_registers": 40,
+    "nvcc_instructions": 460,
+    "proof_total": 5,
+    "proof_assumes": 0,
+    "properties": []
+  },
+  {
+    "name": "conv2d",
+    "forge_compiled": true,
+    "forge_registers": 34,
+    "forge_instructions": 342,
+    "nvcc_compiled": true,
+    "nvcc_registers": 34,
+    "nvcc_instructions": 342,
+    "proof_total": 7,
+    "proof_assumes": 0,
+    "properties": []
+  },
+  {
+    "name": "flash_attention",
+    "forge_compiled": true,
+    "forge_registers": 40,
+    "forge_instructions": 895,
+    "nvcc_compiled": true,
+    "nvcc_registers": 40,
+    "nvcc_instructions": 895,
+    "proof_total": 18,
+    "proof_assumes": 0,
+    "properties": []
+  },
+  {
+    "name": "tiled_smem_gemm",
+    "forge_compiled": true,
+    "forge_registers": 48,
+    "forge_instructions": 374,
+    "nvcc_compiled": true,
+    "nvcc_registers": 48,
+    "nvcc_instructions": 374,
+    "proof_total": 11,
+    "proof_assumes": 0,
+    "properties": []
+  }
+]

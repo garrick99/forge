@@ -92,6 +92,7 @@ type token = Parser.token =
   | FORALL
   | FOR
   | FN
+  | FLOAT_SUFF of (float * string)
   | FLOAT of float
   | FATARROW
   | FALSE
@@ -123,6 +124,7 @@ type token = Parser.token =
   | AUTO
   | AT
   | ASSUME
+  | ASM
   | AS
   | ARROW
   | BACKSLASH

@@ -1,0 +1,27 @@
+// std/coop_groups.fg — Cooperative groups intrinsics (SM_90+)
+//
+// Include with:  use std::coop_groups;
+//
+// Cluster-level primitives for SM_90 (Hopper) and SM_120 (Blackwell).
+// A cluster is a group of thread blocks that can synchronize and share
+// distributed shared memory.
+//
+// Requires cooperative launch: kernel must be launched with
+// cudaLaunchCooperativeKernel or equivalent cluster-enabled API.
+//
+
+// Synchronize all thread blocks in the cluster.
+// Equivalent to __cluster_sync() — blocks until all cluster members arrive.
+extern fn cluster_sync() = "forge_gpu";
+
+// Number of thread blocks in the cluster (X dimension).
+extern fn cluster_dim_x() -> u64 = "forge_gpu";
+
+// This block's rank within the cluster (0..cluster_dim_x-1).
+extern fn cluster_rank() -> u64 = "forge_gpu";
+
+// Map a shared memory pointer from another block in the cluster
+// to a local address. Enables distributed shared memory (DSMEM).
+extern fn cluster_map_shared(remote_ptr: raw<u8>, target_rank: u64) -> raw<u8> = "forge_gpu";
+
+fn main() -> u64 { 0u64 }

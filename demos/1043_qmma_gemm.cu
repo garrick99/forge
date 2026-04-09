@@ -2,6 +2,8 @@
    All proof obligations discharged. This code is correct by construction. */
 
 #include <cuda_runtime.h>
+#include <cuda_fp16.h>
+#include <cuda_bf16.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -37,25 +39,25 @@ typedef void (*forge_fn_ptr_u8_ptr_u8_ptr_u64_u64_u64_ret_unit_t)(uint8_t*, uint
 typedef void (*forge_fn_ptr_u8_ptr_u8_u64_u64_ret_unit_t)(uint8_t*, uint8_t*, uint64_t, uint64_t);
 typedef void (*forge_fn_ptr_u8_ptr_u8_ptr_u8_ptr_u8_span_u32_ret_unit_t)(uint8_t*, uint8_t*, uint8_t*, uint8_t*, forge_span_u32_t);
 
-void mbarrier_init(uint64_t* bar, uint64_t expect);  /* extern: forge_gpu */
+__device__ void mbarrier_init(uint64_t* bar, uint64_t expect);  /* extern: forge_gpu */
 
-uint64_t mbarrier_arrive_tx(uint64_t* bar, uint64_t tx_bytes);  /* extern: forge_gpu */
+__device__ uint64_t mbarrier_arrive_tx(uint64_t* bar, uint64_t tx_bytes);  /* extern: forge_gpu */
 
 _Bool mbarrier_try_wait(uint64_t* bar, uint64_t phase);  /* extern: forge_gpu */
 
-void fence_proxy_async(void);  /* extern: forge_gpu */
+__device__ void fence_proxy_async(void);  /* extern: forge_gpu */
 
 void tma_store_fence(void);  /* extern: forge_gpu */
 
 void tma_load_1d(uint8_t* smem_dst, uint8_t* tma_desc, uint64_t* bar, uint64_t c0);  /* extern: forge_gpu */
 
-void tma_load_2d(uint8_t* smem_dst, uint8_t* tma_desc, uint64_t* bar, uint64_t c0, uint64_t c1);  /* extern: forge_gpu */
+__device__ void tma_load_2d(uint8_t* smem_dst, uint8_t* tma_desc, uint64_t* bar, uint64_t c0, uint64_t c1);  /* extern: forge_gpu */
 
 void tma_store_2d(uint8_t* smem_src, uint8_t* tma_desc, uint64_t c0, uint64_t c1);  /* extern: forge_gpu */
 
-void qmma_f4f4bf16(uint8_t* smem_a, uint8_t* smem_as, uint8_t* smem_b, uint8_t* smem_bs, forge_span_u32_t acc);  /* extern: forge_gpu */
+__device__ void qmma_f4f4bf16(uint8_t* smem_a, uint8_t* smem_as, uint8_t* smem_b, uint8_t* smem_bs, forge_span_u32_t acc);  /* extern: forge_gpu */
 
-void wait_mbar(uint64_t* bar, uint64_t phase);  /* extern: forge_gpu */
+__device__ void wait_mbar(uint64_t* bar, uint64_t phase);  /* extern: forge_gpu */
 
 static const uint64_t BLOCK_M = 64ULL;
 

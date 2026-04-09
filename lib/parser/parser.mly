@@ -15,6 +15,7 @@ open Lexing
 %token <int64>           INT
 %token <int64 * string>  INT_SUFF   (* 42u32, 100i64 *)
 %token <float>  FLOAT
+%token <float * string>  FLOAT_SUFF   (* 0.0f32, 1.5f64 *)
 %token <string> STRING
 %token <string> IDENT
 
@@ -30,6 +31,7 @@ open Lexing
 %token REQUIRES ENSURES DECREASES INVARIANT
 %token PROOF ASSUME ASSERT LEMMA WITNESS BY AUTO AXIOM SYMM TRANS INDUCTION
 %token RAW FORALL EXISTS OLD RESULT
+%token ASM
 
 (* Linearity *)
 %token AS
@@ -275,10 +277,13 @@ struct_def:
       {
         sd_name   = name;
         sd_params = params;
-        sd_fields = fields;
+        sd_fields = List.map (fun (n, t, _bits) -> (n, t)) fields;
         sd_invars = invars;
         sd_is_union = false;
         sd_is_packed = List.exists (fun a -> a.attr_name = "packed") attrs;
+        sd_bitwidths = List.filter_map (fun (name, _ty, bits) ->
+          match bits with Some b -> Some (name.name, b) | None -> None
+        ) fields;
       }
     }
 
@@ -291,19 +296,24 @@ union_def:
       {
         sd_name   = name;
         sd_params = params;
-        sd_fields = fields;
+        sd_fields = List.map (fun (n, t, _bits) -> (n, t)) fields;
         sd_invars = [];
         sd_is_union = true;
         sd_is_packed = false;
+        sd_bitwidths = [];
       }
     }
 
 
 struct_field:
+  | name = ident COLON t = ty COLON bits = INT COMMA
+    { (name, t, Some (Int64.to_int bits)) }
   | name = ident COLON t = ty COMMA
-    { (name, t) }
+    { (name, t, None) }
+  | name = ident COLON t = ty COLON bits = INT
+    { (name, t, Some (Int64.to_int bits)) }
   | name = ident COLON t = ty
-    { (name, t) }
+    { (name, t, None) }
 
 invariant_clause:
   | INVARIANT p = pred SEMI { p }
@@ -620,6 +630,7 @@ pred:
   | ns = INT_SUFF     { let (n, _) = ns in PInt n }
   (* Float literals in pred position — emitted as Real in SMT *)
   | f = FLOAT         { PFloat f }
+  | fs = FLOAT_SUFF   { let (f, _) = fs in PFloat f }
   | name = ident LPAREN args = separated_list(COMMA, pred) RPAREN
     { PApp (name, args) }
   | name = ident
@@ -742,6 +753,7 @@ expr:
   | e = raw_expr      { e }
   | e = assume_expr   { e }
   | e = assert_expr   { e }
+  | e = asm_expr      { e }
   | e = return_expr   { e }
 
   (* __syncthreads() — GPU warp barrier *)
@@ -775,6 +787,10 @@ atom_expr:
     { let (n, s) = ns in mk_expr (ELit (LInt (n, Some (prim_of_suffix s)))) $startpos }
   | f = FLOAT
     { mk_expr (ELit (LFloat (f, None))) $startpos }
+  | fs = FLOAT_SUFF
+    { let (f, s) = fs in
+      let w = match s with "f32" -> Some F32 | "f64" -> Some F64 | _ -> None in
+      mk_expr (ELit (LFloat (f, w))) $startpos }
   | s = STRING
     { mk_expr (ELit (LStr s)) $startpos }
   | TRUE
@@ -1053,6 +1069,56 @@ assume_expr:
 assert_expr:
   | ASSERT LPAREN p = pred RPAREN ctx = option(STRING)
     { mk_expr (EAssert (p, ctx)) $startpos }
+
+(* Inline assembly (GCC-style):                                        *)
+(*   asm("template")                                  — no operands    *)
+(*   asm("template" : "=r"(out) : "r"(in1), "r"(in2))— with operands  *)
+(*   asm("template" : "=r"(out) : "r"(in) : "memory") — with clobbers *)
+asm_expr:
+  | ASM LPAREN tmpl = STRING RPAREN
+    { let loc = loc_of_pos $startpos in
+      mk_expr (EAsm {
+        asm_template = tmpl;
+        asm_outputs = []; asm_inputs = []; asm_clobbers = [];
+        asm_loc = loc;
+      }) $startpos }
+  | ASM LPAREN tmpl = STRING
+      COLON outs = separated_list(COMMA, asm_operand)
+      COLON ins = separated_list(COMMA, asm_operand)
+    RPAREN
+    { let loc = loc_of_pos $startpos in
+      let out_list = List.filter_map (fun (c, e) ->
+        match e.expr_desc with
+        | EVar id -> Some (c, id)
+        | _ -> None) outs in
+      mk_expr (EAsm {
+        asm_template = tmpl;
+        asm_outputs = out_list;
+        asm_inputs = ins;
+        asm_clobbers = [];
+        asm_loc = loc;
+      }) $startpos }
+  | ASM LPAREN tmpl = STRING
+      COLON outs = separated_list(COMMA, asm_operand)
+      COLON ins = separated_list(COMMA, asm_operand)
+      COLON clobs = separated_list(COMMA, STRING)
+    RPAREN
+    { let loc = loc_of_pos $startpos in
+      let out_list = List.filter_map (fun (c, e) ->
+        match e.expr_desc with
+        | EVar id -> Some (c, id)
+        | _ -> None) outs in
+      mk_expr (EAsm {
+        asm_template = tmpl;
+        asm_outputs = out_list;
+        asm_inputs = ins;
+        asm_clobbers = clobs;
+        asm_loc = loc;
+      }) $startpos }
+
+asm_operand:
+  | e = ident EQ c = STRING
+    { (c, mk_expr (EVar e) $startpos) }
 
 (* ------------------------------------------------------------------ *)
 (* Statements                                                           *)

@@ -1,0 +1,61 @@
+// expected: 0
+// Demo 1047: Verified FP16 GEMM kernel (naive, no shared memory)
+//
+// Matrix multiplication: C[M×N] = A[M×K] × B[K×N]
+// All data in FP16 (u16 wrappers). Accumulation via fp16_fma.
+//
+// Each thread computes one output element.
+//
+// Formal properties proven by Z3:
+//   1. All A[], B[], C[] accesses within bounds
+//   2. K-loop termination
+//   3. Row/column bounds from grid dimensions
+//
+// Demonstrates: fp16 stdlib, tiled output, mixed-precision pattern.
+
+use std::fp16;
+
+#[kernel]
+fn fp16_gemm(
+    A: span<u16>, B: span<u16>, C: span<u16>,
+    M: u64, N: u64, K: u64
+)
+    requires M * K <= A.len
+    requires K * N <= B.len
+    requires M * N <= C.len
+    requires K > 0u64
+    requires blockIdx_x < gridDim_x
+    requires blockIdx_y < gridDim_y
+{
+    let row: u64 = blockIdx_y * blockDim_y + threadIdx_y;
+    let col: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+
+    if row < M {
+        if col < N {
+            let mut acc: u16 = FP16_ZERO;
+
+            for k in 0u64..K
+                invariant k <= K
+            {
+                let a_idx: u64 = row * K + k;
+                let b_idx: u64 = k * N + col;
+
+                // Bounds are proven from requires: row < M, k < K, col < N
+                if a_idx < A.len {
+                    if b_idx < B.len {
+                        let a_val: u16 = A[a_idx];
+                        let b_val: u16 = B[b_idx];
+                        acc = fp16_fma(a_val, b_val, acc);
+                    };
+                };
+            };
+
+            let c_idx: u64 = row * N + col;
+            if c_idx < C.len {
+                C[c_idx] = acc;
+            };
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }

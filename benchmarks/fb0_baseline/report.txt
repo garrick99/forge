@@ -1,0 +1,106 @@
+================================================================================
+  ForgeBench — Proof-to-Performance Comparison Report
+  GPU: RTX 5090 (SM_120)  |  CUDA: 13.2  |  Date: 2026-04-09
+================================================================================
+
+  Kernel: reduce_sum
+  ────────────────────────────────────────────────────────────
+  Forge (open stack):
+    Registers:    18
+    Instructions: 169
+    Verified:     YES (3 proofs, 0 assumes)
+
+  nvcc (NVIDIA sm_120):
+    Registers:    18
+    Instructions: 169
+    Verified:     NO
+
+  Delta (nvcc - forge):
+    Registers:    0 (tie)
+    Instructions: 0 (tie)
+
+
+  Kernel: fp16_gemm
+  ────────────────────────────────────────────────────────────
+  Forge (open stack):
+    Registers:    40
+    Instructions: 460
+    Verified:     YES (5 proofs, 0 assumes)
+
+  nvcc (NVIDIA sm_120):
+    Registers:    40
+    Instructions: 460
+    Verified:     NO
+
+  Delta (nvcc - forge):
+    Registers:    0 (tie)
+    Instructions: 0 (tie)
+
+
+  Kernel: conv2d
+  ────────────────────────────────────────────────────────────
+  Forge (open stack):
+    Registers:    34
+    Instructions: 342
+    Verified:     YES (7 proofs, 0 assumes)
+
+  nvcc (NVIDIA sm_120):
+    Registers:    34
+    Instructions: 342
+    Verified:     NO
+
+  Delta (nvcc - forge):
+    Registers:    0 (tie)
+    Instructions: 0 (tie)
+
+
+  Kernel: flash_attention
+  ────────────────────────────────────────────────────────────
+  Forge (open stack):
+    Registers:    40
+    Instructions: 895
+    Verified:     YES (18 proofs, 0 assumes)
+
+  nvcc (NVIDIA sm_120):
+    Registers:    40
+    Instructions: 895
+    Verified:     NO
+
+  Delta (nvcc - forge):
+    Registers:    0 (tie)
+    Instructions: 0 (tie)
+
+
+  Kernel: tiled_smem_gemm
+  ────────────────────────────────────────────────────────────
+  Forge (open stack):
+    Registers:    48
+    Instructions: 374
+    Verified:     YES (11 proofs, 0 assumes)
+
+  nvcc (NVIDIA sm_120):
+    Registers:    48
+    Instructions: 374
+    Verified:     NO
+
+  Delta (nvcc - forge):
+    Registers:    0 (tie)
+    Instructions: 0 (tie)
+
+
+  SUMMARY
+  ────────────────────────────────────────────────────────────────────────
+  Kernel                 Forge Regs  nvcc Regs  Forge Inst  nvcc Inst  Proofs
+  ────────────────────────────────────────────────────────────────────────
+  reduce_sum                     18         18         169        169       3
+  fp16_gemm                      40         40         460        460       5
+  conv2d                         34         34         342        342       7
+  flash_attention                40         40         895        895      18
+  tiled_smem_gemm                48         48         374        374      11
+  ────────────────────────────────────────────────────────────────────────
+
+  Total proofs discharged: 44 (0 assumes)
+  Register wins (forge < nvcc): 0/5
+  Instruction wins (forge < nvcc): 0/5
+
+================================================================================

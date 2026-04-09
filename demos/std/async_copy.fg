@@ -1,0 +1,40 @@
+// std/async_copy.fg — Asynchronous copy intrinsics (SM_80+)
+//
+// Include with:  use std::async_copy;
+//
+// cp.async provides hardware-accelerated global→shared memory copies
+// that bypass the register file. Available on Ampere (SM_80) and later.
+// For structured tensor copies on SM_90+, use std::tma instead.
+//
+// Canonical usage pattern (double-buffered tile prefetch):
+//
+//   cp_async_cg(smem_ptr, gmem_ptr, 16u64);  // 16-byte copy
+//   cp_async_commit();                         // commit group
+//   cp_async_wait_group(0u64);                 // wait for all groups
+//   syncthreads();
+//   // ... use smem data ...
+//
+
+// Asynchronous global → shared memory copy (cache-global policy).
+// Copies `bytes` bytes from src (global) to dst (shared).
+// bytes must be 4, 8, or 16.
+extern fn cp_async_cg(dst: raw<u8>, src: raw<u8>, bytes: u64) = "forge_gpu";
+
+// Commit outstanding cp.async operations into a group.
+extern fn cp_async_commit() = "forge_gpu";
+
+// Wait until at most `n` uncommitted groups remain in flight.
+// cp_async_wait_group(0) waits for all outstanding copies.
+extern fn cp_async_wait_group(n: u64) = "forge_gpu";
+
+// ---- Verified helper -------------------------------------------------------
+
+// Issue a tile-sized async copy with proven capacity check.
+// Requires: destination shared memory buffer has at least `bytes` capacity.
+fn cp_async_tile(dst: raw<u8>, src: raw<u8>, bytes: u64, dst_cap: u64)
+    requires dst_cap >= bytes
+{
+    cp_async_cg(dst, src, bytes);
+}
+
+fn main() -> u64 { 0u64 }

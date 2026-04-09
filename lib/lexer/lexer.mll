@@ -50,6 +50,7 @@ let kw_table = Hashtbl.of_seq @@ List.to_seq [
   "trans",      TRANS;
   "induction",  INDUCTION;
   "raw",          RAW;
+  "asm",          ASM;
   "span",         SPAN;
   "shared",       SHARED;
   "uniform",      UNIFORM;
@@ -151,7 +152,7 @@ rule token = parse
   | ("0x" hex+ as n) (int_type_suf as s)    { INT_SUFF (parse_int n lexbuf, s) }
 
   (* Typed float literals — e.g. 0.0f32, 1.5f64 *)
-  | (float_lit as f) (float_type_suf as _s) { FLOAT (float_of_string f) }
+  | (float_lit as f) (float_type_suf as s) { FLOAT_SUFF (float_of_string f, s) }
 
   (* Plain literals *)
   | int_lit as n   { INT (parse_int n lexbuf) }

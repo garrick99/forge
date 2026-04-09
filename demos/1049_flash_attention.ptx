@@ -1,0 +1,373 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry flash_attention(
+    .param .u64 flash_attention_param_Q_data,
+    .param .u64 flash_attention_param_Q_len,
+    .param .u64 flash_attention_param_K_data,
+    .param .u64 flash_attention_param_K_len,
+    .param .u64 flash_attention_param_V_data,
+    .param .u64 flash_attention_param_V_len,
+    .param .u64 flash_attention_param_O_data,
+    .param .u64 flash_attention_param_O_len,
+    .param .u64 flash_attention_param_seq_len,
+    .param .u64 flash_attention_param_d
+)
+{
+    .reg .pred %p104, %p117, %p122, %p136, %p139, %p144, %p15, %p155, %p160, %p171, %p176, %p187, %p192, %p27, %p32, %p37, %p39, %p56, %p63, %p68, %p81, %p86, %p99;
+    .reg .u64 %rd0, %rd1, %rd101, %rd102, %rd103, %rd106, %rd107, %rd108, %rd109, %rd110, %rd111, %rd116, %rd119, %rd120, %rd121, %rd124, %rd125, %rd126, %rd127, %rd128, %rd129, %rd135, %rd138, %rd141, %rd142, %rd143, %rd146, %rd147, %rd148, %rd149, %rd154, %rd157, %rd158, %rd159, %rd16, %rd162, %rd163, %rd164, %rd165, %rd170, %rd173, %rd174, %rd175, %rd178, %rd179, %rd18, %rd180, %rd181, %rd186, %rd189, %rd19, %rd190, %rd191, %rd194, %rd195, %rd196, %rd197, %rd2, %rd20, %rd21, %rd22, %rd23, %rd25, %rd26, %rd28, %rd3, %rd30, %rd31, %rd33, %rd34, %rd35, %rd36, %rd4, %rd41, %rd42, %rd43, %rd44, %rd45, %rd46, %rd47, %rd48, %rd49, %rd5, %rd50, %rd6, %rd60, %rd61, %rd62, %rd65, %rd66, %rd67, %rd7, %rd70, %rd71, %rd72, %rd73, %rd74, %rd75, %rd8, %rd80, %rd83, %rd84, %rd85, %rd88, %rd89, %rd9, %rd90, %rd91, %rd92, %rd93, %rd98;
+    .reg .u32 %r10, %r11, %r112, %r113, %r114, %r115, %r12, %r13, %r130, %r131, %r132, %r133, %r134, %r14, %r150, %r151, %r152, %r153, %r166, %r167, %r168, %r169, %r182, %r183, %r184, %r185, %r198, %r199, %r200, %r201, %r202, %r203, %r204, %r205, %r206, %r51, %r52, %r53, %r54, %r55, %r58, %r59, %r76, %r77, %r78, %r79, %r94, %r95, %r96, %r97;
+
+  ld.param.u64 %rd0, [flash_attention_param_Q_data];
+  ld.param.u64 %rd1, [flash_attention_param_Q_len];
+  ld.param.u64 %rd2, [flash_attention_param_K_data];
+  ld.param.u64 %rd3, [flash_attention_param_K_len];
+  ld.param.u64 %rd4, [flash_attention_param_V_data];
+  ld.param.u64 %rd5, [flash_attention_param_V_len];
+  ld.param.u64 %rd6, [flash_attention_param_O_data];
+  ld.param.u64 %rd7, [flash_attention_param_O_len];
+  ld.param.u64 %rd8, [flash_attention_param_seq_len];
+  ld.param.u64 %rd9, [flash_attention_param_d];
+
+  mov.u32 %r10, %ctaid.x;
+  mov.u32 %r11, %ntid.x;
+  mul.lo.u32 %r12, %r10, %r11;
+  mov.u32 %r13, %tid.x;
+  add.u32 %r14, %r12, %r13;
+  cvt.u64.u32 %rd16, %r14;
+  setp.lt.u64 %p15, %rd16, %rd8;
+  @%p15 bra flash_attention_then_17;
+  bra flash_attention_else_17;
+  flash_attention_then_17:
+  mov.u64 %rd18, 0;
+  mov.u64 %rd19, 0;
+  mov.u64 %rd20, 0;
+  mov.u64 %rd21, 0;
+  mov.u64 %rd22, 0;
+  mov.u64 %rd23, 0;
+  mov.u64 %rd25, 0;
+  mov.u64 %rd26, %rd25;
+  flash_attention_for_24:
+  setp.lt.u64 %p27, %rd26, %rd8;
+  @!%p27 bra flash_attention_for_end_24;
+  mov.u64 %rd28, 0;
+  mov.u64 %rd30, 0;
+  mov.u64 %rd31, %rd30;
+  flash_attention_for_29:
+  setp.lt.u64 %p32, %rd31, %rd9;
+  @!%p32 bra flash_attention_for_end_29;
+  mul.lo.u64 %rd33, %r14, %rd9;
+  add.u64 %rd34, %rd33, %rd31;
+  mul.lo.u64 %rd35, %rd26, %rd9;
+  add.u64 %rd36, %rd35, %rd31;
+  setp.lt.u64 %p37, %rd34, %rd1;
+  @%p37 bra flash_attention_then_38;
+  bra flash_attention_else_38;
+  flash_attention_then_38:
+  setp.lt.u64 %p39, %rd36, %rd3;
+  @%p39 bra flash_attention_then_40;
+  bra flash_attention_else_40;
+  flash_attention_then_40:
+  mov.u64 %rd41, 8;
+  mul.lo.u64 %rd42, %rd34, %rd41;
+  add.u64 %rd43, %rd0, %rd42;
+  ld.global.u64 %rd44, [%rd43];
+  mov.u64 %rd45, 8;
+  mul.lo.u64 %rd46, %rd36, %rd45;
+  add.u64 %rd47, %rd2, %rd46;
+  ld.global.u64 %rd48, [%rd47];
+  mul.lo.u64 %rd49, %rd44, %rd48;
+  add.u64 %rd50, %rd28, %rd49;
+  mov.u32 %r51, 0; // unit
+  mov.u32 %r52, %r51;
+  bra flash_attention_end_40;
+  flash_attention_else_40:
+  mov.u32 %r52, 0; // no else branch
+  flash_attention_end_40:
+  mov.u32 %r53, 0; // unit
+  mov.u32 %r54, %r53;
+  bra flash_attention_end_38;
+  flash_attention_else_38:
+  mov.u32 %r54, 0; // no else branch
+  flash_attention_end_38:
+  add.u64 %rd31, %rd31, 1;
+  bra flash_attention_for_29;
+  flash_attention_for_end_29:
+  mov.u32 %r55, 0; // unit
+  setp.gt.u64 %p56, %rd50, %rd18;
+  @%p56 bra flash_attention_then_57;
+  bra flash_attention_else_57;
+  flash_attention_then_57:
+  mov.u32 %r58, 0; // unit
+  mov.u32 %r59, %r58;
+  bra flash_attention_end_57;
+  flash_attention_else_57:
+  mov.u32 %r59, 0; // no else branch
+  flash_attention_end_57:
+  mov.u64 %rd60, 1;
+  add.u64 %rd61, %rd19, %rd60;
+  mov.u64 %rd62, 0;
+  setp.gt.u64 %p63, %rd9, %rd62;
+  @%p63 bra flash_attention_then_64;
+  bra flash_attention_else_64;
+  flash_attention_then_64:
+  mul.lo.u64 %rd65, %rd26, %rd9;
+  mov.u64 %rd66, 0;
+  add.u64 %rd67, %rd65, %rd66;
+  setp.lt.u64 %p68, %rd67, %rd5;
+  @%p68 bra flash_attention_then_69;
+  bra flash_attention_else_69;
+  flash_attention_then_69:
+  mov.u64 %rd70, 8;
+  mul.lo.u64 %rd71, %rd67, %rd70;
+  add.u64 %rd72, %rd4, %rd71;
+  ld.global.u64 %rd73, [%rd72];
+  mul.lo.u64 %rd74, %rd73, %rd50;
+  add.u64 %rd75, %rd20, %rd74;
+  mov.u32 %r76, 0; // unit
+  mov.u32 %r77, %r76;
+  bra flash_attention_end_69;
+  flash_attention_else_69:
+  mov.u32 %r77, 0; // no else branch
+  flash_attention_end_69:
+  mov.u32 %r78, 0; // unit
+  mov.u32 %r79, %r78;
+  bra flash_attention_end_64;
+  flash_attention_else_64:
+  mov.u32 %r79, 0; // no else branch
+  flash_attention_end_64:
+  mov.u64 %rd80, 1;
+  setp.gt.u64 %p81, %rd9, %rd80;
+  @%p81 bra flash_attention_then_82;
+  bra flash_attention_else_82;
+  flash_attention_then_82:
+  mul.lo.u64 %rd83, %rd26, %rd9;
+  mov.u64 %rd84, 1;
+  add.u64 %rd85, %rd83, %rd84;
+  setp.lt.u64 %p86, %rd85, %rd5;
+  @%p86 bra flash_attention_then_87;
+  bra flash_attention_else_87;
+  flash_attention_then_87:
+  mov.u64 %rd88, 8;
+  mul.lo.u64 %rd89, %rd85, %rd88;
+  add.u64 %rd90, %rd4, %rd89;
+  ld.global.u64 %rd91, [%rd90];
+  mul.lo.u64 %rd92, %rd91, %rd50;
+  add.u64 %rd93, %rd21, %rd92;
+  mov.u32 %r94, 0; // unit
+  mov.u32 %r95, %r94;
+  bra flash_attention_end_87;
+  flash_attention_else_87:
+  mov.u32 %r95, 0; // no else branch
+  flash_attention_end_87:
+  mov.u32 %r96, 0; // unit
+  mov.u32 %r97, %r96;
+  bra flash_attention_end_82;
+  flash_attention_else_82:
+  mov.u32 %r97, 0; // no else branch
+  flash_attention_end_82:
+  mov.u64 %rd98, 2;
+  setp.gt.u64 %p99, %rd9, %rd98;
+  @%p99 bra flash_attention_then_100;
+  bra flash_attention_else_100;
+  flash_attention_then_100:
+  mul.lo.u64 %rd101, %rd26, %rd9;
+  mov.u64 %rd102, 2;
+  add.u64 %rd103, %rd101, %rd102;
+  setp.lt.u64 %p104, %rd103, %rd5;
+  @%p104 bra flash_attention_then_105;
+  bra flash_attention_else_105;
+  flash_attention_then_105:
+  mov.u64 %rd106, 8;
+  mul.lo.u64 %rd107, %rd103, %rd106;
+  add.u64 %rd108, %rd4, %rd107;
+  ld.global.u64 %rd109, [%rd108];
+  mul.lo.u64 %rd110, %rd109, %rd50;
+  add.u64 %rd111, %rd22, %rd110;
+  mov.u32 %r112, 0; // unit
+  mov.u32 %r113, %r112;
+  bra flash_attention_end_105;
+  flash_attention_else_105:
+  mov.u32 %r113, 0; // no else branch
+  flash_attention_end_105:
+  mov.u32 %r114, 0; // unit
+  mov.u32 %r115, %r114;
+  bra flash_attention_end_100;
+  flash_attention_else_100:
+  mov.u32 %r115, 0; // no else branch
+  flash_attention_end_100:
+  mov.u64 %rd116, 3;
+  setp.gt.u64 %p117, %rd9, %rd116;
+  @%p117 bra flash_attention_then_118;
+  bra flash_attention_else_118;
+  flash_attention_then_118:
+  mul.lo.u64 %rd119, %rd26, %rd9;
+  mov.u64 %rd120, 3;
+  add.u64 %rd121, %rd119, %rd120;
+  setp.lt.u64 %p122, %rd121, %rd5;
+  @%p122 bra flash_attention_then_123;
+  bra flash_attention_else_123;
+  flash_attention_then_123:
+  mov.u64 %rd124, 8;
+  mul.lo.u64 %rd125, %rd121, %rd124;
+  add.u64 %rd126, %rd4, %rd125;
+  ld.global.u64 %rd127, [%rd126];
+  mul.lo.u64 %rd128, %rd127, %rd50;
+  add.u64 %rd129, %rd23, %rd128;
+  mov.u32 %r130, 0; // unit
+  mov.u32 %r131, %r130;
+  bra flash_attention_end_123;
+  flash_attention_else_123:
+  mov.u32 %r131, 0; // no else branch
+  flash_attention_end_123:
+  mov.u32 %r132, 0; // unit
+  mov.u32 %r133, %r132;
+  bra flash_attention_end_118;
+  flash_attention_else_118:
+  mov.u32 %r133, 0; // no else branch
+  flash_attention_end_118:
+  add.u64 %rd26, %rd26, 1;
+  bra flash_attention_for_24;
+  flash_attention_for_end_24:
+  mov.u32 %r134, 0; // unit
+  mov.u64 %rd135, 0;
+  setp.gt.u64 %p136, %rd61, %rd135;
+  @%p136 bra flash_attention_then_137;
+  bra flash_attention_else_137;
+  flash_attention_then_137:
+  mov.u64 %rd138, 0;
+  setp.gt.u64 %p139, %rd9, %rd138;
+  @%p139 bra flash_attention_then_140;
+  bra flash_attention_else_140;
+  flash_attention_then_140:
+  mul.lo.u64 %rd141, %r14, %rd9;
+  mov.u64 %rd142, 0;
+  add.u64 %rd143, %rd141, %rd142;
+  setp.lt.u64 %p144, %rd143, %rd7;
+  @%p144 bra flash_attention_then_145;
+  bra flash_attention_else_145;
+  flash_attention_then_145:
+  div.u64 %rd146, %rd75, %rd61;
+  mov.u64 %rd147, 8;
+  mul.lo.u64 %rd148, %rd143, %rd147;
+  add.u64 %rd149, %rd6, %rd148;
+  st.global.u64 [%rd149], %rd146;
+  mov.u32 %r150, 0; // unit
+  mov.u32 %r151, %r150;
+  bra flash_attention_end_145;
+  flash_attention_else_145:
+  mov.u32 %r151, 0; // no else branch
+  flash_attention_end_145:
+  mov.u32 %r152, 0; // unit
+  mov.u32 %r153, %r152;
+  bra flash_attention_end_140;
+  flash_attention_else_140:
+  mov.u32 %r153, 0; // no else branch
+  flash_attention_end_140:
+  mov.u64 %rd154, 1;
+  setp.gt.u64 %p155, %rd9, %rd154;
+  @%p155 bra flash_attention_then_156;
+  bra flash_attention_else_156;
+  flash_attention_then_156:
+  mul.lo.u64 %rd157, %r14, %rd9;
+  mov.u64 %rd158, 1;
+  add.u64 %rd159, %rd157, %rd158;
+  setp.lt.u64 %p160, %rd159, %rd7;
+  @%p160 bra flash_attention_then_161;
+  bra flash_attention_else_161;
+  flash_attention_then_161:
+  div.u64 %rd162, %rd93, %rd61;
+  mov.u64 %rd163, 8;
+  mul.lo.u64 %rd164, %rd159, %rd163;
+  add.u64 %rd165, %rd6, %rd164;
+  st.global.u64 [%rd165], %rd162;
+  mov.u32 %r166, 0; // unit
+  mov.u32 %r167, %r166;
+  bra flash_attention_end_161;
+  flash_attention_else_161:
+  mov.u32 %r167, 0; // no else branch
+  flash_attention_end_161:
+  mov.u32 %r168, 0; // unit
+  mov.u32 %r169, %r168;
+  bra flash_attention_end_156;
+  flash_attention_else_156:
+  mov.u32 %r169, 0; // no else branch
+  flash_attention_end_156:
+  mov.u64 %rd170, 2;
+  setp.gt.u64 %p171, %rd9, %rd170;
+  @%p171 bra flash_attention_then_172;
+  bra flash_attention_else_172;
+  flash_attention_then_172:
+  mul.lo.u64 %rd173, %r14, %rd9;
+  mov.u64 %rd174, 2;
+  add.u64 %rd175, %rd173, %rd174;
+  setp.lt.u64 %p176, %rd175, %rd7;
+  @%p176 bra flash_attention_then_177;
+  bra flash_attention_else_177;
+  flash_attention_then_177:
+  div.u64 %rd178, %rd111, %rd61;
+  mov.u64 %rd179, 8;
+  mul.lo.u64 %rd180, %rd175, %rd179;
+  add.u64 %rd181, %rd6, %rd180;
+  st.global.u64 [%rd181], %rd178;
+  mov.u32 %r182, 0; // unit
+  mov.u32 %r183, %r182;
+  bra flash_attention_end_177;
+  flash_attention_else_177:
+  mov.u32 %r183, 0; // no else branch
+  flash_attention_end_177:
+  mov.u32 %r184, 0; // unit
+  mov.u32 %r185, %r184;
+  bra flash_attention_end_172;
+  flash_attention_else_172:
+  mov.u32 %r185, 0; // no else branch
+  flash_attention_end_172:
+  mov.u64 %rd186, 3;
+  setp.gt.u64 %p187, %rd9, %rd186;
+  @%p187 bra flash_attention_then_188;
+  bra flash_attention_else_188;
+  flash_attention_then_188:
+  mul.lo.u64 %rd189, %r14, %rd9;
+  mov.u64 %rd190, 3;
+  add.u64 %rd191, %rd189, %rd190;
+  setp.lt.u64 %p192, %rd191, %rd7;
+  @%p192 bra flash_attention_then_193;
+  bra flash_attention_else_193;
+  flash_attention_then_193:
+  div.u64 %rd194, %rd129, %rd61;
+  mov.u64 %rd195, 8;
+  mul.lo.u64 %rd196, %rd191, %rd195;
+  add.u64 %rd197, %rd6, %rd196;
+  st.global.u64 [%rd197], %rd194;
+  mov.u32 %r198, 0; // unit
+  mov.u32 %r199, %r198;
+  bra flash_attention_end_193;
+  flash_attention_else_193:
+  mov.u32 %r199, 0; // no else branch
+  flash_attention_end_193:
+  mov.u32 %r200, 0; // unit
+  mov.u32 %r201, %r200;
+  bra flash_attention_end_188;
+  flash_attention_else_188:
+  mov.u32 %r201, 0; // no else branch
+  flash_attention_end_188:
+  mov.u32 %r202, 0; // unit
+  mov.u32 %r203, %r202;
+  bra flash_attention_end_137;
+  flash_attention_else_137:
+  mov.u32 %r203, 0; // no else branch
+  flash_attention_end_137:
+  mov.u32 %r204, 0; // unit
+  mov.u32 %r205, %r204;
+  bra flash_attention_end_17;
+  flash_attention_else_17:
+  mov.u32 %r205, 0; // no else branch
+  flash_attention_end_17:
+  mov.u32 %r206, 0; // unit
+  ret;
+}
+

@@ -431,6 +431,134 @@ let rec lower_expr st e : string =
       emit st (Printf.sprintf "atom.global.min.u64 %s, [%s], %s;" dst rp rv);
       dst
 
+  | ECall ({ expr_desc = EVar id; _ }, [ptr_e; val_e])
+      when id.name = "atom_or" ->
+      let rp = lower_expr st ptr_e in
+      let rv = lower_expr st val_e in
+      let dst = fresh_reg st U64 in
+      emit st (Printf.sprintf "atom.global.or.b64 %s, [%s], %s;" dst rp rv);
+      dst
+
+  | ECall ({ expr_desc = EVar id; _ }, [ptr_e; val_e])
+      when id.name = "atom_xor" ->
+      let rp = lower_expr st ptr_e in
+      let rv = lower_expr st val_e in
+      let dst = fresh_reg st U64 in
+      emit st (Printf.sprintf "atom.global.xor.b64 %s, [%s], %s;" dst rp rv);
+      dst
+
+  | ECall ({ expr_desc = EVar id; _ }, [ptr_e; val_e])
+      when id.name = "atom_and" ->
+      let rp = lower_expr st ptr_e in
+      let rv = lower_expr st val_e in
+      let dst = fresh_reg st U64 in
+      emit st (Printf.sprintf "atom.global.and.b64 %s, [%s], %s;" dst rp rv);
+      dst
+
+  | ECall ({ expr_desc = EVar id; _ }, [ptr_e; val_e])
+      when id.name = "atom_sub" ->
+      let rp = lower_expr st ptr_e in
+      let rv = lower_expr st val_e in
+      let dst = fresh_reg st U64 in
+      emit st (Printf.sprintf "atom.global.add.u64 %s, [%s], -%s;" dst rp rv);
+      dst
+
+  | ECall ({ expr_desc = EVar id; _ }, [ptr_e; val_e])
+      when id.name = "atom_exch" ->
+      let rp = lower_expr st ptr_e in
+      let rv = lower_expr st val_e in
+      let dst = fresh_reg st U64 in
+      emit st (Printf.sprintf "atom.global.exch.b64 %s, [%s], %s;" dst rp rv);
+      dst
+
+  (* Warp shuffle up *)
+  | ECall ({ expr_desc = EVar id; _ }, [val_e; lane_e; _width_e])
+      when id.name = "shfl_up_sync" ->
+      let rv = lower_expr st val_e in
+      let rl = lower_expr st lane_e in
+      let dst = fresh_reg st U32 in
+      emit st (Printf.sprintf "shfl.sync.up.b32 %s, %s, %s, 0, 0xffffffff;" dst rv rl);
+      dst
+
+  (* Memory fences *)
+  | ECall ({ expr_desc = EVar id; _ }, [])
+      when id.name = "threadfence" ->
+      let r = fresh_reg st U32 in
+      emit st "membar.gl;";
+      emit st (Printf.sprintf "mov.u32 %s, 0;" r); r
+
+  | ECall ({ expr_desc = EVar id; _ }, [])
+      when id.name = "threadfence_block" ->
+      let r = fresh_reg st U32 in
+      emit st "membar.cta;";
+      emit st (Printf.sprintf "mov.u32 %s, 0;" r); r
+
+  | ECall ({ expr_desc = EVar id; _ }, [])
+      when id.name = "threadfence_system" ->
+      let r = fresh_reg st U32 in
+      emit st "membar.sys;";
+      emit st (Printf.sprintf "mov.u32 %s, 0;" r); r
+
+  (* Async copy (SM_80+) *)
+  | ECall ({ expr_desc = EVar id; _ }, [dst_e; src_e; bytes_e])
+      when id.name = "cp_async_cg" ->
+      let rd = lower_expr st dst_e in
+      let rs = lower_expr st src_e in
+      let rb = lower_expr st bytes_e in
+      let r = fresh_reg st U32 in
+      emit st (Printf.sprintf "cp.async.cg.shared.global [%s], [%s], %s;" rd rs rb);
+      emit st (Printf.sprintf "mov.u32 %s, 0;" r); r
+
+  | ECall ({ expr_desc = EVar id; _ }, [])
+      when id.name = "cp_async_commit" ->
+      let r = fresh_reg st U32 in
+      emit st "cp.async.commit_group;";
+      emit st (Printf.sprintf "mov.u32 %s, 0;" r); r
+
+  | ECall ({ expr_desc = EVar id; _ }, [n_e])
+      when id.name = "cp_async_wait_group" ->
+      let rn = lower_expr st n_e in
+      let r = fresh_reg st U32 in
+      emit st (Printf.sprintf "cp.async.wait_group %s;" rn);
+      emit st (Printf.sprintf "mov.u32 %s, 0;" r); r
+
+  (* Cooperative groups (SM_90+) *)
+  | ECall ({ expr_desc = EVar id; _ }, [])
+      when id.name = "cluster_sync" ->
+      let r = fresh_reg st U32 in
+      emit st "barrier.cluster.arrive;";
+      emit st "barrier.cluster.wait;";
+      emit st (Printf.sprintf "mov.u32 %s, 0;" r); r
+
+  (* FP16/BF16 conversions — emit cvt instructions *)
+  | ECall ({ expr_desc = EVar id; _ }, [x_e])
+      when id.name = "f32_to_fp16" ->
+      let rx = lower_expr st x_e in
+      let dst = fresh_reg st U16 in
+      emit st (Printf.sprintf "cvt.rn.f16.f32 %s, %s;" dst rx);
+      dst
+
+  | ECall ({ expr_desc = EVar id; _ }, [x_e])
+      when id.name = "fp16_to_f32" ->
+      let rx = lower_expr st x_e in
+      let dst = fresh_reg st F32 in
+      emit st (Printf.sprintf "cvt.f32.f16 %s, %s;" dst rx);
+      dst
+
+  | ECall ({ expr_desc = EVar id; _ }, [x_e])
+      when id.name = "f32_to_bf16" ->
+      let rx = lower_expr st x_e in
+      let dst = fresh_reg st U16 in
+      emit st (Printf.sprintf "cvt.rn.bf16.f32 %s, %s;" dst rx);
+      dst
+
+  | ECall ({ expr_desc = EVar id; _ }, [x_e])
+      when id.name = "bf16_to_f32" ->
+      let rx = lower_expr st x_e in
+      let dst = fresh_reg st F32 in
+      emit st (Printf.sprintf "cvt.f32.bf16 %s, %s;" dst rx);
+      dst
+
   (* Warp vote: ballot_sync() → bitmask of active threads *)
   | ECall ({ expr_desc = EVar id; _ }, [pred_e])
       when id.name = "ballot_sync" ->
@@ -467,6 +595,13 @@ let rec lower_expr st e : string =
   | EProof _ | EAssume _ ->
       let r = fresh_reg st U32 in
       emit st (Printf.sprintf "mov.u32 %s, 0; // proof/assume erased" r);
+      r
+
+  | EAsm ab ->
+      let r = fresh_reg st U32 in
+      emit st (Printf.sprintf "// inline asm: %s" ab.asm_template);
+      emit st ab.asm_template;
+      emit st (Printf.sprintf "mov.u32 %s, 0;" r);
       r
 
   | _ ->

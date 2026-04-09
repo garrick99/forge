@@ -725,6 +725,102 @@ let rec emit_expr depth e =
   | ECall ({ expr_desc = EVar id; _ }, [])
       when id.name = "warp_id" ->
       "(__builtin_expect(blockDim.x % 32 == 0, 1) ? (threadIdx.x >> 5) : (__builtin_trap(), 0))"
+  (* ---- Additional atomics ---- *)
+  | ECall ({ expr_desc = EVar id; _ }, [ptr; v])
+      when id.name = "atom_or" ->
+      Printf.sprintf "atomicOr((unsigned long long*)%s, %s)" (emit_expr depth ptr) (emit_expr depth v)
+  | ECall ({ expr_desc = EVar id; _ }, [ptr; v])
+      when id.name = "atom_xor" ->
+      Printf.sprintf "atomicXor((unsigned long long*)%s, %s)" (emit_expr depth ptr) (emit_expr depth v)
+  | ECall ({ expr_desc = EVar id; _ }, [ptr; v])
+      when id.name = "atom_and" ->
+      Printf.sprintf "atomicAnd((unsigned long long*)%s, %s)" (emit_expr depth ptr) (emit_expr depth v)
+  | ECall ({ expr_desc = EVar id; _ }, [ptr; v])
+      when id.name = "atom_sub" ->
+      Printf.sprintf "atomicSub((unsigned long long*)%s, %s)" (emit_expr depth ptr) (emit_expr depth v)
+  | ECall ({ expr_desc = EVar id; _ }, [ptr; v])
+      when id.name = "atom_exch" ->
+      Printf.sprintf "atomicExch((unsigned long long*)%s, %s)" (emit_expr depth ptr) (emit_expr depth v)
+  | ECall ({ expr_desc = EVar id; _ }, [v; d; w])
+      when id.name = "shfl_up_sync" ->
+      Printf.sprintf "__shfl_up_sync(0xffffffff, %s, %s, %s)"
+        (emit_expr depth v) (emit_expr depth d) (emit_expr depth w)
+  (* ---- Memory fences ---- *)
+  | ECall ({ expr_desc = EVar id; _ }, [])
+      when id.name = "threadfence" -> "__threadfence()"
+  | ECall ({ expr_desc = EVar id; _ }, [])
+      when id.name = "threadfence_block" -> "__threadfence_block()"
+  | ECall ({ expr_desc = EVar id; _ }, [])
+      when id.name = "threadfence_system" -> "__threadfence_system()"
+  (* ---- FP16/BF16 conversions ---- *)
+  | ECall ({ expr_desc = EVar id; _ }, [x])
+      when id.name = "f32_to_fp16" ->
+      Printf.sprintf "__float2half(%s)" (emit_expr depth x)
+  | ECall ({ expr_desc = EVar id; _ }, [x])
+      when id.name = "fp16_to_f32" ->
+      Printf.sprintf "__half2float(%s)" (emit_expr depth x)
+  | ECall ({ expr_desc = EVar id; _ }, [x])
+      when id.name = "f32_to_bf16" ->
+      Printf.sprintf "__float2bfloat16(%s)" (emit_expr depth x)
+  | ECall ({ expr_desc = EVar id; _ }, [x])
+      when id.name = "bf16_to_f32" ->
+      Printf.sprintf "__bfloat162float(%s)" (emit_expr depth x)
+  (* ---- FP16 arithmetic (cast u16 → __half to resolve overloads) ---- *)
+  | ECall ({ expr_desc = EVar id; _ }, [a; b])
+      when id.name = "fp16_add" ->
+      Printf.sprintf "__hadd(*(__half*)&%s, *(__half*)&%s)" (emit_expr depth a) (emit_expr depth b)
+  | ECall ({ expr_desc = EVar id; _ }, [a; b])
+      when id.name = "fp16_sub" ->
+      Printf.sprintf "__hsub(*(__half*)&%s, *(__half*)&%s)" (emit_expr depth a) (emit_expr depth b)
+  | ECall ({ expr_desc = EVar id; _ }, [a; b])
+      when id.name = "fp16_mul" ->
+      Printf.sprintf "__hmul(*(__half*)&%s, *(__half*)&%s)" (emit_expr depth a) (emit_expr depth b)
+  | ECall ({ expr_desc = EVar id; _ }, [a; b; c])
+      when id.name = "fp16_fma" ->
+      Printf.sprintf "__hfma(*(__half*)&%s, *(__half*)&%s, *(__half*)&%s)"
+        (emit_expr depth a) (emit_expr depth b) (emit_expr depth c)
+  | ECall ({ expr_desc = EVar id; _ }, [a])
+      when id.name = "fp16_neg" ->
+      Printf.sprintf "__hneg(*(__half*)&%s)" (emit_expr depth a)
+  | ECall ({ expr_desc = EVar id; _ }, [a])
+      when id.name = "fp16_abs" ->
+      Printf.sprintf "__habs(*(__half*)&%s)" (emit_expr depth a)
+  | ECall ({ expr_desc = EVar id; _ }, [a; b])
+      when id.name = "fp16_max" ->
+      Printf.sprintf "__hmax(*(__half*)&%s, *(__half*)&%s)" (emit_expr depth a) (emit_expr depth b)
+  | ECall ({ expr_desc = EVar id; _ }, [a; b])
+      when id.name = "fp16_min" ->
+      Printf.sprintf "__hmin(*(__half*)&%s, *(__half*)&%s)" (emit_expr depth a) (emit_expr depth b)
+  (* ---- BF16 arithmetic (cast u16 → __nv_bfloat16) ---- *)
+  | ECall ({ expr_desc = EVar id; _ }, [a; b])
+      when id.name = "bf16_add" ->
+      Printf.sprintf "__hadd(*(__nv_bfloat16*)&%s, *(__nv_bfloat16*)&%s)" (emit_expr depth a) (emit_expr depth b)
+  | ECall ({ expr_desc = EVar id; _ }, [a; b])
+      when id.name = "bf16_sub" ->
+      Printf.sprintf "__hsub(*(__nv_bfloat16*)&%s, *(__nv_bfloat16*)&%s)" (emit_expr depth a) (emit_expr depth b)
+  | ECall ({ expr_desc = EVar id; _ }, [a; b])
+      when id.name = "bf16_mul" ->
+      Printf.sprintf "__hmul(*(__nv_bfloat16*)&%s, *(__nv_bfloat16*)&%s)" (emit_expr depth a) (emit_expr depth b)
+  | ECall ({ expr_desc = EVar id; _ }, [a; b; c])
+      when id.name = "bf16_fma" ->
+      Printf.sprintf "__hfma(*(__nv_bfloat16*)&%s, *(__nv_bfloat16*)&%s, *(__nv_bfloat16*)&%s)"
+        (emit_expr depth a) (emit_expr depth b) (emit_expr depth c)
+  | ECall ({ expr_desc = EVar id; _ }, [a])
+      when id.name = "bf16_neg" ->
+      Printf.sprintf "__hneg(*(__nv_bfloat16*)&%s)" (emit_expr depth a)
+  (* ---- Async copy (SM_80+) ---- *)
+  | ECall ({ expr_desc = EVar id; _ }, [d; s; b])
+      when id.name = "cp_async_cg" ->
+      Printf.sprintf "__pipeline_memcpy_async(%s, %s, %s)"
+        (emit_expr depth d) (emit_expr depth s) (emit_expr depth b)
+  | ECall ({ expr_desc = EVar id; _ }, [])
+      when id.name = "cp_async_commit" -> "__pipeline_commit()"
+  | ECall ({ expr_desc = EVar id; _ }, [n])
+      when id.name = "cp_async_wait_group" ->
+      Printf.sprintf "__pipeline_wait_prior(%s)" (emit_expr depth n)
+  (* ---- Cooperative groups (SM_90+) ---- *)
+  | ECall ({ expr_desc = EVar id; _ }, [])
+      when id.name = "cluster_sync" -> "__cluster_sync()"
   (* ---- Shared memory intrinsics ---- *)
   | ECall ({ expr_desc = EVar id; _ }, [arr; idx])
       when id.name = "shared_load" ->
@@ -933,6 +1029,16 @@ let rec emit_expr depth e =
       ) init_fields in
       Printf.sprintf "(%s){ %s }" name.name (String.concat ", " field_strs)
   | EProof _  -> "/* proof erased */"
+  | EAsm ab   ->
+      if ab.asm_outputs = [] && ab.asm_inputs = [] then
+        Printf.sprintf "__asm__ volatile(\"%s\")" (String.escaped ab.asm_template)
+      else
+        let out_str = String.concat ", "
+          (List.map (fun (c, id) -> Printf.sprintf "\"%s\"(%s)" c id.name) ab.asm_outputs) in
+        let in_str = String.concat ", "
+          (List.map (fun (c, e) -> Printf.sprintf "\"%s\"(%s)" c (emit_expr depth e)) ab.asm_inputs) in
+        Printf.sprintf "__asm__ volatile(\"%s\" : %s : %s)"
+          (String.escaped ab.asm_template) out_str in_str
   | ERaw rb   ->
       let buf = Buffer.create 64 in
       List.iter (fun s ->
@@ -1722,16 +1828,40 @@ and collect_called_fns_stmt acc s =
   | _ -> acc
 
 let compute_device_fns (items : item list) =
-  (* Collect all functions called from #[kernel] functions *)
-  let called = List.fold_left (fun acc item ->
+  (* Build a map from function name → body for transitive closure *)
+  let fn_bodies = Hashtbl.create 64 in
+  List.iter (fun item ->
+    match item.item_desc with
+    | IFn fn ->
+        (match fn.fn_body with
+         | Some body -> Hashtbl.replace fn_bodies fn.fn_name.name body
+         | None -> ())
+    | _ -> ()
+  ) items;
+  (* Collect all functions called from #[kernel] functions (transitive) *)
+  let visited = Hashtbl.create 64 in
+  let rec walk acc name =
+    if Hashtbl.mem visited name then acc
+    else begin
+      Hashtbl.replace visited name true;
+      let acc = name :: acc in
+      match Hashtbl.find_opt fn_bodies name with
+      | Some body -> collect_called_fns_expr acc body
+                     |> List.fold_left (fun a n -> walk a n) acc
+      | None -> acc
+    end
+  in
+  let kernel_callees = List.fold_left (fun acc item ->
     match item.item_desc with
     | IFn fn when List.exists (fun a -> a.attr_name = "kernel") fn.fn_attrs ->
         (match fn.fn_body with
-         | Some body -> collect_called_fns_expr acc body
+         | Some body ->
+             let direct = collect_called_fns_expr [] body in
+             List.fold_left (fun a n -> walk a n) acc direct
          | None -> acc)
     | _ -> acc
   ) [] items in
-  device_fn_names := List.sort_uniq String.compare called
+  device_fn_names := List.sort_uniq String.compare kernel_callees
 
 let gpu_qualifier attrs fn_name =
   if List.exists (fun a -> a.attr_name = "kernel") attrs then "__global__ "
@@ -1864,8 +1994,14 @@ let emit_struct sd =
     let packed_attr = if sd.sd_is_packed then " __attribute__((packed))" else "" in
     Buffer.add_string buf (Printf.sprintf "typedef %s%s %s {\n" keyword packed_attr sd.sd_name.name);
     List.iter (fun (id, ty) ->
-      Buffer.add_string buf
-        (Printf.sprintf "  %s %s;\n" (emit_ty ty) id.name)
+      let bits = List.assoc_opt id.name sd.sd_bitwidths in
+      match bits with
+      | Some w ->
+          Buffer.add_string buf
+            (Printf.sprintf "  %s %s : %d;\n" (emit_ty ty) id.name w)
+      | None ->
+          Buffer.add_string buf
+            (Printf.sprintf "  %s %s;\n" (emit_ty ty) id.name)
     ) sd.sd_fields;
     Buffer.add_string buf (Printf.sprintf "} %s;\n" sd.sd_name.name);
     Buffer.contents buf
@@ -1947,8 +2083,11 @@ let emit_item item =
                Printf.sprintf "%s %s" (emit_ty ty) id.name
              ) fty.params)
            in
-           Printf.sprintf "%s %s(%s);  /* extern: %s */\n"
-             (emit_ty fty.ret) ex.ex_name.name params_str ex.ex_link
+           (* In CUDA mode, extern functions called from kernels need __device__ *)
+           let qual = if List.mem ex.ex_name.name !device_fn_names
+                      then "__device__ " else "" in
+           Printf.sprintf "%s%s %s(%s);  /* extern: %s */\n"
+             qual (emit_ty fty.ret) ex.ex_name.name params_str ex.ex_link
        | ty ->
            Printf.sprintf "extern %s %s;  /* %s */\n"
              (emit_ty ty) ex.ex_name.name ex.ex_link)
@@ -2087,7 +2226,7 @@ and collect_generic_named_expr_desc acc = function
       List.fold_left (fun a arm -> collect_generic_named_expr a arm.body) acc arms
   | EStruct (_, inits) ->
       List.fold_left (fun a (_, e) -> collect_generic_named_expr a e) acc inits
-  | EProof _ | ERaw _ | EAssume _ | EAssert _ -> acc
+  | EProof _ | ERaw _ | EAssume _ | EAssert _ | EAsm _ -> acc
   | EArrayLit elems -> List.fold_left collect_generic_named_expr acc elems
   | EArrayRepeat (v, n) ->
       collect_generic_named_expr (collect_generic_named_expr acc v) n
@@ -2211,6 +2350,8 @@ let emit_program prog =
     "   All proof obligations discharged. This code is correct by construction. */\n\n";
   if cuda then begin
     Buffer.add_string buf "#include <cuda_runtime.h>\n";
+    Buffer.add_string buf "#include <cuda_fp16.h>\n";
+    Buffer.add_string buf "#include <cuda_bf16.h>\n";
     Buffer.add_string buf "#include <stdint.h>\n";
     Buffer.add_string buf "#include <stdbool.h>\n";
     Buffer.add_string buf "#include <stdlib.h>\n";

@@ -150,6 +150,16 @@ and expr_desc =
   | ERange       of expr * expr             (* lo..hi — integer range for for-loops *)
   | ELambda     of (ident * ty) list * expr * string option ref
     (* \(x: T, y: U) -> body  — lifted to __forge_lambda_N; ref filled by typechecking *)
+  | EAsm  of asm_block
+    (* asm("template", in("r") val, ..., out("r") name, ...) — inline assembly *)
+
+and asm_block = {
+  asm_template: string;                         (* assembly template string *)
+  asm_outputs:  (string * ident) list;          (* constraint, variable name *)
+  asm_inputs:   (string * expr) list;           (* constraint, value expr *)
+  asm_clobbers: string list;                    (* clobbered registers *)
+  asm_loc:      loc;
+}
 
 and lit =
   | LInt   of int64 * prim_ty option        (* 42u32, 5i64 — suffix sets type *)
@@ -288,6 +298,7 @@ and struct_def = {
   sd_invars: pred list;             (* struct invariants — always hold *)
   sd_is_union: bool;                (* true = C union, false = C struct *)
   sd_is_packed: bool;               (* true = __attribute__((packed)) *)
+  sd_bitwidths: (string * int) list;  (* field_name -> bit width for bitfields *)
 }
 
 and enum_def = {

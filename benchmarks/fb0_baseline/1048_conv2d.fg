@@ -1,0 +1,84 @@
+// expected: 0
+// Demo 1048: Verified 2D convolution kernel
+//
+// Applies a 3×3 convolution filter to a 2D input image.
+// Each thread computes one output pixel by sliding the kernel
+// over the input with bounds-checked access (zero-padded edges).
+//
+// Formal properties proven by Z3:
+//   1. All input[] accesses within bounds (guarded by row/col checks)
+//   2. All output[] writes within bounds
+//   3. Filter[] accesses within [0, 9) (3×3 kernel)
+//   4. Inner loops terminate (constant bounds)
+//
+// Convolution is the fundamental operation in CNNs (ResNet, YOLO,
+// Stable Diffusion) — proving its memory safety is a first step
+// toward formally verified deep learning inference.
+
+use std::gpu;
+
+const KERNEL_SIZE: u64 = 3u64;
+const KERNEL_RADIUS: u64 = 1u64;   // (KERNEL_SIZE - 1) / 2
+
+#[kernel]
+fn conv2d(
+    input: span<u64>, output: span<u64>, filter: span<u64>,
+    width: u64, height: u64
+)
+    requires width * height <= input.len
+    requires width * height <= output.len
+    requires KERNEL_SIZE * KERNEL_SIZE <= filter.len
+    requires width > 0u64
+    requires height > 0u64
+    requires blockIdx_x < gridDim_x
+    requires blockIdx_y < gridDim_y
+{
+    let ox: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    let oy: u64 = blockIdx_y * blockDim_y + threadIdx_y;
+
+    if ox < width {
+        if oy < height {
+            let mut acc: u64 = 0u64;
+
+            // Slide 3×3 kernel over input
+            for ky in 0u64..KERNEL_SIZE
+                invariant ky <= KERNEL_SIZE
+            {
+                for kx in 0u64..KERNEL_SIZE
+                    invariant kx <= KERNEL_SIZE
+                {
+                    // Input coordinates with implicit zero-padding
+                    let ix: u64 = ox + kx;
+                    let iy: u64 = oy + ky;
+
+                    // Only accumulate if within valid input bounds
+                    // (skip the padded border — equivalent to zero-padding)
+                    if ix >= KERNEL_RADIUS {
+                        if iy >= KERNEL_RADIUS {
+                            let sx: u64 = ix - KERNEL_RADIUS;
+                            let sy: u64 = iy - KERNEL_RADIUS;
+                            if sx < width {
+                                if sy < height {
+                                    let in_idx: u64 = sy * width + sx;
+                                    let f_idx: u64 = ky * KERNEL_SIZE + kx;
+                                    if in_idx < input.len {
+                                        if f_idx < filter.len {
+                                            acc = acc + input[in_idx] * filter[f_idx];
+                                        };
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+
+            let out_idx: u64 = oy * width + ox;
+            if out_idx < output.len {
+                output[out_idx] = acc;
+            };
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }

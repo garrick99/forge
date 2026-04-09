@@ -5,6 +5,7 @@ type token =
   | INT      of int64
   | INT_SUFF of (int64 * string)  (* 42u32, 100i64 — value + suffix string *)
   | FLOAT    of float
+  | FLOAT_SUFF of (float * string)  (* 0.0f32, 1.5f64 — value + suffix *)
   | STRING   of string
 
   (* Identifiers *)
@@ -24,6 +25,9 @@ type token =
   | REQUIRES | ENSURES | DECREASES | INVARIANT
   | PROOF | ASSUME | LEMMA | WITNESS | BY | AUTO | AXIOM | SYMM | TRANS | INDUCTION
   | RAW | FORALL | EXISTS | OLD | RESULT
+
+  (* Keywords — inline assembly *)
+  | ASM
 
   (* Keywords — linearity *)
   | AS

@@ -98,6 +98,7 @@ type token =
   | FORALL
   | FOR
   | FN
+  | FLOAT_SUFF of (float * string)
   | FLOAT of float
   | FATARROW
   | FALSE
@@ -132,6 +133,7 @@ type token =
   | TRAIT
   | ASSUME
   | ASSERT
+  | ASM
   | AS
   | ARROW
   | QUESTION

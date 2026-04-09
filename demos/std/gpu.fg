@@ -25,6 +25,26 @@ extern fn atom_cas(ptr: raw<u64>, val: u64) -> u64 = "forge_gpu";
 extern fn atom_max(ptr: raw<u64>, val: u64) -> u64 = "forge_gpu";
 extern fn atom_min(ptr: raw<u64>, val: u64) -> u64 = "forge_gpu";
 
+// Shuffle up: get value from lane - delta.
+extern fn shfl_up_sync(val: u64, delta: u64, width: u64) -> u64 = "forge_gpu";
+
+// ---- Additional atomic operations ------------------------------------------
+
+// Atomic bitwise OR: atomically ORs val into *ptr, returns old value.
+extern fn atom_or(ptr: raw<u64>, val: u64) -> u64 = "forge_gpu";
+
+// Atomic bitwise XOR.
+extern fn atom_xor(ptr: raw<u64>, val: u64) -> u64 = "forge_gpu";
+
+// Atomic bitwise AND.
+extern fn atom_and(ptr: raw<u64>, val: u64) -> u64 = "forge_gpu";
+
+// Atomic subtract.
+extern fn atom_sub(ptr: raw<u64>, val: u64) -> u64 = "forge_gpu";
+
+// Atomic exchange: atomically sets *ptr = val, returns old value.
+extern fn atom_exch(ptr: raw<u64>, val: u64) -> u64 = "forge_gpu";
+
 // ---- Warp vote -------------------------------------------------------------
 
 // Ballot: returns bitmask of threads where predicate is true.

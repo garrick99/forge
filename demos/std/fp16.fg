@@ -1,0 +1,112 @@
+// std/fp16.fg — Half-precision float (FP16/BF16) via u16 wrapper
+//
+// Include with:  use std::fp16;
+//
+// FP16 (IEEE 754 half): 1 sign + 5 exp + 10 mantissa, range ±65504
+// BF16 (Brain Float):   1 sign + 8 exp +  7 mantissa, same range as f32
+//
+// Both are stored as u16 since Forge's type system has no native f16/bf16.
+// This follows the same wrapper pattern as std/mxfp4.fg (which uses u8).
+// All operations go through extern intrinsics that map to CUDA __half / __nv_bfloat16.
+//
+// For SM_120 FP4 quantization, see std/mxfp4.fg.
+// For tensor core operations using fp16/bf16, see std/tensor_core.fg.
+
+// ---- FP16 conversions ------------------------------------------------------
+
+// Convert f32 → fp16 (round to nearest even).
+extern fn f32_to_fp16(x: f32) -> u16 = "forge_gpu";
+
+// Convert fp16 → f32 (exact, no precision loss).
+extern fn fp16_to_f32(x: u16) -> f32 = "forge_gpu";
+
+// ---- BF16 conversions ------------------------------------------------------
+
+// Convert f32 → bf16 (round to nearest even, truncates mantissa).
+extern fn f32_to_bf16(x: f32) -> u16 = "forge_gpu";
+
+// Convert bf16 → f32 (exact, zero-extends mantissa).
+extern fn bf16_to_f32(x: u16) -> f32 = "forge_gpu";
+
+// ---- FP16 arithmetic -------------------------------------------------------
+
+// fp16 addition: a + b in half precision.
+extern fn fp16_add(a: u16, b: u16) -> u16 = "forge_gpu";
+
+// fp16 subtraction: a - b in half precision.
+extern fn fp16_sub(a: u16, b: u16) -> u16 = "forge_gpu";
+
+// fp16 multiplication: a * b in half precision.
+extern fn fp16_mul(a: u16, b: u16) -> u16 = "forge_gpu";
+
+// fp16 fused multiply-add: a * b + c in half precision.
+extern fn fp16_fma(a: u16, b: u16, c: u16) -> u16 = "forge_gpu";
+
+// fp16 negation.
+extern fn fp16_neg(a: u16) -> u16 = "forge_gpu";
+
+// fp16 absolute value.
+extern fn fp16_abs(a: u16) -> u16 = "forge_gpu";
+
+// fp16 maximum.
+extern fn fp16_max(a: u16, b: u16) -> u16 = "forge_gpu";
+
+// fp16 minimum.
+extern fn fp16_min(a: u16, b: u16) -> u16 = "forge_gpu";
+
+// ---- BF16 arithmetic -------------------------------------------------------
+
+// bf16 addition.
+extern fn bf16_add(a: u16, b: u16) -> u16 = "forge_gpu";
+
+// bf16 subtraction.
+extern fn bf16_sub(a: u16, b: u16) -> u16 = "forge_gpu";
+
+// bf16 multiplication.
+extern fn bf16_mul(a: u16, b: u16) -> u16 = "forge_gpu";
+
+// bf16 fused multiply-add.
+extern fn bf16_fma(a: u16, b: u16, c: u16) -> u16 = "forge_gpu";
+
+// bf16 negation.
+extern fn bf16_neg(a: u16) -> u16 = "forge_gpu";
+
+// ---- Mixed-precision helpers -----------------------------------------------
+
+// FP16 dot product accumulated in f32.
+// Converts a,b to f32, multiplies, adds to accumulator.
+// This is the fundamental mixed-precision pattern: fp16 storage, f32 compute.
+fn fp16_dot_f32(a: u16, b: u16, acc: f32) -> f32 {
+    let af: f32 = fp16_to_f32(a);
+    let bf: f32 = fp16_to_f32(b);
+    acc + af * bf
+}
+
+// BF16 dot product accumulated in f32.
+fn bf16_dot_f32(a: u16, b: u16, acc: f32) -> f32 {
+    let af: f32 = bf16_to_f32(a);
+    let bf: f32 = bf16_to_f32(b);
+    acc + af * bf
+}
+
+// ---- Constants (IEEE 754 half-precision) ------------------------------------
+
+// FP16 zero: 0x0000
+const FP16_ZERO: u16 = 0u16;
+
+// FP16 one: sign=0, exp=15, mantissa=0 → 0x3C00
+const FP16_ONE: u16 = 15360u16;
+
+// FP16 max normal: ±65504 → 0x7BFF
+const FP16_MAX: u16 = 31743u16;
+
+// FP16 smallest positive subnormal: 2^-24 → 0x0001
+const FP16_MIN_SUBNORMAL: u16 = 1u16;
+
+// BF16 zero: 0x0000
+const BF16_ZERO: u16 = 0u16;
+
+// BF16 one: sign=0, exp=127, mantissa=0 → 0x3F80
+const BF16_ONE: u16 = 16256u16;
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,28 @@
+// std/threadfence.fg — GPU memory fence intrinsics
+//
+// Include with:  use std::threadfence;
+//
+// Memory fences ensure visibility of prior writes across different
+// scopes (block, device, system). Required for producer-consumer
+// patterns between thread blocks using global memory.
+//
+// Usage example (device-scope flag):
+//
+//   st.global data[idx] = result;
+//   threadfence();            // ensure data visible before flag
+//   atom_exch(flag_ptr, 1);   // signal consumer
+//
+
+// Device-scope fence: all prior writes visible to all threads on the GPU.
+extern fn threadfence() = "forge_gpu";
+
+// Block-scope fence: all prior writes visible to all threads in this block.
+// Cheaper than device-scope; sufficient for shared memory synchronization
+// patterns that don't cross block boundaries.
+extern fn threadfence_block() = "forge_gpu";
+
+// System-scope fence: all prior writes visible to all threads on the GPU
+// AND to host CPU. Required for mapped/pinned memory communication.
+extern fn threadfence_system() = "forge_gpu";
+
+fn main() -> u64 { 0u64 }

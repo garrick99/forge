@@ -1,0 +1,37 @@
+// expected: 0
+// Demo 1051: Inline assembly with register operands
+//
+// Demonstrates asm() with input/output constraints:
+//   asm("template" : out = "=r" : in1 = "r", in2 = "r")
+//
+// Sections separated by colons:
+//   template : outputs : inputs [: clobbers]
+// Each operand: variable = "constraint"
+// "=" prefix in constraint marks output operands.
+// Operands numbered %0, %1, %2... (outputs first, then inputs).
+//
+// This enables direct PTX/SASS emission for instructions that
+// don't have Forge stdlib wrappers.
+
+fn asm_add_test() -> u64 {
+    let a: u64 = 10u64;
+    let b: u64 = 32u64;
+    let mut res: u64 = 0u64;
+
+    // Inline asm: res = a + b
+    asm("add.u64 %0, %1, %2;" : res = "=r" : a = "r", b = "r");
+
+    res
+}
+
+// No-operand form (memory barriers, NOPs)
+fn fence_test() -> u64 {
+    asm("membar.gl;");
+    0u64
+}
+
+fn main() -> u64 {
+    let _r: u64 = asm_add_test();
+    let _f: u64 = fence_test();
+    0u64
+}

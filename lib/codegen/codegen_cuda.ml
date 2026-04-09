@@ -150,10 +150,75 @@ let rec emit_expr = function
            Printf.sprintf "atomicMax(%s, %s)" (emit_expr p) (emit_expr v)
        | "atom_min", [p; v] ->
            Printf.sprintf "atomicMin(%s, %s)" (emit_expr p) (emit_expr v)
+       | "atom_or", [p; v] ->
+           Printf.sprintf "atomicOr(%s, %s)" (emit_expr p) (emit_expr v)
+       | "atom_xor", [p; v] ->
+           Printf.sprintf "atomicXor(%s, %s)" (emit_expr p) (emit_expr v)
+       | "atom_and", [p; v] ->
+           Printf.sprintf "atomicAnd(%s, %s)" (emit_expr p) (emit_expr v)
+       | "atom_sub", [p; v] ->
+           Printf.sprintf "atomicSub(%s, %s)" (emit_expr p) (emit_expr v)
+       | "atom_exch", [p; v] ->
+           Printf.sprintf "atomicExch(%s, %s)" (emit_expr p) (emit_expr v)
+       | "shfl_up_sync", [v; d; w] ->
+           Printf.sprintf "__shfl_up_sync(0xffffffff, %s, %s, %s)"
+             (emit_expr v) (emit_expr d) (emit_expr w)
        | "ballot_sync", [p] ->
            Printf.sprintf "__ballot_sync(0xffffffff, %s)" (emit_expr p)
        | "lane_id", [] -> "(threadIdx.x & 31)"
        | "warp_id", [] -> "(threadIdx.x >> 5)"
+       (* Memory fences *)
+       | "threadfence", [] -> "__threadfence()"
+       | "threadfence_block", [] -> "__threadfence_block()"
+       | "threadfence_system", [] -> "__threadfence_system()"
+       (* Async copy (SM_80+) *)
+       | "cp_async_cg", [d; s; b] ->
+           Printf.sprintf "__pipeline_memcpy_async(%s, %s, %s)"
+             (emit_expr d) (emit_expr s) (emit_expr b)
+       | "cp_async_commit", [] -> "__pipeline_commit()"
+       | "cp_async_wait_group", [n] ->
+           Printf.sprintf "__pipeline_wait_prior(%s)" (emit_expr n)
+       (* Cooperative groups (SM_90+) *)
+       | "cluster_sync", [] -> "__cluster_sync()"
+       (* FP16 conversions *)
+       | "f32_to_fp16", [x] ->
+           Printf.sprintf "__float2half(%s)" (emit_expr x)
+       | "fp16_to_f32", [x] ->
+           Printf.sprintf "__half2float(%s)" (emit_expr x)
+       | "f32_to_bf16", [x] ->
+           Printf.sprintf "__float2bfloat16(%s)" (emit_expr x)
+       | "bf16_to_f32", [x] ->
+           Printf.sprintf "__bfloat162float(%s)" (emit_expr x)
+       (* FP16 arithmetic *)
+       | "fp16_add", [a; b] ->
+           Printf.sprintf "__hadd(%s, %s)" (emit_expr a) (emit_expr b)
+       | "fp16_sub", [a; b] ->
+           Printf.sprintf "__hsub(%s, %s)" (emit_expr a) (emit_expr b)
+       | "fp16_mul", [a; b] ->
+           Printf.sprintf "__hmul(%s, %s)" (emit_expr a) (emit_expr b)
+       | "fp16_fma", [a; b; c] ->
+           Printf.sprintf "__hfma(%s, %s, %s)"
+             (emit_expr a) (emit_expr b) (emit_expr c)
+       | "fp16_neg", [a] ->
+           Printf.sprintf "__hneg(%s)" (emit_expr a)
+       | "fp16_abs", [a] ->
+           Printf.sprintf "__habs(%s)" (emit_expr a)
+       | "fp16_max", [a; b] ->
+           Printf.sprintf "__hmax(%s, %s)" (emit_expr a) (emit_expr b)
+       | "fp16_min", [a; b] ->
+           Printf.sprintf "__hmin(%s, %s)" (emit_expr a) (emit_expr b)
+       (* BF16 arithmetic *)
+       | "bf16_add", [a; b] ->
+           Printf.sprintf "__hadd(%s, %s)" (emit_expr a) (emit_expr b)
+       | "bf16_sub", [a; b] ->
+           Printf.sprintf "__hsub(%s, %s)" (emit_expr a) (emit_expr b)
+       | "bf16_mul", [a; b] ->
+           Printf.sprintf "__hmul(%s, %s)" (emit_expr a) (emit_expr b)
+       | "bf16_fma", [a; b; c] ->
+           Printf.sprintf "__hfma(%s, %s, %s)"
+             (emit_expr a) (emit_expr b) (emit_expr c)
+       | "bf16_neg", [a] ->
+           Printf.sprintf "__hneg(%s)" (emit_expr a)
        | name, args ->
            Printf.sprintf "%s(%s)" name
              (String.concat ", " (List.map emit_expr args)))
@@ -176,6 +241,17 @@ let rec emit_expr = function
 
   | { expr_desc = EProof _; _ } | { expr_desc = EAssume _; _ } ->
       "/* proof erased */"
+
+  | { expr_desc = EAsm ab; _ } ->
+      if ab.asm_outputs = [] && ab.asm_inputs = [] then
+        Printf.sprintf "asm volatile(\"%s\")" (String.escaped ab.asm_template)
+      else
+        let out_str = String.concat ", "
+          (List.map (fun (c, id) -> Printf.sprintf "\"%s\"(%s)" c id.name) ab.asm_outputs) in
+        let in_str = String.concat ", "
+          (List.map (fun (c, e) -> Printf.sprintf "\"%s\"(%s)" c (emit_expr e)) ab.asm_inputs) in
+        Printf.sprintf "asm volatile(\"%s\" : %s : %s)"
+          (String.escaped ab.asm_template) out_str in_str
 
   | _ -> "0 /* unhandled */"
 
@@ -210,7 +286,7 @@ let rec emit_expr_as_stmt st e =
        | None -> line st "}")
   | EAssign (lhs, rhs) ->
       line st (Printf.sprintf "%s = %s;" (emit_expr lhs) (emit_expr rhs))
-  | EProof _ | EAssume _ -> ()
+  | EProof _ | EAssume _ | EAsm _ -> ()
   | _ ->
       let s = emit_expr e in
       if s <> "/* proof erased */" && s <> "__if_stmt__" && s <> "__block_stmt__" then
@@ -323,7 +399,7 @@ let rec emit_expr_as_return st e =
        | None -> line st "}")
   | EAssign (lhs, rhs) ->
       line st (Printf.sprintf "%s = %s;" (emit_expr lhs) (emit_expr rhs))
-  | EProof _ | EAssume _ -> ()
+  | EProof _ | EAssume _ | EAsm _ -> ()
   | _ ->
       let s = emit_expr e in
       if s <> "/* proof erased */" then
@@ -333,10 +409,15 @@ let emit_function st fn =
   let params = String.concat ", " (List.map emit_param fn.fn_params) in
   let ret = emit_ret_ty fn.fn_ret in
   let returns_value = fn.fn_ret <> TPrim TUnit in
+  (* In CUDA, all non-main non-kernel functions must be __device__
+     if they might be called from a kernel. Since Forge modules are
+     compiled as a single TU and any function could be called from
+     a kernel, emit all non-main functions as __device__. *)
+  let is_main = fn.fn_name.name = "main" in
   let prefix =
     if is_kernel fn then "__global__ void"
-    else if is_device fn then Printf.sprintf "__device__ %s" ret
-    else ret
+    else if is_main then ret
+    else Printf.sprintf "__device__ %s" ret
   in
   blank st;
   line st (Printf.sprintf "%s %s(%s) {" prefix fn.fn_name.name params);
