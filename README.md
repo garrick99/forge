@@ -251,7 +251,12 @@ forge version            Print version
 
 ## License
 
-[MIT](LICENSE)
+Dual-licensed:
+
+- **[Apache 2.0](LICENSE)** — free for research, education, evaluation, and open-source projects
+- **[Commercial License](LICENSE-COMMERCIAL.md)** — required for production deployment of Forge-compiled code in commercial products
+
+See [LICENSE-COMMERCIAL.md](LICENSE-COMMERCIAL.md) for details.
 
 ---
 
