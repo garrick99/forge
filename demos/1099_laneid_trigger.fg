@@ -1,0 +1,25 @@
+// expected: 0
+// Demo 1099: FG-1.13A trigger — minimal %laneid test.
+//
+// TEMPORARY FILE used by the OpenPTXas FG-1.13 diagnostic campaign to
+// force %laneid to appear in Forge-generated PTX with no other moving
+// parts.  No warp shuffle, no device function call, no shared memory,
+// no atomics.  The single kernel reads lane_id() and stores it into
+// output[tid].
+//
+// This file should be deleted after FG-1.13 / FG-1.14 completes.
+
+use std::gpu;
+
+#[kernel]
+fn laneid_trigger(output: span<u64>, n: u64)
+    requires n <= output.len
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        let lid: u64 = lane_id();
+        output[tid] = lid;
+    };
+}
+
+fn main() -> u64 { 0u64 }

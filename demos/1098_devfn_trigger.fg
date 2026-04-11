@@ -1,0 +1,25 @@
+// expected: 0
+// Demo 1098: FG-1.13B trigger — minimal device function call test.
+//
+// TEMPORARY FILE used by the OpenPTXas FG-1.13 diagnostic campaign to
+// force a user-defined device function call in Forge-generated PTX.
+// No warp shuffle, no lane_id, no rem/div, no shared memory, no atomics.
+// The kernel calls one helper that returns a simple computed value, and
+// the result is written to output[tid].
+//
+// This file should be deleted after FG-1.13 / FG-1.14 completes.
+
+fn double_it(x: u64) -> u64 { x + x }
+
+#[kernel]
+fn devfn_trigger(output: span<u64>, n: u64)
+    requires n <= output.len
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        let doubled: u64 = double_it(tid);
+        output[tid] = doubled;
+    };
+}
+
+fn main() -> u64 { 0u64 }

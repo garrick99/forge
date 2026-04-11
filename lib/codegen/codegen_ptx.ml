@@ -78,6 +78,11 @@ type emit_state = {
   fn_name : string;
   (* Variable → register name mapping *)
   mutable reg_env  : (string * string) list;
+  (* FG-2.6: user-defined non-kernel functions available for inlining
+     at a call site.  Keyed by function name; value is the full AST
+     definition.  The generic ECall branch consults this table to
+     inline the body when the callee is a known device function. *)
+  fn_defs : (string, fn_def) Hashtbl.t;
 }
 
 let fresh_reg st rty =
@@ -569,11 +574,21 @@ let rec lower_expr st e : string =
       emit st (Printf.sprintf "vote.sync.ballot.b32 %s, %s, 0xffffffff;" dst ptmp);
       dst
 
-  (* Lane ID *)
+  (* Lane ID.
+     FG-2.6: emit a u64 register so callers that bind the result to a
+     u64 variable get a correctly-typed value without relying on an
+     implicit u32→u64 coercion at the assignment site (which the PTX
+     backend does not currently insert).  The extra `mov.u32` into a
+     temporary followed by `cvt.u64.u32` is what PTXAS would do
+     internally; by emitting it here we guarantee the downstream
+     store sees a valid u64 operand. *)
   | ECall ({ expr_desc = EVar id; _ }, [])
       when id.name = "lane_id" ->
-      let r = fresh_reg st U32 in
-      emit st (Printf.sprintf "mov.u32 %s, %%laneid;" r); r
+      let tmp = fresh_reg st U32 in
+      emit st (Printf.sprintf "mov.u32 %s, %%laneid;" tmp);
+      let r = fresh_reg st U64 in
+      emit st (Printf.sprintf "cvt.u64.u32 %s, %s;" r tmp);
+      r
 
   (* Warp ID *)
   | ECall ({ expr_desc = EVar id; _ }, [])
@@ -581,11 +596,94 @@ let rec lower_expr st e : string =
       let r = fresh_reg st U32 in
       emit st (Printf.sprintf "mov.u32 %s, %%warpid;" r); r
 
-  (* Generic function calls *)
-  | ECall ({ expr_desc = EVar id; _ }, _args) ->
-      let r = fresh_reg st U64 in
-      emit st (Printf.sprintf "mov.u64 %s, 0; // call %s (device fn)" r id.name);
-      r
+  (* Generic function calls.
+
+     FG-2.6: inline user-defined device functions at the call site.
+     The PTX backend has no call/return machinery, so a real PTX
+     call is not available.  Inlining is sufficient for the
+     supported minimal scope:
+       - simple pure functions (no side effects beyond the returned
+         value)
+       - one body expression (any shape that lower_expr handles)
+       - positional arguments bound by parameter name
+     Recursion and mutually-recursive functions are NOT supported.
+     Functions not found in st.fn_defs fall through to the legacy
+     stub (mov.u64 %rdN, 0) and a warning comment in the emitted PTX
+     so callers can see the failure mode instead of silently running
+     the stub value. *)
+  | ECall ({ expr_desc = EVar id; _ }, args) ->
+      (match Hashtbl.find_opt st.fn_defs id.name with
+       | Some callee when callee.fn_body <> None ->
+           (* 1. Lower each argument expression in the caller's
+                 environment to get a source register.  The
+                 argument register may not match the callee's
+                 parameter type — for example, a `tid: u64`
+                 variable computed as `add.u32 %r7, ...` holds its
+                 value in a u32 register even though its Forge
+                 type is u64.  To keep the inlined body type-
+                 correct (and to stay within PTXAS's strict
+                 operand-type check), coerce each argument register
+                 to its parameter type via cvt.u64.u32 / cvt.u32.u64
+                 as needed.  Only the narrow u32<->u64 conversion
+                 pair is handled here because that is the only
+                 case the current backend exercises; broader type
+                 coercion is tracked as future work. *)
+           let arg_regs = List.map (lower_expr st) args in
+           let coerced_regs =
+             List.map2 (fun (_pname, pty) areg ->
+               let pty_rty = ptx_rty_of_ty pty in
+               let areg_rty = reg_rty st areg in
+               if pty_rty = areg_rty then areg
+               else begin
+                 match areg_rty, pty_rty with
+                 | U32, U64 ->
+                     let r = fresh_reg st U64 in
+                     emit st (Printf.sprintf "cvt.u64.u32 %s, %s;" r areg);
+                     r
+                 | U64, U32 ->
+                     let r = fresh_reg st U32 in
+                     emit st (Printf.sprintf "cvt.u32.u64 %s, %s;" r areg);
+                     r
+                 | _ ->
+                     (* Leave other type mismatches alone; PTXAS
+                        will catch them explicitly rather than the
+                        inliner silently mis-coercing. *)
+                     areg
+               end
+             ) callee.fn_params arg_regs
+           in
+           (* 2. Bind callee parameter names to the coerced argument
+                 registers.  Save the current reg_env so we can
+                 restore it after the inlined body and avoid leaking
+                 the binding. *)
+           let saved_env = st.reg_env in
+           let new_bindings =
+             List.map2 (fun (pname, _pty) areg -> (pname.name, areg))
+               callee.fn_params coerced_regs
+           in
+           st.reg_env <- new_bindings @ saved_env;
+           (* 3. Lower the callee body in the caller's state.  Its
+                 fresh_reg allocations flow into st, so all emitted
+                 instructions belong to the current kernel's register
+                 space and there is no cross-function conflict. *)
+           let body = match callee.fn_body with
+             | Some b -> b
+             | None -> assert false
+           in
+           let result_reg = lower_expr st body in
+           (* 4. Restore the reg_env.  Register decls stay in
+                 st.reg_decls (they are per-kernel, not per-scope). *)
+           st.reg_env <- saved_env;
+           result_reg
+       | _ ->
+           (* Unknown callee — emit stub + warning.  This path is
+              intentionally loud so missing device-function cases
+              surface immediately instead of silently succeeding. *)
+           let r = fresh_reg st U64 in
+           emit st (Printf.sprintf
+             "mov.u64 %s, 0; // FG-2.6: UNRESOLVED device fn %s (stub)"
+             r id.name);
+           r)
 
   | EAssign (lhs, rhs) ->
       let rv = lower_expr st rhs in
@@ -804,13 +902,14 @@ let emit_param st (id, ty) =
 (* Kernel function emission                                             *)
 (* ------------------------------------------------------------------ *)
 
-let emit_kernel (fn : fn_def) : string =
+let emit_kernel ?(fn_defs = Hashtbl.create 0) (fn : fn_def) : string =
   let st = {
     counter   = 0;
     instrs    = [];
     reg_decls = [];
     fn_name   = fn.fn_name.name;
     reg_env   = [];
+    fn_defs;
   } in
   (* Collect param decls and load instrs *)
   let (param_decls_ll, load_instrs_ll) =
@@ -867,6 +966,17 @@ let emit_ptx_program (items : item list) (sm : int) : string =
         Some fn
     | _ -> None
   ) items in
+  (* FG-2.6: build the device-function table from every non-kernel
+     IFn item in the module.  This table is consulted by the generic
+     ECall lowering in lower_expr to inline user-defined device
+     functions at the call site. *)
+  let fn_defs : (string, fn_def) Hashtbl.t = Hashtbl.create 16 in
+  List.iter (fun item ->
+    match item.item_desc with
+    | IFn fn when not (List.exists (fun a -> a.attr_name = "kernel") fn.fn_attrs) ->
+        Hashtbl.replace fn_defs fn.fn_name.name fn
+    | _ -> ()
+  ) items;
   if kernels = [] then ""
   else begin
     let buf = Buffer.create 4096 in
@@ -877,7 +987,7 @@ let emit_ptx_program (items : item list) (sm : int) : string =
     let ptx_ver = if sm >= 120 then "8.8" else "8.5" in
     Buffer.add_string buf (Printf.sprintf ".version %s\n.target sm_%d\n.address_size 64\n\n" ptx_ver sm);
     List.iter (fun fn ->
-      Buffer.add_string buf (emit_kernel fn);
+      Buffer.add_string buf (emit_kernel ~fn_defs fn);
       Buffer.add_char buf '\n'
     ) kernels;
     Buffer.contents buf
