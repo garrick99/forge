@@ -1,0 +1,37 @@
+// expected: 0
+// FORGE21-24 shared-memory neighborhood slice.
+//
+// shared[tid] = a[tid]
+// syncthreads()
+// out[tid] = shared[tid] + shared[tid + 1]   (only for tid < n-1)
+//
+// Single block, u32 only.  No loops, no atomics, no warp intrinsics.
+// One bar.sync between the shared write and the neighbor read so the
+// proof reads the post-write data.
+
+use std::gpu;
+
+#[kernel]
+fn vec_shared_neighbor(a: span<u32>, out: span<u32>, n: u32, n_minus_1: u32)
+    requires n <= a.len
+    requires n <= out.len
+    requires n <= 256u32
+    requires n_minus_1 + 1u32 == n
+    requires n > 0u32
+{
+    let smem: shared<u32>[256] = 0;
+    let tid: u32 = threadIdx_x;
+
+    // Stage 1: cooperative load global -> shared.
+    if tid < n { smem[tid] = a[tid]; };
+    syncthreads();
+
+    // Stage 2: each thread (except last) sums own + neighbor.
+    if tid < n_minus_1 {
+        let v0: u32 = smem[tid];
+        let v1: u32 = smem[tid + 1u32];
+        out[tid] = v0 + v1;
+    };
+}
+
+fn main() -> u64 { 0u64 }
