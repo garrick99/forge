@@ -1,0 +1,33 @@
+// expected: 0
+// FORGE13-16 parallel map + composition slice.
+//
+// tmp[tid] = a[tid] * 3 + 7
+// out[tid] = (tmp[tid] ^ b[tid]) + c[tid]
+//
+// `tmp` is a per-thread intermediate (scalar local, lives in regs;
+// no tmp array allocation needed).  This exercises chained data flow
+// across 4 arrays + an intermediate without loops or atomics.
+
+use std::gpu;
+
+// Pure compute helper: stage 1 (mul+add) feeds stage 2 (xor+add).
+fn map_chain_u32(av: u32, bv: u32, cv: u32) -> u32 {
+    let tmp: u32 = av * 3u32 + 7u32;
+    (tmp ^ bv) + cv
+}
+
+#[kernel]
+fn vec_map_compose(a: span<u32>, b: span<u32>, c: span<u32>,
+                   out: span<u32>, n: u32)
+    requires n <= a.len
+    requires n <= b.len
+    requires n <= c.len
+    requires n <= out.len
+{
+    let tid: u32 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        out[tid] = map_chain_u32(a[tid], b[tid], c[tid]);
+    };
+}
+
+fn main() -> u64 { 0u64 }
