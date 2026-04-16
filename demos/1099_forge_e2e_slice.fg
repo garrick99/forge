@@ -1,0 +1,39 @@
+// expected: 0
+// FORGE01-04 vertical slice: Forge -> CUDA -> PTX -> SASS -> GPU
+//
+// Bounded u32-only kernel that exercises the OpenPTXas backend through
+// the full toolchain.  Avoids known-hard families:
+//   - no u64 ops      (avoids IADD.64/IMAD.WIDE family - ALLOC subsystem)
+//   - no loops        (avoids loop unrolling/back-edge issues)
+//   - no atomics      (out-of-scope per operating rules)
+//   - no FP           (no HFMA2/FFMA risk)
+//
+// Operations exercised:
+//   add (IADD3), mul (IMAD), xor (LOP3), clamp (IMNMX - newly modeled
+//   in IMNMX01-04 sprint), tid-bounded entry guard.
+
+use std::gpu;
+
+// Pure compute helper: a + b, then xor with magic, then *3, then upper-clamp 1024.
+// (u32 is unsigned so lower clamp at 0 is trivial.)
+fn compute_clamp_u32(a: u32, b: u32) -> u32 {
+    let x: u32 = a + b;
+    let y: u32 = x ^ 0xDEADBEEFu32;
+    let z: u32 = y * 3u32;
+    if z > 1024u32 { 1024u32 } else { z }
+}
+
+// Slice kernel: per-thread compute + store.
+#[kernel]
+fn vec_compute_clamp(a: span<u32>, b: span<u32>, out: span<u32>, n: u32)
+    requires n <= a.len
+    requires n <= b.len
+    requires n <= out.len
+{
+    let tid: u32 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        out[tid] = compute_clamp_u32(a[tid], b[tid]);
+    };
+}
+
+fn main() -> u64 { 0u64 }

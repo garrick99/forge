@@ -77,8 +77,18 @@ let emit_ret_ty = function
 (* ------------------------------------------------------------------ *)
 
 let rec emit_expr = function
-  | { expr_desc = ELit (LInt (n, _)); _ } ->
-      if n >= 0L then Printf.sprintf "%LuULL" n
+  | { expr_desc = ELit (LInt (n, ty_opt)); _ } ->
+      (* FORGE01-04: emit width-correct integer suffix so OpenCUDA does
+         not promote u32 expressions to u64 (which would force the
+         IADD.64/MUL.64 family - ALLOC subsystem rewrite required).
+         Default to ULL for u64/unspecified to preserve prior behavior. *)
+      let suffix = match ty_opt with
+        | Some (TUint U8)  | Some (TUint U16) | Some (TUint U32) -> "U"
+        | Some (TInt I8)   | Some (TInt I16)  | Some (TInt I32)  -> ""
+        | Some (TInt I64)                                          -> "LL"
+        | _ -> "ULL"
+      in
+      if n >= 0L then Printf.sprintf "%Lu%s" n suffix
       else Printf.sprintf "(%Ld)" n
 
   | { expr_desc = ELit (LFloat (f, _)); _ } ->
