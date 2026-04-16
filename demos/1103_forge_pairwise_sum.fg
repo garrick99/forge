@@ -1,0 +1,29 @@
+// expected: 0
+// FORGE17-20 pairwise reduction slice.
+//
+// out[tid] = a[tid] + a[tid + 1]
+//
+// Bounded pairwise sum (no loops, no shared memory).  Exercises:
+//   - two reads from the same array
+//   - dependent address computation
+//   - bounds: only threads with tid+1 < n compute (last thread idle)
+
+use std::gpu;
+
+#[kernel]
+fn vec_pairwise_sum(a: span<u32>, out: span<u32>, n: u32, n_minus_1: u32)
+    requires n <= a.len
+    requires n <= out.len
+    requires n_minus_1 + 1u32 == n
+    requires n > 0u32
+{
+    let tid: u32 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n_minus_1 {
+        let i_next: u32 = tid + 1u32;
+        let v0: u32 = a[tid];
+        let v1: u32 = a[i_next];
+        out[tid] = v0 + v1;
+    };
+}
+
+fn main() -> u64 { 0u64 }
