@@ -1,4 +1,28 @@
-# Forge → OpenCUDA → OpenPTXas → GPU — Memory Slice (FORGE09-12) — BLOCKED
+# Forge → OpenCUDA → OpenPTXas → GPU — Memory Slice (FORGE09-12) — RESOLVED
+
+## RESOLUTION (2026-04-16, openptxas commits `433c94d` + `0736551`)
+
+This slice was BLOCKED at first attempt by a coordinated pair of
+OpenPTXas backend bugs.  Both have since been fixed by bounded changes:
+
+1. **ALLOC-R01-08** (`433c94d`): lifetime-correct S2R hoist —
+   prevents `LDC Rn = blockDim` from clobbering a hoisted
+   `S2R Rn = TID` when both target the same physical register.
+2. **ALLOC-R09-16** (`0736551`): phys-reg-aware IMAD fusion guard —
+   blocks the `mul + add` peephole fusion when its `mul.dest`/
+   `add.dest` aliasing would let a later `mul.dest` rewrite corrupt
+   a subsequent read of `add.dest`.
+
+**Current state**: GPU PASS (16/16) for `vec_memory_mix3`, with
+zero backend regressions (pytest 865/865, GPU 127/10/7, frontier
+BYTE_EXACT 66 / STRUCTURAL 78 — all unchanged).
+
+The original BLOCKED writeup below is preserved as evidence of the
+diagnostic chain that led to the fix.
+
+---
+
+# Forge → OpenCUDA → OpenPTXas → GPU — Memory Slice (FORGE09-12) — original BLOCKED writeup
 
 **Date**: 2026-04-16
 **Hardware**: RTX 5090 (SM_120, Blackwell)
