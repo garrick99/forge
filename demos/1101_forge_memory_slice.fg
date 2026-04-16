@@ -1,0 +1,37 @@
+// expected: 0
+// FORGE09-12 memory indexing vertical slice (3-array variant).
+//
+// out[tid] = (a[tid] * 2 + b[tid + 5]) ^ c[tid]
+//
+// Exercises:
+//   - linear index (tid)              -> a[tid], c[tid]
+//   - offset index (tid + 5)          -> b[tid + 5]   (bounds: tid < n - 5)
+//   - 3 input arrays + 1 output array
+//
+// Uses the same 7-param pattern (3 spans + 1 u32) that FORGE05-08
+// proved end-to-end. The 4-span variant (a, b, c, out, n, two_n)
+// hits a deeper OURS regalloc/scheduling bug where the TID register
+// is overwritten by a literal load before its use in the global-tid
+// IMAD - tracked separately as a backend limitation.
+
+use std::gpu;
+
+#[kernel]
+fn vec_memory_mix3(a: span<u32>, b: span<u32>, c: span<u32>,
+                   n: u32)
+    requires n <= a.len
+    requires n + 5u32 <= b.len
+    requires n <= c.len
+    requires n > 5u32
+{
+    let tid: u32 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid + 5u32 < n + 5u32 {
+        let i_b: u32 = tid + 5u32;
+        let va: u32 = a[tid];
+        let vb: u32 = b[i_b];
+        let vc: u32 = c[tid];
+        a[tid] = (va * 2u32 + vb) ^ vc;
+    };
+}
+
+fn main() -> u64 { 0u64 }
