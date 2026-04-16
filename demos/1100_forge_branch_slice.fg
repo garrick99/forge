@@ -1,0 +1,34 @@
+// expected: 0
+// FORGE05-08 branching vertical slice: predicate execution proof.
+//
+// out[tid] = if a[tid] > b[tid] then (a[tid] - b[tid]) * 2
+//            else (b[tid] - a[tid]) * 3
+//
+// Constraints (same envelope as FORGE01-04):
+//   u32 only, no loops, no IADD.64, no HFMA2, no atomics, no FP.
+
+use std::gpu;
+
+// Pure compute helper isolates the if-merge predicate logic from
+// the kernel's bounds-check obligations.
+fn diff_scaled_u32(a: u32, b: u32) -> u32 {
+    if a > b {
+        (a - b) * 2u32
+    } else {
+        (b - a) * 3u32
+    }
+}
+
+#[kernel]
+fn vec_diff_branch(a: span<u32>, b: span<u32>, out: span<u32>, n: u32)
+    requires n <= a.len
+    requires n <= b.len
+    requires n <= out.len
+{
+    let tid: u32 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        out[tid] = diff_scaled_u32(a[tid], b[tid]);
+    };
+}
+
+fn main() -> u64 { 0u64 }
