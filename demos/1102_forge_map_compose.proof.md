@@ -1,4 +1,24 @@
-# Forge → OpenCUDA → OpenPTXas → GPU — Map Composition (FORGE13-16) — BLOCKED on OpenCUDA reuse
+# Forge → OpenCUDA → OpenPTXas → GPU — Map Composition (FORGE13-16) — RESOLVED
+
+## RESOLUTION (2026-04-16, opencuda commit `56480aa`)
+
+OCUDA01-08 chain shipped an OpenCUDA-side fix: disable linear-scan
+free-list reuse for the b32 (`r`) prefix in
+`opencuda/codegen/emit.py::_build_alloc_map`.  Each 32-bit int Value
+now gets a fresh `%rN` (SSA-faithful).  Other prefixes (rd, f, h, p,
+etc.) retain their reuse behaviour.
+
+Result: FORGE13 vec_map_compose now GPU PASS (256/256 threads correct)
+with zero OpenPTXas changes and zero net regressions (one OpenCUDA
+test marked @skip — the old reuse-asserts-against-naive-count test
+no longer applies to b32; correctness wins over efficiency).
+
+The original BLOCKED writeup below is preserved as evidence of the
+diagnostic chain that led to the fix.
+
+---
+
+# Forge → OpenCUDA → OpenPTXas → GPU — Map Composition (FORGE13-16) — original BLOCKED writeup
 
 **Date**: 2026-04-16
 **Hardware**: RTX 5090 (SM_120, Blackwell)
