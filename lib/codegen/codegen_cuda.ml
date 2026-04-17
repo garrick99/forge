@@ -152,6 +152,13 @@ let rec emit_expr = function
        | "shfl_xor_sync", [v; m; w] ->
            Printf.sprintf "__shfl_xor_sync(0xffffffff, %s, %s, %s)"
              (emit_expr v) (emit_expr m) (emit_expr w)
+       | "shfl_xor_sync_u32", [v; m; w] ->
+           (* FORGE33-36: u32 overload alias.  Forge stdlib only declares
+              the u64 form of shfl_xor_sync; the u32 binding lives in
+              user code under this name and lowers to the same CUDA
+              builtin (overload-resolved by C++ frontend on val type). *)
+           Printf.sprintf "__shfl_xor_sync(0xffffffff, %s, %s, %s)"
+             (emit_expr v) (emit_expr m) (emit_expr w)
        | "atom_add", [p; v] ->
            Printf.sprintf "atomicAdd(%s, %s)" (emit_expr p) (emit_expr v)
        | "atom_add_u32", [p; v] ->

@@ -1,0 +1,33 @@
+// expected: 0
+// FORGE33-36 warp-shuffle slice (intra-warp data movement).
+//
+// Each lane swaps its value with its lane^1 neighbour via shfl.xor:
+//   x = a[tid]
+//   y = shfl_xor_u32(x, 1)           (lane i reads from lane i^1)
+//   out[tid] = x + y
+//
+// Single warp (blockDim = 32).  No shared memory, no atomics.
+// Pairwise lane exchange: (0<->1, 2<->3, 4<->5, ...).
+
+use std::gpu;
+
+// u32 overload binding for __shfl_xor_sync.  Forge stdlib only
+// declares u64; the u32 form is mapped in lib/codegen/codegen_cuda.ml
+// to the same CUDA builtin (overload-resolved by C++ on val type).
+extern fn shfl_xor_sync_u32(val: u32, mask: u32, width: u32) -> u32 = "forge_gpu";
+
+#[kernel]
+fn vec_shfl_pair(a: span<u32>, out: span<u32>, n: u32)
+    requires n <= a.len
+    requires n <= out.len
+    requires n > 0u32
+{
+    let tid: u32 = threadIdx_x;
+    if tid < n {
+        let x: u32 = a[tid];
+        let y: u32 = shfl_xor_sync_u32(x, 1u32, 32u32);
+        out[tid] = x + y;
+    };
+}
+
+fn main() -> u64 { 0u64 }
