@@ -1,0 +1,114 @@
+.version 9.0
+.target sm_120
+.address_size 64
+
+.visible .entry tiled_stencil_5pt(
+    .param .u64 inp, .param .u64 inp_len, .param .u64 out, .param .u64 out_len, .param .u32 width, .param .u32 height)
+{
+    .shared .u32 smem[256];
+    .reg .b32 %r<40>;
+    .reg .b64 %rd<17>;
+    .reg .pred %p<1>;
+
+    mov.u64 %rd0, smem;
+    ld.param.u64 %rd1, [inp];
+    ld.param.u64 %rd2, [inp_len];
+    ld.param.u64 %rd3, [out];
+    ld.param.u64 %rd4, [out_len];
+    ld.param.u32 %r0, [width];
+    ld.param.u32 %r1, [height];
+    mov.u32 %r2, %tid.x;
+    mov.u32 %r3, %tid.y;
+    mov.u32 %r4, %ctaid.x;
+    shl.b32 %r5, %r4, 4;
+    add.u32 %r6, %r5, %r2;
+    mov.u32 %r7, %ctaid.y;
+    shl.b32 %r8, %r7, 4;
+    add.u32 %r9, %r8, %r3;
+    shl.b32 %r10, %r3, 4;
+    add.u32 %r11, %r10, %r2;
+    setp.lt.u32 %p0, %r6, %r0;
+    @%p0 bra if_true_2;
+    bra if_merge_4;
+if_true_2:
+    setp.lt.u32 %p0, %r9, %r1;
+    @%p0 bra if_true_5;
+    bra if_merge_4;
+if_merge_4:
+    bar.sync 0;
+    setp.gt.u32 %p0, %r2, 0;
+    @!%p0 ret;
+    setp.lt.u32 %p0, %r2, 15;
+    @!%p0 ret;
+    setp.gt.u32 %p0, %r3, 0;
+    @!%p0 ret;
+    setp.lt.u32 %p0, %r3, 15;
+    @!%p0 ret;
+    setp.gt.u32 %p0, %r6, 0;
+    @!%p0 ret;
+    add.u32 %r17, %r6, 1;
+    setp.lt.u32 %p0, %r17, %r0;
+    @!%p0 ret;
+    setp.gt.u32 %p0, %r9, 0;
+    @!%p0 ret;
+    add.u32 %r18, %r9, 1;
+    setp.lt.u32 %p0, %r18, %r1;
+    @!%p0 ret;
+    shl.b32 %r19, %r11, 2;
+    cvt.u64.u32 %rd7, %r19;
+    add.u64 %rd1, %rd0, %rd7;
+    ld.shared.u32 %r20, [%rd1];
+    sub.u32 %r21, %r11, 16;
+    shl.b32 %r22, %r21, 2;
+    cvt.u64.u32 %rd8, %r22;
+    add.u64 %rd2, %rd0, %rd8;
+    ld.shared.u32 %r23, [%rd2];
+    add.u32 %r24, %r11, 16;
+    shl.b32 %r25, %r24, 2;
+    cvt.u64.u32 %rd9, %r25;
+    add.u64 %rd5, %rd0, %rd9;
+    ld.shared.u32 %r26, [%rd5];
+    sub.u32 %r27, %r11, 1;
+    shl.b32 %r28, %r27, 2;
+    cvt.u64.u32 %rd10, %r28;
+    add.u64 %rd6, %rd0, %rd10;
+    ld.shared.u32 %r29, [%rd6];
+    add.u32 %r30, %r11, 1;
+    shl.b32 %r31, %r30, 2;
+    cvt.u64.u32 %rd11, %r31;
+    add.u64 %rd1, %rd0, %rd11;
+    ld.shared.u32 %r32, [%rd1];
+    add.u32 %r33, %r20, %r23;
+    add.u32 %r34, %r33, %r26;
+    add.u32 %r35, %r34, %r29;
+    add.u32 %r36, %r35, %r32;
+    mul.lo.u32 %r37, %r9, %r0;
+    add.u32 %r38, %r37, %r6;
+    cvt.u64.u32 %rd12, %r38;
+    setp.lt.u64 %p0, %rd12, %rd4;
+    @!%p0 ret;
+    shl.b32 %r39, %r38, 2;
+    cvt.u64.u32 %rd13, %r39;
+    add.u64 %rd2, %rd3, %rd13;
+    st.global.u32 [%rd2], %r36;
+    bra if_merge_13;
+if_true_5:
+    mul.lo.u32 %r12, %r9, %r0;
+    add.u32 %r13, %r12, %r6;
+    cvt.u64.u32 %rd14, %r13;
+    setp.lt.u64 %p0, %rd14, %rd2;
+    @%p0 bra if_true_8;
+    bra if_merge_4;
+if_true_8:
+    shl.b32 %r14, %r11, 2;
+    cvt.u64.u32 %rd15, %r14;
+    add.u64 %rd5, %rd0, %rd15;
+    shl.b32 %r15, %r13, 2;
+    cvt.u64.u32 %rd16, %r15;
+    add.u64 %rd6, %rd1, %rd16;
+    ld.global.u32 %r16, [%rd6];
+    st.shared.u32 [%rd5], %r16;
+    bra if_merge_4;
+if_merge_13:
+    ret;
+}
