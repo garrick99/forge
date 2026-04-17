@@ -1,0 +1,31 @@
+.version 9.0
+.target sm_120
+.address_size 64
+
+.visible .entry vec_atomic_sum(
+    .param .u64 a, .param .u64 a_len, .param .u64 out_ptr, .param .u32 n)
+{
+    .reg .b32 %r<9>;
+    .reg .b64 %rd<4>;
+    .reg .pred %p<1>;
+
+    ld.param.u64 %rd0, [a];
+    ld.param.u64 %rd1, [a_len];
+    ld.param.u64 %rd1, [out_ptr];
+    ld.param.u32 %r0, [n];
+    mov.u32 %r1, %ctaid.x;
+    mov.u32 %r2, %ntid.x;
+    mul.lo.u32 %r3, %r1, %r2;
+    mov.u32 %r4, %tid.x;
+    add.u32 %r5, %r3, %r4;
+    setp.lt.u32 %p0, %r5, %r0;
+    @!%p0 ret;
+    shl.b32 %r6, %r5, 2;
+    cvt.u64.u32 %rd3, %r6;
+    add.u64 %rd2, %rd0, %rd3;
+    ld.global.u32 %r7, [%rd2];
+    atom.global.add.u32 %r8, [%rd1], %r7;
+    bra if_merge_4;
+if_merge_4:
+    ret;
+}

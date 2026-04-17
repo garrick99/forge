@@ -154,6 +154,12 @@ let rec emit_expr = function
              (emit_expr v) (emit_expr m) (emit_expr w)
        | "atom_add", [p; v] ->
            Printf.sprintf "atomicAdd(%s, %s)" (emit_expr p) (emit_expr v)
+       | "atom_add_u32", [p; v] ->
+           (* FORGE29-32: u32 overload alias.  Forge stdlib only declares
+              the u64 form of atom_add; the u32 binding lives in user code
+              under this name.  Both lower to the same CUDA atomicAdd
+              builtin — the C++ frontend overload-resolves on pointer type. *)
+           Printf.sprintf "atomicAdd(%s, %s)" (emit_expr p) (emit_expr v)
        | "atom_cas", [p; v] ->
            Printf.sprintf "atomicCAS(%s, %s, %s)" (emit_expr p) (emit_expr v) (emit_expr v)
        | "atom_max", [p; v] ->

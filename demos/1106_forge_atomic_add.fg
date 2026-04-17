@@ -1,0 +1,30 @@
+// expected: 0
+// FORGE29-32 atomic-add slice (global accumulation).
+//
+// for each thread: atomicAdd(&out[0], a[tid])
+//
+// Single global accumulator, all threads contribute.  u32 only.
+// No loops, no shared memory.  Stress-tests atomic correctness
+// under contention.
+
+use std::gpu;
+
+// u32-typed atomicAdd.  Forge stdlib only declares the u64 form;
+// the u32 binding `atom_add_u32` is mapped in lib/codegen/codegen_cuda.ml
+// to the same CUDA `atomicAdd(...)` builtin (C++ frontend overload-
+// resolves on pointer type).
+extern fn atom_add_u32(ptr: raw<u32>, val: u32) -> u32 = "forge_gpu";
+
+#[kernel]
+fn vec_atomic_sum(a: span<u32>, out_ptr: raw<u32>, n: u32)
+    requires n <= a.len
+    requires n > 0u32
+{
+    let tid: u32 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n {
+        let v: u32 = a[tid];
+        let _old: u32 = atom_add_u32(out_ptr, v);
+    };
+}
+
+fn main() -> u64 { 0u64 }
