@@ -1,0 +1,68 @@
+// expected: 0
+// FORGE45-48 tiled matrix transpose (shared mem + 2D indexing + barrier).
+//
+// TILE = 16. Each block transposes a 16x16 tile of input into the
+// transposed location in output, using shared memory + a barrier.
+//
+//   Phase 1:  smem[y, x] = in [gy*width  + gx]    (gx, gy = global col/row)
+//   sync
+//   Phase 2:  out[ty*height + tx] = smem[x, y]    (transposed read)
+//
+//   gx = blockIdx_x * TILE + threadIdx_x
+//   gy = blockIdx_y * TILE + threadIdx_y
+//   tx = blockIdx_y * TILE + threadIdx_x  -> destination column
+//   ty = blockIdx_x * TILE + threadIdx_y  -> destination row
+//
+// Phase-1 read is coalesced (threads with consecutive x hit consecutive
+// in[gy*width + gx]).  Phase-2 write is coalesced (threads with
+// consecutive x hit consecutive out[ty*height + tx]).
+
+use std::gpu;
+
+#[kernel]
+fn transpose_tile(
+    inp: span<u32>, out: span<u32>,
+    width: u32, height: u32
+)
+    requires width > 0u32
+    requires height > 0u32
+    requires width * height <= inp.len
+    requires width * height <= out.len
+    requires threadIdx_x < 16u32
+    requires threadIdx_y < 16u32
+{
+    let smem: shared<u32>[256] = 0;
+
+    let x: u32 = threadIdx_x;
+    let y: u32 = threadIdx_y;
+    let bx: u32 = blockIdx_x;
+    let by: u32 = blockIdx_y;
+
+    // Phase 1: load from global (row=gy, col=gx) into smem[y][x].
+    let gx: u32 = bx * 16u32 + x;
+    let gy: u32 = by * 16u32 + y;
+    if gx < width {
+        if gy < height {
+            let in_idx: u32  = gy * width + gx;
+            let sw_idx: u32  = y * 16u32 + x;
+            smem[sw_idx] = inp[in_idx];
+        };
+    };
+
+    syncthreads();
+
+    // Phase 2: write smem[x][y] (transposed read) to out[ty, tx].
+    let tx: u32 = by * 16u32 + x;
+    let ty: u32 = bx * 16u32 + y;
+    if tx < height {
+        if ty < width {
+            let out_idx: u32 = ty * height + tx;
+            let sr_idx: u32  = x * 16u32 + y;
+            if out_idx < out.len {
+                out[out_idx] = smem[sr_idx];
+            };
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }

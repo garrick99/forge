@@ -1,0 +1,408 @@
+	.target	sm_120
+
+	.elftype	@"ET_EXEC"
+
+
+//--------------------- .note.nv.tkinfo           --------------------------
+	.section	.note.nv.tkinfo,"",@"SHT_NOTE"
+	.sectionflags	@"SHF_NOTE_NV_TKINFO"
+	.tkinfo
+        /*0018*/ 	.word	0x00000002
+        /*0030*/ 	.string	""
+        /*0030*/ 	.string	"ptxas"
+        /*0030*/ 	.string	"Cuda compilation tools, release 13.0, V13.0.88"
+        /*0030*/ 	.string	"Build cuda_13.0.r13.0/compiler.36424714_0"
+        /*0030*/ 	.string	"-arch sm_120 "
+
+
+
+//--------------------- .note.nv.cuinfo           --------------------------
+	.section	.note.nv.cuinfo,"",@"SHT_NOTE"
+	.sectionflags	@"SHF_NOTE_NV_CUINFO"
+        /*0018*/ 	.short	0x0002
+        /*001a*/ 	.short	0x0078
+        /*001c*/ 	.short	0x0082
+	.zero		2
+
+
+//--------------------- .nv.info                  --------------------------
+	.section	.nv.info,"",@"SHT_CUDA_INFO"
+	.align	4
+
+
+	//----- nvinfo : EIATTR_REGCOUNT
+	.align		4
+        /*0000*/ 	.byte	0x04, 0x2f
+        /*0002*/ 	.short	(.L_1 - .L_0)
+	.align		4
+.L_0:
+        /*0004*/ 	.word	index@(transpose_tile)
+        /*0008*/ 	.word	0x0000001c
+
+
+	//----- nvinfo : EIATTR_FRAME_SIZE
+	.align		4
+.L_1:
+        /*000c*/ 	.byte	0x04, 0x11
+        /*000e*/ 	.short	(.L_3 - .L_2)
+	.align		4
+.L_2:
+        /*0010*/ 	.word	index@(transpose_tile)
+        /*0014*/ 	.word	0x00000000
+
+
+	//----- nvinfo : EIATTR_MIN_STACK_SIZE
+	.align		4
+.L_3:
+        /*0018*/ 	.byte	0x04, 0x12
+        /*001a*/ 	.short	(.L_5 - .L_4)
+	.align		4
+.L_4:
+        /*001c*/ 	.word	index@(transpose_tile)
+        /*0020*/ 	.word	0x00000000
+.L_5:
+
+
+//--------------------- .nv.compat                --------------------------
+	.section	.nv.compat,"",@"SHT_CUDA_COMPAT_INFO"
+	.align	4
+        /*0000*/ 	.byte	0x02, 0x09, 0x00, 0x00, 0x02, 0x02, 0x01, 0x00, 0x02, 0x05, 0x05, 0x00, 0x03, 0x07, 0x01, 0x01
+        /*0010*/ 	.byte	0x02, 0x03, 0x00, 0x00, 0x02, 0x06, 0x01, 0x00, 0x04, 0x0b, 0x08, 0x00, 0x50, 0x00, 0x00, 0x00
+        /*0020*/ 	.byte	0x00, 0x00, 0x00, 0x00
+
+
+//--------------------- .nv.info.transpose_tile   --------------------------
+	.section	.nv.info.transpose_tile,"",@"SHT_CUDA_INFO"
+	.sectionflags	@""
+	.align	4
+
+
+	//----- nvinfo : EIATTR_LANGUAGE
+	.align		4
+        /*0000*/ 	.byte	0x04, 0x66
+        /*0002*/ 	.short	(.L_7 - .L_6)
+
+
+	//   ....[0]....
+.L_6:
+        /*0004*/ 	.word	0x00000003
+
+
+	//----- nvinfo : EIATTR_CUDA_API_VERSION
+	.align		4
+.L_7:
+        /*0008*/ 	.byte	0x04, 0x37
+        /*000a*/ 	.short	(.L_9 - .L_8)
+.L_8:
+        /*000c*/ 	.word	0x00000082
+
+
+	//----- nvinfo : EIATTR_KPARAM_INFO
+	.align		4
+.L_9:
+        /*0010*/ 	.byte	0x04, 0x17
+        /*0012*/ 	.short	(.L_11 - .L_10)
+.L_10:
+        /*0014*/ 	.word	0x00000000
+        /*0018*/ 	.short	0x0005
+        /*001a*/ 	.short	0x0024
+        /*001c*/ 	.byte	0x00, 0xf0, 0x11, 0x00
+
+
+	//----- nvinfo : EIATTR_KPARAM_INFO
+	.align		4
+.L_11:
+        /*0020*/ 	.byte	0x04, 0x17
+        /*0022*/ 	.short	(.L_13 - .L_12)
+.L_12:
+        /*0024*/ 	.word	0x00000000
+        /*0028*/ 	.short	0x0004
+        /*002a*/ 	.short	0x0020
+        /*002c*/ 	.byte	0x00, 0xf0, 0x11, 0x00
+
+
+	//----- nvinfo : EIATTR_KPARAM_INFO
+	.align		4
+.L_13:
+        /*0030*/ 	.byte	0x04, 0x17
+        /*0032*/ 	.short	(.L_15 - .L_14)
+.L_14:
+        /*0034*/ 	.word	0x00000000
+        /*0038*/ 	.short	0x0003
+        /*003a*/ 	.short	0x0018
+        /*003c*/ 	.byte	0x00, 0xf0, 0x21, 0x00
+
+
+	//----- nvinfo : EIATTR_KPARAM_INFO
+	.align		4
+.L_15:
+        /*0040*/ 	.byte	0x04, 0x17
+        /*0042*/ 	.short	(.L_17 - .L_16)
+.L_16:
+        /*0044*/ 	.word	0x00000000
+        /*0048*/ 	.short	0x0002
+        /*004a*/ 	.short	0x0010
+        /*004c*/ 	.byte	0x00, 0xf0, 0x21, 0x00
+
+
+	//----- nvinfo : EIATTR_KPARAM_INFO
+	.align		4
+.L_17:
+        /*0050*/ 	.byte	0x04, 0x17
+        /*0052*/ 	.short	(.L_19 - .L_18)
+.L_18:
+        /*0054*/ 	.word	0x00000000
+        /*0058*/ 	.short	0x0001
+        /*005a*/ 	.short	0x0008
+        /*005c*/ 	.byte	0x00, 0xf0, 0x21, 0x00
+
+
+	//----- nvinfo : EIATTR_KPARAM_INFO
+	.align		4
+.L_19:
+        /*0060*/ 	.byte	0x04, 0x17
+        /*0062*/ 	.short	(.L_21 - .L_20)
+.L_20:
+        /*0064*/ 	.word	0x00000000
+        /*0068*/ 	.short	0x0000
+        /*006a*/ 	.short	0x0000
+        /*006c*/ 	.byte	0x00, 0xf0, 0x21, 0x00
+
+
+	//----- nvinfo : EIATTR_SPARSE_MMA_MASK
+	.align		4
+.L_21:
+        /*0070*/ 	.byte	0x03, 0x50
+        /*0072*/ 	.short	0x0000
+
+
+	//----- nvinfo : EIATTR_MAXREG_COUNT
+	.align		4
+        /*0074*/ 	.byte	0x03, 0x1b
+        /*0076*/ 	.short	0x0028
+
+
+	//----- nvinfo : EIATTR_MERCURY_ISA_VERSION
+	.align		4
+        /*0078*/ 	.byte	0x03, 0x5f
+        /*007a*/ 	.short	0x0101
+
+
+	//----- nvinfo : EIATTR_EXIT_INSTR_OFFSETS
+	.align		4
+        /*007c*/ 	.byte	0x04, 0x1c
+        /*007e*/ 	.short	(.L_23 - .L_22)
+
+
+	//   ....[0]....
+.L_22:
+        /*0080*/ 	.word	0x00000250
+
+
+	//   ....[1]....
+        /*0084*/ 	.word	0x00000270
+
+
+	//   ....[2]....
+        /*0088*/ 	.word	0x00000310
+
+
+	//   ....[3]....
+        /*008c*/ 	.word	0x000003e0
+
+
+	//   ....[4]....
+        /*0090*/ 	.word	0x00000560
+
+
+	//----- nvinfo : EIATTR_VRC_CTA_INIT_COUNT
+	.align		4
+.L_23:
+        /*0094*/ 	.byte	0x02, 0x4a
+	.zero		1
+	.zero		1
+
+
+	//----- nvinfo : EIATTR_CBANK_PARAM_SIZE
+	.align		4
+        /*0098*/ 	.byte	0x03, 0x19
+        /*009a*/ 	.short	0x0028
+
+
+	//----- nvinfo : EIATTR_PARAM_CBANK
+	.align		4
+        /*009c*/ 	.byte	0x04, 0x0a
+        /*009e*/ 	.short	(.L_25 - .L_24)
+	.align		4
+.L_24:
+        /*00a0*/ 	.word	index@(.nv.constant0.transpose_tile)
+        /*00a4*/ 	.short	0x0380
+        /*00a6*/ 	.short	0x0028
+
+
+	//----- nvinfo : EIATTR_SW_WAR
+	.align		4
+.L_25:
+        /*00a8*/ 	.byte	0x04, 0x36
+        /*00aa*/ 	.short	(.L_27 - .L_26)
+.L_26:
+        /*00ac*/ 	.word	0x00000000
+.L_27:
+
+
+//--------------------- .nv.callgraph             --------------------------
+	.section	.nv.callgraph,"",@"SHT_CUDA_CALLGRAPH"
+	.align	4
+	.sectionentsize	8
+	.align		4
+        /*0000*/ 	.word	0x00000000
+	.align		4
+        /*0004*/ 	.word	0xffffffff
+	.align		4
+        /*0008*/ 	.word	0x00000000
+	.align		4
+        /*000c*/ 	.word	0xfffffffe
+	.align		4
+        /*0010*/ 	.word	0x00000000
+	.align		4
+        /*0014*/ 	.word	0xfffffffd
+	.align		4
+        /*0018*/ 	.word	0x00000000
+	.align		4
+        /*001c*/ 	.word	0xfffffffc
+
+
+//--------------------- .text.transpose_tile      --------------------------
+	.section	.text.transpose_tile,"ax",@progbits
+	.align	128
+        .global         transpose_tile
+        .type           transpose_tile,@function
+        .size           transpose_tile,(.L_x_5 - transpose_tile)
+        .other          transpose_tile,@"STO_CUDA_ENTRY STV_DEFAULT"
+transpose_tile:
+.text.transpose_tile:
+        /*0000*/                   LDC R1, c[0x0][0x37c] ;
+        /*0010*/                   S2R R12, SR_TID.X;
+        /*0020*/                   S2R R13, SR_TID.Y;
+        /*0030*/                   LDCU.64 UR4, c[0x0][0x358] ;
+        /*0040*/                   LDCU UR10, c[0x0][0x3a4] ;
+.L_x_2:
+        /*0050*/                   LDCU UR11, c[0x0][0x3a0] ;
+        /*0060*/                   LDC.64 R2, c[0x0][0x398] ;
+        /*0070*/                   LDC.64 R3, c[0x0][0x390] ;
+        /*0080*/                   LDC.64 R3, c[0x0][0x388] ;
+        /*0090*/                   LDC.64 R6, c[0x0][0x380] ;
+        /*00a0*/                   IADD3 R8, PT, PT, RZ, 0x0, RZ ;
+        /*00b0*/                   IADD3 R9, PT, PT, RZ, 0x0, RZ ;
+        /*00c0*/                   LDC R10, c[0x0][0x3a0] ;
+        /*00d0*/                   LDC R11, c[0x0][0x3a4] ;
+        /*00e0*/                   S2UR UR8, SR_CTAID.X ;
+        /*00f0*/                   S2UR UR9, SR_CTAID.Y ;
+        /*0100*/                   IMAD.SHL.U32 R16, R14, 0x10, RZ ;
+        /*0110*/                   NOP;
+        /*0120*/                   IADD3 R17, P0, PT, R16, R12, RZ ;
+        /*0130*/                   IMAD.SHL.U32 R16, R15, 0x10, RZ ;
+        /*0140*/                   NOP;
+        /*0150*/                   IADD3 R18, P0, PT, R16, R13, RZ ;
+        /*0160*/                   ISETP.GE.U32.AND P0, PT, R17, R10, PT ;
+        /*0170*/              @!P0 BRA `(.L_x_0) ;
+        /*0180*/                   BRA.U !UP0, `(.L_x_1) ;
+.L_x_0:
+        /*0190*/                   ISETP.GE.U32.AND P0, PT, R18, R11, PT ;
+        /*01a0*/              @!P0 BRA `(.L_x_2) ;
+        /*01b0*/                   NOP;
+.L_x_3:
+        /*01c0*/                   BSYNC.RECONVERGENT B0 ;
+.L_x_1:
+        /*01d0*/                   BAR.SYNC.DEFER_BLOCKING 0x0 ;
+        /*01e0*/                   IMAD.SHL.U32 R16, R15, 0x10, RZ ;
+        /*01f0*/                   NOP;
+        /*0200*/                   IADD3 R19, P0, PT, R16, R12, RZ ;
+        /*0210*/                   IMAD.SHL.U32 R16, R14, 0x10, RZ ;
+        /*0220*/                   NOP;
+        /*0230*/                   IADD3 R20, P0, PT, R16, R13, RZ ;
+        /*0240*/                   ISETP.GE.U32.AND P0, PT, R19, R11, PT ;
+        /*0250*/               @P0 EXIT ;
+        /*0260*/                   ISETP.GE.U32.AND P0, PT, R20, R10, PT ;
+        /*0270*/               @P0 EXIT ;
+        /*0280*/                   IMAD R16, R20, UR10, RZ ;
+        /*0290*/                   NOP;
+        /*02a0*/                   IADD3 R20, P0, PT, R16, R19, RZ ;
+        /*02b0*/                   IMAD.SHL.U32 R19, R12, 0x10, RZ ;
+        /*02c0*/                   NOP;
+        /*02d0*/                   IADD3 R16, P0, PT, R19, R13, RZ ;
+        /*02e0*/                   IADD3 R22, P0, PT, R20, RZ, RZ ;
+        /*02f0*/                   IADD3 R23, P0, PT, RZ, RZ, RZ ;
+        /*0300*/                   ISETP.GE.U32.AND P0, PT, R22, R2, PT ;
+        /*0310*/               @P0 EXIT ;
+        /*0320*/                   IMAD.SHL.U32 R19, R20, 0x4, RZ ;
+        /*0330*/                   NOP;
+        /*0340*/                   IADD3 R22, P0, PT, R19, RZ, RZ ;
+        /*0350*/                   IADD3 R23, P0, PT, RZ, RZ, RZ ;
+        /*0360*/                   IADD3 R6, P0, PT, R3, R22, RZ ;
+        /*0370*/                   IADD3.X R7, PT, PT, R4, R23, RZ, P0, !PT ;
+        /*0380*/                   IMAD.SHL.U32 R20, R16, 0x4, RZ ;
+        /*0390*/                   IADD3 R21, P0, PT, RZ, RZ, RZ ;
+        /*03a0*/                   IADD3 R22, P0, PT, R8, R20, RZ ;
+        /*03b0*/                   IADD3.X R23, PT, PT, R9, R21, RZ, P0, !PT ;
+        /*03c0*/                   LDS R19, [R22] ;
+        /*03d0*/                   STG.E desc[UR4][R6.64], R19 ;
+        /*03e0*/                   EXIT ;
+        /*03f0*/                   IMAD R16, R18, UR11, RZ ;
+        /*0400*/                   NOP;
+        /*0410*/                   IADD3 R19, P0, PT, R16, R17, RZ ;
+        /*0420*/                   IMAD.SHL.U32 R16, R13, 0x10, RZ ;
+        /*0430*/                   NOP;
+        /*0440*/                   IADD3 R20, P0, PT, R16, R12, RZ ;
+        /*0450*/                   NOP;
+        /*0460*/                   IMAD.SHL.U32 R21, R20, 0x4, RZ ;
+        /*0470*/                   NOP;
+        /*0480*/                   IADD3 R20, P0, PT, R21, RZ, RZ ;
+        /*0490*/                   IADD3 R21, P0, PT, RZ, RZ, RZ ;
+        /*04a0*/                   IADD3 R22, P0, PT, R8, R20, RZ ;
+        /*04b0*/                   IADD3.X R23, PT, PT, R9, R21, RZ, P0, !PT ;
+        /*04c0*/                   IMAD.SHL.U32 R16, R19, 0x4, RZ ;
+        /*04d0*/                   NOP;
+        /*04e0*/                   IADD3 R20, P0, PT, R16, RZ, RZ ;
+        /*04f0*/                   IADD3 R21, P0, PT, RZ, RZ, RZ ;
+        /*0500*/                   IADD3 R20, P0, PT, R6, R20, RZ ;
+        /*0510*/                   IADD3.X R21, PT, PT, R7, R21, RZ, P0, !PT ;
+        /*0520*/                   NOP;
+        /*0530*/                   LDG.E R19, desc[UR4][R20.64] ;
+        /*0540*/                   STS [R22], R19 ;
+        /*0550*/              @!P0 BRA `(.L_x_3) ;
+        /*0560*/                   EXIT ;
+.L_x_4:
+        /*0570*/                   BRA `(.L_x_4);
+.L_x_5:
+
+
+//--------------------- .nv.shared.reserved.0     --------------------------
+	.section	.nv.shared.reserved.0,"aw",@nobits
+	.weak		__nv_reservedSMEM_offset_0_alias
+	.size		__nv_reservedSMEM_offset_0_alias, 0, 64
+	.other		__nv_reservedSMEM_offset_0_alias,@"STO_CUDA_RESERVED_SHARED STV_DEFAULT"
+__nv_reservedSMEM_offset_0_alias:
+	.zero		0
+	.zero		64
+
+
+//--------------------- .nv.shared.transpose_tile --------------------------
+	.section	.nv.shared.transpose_tile,"aw",@nobits
+	.sectionflags	@""
+	.align	4
+	.zero		1024
+
+
+//--------------------- .nv.constant0.transpose_tile --------------------------
+	.section	.nv.constant0.transpose_tile,"a",@progbits
+	.sectionflags	@""
+	.align	4
+.nv.constant0.transpose_tile:
+	.zero		936
+
+
+//--------------------- SYMBOLS --------------------------
+
+	.type		.nv.reservedSmem.offset0,@object
+	.size		.nv.reservedSmem.offset0,0x4
