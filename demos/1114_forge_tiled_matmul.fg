@@ -1,0 +1,77 @@
+// expected: 0
+// FORGE61-64 row-major tiled matmul microkernel (K=16 fixed).
+//
+// C[M,N] = A[M,16] × B[16,N]
+//
+// TILE = 16.  Each block computes one 16×16 tile of C.
+// K is hardcoded to 16: no outer loop, single shared-memory pass.
+//
+// Uses 2D blockDim (16,16) with 2D grid.
+
+use std::gpu;
+
+#[kernel]
+fn matmul_16(
+    a: span<u32>, b: span<u32>, c: span<u32>,
+    m: u32, n: u32
+)
+    requires m > 0u32
+    requires n > 0u32
+    requires m * 16u32 <= a.len
+    requires 16u32 * n <= b.len
+    requires m * n <= c.len
+    requires threadIdx_x < 16u32
+    requires threadIdx_y < 16u32
+{
+    let as_tile: shared<u32>[256] = 0;
+    let bs_tile: shared<u32>[256] = 0;
+
+    let x: u32 = threadIdx_x;
+    let y: u32 = threadIdx_y;
+    let col: u32 = blockIdx_x * 16u32 + x;
+    let row: u32 = blockIdx_y * 16u32 + y;
+
+    // Phase 1: load tiles of A and B into shared memory.
+    //   As[y][x] = A[row * 16 + x]  (each thread loads one element)
+    //   Bs[y][x] = B[y * N + col]
+    let s_idx: u32 = y * 16u32 + x;
+
+    if row < m {
+        let a_idx: u32 = row * 16u32 + x;
+        if a_idx < a.len {
+            as_tile[s_idx] = a[a_idx];
+        };
+    };
+    if col < n {
+        let b_idx: u32 = y * n + col;
+        if b_idx < b.len {
+            bs_tile[s_idx] = b[b_idx];
+        };
+    };
+
+    syncthreads();
+
+    // Phase 2: 16-step dot product from shared memory.
+    if row < m {
+        if col < n {
+            let mut acc: u32 = 0u32;
+            let mut ki: u32 = 0u32;
+            while ki < 16u32
+                invariant ki <= 16u32
+            {
+                let a_s: u32 = y * 16u32 + ki;
+                let b_s: u32 = ki * 16u32 + x;
+                let av: u32 = as_tile[a_s];
+                let bv: u32 = bs_tile[b_s];
+                acc = acc + av * bv;
+                ki = ki + 1u32;
+            };
+            let c_idx: u32 = row * n + col;
+            if c_idx < c.len {
+                c[c_idx] = acc;
+            };
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }
