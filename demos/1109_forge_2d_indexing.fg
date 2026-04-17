@@ -1,0 +1,35 @@
+// expected: 0
+// FORGE41-44 2D indexing + coalesced access slice.
+//
+// Treat 1D launch (gridDim.x × blockDim.x = total threads) as a 2D
+// (y, x) grid where y = blockIdx.x and x = threadIdx.x.  Linearize:
+//
+//   idx = y * width + x   (with width = blockDim.x)
+//   out[idx] = a[idx] + b[idx]
+//
+// Coalesced access: lanes 0..width-1 within a block hit contiguous
+// memory, the canonical CUDA fast path.  No shared memory, no
+// atomics, no loops.
+
+use std::gpu;
+
+#[kernel]
+fn vec_2d_add(a: span<u32>, b: span<u32>, out: span<u32>,
+              n: u32, width: u32)
+    requires n <= a.len
+    requires n <= b.len
+    requires n <= out.len
+    requires n > 0u32
+    requires width > 0u32
+{
+    let x: u32 = threadIdx_x;
+    let y: u32 = blockIdx_x;
+    let idx: u32 = y * width + x;
+    if idx < n {
+        let va: u32 = a[idx];
+        let vb: u32 = b[idx];
+        out[idx] = va + vb;
+    };
+}
+
+fn main() -> u64 { 0u64 }
