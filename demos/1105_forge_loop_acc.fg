@@ -1,0 +1,36 @@
+// expected: 0
+// FORGE25-28 per-thread loop slice (bounded iteration).
+//
+// for i in 0..3:
+//     sum += a[tid + i]
+// out[tid] = sum
+//
+// 3-iteration u32 accumulator using Forge's `while` with invariant +
+// decreases (the verified-loop form).  Bound: only threads with
+// tid + 2 < n compute (so tid + i for i in {0,1,2} is in [tid, tid+2]).
+
+use std::gpu;
+
+#[kernel]
+fn vec_loop_acc(a: span<u32>, out: span<u32>, n: u32, n_minus_2: u32)
+    requires n <= a.len
+    requires n <= out.len
+    requires n_minus_2 + 2u32 == n
+    requires n > 2u32
+{
+    let tid: u32 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < n_minus_2 {
+        let mut sum: u32 = 0u32;
+        let mut i: u32 = 0u32;
+        while i < 3u32
+            invariant i <= 3u32
+            decreases 3u32 - i
+        {
+            sum = sum + a[tid + i];
+            i = i + 1u32;
+        };
+        out[tid] = sum;
+    };
+}
+
+fn main() -> u64 { 0u64 }
