@@ -1,0 +1,96 @@
+// expected: 0
+// FORGE57-60 shared-memory tiled 3×3 weighted convolution.
+//
+// TILE = 16.  Each block loads a 16×16 tile into shared memory.
+// After barrier, interior tile threads (1 ≤ y ≤ 14, 1 ≤ x ≤ 14)
+// that are also global interior compute a 3×3 weighted sum:
+//
+//   weights:  [ 1  2  1 ]
+//             [ 2  4  2 ]
+//             [ 1  2  1 ]
+//
+//   out[r,c] = 1*tile[y-1][x-1] + 2*tile[y-1][x] + 1*tile[y-1][x+1]
+//            + 2*tile[y  ][x-1] + 4*tile[y  ][x] + 2*tile[y  ][x+1]
+//            + 1*tile[y+1][x-1] + 2*tile[y+1][x] + 1*tile[y+1][x+1]
+//
+// No normalization (raw weighted sum, u32 arithmetic).
+// Tile-edge threads are load-only helpers.  No halo loading.
+
+use std::gpu;
+
+#[kernel]
+fn conv2d_3x3(
+    inp: span<u32>, out: span<u32>,
+    width: u32, height: u32
+)
+    requires width > 2u32
+    requires height > 2u32
+    requires width * height <= inp.len
+    requires width * height <= out.len
+    requires threadIdx_x < 16u32
+    requires threadIdx_y < 16u32
+{
+    let smem: shared<u32>[256] = 0;
+
+    let x: u32 = threadIdx_x;
+    let y: u32 = threadIdx_y;
+    let col: u32 = blockIdx_x * 16u32 + x;
+    let row: u32 = blockIdx_y * 16u32 + y;
+
+    // Phase 1: load tile from global into shared.
+    let s_idx: u32 = y * 16u32 + x;
+    if col < width {
+        if row < height {
+            let g_idx: u32 = row * width + col;
+            if g_idx < inp.len {
+                smem[s_idx] = inp[g_idx];
+            };
+        };
+    };
+
+    syncthreads();
+
+    // Phase 2: interior tile threads compute 3×3 weighted convolution.
+    if x > 0u32 {
+        if x < 15u32 {
+            if y > 0u32 {
+                if y < 15u32 {
+                    if col > 0u32 {
+                        if col + 1u32 < width {
+                            if row > 0u32 {
+                                if row + 1u32 < height {
+                                    // Row y-1 (north row)
+                                    let nw: u32 = smem[s_idx - 17u32];
+                                    let n: u32  = smem[s_idx - 16u32];
+                                    let ne: u32 = smem[s_idx - 15u32];
+                                    // Row y (center row)
+                                    let w: u32  = smem[s_idx - 1u32];
+                                    let c: u32  = smem[s_idx];
+                                    let e: u32  = smem[s_idx + 1u32];
+                                    // Row y+1 (south row)
+                                    let sw: u32 = smem[s_idx + 15u32];
+                                    let s: u32  = smem[s_idx + 16u32];
+                                    let se: u32 = smem[s_idx + 17u32];
+
+                                    // Weighted sum: 1*nw + 2*n + 1*ne
+                                    //             + 2*w  + 4*c + 2*e
+                                    //             + 1*sw + 2*s + 1*se
+                                    let val: u32 = nw + 2u32 * n + ne
+                                                 + 2u32 * w + 4u32 * c + 2u32 * e
+                                                 + sw + 2u32 * s + se;
+
+                                    let o_idx: u32 = row * width + col;
+                                    if o_idx < out.len {
+                                        out[o_idx] = val;
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }
