@@ -18,6 +18,7 @@ Usage:
     python benchmarks/forgebench.py [--runs 100] [--warmup 10]
 """
 
+import argparse
 import subprocess
 import struct
 import ctypes
@@ -416,7 +417,200 @@ def run_benchmark(bench: BenchDef) -> BenchResult:
     return result
 
 
+# ── FB-1 Phase A: open-backend lane (pilot only) ──────────────────
+
+OPEN_PILOT_CU = FORGE_ROOT / "benchmarks" / "fb0_baseline" / "1046a_multi_reduction_u32.cu"
+OPEN_PILOT_KERNEL = "reduce_sum_u32"
+OPENCUDA_ROOT = FORGE_ROOT.parent / "opencuda"
+OPENPTXAS_ROOT = FORGE_ROOT.parent / "openptxas"
+
+
+def opencuda_emit_ptx(cu_path: str, out_ptx: str) -> bool:
+    """Drive: .cu -> OpenCUDA -> .ptx"""
+    cmd = [sys.executable, "-m", "opencuda", cu_path,
+           "--emit-ptx", "--out", out_ptx, "--arch", SM_ARCH]
+    r = subprocess.run(cmd, cwd=str(OPENCUDA_ROOT), capture_output=True, text=True)
+    if r.returncode != 0 or not os.path.exists(out_ptx):
+        print(f"  [open] OpenCUDA error: {(r.stdout + r.stderr)[:300]}")
+        return False
+    return True
+
+
+def openptxas_assemble(ptx_path: str, out_cubin: str) -> bool:
+    """Drive: .ptx -> OpenPTXas -> .cubin"""
+    cmd = [sys.executable, "__main__.py", ptx_path,
+           "--arch", SM_ARCH, "--out", out_cubin]
+    r = subprocess.run(cmd, cwd=str(OPENPTXAS_ROOT), capture_output=True, text=True)
+    if r.returncode != 0 or not os.path.exists(out_cubin):
+        print(f"  [open] OpenPTXas error: {(r.stdout + r.stderr)[:300]}")
+        return False
+    return True
+
+
+def _gpu_run_pilot_u32(cubin_path: str, kernel: str) -> tuple:
+    """Launch the pilot reduce_sum_u32 on the GPU and compare against CPU.
+
+    Returns (e1, e2, mismatches). mismatches == 0 and both errors == 0
+    means the cubin produced the correct block partial sums.
+    """
+    cuda = ctypes.CDLL("nvcuda.dll")
+    cuda.cuMemcpyHtoD_v2.argtypes = [ctypes.c_uint64, ctypes.c_void_p, ctypes.c_size_t]
+    cuda.cuMemcpyDtoH_v2.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_size_t]
+    cuda.cuMemAlloc_v2.argtypes = [ctypes.POINTER(ctypes.c_uint64), ctypes.c_size_t]
+
+    import numpy as np
+    N = 65536
+    BLOCK = 256
+    GRID = 256
+    data = (np.arange(N, dtype=np.uint32) % 1000).astype(np.uint32)
+    out  = np.zeros(GRID, dtype=np.uint32)
+
+    def chk(e, msg=""):
+        if e != 0:
+            raise RuntimeError(f"{msg}: cuda err {e}")
+
+    chk(cuda.cuInit(0), "cuInit")
+    D = ctypes.c_int(); chk(cuda.cuDeviceGet(ctypes.byref(D), 0), "cuDeviceGet")
+    ctx = ctypes.c_void_p()
+    chk(cuda.cuCtxCreate_v2(ctypes.byref(ctx), 0, D), "cuCtxCreate")
+    try:
+        mod = ctypes.c_void_p()
+        e = cuda.cuModuleLoad(ctypes.byref(mod), cubin_path.encode())
+        if e != 0:
+            return (e, -1, GRID)
+        fn = ctypes.c_void_p()
+        chk(cuda.cuModuleGetFunction(ctypes.byref(fn), mod, kernel.encode()),
+            "getFn")
+
+        d_data = ctypes.c_uint64(); d_out = ctypes.c_uint64()
+        chk(cuda.cuMemAlloc_v2(ctypes.byref(d_data), N * 4), "alloc data")
+        chk(cuda.cuMemAlloc_v2(ctypes.byref(d_out),  GRID * 4), "alloc out")
+        chk(cuda.cuMemcpyHtoD_v2(d_data, data.ctypes.data_as(ctypes.c_void_p), N * 4), "H2D data")
+        chk(cuda.cuMemcpyHtoD_v2(d_out,  out.ctypes.data_as(ctypes.c_void_p),  GRID * 4), "H2D out")
+
+        p_data = ctypes.c_uint64(d_data.value)
+        p_n    = ctypes.c_uint32(N)
+        p_out  = ctypes.c_uint64(d_out.value)
+        params = (ctypes.c_void_p * 3)(*[
+            ctypes.cast(ctypes.pointer(x), ctypes.c_void_p)
+            for x in [p_data, p_n, p_out]
+        ])
+        e1 = cuda.cuLaunchKernel(fn, GRID, 1, 1, BLOCK, 1, 1,
+                                 0, ctypes.c_void_p(0), params, ctypes.c_void_p(0))
+        e2 = cuda.cuCtxSynchronize()
+        chk(cuda.cuMemcpyDtoH_v2(out.ctypes.data, d_out, GRID * 4), "D2H")
+
+        exp = np.zeros(GRID, dtype=np.uint32)
+        for bx in range(GRID):
+            base = bx * BLOCK
+            exp[bx] = np.sum(data[base:base + 32], dtype=np.uint32)
+        mis = int(np.sum(out != exp))
+
+        cuda.cuMemFree_v2(d_data); cuda.cuMemFree_v2(d_out)
+        return (e1, e2, mis)
+    finally:
+        cuda.cuCtxDestroy_v2(ctx)
+
+
+def run_open_pilot() -> int:
+    """FB-1 Phase A: drive the u32 pilot through the open lane and
+    compare GPU output to the nvcc-baseline cubin.  Returns process exit
+    code (0 = pilot PASS, nonzero = FAIL/BLOCKED)."""
+    print("=" * 60)
+    print("  ForgeBench FB-1 Phase A — u32 pilot open lane")
+    print("=" * 60)
+
+    cu_path    = str(OPEN_PILOT_CU)
+    ptx_path   = str(OPEN_PILOT_CU).replace('.cu', '.ptx')
+    open_cubin = str(OPEN_PILOT_CU).replace('.cu', '_open.cubin')
+    nvcc_cubin = str(OPEN_PILOT_CU).replace('.cu', '_nvcc.cubin')
+
+    if not os.path.exists(cu_path):
+        print(f"  [open] pilot not found: {cu_path}")
+        return 2
+
+    print(f"  pilot kernel: {OPEN_PILOT_KERNEL}  ({cu_path})")
+
+    print("  step 1/4  nvcc baseline compile...")
+    nvcc_r = subprocess.run(
+        [NVCC, '-arch', SM_ARCH, '-cubin', '-ccbin', NVCC_CCBIN,
+         '-o', nvcc_cubin, cu_path],
+        capture_output=True, text=True)
+    nvcc_ok = (nvcc_r.returncode == 0 and os.path.exists(nvcc_cubin))
+    print(f"    nvcc lane: {'PASS' if nvcc_ok else 'FAIL'}")
+
+    print("  step 2/4  OpenCUDA emit PTX...")
+    cuda_ok = opencuda_emit_ptx(cu_path, ptx_path)
+    print(f"    OpenCUDA: {'PASS' if cuda_ok else 'FAIL'}")
+    if not cuda_ok:
+        return 3
+
+    print("  step 3/4  OpenPTXas assemble...")
+    asm_ok = openptxas_assemble(ptx_path, open_cubin)
+    print(f"    OpenPTXas: {'PASS' if asm_ok else 'FAIL'}")
+    if not asm_ok:
+        return 4
+
+    print("  step 4/4  GPU run + correctness check...")
+    results = {}
+
+    def _safe_run(cubin, tag):
+        try:
+            return _gpu_run_pilot_u32(cubin, OPEN_PILOT_KERNEL)
+        except RuntimeError as exc:
+            return (-1, -1, 99999, str(exc))
+
+    if nvcc_ok:
+        results['nvcc'] = _safe_run(nvcc_cubin, 'nvcc')
+    results['open'] = _safe_run(open_cubin, 'open')
+
+    for lane, rec in results.items():
+        tag = f"{lane:<6}"
+        if len(rec) == 4:
+            _, _, _, err_msg = rec
+            print(f"    {tag}: RUN_EXC ({err_msg})")
+            continue
+        e1, e2, mis = rec
+        if e1 == 0 and e2 == 0 and mis == 0:
+            print(f"    {tag}: PASS")
+        else:
+            print(f"    {tag}: FAIL (launch={e1}, sync={e2}, mismatches={mis})")
+
+    def _lane_ok(rec):
+        if len(rec) == 4:
+            return False
+        e1, e2, mis = rec
+        return e1 == 0 and e2 == 0 and mis == 0
+
+    open_ok = _lane_ok(results['open'])
+    nvcc_ok_gpu = _lane_ok(results.get('nvcc', (0, 0, 0)))
+
+    print()
+    print("  VERDICT")
+    print(f"    nvcc lane correctness: {'PASS' if nvcc_ok_gpu else 'FAIL'}")
+    print(f"    open lane correctness: {'PASS' if open_ok else 'FAIL'}")
+    print(f"    comparison: {'MATCH' if (open_ok and nvcc_ok_gpu) else 'MISMATCH'}")
+    print()
+    if open_ok and nvcc_ok_gpu:
+        print("  FB-1 Phase A pilot lane PROVEN.")
+        return 0
+    print("  FB-1 Phase A pilot lane BLOCKED.")
+    return 5
+
+
 def main():
+    # FB-1 Phase A: --open runs the u32 pilot through the open lane only
+    # (OpenCUDA -> OpenPTXas -> cubin -> GPU).  Existing nvcc-only lane
+    # behavior is preserved byte-for-byte when --open is absent.
+    ap = argparse.ArgumentParser(prog="forgebench")
+    ap.add_argument("--open", action="store_true",
+                    help="FB-1 Phase A: drive the u32 pilot through "
+                         "OpenCUDA + OpenPTXas + GPU and compare to nvcc.")
+    args = ap.parse_args()
+
+    if args.open:
+        sys.exit(run_open_pilot())
+
     print("=" * 60)
     print("  ForgeBench — Proof-to-Performance Report")
     print("=" * 60)

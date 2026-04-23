@@ -5,7 +5,7 @@
 .visible .entry vec_memory_mix3(
     .param .u64 a, .param .u64 a_len, .param .u64 b, .param .u64 b_len, .param .u64 c, .param .u64 c_len, .param .u32 n)
 {
-    .reg .b32 %r<4>;
+    .reg .b32 %r<16>;
     .reg .b64 %rd<6>;
     .reg .pred %p<1>;
 
@@ -19,26 +19,26 @@
     mov.u32 %r1, %ctaid.x;
     mov.u32 %r2, %ntid.x;
     mul.lo.u32 %r3, %r1, %r2;
-    mov.u32 %r1, %tid.x;
-    add.u32 %r2, %r3, %r1;
-    add.u32 %r3, %r2, 5;
-    add.u32 %r1, %r0, 5;
-    setp.lt.u32 %p0, %r3, %r1;
+    mov.u32 %r4, %tid.x;
+    add.u32 %r5, %r3, %r4;
+    add.u32 %r6, %r5, 5;
+    add.u32 %r7, %r0, 5;
+    setp.lt.u32 %p0, %r6, %r7;
     @!%p0 ret;
-    shl.b32 %r0, %r2, 2;
-    cvt.u64.u32 %rd4, %r0;
+    shl.b32 %r8, %r5, 2;
+    cvt.u64.u32 %rd4, %r8;
     add.u64 %rd3, %rd0, %rd4;
-    ld.global.u32 %r1, [%rd3];
-    shl.b32 %r2, %r3, 2;
-    cvt.u64.u32 %rd5, %r2;
+    ld.global.u32 %r9, [%rd3];
+    shl.b32 %r10, %r6, 2;
+    cvt.u64.u32 %rd5, %r10;
     add.u64 %rd0, %rd1, %rd5;
-    ld.global.u32 %r3, [%rd0];
+    ld.global.u32 %r11, [%rd0];
     add.u64 %rd1, %rd2, %rd4;
-    ld.global.u32 %r2, [%rd1];
-    shl.b32 %r0, %r1, 1;
-    add.u32 %r1, %r0, %r3;
-    xor.b32 %r3, %r1, %r2;
-    st.global.u32 [%rd3], %r3;
+    ld.global.u32 %r12, [%rd1];
+    shl.b32 %r13, %r9, 1;
+    add.u32 %r14, %r13, %r11;
+    xor.b32 %r15, %r14, %r12;
+    st.global.u32 [%rd3], %r15;
     bra if_merge_4;
 if_merge_4:
     ret;

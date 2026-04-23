@@ -5,7 +5,7 @@
 .visible .entry vec_diff_branch(
     .param .u64 a, .param .u64 a_len, .param .u64 b, .param .u64 b_len, .param .u64 out, .param .u64 out_len, .param .u32 n)
 {
-    .reg .b32 %r<5>;
+    .reg .b32 %r<14>;
     .reg .b64 %rd<5>;
     .reg .pred %p<1>;
 
@@ -19,33 +19,33 @@
     mov.u32 %r1, %ctaid.x;
     mov.u32 %r2, %ntid.x;
     mul.lo.u32 %r3, %r1, %r2;
-    mov.u32 %r1, %tid.x;
-    add.u32 %r2, %r3, %r1;
-    setp.lt.u32 %p0, %r2, %r0;
+    mov.u32 %r4, %tid.x;
+    add.u32 %r5, %r3, %r4;
+    setp.lt.u32 %p0, %r5, %r0;
     @!%p0 ret;
-    shl.b32 %r0, %r2, 2;
-    cvt.u64.u32 %rd4, %r0;
+    shl.b32 %r6, %r5, 2;
+    cvt.u64.u32 %rd4, %r6;
     add.u64 %rd2, %rd2, %rd4;
     add.u64 %rd0, %rd0, %rd4;
-    ld.global.u32 %r3, [%rd0];
+    ld.global.u32 %r7, [%rd0];
     add.u64 %rd1, %rd1, %rd4;
-    ld.global.u32 %r1, [%rd1];
-    setp.gt.u32 %p0, %r3, %r1;
+    ld.global.u32 %r8, [%rd1];
+    setp.gt.u32 %p0, %r7, %r8;
     @%p0 bra if_true_6;
     bra if_false_7;
 if_merge_4:
     ret;
 inline_diff_scaled_u32_merge_5:
-    st.global.u32 [%rd2], %r2;
+    st.global.u32 [%rd2], %r9;
     bra if_merge_4;
 if_true_6:
-    sub.u32 %r0, %r3, %r1;
-    shl.b32 %r4, %r0, 1;
-    mov.u32 %r2, %r4;
+    sub.u32 %r10, %r7, %r8;
+    shl.b32 %r11, %r10, 1;
+    mov.u32 %r9, %r11;
     bra inline_diff_scaled_u32_merge_5;
 if_false_7:
-    sub.u32 %r0, %r1, %r3;
-    mul.lo.u32 %r4, %r0, 3;
-    mov.u32 %r2, %r4;
+    sub.u32 %r12, %r8, %r7;
+    mul.lo.u32 %r13, %r12, 3;
+    mov.u32 %r9, %r13;
     bra inline_diff_scaled_u32_merge_5;
 }

@@ -1,0 +1,48 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry laneid_trigger(
+    .param .u64 laneid_trigger_param_output_data,
+    .param .u64 laneid_trigger_param_output_len,
+    .param .u64 laneid_trigger_param_n
+)
+{
+    .reg .pred %p8;
+    .reg .u64 %rd0, %rd1, %rd12, %rd13, %rd14, %rd15, %rd16, %rd2, %rd9;
+    .reg .u32 %r11, %r17, %r18, %r19, %r3, %r4, %r5, %r6, %r7;
+
+  ld.param.u64 %rd0, [laneid_trigger_param_output_data];
+  ld.param.u64 %rd1, [laneid_trigger_param_output_len];
+  ld.param.u64 %rd2, [laneid_trigger_param_n];
+
+  mov.u32 %r3, %ctaid.x;
+  mov.u32 %r4, %ntid.x;
+  mul.lo.u32 %r5, %r3, %r4;
+  mov.u32 %r6, %tid.x;
+  add.u32 %r7, %r5, %r6;
+  cvt.u64.u32 %rd9, %r7;
+  setp.lt.u64 %p8, %rd9, %rd2;
+  @%p8 bra laneid_trigger_then_10;
+  bra laneid_trigger_else_10;
+  laneid_trigger_then_10:
+  mov.u32 %r11, %laneid;
+  cvt.u64.u32 %rd12, %r11;
+  cvt.u64.u32 %rd13, %r7;
+  mov.u64 %rd14, 8;
+  mul.lo.u64 %rd15, %rd13, %rd14;
+  add.u64 %rd16, %rd0, %rd15;
+  st.global.u64 [%rd16], %rd12;
+  mov.u32 %r17, 0; // unit
+  mov.u32 %r18, %r17;
+  bra laneid_trigger_end_10;
+  laneid_trigger_else_10:
+  mov.u32 %r18, 0; // no else branch
+  laneid_trigger_end_10:
+  mov.u32 %r19, 0; // unit
+  ret;
+}
+
