@@ -1,0 +1,60 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry bf16_rsqrt(
+    .param .u64 bf16_rsqrt_param_inp_data,
+    .param .u64 bf16_rsqrt_param_inp_len,
+    .param .u64 bf16_rsqrt_param_out_data,
+    .param .u64 bf16_rsqrt_param_out_len,
+    .param .u64 bf16_rsqrt_param_n
+)
+{
+    .reg .u16 %rs18, %rs21;
+    .reg .pred %p13;
+    .reg .u64 %rd0, %rd1, %rd11, %rd12, %rd15, %rd16, %rd17, %rd2, %rd22, %rd23, %rd24, %rd3, %rd4, %rd7, %rd8, %rd9;
+    .reg .f32 %f19, %f20;
+    .reg .u32 %r10, %r25, %r26, %r27, %r5, %r6;
+
+  ld.param.u64 %rd0, [bf16_rsqrt_param_inp_data];
+  ld.param.u64 %rd1, [bf16_rsqrt_param_inp_len];
+  ld.param.u64 %rd2, [bf16_rsqrt_param_out_data];
+  ld.param.u64 %rd3, [bf16_rsqrt_param_out_len];
+  ld.param.u64 %rd4, [bf16_rsqrt_param_n];
+
+  mov.u32 %r5, %ctaid.x;
+  mov.u32 %r6, %ntid.x;
+  cvt.u64.u32 %rd7, %r6;
+  cvt.u64.u32 %rd8, %r5;
+  mul.lo.u64 %rd9, %rd8, %rd7;
+  mov.u32 %r10, %tid.x;
+  cvt.u64.u32 %rd11, %r10;
+  add.u64 %rd12, %rd9, %rd11;
+  setp.lt.u64 %p13, %rd12, %rd4;
+  @%p13 bra bf16_rsqrt_then_14;
+  bra bf16_rsqrt_else_14;
+  bf16_rsqrt_then_14:
+  mov.u64 %rd15, 2;
+  mul.lo.u64 %rd16, %rd12, %rd15;
+  add.u64 %rd17, %rd0, %rd16;
+  ld.global.u16 %rs18, [%rd17];
+  cvt.f32.bf16 %f19, %rs18;
+  rsqrt.approx.f32 %f20, %f19;
+  cvt.rn.bf16.f32 %rs21, %f20;
+  mov.u64 %rd22, 2;
+  mul.lo.u64 %rd23, %rd12, %rd22;
+  add.u64 %rd24, %rd2, %rd23;
+  st.global.u16 [%rd24], %rs21;
+  mov.u32 %r25, 0; // unit
+  mov.u32 %r26, %r25;
+  bra bf16_rsqrt_end_14;
+  bf16_rsqrt_else_14:
+  mov.u32 %r26, 0; // no else branch
+  bf16_rsqrt_end_14:
+  mov.u32 %r27, 0; // unit
+  ret;
+}
+

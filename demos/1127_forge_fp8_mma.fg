@@ -1,0 +1,26 @@
+// Tensor-core FP8 (E4M3) → f32 MMA, m16n8k32 shape.
+//
+// Mirror of 1125 FP16 HMMA but with FP8 inputs: the k-depth doubles
+// (32 vs 16) because each .b32 register now packs 4 FP8 values instead
+// of 2 FP16, so the per-thread fragment byte layout is identical.
+//
+// Computes a 16×8 f32 output tile D = A (16×32 fp8) · B (32×8 fp8) + C
+// using a single `mma.sync.aligned.m16n8k32.row.col.f32.e4m3.e4m3.f32`
+// instruction.
+
+use std::prelude;
+use std::tensor_core;
+
+#[kernel]
+fn fp8_mma_tile(
+    A: span<u8>, B: span<u8>, C: span<f32>
+)
+    requires 512u64 <= A.len   // 16*32 fp8 A fragment
+    requires 256u64 <= B.len   // 32*8  fp8 B fragment
+    requires 128u64 <= C.len   // 16*8  f32 C fragment
+    requires threadIdx_x < 32u32
+{
+    mma_m16n8k32_e4m3(A, B, C);
+}
+
+fn main() -> i32 { 0i32 }

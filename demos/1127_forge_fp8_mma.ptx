@@ -1,0 +1,57 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry fp8_mma_tile(
+    .param .u64 fp8_mma_tile_param_A_data,
+    .param .u64 fp8_mma_tile_param_A_len,
+    .param .u64 fp8_mma_tile_param_B_data,
+    .param .u64 fp8_mma_tile_param_B_len,
+    .param .u64 fp8_mma_tile_param_C_data,
+    .param .u64 fp8_mma_tile_param_C_len
+)
+{
+    .reg .f32 %f22, %f23, %f24, %f25, %f26, %f27, %f28, %f29;
+    .reg .u64 %rd0, %rd1, %rd10, %rd11, %rd12, %rd13, %rd14, %rd15, %rd2, %rd3, %rd4, %rd5, %rd7, %rd8, %rd9;
+    .reg .u32 %r16, %r17, %r18, %r19, %r20, %r21, %r30, %r31, %r6;
+
+  ld.param.u64 %rd0, [fp8_mma_tile_param_A_data];
+  ld.param.u64 %rd1, [fp8_mma_tile_param_A_len];
+  ld.param.u64 %rd2, [fp8_mma_tile_param_B_data];
+  ld.param.u64 %rd3, [fp8_mma_tile_param_B_len];
+  ld.param.u64 %rd4, [fp8_mma_tile_param_C_data];
+  ld.param.u64 %rd5, [fp8_mma_tile_param_C_len];
+
+  mov.u32 %r6, %tid.x;
+  cvt.u64.u32 %rd7, %r6;
+  mov.u64 %rd8, 16;
+  mov.u64 %rd9, 8;
+  mul.lo.u64 %rd10, %rd7, %rd8;
+  add.u64 %rd11, %rd0, %rd10;
+  mul.lo.u64 %rd12, %rd7, %rd9;
+  add.u64 %rd13, %rd2, %rd12;
+  mul.lo.u64 %rd14, %rd7, %rd8;
+  add.u64 %rd15, %rd4, %rd14;
+  ld.global.u32 %r16, [%rd11+0];
+  ld.global.u32 %r17, [%rd11+4];
+  ld.global.u32 %r18, [%rd11+8];
+  ld.global.u32 %r19, [%rd11+12];
+  ld.global.u32 %r20, [%rd13+0];
+  ld.global.u32 %r21, [%rd13+4];
+  ld.global.f32 %f22, [%rd15+0];
+  ld.global.f32 %f23, [%rd15+4];
+  ld.global.f32 %f24, [%rd15+8];
+  ld.global.f32 %f25, [%rd15+12];
+  mma.sync.aligned.m16n8k32.row.col.f32.e4m3.e4m3.f32 {%f26, %f27, %f28, %f29}, {%r16, %r17, %r18, %r19}, {%r20, %r21}, {%f22, %f23, %f24, %f25};
+  st.global.f32 [%rd15+0],  %f26;
+  st.global.f32 [%rd15+4],  %f27;
+  st.global.f32 [%rd15+8],  %f28;
+  st.global.f32 [%rd15+12], %f29;
+  mov.u32 %r30, 0; // mma returns unit
+  mov.u32 %r31, 0; // unit
+  ret;
+}
+

@@ -714,6 +714,77 @@ let rec lower_expr st e : string =
       emit st (Printf.sprintf "mov.u32 %s, 0; // mma returns unit" r);
       r
 
+  (* FORGE78: tensor-core FP8 × FP8 → f32 MMA, m16n8k32 shape, E4M3 variant.
+     Fragment layout per thread (CUTLASS-compatible):
+       A: 16 fp8 per thread = 16 bytes at tid * 16 (4 .b32 regs; 4 FP8 per reg)
+       B:  8 fp8 per thread =  8 bytes at tid *  8 (2 .b32 regs)
+       C:  4 f32 per thread = 16 bytes at tid * 16 (4 .f32 regs)
+     Register counts match the FP16 HMMA, only the instruction selector
+     changes — the k-depth doubles (FP8 packs 4 per reg vs FP16's 2) so
+     k=32 fits the same register budget as fp16 k=16. *)
+  | ECall ({ expr_desc = EVar id; _ },
+           [{ expr_desc = EVar a_id; _ };
+            { expr_desc = EVar b_id; _ };
+            { expr_desc = EVar c_id; _ }])
+      when id.name = "mma_m16n8k32_e4m3"
+        || id.name = "mma_m16n8k32_e5m2" ->
+      let e_tag = if id.name = "mma_m16n8k32_e4m3" then "e4m3" else "e5m2" in
+      let a_base = reg_of_var st a_id.name in
+      let b_base = reg_of_var st b_id.name in
+      let c_base = reg_of_var st c_id.name in
+      let tid32 = fresh_reg st U32 in
+      emit st (Printf.sprintf "mov.u32 %s, %%tid.x;" tid32);
+      let tid64 = fresh_reg st U64 in
+      emit st (Printf.sprintf "cvt.u64.u32 %s, %s;" tid64 tid32);
+      let ofs16 = fresh_reg st U64 in
+      emit st (Printf.sprintf "mov.u64 %s, 16;" ofs16);
+      let ofs8 = fresh_reg st U64 in
+      emit st (Printf.sprintf "mov.u64 %s, 8;" ofs8);
+      let a_ofs = fresh_reg st U64 in
+      emit st (Printf.sprintf "mul.lo.u64 %s, %s, %s;" a_ofs tid64 ofs16);
+      let a_ptr = fresh_reg st U64 in
+      emit st (Printf.sprintf "add.u64 %s, %s, %s;" a_ptr a_base a_ofs);
+      let b_ofs = fresh_reg st U64 in
+      emit st (Printf.sprintf "mul.lo.u64 %s, %s, %s;" b_ofs tid64 ofs8);
+      let b_ptr = fresh_reg st U64 in
+      emit st (Printf.sprintf "add.u64 %s, %s, %s;" b_ptr b_base b_ofs);
+      let c_ofs = fresh_reg st U64 in
+      emit st (Printf.sprintf "mul.lo.u64 %s, %s, %s;" c_ofs tid64 ofs16);
+      let c_ptr = fresh_reg st U64 in
+      emit st (Printf.sprintf "add.u64 %s, %s, %s;" c_ptr c_base c_ofs);
+      let ra0 = fresh_reg st U32 in let ra1 = fresh_reg st U32 in
+      let ra2 = fresh_reg st U32 in let ra3 = fresh_reg st U32 in
+      emit st (Printf.sprintf "ld.global.u32 %s, [%s+0];"  ra0 a_ptr);
+      emit st (Printf.sprintf "ld.global.u32 %s, [%s+4];"  ra1 a_ptr);
+      emit st (Printf.sprintf "ld.global.u32 %s, [%s+8];"  ra2 a_ptr);
+      emit st (Printf.sprintf "ld.global.u32 %s, [%s+12];" ra3 a_ptr);
+      let rb0 = fresh_reg st U32 in let rb1 = fresh_reg st U32 in
+      emit st (Printf.sprintf "ld.global.u32 %s, [%s+0];" rb0 b_ptr);
+      emit st (Printf.sprintf "ld.global.u32 %s, [%s+4];" rb1 b_ptr);
+      let fc0 = fresh_reg st F32 in let fc1 = fresh_reg st F32 in
+      let fc2 = fresh_reg st F32 in let fc3 = fresh_reg st F32 in
+      emit st (Printf.sprintf "ld.global.f32 %s, [%s+0];"  fc0 c_ptr);
+      emit st (Printf.sprintf "ld.global.f32 %s, [%s+4];"  fc1 c_ptr);
+      emit st (Printf.sprintf "ld.global.f32 %s, [%s+8];"  fc2 c_ptr);
+      emit st (Printf.sprintf "ld.global.f32 %s, [%s+12];" fc3 c_ptr);
+      let fd0 = fresh_reg st F32 in let fd1 = fresh_reg st F32 in
+      let fd2 = fresh_reg st F32 in let fd3 = fresh_reg st F32 in
+      emit st (Printf.sprintf
+        "mma.sync.aligned.m16n8k32.row.col.f32.%s.%s.f32 \
+         {%s, %s, %s, %s}, {%s, %s, %s, %s}, {%s, %s}, {%s, %s, %s, %s};"
+        e_tag e_tag
+        fd0 fd1 fd2 fd3
+        ra0 ra1 ra2 ra3
+        rb0 rb1
+        fc0 fc1 fc2 fc3);
+      emit st (Printf.sprintf "st.global.f32 [%s+0],  %s;" c_ptr fd0);
+      emit st (Printf.sprintf "st.global.f32 [%s+4],  %s;" c_ptr fd1);
+      emit st (Printf.sprintf "st.global.f32 [%s+8],  %s;" c_ptr fd2);
+      emit st (Printf.sprintf "st.global.f32 [%s+12], %s;" c_ptr fd3);
+      let r = fresh_reg st U32 in
+      emit st (Printf.sprintf "mov.u32 %s, 0; // mma returns unit" r);
+      r
+
   (* FORGE73: expf(x) → ex2.approx.f32(x * log2(e)).  This is how CUDA's
      libdevice implements expf at the hardware level on SM_80+ — a single
      MUFU.EX2 instruction preceded by a multiply by log2(e) (~1.442695).
