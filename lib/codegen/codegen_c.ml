@@ -245,6 +245,11 @@ let rec collect_fn_ptr_tys acc = function
    produced a reference to `forge_fn_..._t` that had no corresponding
    typedef emission, because the earlier collector only scanned
    parameter, return, struct-field, and extern types.  *)
+(* Walk an expression's sub-expressions for TFn collection without
+   collecting the expression's own expr_ty.  Used at the callee position
+   of an ECall: the callee itself never needs a named fn-pointer typedef,
+   but complex callees (field access, returned-fn values) may contain
+   sub-expressions that do. *)
 let rec collect_fn_ptr_in_expr acc e =
   let acc = match e.expr_ty with
     | Some t -> collect_fn_ptr_tys acc t
@@ -258,7 +263,16 @@ let rec collect_fn_ptr_in_expr acc e =
   | EField_n (x, _) ->
       collect_fn_ptr_in_expr acc x
   | ECall (f, xs) ->
-      let acc = collect_fn_ptr_in_expr acc f in
+      (* The callee position of a call never needs a fn-pointer typedef —
+         C calls a function by name or through a pointer expression directly
+         without introducing a named type at the call site.  Collecting the
+         callee's TFn type here would produce spurious typedefs that can
+         even be invalid if the fn-type references a user struct declared
+         later (forward-reference ordering bug).  Recurse into `f` only for
+         the sub-expressions it contains (e.g., `(d.op)(x, y)` → need to
+         walk `d` for struct field types), without picking up the callee's
+         own fn-type. *)
+      let acc = collect_fn_ptr_in_expr_subparts acc f in
       List.fold_left collect_fn_ptr_in_expr acc xs
   | EBlock (stmts, tail) ->
       let acc = List.fold_left collect_fn_ptr_in_stmt acc stmts in
@@ -291,6 +305,19 @@ let rec collect_fn_ptr_in_expr acc e =
   | EAsm asm ->
       let acc = List.fold_left (fun a (_, e) -> collect_fn_ptr_in_expr a e) acc asm.asm_inputs in
       ignore asm.asm_outputs; acc
+
+and collect_fn_ptr_in_expr_subparts acc e =
+  match e.expr_desc with
+  | ELit _ | EVar _ | ESync -> acc
+  | EField (x, _) | EField_n (x, _) | EDeref x -> collect_fn_ptr_in_expr acc x
+  | EIndex (a, b) ->
+      collect_fn_ptr_in_expr (collect_fn_ptr_in_expr acc a) b
+  | _ ->
+      (* Any other callee shape (e.g., a returned-fn value from ECall,
+         a parenthesised expression, a cast to fn-pointer) needs the
+         full walk — the sub-expression really is producing a fn value
+         that might need a typedef. *)
+      collect_fn_ptr_in_expr acc e
 
 and collect_fn_ptr_in_stmt acc s =
   match s.stmt_desc with

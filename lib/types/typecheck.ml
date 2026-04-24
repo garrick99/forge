@@ -1532,6 +1532,97 @@ let format_obligation_kind = function
 (* Type checking expressions                                            *)
 (* ------------------------------------------------------------------ *)
 
+(* Walk an expression collecting EVar references to names that are neither
+   in `param_names` (the lambda's own bindings) nor in `top_level_names`
+   (functions / globals / imports — resolvable at C link time), and that
+   exist in `outer_var_names` (the enclosing scope's let-bindings).
+   Such references would become undefined-symbol errors in the generated C
+   after lambda-lifting, since the lifted function has no access to the
+   enclosing frame.  Returns (name, location) pairs.
+
+   Tracks nested let-bindings inside `body` by carrying a `bound` set that
+   grows as the walk enters scopes that introduce new names. *)
+let find_lambda_captures body param_names outer_var_names =
+  let captures : (string * loc) list ref = ref [] in
+  let already_reported : string list ref = ref [] in
+  let report name loc =
+    if List.mem name outer_var_names
+       && not (List.mem name !already_reported) then begin
+      already_reported := name :: !already_reported;
+      captures := (name, loc) :: !captures
+    end
+  in
+  let rec walk_expr bound e =
+    match e.expr_desc with
+    | EVar id ->
+        if not (List.mem id.name bound) then report id.name id.loc
+    | ELit _ | ESync -> ()
+    | EBinop (_, a, b) | EAssign (a, b) | EIndex (a, b) ->
+        walk_expr bound a; walk_expr bound b
+    | EUnop (_, x) | EField (x, _) | ERef x | ERefMut x | EDeref x
+    | EField_n (x, _) | ECast (x, _) ->
+        walk_expr bound x
+    | ECall (f, xs) ->
+        walk_expr bound f; List.iter (walk_expr bound) xs
+    | EBlock (stmts, tail) ->
+        let bound' = walk_stmts bound stmts in
+        (match tail with Some t -> walk_expr bound' t | None -> ())
+    | EIf (c, t, e_opt) ->
+        walk_expr bound c; walk_expr bound t;
+        (match e_opt with Some x -> walk_expr bound x | None -> ())
+    | EMatch (scrut, arms) ->
+        walk_expr bound scrut;
+        List.iter (fun arm ->
+          let bound' = pattern_bindings bound arm.pattern in
+          walk_expr bound' arm.body) arms
+    | EProof _ | ERaw _ | EAssume _ | EAssert _ -> ()
+    | ELoop stmts -> let _ = walk_stmts bound stmts in ()
+    | EStruct (_, fields) ->
+        List.iter (fun (_, v) -> walk_expr bound v) fields
+    | EArrayLit xs | ETuple xs ->
+        List.iter (walk_expr bound) xs
+    | EArrayRepeat (v, n) ->
+        walk_expr bound v; walk_expr bound n
+    | ESubspan (s, lo, hi) ->
+        walk_expr bound s; walk_expr bound lo; walk_expr bound hi
+    | ERange (lo, hi) ->
+        walk_expr bound lo; walk_expr bound hi
+    | ELambda (inner_params, inner_body, _) ->
+        (* Nested lambda — its own params shadow outer names in its body. *)
+        let bound' = List.fold_left (fun acc (id, _) -> id.name :: acc)
+                       bound inner_params in
+        walk_expr bound' inner_body
+    | EAsm asm ->
+        List.iter (fun (_, e) -> walk_expr bound e) asm.asm_inputs
+  and walk_stmts bound stmts =
+    List.fold_left walk_stmt bound stmts
+  and walk_stmt bound stmt =
+    match stmt.stmt_desc with
+    | SLet (id, _, e, _) | SGhost (id, _, e) ->
+        walk_expr bound e; id.name :: bound
+    | SGhostAssign (_, e) | SExpr e -> walk_expr bound e; bound
+    | SReturn (Some e) -> walk_expr bound e; bound
+    | SReturn None -> bound
+    | SWhile (c, _, _, body) ->
+        walk_expr bound c;
+        let _ = walk_stmts bound body in bound
+    | SFor (id, iter, _, _, body) ->
+        walk_expr bound iter;
+        let _ = walk_stmts (id.name :: bound) body in bound
+    | SBreak (Some e) -> walk_expr bound e; bound
+    | SBreak None | SContinue -> bound
+  and pattern_bindings bound p =
+    match p with
+    | PWild | PLit _ | PLitRange _ -> bound
+    | PBind id -> id.name :: bound
+    | PCtor (_, ps) | PTuple ps ->
+        List.fold_left pattern_bindings bound ps
+    | PAs (p, id) -> pattern_bindings (id.name :: bound) p
+    | POr (p, _) -> pattern_bindings bound p  (* both sides bind same names *)
+  in
+  walk_expr param_names body;
+  List.rev !captures
+
 let rec check_expr env expr : ty =
   let ty = infer_expr env expr in
   expr.expr_ty <- Some ty;
@@ -2312,6 +2403,25 @@ and infer_expr env expr : ty =
         env params
       in
       let ret_ty = check_expr inner_env body in
+      (* Closure-capture check: Forge lambdas currently lift to plain top-level
+         C functions with no environment.  If the body references a local
+         variable from the enclosing scope (not a top-level symbol and not in
+         the lambda's own parameter list), the generated C is not compilable
+         — the lifted function has no way to see the captured value.
+         Detect this and emit a clear error instead of silently producing
+         broken C.  Full closure support (fat fn-pointer with env struct +
+         thunk) is tracked as future work.  *)
+      let param_names = List.map (fun (id, _) -> id.name) params in
+      let outer_var_names = List.map fst env.vars in
+      let captures = find_lambda_captures body param_names outer_var_names in
+      List.iter (fun (name, loc) ->
+        fail loc
+          (Printf.sprintf
+             "lambda captures local variable '%s' from enclosing scope, \
+              but Forge lambdas do not yet support environment capture. \
+              Pass '%s' as an explicit parameter instead, or use a named \
+              top-level function." name name)
+      ) captures;
       (* Synthesize the top-level IFn *)
       let lam_fn : fn_def = {
         fn_name     = { name = lam_name; loc = expr.expr_loc };
