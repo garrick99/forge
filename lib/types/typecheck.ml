@@ -2419,8 +2419,13 @@ and infer_expr env expr : ty =
           (Printf.sprintf
              "lambda captures local variable '%s' from enclosing scope, \
               but Forge lambdas do not yet support environment capture. \
-              Pass '%s' as an explicit parameter instead, or use a named \
-              top-level function." name name)
+              Options:\n  \
+              (a) pass '%s' as an explicit parameter;\n  \
+              (b) use a named top-level function;\n  \
+              (c) express the closure manually as a struct + fn-pointer \
+              (see demos/303_closure_simulation.fg — works today, \
+              proven by FORGE71's vtable-dispatch path)."
+             name name)
       ) captures;
       (* Synthesize the top-level IFn *)
       let lam_fn : fn_def = {
