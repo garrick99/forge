@@ -1,0 +1,28 @@
+// Tensor-core HMMA FP16 → f32: single 16x8x16 tile.
+//
+// One CUDA block = one warp (32 threads), one MMA call.  Computes a
+// 16×8 output tile D = A (16×16 fp16) · B (16×8 fp16) + C (16×8 f32)
+// using the single mma.sync.aligned.m16n8k16 instruction.
+//
+// The Forge-level surface passes the fragments as span<u16> (for A/B)
+// and span<f32> (for C), matching how CUTLASS and the std::tensor_core
+// wrapper present the intrinsic.  Actual fragment decomposition across
+// the 32 lanes happens inside the intrinsic lowering.
+
+use std::prelude;
+use std::fp16;
+use std::tensor_core;
+
+#[kernel]
+fn hmma_tile(
+    A: span<u16>, B: span<u16>, C: span<f32>
+)
+    requires 256u64 <= A.len   // 16*16 fp16 A fragment
+    requires 128u64 <= B.len   // 16*8  fp16 B fragment
+    requires 128u64 <= C.len   // 16*8  f32  C fragment
+    requires threadIdx_x < 32u32
+{
+    mma_m16n8k16_fp16(A, B, C);
+}
+
+fn main() -> i32 { 0i32 }
