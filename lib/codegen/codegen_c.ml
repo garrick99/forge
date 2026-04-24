@@ -237,12 +237,90 @@ let rec collect_fn_ptr_tys acc = function
   | TTuple tys -> List.fold_left collect_fn_ptr_tys acc tys
   | _ -> acc
 
+(* Walk every expression and statement in a function body to also collect
+   TFn types that appear only as local variable annotations (SLet with a
+   type ascription) or as the inferred type of an expression (e.g. the
+   result of taking a function's name as a first-class value).  Without
+   this, `let f: fn(i32, i32) -> i32 = add;` inside a function body
+   produced a reference to `forge_fn_..._t` that had no corresponding
+   typedef emission, because the earlier collector only scanned
+   parameter, return, struct-field, and extern types.  *)
+let rec collect_fn_ptr_in_expr acc e =
+  let acc = match e.expr_ty with
+    | Some t -> collect_fn_ptr_tys acc t
+    | None   -> acc
+  in
+  match e.expr_desc with
+  | ELit _ | EVar _ | ESync -> acc
+  | EBinop (_, a, b) | EAssign (a, b) | EIndex (a, b) ->
+      collect_fn_ptr_in_expr (collect_fn_ptr_in_expr acc a) b
+  | EUnop (_, x) | EField (x, _) | ERef x | ERefMut x | EDeref x
+  | EField_n (x, _) ->
+      collect_fn_ptr_in_expr acc x
+  | ECall (f, xs) ->
+      let acc = collect_fn_ptr_in_expr acc f in
+      List.fold_left collect_fn_ptr_in_expr acc xs
+  | EBlock (stmts, tail) ->
+      let acc = List.fold_left collect_fn_ptr_in_stmt acc stmts in
+      (match tail with Some e -> collect_fn_ptr_in_expr acc e | None -> acc)
+  | EIf (c, t, e_opt) ->
+      let acc = collect_fn_ptr_in_expr (collect_fn_ptr_in_expr acc c) t in
+      (match e_opt with Some e -> collect_fn_ptr_in_expr acc e | None -> acc)
+  | EMatch (scrut, arms) ->
+      let acc = collect_fn_ptr_in_expr acc scrut in
+      List.fold_left (fun a arm -> collect_fn_ptr_in_expr a arm.body) acc arms
+  | ECast (x, t) ->
+      collect_fn_ptr_in_expr (collect_fn_ptr_tys acc t) x
+  | EProof _ | ERaw _ | EAssume _ | EAssert _ -> acc
+  | ELoop stmts ->
+      List.fold_left collect_fn_ptr_in_stmt acc stmts
+  | EStruct (_, fields) ->
+      List.fold_left (fun a (_, v) -> collect_fn_ptr_in_expr a v) acc fields
+  | EArrayLit xs | ETuple xs ->
+      List.fold_left collect_fn_ptr_in_expr acc xs
+  | EArrayRepeat (v, n) ->
+      collect_fn_ptr_in_expr (collect_fn_ptr_in_expr acc v) n
+  | ESubspan (s, lo, hi) ->
+      collect_fn_ptr_in_expr
+        (collect_fn_ptr_in_expr (collect_fn_ptr_in_expr acc s) lo) hi
+  | ERange (lo, hi) ->
+      collect_fn_ptr_in_expr (collect_fn_ptr_in_expr acc lo) hi
+  | ELambda (params, body, _) ->
+      let acc = List.fold_left (fun a (_, t) -> collect_fn_ptr_tys a t) acc params in
+      collect_fn_ptr_in_expr acc body
+  | EAsm asm ->
+      let acc = List.fold_left (fun a (_, e) -> collect_fn_ptr_in_expr a e) acc asm.asm_inputs in
+      ignore asm.asm_outputs; acc
+
+and collect_fn_ptr_in_stmt acc s =
+  match s.stmt_desc with
+  | SLet (_, ty_opt, e, _) | SGhost (_, ty_opt, e) ->
+      let acc = match ty_opt with
+        | Some t -> collect_fn_ptr_tys acc t
+        | None   -> acc
+      in
+      collect_fn_ptr_in_expr acc e
+  | SGhostAssign (_, e) | SExpr e -> collect_fn_ptr_in_expr acc e
+  | SReturn e_opt ->
+      (match e_opt with Some e -> collect_fn_ptr_in_expr acc e | None -> acc)
+  | SWhile (c, _, _, body) ->
+      let acc = collect_fn_ptr_in_expr acc c in
+      List.fold_left collect_fn_ptr_in_stmt acc body
+  | SFor (_, iter, _, _, body) ->
+      let acc = collect_fn_ptr_in_expr acc iter in
+      List.fold_left collect_fn_ptr_in_stmt acc body
+  | SBreak (Some e) -> collect_fn_ptr_in_expr acc e
+  | SBreak None | SContinue -> acc
+
 let collect_fn_ptr_types items =
   List.fold_left (fun acc item ->
     match item.item_desc with
     | IFn fn ->
         let acc = List.fold_left (fun a (_, t) -> collect_fn_ptr_tys a t) acc fn.fn_params in
-        collect_fn_ptr_tys acc fn.fn_ret
+        let acc = collect_fn_ptr_tys acc fn.fn_ret in
+        (match fn.fn_body with
+         | Some body -> collect_fn_ptr_in_expr acc body
+         | None      -> acc)
     | IExtern ex -> collect_fn_ptr_tys acc ex.ex_ty
     | IStruct sd -> List.fold_left (fun a (_, t) -> collect_fn_ptr_tys a t) acc sd.sd_fields
     | _ -> acc
