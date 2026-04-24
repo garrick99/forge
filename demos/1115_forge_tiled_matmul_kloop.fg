@@ -1,0 +1,111 @@
+// expected: 0
+// FORGE65-68 full tiled matmul — arbitrary K via outer tile loop.
+//
+// C[M, N] = A[M, K] × B[K, N] for any K that is a multiple of TILE=16.
+//
+// Builds on FORGE61-64 (K=16 microkernel) by wrapping an outer while
+// loop over K-tiles.  Two shared-memory tiles (one A-tile, one B-tile)
+// are reloaded each iteration; a running accumulator sums the
+// 16-step dot product per iteration.
+//
+// Proof obligations:
+//   * inner dot loop invariant: 0 <= ki <= 16
+//   * outer K-tile loop invariant: 0 <= kt <= num_k_tiles
+//   * every shared-memory index < 256
+//   * every global load/store index < a.len / b.len / c.len
+// All discharged by Z3.
+
+use std::gpu;
+
+#[kernel]
+fn matmul_kloop(
+    a: span<u32>, b: span<u32>, c: span<u32>,
+    m: u32, n: u32, k: u32
+)
+    requires m > 0u32
+    requires n > 0u32
+    requires k > 0u32
+    requires k % 16u32 == 0u32             // K must be a multiple of TILE
+    requires m * k <= a.len
+    requires k * n <= b.len
+    requires m * n <= c.len
+    requires threadIdx_x < 16u32
+    requires threadIdx_y < 16u32
+{
+    let as_tile: shared<u32>[256] = 0;
+    let bs_tile: shared<u32>[256] = 0;
+
+    let x: u32 = threadIdx_x;
+    let y: u32 = threadIdx_y;
+    let col: u32 = blockIdx_x * 16u32 + x;
+    let row: u32 = blockIdx_y * 16u32 + y;
+
+    let s_idx: u32 = y * 16u32 + x;
+    let num_k_tiles: u32 = k / 16u32;
+
+    let mut acc: u32 = 0u32;
+    let mut kt: u32 = 0u32;
+    while kt < num_k_tiles
+        invariant kt <= num_k_tiles
+    {
+        // Phase 1: load A-tile and B-tile for this K slab.
+        //   As[y, x] = A[row, kt*TILE + x]    — A is row-major with stride K
+        //   Bs[y, x] = B[kt*TILE + y, col]    — B is row-major with stride N
+        let k_base: u32 = kt * 16u32;
+
+        if row < m {
+            let a_col: u32 = k_base + x;
+            if a_col < k {
+                let a_idx: u32 = row * k + a_col;
+                if a_idx < a.len {
+                    as_tile[s_idx] = a[a_idx];
+                };
+            };
+        };
+        if col < n {
+            let b_row: u32 = k_base + y;
+            if b_row < k {
+                let b_idx: u32 = b_row * n + col;
+                if b_idx < b.len {
+                    bs_tile[s_idx] = b[b_idx];
+                };
+            };
+        };
+
+        syncthreads();
+
+        // Phase 2: 16-step dot product from shared memory.
+        if row < m {
+            if col < n {
+                let mut ki: u32 = 0u32;
+                while ki < 16u32
+                    invariant ki <= 16u32
+                {
+                    let a_s: u32 = y * 16u32 + ki;
+                    let b_s: u32 = ki * 16u32 + x;
+                    let av: u32 = as_tile[a_s];
+                    let bv: u32 = bs_tile[b_s];
+                    acc = acc + av * bv;
+                    ki = ki + 1u32;
+                };
+            };
+        };
+
+        // Phase 3: barrier before next K-tile reloads shared memory.
+        syncthreads();
+
+        kt = kt + 1u32;
+    };
+
+    // Phase 4: write accumulator to global.
+    if row < m {
+        if col < n {
+            let c_idx: u32 = row * n + col;
+            if c_idx < c.len {
+                c[c_idx] = acc;
+            };
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }
