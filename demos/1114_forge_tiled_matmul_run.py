@@ -78,9 +78,9 @@ for (M, N) in shapes:
         p_m    = ctypes.c_uint32(M)
         p_n    = ctypes.c_uint32(N)
         
-        params = (ctypes.c_void_p * 9)(*[
+        params = (ctypes.c_void_p * 8)(*[
             ctypes.cast(ctypes.pointer(x), ctypes.c_void_p)
-            for x in [p_a, p_alen, p_b, p_blen, p_c, p_clen, p_m, p_n, p_k]
+            for x in [p_a, p_alen, p_b, p_blen, p_c, p_clen, p_m, p_n]
         ])
 
         bx = (N + TILE - 1) // TILE
