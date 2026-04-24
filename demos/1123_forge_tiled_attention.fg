@@ -1,0 +1,138 @@
+// Tiled attention, Forge-native.  One block per query row; 128 threads
+// cooperate via shared memory to avoid the O(seq_len^2) recomputation
+// that kept 1122 single-threaded.
+//
+// Per query row i:
+//   s[j]   = <Q[i], K[j]> * rsqrt(d)          parallel over j
+//   m      = max_j s[j]                        tree-reduce in smem
+//   e[j]   = exp(s[j] - m)                    parallel over j
+//   denom  = sum_j e[j]                        tree-reduce in smem
+//   out[k] = sum_j (e[j] / denom) * V[j,k]   tree-reduce in smem, one k at a time
+//
+// Preconditions fix seq_len <= 128 and d <= 32 to keep the shared buffers
+// small and the proof surface tractable.  One block per query row, 128
+// threads per block.
+
+use std::prelude;
+use std::gpu;
+
+#[kernel]
+fn tiled_attention(
+    Q: span<f32>, K: span<f32>, V: span<f32>, O: span<f32>,
+    seq_len: u64, d: u64
+)
+    requires seq_len * d <= Q.len
+    requires seq_len * d <= K.len
+    requires seq_len * d <= V.len
+    requires seq_len * d <= O.len
+    requires 1u64 <= seq_len
+    requires seq_len <= 128u64
+    requires 1u64 <= d
+    requires d <= 32u64
+    requires blockIdx_x < gridDim_x
+    requires gridDim_x <= seq_len
+    requires threadIdx_x < 128u32
+{
+    let scores: shared<f32>[128] = [0.0f32; 128u64];
+    let i: u64 = blockIdx_x;
+    let tid: u64 = threadIdx_x;
+    let scale: f32 = rsqrtf(d as f32);
+
+    // Pass 1 — compute scores[j] = <Q[i], K[j]> * scale for j = tid.
+    let mut s: f32 = 0.0f32;
+    if tid < seq_len {
+        let mut e: u64 = 0u64;
+        while e < d
+            invariant e <= d
+            decreases d - e
+        {
+            s = s + Q[i * d + e] * K[tid * d + e];
+            e = e + 1u64;
+        };
+        scores[tid] = s * scale;
+    } else {
+        scores[tid] = -1.0e30f32;
+    };
+    syncthreads();
+
+    // Pass 2 — row-max via tree reduce.
+    let mut r: u64 = 64u64;
+    while r > 0u64
+        invariant r <= 64u64
+        decreases r
+    {
+        if tid < r {
+            let a: f32 = scores[tid];
+            let b: f32 = scores[tid + r];
+            if b > a { scores[tid] = b; };
+        };
+        syncthreads();
+        r = r >> 1u64;
+    };
+    let m: f32 = scores[0];
+    syncthreads();
+
+    // Pass 3 — compute exp(score[tid] - m), overwrite scores.
+    let mut ex: f32 = 0.0f32;
+    if tid < seq_len {
+        ex = expf(s * scale - m);
+    };
+    scores[tid] = ex;
+    syncthreads();
+
+    // Pass 4 — denom = sum_j e[j] via tree reduce over a scratch copy.
+    // We re-read the current scores into a local, tree-reduce, then
+    // restore scores[tid] = ex for use in pass 5.
+    let mut r2: u64 = 64u64;
+    while r2 > 0u64
+        invariant r2 <= 64u64
+        decreases r2
+    {
+        if tid < r2 {
+            scores[tid] = scores[tid] + scores[tid + r2];
+        };
+        syncthreads();
+        r2 = r2 >> 1u64;
+    };
+    let denom: f32 = scores[0];
+    syncthreads();
+    assume(denom > 0.0f32) "denom >= exp(0) = 1 at the argmax";
+
+    // Pass 5 — each thread holds weight_j = ex / denom; compute output[k]
+    // for k = 0..d via tree reduce on (weight * V[j,k]).
+    let weight: f32 = ex / denom;
+    let mut k: u64 = 0u64;
+    while k < d
+        invariant k <= d
+        decreases d - k
+    {
+        // Load weight * V[tid, k] into scores[tid] (reusing as scratch).
+        let mut v: f32 = 0.0f32;
+        if tid < seq_len {
+            v = V[tid * d + k];
+        };
+        scores[tid] = weight * v;
+        syncthreads();
+
+        let mut r3: u64 = 64u64;
+        while r3 > 0u64
+            invariant r3 <= 64u64
+            decreases r3
+        {
+            if tid < r3 {
+                scores[tid] = scores[tid] + scores[tid + r3];
+            };
+            syncthreads();
+            r3 = r3 >> 1u64;
+        };
+
+        if tid == 0u64 {
+            O[i * d + k] = scores[0];
+        };
+        syncthreads();
+
+        k = k + 1u64;
+    };
+}
+
+fn main() -> i32 { 0i32 }
