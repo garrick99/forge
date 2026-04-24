@@ -1,0 +1,69 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry gelu_kernel(
+    .param .u64 gelu_kernel_param_inp_data,
+    .param .u64 gelu_kernel_param_inp_len,
+    .param .u64 gelu_kernel_param_out_data,
+    .param .u64 gelu_kernel_param_out_len,
+    .param .u64 gelu_kernel_param_n
+)
+{
+    .reg .pred %p13;
+    .reg .u64 %rd0, %rd1, %rd11, %rd12, %rd15, %rd16, %rd17, %rd2, %rd3, %rd32, %rd33, %rd34, %rd4, %rd7, %rd8, %rd9;
+    .reg .f32 %f18, %f19, %f20, %f21, %f22, %f23, %f24, %f25, %f26, %f27, %f28, %f29, %f30, %f31;
+    .reg .u32 %r10, %r35, %r36, %r37, %r5, %r6;
+
+  ld.param.u64 %rd0, [gelu_kernel_param_inp_data];
+  ld.param.u64 %rd1, [gelu_kernel_param_inp_len];
+  ld.param.u64 %rd2, [gelu_kernel_param_out_data];
+  ld.param.u64 %rd3, [gelu_kernel_param_out_len];
+  ld.param.u64 %rd4, [gelu_kernel_param_n];
+
+  mov.u32 %r5, %ctaid.x;
+  mov.u32 %r6, %ntid.x;
+  cvt.u64.u32 %rd7, %r6;
+  cvt.u64.u32 %rd8, %r5;
+  mul.lo.u64 %rd9, %rd8, %rd7;
+  mov.u32 %r10, %tid.x;
+  cvt.u64.u32 %rd11, %r10;
+  add.u64 %rd12, %rd9, %rd11;
+  setp.lt.u64 %p13, %rd12, %rd4;
+  @%p13 bra gelu_kernel_then_14;
+  bra gelu_kernel_else_14;
+  gelu_kernel_then_14:
+  mov.u64 %rd15, 4;
+  mul.lo.u64 %rd16, %rd12, %rd15;
+  add.u64 %rd17, %rd0, %rd16;
+  ld.global.f32 %f18, [%rd17];
+  mul.f32 %f19, %f18, %f18;
+  mul.f32 %f20, %f19, %f18;
+  mov.f32 %f21, 0f3F4C422A; // 0.797885
+  mov.f32 %f22, 0f3D372713; // 0.044715
+  mul.f32 %f23, %f22, %f20;
+  add.f32 %f24, %f18, %f23;
+  mul.f32 %f25, %f21, %f24;
+  tanh.approx.f32 %f26, %f25;
+  mov.f32 %f27, 0f3F000000; // 0.5
+  mul.f32 %f28, %f27, %f18;
+  mov.f32 %f29, 0f3F800000; // 1
+  add.f32 %f30, %f29, %f26;
+  mul.f32 %f31, %f28, %f30;
+  mov.u64 %rd32, 4;
+  mul.lo.u64 %rd33, %rd12, %rd32;
+  add.u64 %rd34, %rd2, %rd33;
+  st.global.f32 [%rd34], %f31;
+  mov.u32 %r35, 0; // unit
+  mov.u32 %r36, %r35;
+  bra gelu_kernel_end_14;
+  gelu_kernel_else_14:
+  mov.u32 %r36, 0; // no else branch
+  gelu_kernel_end_14:
+  mov.u32 %r37, 0; // unit
+  ret;
+}
+

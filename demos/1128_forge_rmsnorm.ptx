@@ -1,0 +1,132 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry rmsnorm_rowwise(
+    .param .u64 rmsnorm_rowwise_param_inp_data,
+    .param .u64 rmsnorm_rowwise_param_inp_len,
+    .param .u64 rmsnorm_rowwise_param_out_data,
+    .param .u64 rmsnorm_rowwise_param_out_len,
+    .param .u64 rmsnorm_rowwise_param_n_cols
+)
+{
+    .shared .f32 __forge_smem_smem[256];
+
+    .reg .pred %p13, %p33, %p34, %p67;
+    .reg .u64 %rd0, %rd1, %rd14, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd25, %rd26, %rd27, %rd28, %rd3, %rd30, %rd32, %rd35, %rd37, %rd38, %rd39, %rd4, %rd40, %rd42, %rd43, %rd44, %rd45, %rd46, %rd49, %rd5, %rd50, %rd51, %rd52, %rd56, %rd57, %rd59, %rd60, %rd61, %rd62, %rd68, %rd71, %rd72, %rd73, %rd74, %rd75, %rd8, %rd9;
+    .reg .f32 %f10, %f11, %f12, %f21, %f24, %f41, %f47, %f48, %f63, %f64, %f65, %f66, %f70;
+    .reg .u32 %r22, %r23, %r29, %r53, %r54, %r55, %r58, %r6, %r7, %r76, %r77, %r78;
+
+  ld.param.u64 %rd0, [rmsnorm_rowwise_param_inp_data];
+  ld.param.u64 %rd1, [rmsnorm_rowwise_param_inp_len];
+  ld.param.u64 %rd2, [rmsnorm_rowwise_param_out_data];
+  ld.param.u64 %rd3, [rmsnorm_rowwise_param_out_len];
+  ld.param.u64 %rd4, [rmsnorm_rowwise_param_n_cols];
+
+  mov.u64 %rd5, __forge_smem_smem;
+  mov.u32 %r6, %tid.x;
+  mov.u32 %r7, %ctaid.x;
+  cvt.u64.u32 %rd8, %r7;
+  mul.lo.u64 %rd9, %rd8, %rd4;
+  cvt.f32.u64 %f10, %rd4;
+  mov.f32 %f11, 0f3727C5AC; // 1e-05
+  mov.f32 %f12, 0f00000000; // 0
+  cvt.u64.u32 %rd14, %r6;
+  setp.lt.u64 %p13, %rd14, %rd4;
+  @%p13 bra rmsnorm_rowwise_then_15;
+  bra rmsnorm_rowwise_else_15;
+  rmsnorm_rowwise_then_15:
+  cvt.u64.u32 %rd16, %r6;
+  add.u64 %rd17, %rd9, %rd16;
+  mov.u64 %rd18, 4;
+  mul.lo.u64 %rd19, %rd17, %rd18;
+  add.u64 %rd20, %rd0, %rd19;
+  ld.global.f32 %f21, [%rd20];
+  mov.u32 %r22, 0; // unit
+  mov.u32 %r23, %r22;
+  bra rmsnorm_rowwise_end_15;
+  rmsnorm_rowwise_else_15:
+  mov.u32 %r23, 0; // no else branch
+  rmsnorm_rowwise_end_15:
+  mul.f32 %f24, %f21, %f21;
+  cvt.u64.u32 %rd25, %r6;
+  mov.u64 %rd26, 4;
+  mul.lo.u64 %rd27, %rd25, %rd26;
+  add.u64 %rd28, %rd5, %rd27;
+  st.shared.f32 [%rd28], %f24;
+  bar.sync 0;
+  mov.u32 %r29, 0; // unit
+  mov.u64 %rd30, 128;
+  rmsnorm_rowwise_loop_31:
+  mov.u64 %rd32, 0;
+  setp.gt.u64 %p33, %rd30, %rd32;
+  @!%p33 bra rmsnorm_rowwise_loop_end_31;
+  cvt.u64.u32 %rd35, %r6;
+  setp.lt.u64 %p34, %rd35, %rd30;
+  @%p34 bra rmsnorm_rowwise_then_36;
+  bra rmsnorm_rowwise_else_36;
+  rmsnorm_rowwise_then_36:
+  cvt.u64.u32 %rd37, %r6;
+  mov.u64 %rd38, 4;
+  mul.lo.u64 %rd39, %rd37, %rd38;
+  add.u64 %rd40, %rd5, %rd39;
+  ld.shared.f32 %f41, [%rd40];
+  cvt.u64.u32 %rd42, %r6;
+  add.u64 %rd43, %rd42, %rd30;
+  mov.u64 %rd44, 4;
+  mul.lo.u64 %rd45, %rd43, %rd44;
+  add.u64 %rd46, %rd5, %rd45;
+  ld.shared.f32 %f47, [%rd46];
+  add.f32 %f48, %f41, %f47;
+  cvt.u64.u32 %rd49, %r6;
+  mov.u64 %rd50, 4;
+  mul.lo.u64 %rd51, %rd49, %rd50;
+  add.u64 %rd52, %rd5, %rd51;
+  st.shared.f32 [%rd52], %f48;
+  mov.u32 %r53, 0; // unit
+  mov.u32 %r54, %r53;
+  bra rmsnorm_rowwise_end_36;
+  rmsnorm_rowwise_else_36:
+  mov.u32 %r54, 0; // no else branch
+  rmsnorm_rowwise_end_36:
+  bar.sync 0;
+  mov.u32 %r55, 0; // unit
+  mov.u64 %rd56, 1;
+  shr.u64 %rd57, %rd30, %rd56;
+  mov.u64 %rd30, %rd57; // loop wb: s
+  bra rmsnorm_rowwise_loop_31;
+  rmsnorm_rowwise_loop_end_31:
+  mov.u32 %r58, 0; // unit
+  mov.u64 %rd59, 0;
+  mov.u64 %rd60, 4;
+  mul.lo.u64 %rd61, %rd59, %rd60;
+  add.u64 %rd62, %rd5, %rd61;
+  ld.shared.f32 %f63, [%rd62];
+  div.f32 %f64, %f63, %f10;
+  add.f32 %f65, %f64, %f11;
+  rsqrt.approx.f32 %f66, %f65;
+  cvt.u64.u32 %rd68, %r6;
+  setp.lt.u64 %p67, %rd68, %rd4;
+  @%p67 bra rmsnorm_rowwise_then_69;
+  bra rmsnorm_rowwise_else_69;
+  rmsnorm_rowwise_then_69:
+  mul.f32 %f70, %f21, %f66;
+  cvt.u64.u32 %rd71, %r6;
+  add.u64 %rd72, %rd9, %rd71;
+  mov.u64 %rd73, 4;
+  mul.lo.u64 %rd74, %rd72, %rd73;
+  add.u64 %rd75, %rd2, %rd74;
+  st.global.f32 [%rd75], %f70;
+  mov.u32 %r76, 0; // unit
+  mov.u32 %r77, %r76;
+  bra rmsnorm_rowwise_end_69;
+  rmsnorm_rowwise_else_69:
+  mov.u32 %r77, 0; // no else branch
+  rmsnorm_rowwise_end_69:
+  mov.u32 %r78, 0; // unit
+  ret;
+}
+

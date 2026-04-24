@@ -799,6 +799,14 @@ let rec lower_expr st e : string =
       emit st (Printf.sprintf "ex2.approx.f32 %s, %s;" result scaled);
       result
 
+  (* FORGE80: tanhf(x) → tanh.approx.f32(x).  Single SFU instruction on SM_75+. *)
+  | ECall ({ expr_desc = EVar id; _ }, [arg])
+      when id.name = "tanhf" ->
+      let rx = lower_expr st arg in
+      let result = fresh_reg st F32 in
+      emit st (Printf.sprintf "tanh.approx.f32 %s, %s;" result rx);
+      result
+
   (* FORGE73: rsqrtf(x) → rsqrt.approx.f32(x).  Single hardware instruction. *)
   | ECall ({ expr_desc = EVar id; _ }, [arg])
       when id.name = "rsqrtf" ->

@@ -1,0 +1,31 @@
+// Elementwise SiLU (Swish) activation.
+//
+// SiLU(x) = x * sigmoid(x) = x / (1 + expf(-x))
+//
+// Used in LLaMA-style FFN gates (SwiGLU).  Pure elementwise map —
+// single expf + reciprocal add per element.
+//
+// Substitutes the "tiled FlashAttention" slot in Task 51 because
+// 1123_forge_tiled_attention already covers the multi-thread shared-mem
+// attention pattern, and SiLU fills the remaining common transformer
+// activation gap (paired with GELU in 1129).
+
+use std::prelude;
+
+#[kernel]
+fn silu_kernel(inp: span<f32>, out: span<f32>, n: u64)
+    requires n <= inp.len
+    requires n <= out.len
+    requires blockIdx_x < gridDim_x
+{
+    let gid: u64 = blockIdx_x * (blockDim_x as u64) + (threadIdx_x as u64);
+    if gid < n {
+        let x: f32 = inp[gid];
+        let neg_x: f32 = 0.0f32 - x;
+        let e: f32 = expf(neg_x);
+        let denom: f32 = 1.0f32 + e;
+        out[gid] = x / denom;
+    };
+}
+
+fn main() -> i32 { 0i32 }

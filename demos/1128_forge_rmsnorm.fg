@@ -1,0 +1,56 @@
+// Row-wise RMSNorm, Forge-native.  Simpler than LayerNorm: no mean
+// subtraction — normalise by rsqrt(mean-square + eps).
+//
+//   y[i] = x[i] * rsqrtf(sum(x_j^2) / n + eps)
+//
+// Single-pass in terms of data (one tree reduction in shared memory).
+// Block-per-row, 256 threads.
+
+use std::prelude;
+use std::gpu;
+
+#[kernel]
+fn rmsnorm_rowwise(inp: span<f32>, out: span<f32>, n_cols: u64)
+    requires 1u64 <= n_cols
+    requires n_cols <= 256u64
+    requires blockIdx_x < gridDim_x
+    requires gridDim_x * n_cols <= inp.len
+    requires gridDim_x * n_cols <= out.len
+    requires threadIdx_x < 256u64
+{
+    let smem: shared<f32>[256] = [0.0f32; 256u64];
+    let tid: u64 = threadIdx_x;
+    let row: u64 = blockIdx_x;
+    let base: u64 = row * n_cols;
+    let n_f: f32 = n_cols as f32;
+    let eps: f32 = 0.00001f32;
+
+    let mut x: f32 = 0.0f32;
+    if tid < n_cols {
+        x = inp[base + tid];
+    };
+
+    // Pass 1 — tree-reduce sum of squares.
+    smem[tid] = x * x;
+    syncthreads();
+
+    let mut s: u64 = 128u64;
+    while s > 0u64
+        invariant s <= 128u64
+        decreases s
+    {
+        if tid < s {
+            smem[tid] = smem[tid] + smem[tid + s];
+        };
+        syncthreads();
+        s = s >> 1u64;
+    };
+    let ms: f32 = smem[0] / n_f;
+    let inv_rms: f32 = rsqrtf(ms + eps);
+
+    if tid < n_cols {
+        out[base + tid] = x * inv_rms;
+    };
+}
+
+fn main() -> i32 { 0i32 }
