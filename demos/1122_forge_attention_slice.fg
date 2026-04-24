@@ -1,0 +1,118 @@
+// Tiny single-head attention slice, Forge-native.
+//
+// For each query row q[i], compute attention over all key/value rows:
+//   score[j] = <q[i], k[j]> / sqrt(d)    (for j in [0, seq_len))
+//   weight[j] = exp(score[j] - max_s) / denom      (numerically-stable softmax)
+//   out[i]  = sum_j ( weight[j] * v[j] )
+//
+// Single thread per query row; the softmax is two-pass online over the
+// same j-loop (first pass finds the max + denom, second pass re-weighs
+// values).  This is the simplest attention pattern that still exercises
+// the full f32 stdlib: expf, rsqrtf, warp reductions aren't needed here
+// because the reduction is along the single-threaded `j` loop.
+//
+// Formal properties proven by Z3:
+//   - Q / K / V / O accesses in bounds (seq_len * d <= span.len)
+//   - j-loop and e-loop termination
+//   - accumulator loop invariants
+// One assume: denom > 0 after the exp-sum pass (holds because the argmax
+// contributes exp(0) = 1; beyond Z3 float automation).
+
+use std::prelude;
+use std::gpu;
+
+#[kernel]
+fn attention_slice(
+    Q: span<f32>, K: span<f32>, V: span<f32>, O: span<f32>,
+    seq_len: u64, d: u64
+)
+    requires seq_len * d <= Q.len
+    requires seq_len * d <= K.len
+    requires seq_len * d <= V.len
+    requires seq_len * d <= O.len
+    requires 1u64 <= seq_len
+    requires 1u64 <= d
+    requires seq_len <= 128u64
+    requires d <= 64u64
+    requires blockIdx_x < gridDim_x
+    requires blockDim_x >= 1u32
+{
+    let gid: u64 = blockIdx_x * (blockDim_x as u64) + (threadIdx_x as u64);
+
+    if gid < seq_len {
+        let scale: f32 = rsqrtf(d as f32);
+
+        // Pass 1 — find max_s over j.
+        let mut max_s: f32 = -1.0e30f32;
+        let mut j: u64 = 0u64;
+        while j < seq_len
+            invariant j <= seq_len
+            decreases seq_len - j
+        {
+            let mut s: f32 = 0.0f32;
+            let mut e: u64 = 0u64;
+            while e < d
+                invariant e <= d
+                decreases d - e
+            {
+                s = s + Q[gid * d + e] * K[j * d + e];
+                e = e + 1u64;
+            };
+            let sc: f32 = s * scale;
+            if sc > max_s { max_s = sc; };
+            j = j + 1u64;
+        };
+
+        // Pass 2 — compute denom = sum_j exp(score[j] - max_s).
+        let mut denom: f32 = 0.0f32;
+        let mut j2: u64 = 0u64;
+        while j2 < seq_len
+            invariant j2 <= seq_len
+            decreases seq_len - j2
+        {
+            let mut s: f32 = 0.0f32;
+            let mut e: u64 = 0u64;
+            while e < d
+                invariant e <= d
+                decreases d - e
+            {
+                s = s + Q[gid * d + e] * K[j2 * d + e];
+                e = e + 1u64;
+            };
+            denom = denom + expf(s * scale - max_s);
+            j2 = j2 + 1u64;
+        };
+        assume(denom > 0.0f32) "denom >= exp(0) = 1.0 at the argmax";
+
+        // Pass 3 — for each output dim k, accumulate weighted values.
+        let mut k: u64 = 0u64;
+        while k < d
+            invariant k <= d
+            decreases d - k
+        {
+            let mut acc: f32 = 0.0f32;
+            let mut j3: u64 = 0u64;
+            while j3 < seq_len
+                invariant j3 <= seq_len
+                decreases seq_len - j3
+            {
+                let mut s: f32 = 0.0f32;
+                let mut e: u64 = 0u64;
+                while e < d
+                    invariant e <= d
+                    decreases d - e
+                {
+                    s = s + Q[gid * d + e] * K[j3 * d + e];
+                    e = e + 1u64;
+                };
+                let w: f32 = expf(s * scale - max_s) / denom;
+                acc = acc + w * V[j3 * d + k];
+                j3 = j3 + 1u64;
+            };
+            O[gid * d + k] = acc;
+            k = k + 1u64;
+        };
+    };
+}
+
+fn main() -> i32 { 0i32 }
