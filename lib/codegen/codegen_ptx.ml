@@ -83,6 +83,14 @@ type emit_state = {
      definition.  The generic ECall branch consults this table to
      inline the body when the callee is a known device function. *)
   fn_defs : (string, fn_def) Hashtbl.t;
+  (* FORGE73: shared-memory declarations for this kernel.
+     Each entry is (symbol, elem_rty, num_elements).  Emitted as
+     `.shared .<rty> <sym>[<N>];` in the kernel header. *)
+  mutable shared_decls : (string * ptx_rty * int) list;
+  (* Set of registers that hold the base address of a shared-memory
+     allocation.  ld/st through these registers must use the .shared
+     state space rather than .global. *)
+  mutable shared_regs : string list;
 }
 
 let fresh_reg st rty =
@@ -199,19 +207,38 @@ let rec lower_expr st e : string =
           emit st (Printf.sprintf "cvt.%s.%s %s, %s;" (arith_pfx tgt_rty) (arith_pfx src_rty) r reg);
           r
       in
+      (* FORGE73: widen integer operands to the expression's declared type
+         for arithmetic ops.  PTX is strict — `mul.lo.u64 %rd, %r32, %rd`
+         with a u32 source is a type error that ptxas rejects and that
+         OpenPTXas silently miscompiles.  Builtins like `blockIdx_x` come
+         back as u32 even when used in u64 expressions (e.g. `row * n_cols`),
+         so we insert cvt.u64.u32 at the use site.  Skip predicate and
+         float operands — those are never zero-extended to wider ints. *)
+      let needs_int_widen src_rty tgt_rty =
+        src_rty <> tgt_rty
+        && src_rty <> Pred && tgt_rty <> Pred
+        && src_rty <> F32 && src_rty <> F64
+        && tgt_rty <> F32 && tgt_rty <> F64
+      in
+      let rl_w =
+        let s = reg_rty st rl in
+        if needs_int_widen s rty then widen rl s rty else rl in
+      let rr_w =
+        let s = reg_rty st rr in
+        if needs_int_widen s rty then widen rr s rty else rr in
       let dst = fresh_reg st rty in
       let pfx = arith_pfx rty in
       (match op with
-      | Add    -> emit st (Printf.sprintf "add.%s %s, %s, %s;" pfx dst rl rr)
-      | Sub    -> emit st (Printf.sprintf "sub.%s %s, %s, %s;" pfx dst rl rr)
+      | Add    -> emit st (Printf.sprintf "add.%s %s, %s, %s;" pfx dst rl_w rr_w)
+      | Sub    -> emit st (Printf.sprintf "sub.%s %s, %s, %s;" pfx dst rl_w rr_w)
       | Mul    ->
           (match rty with
            | F32 | F64 ->
-               emit st (Printf.sprintf "mul.%s %s, %s, %s;" pfx dst rl rr)
+               emit st (Printf.sprintf "mul.%s %s, %s, %s;" pfx dst rl_w rr_w)
            | _ ->
-               emit st (Printf.sprintf "mul.lo.%s %s, %s, %s;" pfx dst rl rr))
-      | Div    -> emit st (Printf.sprintf "div.%s %s, %s, %s;" pfx dst rl rr)
-      | Mod    -> emit st (Printf.sprintf "rem.%s %s, %s, %s;" pfx dst rl rr)
+               emit st (Printf.sprintf "mul.lo.%s %s, %s, %s;" pfx dst rl_w rr_w))
+      | Div    -> emit st (Printf.sprintf "div.%s %s, %s, %s;" pfx dst rl_w rr_w)
+      | Mod    -> emit st (Printf.sprintf "rem.%s %s, %s, %s;" pfx dst rl_w rr_w)
       | BitAnd -> emit st (Printf.sprintf "and.b%d %s, %s, %s;" (sizeof_rty rty*8) dst rl rr)
       | BitOr  -> emit st (Printf.sprintf "or.b%d %s, %s, %s;"  (sizeof_rty rty*8) dst rl rr)
       | BitXor -> emit st (Printf.sprintf "xor.b%d %s, %s, %s;" (sizeof_rty rty*8) dst rl rr)
@@ -289,12 +316,21 @@ let rec lower_expr st e : string =
       emit st (Printf.sprintf "mul.lo.u64 %s, %s, %s;" offset ridx64 rsz);
       let addr = fresh_reg st U64 in
       emit st (Printf.sprintf "add.u64 %s, %s, %s;" addr base offset);
-      (* secret<T> array → cache-volatile load *)
+      (* secret<T> array → cache-volatile load.
+         shared<T>[N] → .shared state space (FORGE73). *)
       let is_sec = match e.expr_ty with
         | Some (TSecret _) -> true | _ -> false in
-      let cv = if is_sec then ".cv" else "" in
+      let is_shared = List.mem base st.shared_regs in
       let dst = fresh_reg st elem_rty in
-      emit st (Printf.sprintf "ld.global%s.%s %s, [%s];" cv (arith_pfx elem_rty) dst addr);
+      let () =
+        if is_shared then
+          emit st (Printf.sprintf "ld.shared.%s %s, [%s];"
+            (arith_pfx elem_rty) dst addr)
+        else
+          let cv = if is_sec then ".cv" else "" in
+          emit st (Printf.sprintf "ld.global%s.%s %s, [%s];"
+            cv (arith_pfx elem_rty) dst addr)
+      in
       dst
 
   (* Field access — span .len and .data *)
@@ -596,6 +632,61 @@ let rec lower_expr st e : string =
       let r = fresh_reg st U32 in
       emit st (Printf.sprintf "mov.u32 %s, %%warpid;" r); r
 
+  (* FORGE73: expf(x) → ex2.approx.f32(x * log2(e)).  This is how CUDA's
+     libdevice implements expf at the hardware level on SM_80+ — a single
+     MUFU.EX2 instruction preceded by a multiply by log2(e) (~1.442695).
+     Bit pattern for log2(e) as f32 is 0x3FB8AA3B. *)
+  | ECall ({ expr_desc = EVar id; _ }, [arg])
+      when id.name = "expf" ->
+      let rx = lower_expr st arg in
+      let scaled = fresh_reg st F32 in
+      emit st (Printf.sprintf "mul.rn.f32 %s, %s, 0f3FB8AA3B; // log2(e)"
+                 scaled rx);
+      let result = fresh_reg st F32 in
+      emit st (Printf.sprintf "ex2.approx.f32 %s, %s;" result scaled);
+      result
+
+  (* FORGE73: rsqrtf(x) → rsqrt.approx.f32(x).  Single hardware instruction. *)
+  | ECall ({ expr_desc = EVar id; _ }, [arg])
+      when id.name = "rsqrtf" ->
+      let rx = lower_expr st arg in
+      let result = fresh_reg st F32 in
+      emit st (Printf.sprintf "rsqrt.approx.f32 %s, %s;" result rx);
+      result
+
+  (* FORGE73: sqrtf(x) → sqrt.approx.f32(x). *)
+  | ECall ({ expr_desc = EVar id; _ }, [arg])
+      when id.name = "sqrtf" ->
+      let rx = lower_expr st arg in
+      let result = fresh_reg st F32 in
+      emit st (Printf.sprintf "sqrt.approx.f32 %s, %s;" result rx);
+      result
+
+  (* FORGE73: fmaxf / fminf lower to max.f32 / min.f32 single instructions. *)
+  | ECall ({ expr_desc = EVar id; _ }, [a; b])
+      when id.name = "fmaxf" ->
+      let ra = lower_expr st a in
+      let rb = lower_expr st b in
+      let result = fresh_reg st F32 in
+      emit st (Printf.sprintf "max.f32 %s, %s, %s;" result ra rb);
+      result
+
+  | ECall ({ expr_desc = EVar id; _ }, [a; b])
+      when id.name = "fminf" ->
+      let ra = lower_expr st a in
+      let rb = lower_expr st b in
+      let result = fresh_reg st F32 in
+      emit st (Printf.sprintf "min.f32 %s, %s, %s;" result ra rb);
+      result
+
+  (* FORGE73: fabsf(x) → abs.f32. *)
+  | ECall ({ expr_desc = EVar id; _ }, [arg])
+      when id.name = "fabsf" ->
+      let rx = lower_expr st arg in
+      let result = fresh_reg st F32 in
+      emit st (Printf.sprintf "abs.f32 %s, %s;" result rx);
+      result
+
   (* Generic function calls.
 
      FG-2.6: inline user-defined device functions at the call site.
@@ -734,10 +825,17 @@ and lower_assign st lhs rv =
       emit st (Printf.sprintf "mul.lo.u64 %s, %s, %s;" offset ridx64 rsz);
       let addr = fresh_reg st U64 in
       emit st (Printf.sprintf "add.u64 %s, %s, %s;" addr base offset);
+      (* secret<T> array → cache-streaming store.
+         shared<T>[N] → .shared state space (FORGE73). *)
       let is_sec = match lhs.expr_ty with
         | Some (TSecret _) -> true | _ -> false in
-      let cs = if is_sec then ".cs" else "" in
-      emit st (Printf.sprintf "st.global%s.%s [%s], %s;" cs (arith_pfx elem_rty) addr rv)
+      let is_shared = List.mem base st.shared_regs in
+      if is_shared then
+        emit st (Printf.sprintf "st.shared.%s [%s], %s;"
+          (arith_pfx elem_rty) addr rv)
+      else
+        let cs = if is_sec then ".cs" else "" in
+        emit st (Printf.sprintf "st.global%s.%s [%s], %s;" cs (arith_pfx elem_rty) addr rv)
 
   | _ ->
       emit st (Printf.sprintf "// assign to complex lvalue — ignored")
@@ -747,6 +845,28 @@ and lower_assign st lhs rv =
 (* ------------------------------------------------------------------ *)
 and lower_stmt st s =
   match s.stmt_desc with
+  | SLet (id, Some (TShared (elem_ty, size_opt)), _init, _lin) ->
+      (* FORGE73: shared<T>[N] — allocate PTX .shared memory symbol.
+         The initializer (e.g. `[0.0f32; 256]`) is erased; shared memory
+         has no declarator-level init in PTX.  Kernels that rely on a
+         zeroed smem must write zeros explicitly (softmax fills smem[tid]
+         before any read).  The symbol name is derived from the binding
+         so multiple shared arrays in one kernel stay distinct. *)
+      let n = match size_opt with
+        | Some { expr_desc = ELit (LInt (v, _)); _ } -> Int64.to_int v
+        | _ -> failwith
+            (Printf.sprintf "PTX backend: shared<%s>[N] needs a constant size"
+               id.name)
+      in
+      let elem_rty = ptx_rty_of_ty elem_ty in
+      let sym = Printf.sprintf "__forge_smem_%s" id.name in
+      st.shared_decls <- (sym, elem_rty, n) :: st.shared_decls;
+      (* Allocate a u64 register holding the symbol's address. *)
+      let r = fresh_reg st U64 in
+      emit st (Printf.sprintf "mov.u64 %s, %s;" r sym);
+      st.shared_regs <- r :: st.shared_regs;
+      st.reg_env <- (id.name, r) :: st.reg_env
+
   | SLet (id, _ty, e, _lin) ->
       let r = lower_expr st e in
       st.reg_env <- (id.name, r) :: st.reg_env
@@ -904,12 +1024,14 @@ let emit_param st (id, ty) =
 
 let emit_kernel ?(fn_defs = Hashtbl.create 0) (fn : fn_def) : string =
   let st = {
-    counter   = 0;
-    instrs    = [];
-    reg_decls = [];
-    fn_name   = fn.fn_name.name;
-    reg_env   = [];
+    counter       = 0;
+    instrs        = [];
+    reg_decls     = [];
+    fn_name       = fn.fn_name.name;
+    reg_env       = [];
     fn_defs;
+    shared_decls  = [];
+    shared_regs   = [];
   } in
   (* Collect param decls and load instrs *)
   let (param_decls_ll, load_instrs_ll) =
@@ -941,11 +1063,18 @@ let emit_kernel ?(fn_defs = Hashtbl.create 0) (fn : fn_def) : string =
       (ptx_rty_name rty)
       (String.concat ", " unique)]
   ) reg_groups in
+  (* FORGE73: shared-memory declarations.  PTX syntax requires them
+     inside the entry block, conventionally placed before .reg decls. *)
+  let shared_decl_strs = List.map (fun (sym, rty, n) ->
+    Printf.sprintf "    .shared %s %s[%d];" (ptx_rty_name rty) sym n
+  ) (List.rev st.shared_decls) in
   (* Build PTX *)
   let buf = Buffer.create 2048 in
   Buffer.add_string buf (Printf.sprintf ".visible .entry %s(\n" fn.fn_name.name);
   Buffer.add_string buf (String.concat ",\n" param_decls);
   Buffer.add_string buf "\n)\n{\n";
+  List.iter (fun s -> Buffer.add_string buf (s ^ "\n")) shared_decl_strs;
+  if shared_decl_strs <> [] then Buffer.add_char buf '\n';
   List.iter (fun s -> Buffer.add_string buf (s ^ "\n")) reg_decl_strs;
   Buffer.add_char buf '\n';
   List.iter (fun s -> Buffer.add_string buf (s ^ "\n")) load_instrs;

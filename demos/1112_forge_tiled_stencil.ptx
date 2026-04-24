@@ -1,114 +1,235 @@
-.version 9.0
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
 .target sm_120
 .address_size 64
 
 .visible .entry tiled_stencil_5pt(
-    .param .u64 inp, .param .u64 inp_len, .param .u64 out, .param .u64 out_len, .param .u32 width, .param .u32 height)
+    .param .u64 tiled_stencil_5pt_param_inp_data,
+    .param .u64 tiled_stencil_5pt_param_inp_len,
+    .param .u64 tiled_stencil_5pt_param_out_data,
+    .param .u64 tiled_stencil_5pt_param_out_len,
+    .param .u32 tiled_stencil_5pt_param_width,
+    .param .u32 tiled_stencil_5pt_param_height
+)
 {
-    .shared .u32 smem[256];
-    .reg .b32 %r<40>;
-    .reg .b64 %rd<17>;
-    .reg .pred %p<1>;
+    .reg .pred %p110, %p20, %p22, %p26, %p46, %p49, %p52, %p55, %p58, %p62, %p65, %p69;
+    .reg .u64 %rd0, %rd1, %rd100, %rd101, %rd102, %rd111, %rd113, %rd114, %rd115, %rd116, %rd2, %rd27, %rd29, %rd3, %rd30, %rd31, %rd32, %rd34, %rd35, %rd36, %rd37, %rd6, %rd71, %rd72, %rd73, %rd74, %rd78, %rd79, %rd80, %rd81, %rd85, %rd86, %rd87, %rd88, %rd92, %rd93, %rd94, %rd95, %rd99;
+    .reg .u32 %r10, %r103, %r104, %r105, %r106, %r107, %r108, %r109, %r11, %r117, %r118, %r119, %r12, %r120, %r121, %r122, %r123, %r124, %r125, %r126, %r127, %r128, %r129, %r13, %r130, %r131, %r132, %r133, %r134, %r135, %r14, %r15, %r16, %r17, %r18, %r19, %r24, %r25, %r33, %r38, %r39, %r4, %r40, %r41, %r42, %r43, %r44, %r45, %r48, %r5, %r51, %r54, %r57, %r60, %r61, %r64, %r67, %r68, %r7, %r75, %r76, %r77, %r8, %r82, %r83, %r84, %r89, %r9, %r90, %r91, %r96, %r97, %r98;
 
-    mov.u64 %rd0, smem;
-    ld.param.u64 %rd1, [inp];
-    ld.param.u64 %rd2, [inp_len];
-    ld.param.u64 %rd3, [out];
-    ld.param.u64 %rd4, [out_len];
-    ld.param.u32 %r0, [width];
-    ld.param.u32 %r1, [height];
-    mov.u32 %r2, %tid.x;
-    mov.u32 %r3, %tid.y;
-    mov.u32 %r4, %ctaid.x;
-    shl.b32 %r5, %r4, 4;
-    add.u32 %r6, %r5, %r2;
-    mov.u32 %r7, %ctaid.y;
-    shl.b32 %r8, %r7, 4;
-    add.u32 %r9, %r8, %r3;
-    shl.b32 %r10, %r3, 4;
-    add.u32 %r11, %r10, %r2;
-    setp.lt.u32 %p0, %r6, %r0;
-    @%p0 bra if_true_2;
-    bra if_merge_4;
-if_true_2:
-    setp.lt.u32 %p0, %r9, %r1;
-    @%p0 bra if_true_5;
-    bra if_merge_4;
-if_merge_4:
-    bar.sync 0;
-    setp.gt.u32 %p0, %r2, 0;
-    @!%p0 ret;
-    setp.lt.u32 %p0, %r2, 15;
-    @!%p0 ret;
-    setp.gt.u32 %p0, %r3, 0;
-    @!%p0 ret;
-    setp.lt.u32 %p0, %r3, 15;
-    @!%p0 ret;
-    setp.gt.u32 %p0, %r6, 0;
-    @!%p0 ret;
-    add.u32 %r17, %r6, 1;
-    setp.lt.u32 %p0, %r17, %r0;
-    @!%p0 ret;
-    setp.gt.u32 %p0, %r9, 0;
-    @!%p0 ret;
-    add.u32 %r18, %r9, 1;
-    setp.lt.u32 %p0, %r18, %r1;
-    @!%p0 ret;
-    shl.b32 %r19, %r11, 2;
-    cvt.u64.u32 %rd7, %r19;
-    add.u64 %rd1, %rd0, %rd7;
-    ld.shared.u32 %r20, [%rd1];
-    sub.u32 %r21, %r11, 16;
-    shl.b32 %r22, %r21, 2;
-    cvt.u64.u32 %rd8, %r22;
-    add.u64 %rd2, %rd0, %rd8;
-    ld.shared.u32 %r23, [%rd2];
-    add.u32 %r24, %r11, 16;
-    shl.b32 %r25, %r24, 2;
-    cvt.u64.u32 %rd9, %r25;
-    add.u64 %rd5, %rd0, %rd9;
-    ld.shared.u32 %r26, [%rd5];
-    sub.u32 %r27, %r11, 1;
-    shl.b32 %r28, %r27, 2;
-    cvt.u64.u32 %rd10, %r28;
-    add.u64 %rd6, %rd0, %rd10;
-    ld.shared.u32 %r29, [%rd6];
-    add.u32 %r30, %r11, 1;
-    shl.b32 %r31, %r30, 2;
-    cvt.u64.u32 %rd11, %r31;
-    add.u64 %rd1, %rd0, %rd11;
-    ld.shared.u32 %r32, [%rd1];
-    add.u32 %r33, %r20, %r23;
-    add.u32 %r34, %r33, %r26;
-    add.u32 %r35, %r34, %r29;
-    add.u32 %r36, %r35, %r32;
-    mul.lo.u32 %r37, %r9, %r0;
-    add.u32 %r38, %r37, %r6;
-    cvt.u64.u32 %rd12, %r38;
-    setp.lt.u64 %p0, %rd12, %rd4;
-    @!%p0 ret;
-    shl.b32 %r39, %r38, 2;
-    cvt.u64.u32 %rd13, %r39;
-    add.u64 %rd2, %rd3, %rd13;
-    st.global.u32 [%rd2], %r36;
-    bra if_merge_13;
-if_true_5:
-    mul.lo.u32 %r12, %r9, %r0;
-    add.u32 %r13, %r12, %r6;
-    cvt.u64.u32 %rd14, %r13;
-    setp.lt.u64 %p0, %rd14, %rd2;
-    @%p0 bra if_true_8;
-    bra if_merge_4;
-if_true_8:
-    shl.b32 %r14, %r11, 2;
-    cvt.u64.u32 %rd15, %r14;
-    add.u64 %rd5, %rd0, %rd15;
-    shl.b32 %r15, %r13, 2;
-    cvt.u64.u32 %rd16, %r15;
-    add.u64 %rd6, %rd1, %rd16;
-    ld.global.u32 %r16, [%rd6];
-    st.shared.u32 [%rd5], %r16;
-    bra if_merge_4;
-if_merge_13:
-    ret;
+  ld.param.u64 %rd0, [tiled_stencil_5pt_param_inp_data];
+  ld.param.u64 %rd1, [tiled_stencil_5pt_param_inp_len];
+  ld.param.u64 %rd2, [tiled_stencil_5pt_param_out_data];
+  ld.param.u64 %rd3, [tiled_stencil_5pt_param_out_len];
+  ld.param.u32 %r4, [tiled_stencil_5pt_param_width];
+  ld.param.u32 %r5, [tiled_stencil_5pt_param_height];
+
+  mov.u64 %rd6, 0;
+  mov.u32 %r7, %tid.x;
+  mov.u32 %r8, %tid.y;
+  mov.u32 %r9, %ctaid.x;
+  mov.u32 %r10, 16;
+  mul.lo.u32 %r11, %r9, %r10;
+  add.u32 %r12, %r11, %r7;
+  mov.u32 %r13, %ctaid.y;
+  mov.u32 %r14, 16;
+  mul.lo.u32 %r15, %r13, %r14;
+  add.u32 %r16, %r15, %r8;
+  mov.u32 %r17, 16;
+  mul.lo.u32 %r18, %r8, %r17;
+  add.u32 %r19, %r18, %r7;
+  setp.lt.u32 %p20, %r12, %r4;
+  @%p20 bra tiled_stencil_5pt_then_21;
+  bra tiled_stencil_5pt_else_21;
+  tiled_stencil_5pt_then_21:
+  setp.lt.u32 %p22, %r16, %r5;
+  @%p22 bra tiled_stencil_5pt_then_23;
+  bra tiled_stencil_5pt_else_23;
+  tiled_stencil_5pt_then_23:
+  mul.lo.u32 %r24, %r16, %r4;
+  add.u32 %r25, %r24, %r12;
+  cvt.u64.u32 %rd27, %r25;
+  setp.lt.u64 %p26, %rd27, %rd1;
+  @%p26 bra tiled_stencil_5pt_then_28;
+  bra tiled_stencil_5pt_else_28;
+  tiled_stencil_5pt_then_28:
+  cvt.u64.u32 %rd29, %r25;
+  mov.u64 %rd30, 4;
+  mul.lo.u64 %rd31, %rd29, %rd30;
+  add.u64 %rd32, %rd0, %rd31;
+  ld.global.u32 %r33, [%rd32];
+  cvt.u64.u32 %rd34, %r19;
+  mov.u64 %rd35, 4;
+  mul.lo.u64 %rd36, %rd34, %rd35;
+  add.u64 %rd37, %rd6, %rd36;
+  st.global.u32 [%rd37], %r33;
+  mov.u32 %r38, 0; // unit
+  mov.u32 %r39, %r38;
+  bra tiled_stencil_5pt_end_28;
+  tiled_stencil_5pt_else_28:
+  mov.u32 %r39, 0; // no else branch
+  tiled_stencil_5pt_end_28:
+  mov.u32 %r40, 0; // unit
+  mov.u32 %r41, %r40;
+  bra tiled_stencil_5pt_end_23;
+  tiled_stencil_5pt_else_23:
+  mov.u32 %r41, 0; // no else branch
+  tiled_stencil_5pt_end_23:
+  mov.u32 %r42, 0; // unit
+  mov.u32 %r43, %r42;
+  bra tiled_stencil_5pt_end_21;
+  tiled_stencil_5pt_else_21:
+  mov.u32 %r43, 0; // no else branch
+  tiled_stencil_5pt_end_21:
+  bar.sync 0;
+  mov.u32 %r44, 0; // unit
+  mov.u32 %r45, 0;
+  setp.gt.u32 %p46, %r7, %r45;
+  @%p46 bra tiled_stencil_5pt_then_47;
+  bra tiled_stencil_5pt_else_47;
+  tiled_stencil_5pt_then_47:
+  mov.u32 %r48, 15;
+  setp.lt.u32 %p49, %r7, %r48;
+  @%p49 bra tiled_stencil_5pt_then_50;
+  bra tiled_stencil_5pt_else_50;
+  tiled_stencil_5pt_then_50:
+  mov.u32 %r51, 0;
+  setp.gt.u32 %p52, %r8, %r51;
+  @%p52 bra tiled_stencil_5pt_then_53;
+  bra tiled_stencil_5pt_else_53;
+  tiled_stencil_5pt_then_53:
+  mov.u32 %r54, 15;
+  setp.lt.u32 %p55, %r8, %r54;
+  @%p55 bra tiled_stencil_5pt_then_56;
+  bra tiled_stencil_5pt_else_56;
+  tiled_stencil_5pt_then_56:
+  mov.u32 %r57, 0;
+  setp.gt.u32 %p58, %r12, %r57;
+  @%p58 bra tiled_stencil_5pt_then_59;
+  bra tiled_stencil_5pt_else_59;
+  tiled_stencil_5pt_then_59:
+  mov.u32 %r60, 1;
+  add.u32 %r61, %r12, %r60;
+  setp.lt.u32 %p62, %r61, %r4;
+  @%p62 bra tiled_stencil_5pt_then_63;
+  bra tiled_stencil_5pt_else_63;
+  tiled_stencil_5pt_then_63:
+  mov.u32 %r64, 0;
+  setp.gt.u32 %p65, %r16, %r64;
+  @%p65 bra tiled_stencil_5pt_then_66;
+  bra tiled_stencil_5pt_else_66;
+  tiled_stencil_5pt_then_66:
+  mov.u32 %r67, 1;
+  add.u32 %r68, %r16, %r67;
+  setp.lt.u32 %p69, %r68, %r5;
+  @%p69 bra tiled_stencil_5pt_then_70;
+  bra tiled_stencil_5pt_else_70;
+  tiled_stencil_5pt_then_70:
+  cvt.u64.u32 %rd71, %r19;
+  mov.u64 %rd72, 4;
+  mul.lo.u64 %rd73, %rd71, %rd72;
+  add.u64 %rd74, %rd6, %rd73;
+  ld.global.u32 %r75, [%rd74];
+  mov.u32 %r76, 16;
+  sub.u32 %r77, %r19, %r76;
+  cvt.u64.u32 %rd78, %r77;
+  mov.u64 %rd79, 4;
+  mul.lo.u64 %rd80, %rd78, %rd79;
+  add.u64 %rd81, %rd6, %rd80;
+  ld.global.u32 %r82, [%rd81];
+  mov.u32 %r83, 16;
+  add.u32 %r84, %r19, %r83;
+  cvt.u64.u32 %rd85, %r84;
+  mov.u64 %rd86, 4;
+  mul.lo.u64 %rd87, %rd85, %rd86;
+  add.u64 %rd88, %rd6, %rd87;
+  ld.global.u32 %r89, [%rd88];
+  mov.u32 %r90, 1;
+  sub.u32 %r91, %r19, %r90;
+  cvt.u64.u32 %rd92, %r91;
+  mov.u64 %rd93, 4;
+  mul.lo.u64 %rd94, %rd92, %rd93;
+  add.u64 %rd95, %rd6, %rd94;
+  ld.global.u32 %r96, [%rd95];
+  mov.u32 %r97, 1;
+  add.u32 %r98, %r19, %r97;
+  cvt.u64.u32 %rd99, %r98;
+  mov.u64 %rd100, 4;
+  mul.lo.u64 %rd101, %rd99, %rd100;
+  add.u64 %rd102, %rd6, %rd101;
+  ld.global.u32 %r103, [%rd102];
+  add.u32 %r104, %r75, %r82;
+  add.u32 %r105, %r104, %r89;
+  add.u32 %r106, %r105, %r96;
+  add.u32 %r107, %r106, %r103;
+  mul.lo.u32 %r108, %r16, %r4;
+  add.u32 %r109, %r108, %r12;
+  cvt.u64.u32 %rd111, %r109;
+  setp.lt.u64 %p110, %rd111, %rd3;
+  @%p110 bra tiled_stencil_5pt_then_112;
+  bra tiled_stencil_5pt_else_112;
+  tiled_stencil_5pt_then_112:
+  cvt.u64.u32 %rd113, %r109;
+  mov.u64 %rd114, 4;
+  mul.lo.u64 %rd115, %rd113, %rd114;
+  add.u64 %rd116, %rd2, %rd115;
+  st.global.u32 [%rd116], %r107;
+  mov.u32 %r117, 0; // unit
+  mov.u32 %r118, %r117;
+  bra tiled_stencil_5pt_end_112;
+  tiled_stencil_5pt_else_112:
+  mov.u32 %r118, 0; // no else branch
+  tiled_stencil_5pt_end_112:
+  mov.u32 %r119, 0; // unit
+  mov.u32 %r120, %r119;
+  bra tiled_stencil_5pt_end_70;
+  tiled_stencil_5pt_else_70:
+  mov.u32 %r120, 0; // no else branch
+  tiled_stencil_5pt_end_70:
+  mov.u32 %r121, 0; // unit
+  mov.u32 %r122, %r121;
+  bra tiled_stencil_5pt_end_66;
+  tiled_stencil_5pt_else_66:
+  mov.u32 %r122, 0; // no else branch
+  tiled_stencil_5pt_end_66:
+  mov.u32 %r123, 0; // unit
+  mov.u32 %r124, %r123;
+  bra tiled_stencil_5pt_end_63;
+  tiled_stencil_5pt_else_63:
+  mov.u32 %r124, 0; // no else branch
+  tiled_stencil_5pt_end_63:
+  mov.u32 %r125, 0; // unit
+  mov.u32 %r126, %r125;
+  bra tiled_stencil_5pt_end_59;
+  tiled_stencil_5pt_else_59:
+  mov.u32 %r126, 0; // no else branch
+  tiled_stencil_5pt_end_59:
+  mov.u32 %r127, 0; // unit
+  mov.u32 %r128, %r127;
+  bra tiled_stencil_5pt_end_56;
+  tiled_stencil_5pt_else_56:
+  mov.u32 %r128, 0; // no else branch
+  tiled_stencil_5pt_end_56:
+  mov.u32 %r129, 0; // unit
+  mov.u32 %r130, %r129;
+  bra tiled_stencil_5pt_end_53;
+  tiled_stencil_5pt_else_53:
+  mov.u32 %r130, 0; // no else branch
+  tiled_stencil_5pt_end_53:
+  mov.u32 %r131, 0; // unit
+  mov.u32 %r132, %r131;
+  bra tiled_stencil_5pt_end_50;
+  tiled_stencil_5pt_else_50:
+  mov.u32 %r132, 0; // no else branch
+  tiled_stencil_5pt_end_50:
+  mov.u32 %r133, 0; // unit
+  mov.u32 %r134, %r133;
+  bra tiled_stencil_5pt_end_47;
+  tiled_stencil_5pt_else_47:
+  mov.u32 %r134, 0; // no else branch
+  tiled_stencil_5pt_end_47:
+  mov.u32 %r135, 0; // unit
+  ret;
 }
+
