@@ -1,0 +1,30 @@
+// FP16 storage + f32 compute: elementwise rsqrt.
+//
+// Proves the mixed-precision path works end-to-end in Forge.  Input and
+// output arrays are stored as u16 (FP16 bit pattern); arithmetic happens
+// in f32 using the single-instruction rsqrt.approx.f32 intrinsic that
+// FORGE73 wired into codegen_ptx.ml.
+//
+//   for i = tid in [0, n):
+//     x_f = fp16_to_f32(inp[i])
+//     y_f = rsqrtf(x_f)
+//     out[i] = f32_to_fp16(y_f)
+
+use std::prelude;
+use std::fp16;
+
+#[kernel]
+fn fp16_rsqrt(inp: span<u16>, out: span<u16>, n: u64)
+    requires n <= inp.len
+    requires n <= out.len
+    requires blockIdx_x < gridDim_x
+{
+    let gid: u64 = blockIdx_x * (blockDim_x as u64) + (threadIdx_x as u64);
+    if gid < n {
+        let x_f: f32 = fp16_to_f32(inp[gid]);
+        let y_f: f32 = rsqrtf(x_f);
+        out[gid] = f32_to_fp16(y_f);
+    };
+}
+
+fn main() -> i32 { 0i32 }
