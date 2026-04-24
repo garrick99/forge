@@ -56,3 +56,7 @@ extern fn sinf(x: f32) -> f32   = "<math.h>";
 extern fn cosf(x: f32) -> f32   = "<math.h>";
 extern fn expf(x: f32) -> f32   = "<math.h>";
 extern fn logf(x: f32) -> f32   = "<math.h>";
+extern fn fmaxf(x: f32, y: f32) -> f32 = "<math.h>";
+extern fn fminf(x: f32, y: f32) -> f32 = "<math.h>";
+extern fn rsqrtf(x: f32) -> f32 = "<math.h>";
+extern fn tanhf(x: f32) -> f32  = "<math.h>";

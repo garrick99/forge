@@ -101,6 +101,60 @@ fn warp_reduce_min(val: u64) -> u64 {
     v
 }
 
+// ---- f32 warp shuffle primitives -------------------------------------------
+//
+// CUDA's __shfl_*_sync intrinsics are overloaded on value type; these Forge
+// bindings route through the same codegen pattern as the u64 form but carry
+// f32 through the type system.
+
+extern fn shfl_xor_sync_f32(val: f32, mask: u64, width: u64) -> f32 = "forge_gpu";
+extern fn shfl_down_sync_f32(val: f32, delta: u64, width: u64) -> f32 = "forge_gpu";
+
+// ---- f32 warp-level reductions ---------------------------------------------
+//
+// Butterfly reduction over a warp (32 lanes); each lane ends up holding the
+// reduced value (sum / max / min of all 32 input values).
+
+fn warp_reduce_sum_f32(val: f32) -> f32 {
+    let mut v: f32 = val;
+    v = v + shfl_xor_sync_f32(v, 16u64, 32u64);
+    v = v + shfl_xor_sync_f32(v, 8u64, 32u64);
+    v = v + shfl_xor_sync_f32(v, 4u64, 32u64);
+    v = v + shfl_xor_sync_f32(v, 2u64, 32u64);
+    v = v + shfl_xor_sync_f32(v, 1u64, 32u64);
+    v
+}
+
+fn warp_reduce_max_f32(val: f32) -> f32 {
+    let mut v: f32 = val;
+    let mut s: f32 = shfl_xor_sync_f32(v, 16u64, 32u64);
+    if s > v { v = s; };
+    s = shfl_xor_sync_f32(v, 8u64, 32u64);
+    if s > v { v = s; };
+    s = shfl_xor_sync_f32(v, 4u64, 32u64);
+    if s > v { v = s; };
+    s = shfl_xor_sync_f32(v, 2u64, 32u64);
+    if s > v { v = s; };
+    s = shfl_xor_sync_f32(v, 1u64, 32u64);
+    if s > v { v = s; };
+    v
+}
+
+fn warp_reduce_min_f32(val: f32) -> f32 {
+    let mut v: f32 = val;
+    let mut s: f32 = shfl_xor_sync_f32(v, 16u64, 32u64);
+    if s < v { v = s; };
+    s = shfl_xor_sync_f32(v, 8u64, 32u64);
+    if s < v { v = s; };
+    s = shfl_xor_sync_f32(v, 4u64, 32u64);
+    if s < v { v = s; };
+    s = shfl_xor_sync_f32(v, 2u64, 32u64);
+    if s < v { v = s; };
+    s = shfl_xor_sync_f32(v, 1u64, 32u64);
+    if s < v { v = s; };
+    v
+}
+
 // ---- Grid-stride loop helpers -----------------------------------------------
 // GPU built-ins (threadIdx_x, etc.) are only valid inside #[kernel].
 // Pass them as parameters to non-kernel utility functions.

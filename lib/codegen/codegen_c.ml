@@ -753,6 +753,17 @@ let rec emit_expr depth e =
       when id.name = "shfl_xor_sync" ->
       Printf.sprintf "__shfl_xor_sync(0xffffffff, %s, %s, %s)"
         (emit_expr depth v) (emit_expr depth lane) (emit_expr depth width)
+  | ECall ({ expr_desc = EVar id; _ }, [v; lane; width])
+      when id.name = "shfl_xor_sync_f32" ->
+      (* FORGE70: f32 overload for warp-level float reductions (softmax,
+         layernorm).  Lowers to the same CUDA builtin; type-resolved to
+         the f32 overload by the C++ frontend via argument type. *)
+      Printf.sprintf "__shfl_xor_sync(0xffffffff, %s, %s, %s)"
+        (emit_expr depth v) (emit_expr depth lane) (emit_expr depth width)
+  | ECall ({ expr_desc = EVar id; _ }, [v; lane; width])
+      when id.name = "shfl_down_sync_f32" ->
+      Printf.sprintf "__shfl_down_sync(0xffffffff, %s, %s, %s)"
+        (emit_expr depth v) (emit_expr depth lane) (emit_expr depth width)
   | ECall ({ expr_desc = EVar id; _ }, [ptr; v])
       when id.name = "atom_add" ->
       (* Choose the correct CUDA atomicAdd overload based on the pointer element type.

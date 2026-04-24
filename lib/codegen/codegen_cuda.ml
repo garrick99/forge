@@ -159,6 +159,16 @@ let rec emit_expr = function
               builtin (overload-resolved by C++ frontend on val type). *)
            Printf.sprintf "__shfl_xor_sync(0xffffffff, %s, %s, %s)"
              (emit_expr v) (emit_expr m) (emit_expr w)
+       | "shfl_xor_sync_f32", [v; m; w] ->
+           (* FORGE70: f32 overload of shfl_xor_sync for warp-level float
+              reductions (softmax row-max, row-sum, layernorm).  Lowers to
+              the same CUDA builtin; type-resolved to the f32 overload by
+              the C++ frontend. *)
+           Printf.sprintf "__shfl_xor_sync(0xffffffff, %s, %s, %s)"
+             (emit_expr v) (emit_expr m) (emit_expr w)
+       | "shfl_down_sync_f32", [v; d; w] ->
+           Printf.sprintf "__shfl_down_sync(0xffffffff, %s, %s, %s)"
+             (emit_expr v) (emit_expr d) (emit_expr w)
        | "atom_add", [p; v] ->
            Printf.sprintf "atomicAdd(%s, %s)" (emit_expr p) (emit_expr v)
        | "atom_add_u32", [p; v] ->

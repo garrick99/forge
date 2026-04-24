@@ -1,0 +1,92 @@
+// Row-wise softmax, Forge-native.
+//
+// Pipeline: Forge (.fg) → proofs discharged → CUDA C → OpenCUDA → PTX → OpenPTXas → SASS.
+//
+// Uses the new f32 GPU stdlib (FORGE70):
+//   - shared<f32>[256] for scratch
+//   - expf from std::prelude
+//   - warp_reduce_sum_f32 / warp_reduce_max_f32 from std::gpu (available for future variants)
+//
+// Layout: one block per row, 256 threads per block.  Each thread handles
+// one column (n_cols <= 256).  Two-pass tree reduction in shared memory
+// (max, then sum-of-exp).  Caller launches <<<rows, 256>>> with
+//   inp.len == out.len == rows * n_cols
+// — preconditions stated per-block below.
+
+use std::prelude;
+use std::gpu;
+
+#[kernel]
+fn softmax_rowwise(inp: span<f32>, out: span<f32>, n_cols: u64)
+    requires 1u64 <= n_cols
+    requires n_cols <= 256u64
+    requires blockIdx_x < gridDim_x
+    requires gridDim_x * n_cols <= inp.len
+    requires gridDim_x * n_cols <= out.len
+    requires threadIdx_x < 256u64
+{
+    let smem: shared<f32>[256] = [0.0f32; 256u64];
+    let tid: u64 = threadIdx_x;
+    let row: u64 = blockIdx_x;
+    let base: u64 = row * n_cols;
+
+    let mut x: f32 = 0.0f32;
+    if tid < n_cols {
+        x = inp[base + tid];
+    };
+
+    // Pass 1 — row-max via tree reduce.
+    if tid < n_cols {
+        smem[tid] = x;
+    } else {
+        smem[tid] = -1.0e30f32;
+    };
+    syncthreads();
+
+    let mut s: u64 = 128u64;
+    while s > 0u64
+        invariant s <= 128u64
+        decreases s
+    {
+        if tid < s {
+            let a: f32 = smem[tid];
+            let b: f32 = smem[tid + s];
+            if b > a { smem[tid] = b; };
+        };
+        syncthreads();
+        s = s >> 1u64;
+    };
+    let row_max: f32 = smem[0];
+    syncthreads();
+
+    // Pass 2 — compute exp(x - row_max), sum via tree reduce.
+    let mut ex: f32 = 0.0f32;
+    if tid < n_cols {
+        ex = expf(x - row_max);
+    };
+    smem[tid] = ex;
+    syncthreads();
+
+    let mut s2: u64 = 128u64;
+    while s2 > 0u64
+        invariant s2 <= 128u64
+        decreases s2
+    {
+        if tid < s2 {
+            smem[tid] = smem[tid] + smem[tid + s2];
+        };
+        syncthreads();
+        s2 = s2 >> 1u64;
+    };
+
+    // Normalize.  smem[0] is the sum of exp(x_i - row_max) for i in [0, n_cols).
+    // For the argmax index, exp(x - row_max) = exp(0) = 1, so smem[0] >= 1 > 0.
+    // This reasoning is beyond Z3's float automation — we assume it with a
+    // witness comment recorded in the assume audit.
+    if tid < n_cols {
+        assume(smem[0] > 0.0f32) "smem[0] = sum(exp(x_i - row_max)) >= exp(0) = 1.0";
+        out[base + tid] = ex / smem[0];
+    };
+}
+
+fn main() -> i32 { 0i32 }

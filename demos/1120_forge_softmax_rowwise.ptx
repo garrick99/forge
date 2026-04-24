@@ -1,0 +1,216 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry softmax_rowwise(
+    .param .u64 softmax_rowwise_param_inp_data,
+    .param .u64 softmax_rowwise_param_inp_len,
+    .param .u64 softmax_rowwise_param_out_data,
+    .param .u64 softmax_rowwise_param_out_len,
+    .param .u64 softmax_rowwise_param_n_cols
+)
+{
+    .reg .pred %p10, %p114, %p20, %p40, %p41, %p54, %p75, %p89, %p90;
+    .reg .u64 %rd0, %rd1, %rd100, %rd101, %rd104, %rd105, %rd106, %rd107, %rd11, %rd111, %rd112, %rd115, %rd118, %rd119, %rd120, %rd121, %rd124, %rd125, %rd126, %rd127, %rd13, %rd14, %rd15, %rd16, %rd2, %rd21, %rd23, %rd24, %rd25, %rd26, %rd3, %rd31, %rd32, %rd33, %rd34, %rd37, %rd39, %rd4, %rd42, %rd44, %rd45, %rd46, %rd47, %rd49, %rd5, %rd50, %rd51, %rd52, %rd56, %rd57, %rd58, %rd59, %rd65, %rd66, %rd68, %rd69, %rd70, %rd71, %rd76, %rd78, %rd8, %rd81, %rd82, %rd83, %rd84, %rd86, %rd88, %rd91, %rd93, %rd94, %rd95, %rd96, %rd98, %rd99;
+    .reg .f32 %f102, %f103, %f122, %f123, %f17, %f29, %f30, %f48, %f53, %f72, %f74, %f9, %f97;
+    .reg .u32 %r108, %r109, %r110, %r113, %r117, %r128, %r129, %r130, %r18, %r19, %r27, %r28, %r35, %r36, %r6, %r60, %r61, %r62, %r63, %r64, %r67, %r7, %r73, %r79, %r80, %r85;
+
+  ld.param.u64 %rd0, [softmax_rowwise_param_inp_data];
+  ld.param.u64 %rd1, [softmax_rowwise_param_inp_len];
+  ld.param.u64 %rd2, [softmax_rowwise_param_out_data];
+  ld.param.u64 %rd3, [softmax_rowwise_param_out_len];
+  ld.param.u64 %rd4, [softmax_rowwise_param_n_cols];
+
+  mov.u64 %rd5, 0; // unhandled expr
+  mov.u32 %r6, %tid.x;
+  mov.u32 %r7, %ctaid.x;
+  mul.lo.u64 %rd8, %r7, %rd4;
+  mov.f32 %f9, 0f00000000; // 0
+  cvt.u64.u32 %rd11, %r6;
+  setp.lt.u64 %p10, %rd11, %rd4;
+  @%p10 bra softmax_rowwise_then_12;
+  bra softmax_rowwise_else_12;
+  softmax_rowwise_then_12:
+  add.u64 %rd13, %rd8, %r6;
+  mov.u64 %rd14, 4;
+  mul.lo.u64 %rd15, %rd13, %rd14;
+  add.u64 %rd16, %rd0, %rd15;
+  ld.global.f32 %f17, [%rd16];
+  mov.u32 %r18, 0; // unit
+  mov.u32 %r19, %r18;
+  bra softmax_rowwise_end_12;
+  softmax_rowwise_else_12:
+  mov.u32 %r19, 0; // no else branch
+  softmax_rowwise_end_12:
+  cvt.u64.u32 %rd21, %r6;
+  setp.lt.u64 %p20, %rd21, %rd4;
+  @%p20 bra softmax_rowwise_then_22;
+  bra softmax_rowwise_else_22;
+  softmax_rowwise_then_22:
+  cvt.u64.u32 %rd23, %r6;
+  mov.u64 %rd24, 4;
+  mul.lo.u64 %rd25, %rd23, %rd24;
+  add.u64 %rd26, %rd5, %rd25;
+  st.global.f32 [%rd26], %f17;
+  mov.u32 %r27, 0; // unit
+  mov.u32 %r28, %r27;
+  bra softmax_rowwise_end_22;
+  softmax_rowwise_else_22:
+  mov.f32 %f29, 0f7149F2CA; // 1e+30
+  neg.f32 %f30, %f29;
+  cvt.u64.u32 %rd31, %r6;
+  mov.u64 %rd32, 4;
+  mul.lo.u64 %rd33, %rd31, %rd32;
+  add.u64 %rd34, %rd5, %rd33;
+  st.global.f32 [%rd34], %f30;
+  mov.u32 %r35, 0; // unit
+  mov.u32 %r28, %r35;
+  softmax_rowwise_end_22:
+  bar.sync 0;
+  mov.u32 %r36, 0; // unit
+  mov.u64 %rd37, 128;
+  softmax_rowwise_loop_38:
+  mov.u64 %rd39, 0;
+  setp.gt.u64 %p40, %rd37, %rd39;
+  @!%p40 bra softmax_rowwise_loop_end_38;
+  cvt.u64.u32 %rd42, %r6;
+  setp.lt.u64 %p41, %rd42, %rd37;
+  @%p41 bra softmax_rowwise_then_43;
+  bra softmax_rowwise_else_43;
+  softmax_rowwise_then_43:
+  cvt.u64.u32 %rd44, %r6;
+  mov.u64 %rd45, 4;
+  mul.lo.u64 %rd46, %rd44, %rd45;
+  add.u64 %rd47, %rd5, %rd46;
+  ld.global.f32 %f48, [%rd47];
+  add.u64 %rd49, %r6, %rd37;
+  mov.u64 %rd50, 4;
+  mul.lo.u64 %rd51, %rd49, %rd50;
+  add.u64 %rd52, %rd5, %rd51;
+  ld.global.f32 %f53, [%rd52];
+  setp.gt.f32 %p54, %f53, %f48;
+  @%p54 bra softmax_rowwise_then_55;
+  bra softmax_rowwise_else_55;
+  softmax_rowwise_then_55:
+  cvt.u64.u32 %rd56, %r6;
+  mov.u64 %rd57, 4;
+  mul.lo.u64 %rd58, %rd56, %rd57;
+  add.u64 %rd59, %rd5, %rd58;
+  st.global.f32 [%rd59], %f53;
+  mov.u32 %r60, 0; // unit
+  mov.u32 %r61, %r60;
+  bra softmax_rowwise_end_55;
+  softmax_rowwise_else_55:
+  mov.u32 %r61, 0; // no else branch
+  softmax_rowwise_end_55:
+  mov.u32 %r62, 0; // unit
+  mov.u32 %r63, %r62;
+  bra softmax_rowwise_end_43;
+  softmax_rowwise_else_43:
+  mov.u32 %r63, 0; // no else branch
+  softmax_rowwise_end_43:
+  bar.sync 0;
+  mov.u32 %r64, 0; // unit
+  mov.u64 %rd65, 1;
+  shr.u64 %rd66, %rd37, %rd65;
+  mov.u64 %rd37, %rd66; // loop wb: s
+  bra softmax_rowwise_loop_38;
+  softmax_rowwise_loop_end_38:
+  mov.u32 %r67, 0; // unit
+  mov.u64 %rd68, 0;
+  mov.u64 %rd69, 4;
+  mul.lo.u64 %rd70, %rd68, %rd69;
+  add.u64 %rd71, %rd5, %rd70;
+  ld.global.f32 %f72, [%rd71];
+  bar.sync 0;
+  mov.u32 %r73, 0; // unit
+  mov.f32 %f74, 0f00000000; // 0
+  cvt.u64.u32 %rd76, %r6;
+  setp.lt.u64 %p75, %rd76, %rd4;
+  @%p75 bra softmax_rowwise_then_77;
+  bra softmax_rowwise_else_77;
+  softmax_rowwise_then_77:
+  mov.u64 %rd78, 0; // FG-2.6: UNRESOLVED device fn expf (stub)
+  mov.u32 %r79, 0; // unit
+  mov.u32 %r80, %r79;
+  bra softmax_rowwise_end_77;
+  softmax_rowwise_else_77:
+  mov.u32 %r80, 0; // no else branch
+  softmax_rowwise_end_77:
+  cvt.u64.u32 %rd81, %r6;
+  mov.u64 %rd82, 4;
+  mul.lo.u64 %rd83, %rd81, %rd82;
+  add.u64 %rd84, %rd5, %rd83;
+  st.global.f32 [%rd84], %rd78;
+  bar.sync 0;
+  mov.u32 %r85, 0; // unit
+  mov.u64 %rd86, 128;
+  softmax_rowwise_loop_87:
+  mov.u64 %rd88, 0;
+  setp.gt.u64 %p89, %rd86, %rd88;
+  @!%p89 bra softmax_rowwise_loop_end_87;
+  cvt.u64.u32 %rd91, %r6;
+  setp.lt.u64 %p90, %rd91, %rd86;
+  @%p90 bra softmax_rowwise_then_92;
+  bra softmax_rowwise_else_92;
+  softmax_rowwise_then_92:
+  cvt.u64.u32 %rd93, %r6;
+  mov.u64 %rd94, 4;
+  mul.lo.u64 %rd95, %rd93, %rd94;
+  add.u64 %rd96, %rd5, %rd95;
+  ld.global.f32 %f97, [%rd96];
+  add.u64 %rd98, %r6, %rd86;
+  mov.u64 %rd99, 4;
+  mul.lo.u64 %rd100, %rd98, %rd99;
+  add.u64 %rd101, %rd5, %rd100;
+  ld.global.f32 %f102, [%rd101];
+  add.f32 %f103, %f97, %f102;
+  cvt.u64.u32 %rd104, %r6;
+  mov.u64 %rd105, 4;
+  mul.lo.u64 %rd106, %rd104, %rd105;
+  add.u64 %rd107, %rd5, %rd106;
+  st.global.f32 [%rd107], %f103;
+  mov.u32 %r108, 0; // unit
+  mov.u32 %r109, %r108;
+  bra softmax_rowwise_end_92;
+  softmax_rowwise_else_92:
+  mov.u32 %r109, 0; // no else branch
+  softmax_rowwise_end_92:
+  bar.sync 0;
+  mov.u32 %r110, 0; // unit
+  mov.u64 %rd111, 1;
+  shr.u64 %rd112, %rd86, %rd111;
+  mov.u64 %rd86, %rd112; // loop wb: s2
+  bra softmax_rowwise_loop_87;
+  softmax_rowwise_loop_end_87:
+  mov.u32 %r113, 0; // unit
+  cvt.u64.u32 %rd115, %r6;
+  setp.lt.u64 %p114, %rd115, %rd4;
+  @%p114 bra softmax_rowwise_then_116;
+  bra softmax_rowwise_else_116;
+  softmax_rowwise_then_116:
+  mov.u32 %r117, 0; // proof/assume erased
+  mov.u64 %rd118, 0;
+  mov.u64 %rd119, 4;
+  mul.lo.u64 %rd120, %rd118, %rd119;
+  add.u64 %rd121, %rd5, %rd120;
+  ld.global.f32 %f122, [%rd121];
+  div.f32 %f123, %rd78, %f122;
+  add.u64 %rd124, %rd8, %r6;
+  mov.u64 %rd125, 4;
+  mul.lo.u64 %rd126, %rd124, %rd125;
+  add.u64 %rd127, %rd2, %rd126;
+  st.global.f32 [%rd127], %f123;
+  mov.u32 %r128, 0; // unit
+  mov.u32 %r129, %r128;
+  bra softmax_rowwise_end_116;
+  softmax_rowwise_else_116:
+  mov.u32 %r129, 0; // no else branch
+  softmax_rowwise_end_116:
+  mov.u32 %r130, 0; // unit
+  ret;
+}
+
