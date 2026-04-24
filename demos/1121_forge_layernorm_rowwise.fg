@@ -1,0 +1,85 @@
+// Row-wise LayerNorm, Forge-native.  Paired with 1120 softmax_rowwise.
+//
+// y[i] = (x[i] - mean) / sqrt(var + eps)
+//
+// Two-pass tree reduction per row:
+//   1. sum   → mean
+//   2. sumsq → var = sumsq/n - mean^2
+// Then normalize using rsqrtf for the inverse std-dev.
+//
+// Layout: one block per row, 256 threads per block, n_cols <= 256.
+
+use std::prelude;
+use std::gpu;
+
+#[kernel]
+fn layernorm_rowwise(inp: span<f32>, out: span<f32>, n_cols: u64)
+    requires 1u64 <= n_cols
+    requires n_cols <= 256u64
+    requires blockIdx_x < gridDim_x
+    requires gridDim_x * n_cols <= inp.len
+    requires gridDim_x * n_cols <= out.len
+    requires threadIdx_x < 256u64
+{
+    let smem: shared<f32>[256] = [0.0f32; 256u64];
+    let tid: u64 = threadIdx_x;
+    let row: u64 = blockIdx_x;
+    let base: u64 = row * n_cols;
+    let n_f: f32 = n_cols as f32;
+    let eps: f32 = 0.00001f32;
+
+    // Load element; lanes beyond n_cols hold 0 so they don't perturb sums.
+    let mut x: f32 = 0.0f32;
+    if tid < n_cols {
+        x = inp[base + tid];
+    };
+
+    // Pass 1 — mean: tree-reduce sum over the row.
+    smem[tid] = x;
+    syncthreads();
+
+    let mut s: u64 = 128u64;
+    while s > 0u64
+        invariant s <= 128u64
+        decreases s
+    {
+        if tid < s {
+            smem[tid] = smem[tid] + smem[tid + s];
+        };
+        syncthreads();
+        s = s >> 1u64;
+    };
+    let row_sum: f32 = smem[0];
+    syncthreads();
+    let mean: f32 = row_sum / n_f;
+
+    // Pass 2 — variance: tree-reduce sum of (x - mean)^2.
+    let mut d: f32 = 0.0f32;
+    if tid < n_cols {
+        d = x - mean;
+    };
+    smem[tid] = d * d;
+    syncthreads();
+
+    let mut s2: u64 = 128u64;
+    while s2 > 0u64
+        invariant s2 <= 128u64
+        decreases s2
+    {
+        if tid < s2 {
+            smem[tid] = smem[tid] + smem[tid + s2];
+        };
+        syncthreads();
+        s2 = s2 >> 1u64;
+    };
+    let row_sumsq: f32 = smem[0];
+    let var: f32 = row_sumsq / n_f;
+
+    // Normalize using rsqrtf for 1 / sqrt(var + eps).
+    if tid < n_cols {
+        let inv_std: f32 = rsqrtf(var + eps);
+        out[base + tid] = d * inv_std;
+    };
+}
+
+fn main() -> i32 { 0i32 }
