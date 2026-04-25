@@ -1,0 +1,65 @@
+// Generalised masked softmax — apply a precomputed boolean mask to
+// scores BEFORE the softmax max/sum.  Masked positions fold to -inf so
+// they contribute zero to the denominator.
+//
+//   scores'[j] = scores[j]  if mask[j] != 0
+//              = -inf       if mask[j] == 0
+//   y[j] = exp(scores'[j] - max(scores')) / sum_k exp(scores'[k] - max)
+//
+// Generalises 1138 causal-softmax (whose mask is the lower-triangular
+// pattern) to any boolean mask.  Used in T5-style relative-position
+// attention biases and in BERT-style padding masks.
+
+use std::prelude;
+use std::gpu;
+
+#[kernel]
+fn masked_softmax(
+    scores: span<f32>, mask: span<u32>, out: span<f32>,
+    n_cols: u64
+)
+    requires 1u64 <= n_cols
+    requires n_cols <= 32u64
+    requires blockIdx_x < gridDim_x
+    requires gridDim_x * n_cols <= scores.len
+    requires gridDim_x * n_cols <= out.len
+    requires gridDim_x * n_cols <= mask.len
+    requires threadIdx_x < 32u64
+{
+    let lane: u64 = threadIdx_x;
+    let row: u64 = blockIdx_x;
+    let base: u64 = row * n_cols;
+    let neg_inf: f32 = -1.0e30f32;
+
+    // Load + apply mask.  Lanes outside [0, n_cols) and lanes whose
+    // mask bit is 0 both fold to -inf so they contribute zero to the
+    // softmax denominator.
+    let mut s: f32 = neg_inf;
+    let mut m_keep: u32 = 0u32;
+    if lane < n_cols {
+        assume(base + lane < mask.len) "blockIdx<gridDim + lane<n_cols + gridDim*n_cols<=mask.len";
+        m_keep = mask[base + lane];
+        if m_keep != 0u32 {
+            assume(base + lane < scores.len) "mirrors mask bounds chain";
+            s = scores[base + lane];
+        };
+    };
+
+    // Numerically-stable softmax.
+    let m: f32 = warp_reduce_max_f32(s);
+    let mut ex: f32 = 0.0f32;
+    if lane < n_cols {
+        if m_keep != 0u32 {
+            ex = expf(s - m);
+        };
+    };
+    let denom: f32 = warp_reduce_sum_f32(ex);
+    assume(denom > 0.0f32) "caller guarantees at least one mask bit set per row";
+
+    if lane < n_cols {
+        assume(base + lane < out.len) "mirrors mask bounds chain";
+        out[base + lane] = ex / denom;
+    };
+}
+
+fn main() -> i32 { 0i32 }

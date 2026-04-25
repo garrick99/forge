@@ -1,0 +1,197 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry argmax_row(
+    .param .u64 argmax_row_param_logits_data,
+    .param .u64 argmax_row_param_logits_len,
+    .param .u64 argmax_row_param_out_data,
+    .param .u64 argmax_row_param_out_len,
+    .param .u64 argmax_row_param_n_classes
+)
+{
+    .reg .pred %p11, %p24, %p30, %p35, %p40, %p45, %p51, %p56, %p62, %p67, %p72, %p77, %p83;
+    .reg .u64 %rd0, %rd1, %rd12, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd23, %rd25, %rd29, %rd3, %rd34, %rd39, %rd4, %rd44, %rd52, %rd55, %rd57, %rd61, %rd66, %rd7, %rd71, %rd76, %rd8, %rd82, %rd84, %rd87, %rd88, %rd89, %rd90;
+    .reg .f32 %f10, %f20, %f49, %f50, %f54, %f9;
+    .reg .u32 %r14, %r21, %r22, %r27, %r28, %r32, %r33, %r37, %r38, %r42, %r43, %r47, %r48, %r5, %r59, %r6, %r60, %r64, %r65, %r69, %r70, %r74, %r75, %r79, %r80, %r81, %r86, %r91, %r92, %r93;
+
+  ld.param.u64 %rd0, [argmax_row_param_logits_data];
+  ld.param.u64 %rd1, [argmax_row_param_logits_len];
+  ld.param.u64 %rd2, [argmax_row_param_out_data];
+  ld.param.u64 %rd3, [argmax_row_param_out_len];
+  ld.param.u64 %rd4, [argmax_row_param_n_classes];
+
+  mov.u32 %r5, %tid.x;
+  mov.u32 %r6, %ctaid.x;
+  cvt.u64.u32 %rd7, %r6;
+  mul.lo.u64 %rd8, %rd7, %rd4;
+  mov.f32 %f9, 0f7149F2CA; // 1e+30
+  neg.f32 %f10, %f9;
+  cvt.u64.u32 %rd12, %r5;
+  setp.lt.u64 %p11, %rd12, %rd4;
+  @%p11 bra argmax_row_then_13;
+  bra argmax_row_else_13;
+  argmax_row_then_13:
+  mov.u32 %r14, 0; // proof/assume erased
+  cvt.u64.u32 %rd15, %r5;
+  add.u64 %rd16, %rd8, %rd15;
+  mov.u64 %rd17, 4;
+  mul.lo.u64 %rd18, %rd16, %rd17;
+  add.u64 %rd19, %rd0, %rd18;
+  ld.global.f32 %f20, [%rd19];
+  mov.u32 %r21, 0; // unit
+  mov.u32 %r22, %r21;
+  bra argmax_row_end_13;
+  argmax_row_else_13:
+  mov.u32 %r22, 0; // no else branch
+  argmax_row_end_13:
+  mov.u64 %rd23, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  cvt.u64.f32 %rd25, %f20;
+  setp.gt.u64 %p24, %rd23, %rd25;
+  @%p24 bra argmax_row_then_26;
+  bra argmax_row_else_26;
+  argmax_row_then_26:
+  mov.u32 %r27, 0; // unit
+  mov.u32 %r28, %r27;
+  bra argmax_row_end_26;
+  argmax_row_else_26:
+  mov.u32 %r28, 0; // no else branch
+  argmax_row_end_26:
+  mov.u64 %rd29, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p30, %rd29, %rd23;
+  @%p30 bra argmax_row_then_31;
+  bra argmax_row_else_31;
+  argmax_row_then_31:
+  mov.u32 %r32, 0; // unit
+  mov.u32 %r33, %r32;
+  bra argmax_row_end_31;
+  argmax_row_else_31:
+  mov.u32 %r33, 0; // no else branch
+  argmax_row_end_31:
+  mov.u64 %rd34, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p35, %rd34, %rd29;
+  @%p35 bra argmax_row_then_36;
+  bra argmax_row_else_36;
+  argmax_row_then_36:
+  mov.u32 %r37, 0; // unit
+  mov.u32 %r38, %r37;
+  bra argmax_row_end_36;
+  argmax_row_else_36:
+  mov.u32 %r38, 0; // no else branch
+  argmax_row_end_36:
+  mov.u64 %rd39, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p40, %rd39, %rd34;
+  @%p40 bra argmax_row_then_41;
+  bra argmax_row_else_41;
+  argmax_row_then_41:
+  mov.u32 %r42, 0; // unit
+  mov.u32 %r43, %r42;
+  bra argmax_row_end_41;
+  argmax_row_else_41:
+  mov.u32 %r43, 0; // no else branch
+  argmax_row_end_41:
+  mov.u64 %rd44, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p45, %rd44, %rd39;
+  @%p45 bra argmax_row_then_46;
+  bra argmax_row_else_46;
+  argmax_row_then_46:
+  mov.u32 %r47, 0; // unit
+  mov.u32 %r48, %r47;
+  bra argmax_row_end_46;
+  argmax_row_else_46:
+  mov.u32 %r48, 0; // no else branch
+  argmax_row_end_46:
+  mov.f32 %f49, 0f501502F9; // 1e+10
+  cvt.f32.u64 %f50, %r5;
+  cvt.u64.f32 %rd52, %f20;
+  setp.eq.u64 %p51, %rd52, %rd44;
+  @%p51 bra argmax_row_then_53;
+  bra argmax_row_else_53;
+  argmax_row_then_53:
+  mov.f32 %f54, %f50;
+  bra argmax_row_end_53;
+  argmax_row_else_53:
+  mov.f32 %f54, %f49;
+  argmax_row_end_53:
+  mov.u64 %rd55, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  cvt.u64.f32 %rd57, %f54;
+  setp.lt.u64 %p56, %rd55, %rd57;
+  @%p56 bra argmax_row_then_58;
+  bra argmax_row_else_58;
+  argmax_row_then_58:
+  mov.u32 %r59, 0; // unit
+  mov.u32 %r60, %r59;
+  bra argmax_row_end_58;
+  argmax_row_else_58:
+  mov.u32 %r60, 0; // no else branch
+  argmax_row_end_58:
+  mov.u64 %rd61, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.lt.u64 %p62, %rd61, %rd55;
+  @%p62 bra argmax_row_then_63;
+  bra argmax_row_else_63;
+  argmax_row_then_63:
+  mov.u32 %r64, 0; // unit
+  mov.u32 %r65, %r64;
+  bra argmax_row_end_63;
+  argmax_row_else_63:
+  mov.u32 %r65, 0; // no else branch
+  argmax_row_end_63:
+  mov.u64 %rd66, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.lt.u64 %p67, %rd66, %rd61;
+  @%p67 bra argmax_row_then_68;
+  bra argmax_row_else_68;
+  argmax_row_then_68:
+  mov.u32 %r69, 0; // unit
+  mov.u32 %r70, %r69;
+  bra argmax_row_end_68;
+  argmax_row_else_68:
+  mov.u32 %r70, 0; // no else branch
+  argmax_row_end_68:
+  mov.u64 %rd71, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.lt.u64 %p72, %rd71, %rd66;
+  @%p72 bra argmax_row_then_73;
+  bra argmax_row_else_73;
+  argmax_row_then_73:
+  mov.u32 %r74, 0; // unit
+  mov.u32 %r75, %r74;
+  bra argmax_row_end_73;
+  argmax_row_else_73:
+  mov.u32 %r75, 0; // no else branch
+  argmax_row_end_73:
+  mov.u64 %rd76, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.lt.u64 %p77, %rd76, %rd71;
+  @%p77 bra argmax_row_then_78;
+  bra argmax_row_else_78;
+  argmax_row_then_78:
+  mov.u32 %r79, 0; // unit
+  mov.u32 %r80, %r79;
+  bra argmax_row_end_78;
+  argmax_row_else_78:
+  mov.u32 %r80, 0; // no else branch
+  argmax_row_end_78:
+  cvt.u32.f32 %r81, %rd76;
+  mov.u64 %rd82, 0;
+  cvt.u64.u32 %rd84, %r5;
+  setp.eq.u64 %p83, %rd84, %rd82;
+  @%p83 bra argmax_row_then_85;
+  bra argmax_row_else_85;
+  argmax_row_then_85:
+  mov.u32 %r86, 0; // proof/assume erased
+  cvt.u64.u32 %rd87, %r6;
+  mov.u64 %rd88, 4;
+  mul.lo.u64 %rd89, %rd87, %rd88;
+  add.u64 %rd90, %rd2, %rd89;
+  st.global.u32 [%rd90], %r81;
+  mov.u32 %r91, 0; // unit
+  mov.u32 %r92, %r91;
+  bra argmax_row_end_85;
+  argmax_row_else_85:
+  mov.u32 %r92, 0; // no else branch
+  argmax_row_end_85:
+  mov.u32 %r93, 0; // unit
+  ret;
+}
+

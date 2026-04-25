@@ -26,4 +26,7 @@ Proof / assume / emission counts for the f32 ML kernel arc (1120-1135), Forge-na
 | `1139_forge_softmax_dropout` | 4 | 4 | 238 | 173 |
 | `1140_forge_layernorm_affine` | 16 | 0 | 248 | 211 |
 | `1141_forge_embedding_gather` | 3 | 4 | 73 | 57 |
-| **total** | **169** | **26** | | |
+| `1142_forge_sinusoidal_pe` | 2 | 2 | 74 | 54 |
+| `1143_forge_argmax_row` | 2 | 2 | 231 | 190 |
+| `1144_forge_masked_softmax` | 4 | 4 | 236 | 182 |
+| **total** | **177** | **34** | | |

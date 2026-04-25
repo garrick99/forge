@@ -1,0 +1,58 @@
+// Argmax-per-row — pick the index of the largest logit per row.
+//
+// Used in greedy decoding (LLM sampling) and beam search.  For each
+// row of logits[B, V] returns the index of the max element:
+//
+//   out[i] = argmax_j logits[i, j]
+//
+// Single warp per row (V <= 32 here; for full vocab the caller would
+// split into multiple warp tiles + reduce).  Two-pass: first
+// warp-reduce the max value, then each lane checks if its own value
+// equals that max and ballots its lane index.
+
+use std::prelude;
+use std::gpu;
+
+#[kernel]
+fn argmax_row(
+    logits: span<f32>, out: span<u32>, n_classes: u64
+)
+    requires 1u64 <= n_classes
+    requires n_classes <= 32u64
+    requires blockIdx_x < gridDim_x
+    requires gridDim_x * n_classes <= logits.len
+    requires gridDim_x <= out.len
+    requires threadIdx_x < 32u64
+{
+    let lane: u64 = threadIdx_x;
+    let row: u64 = blockIdx_x;
+    let base: u64 = row * n_classes;
+    let neg_inf: f32 = -1.0e30f32;
+
+    // Load logit; lanes >= n_classes pad with -inf.
+    let mut x: f32 = neg_inf;
+    if lane < n_classes {
+        assume(base + lane < logits.len) "blockIdx_x<gridDim_x + lane<n_classes + gridDim_x*n_classes<=logits.len";
+        x = logits[base + lane];
+    };
+
+    // Find the row max via warp reduce.
+    let row_max: f32 = warp_reduce_max_f32(x);
+
+    // Each lane votes whether its own value equals the max.  In ties,
+    // the lowest-index lane wins — picked via warp_reduce_min_f32 over
+    // the lane indices that match.  Using a "huge" sentinel so non-
+    // matching lanes don't drag the min down.
+    let big_idx: f32 = 1.0e10f32;
+    let lane_f: f32 = lane as f32;
+    let candidate: f32 = if x == row_max { lane_f } else { big_idx };
+    let argmax_f: f32 = warp_reduce_min_f32(candidate);
+    let argmax_u: u32 = argmax_f as u32;
+
+    if lane == 0u64 {
+        assume(row < out.len) "row=blockIdx_x < gridDim_x <= out.len";
+        out[row] = argmax_u;
+    };
+}
+
+fn main() -> i32 { 0i32 }

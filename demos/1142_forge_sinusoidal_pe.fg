@@ -1,0 +1,50 @@
+// Sinusoidal position encoding (Vaswani et al. 2017 / original Transformer).
+//
+// For position p in [0, seq_len) and dim e in [0, d):
+//
+//   PE[p, 2i  ] = sin( p / 10000^(2i / d) )
+//   PE[p, 2i+1] = cos( p / 10000^(2i / d) )
+//
+// One thread per pair: thread `lane` handles dims 2*lane and 2*lane+1.
+// blockIdx_x indexes position; blockDim_x = d/2 = 16 (we fix d=32).
+//
+// Same shape as RoPE (1137) — different math (additive PE not rotation).
+// Uses the FORGE83 sin.approx.f32 / cos.approx.f32 PTX intrinsics.
+
+use std::prelude;
+
+#[kernel]
+fn sinusoidal_pe(
+    out: span<f32>, seq_len: u64
+)
+    requires seq_len <= 4096u64
+    requires seq_len * 32u64 <= out.len
+    requires blockIdx_x < gridDim_x
+    requires blockIdx_x < seq_len
+    requires threadIdx_x < 16u64
+{
+    let lane: u64 = threadIdx_x;
+    let pos: u64 = blockIdx_x;
+    let base: u64 = pos * 32u64;
+
+    // theta_i = pos / 10000^(2 * lane / d) with d=32
+    //         = pos * exp(-2*lane/32 * ln(10000))
+    //         = pos * exp(-lane/16 * 9.210340371976184)
+    let lane_f: f32 = lane as f32;
+    let pos_f: f32 = pos as f32;
+    let exponent: f32 = 0.0f32 - (lane_f * 0.5756462732485115f32);
+    let freq: f32 = expf(exponent);
+    let theta: f32 = pos_f * freq;
+
+    let s: f32 = sinf(theta);
+    let c: f32 = cosf(theta);
+
+    let idx_e: u64 = base + lane * 2u64;
+    let idx_o: u64 = base + lane * 2u64 + 1u64;
+    assume(idx_e < out.len) "pos<seq_len + lane<16 + seq_len*32<=out.len";
+    assume(idx_o < out.len) "same chain (idx_o = idx_e + 1 < base + 32)";
+    out[idx_e] = s;
+    out[idx_o] = c;
+}
+
+fn main() -> i32 { 0i32 }
