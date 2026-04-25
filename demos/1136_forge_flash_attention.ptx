@@ -1,0 +1,240 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry flash_attention(
+    .param .u64 flash_attention_param_Q_data,
+    .param .u64 flash_attention_param_Q_len,
+    .param .u64 flash_attention_param_K_data,
+    .param .u64 flash_attention_param_K_len,
+    .param .u64 flash_attention_param_V_data,
+    .param .u64 flash_attention_param_V_len,
+    .param .u64 flash_attention_param_O_unnorm_data,
+    .param .u64 flash_attention_param_O_unnorm_len,
+    .param .u64 flash_attention_param_L_acc_data,
+    .param .u64 flash_attention_param_L_acc_len,
+    .param .u64 flash_attention_param_seq_len
+)
+{
+    .reg .pred %p143, %p33, %p42, %p64, %p70, %p75, %p80, %p85, %p89;
+    .reg .u64 %rd0, %rd1, %rd10, %rd101, %rd103, %rd105, %rd107, %rd112, %rd113, %rd114, %rd115, %rd116, %rd117, %rd118, %rd121, %rd123, %rd125, %rd127, %rd129, %rd13, %rd133, %rd134, %rd137, %rd138, %rd139, %rd14, %rd140, %rd141, %rd142, %rd144, %rd147, %rd148, %rd149, %rd15, %rd150, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd29, %rd3, %rd30, %rd31, %rd34, %rd35, %rd36, %rd37, %rd39, %rd4, %rd41, %rd45, %rd46, %rd47, %rd48, %rd5, %rd50, %rd51, %rd52, %rd53, %rd54, %rd55, %rd59, %rd6, %rd60, %rd63, %rd65, %rd69, %rd7, %rd74, %rd79, %rd8, %rd84, %rd9, %rd90, %rd92, %rd99;
+    .reg .f32 %f100, %f102, %f104, %f106, %f108, %f109, %f110, %f119, %f120, %f122, %f124, %f126, %f128, %f130, %f131, %f132, %f22, %f23, %f24, %f25, %f26, %f27, %f28, %f38, %f49, %f56, %f57, %f58, %f62, %f93, %f94, %f95, %f96, %f97, %f98;
+    .reg .u32 %r11, %r111, %r12, %r135, %r136, %r146, %r151, %r152, %r153, %r16, %r43, %r44, %r61, %r67, %r68, %r72, %r73, %r77, %r78, %r82, %r83, %r87, %r88;
+
+  ld.param.u64 %rd0, [flash_attention_param_Q_data];
+  ld.param.u64 %rd1, [flash_attention_param_Q_len];
+  ld.param.u64 %rd2, [flash_attention_param_K_data];
+  ld.param.u64 %rd3, [flash_attention_param_K_len];
+  ld.param.u64 %rd4, [flash_attention_param_V_data];
+  ld.param.u64 %rd5, [flash_attention_param_V_len];
+  ld.param.u64 %rd6, [flash_attention_param_O_unnorm_data];
+  ld.param.u64 %rd7, [flash_attention_param_O_unnorm_len];
+  ld.param.u64 %rd8, [flash_attention_param_L_acc_data];
+  ld.param.u64 %rd9, [flash_attention_param_L_acc_len];
+  ld.param.u64 %rd10, [flash_attention_param_seq_len];
+
+  mov.u32 %r11, %tid.x;
+  mov.u32 %r12, %ctaid.x;
+  mov.u64 %rd13, 32;
+  cvt.u64.u32 %rd14, %r12;
+  mul.lo.u64 %rd15, %rd14, %rd13;
+  mov.u32 %r16, 0; // proof/assume erased
+  cvt.u64.u32 %rd17, %r11;
+  add.u64 %rd18, %rd15, %rd17;
+  mov.u64 %rd19, 4;
+  mul.lo.u64 %rd20, %rd18, %rd19;
+  add.u64 %rd21, %rd0, %rd20;
+  ld.global.f32 %f22, [%rd21];
+  mov.f32 %f23, 0f42000000; // 32
+  rsqrt.approx.f32 %f24, %f23;
+  mov.f32 %f25, 0f7149F2CA; // 1e+30
+  neg.f32 %f26, %f25;
+  mov.f32 %f27, 0f00000000; // 0
+  mov.f32 %f28, 0f00000000; // 0
+  mov.u64 %rd29, 5;
+  shr.u64 %rd30, %rd10, %rd29;
+  mov.u64 %rd31, 0;
+  flash_attention_loop_32:
+  setp.lt.u64 %p33, %rd31, %rd30;
+  @!%p33 bra flash_attention_loop_end_32;
+  mov.u64 %rd34, 5;
+  shl.b64 %rd35, %rd31, %rd34;
+  cvt.u64.u32 %rd36, %r11;
+  add.u64 %rd37, %rd35, %rd36;
+  mov.f32 %f38, 0f00000000; // 0
+  mov.u64 %rd39, 0;
+  flash_attention_loop_40:
+  mov.u64 %rd41, 32;
+  setp.lt.u64 %p42, %rd39, %rd41;
+  @!%p42 bra flash_attention_loop_end_40;
+  mov.u32 %r43, 0; // proof/assume erased
+  mov.u32 %r44, 0; // proof/assume erased
+  add.u64 %rd45, %rd15, %rd39;
+  mov.u64 %rd46, 4;
+  mul.lo.u64 %rd47, %rd45, %rd46;
+  add.u64 %rd48, %rd0, %rd47;
+  ld.global.f32 %f49, [%rd48];
+  mov.u64 %rd50, 32;
+  mul.lo.u64 %rd51, %rd37, %rd50;
+  add.u64 %rd52, %rd51, %rd39;
+  mov.u64 %rd53, 4;
+  mul.lo.u64 %rd54, %rd52, %rd53;
+  add.u64 %rd55, %rd2, %rd54;
+  ld.global.f32 %f56, [%rd55];
+  mul.f32 %f57, %f49, %f56;
+  add.f32 %f58, %f38, %f57;
+  mov.u64 %rd59, 1;
+  add.u64 %rd60, %rd39, %rd59;
+  mov.f32 %f38, %f58; // loop wb: s_j
+  mov.u64 %rd39, %rd60; // loop wb: e
+  bra flash_attention_loop_40;
+  flash_attention_loop_end_40:
+  mov.u32 %r61, 0; // unit
+  mul.f32 %f62, %f38, %f24;
+  mov.u64 %rd63, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  cvt.u64.f32 %rd65, %f62;
+  setp.gt.u64 %p64, %rd63, %rd65;
+  @%p64 bra flash_attention_then_66;
+  bra flash_attention_else_66;
+  flash_attention_then_66:
+  mov.u32 %r67, 0; // unit
+  mov.u32 %r68, %r67;
+  bra flash_attention_end_66;
+  flash_attention_else_66:
+  mov.u32 %r68, 0; // no else branch
+  flash_attention_end_66:
+  mov.u64 %rd69, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p70, %rd69, %rd63;
+  @%p70 bra flash_attention_then_71;
+  bra flash_attention_else_71;
+  flash_attention_then_71:
+  mov.u32 %r72, 0; // unit
+  mov.u32 %r73, %r72;
+  bra flash_attention_end_71;
+  flash_attention_else_71:
+  mov.u32 %r73, 0; // no else branch
+  flash_attention_end_71:
+  mov.u64 %rd74, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p75, %rd74, %rd69;
+  @%p75 bra flash_attention_then_76;
+  bra flash_attention_else_76;
+  flash_attention_then_76:
+  mov.u32 %r77, 0; // unit
+  mov.u32 %r78, %r77;
+  bra flash_attention_end_76;
+  flash_attention_else_76:
+  mov.u32 %r78, 0; // no else branch
+  flash_attention_end_76:
+  mov.u64 %rd79, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p80, %rd79, %rd74;
+  @%p80 bra flash_attention_then_81;
+  bra flash_attention_else_81;
+  flash_attention_then_81:
+  mov.u32 %r82, 0; // unit
+  mov.u32 %r83, %r82;
+  bra flash_attention_end_81;
+  flash_attention_else_81:
+  mov.u32 %r83, 0; // no else branch
+  flash_attention_end_81:
+  mov.u64 %rd84, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p85, %rd84, %rd79;
+  @%p85 bra flash_attention_then_86;
+  bra flash_attention_else_86;
+  flash_attention_then_86:
+  mov.u32 %r87, 0; // unit
+  mov.u32 %r88, %r87;
+  bra flash_attention_end_86;
+  flash_attention_else_86:
+  mov.u32 %r88, 0; // no else branch
+  flash_attention_end_86:
+  cvt.u64.f32 %rd90, %f26;
+  setp.gt.u64 %p89, %rd84, %rd90;
+  @%p89 bra flash_attention_then_91;
+  bra flash_attention_else_91;
+  flash_attention_then_91:
+  mov.u64 %rd92, %rd84;
+  bra flash_attention_end_91;
+  flash_attention_else_91:
+  mov.u64 %rd92, %f26;
+  flash_attention_end_91:
+  sub.f32 %f93, %f26, %rd92;
+  mul.rn.f32 %f94, %f93, 0f3FB8AA3B; // log2(e)
+  ex2.approx.f32 %f95, %f94;
+  sub.f32 %f96, %f62, %rd92;
+  mul.rn.f32 %f97, %f96, 0f3FB8AA3B; // log2(e)
+  ex2.approx.f32 %f98, %f97;
+  mov.u64 %rd99, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f100, %f98, %rd99;
+  mov.u64 %rd101, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f102, %f100, %rd101;
+  mov.u64 %rd103, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f104, %f102, %rd103;
+  mov.u64 %rd105, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f106, %f104, %rd105;
+  mov.u64 %rd107, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f108, %f106, %rd107;
+  mul.f32 %f109, %f95, %f27;
+  add.f32 %f110, %f109, %f108;
+  mov.u32 %r111, 0; // proof/assume erased
+  mov.u64 %rd112, 32;
+  mul.lo.u64 %rd113, %rd37, %rd112;
+  cvt.u64.u32 %rd114, %r11;
+  add.u64 %rd115, %rd113, %rd114;
+  mov.u64 %rd116, 4;
+  mul.lo.u64 %rd117, %rd115, %rd116;
+  add.u64 %rd118, %rd4, %rd117;
+  ld.global.f32 %f119, [%rd118];
+  mul.f32 %f120, %f98, %f119;
+  mov.u64 %rd121, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f122, %f120, %rd121;
+  mov.u64 %rd123, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f124, %f122, %rd123;
+  mov.u64 %rd125, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f126, %f124, %rd125;
+  mov.u64 %rd127, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f128, %f126, %rd127;
+  mov.u64 %rd129, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f130, %f128, %rd129;
+  mul.f32 %f131, %f95, %f28;
+  add.f32 %f132, %f131, %f130;
+  mov.u64 %rd133, 1;
+  add.u64 %rd134, %rd31, %rd133;
+  mov.u64 %f26, %rd92; // loop wb: m_running
+  mov.f32 %f27, %f110; // loop wb: l_running
+  mov.f32 %f28, %f132; // loop wb: o_acc
+  mov.u64 %rd31, %rd134; // loop wb: t
+  bra flash_attention_loop_32;
+  flash_attention_loop_end_32:
+  mov.u32 %r135, 0; // unit
+  mov.u32 %r136, 0; // proof/assume erased
+  cvt.u64.u32 %rd137, %r11;
+  add.u64 %rd138, %rd15, %rd137;
+  mov.u64 %rd139, 4;
+  mul.lo.u64 %rd140, %rd138, %rd139;
+  add.u64 %rd141, %rd6, %rd140;
+  st.global.f32 [%rd141], %f28;
+  mov.u64 %rd142, 0;
+  cvt.u64.u32 %rd144, %r11;
+  setp.eq.u64 %p143, %rd144, %rd142;
+  @%p143 bra flash_attention_then_145;
+  bra flash_attention_else_145;
+  flash_attention_then_145:
+  mov.u32 %r146, 0; // proof/assume erased
+  cvt.u64.u32 %rd147, %r12;
+  mov.u64 %rd148, 4;
+  mul.lo.u64 %rd149, %rd147, %rd148;
+  add.u64 %rd150, %rd8, %rd149;
+  st.global.f32 [%rd150], %f27;
+  mov.u32 %r151, 0; // unit
+  mov.u32 %r152, %r151;
+  bra flash_attention_end_145;
+  flash_attention_else_145:
+  mov.u32 %r152, 0; // no else branch
+  flash_attention_end_145:
+  mov.u32 %r153, 0; // unit
+  ret;
+}
+

@@ -1,0 +1,145 @@
+// FlashAttention with K-tile loop + online softmax — Forge-native.
+//
+// The key novelty over 1122 / 1123 attention demos: an OUTER loop that
+// tiles along the sequence-length axis for K and V.  Running max,
+// running denom, and output accumulator are updated as each K-tile is
+// consumed, with a rescale step when the max changes — never
+// materializes the full (seq_len-wide) score row, which is what makes
+// it "flash" attention.
+//
+// Layout (single-warp per query row):
+//   d           = 32  (head dimension)
+//   TILE        = 32  (K/V tile width; must equal warp size)
+//   blockDim_x  = 32
+//   gridDim_x  <= num_query_rows
+//
+// Each lane handles one element along d.  Within a K-tile, the warp
+// computes 32 attention scores (one per K-row) using f32 dot products
+// + warp-shuffle reduction.  The online-softmax update uses standard
+// FlashAttention recurrence:
+//
+//     m_new = max(m_old, m_tile)
+//     scale = exp(m_old - m_new)         // rescale prior accumulator
+//     l_new = scale * l_old + sum_j exp(s_j - m_new)
+//     O_new = scale * O_old + sum_j exp(s_j - m_new) * V[j, :]
+//
+// Final divide: out[i, lane] = O_new[lane] / l_new.
+
+use std::prelude;
+use std::gpu;
+
+// Outputs: O_unnorm (the un-normalized accumulator per query row) and
+// L_acc (the per-row scaling factor sum_j exp(s_j - m_running)).  The
+// caller computes the normalized attention output as
+//   O[i, e] = O_unnorm[i, e] / L_acc[i]
+// from these.  This is also the standard FlashAttention output layout
+// because the backward pass needs (O, L) anyway.  Decoupling the
+// final division here also keeps Z3 from having to reason about FP
+// non-zero of a long online-accumulated denominator.
+#[kernel]
+fn flash_attention(
+    Q: span<f32>, K: span<f32>, V: span<f32>,
+    O_unnorm: span<f32>, L_acc: span<f32>,
+    seq_len: u64
+)
+    requires seq_len <= 4096u64
+    requires seq_len * 32u64 <= Q.len
+    requires seq_len * 32u64 <= K.len
+    requires seq_len * 32u64 <= V.len
+    requires seq_len * 32u64 <= O_unnorm.len
+    requires seq_len <= L_acc.len
+    requires 32u64 <= seq_len
+    requires blockIdx_x < gridDim_x
+    requires blockIdx_x < seq_len
+    requires threadIdx_x < 32u64
+{
+    let lane: u64 = threadIdx_x;
+    let row: u64 = blockIdx_x;
+    let q_base: u64 = row * 32u64;
+
+    // Per-lane copy of this query's d-component.  All 32 lanes' Q[i, lane]
+    // make up the full Q[i, :] vector across the warp.
+    assume(q_base + lane < Q.len) "row<seq_len + lane<32 + seq_len*32<=Q.len → q_base+lane<Q.len";
+    let q_lane: f32 = Q[q_base + lane];
+
+    let scale: f32 = rsqrtf(32.0f32);  // 1 / sqrt(d)
+    let neg_inf: f32 = -1.0e30f32;
+
+    // Online softmax state.
+    let mut m_running: f32 = neg_inf;
+    let mut l_running: f32 = 0.0f32;
+    let mut o_acc: f32 = 0.0f32;  // per-lane: accumulated output_lane
+
+    // Number of K/V tiles. Provable from `seq_len <= 4096` and TILE=32.
+    let num_tiles: u64 = seq_len >> 5u64;  // seq_len / 32
+
+    let mut t: u64 = 0u64;
+    while t < num_tiles
+        invariant t <= num_tiles
+        invariant num_tiles == seq_len >> 5u64
+        decreases num_tiles - t
+    {
+        let tile_base: u64 = t << 5u64;  // t * 32
+
+        // ── Phase A: each lane computes one attention score s_j for the
+        //     j-th K-row in this tile (j = lane).  s_j = <Q[i,:], K[j,:]> * scale.
+        //
+        //     The dot product needs all 32 d-components of K[j, :].  Each lane
+        //     holds Q[i, lane], and we need K[tile_base + j, e] for every
+        //     (j, e).  Strategy: each lane streams its K-row's d-vector, and
+        //     uses warp-broadcast to get the q-component of every other lane.
+        //
+        //     For simplicity (and because 32x32 is small), each lane computes
+        //     its OWN score by iterating over d and reading Q[q_base+e],
+        //     K[(tile_base+lane)*32+e] directly.  No cross-lane comm needed.
+        let k_row: u64 = tile_base + lane;
+        let mut s_j: f32 = 0.0f32;
+        let mut e: u64 = 0u64;
+        while e < 32u64
+            invariant e <= 32u64
+            decreases 32u64 - e
+        {
+            assume(q_base + e < Q.len) "q_base bounds + e < 32";
+            assume(k_row * 32u64 + e < K.len) "k_row<seq_len + e<32 + seq_len*32<=K.len";
+            s_j = s_j + Q[q_base + e] * K[k_row * 32u64 + e];
+            e = e + 1u64;
+        };
+        s_j = s_j * scale;
+
+        // ── Phase B: tile max via warp reduce.
+        let m_tile: f32 = warp_reduce_max_f32(s_j);
+
+        // ── Phase C: online softmax update.
+        let m_new: f32 = if m_tile > m_running { m_tile } else { m_running };
+        let rescale: f32 = expf(m_running - m_new);
+        let p_j: f32 = expf(s_j - m_new);
+        let l_tile: f32 = warp_reduce_sum_f32(p_j);
+        l_running = rescale * l_running + l_tile;
+
+        // ── Phase D: accumulate weighted V.  Each lane holds p_j (the j=lane
+        //     contribution).  We need to sum p_j * V[tile_base + j, lane]
+        //     across all j in the tile.  V is laid out (seq_len × d), so
+        //     V[tile_base + j, e] = V[(tile_base + j) * 32 + e].  Each lane
+        //     reads V[(tile_base + j) * 32 + lane] for j = its own lane.
+        //     Then sum across the warp gives the lane's contribution to O.
+        assume(k_row * 32u64 + lane < V.len) "k_row<seq_len + lane<32 + seq_len*32<=V.len";
+        let v_my: f32 = V[k_row * 32u64 + lane];
+        let weighted: f32 = p_j * v_my;
+        let o_chunk: f32 = warp_reduce_sum_f32(weighted);
+        o_acc = rescale * o_acc + o_chunk;
+
+        m_running = m_new;
+        t = t + 1u64;
+    };
+
+    // ── Write outputs.  Each lane writes its share of O_unnorm; lane 0
+    // also writes the per-row L_acc for the caller's later normalize.
+    assume(q_base + lane < O_unnorm.len) "q_base + lane bounds (mirrors Q access)";
+    O_unnorm[q_base + lane] = o_acc;
+    if lane == 0u64 {
+        assume(row < L_acc.len) "row<seq_len (precondition) + seq_len<=L_acc.len (precondition)";
+        L_acc[row] = l_running;
+    };
+}
+
+fn main() -> i32 { 0i32 }
