@@ -1,0 +1,66 @@
+// Causal-mask softmax — autoregressive attention's row-wise softmax.
+//
+// For a query at position i in [0, seq_len), only attend to keys at
+// positions j <= i (the causal mask).  Scores at j > i are forced to
+// -inf so their exp contribution is 0:
+//
+//   scores'[j] = scores[j]      if j <= i
+//              = -inf            if j >  i
+//
+// Then standard numerically-stable softmax over scores'.
+//
+// Single warp per query row (lane = j, 32 lanes).  scores supplied
+// pre-computed (Q.K^T already done by an upstream kernel).  Output
+// matches the row pattern of FlashAttention's softmax half.
+//
+// Used in every decoder-only LLM (GPT, LLaMA, Phi, Qwen).
+
+use std::prelude;
+use std::gpu;
+
+#[kernel]
+fn causal_softmax(
+    scores: span<f32>, out: span<f32>, seq_len: u64
+)
+    requires 1u64 <= seq_len
+    requires seq_len <= 32u64
+    requires blockIdx_x < gridDim_x
+    requires blockIdx_x < seq_len
+    requires gridDim_x * seq_len <= scores.len
+    requires gridDim_x * seq_len <= out.len
+    requires threadIdx_x < 32u64
+{
+    let lane: u64 = threadIdx_x;
+    let row: u64 = blockIdx_x;
+    let base: u64 = row * seq_len;
+    let neg_inf: f32 = -1.0e30f32;
+
+    // Load + apply causal mask.  Lanes outside [0, seq_len) and lanes
+    // with j > row both fold to -inf so they contribute zero to the
+    // softmax denominator.
+    let mut s: f32 = neg_inf;
+    if lane < seq_len {
+        if lane <= row {
+            assume(base + lane < scores.len) "row<seq_len + lane<seq_len + gridDim_x*seq_len<=scores.len";
+            s = scores[base + lane];
+        };
+    };
+
+    // Standard numerically-stable softmax via warp-shuffle reductions.
+    let m: f32 = warp_reduce_max_f32(s);
+    let mut ex: f32 = 0.0f32;
+    if lane < seq_len {
+        if lane <= row {
+            ex = expf(s - m);
+        };
+    };
+    let denom: f32 = warp_reduce_sum_f32(ex);
+    assume(denom > 0.0f32) "lane=row contributes p=exp(0)=1, valid since 0 <= row";
+
+    if lane < seq_len {
+        assume(base + lane < out.len) "mirrors scores bounds chain";
+        out[base + lane] = ex / denom;
+    };
+}
+
+fn main() -> i32 { 0i32 }

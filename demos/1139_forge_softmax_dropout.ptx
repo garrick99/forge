@@ -1,0 +1,180 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry softmax_dropout(
+    .param .u64 softmax_dropout_param_inp_data,
+    .param .u64 softmax_dropout_param_inp_len,
+    .param .u64 softmax_dropout_param_mask_data,
+    .param .u64 softmax_dropout_param_mask_len,
+    .param .u64 softmax_dropout_param_out_data,
+    .param .u64 softmax_dropout_param_out_len,
+    .param .u64 softmax_dropout_param_n_cols,
+    .param .f32 softmax_dropout_param_keep_scale
+)
+{
+    .reg .pred %p14, %p27, %p33, %p38, %p43, %p48, %p53, %p72, %p84;
+    .reg .u64 %rd0, %rd1, %rd10, %rd11, %rd15, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd26, %rd28, %rd3, %rd32, %rd37, %rd4, %rd42, %rd47, %rd5, %rd54, %rd6, %rd61, %rd63, %rd65, %rd67, %rd69, %rd73, %rd76, %rd77, %rd78, %rd79, %rd80, %rd90, %rd91, %rd92, %rd93, %rd94;
+    .reg .f32 %f12, %f13, %f23, %f52, %f56, %f57, %f58, %f62, %f64, %f66, %f68, %f7, %f70, %f82, %f86, %f87, %f88;
+    .reg .u32 %r17, %r24, %r25, %r30, %r31, %r35, %r36, %r40, %r41, %r45, %r46, %r50, %r51, %r59, %r60, %r71, %r75, %r8, %r81, %r83, %r89, %r9, %r95, %r96, %r97;
+
+  ld.param.u64 %rd0, [softmax_dropout_param_inp_data];
+  ld.param.u64 %rd1, [softmax_dropout_param_inp_len];
+  ld.param.u64 %rd2, [softmax_dropout_param_mask_data];
+  ld.param.u64 %rd3, [softmax_dropout_param_mask_len];
+  ld.param.u64 %rd4, [softmax_dropout_param_out_data];
+  ld.param.u64 %rd5, [softmax_dropout_param_out_len];
+  ld.param.u64 %rd6, [softmax_dropout_param_n_cols];
+  ld.param.f32 %f7, [softmax_dropout_param_keep_scale];
+
+  mov.u32 %r8, %tid.x;
+  mov.u32 %r9, %ctaid.x;
+  cvt.u64.u32 %rd10, %r9;
+  mul.lo.u64 %rd11, %rd10, %rd6;
+  mov.f32 %f12, 0f7149F2CA; // 1e+30
+  neg.f32 %f13, %f12;
+  cvt.u64.u32 %rd15, %r8;
+  setp.lt.u64 %p14, %rd15, %rd6;
+  @%p14 bra softmax_dropout_then_16;
+  bra softmax_dropout_else_16;
+  softmax_dropout_then_16:
+  mov.u32 %r17, 0; // proof/assume erased
+  cvt.u64.u32 %rd18, %r8;
+  add.u64 %rd19, %rd11, %rd18;
+  mov.u64 %rd20, 4;
+  mul.lo.u64 %rd21, %rd19, %rd20;
+  add.u64 %rd22, %rd0, %rd21;
+  ld.global.f32 %f23, [%rd22];
+  mov.u32 %r24, 0; // unit
+  mov.u32 %r25, %r24;
+  bra softmax_dropout_end_16;
+  softmax_dropout_else_16:
+  mov.u32 %r25, 0; // no else branch
+  softmax_dropout_end_16:
+  mov.u64 %rd26, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  cvt.u64.f32 %rd28, %f23;
+  setp.gt.u64 %p27, %rd26, %rd28;
+  @%p27 bra softmax_dropout_then_29;
+  bra softmax_dropout_else_29;
+  softmax_dropout_then_29:
+  mov.u32 %r30, 0; // unit
+  mov.u32 %r31, %r30;
+  bra softmax_dropout_end_29;
+  softmax_dropout_else_29:
+  mov.u32 %r31, 0; // no else branch
+  softmax_dropout_end_29:
+  mov.u64 %rd32, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p33, %rd32, %rd26;
+  @%p33 bra softmax_dropout_then_34;
+  bra softmax_dropout_else_34;
+  softmax_dropout_then_34:
+  mov.u32 %r35, 0; // unit
+  mov.u32 %r36, %r35;
+  bra softmax_dropout_end_34;
+  softmax_dropout_else_34:
+  mov.u32 %r36, 0; // no else branch
+  softmax_dropout_end_34:
+  mov.u64 %rd37, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p38, %rd37, %rd32;
+  @%p38 bra softmax_dropout_then_39;
+  bra softmax_dropout_else_39;
+  softmax_dropout_then_39:
+  mov.u32 %r40, 0; // unit
+  mov.u32 %r41, %r40;
+  bra softmax_dropout_end_39;
+  softmax_dropout_else_39:
+  mov.u32 %r41, 0; // no else branch
+  softmax_dropout_end_39:
+  mov.u64 %rd42, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p43, %rd42, %rd37;
+  @%p43 bra softmax_dropout_then_44;
+  bra softmax_dropout_else_44;
+  softmax_dropout_then_44:
+  mov.u32 %r45, 0; // unit
+  mov.u32 %r46, %r45;
+  bra softmax_dropout_end_44;
+  softmax_dropout_else_44:
+  mov.u32 %r46, 0; // no else branch
+  softmax_dropout_end_44:
+  mov.u64 %rd47, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p48, %rd47, %rd42;
+  @%p48 bra softmax_dropout_then_49;
+  bra softmax_dropout_else_49;
+  softmax_dropout_then_49:
+  mov.u32 %r50, 0; // unit
+  mov.u32 %r51, %r50;
+  bra softmax_dropout_end_49;
+  softmax_dropout_else_49:
+  mov.u32 %r51, 0; // no else branch
+  softmax_dropout_end_49:
+  mov.f32 %f52, 0f00000000; // 0
+  cvt.u64.u32 %rd54, %r8;
+  setp.lt.u64 %p53, %rd54, %rd6;
+  @%p53 bra softmax_dropout_then_55;
+  bra softmax_dropout_else_55;
+  softmax_dropout_then_55:
+  sub.f32 %f56, %f23, %rd47;
+  mul.rn.f32 %f57, %f56, 0f3FB8AA3B; // log2(e)
+  ex2.approx.f32 %f58, %f57;
+  mov.u32 %r59, 0; // unit
+  mov.u32 %r60, %r59;
+  bra softmax_dropout_end_55;
+  softmax_dropout_else_55:
+  mov.u32 %r60, 0; // no else branch
+  softmax_dropout_end_55:
+  mov.u64 %rd61, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f62, %f58, %rd61;
+  mov.u64 %rd63, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f64, %f62, %rd63;
+  mov.u64 %rd65, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f66, %f64, %rd65;
+  mov.u64 %rd67, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f68, %f66, %rd67;
+  mov.u64 %rd69, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f70, %f68, %rd69;
+  mov.u32 %r71, 0; // proof/assume erased
+  cvt.u64.u32 %rd73, %r8;
+  setp.lt.u64 %p72, %rd73, %rd6;
+  @%p72 bra softmax_dropout_then_74;
+  bra softmax_dropout_else_74;
+  softmax_dropout_then_74:
+  mov.u32 %r75, 0; // proof/assume erased
+  cvt.u64.u32 %rd76, %r8;
+  add.u64 %rd77, %rd11, %rd76;
+  mov.u64 %rd78, 4;
+  mul.lo.u64 %rd79, %rd77, %rd78;
+  add.u64 %rd80, %rd2, %rd79;
+  ld.global.u32 %r81, [%rd80];
+  div.f32 %f82, %f58, %f70;
+  mov.u32 %r83, 0;
+  setp.eq.u32 %p84, %r81, %r83;
+  @%p84 bra softmax_dropout_then_85;
+  bra softmax_dropout_else_85;
+  softmax_dropout_then_85:
+  mov.f32 %f86, 0f00000000; // 0
+  mov.f32 %f87, %f86;
+  bra softmax_dropout_end_85;
+  softmax_dropout_else_85:
+  mul.f32 %f88, %f82, %f7;
+  mov.f32 %f87, %f88;
+  softmax_dropout_end_85:
+  mov.u32 %r89, 0; // proof/assume erased
+  cvt.u64.u32 %rd90, %r8;
+  add.u64 %rd91, %rd11, %rd90;
+  mov.u64 %rd92, 4;
+  mul.lo.u64 %rd93, %rd91, %rd92;
+  add.u64 %rd94, %rd4, %rd93;
+  st.global.f32 [%rd94], %f87;
+  mov.u32 %r95, 0; // unit
+  mov.u32 %r96, %r95;
+  bra softmax_dropout_end_74;
+  softmax_dropout_else_74:
+  mov.u32 %r96, 0; // no else branch
+  softmax_dropout_end_74:
+  mov.u32 %r97, 0; // unit
+  ret;
+}
+

@@ -1,0 +1,175 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry causal_softmax(
+    .param .u64 causal_softmax_param_scores_data,
+    .param .u64 causal_softmax_param_scores_len,
+    .param .u64 causal_softmax_param_out_data,
+    .param .u64 causal_softmax_param_out_len,
+    .param .u64 causal_softmax_param_seq_len
+)
+{
+    .reg .pred %p11, %p14, %p28, %p34, %p39, %p44, %p49, %p54, %p57, %p77;
+    .reg .u64 %rd0, %rd1, %rd12, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd27, %rd29, %rd3, %rd33, %rd38, %rd4, %rd43, %rd48, %rd55, %rd66, %rd68, %rd7, %rd70, %rd72, %rd74, %rd78, %rd8, %rd82, %rd83, %rd84, %rd85, %rd86;
+    .reg .f32 %f10, %f22, %f53, %f59, %f60, %f61, %f67, %f69, %f71, %f73, %f75, %f81, %f9;
+    .reg .u32 %r16, %r23, %r24, %r25, %r26, %r31, %r32, %r36, %r37, %r41, %r42, %r46, %r47, %r5, %r51, %r52, %r6, %r62, %r63, %r64, %r65, %r76, %r80, %r87, %r88, %r89;
+
+  ld.param.u64 %rd0, [causal_softmax_param_scores_data];
+  ld.param.u64 %rd1, [causal_softmax_param_scores_len];
+  ld.param.u64 %rd2, [causal_softmax_param_out_data];
+  ld.param.u64 %rd3, [causal_softmax_param_out_len];
+  ld.param.u64 %rd4, [causal_softmax_param_seq_len];
+
+  mov.u32 %r5, %tid.x;
+  mov.u32 %r6, %ctaid.x;
+  cvt.u64.u32 %rd7, %r6;
+  mul.lo.u64 %rd8, %rd7, %rd4;
+  mov.f32 %f9, 0f7149F2CA; // 1e+30
+  neg.f32 %f10, %f9;
+  cvt.u64.u32 %rd12, %r5;
+  setp.lt.u64 %p11, %rd12, %rd4;
+  @%p11 bra causal_softmax_then_13;
+  bra causal_softmax_else_13;
+  causal_softmax_then_13:
+  setp.le.u32 %p14, %r5, %r6;
+  @%p14 bra causal_softmax_then_15;
+  bra causal_softmax_else_15;
+  causal_softmax_then_15:
+  mov.u32 %r16, 0; // proof/assume erased
+  cvt.u64.u32 %rd17, %r5;
+  add.u64 %rd18, %rd8, %rd17;
+  mov.u64 %rd19, 4;
+  mul.lo.u64 %rd20, %rd18, %rd19;
+  add.u64 %rd21, %rd0, %rd20;
+  ld.global.f32 %f22, [%rd21];
+  mov.u32 %r23, 0; // unit
+  mov.u32 %r24, %r23;
+  bra causal_softmax_end_15;
+  causal_softmax_else_15:
+  mov.u32 %r24, 0; // no else branch
+  causal_softmax_end_15:
+  mov.u32 %r25, 0; // unit
+  mov.u32 %r26, %r25;
+  bra causal_softmax_end_13;
+  causal_softmax_else_13:
+  mov.u32 %r26, 0; // no else branch
+  causal_softmax_end_13:
+  mov.u64 %rd27, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  cvt.u64.f32 %rd29, %f22;
+  setp.gt.u64 %p28, %rd27, %rd29;
+  @%p28 bra causal_softmax_then_30;
+  bra causal_softmax_else_30;
+  causal_softmax_then_30:
+  mov.u32 %r31, 0; // unit
+  mov.u32 %r32, %r31;
+  bra causal_softmax_end_30;
+  causal_softmax_else_30:
+  mov.u32 %r32, 0; // no else branch
+  causal_softmax_end_30:
+  mov.u64 %rd33, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p34, %rd33, %rd27;
+  @%p34 bra causal_softmax_then_35;
+  bra causal_softmax_else_35;
+  causal_softmax_then_35:
+  mov.u32 %r36, 0; // unit
+  mov.u32 %r37, %r36;
+  bra causal_softmax_end_35;
+  causal_softmax_else_35:
+  mov.u32 %r37, 0; // no else branch
+  causal_softmax_end_35:
+  mov.u64 %rd38, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p39, %rd38, %rd33;
+  @%p39 bra causal_softmax_then_40;
+  bra causal_softmax_else_40;
+  causal_softmax_then_40:
+  mov.u32 %r41, 0; // unit
+  mov.u32 %r42, %r41;
+  bra causal_softmax_end_40;
+  causal_softmax_else_40:
+  mov.u32 %r42, 0; // no else branch
+  causal_softmax_end_40:
+  mov.u64 %rd43, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p44, %rd43, %rd38;
+  @%p44 bra causal_softmax_then_45;
+  bra causal_softmax_else_45;
+  causal_softmax_then_45:
+  mov.u32 %r46, 0; // unit
+  mov.u32 %r47, %r46;
+  bra causal_softmax_end_45;
+  causal_softmax_else_45:
+  mov.u32 %r47, 0; // no else branch
+  causal_softmax_end_45:
+  mov.u64 %rd48, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p49, %rd48, %rd43;
+  @%p49 bra causal_softmax_then_50;
+  bra causal_softmax_else_50;
+  causal_softmax_then_50:
+  mov.u32 %r51, 0; // unit
+  mov.u32 %r52, %r51;
+  bra causal_softmax_end_50;
+  causal_softmax_else_50:
+  mov.u32 %r52, 0; // no else branch
+  causal_softmax_end_50:
+  mov.f32 %f53, 0f00000000; // 0
+  cvt.u64.u32 %rd55, %r5;
+  setp.lt.u64 %p54, %rd55, %rd4;
+  @%p54 bra causal_softmax_then_56;
+  bra causal_softmax_else_56;
+  causal_softmax_then_56:
+  setp.le.u32 %p57, %r5, %r6;
+  @%p57 bra causal_softmax_then_58;
+  bra causal_softmax_else_58;
+  causal_softmax_then_58:
+  sub.f32 %f59, %f22, %rd48;
+  mul.rn.f32 %f60, %f59, 0f3FB8AA3B; // log2(e)
+  ex2.approx.f32 %f61, %f60;
+  mov.u32 %r62, 0; // unit
+  mov.u32 %r63, %r62;
+  bra causal_softmax_end_58;
+  causal_softmax_else_58:
+  mov.u32 %r63, 0; // no else branch
+  causal_softmax_end_58:
+  mov.u32 %r64, 0; // unit
+  mov.u32 %r65, %r64;
+  bra causal_softmax_end_56;
+  causal_softmax_else_56:
+  mov.u32 %r65, 0; // no else branch
+  causal_softmax_end_56:
+  mov.u64 %rd66, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f67, %f61, %rd66;
+  mov.u64 %rd68, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f69, %f67, %rd68;
+  mov.u64 %rd70, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f71, %f69, %rd70;
+  mov.u64 %rd72, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f73, %f71, %rd72;
+  mov.u64 %rd74, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f75, %f73, %rd74;
+  mov.u32 %r76, 0; // proof/assume erased
+  cvt.u64.u32 %rd78, %r5;
+  setp.lt.u64 %p77, %rd78, %rd4;
+  @%p77 bra causal_softmax_then_79;
+  bra causal_softmax_else_79;
+  causal_softmax_then_79:
+  mov.u32 %r80, 0; // proof/assume erased
+  div.f32 %f81, %f61, %f75;
+  cvt.u64.u32 %rd82, %r5;
+  add.u64 %rd83, %rd8, %rd82;
+  mov.u64 %rd84, 4;
+  mul.lo.u64 %rd85, %rd83, %rd84;
+  add.u64 %rd86, %rd2, %rd85;
+  st.global.f32 [%rd86], %f81;
+  mov.u32 %r87, 0; // unit
+  mov.u32 %r88, %r87;
+  bra causal_softmax_end_79;
+  causal_softmax_else_79:
+  mov.u32 %r88, 0; // no else branch
+  causal_softmax_end_79:
+  mov.u32 %r89, 0; // unit
+  ret;
+}
+

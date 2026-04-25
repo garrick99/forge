@@ -1,0 +1,63 @@
+// Fused softmax + dropout — apply a precomputed boolean mask to the
+// post-softmax probabilities, rescaling kept entries by 1 / (1 - p).
+//
+// The dropout mask is supplied as a span<u32> (0 = drop, non-zero = keep)
+// rather than generated inside the kernel, so the kernel stays
+// deterministic and the proof surface stays small.  Caller fills the
+// mask from a Philox / Threefry RNG before launching.
+//
+//   y[j] = (mask[j] != 0) * softmax(x)[j] / (1 - p)
+//
+// Single warp per row.  Used in transformer FFN dropout / attention
+// dropout paths (BERT/GPT FFN, T5 dropout-on-scores).
+
+use std::prelude;
+use std::gpu;
+
+#[kernel]
+fn softmax_dropout(
+    inp: span<f32>, mask: span<u32>, out: span<f32>,
+    n_cols: u64, keep_scale: f32
+)
+    requires 1u64 <= n_cols
+    requires n_cols <= 32u64
+    requires blockIdx_x < gridDim_x
+    requires gridDim_x * n_cols <= inp.len
+    requires gridDim_x * n_cols <= out.len
+    requires gridDim_x * n_cols <= mask.len
+    requires threadIdx_x < 32u64
+{
+    let lane: u64 = threadIdx_x;
+    let row: u64 = blockIdx_x;
+    let base: u64 = row * n_cols;
+    let neg_inf: f32 = -1.0e30f32;
+
+    // Load.  Lanes >= n_cols pad with -inf so they don't perturb max/sum.
+    let mut x: f32 = neg_inf;
+    if lane < n_cols {
+        assume(base + lane < inp.len) "blockIdx<gridDim + lane<n_cols + gridDim*n_cols<=inp.len";
+        x = inp[base + lane];
+    };
+
+    // Numerically-stable softmax.
+    let m: f32 = warp_reduce_max_f32(x);
+    let mut ex: f32 = 0.0f32;
+    if lane < n_cols {
+        ex = expf(x - m);
+    };
+    let denom: f32 = warp_reduce_sum_f32(ex);
+    assume(denom > 0.0f32) "argmax lane contributes p=exp(0)=1";
+
+    // Apply mask + dropout rescaling.
+    if lane < n_cols {
+        assume(base + lane < mask.len) "mirrors inp bounds";
+        let m_keep: u32 = mask[base + lane];
+        let p: f32 = ex / denom;
+        let kept: f32 = if m_keep == 0u32 { 0.0f32 } else { p * keep_scale };
+
+        assume(base + lane < out.len) "mirrors inp bounds";
+        out[base + lane] = kept;
+    };
+}
+
+fn main() -> i32 { 0i32 }
