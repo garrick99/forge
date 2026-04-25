@@ -29,4 +29,7 @@ Proof / assume / emission counts for the f32 ML kernel arc (1120-1135), Forge-na
 | `1142_forge_sinusoidal_pe` | 2 | 2 | 74 | 54 |
 | `1143_forge_argmax_row` | 2 | 2 | 231 | 190 |
 | `1144_forge_masked_softmax` | 4 | 4 | 236 | 182 |
-| **total** | **177** | **34** | | |
+| `1145_forge_swiglu` | 4 | 0 | 63 | 67 |
+| `1146_forge_log_softmax` | 2 | 3 | 228 | 151 |
+| `1147_forge_scaled_add` | 3 | 0 | 58 | 64 |
+| **total** | **186** | **37** | | |

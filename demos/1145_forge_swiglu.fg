@@ -1,0 +1,38 @@
+// SwiGLU — LLaMA / Mistral / Phi FFN gate activation.
+//
+//   y[i] = silu(gate[i]) * up[i]
+//        = (gate[i] / (1 + exp(-gate[i]))) * up[i]
+//
+// Pure elementwise; one thread per element.  The standard FFN block in
+// modern decoder-only LLMs computes:
+//
+//   gate, up = W_gate @ x, W_up @ x       (two parallel projections)
+//   y        = SwiGLU(gate, up)            (this kernel)
+//   out      = W_down @ y                  (down-projection)
+//
+// This kernel is the SwiGLU step, fusing the silu activation with the
+// per-element gate*up multiply.
+
+use std::prelude;
+
+#[kernel]
+fn swiglu(
+    gate: span<f32>, up: span<f32>, out: span<f32>, n: u64
+)
+    requires n <= gate.len
+    requires n <= up.len
+    requires n <= out.len
+    requires blockIdx_x < gridDim_x
+{
+    let gid: u64 = blockIdx_x * (blockDim_x as u64) + (threadIdx_x as u64);
+    if gid < n {
+        let g: f32 = gate[gid];
+        let u: f32 = up[gid];
+        let neg_g: f32 = 0.0f32 - g;
+        let e: f32 = expf(neg_g);
+        let sigmoid: f32 = 1.0f32 / (1.0f32 + e);
+        out[gid] = g * sigmoid * u;
+    };
+}
+
+fn main() -> i32 { 0i32 }

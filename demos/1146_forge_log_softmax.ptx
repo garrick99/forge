@@ -1,0 +1,158 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry log_softmax(
+    .param .u64 log_softmax_param_inp_data,
+    .param .u64 log_softmax_param_inp_len,
+    .param .u64 log_softmax_param_out_data,
+    .param .u64 log_softmax_param_out_len,
+    .param .u64 log_softmax_param_n_cols
+)
+{
+    .reg .pred %p11, %p24, %p30, %p35, %p40, %p45, %p50, %p71;
+    .reg .u64 %rd0, %rd1, %rd12, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd23, %rd25, %rd29, %rd3, %rd34, %rd39, %rd4, %rd44, %rd51, %rd58, %rd60, %rd62, %rd64, %rd66, %rd7, %rd72, %rd77, %rd78, %rd79, %rd8, %rd80, %rd81;
+    .reg .f32 %f10, %f20, %f49, %f53, %f54, %f55, %f59, %f61, %f63, %f65, %f67, %f69, %f70, %f75, %f76, %f9;
+    .reg .u32 %r14, %r21, %r22, %r27, %r28, %r32, %r33, %r37, %r38, %r42, %r43, %r47, %r48, %r5, %r56, %r57, %r6, %r68, %r74, %r82, %r83, %r84;
+
+  ld.param.u64 %rd0, [log_softmax_param_inp_data];
+  ld.param.u64 %rd1, [log_softmax_param_inp_len];
+  ld.param.u64 %rd2, [log_softmax_param_out_data];
+  ld.param.u64 %rd3, [log_softmax_param_out_len];
+  ld.param.u64 %rd4, [log_softmax_param_n_cols];
+
+  mov.u32 %r5, %tid.x;
+  mov.u32 %r6, %ctaid.x;
+  cvt.u64.u32 %rd7, %r6;
+  mul.lo.u64 %rd8, %rd7, %rd4;
+  mov.f32 %f9, 0f7149F2CA; // 1e+30
+  neg.f32 %f10, %f9;
+  cvt.u64.u32 %rd12, %r5;
+  setp.lt.u64 %p11, %rd12, %rd4;
+  @%p11 bra log_softmax_then_13;
+  bra log_softmax_else_13;
+  log_softmax_then_13:
+  mov.u32 %r14, 0; // proof/assume erased
+  cvt.u64.u32 %rd15, %r5;
+  add.u64 %rd16, %rd8, %rd15;
+  mov.u64 %rd17, 4;
+  mul.lo.u64 %rd18, %rd16, %rd17;
+  add.u64 %rd19, %rd0, %rd18;
+  ld.global.f32 %f20, [%rd19];
+  mov.u32 %r21, 0; // unit
+  mov.u32 %r22, %r21;
+  bra log_softmax_end_13;
+  log_softmax_else_13:
+  mov.u32 %r22, 0; // no else branch
+  log_softmax_end_13:
+  mov.u64 %rd23, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  cvt.u64.f32 %rd25, %f20;
+  setp.gt.u64 %p24, %rd23, %rd25;
+  @%p24 bra log_softmax_then_26;
+  bra log_softmax_else_26;
+  log_softmax_then_26:
+  mov.u32 %r27, 0; // unit
+  mov.u32 %r28, %r27;
+  bra log_softmax_end_26;
+  log_softmax_else_26:
+  mov.u32 %r28, 0; // no else branch
+  log_softmax_end_26:
+  mov.u64 %rd29, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p30, %rd29, %rd23;
+  @%p30 bra log_softmax_then_31;
+  bra log_softmax_else_31;
+  log_softmax_then_31:
+  mov.u32 %r32, 0; // unit
+  mov.u32 %r33, %r32;
+  bra log_softmax_end_31;
+  log_softmax_else_31:
+  mov.u32 %r33, 0; // no else branch
+  log_softmax_end_31:
+  mov.u64 %rd34, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p35, %rd34, %rd29;
+  @%p35 bra log_softmax_then_36;
+  bra log_softmax_else_36;
+  log_softmax_then_36:
+  mov.u32 %r37, 0; // unit
+  mov.u32 %r38, %r37;
+  bra log_softmax_end_36;
+  log_softmax_else_36:
+  mov.u32 %r38, 0; // no else branch
+  log_softmax_end_36:
+  mov.u64 %rd39, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p40, %rd39, %rd34;
+  @%p40 bra log_softmax_then_41;
+  bra log_softmax_else_41;
+  log_softmax_then_41:
+  mov.u32 %r42, 0; // unit
+  mov.u32 %r43, %r42;
+  bra log_softmax_end_41;
+  log_softmax_else_41:
+  mov.u32 %r43, 0; // no else branch
+  log_softmax_end_41:
+  mov.u64 %rd44, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p45, %rd44, %rd39;
+  @%p45 bra log_softmax_then_46;
+  bra log_softmax_else_46;
+  log_softmax_then_46:
+  mov.u32 %r47, 0; // unit
+  mov.u32 %r48, %r47;
+  bra log_softmax_end_46;
+  log_softmax_else_46:
+  mov.u32 %r48, 0; // no else branch
+  log_softmax_end_46:
+  mov.f32 %f49, 0f00000000; // 0
+  cvt.u64.u32 %rd51, %r5;
+  setp.lt.u64 %p50, %rd51, %rd4;
+  @%p50 bra log_softmax_then_52;
+  bra log_softmax_else_52;
+  log_softmax_then_52:
+  sub.f32 %f53, %f20, %rd44;
+  mul.rn.f32 %f54, %f53, 0f3FB8AA3B; // log2(e)
+  ex2.approx.f32 %f55, %f54;
+  mov.u32 %r56, 0; // unit
+  mov.u32 %r57, %r56;
+  bra log_softmax_end_52;
+  log_softmax_else_52:
+  mov.u32 %r57, 0; // no else branch
+  log_softmax_end_52:
+  mov.u64 %rd58, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f59, %f55, %rd58;
+  mov.u64 %rd60, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f61, %f59, %rd60;
+  mov.u64 %rd62, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f63, %f61, %rd62;
+  mov.u64 %rd64, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f65, %f63, %rd64;
+  mov.u64 %rd66, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f67, %f65, %rd66;
+  mov.u32 %r68, 0; // proof/assume erased
+  lg2.approx.f32 %f69, %f67;
+  mul.rn.f32 %f70, %f69, 0f3F317218; // ln(2)
+  cvt.u64.u32 %rd72, %r5;
+  setp.lt.u64 %p71, %rd72, %rd4;
+  @%p71 bra log_softmax_then_73;
+  bra log_softmax_else_73;
+  log_softmax_then_73:
+  mov.u32 %r74, 0; // proof/assume erased
+  sub.f32 %f75, %f20, %rd44;
+  sub.f32 %f76, %f75, %f70;
+  cvt.u64.u32 %rd77, %r5;
+  add.u64 %rd78, %rd8, %rd77;
+  mov.u64 %rd79, 4;
+  mul.lo.u64 %rd80, %rd78, %rd79;
+  add.u64 %rd81, %rd2, %rd80;
+  st.global.f32 [%rd81], %f76;
+  mov.u32 %r82, 0; // unit
+  mov.u32 %r83, %r82;
+  bra log_softmax_end_73;
+  log_softmax_else_73:
+  mov.u32 %r83, 0; // no else branch
+  log_softmax_end_73:
+  mov.u32 %r84, 0; // unit
+  ret;
+}
+

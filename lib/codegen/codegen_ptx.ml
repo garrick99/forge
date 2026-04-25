@@ -807,6 +807,19 @@ let rec lower_expr st e : string =
       emit st (Printf.sprintf "tanh.approx.f32 %s, %s;" result rx);
       result
 
+  (* FORGE87: logf(x) → lg2.approx.f32(x) * ln(2).  PTX has log2 in
+     hardware (single SFU); the natural-log version is one extra fma.
+     Bit pattern for ln(2) as f32: 0x3F317218. *)
+  | ECall ({ expr_desc = EVar id; _ }, [arg])
+      when id.name = "logf" ->
+      let rx = lower_expr st arg in
+      let lg2 = fresh_reg st F32 in
+      emit st (Printf.sprintf "lg2.approx.f32 %s, %s;" lg2 rx);
+      let result = fresh_reg st F32 in
+      emit st (Printf.sprintf "mul.rn.f32 %s, %s, 0f3F317218; // ln(2)"
+                 result lg2);
+      result
+
   (* FORGE83: sinf(x) → sin.approx.f32(x), cosf(x) → cos.approx.f32(x).
      Single SFU instructions.  Used in RoPE / position-encoding kernels. *)
   | ECall ({ expr_desc = EVar id; _ }, [arg])
