@@ -1,0 +1,51 @@
+// Row-wise RMSNorm with BF16 storage and f32 compute.  Mirror of 1128
+// FP32 RMSNorm.  Same proof structure; conversions on load and store.
+
+use std::prelude;
+use std::gpu;
+use std::fp16;
+
+#[kernel]
+fn rmsnorm_bf16(inp: span<u16>, out: span<u16>, n_cols: u64)
+    requires 1u64 <= n_cols
+    requires n_cols <= 256u64
+    requires blockIdx_x < gridDim_x
+    requires gridDim_x * n_cols <= inp.len
+    requires gridDim_x * n_cols <= out.len
+    requires threadIdx_x < 256u64
+{
+    let smem: shared<f32>[256] = [0.0f32; 256u64];
+    let tid: u64 = threadIdx_x;
+    let row: u64 = blockIdx_x;
+    let base: u64 = row * n_cols;
+    let n_f: f32 = n_cols as f32;
+    let eps: f32 = 0.00001f32;
+
+    let mut x: f32 = 0.0f32;
+    if tid < n_cols {
+        x = bf16_to_f32(inp[base + tid]);
+    };
+
+    smem[tid] = x * x;
+    syncthreads();
+
+    let mut s: u64 = 128u64;
+    while s > 0u64
+        invariant s <= 128u64
+        decreases s
+    {
+        if tid < s {
+            smem[tid] = smem[tid] + smem[tid + s];
+        };
+        syncthreads();
+        s = s >> 1u64;
+    };
+    let ms: f32 = smem[0] / n_f;
+    let inv_rms: f32 = rsqrtf(ms + eps);
+
+    if tid < n_cols {
+        out[base + tid] = f32_to_bf16(x * inv_rms);
+    };
+}
+
+fn main() -> i32 { 0i32 }

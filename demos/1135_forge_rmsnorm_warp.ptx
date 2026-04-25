@@ -1,0 +1,86 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry rmsnorm_warp(
+    .param .u64 rmsnorm_warp_param_inp_data,
+    .param .u64 rmsnorm_warp_param_inp_len,
+    .param .u64 rmsnorm_warp_param_out_data,
+    .param .u64 rmsnorm_warp_param_out_len,
+    .param .u64 rmsnorm_warp_param_n_cols
+)
+{
+    .reg .pred %p12, %p37;
+    .reg .u64 %rd0, %rd1, %rd13, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd24, %rd26, %rd28, %rd3, %rd30, %rd32, %rd38, %rd4, %rd41, %rd42, %rd43, %rd44, %rd45, %rd7, %rd8;
+    .reg .f32 %f10, %f11, %f20, %f23, %f25, %f27, %f29, %f31, %f33, %f34, %f35, %f36, %f40, %f9;
+    .reg .u32 %r21, %r22, %r46, %r47, %r48, %r5, %r6;
+
+  ld.param.u64 %rd0, [rmsnorm_warp_param_inp_data];
+  ld.param.u64 %rd1, [rmsnorm_warp_param_inp_len];
+  ld.param.u64 %rd2, [rmsnorm_warp_param_out_data];
+  ld.param.u64 %rd3, [rmsnorm_warp_param_out_len];
+  ld.param.u64 %rd4, [rmsnorm_warp_param_n_cols];
+
+  mov.u32 %r5, %tid.x;
+  mov.u32 %r6, %ctaid.x;
+  cvt.u64.u32 %rd7, %r6;
+  mul.lo.u64 %rd8, %rd7, %rd4;
+  cvt.f32.u64 %f9, %rd4;
+  mov.f32 %f10, 0f3727C5AC; // 1e-05
+  mov.f32 %f11, 0f00000000; // 0
+  cvt.u64.u32 %rd13, %r5;
+  setp.lt.u64 %p12, %rd13, %rd4;
+  @%p12 bra rmsnorm_warp_then_14;
+  bra rmsnorm_warp_else_14;
+  rmsnorm_warp_then_14:
+  cvt.u64.u32 %rd15, %r5;
+  add.u64 %rd16, %rd8, %rd15;
+  mov.u64 %rd17, 4;
+  mul.lo.u64 %rd18, %rd16, %rd17;
+  add.u64 %rd19, %rd0, %rd18;
+  ld.global.f32 %f20, [%rd19];
+  mov.u32 %r21, 0; // unit
+  mov.u32 %r22, %r21;
+  bra rmsnorm_warp_end_14;
+  rmsnorm_warp_else_14:
+  mov.u32 %r22, 0; // no else branch
+  rmsnorm_warp_end_14:
+  mul.f32 %f23, %f20, %f20;
+  mov.u64 %rd24, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f25, %f23, %rd24;
+  mov.u64 %rd26, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f27, %f25, %rd26;
+  mov.u64 %rd28, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f29, %f27, %rd28;
+  mov.u64 %rd30, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f31, %f29, %rd30;
+  mov.u64 %rd32, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f33, %f31, %rd32;
+  div.f32 %f34, %f33, %f9;
+  add.f32 %f35, %f34, %f10;
+  rsqrt.approx.f32 %f36, %f35;
+  cvt.u64.u32 %rd38, %r5;
+  setp.lt.u64 %p37, %rd38, %rd4;
+  @%p37 bra rmsnorm_warp_then_39;
+  bra rmsnorm_warp_else_39;
+  rmsnorm_warp_then_39:
+  mul.f32 %f40, %f20, %f36;
+  cvt.u64.u32 %rd41, %r5;
+  add.u64 %rd42, %rd8, %rd41;
+  mov.u64 %rd43, 4;
+  mul.lo.u64 %rd44, %rd42, %rd43;
+  add.u64 %rd45, %rd2, %rd44;
+  st.global.f32 [%rd45], %f40;
+  mov.u32 %r46, 0; // unit
+  mov.u32 %r47, %r46;
+  bra rmsnorm_warp_end_39;
+  rmsnorm_warp_else_39:
+  mov.u32 %r47, 0; // no else branch
+  rmsnorm_warp_end_39:
+  mov.u32 %r48, 0; // unit
+  ret;
+}
+

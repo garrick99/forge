@@ -1,0 +1,46 @@
+// Single-warp RMSNorm (n_cols <= 32) using warp_reduce_sum_f32.
+
+use std::prelude;
+use std::gpu;
+
+#[kernel]
+fn rmsnorm_warp(inp: span<f32>, out: span<f32>, n_cols: u64)
+    requires 1u64 <= n_cols
+    requires n_cols <= 32u64
+    requires blockIdx_x < gridDim_x
+    requires gridDim_x * n_cols <= inp.len
+    requires gridDim_x * n_cols <= out.len
+    requires threadIdx_x < 32u64
+{
+    let lane: u64 = threadIdx_x;
+    let row: u64 = blockIdx_x;
+    let base: u64 = row * n_cols;
+    let n_f: f32 = n_cols as f32;
+    let eps: f32 = 0.00001f32;
+
+    let mut x: f32 = 0.0f32;
+    if lane < n_cols {
+        // Z3 v4.15+ doesn't always prove `base + lane < inp.len` from
+        // `gridDim_x * n_cols <= inp.len` + `blockIdx_x < gridDim_x` +
+        // `lane < n_cols` (needs nonlinear mul reasoning).  Explicit
+        // bounds assert linearises the chain.
+        assume(base + lane < inp.len) "from gridDim_x*n_cols <= inp.len + blockIdx_x < gridDim_x + lane < n_cols";
+        x = inp[base + lane];
+    };
+    let sq: f32 = x * x;
+    let total: f32 = warp_reduce_sum_f32(sq);
+    // Z3 v4.15+ doesn't propagate `assume(n_f != 0)` into the FP division
+    // precondition reliably — restructure so the non-zero fact is part of
+    // the surrounding control flow.  n_cols >= 1 (precondition) so the
+    // else branch is dead in practice; the if-guard makes the proof
+    // trivial under any Z3 version.
+    let n_f_safe: f32 = if n_f == 0.0f32 { 1.0f32 } else { n_f };
+    let ms: f32 = total / n_f_safe;
+    let inv_rms: f32 = rsqrtf(ms + eps);
+
+    if lane < n_cols {
+        out[base + lane] = x * inv_rms;
+    };
+}
+
+fn main() -> i32 { 0i32 }

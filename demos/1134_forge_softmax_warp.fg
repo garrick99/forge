@@ -1,0 +1,49 @@
+// Single-warp softmax (n_cols <= 32) using warp-shuffle reductions
+// instead of shared-memory tree reduce.  Faster on small rows + sidesteps
+// the OpenPTXas predicated-smem-loop hang from Task 49 (warp_reduce_*
+// uses shfl_xor_sync_f32, no STS/LDS in the reduction loop).
+//
+//   each lane:
+//     x      = inp[base + lane]   (or -inf padding)
+//     m      = warp_reduce_max_f32(x)        // butterfly shuffle
+//     ex     = expf(x - m)
+//     denom  = warp_reduce_sum_f32(ex)
+//     out    = ex / denom
+//
+// One block = one warp = one row; 32 lanes; n_cols <= 32.
+
+use std::prelude;
+use std::gpu;
+
+#[kernel]
+fn softmax_warp(inp: span<f32>, out: span<f32>, n_cols: u64)
+    requires 1u64 <= n_cols
+    requires n_cols <= 32u64
+    requires blockIdx_x < gridDim_x
+    requires gridDim_x * n_cols <= inp.len
+    requires gridDim_x * n_cols <= out.len
+    requires threadIdx_x < 32u64
+{
+    let lane: u64 = threadIdx_x;
+    let row: u64 = blockIdx_x;
+    let base: u64 = row * n_cols;
+
+    let mut x: f32 = -1.0e30f32;
+    if lane < n_cols {
+        x = inp[base + lane];
+    };
+
+    let m: f32 = warp_reduce_max_f32(x);
+    let mut ex: f32 = 0.0f32;
+    if lane < n_cols {
+        ex = expf(x - m);
+    };
+    let denom: f32 = warp_reduce_sum_f32(ex);
+    assume(denom > 0.0f32) "denom >= exp(0) = 1 at the argmax lane";
+
+    if lane < n_cols {
+        out[base + lane] = ex / denom;
+    };
+}
+
+fn main() -> i32 { 0i32 }

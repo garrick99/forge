@@ -1,0 +1,22 @@
+// Elementwise GELU with BF16 storage, f32 compute.  Mirror of 1129.
+
+use std::prelude;
+use std::fp16;
+
+#[kernel]
+fn gelu_bf16(inp: span<u16>, out: span<u16>, n: u64)
+    requires n <= inp.len
+    requires n <= out.len
+    requires blockIdx_x < gridDim_x
+{
+    let gid: u64 = blockIdx_x * (blockDim_x as u64) + (threadIdx_x as u64);
+    if gid < n {
+        let x: f32 = bf16_to_f32(inp[gid]);
+        let x3: f32 = x * x * x;
+        let inner: f32 = 0.7978845608f32 * (x + 0.044715f32 * x3);
+        let t: f32 = tanhf(inner);
+        out[gid] = f32_to_bf16(0.5f32 * x * (1.0f32 + t));
+    };
+}
+
+fn main() -> i32 { 0i32 }

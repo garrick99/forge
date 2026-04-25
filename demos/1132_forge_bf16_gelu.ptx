@@ -1,0 +1,72 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry gelu_bf16(
+    .param .u64 gelu_bf16_param_inp_data,
+    .param .u64 gelu_bf16_param_inp_len,
+    .param .u64 gelu_bf16_param_out_data,
+    .param .u64 gelu_bf16_param_out_len,
+    .param .u64 gelu_bf16_param_n
+)
+{
+    .reg .u16 %rs18, %rs33;
+    .reg .pred %p13;
+    .reg .u64 %rd0, %rd1, %rd11, %rd12, %rd15, %rd16, %rd17, %rd2, %rd3, %rd34, %rd35, %rd36, %rd4, %rd7, %rd8, %rd9;
+    .reg .f32 %f19, %f20, %f21, %f22, %f23, %f24, %f25, %f26, %f27, %f28, %f29, %f30, %f31, %f32;
+    .reg .u32 %r10, %r37, %r38, %r39, %r5, %r6;
+
+  ld.param.u64 %rd0, [gelu_bf16_param_inp_data];
+  ld.param.u64 %rd1, [gelu_bf16_param_inp_len];
+  ld.param.u64 %rd2, [gelu_bf16_param_out_data];
+  ld.param.u64 %rd3, [gelu_bf16_param_out_len];
+  ld.param.u64 %rd4, [gelu_bf16_param_n];
+
+  mov.u32 %r5, %ctaid.x;
+  mov.u32 %r6, %ntid.x;
+  cvt.u64.u32 %rd7, %r6;
+  cvt.u64.u32 %rd8, %r5;
+  mul.lo.u64 %rd9, %rd8, %rd7;
+  mov.u32 %r10, %tid.x;
+  cvt.u64.u32 %rd11, %r10;
+  add.u64 %rd12, %rd9, %rd11;
+  setp.lt.u64 %p13, %rd12, %rd4;
+  @%p13 bra gelu_bf16_then_14;
+  bra gelu_bf16_else_14;
+  gelu_bf16_then_14:
+  mov.u64 %rd15, 2;
+  mul.lo.u64 %rd16, %rd12, %rd15;
+  add.u64 %rd17, %rd0, %rd16;
+  ld.global.u16 %rs18, [%rd17];
+  cvt.f32.bf16 %f19, %rs18;
+  mul.f32 %f20, %f19, %f19;
+  mul.f32 %f21, %f20, %f19;
+  mov.f32 %f22, 0f3F4C422A; // 0.797885
+  mov.f32 %f23, 0f3D372713; // 0.044715
+  mul.f32 %f24, %f23, %f21;
+  add.f32 %f25, %f19, %f24;
+  mul.f32 %f26, %f22, %f25;
+  tanh.approx.f32 %f27, %f26;
+  mov.f32 %f28, 0f3F000000; // 0.5
+  mul.f32 %f29, %f28, %f19;
+  mov.f32 %f30, 0f3F800000; // 1
+  add.f32 %f31, %f30, %f27;
+  mul.f32 %f32, %f29, %f31;
+  cvt.rn.bf16.f32 %rs33, %f32;
+  mov.u64 %rd34, 2;
+  mul.lo.u64 %rd35, %rd12, %rd34;
+  add.u64 %rd36, %rd2, %rd35;
+  st.global.u16 [%rd36], %rs33;
+  mov.u32 %r37, 0; // unit
+  mov.u32 %r38, %r37;
+  bra gelu_bf16_end_14;
+  gelu_bf16_else_14:
+  mov.u32 %r38, 0; // no else branch
+  gelu_bf16_end_14:
+  mov.u32 %r39, 0; // unit
+  ret;
+}
+
