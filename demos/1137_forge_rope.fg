@@ -1,0 +1,64 @@
+// Rotary Position Embedding (RoPE), Forge-native.
+//
+// For each token at position p and each consecutive pair (x_{2i}, x_{2i+1})
+// in the head dimension d:
+//
+//   theta_i = p * base ^ (-2i/d)    where base = 10000.0
+//   x'_{2i}     =  x_{2i} * cos(theta_i) - x_{2i+1} * sin(theta_i)
+//   x'_{2i+1}   =  x_{2i} * sin(theta_i) + x_{2i+1} * cos(theta_i)
+//
+// One thread per pair: thread `lane` handles dimension indices 2*lane and
+// 2*lane+1 of one token's head.  blockIdx_x indexes the token (position),
+// blockDim_x = d/2 = 16 (here we fix d=32, matches 1136 FlashAttention).
+//
+// Used in LLaMA / GPT-NeoX / Phi / Qwen attention.  Standard f32 ops
+// plus sin.approx.f32 / cos.approx.f32 (FORGE83 PTX intrinsics).
+
+use std::prelude;
+
+#[kernel]
+fn rope_rotate(
+    inp: span<f32>, out: span<f32>, seq_len: u64
+)
+    requires seq_len <= 4096u64
+    requires seq_len * 32u64 <= inp.len
+    requires seq_len * 32u64 <= out.len
+    requires blockIdx_x < gridDim_x
+    requires blockIdx_x < seq_len
+    requires threadIdx_x < 16u64
+{
+    let lane: u64 = threadIdx_x;        // 0..15  (handles pair (2*lane, 2*lane+1))
+    let pos: u64 = blockIdx_x;          // token position in [0, seq_len)
+    let base: u64 = pos * 32u64;        // start of this token's head in inp/out
+
+    // theta_i = pos * base ^ (-2 * lane / d) with d=32, base=10000
+    //         = pos * exp(-2*lane/32 * ln(10000))
+    //         = pos * exp(-lane/16 * 9.210340371976184)
+    let lane_f: f32 = lane as f32;
+    let pos_f: f32 = pos as f32;
+    let exponent: f32 = 0.0f32 - (lane_f * 0.5756462732485115f32);  // = -lane / 16 * ln(10000)
+    let freq: f32 = expf(exponent);
+    let theta: f32 = pos_f * freq;
+    let c: f32 = cosf(theta);
+    let s: f32 = sinf(theta);
+
+    // Load the pair (x_even, x_odd).
+    let idx_e: u64 = base + lane * 2u64;
+    let idx_o: u64 = base + lane * 2u64 + 1u64;
+    assume(idx_e < inp.len) "pos<seq_len + lane<16 + seq_len*32<=inp.len → idx_e<inp.len";
+    assume(idx_o < inp.len) "same chain (idx_o = idx_e + 1 < base + 32)";
+    let x_e: f32 = inp[idx_e];
+    let x_o: f32 = inp[idx_o];
+
+    // Rotate.
+    let y_e: f32 = x_e * c - x_o * s;
+    let y_o: f32 = x_e * s + x_o * c;
+
+    // Store back.
+    assume(idx_e < out.len) "mirrors inp bounds";
+    assume(idx_o < out.len) "mirrors inp bounds";
+    out[idx_e] = y_e;
+    out[idx_o] = y_o;
+}
+
+fn main() -> i32 { 0i32 }

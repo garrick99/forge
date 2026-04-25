@@ -807,6 +807,22 @@ let rec lower_expr st e : string =
       emit st (Printf.sprintf "tanh.approx.f32 %s, %s;" result rx);
       result
 
+  (* FORGE83: sinf(x) → sin.approx.f32(x), cosf(x) → cos.approx.f32(x).
+     Single SFU instructions.  Used in RoPE / position-encoding kernels. *)
+  | ECall ({ expr_desc = EVar id; _ }, [arg])
+      when id.name = "sinf" ->
+      let rx = lower_expr st arg in
+      let result = fresh_reg st F32 in
+      emit st (Printf.sprintf "sin.approx.f32 %s, %s;" result rx);
+      result
+
+  | ECall ({ expr_desc = EVar id; _ }, [arg])
+      when id.name = "cosf" ->
+      let rx = lower_expr st arg in
+      let result = fresh_reg st F32 in
+      emit st (Printf.sprintf "cos.approx.f32 %s, %s;" result rx);
+      result
+
   (* FORGE73: rsqrtf(x) → rsqrt.approx.f32(x).  Single hardware instruction. *)
   | ECall ({ expr_desc = EVar id; _ }, [arg])
       when id.name = "rsqrtf" ->

@@ -1,0 +1,81 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry rope_rotate(
+    .param .u64 rope_rotate_param_inp_data,
+    .param .u64 rope_rotate_param_inp_len,
+    .param .u64 rope_rotate_param_out_data,
+    .param .u64 rope_rotate_param_out_len,
+    .param .u64 rope_rotate_param_seq_len
+)
+{
+    .reg .u64 %rd0, %rd1, %rd2, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd29, %rd3, %rd30, %rd33, %rd34, %rd35, %rd37, %rd38, %rd39, %rd4, %rd49, %rd50, %rd51, %rd52, %rd53, %rd54, %rd7, %rd8, %rd9;
+    .reg .f32 %f10, %f11, %f12, %f13, %f14, %f15, %f16, %f17, %f18, %f19, %f20, %f36, %f40, %f41, %f42, %f43, %f44, %f45, %f46;
+    .reg .u32 %r31, %r32, %r47, %r48, %r5, %r55, %r6;
+
+  ld.param.u64 %rd0, [rope_rotate_param_inp_data];
+  ld.param.u64 %rd1, [rope_rotate_param_inp_len];
+  ld.param.u64 %rd2, [rope_rotate_param_out_data];
+  ld.param.u64 %rd3, [rope_rotate_param_out_len];
+  ld.param.u64 %rd4, [rope_rotate_param_seq_len];
+
+  mov.u32 %r5, %tid.x;
+  mov.u32 %r6, %ctaid.x;
+  mov.u64 %rd7, 32;
+  cvt.u64.u32 %rd8, %r6;
+  mul.lo.u64 %rd9, %rd8, %rd7;
+  cvt.f32.u64 %f10, %r5;
+  cvt.f32.u64 %f11, %r6;
+  mov.f32 %f12, 0f00000000; // 0
+  mov.f32 %f13, 0f3F135D8E; // 0.575646
+  mul.f32 %f14, %f10, %f13;
+  sub.f32 %f15, %f12, %f14;
+  mul.rn.f32 %f16, %f15, 0f3FB8AA3B; // log2(e)
+  ex2.approx.f32 %f17, %f16;
+  mul.f32 %f18, %f11, %f17;
+  cos.approx.f32 %f19, %f18;
+  sin.approx.f32 %f20, %f18;
+  mov.u64 %rd21, 2;
+  cvt.u64.u32 %rd22, %r5;
+  mul.lo.u64 %rd23, %rd22, %rd21;
+  add.u64 %rd24, %rd9, %rd23;
+  mov.u64 %rd25, 2;
+  cvt.u64.u32 %rd26, %r5;
+  mul.lo.u64 %rd27, %rd26, %rd25;
+  add.u64 %rd28, %rd9, %rd27;
+  mov.u64 %rd29, 1;
+  add.u64 %rd30, %rd28, %rd29;
+  mov.u32 %r31, 0; // proof/assume erased
+  mov.u32 %r32, 0; // proof/assume erased
+  mov.u64 %rd33, 4;
+  mul.lo.u64 %rd34, %rd24, %rd33;
+  add.u64 %rd35, %rd0, %rd34;
+  ld.global.f32 %f36, [%rd35];
+  mov.u64 %rd37, 4;
+  mul.lo.u64 %rd38, %rd30, %rd37;
+  add.u64 %rd39, %rd0, %rd38;
+  ld.global.f32 %f40, [%rd39];
+  mul.f32 %f41, %f36, %f19;
+  mul.f32 %f42, %f40, %f20;
+  sub.f32 %f43, %f41, %f42;
+  mul.f32 %f44, %f36, %f20;
+  mul.f32 %f45, %f40, %f19;
+  add.f32 %f46, %f44, %f45;
+  mov.u32 %r47, 0; // proof/assume erased
+  mov.u32 %r48, 0; // proof/assume erased
+  mov.u64 %rd49, 4;
+  mul.lo.u64 %rd50, %rd24, %rd49;
+  add.u64 %rd51, %rd2, %rd50;
+  st.global.f32 [%rd51], %f43;
+  mov.u64 %rd52, 4;
+  mul.lo.u64 %rd53, %rd30, %rd52;
+  add.u64 %rd54, %rd2, %rd53;
+  st.global.f32 [%rd54], %f46;
+  mov.u32 %r55, 0; // unit
+  ret;
+}
+
