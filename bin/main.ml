@@ -114,13 +114,29 @@ let rec load_module base_dir (path_parts : Ast.ident list) =
     resolve_uses dir prog.Ast.prog_items
   end
 
+(* Drop stdlib-style `fn main() -> u64 { 0u64 }` stubs from modules
+   brought in via `use`. Every std/*.fg carries such a stub so each file
+   builds standalone, but splicing N modules' mains into the user's
+   program produces N duplicate `int main()` emits. The user's OWN main
+   is not loaded through this path (it comes from the top-level file),
+   so it survives. Filtering here is safer than filtering at emit time:
+   a user who *does* want a module's main (e.g. a test harness) can
+   reach it by parsing that file as the top-level instead of `use`-ing it. *)
+and is_stub_main (item : Ast.item) =
+  match item.Ast.item_desc with
+  | Ast.IFn fn -> fn.fn_name.name = "main"
+  | _ -> false
+
 (* Expand IUse items by splicing in the referred file's items. *)
 and resolve_uses base_dir items =
   List.concat_map (fun (item : Ast.item) ->
     match item.Ast.item_desc with
     | Ast.IUse path_parts ->
-        (* Replace the IUse node with the included file's items *)
+        (* Replace the IUse node with the included file's items,
+           minus any stub `fn main` the stdlib module carries for
+           standalone-buildability. *)
         load_module base_dir path_parts
+        |> List.filter (fun it -> not (is_stub_main it))
     | _ -> [item]
   ) items
 
@@ -128,7 +144,7 @@ and resolve_uses base_dir items =
 (* Compile pipeline                                                     *)
 (* ------------------------------------------------------------------ *)
 
-let compile path emit_code =
+let compile ?(lib_mode=false) path emit_code =
   Printf.printf "[forge] %s\n%!" path;
   loaded_files := [];            (* reset module cycle tracker *)
   Codegen_c.reset_codegen_state (); (* reset enum registries (may be stale from check-only mode) *)
@@ -138,9 +154,18 @@ let compile path emit_code =
   let raw = parse_file path in
   let base_dir = Filename.dirname path in
   let resolved_items = resolve_uses base_dir raw.Ast.prog_items in
+  (* Library-mode emit: drop any user-written `fn main` too. `resolve_uses`
+     already drops stdlib stub mains; this removes the top-level file's
+     main so the emitted C is clean for `#include`-style integration into
+     a larger build (e.g., a Rust binary that owns the real entry point). *)
+  let resolved_items =
+    if lib_mode
+    then List.filter (fun it -> not (is_stub_main it)) resolved_items
+    else resolved_items in
   let prog = { raw with Ast.prog_items = resolved_items } in
-  Printf.printf "[forge] parsed %d top-level items\n%!"
-    (List.length prog.Ast.prog_items);
+  Printf.printf "[forge] parsed %d top-level items%s\n%!"
+    (List.length prog.Ast.prog_items)
+    (if lib_mode then " (lib mode — main elided)" else "");
 
   (* 2. Type check + generate proof obligations *)
   Printf.printf "[forge] type checking...\n%!";
@@ -382,6 +407,8 @@ let () =
       Printf.printf "  Z3 SMT backend (Tier 1 automatic)\n";
       Printf.printf "  Target: C99\n"
   | ["build"; path]  -> compile path true
+  | ["build-lib"; path]
+                     -> compile ~lib_mode:true path true
   | ["cuda"; path]   -> compile_cuda path
   | ["check"; path]  -> compile path false
   | ["audit"; path]  -> audit path

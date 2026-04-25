@@ -81,7 +81,6 @@ __device__ float warp_reduce_max_f32(float val __attribute__((unused)));
 __device__ float warp_reduce_min_f32(float val __attribute__((unused)));
 uint64_t grid_stride_start(uint64_t block_idx __attribute__((unused)), uint64_t block_dim __attribute__((unused)), uint64_t thread_idx __attribute__((unused)));
 uint64_t grid_stride_step(uint64_t block_dim __attribute__((unused)), uint64_t grid_dim __attribute__((unused)));
-int main();
 uint32_t m31_add(uint32_t a __attribute__((unused)), uint32_t b __attribute__((unused)));
 uint32_t m31_sub(uint32_t a __attribute__((unused)), uint32_t b __attribute__((unused)));
 uint32_t m31_mul(uint32_t a __attribute__((unused)), uint32_t b __attribute__((unused)));
@@ -105,10 +104,8 @@ uint32_t qm31_sub_re_re(uint32_t a __attribute__((unused)), uint32_t b __attribu
 uint32_t qm31_sub_re_im(uint32_t a __attribute__((unused)), uint32_t b __attribute__((unused)));
 uint32_t qm31_sub_im_re(uint32_t a __attribute__((unused)), uint32_t b __attribute__((unused)));
 uint32_t qm31_sub_im_im(uint32_t a __attribute__((unused)), uint32_t b __attribute__((unused)));
-int main();
 __device__ uint32_t reduce_word(uint32_t v __attribute__((unused)));
 __global__ void reduce_words_to_m31(forge_span_u32_t data __attribute__((unused)), uint64_t n_words __attribute__((unused)));
-int main();
 
 __device__ uint64_t warp_reduce_sum(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
@@ -258,11 +255,6 @@ uint64_t grid_stride_step(uint64_t block_dim __attribute__((unused)), uint64_t g
   return (block_dim * grid_dim);
 }
 
-int main() {
-  return (int)(0ULL);
-
-}
-
 uint32_t m31_add(uint32_t a __attribute__((unused)), uint32_t b __attribute__((unused))) {
   uint64_t s __attribute__((unused)) = (((uint64_t)a) + ((uint64_t)b));
   uint64_t p __attribute__((unused)) = ((uint64_t)M31_P);
@@ -395,11 +387,6 @@ uint32_t qm31_sub_im_im(uint32_t a __attribute__((unused)), uint32_t b __attribu
   return m31_sub(a, b);
 }
 
-int main() {
-  return (int)(0ULL);
-
-}
-
 __device__ uint32_t reduce_word(uint32_t v __attribute__((unused))) {
   uint32_t lo __attribute__((unused)) = (v & M31_P);
   uint32_t hi __attribute__((unused)) = (v >> 31ULL);
@@ -418,10 +405,5 @@ __global__ void reduce_words_to_m31(forge_span_u32_t data __attribute__((unused)
     data.data[tid] = reduce_word(v);
 
   }
-}
-
-int main() {
-  return (int)(0ULL);
-
 }
 
