@@ -59,6 +59,7 @@ extern fn warp_id() -> u64 = "forge_gpu";
 
 // Warp-level sum reduction using butterfly shuffle.
 // Reduces 32 values (one per lane) to a single sum in lane 0.
+#[device]
 fn warp_reduce_sum(val: u64) -> u64 {
     let mut v: u64 = val;
     v = v + shfl_xor_sync(v, 16u64, 32u64);
@@ -70,6 +71,7 @@ fn warp_reduce_sum(val: u64) -> u64 {
 }
 
 // Warp-level max reduction.
+#[device]
 fn warp_reduce_max(val: u64) -> u64 {
     let mut v: u64 = val;
     let mut s: u64 = shfl_xor_sync(v, 16u64, 32u64);
@@ -86,6 +88,7 @@ fn warp_reduce_max(val: u64) -> u64 {
 }
 
 // Warp-level min reduction.
+#[device]
 fn warp_reduce_min(val: u64) -> u64 {
     let mut v: u64 = val;
     let mut s: u64 = shfl_xor_sync(v, 16u64, 32u64);
@@ -115,6 +118,7 @@ extern fn shfl_down_sync_f32(val: f32, delta: u64, width: u64) -> f32 = "forge_g
 // Butterfly reduction over a warp (32 lanes); each lane ends up holding the
 // reduced value (sum / max / min of all 32 input values).
 
+#[device]
 fn warp_reduce_sum_f32(val: f32) -> f32 {
     let mut v: f32 = val;
     v = v + shfl_xor_sync_f32(v, 16u64, 32u64);
@@ -125,6 +129,7 @@ fn warp_reduce_sum_f32(val: f32) -> f32 {
     v
 }
 
+#[device]
 fn warp_reduce_max_f32(val: f32) -> f32 {
     let mut v: f32 = val;
     let mut s: f32 = shfl_xor_sync_f32(v, 16u64, 32u64);
@@ -140,6 +145,7 @@ fn warp_reduce_max_f32(val: f32) -> f32 {
     v
 }
 
+#[device]
 fn warp_reduce_min_f32(val: f32) -> f32 {
     let mut v: f32 = val;
     let mut s: f32 = shfl_xor_sync_f32(v, 16u64, 32u64);

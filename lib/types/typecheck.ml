@@ -99,6 +99,15 @@ let env_lookup_fn env name =
 let env_add_fn env name sig_ =
   { env with fns = (name, sig_) :: env.fns }
 
+(* Like env_add_fn, but a no-op if the name is already registered. Used for
+   GPU-intrinsic injection in #[kernel] / #[device] contexts: the fallback
+   signature should not override a user's `extern fn` (typically from
+   `use std::gpu;`) which may carry more-precise argument types. *)
+let env_add_fn_if_missing env name sig_ =
+  match List.assoc_opt name env.fns with
+  | Some _ -> env
+  | None -> env_add_fn env name sig_
+
 let env_add_fact env pred =
   { env with proof_ctx = ctx_add_assume env.proof_ctx pred }
 
@@ -3354,102 +3363,102 @@ let check_fn env fn =
       let u64 = TPrim (TUint U64) in
       let _f32 = TPrim (TFloat F32) in
       (* Warp shuffles: shfl_down_sync(val, delta, width) -> val *)
-      let e = env_add_fn e "shfl_down_sync"
+      let e = env_add_fn_if_missing e "shfl_down_sync"
         (gpu_fn "shfl_down_sync" [mk_p "val" u32; mk_p "delta" u32; mk_p "width" u32] u32) in
-      let e = env_add_fn e "shfl_xor_sync"
+      let e = env_add_fn_if_missing e "shfl_xor_sync"
         (gpu_fn "shfl_xor_sync" [mk_p "val" u32; mk_p "mask" u32; mk_p "width" u32] u32) in
-      let e = env_add_fn e "shfl_up_sync"
+      let e = env_add_fn_if_missing e "shfl_up_sync"
         (gpu_fn "shfl_up_sync" [mk_p "val" u32; mk_p "delta" u32; mk_p "width" u32] u32) in
       (* Atomics: atom_add(ptr, val) -> old *)
-      let e = env_add_fn e "atom_add"
+      let e = env_add_fn_if_missing e "atom_add"
         (gpu_fn "atom_add" [mk_p "ptr" (TRaw u64); mk_p "val" u64] u64) in
-      let e = env_add_fn e "atom_cas"
+      let e = env_add_fn_if_missing e "atom_cas"
         (gpu_fn "atom_cas" [mk_p "ptr" (TRaw u64); mk_p "val" u64] u64) in
-      let e = env_add_fn e "atom_max"
+      let e = env_add_fn_if_missing e "atom_max"
         (gpu_fn "atom_max" [mk_p "ptr" (TRaw u64); mk_p "val" u64] u64) in
-      let e = env_add_fn e "atom_min"
+      let e = env_add_fn_if_missing e "atom_min"
         (gpu_fn "atom_min" [mk_p "ptr" (TRaw u64); mk_p "val" u64] u64) in
-      let e = env_add_fn e "atom_or"
+      let e = env_add_fn_if_missing e "atom_or"
         (gpu_fn "atom_or" [mk_p "ptr" (TRaw u64); mk_p "val" u64] u64) in
-      let e = env_add_fn e "atom_xor"
+      let e = env_add_fn_if_missing e "atom_xor"
         (gpu_fn "atom_xor" [mk_p "ptr" (TRaw u64); mk_p "val" u64] u64) in
-      let e = env_add_fn e "atom_and"
+      let e = env_add_fn_if_missing e "atom_and"
         (gpu_fn "atom_and" [mk_p "ptr" (TRaw u64); mk_p "val" u64] u64) in
-      let e = env_add_fn e "atom_sub"
+      let e = env_add_fn_if_missing e "atom_sub"
         (gpu_fn "atom_sub" [mk_p "ptr" (TRaw u64); mk_p "val" u64] u64) in
-      let e = env_add_fn e "atom_exch"
+      let e = env_add_fn_if_missing e "atom_exch"
         (gpu_fn "atom_exch" [mk_p "ptr" (TRaw u64); mk_p "val" u64] u64) in
       (* Warp vote *)
-      let e = env_add_fn e "ballot_sync"
+      let e = env_add_fn_if_missing e "ballot_sync"
         (gpu_fn "ballot_sync" [mk_p "pred" u64] u32) in
       (* Lane/warp ID *)
-      let e = env_add_fn e "lane_id"
+      let e = env_add_fn_if_missing e "lane_id"
         (gpu_fn "lane_id" [] u32) in
-      let e = env_add_fn e "warp_id"
+      let e = env_add_fn_if_missing e "warp_id"
         (gpu_fn "warp_id" [] u32) in
       (* Memory fences *)
       let unit_ty = TPrim TUnit in
-      let e = env_add_fn e "threadfence"
+      let e = env_add_fn_if_missing e "threadfence"
         (gpu_fn "threadfence" [] unit_ty) in
-      let e = env_add_fn e "threadfence_block"
+      let e = env_add_fn_if_missing e "threadfence_block"
         (gpu_fn "threadfence_block" [] unit_ty) in
-      let e = env_add_fn e "threadfence_system"
+      let e = env_add_fn_if_missing e "threadfence_system"
         (gpu_fn "threadfence_system" [] unit_ty) in
       (* Async copy (SM_80+) *)
       let u8 = TPrim (TUint U8) in
-      let e = env_add_fn e "cp_async_cg"
+      let e = env_add_fn_if_missing e "cp_async_cg"
         (gpu_fn "cp_async_cg" [mk_p "dst" (TRaw u8); mk_p "src" (TRaw u8); mk_p "bytes" u64] unit_ty) in
-      let e = env_add_fn e "cp_async_commit"
+      let e = env_add_fn_if_missing e "cp_async_commit"
         (gpu_fn "cp_async_commit" [] unit_ty) in
-      let e = env_add_fn e "cp_async_wait_group"
+      let e = env_add_fn_if_missing e "cp_async_wait_group"
         (gpu_fn "cp_async_wait_group" [mk_p "n" u64] unit_ty) in
       (* Cooperative groups (SM_90+) *)
-      let e = env_add_fn e "cluster_sync"
+      let e = env_add_fn_if_missing e "cluster_sync"
         (gpu_fn "cluster_sync" [] unit_ty) in
-      let e = env_add_fn e "cluster_dim_x"
+      let e = env_add_fn_if_missing e "cluster_dim_x"
         (gpu_fn "cluster_dim_x" [] u64) in
-      let e = env_add_fn e "cluster_rank"
+      let e = env_add_fn_if_missing e "cluster_rank"
         (gpu_fn "cluster_rank" [] u64) in
-      let e = env_add_fn e "cluster_map_shared"
+      let e = env_add_fn_if_missing e "cluster_map_shared"
         (gpu_fn "cluster_map_shared" [mk_p "ptr" (TRaw u8); mk_p "rank" u64] (TRaw u8)) in
       (* FP16/BF16 conversions *)
       let u16 = TPrim (TUint U16) in
       let f32 = TPrim (TFloat F32) in
-      let e = env_add_fn e "f32_to_fp16"
+      let e = env_add_fn_if_missing e "f32_to_fp16"
         (gpu_fn "f32_to_fp16" [mk_p "x" f32] u16) in
-      let e = env_add_fn e "fp16_to_f32"
+      let e = env_add_fn_if_missing e "fp16_to_f32"
         (gpu_fn "fp16_to_f32" [mk_p "x" u16] f32) in
-      let e = env_add_fn e "f32_to_bf16"
+      let e = env_add_fn_if_missing e "f32_to_bf16"
         (gpu_fn "f32_to_bf16" [mk_p "x" f32] u16) in
-      let e = env_add_fn e "bf16_to_f32"
+      let e = env_add_fn_if_missing e "bf16_to_f32"
         (gpu_fn "bf16_to_f32" [mk_p "x" u16] f32) in
       (* FP16 arithmetic *)
-      let e = env_add_fn e "fp16_add"
+      let e = env_add_fn_if_missing e "fp16_add"
         (gpu_fn "fp16_add" [mk_p "a" u16; mk_p "b" u16] u16) in
-      let e = env_add_fn e "fp16_sub"
+      let e = env_add_fn_if_missing e "fp16_sub"
         (gpu_fn "fp16_sub" [mk_p "a" u16; mk_p "b" u16] u16) in
-      let e = env_add_fn e "fp16_mul"
+      let e = env_add_fn_if_missing e "fp16_mul"
         (gpu_fn "fp16_mul" [mk_p "a" u16; mk_p "b" u16] u16) in
-      let e = env_add_fn e "fp16_fma"
+      let e = env_add_fn_if_missing e "fp16_fma"
         (gpu_fn "fp16_fma" [mk_p "a" u16; mk_p "b" u16; mk_p "c" u16] u16) in
-      let e = env_add_fn e "fp16_neg"
+      let e = env_add_fn_if_missing e "fp16_neg"
         (gpu_fn "fp16_neg" [mk_p "a" u16] u16) in
-      let e = env_add_fn e "fp16_abs"
+      let e = env_add_fn_if_missing e "fp16_abs"
         (gpu_fn "fp16_abs" [mk_p "a" u16] u16) in
-      let e = env_add_fn e "fp16_max"
+      let e = env_add_fn_if_missing e "fp16_max"
         (gpu_fn "fp16_max" [mk_p "a" u16; mk_p "b" u16] u16) in
-      let e = env_add_fn e "fp16_min"
+      let e = env_add_fn_if_missing e "fp16_min"
         (gpu_fn "fp16_min" [mk_p "a" u16; mk_p "b" u16] u16) in
       (* BF16 arithmetic *)
-      let e = env_add_fn e "bf16_add"
+      let e = env_add_fn_if_missing e "bf16_add"
         (gpu_fn "bf16_add" [mk_p "a" u16; mk_p "b" u16] u16) in
-      let e = env_add_fn e "bf16_sub"
+      let e = env_add_fn_if_missing e "bf16_sub"
         (gpu_fn "bf16_sub" [mk_p "a" u16; mk_p "b" u16] u16) in
-      let e = env_add_fn e "bf16_mul"
+      let e = env_add_fn_if_missing e "bf16_mul"
         (gpu_fn "bf16_mul" [mk_p "a" u16; mk_p "b" u16] u16) in
-      let e = env_add_fn e "bf16_fma"
+      let e = env_add_fn_if_missing e "bf16_fma"
         (gpu_fn "bf16_fma" [mk_p "a" u16; mk_p "b" u16; mk_p "c" u16] u16) in
-      let e = env_add_fn e "bf16_neg"
+      let e = env_add_fn_if_missing e "bf16_neg"
         (gpu_fn "bf16_neg" [mk_p "a" u16] u16) in
       e
     end else env
