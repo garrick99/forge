@@ -1,0 +1,87 @@
+// Row-wise LayerNorm with affine (gamma, beta) — standard PyTorch
+// nn.LayerNorm signature.  Extends 1121 with the per-element learned
+// scale and bias:
+//
+//   y[i, e] = ((x[i, e] - mean) / sqrt(var + eps)) * gamma[e] + beta[e]
+//
+// gamma and beta are per-feature (length n_cols), shared across rows.
+//
+// Block-per-row, 256 threads, two-pass tree reduction in shared memory
+// (mirror of 1121's structure).
+
+use std::prelude;
+use std::gpu;
+
+#[kernel]
+fn layernorm_affine(
+    inp: span<f32>, out: span<f32>,
+    gamma: span<f32>, beta: span<f32>,
+    n_cols: u64
+)
+    requires 1u64 <= n_cols
+    requires n_cols <= 256u64
+    requires blockIdx_x < gridDim_x
+    requires gridDim_x * n_cols <= inp.len
+    requires gridDim_x * n_cols <= out.len
+    requires n_cols <= gamma.len
+    requires n_cols <= beta.len
+    requires threadIdx_x < 256u64
+{
+    let smem: shared<f32>[256] = [0.0f32; 256u64];
+    let tid: u64 = threadIdx_x;
+    let row: u64 = blockIdx_x;
+    let base: u64 = row * n_cols;
+    let n_f: f32 = n_cols as f32;
+    let eps: f32 = 0.00001f32;
+
+    let mut x: f32 = 0.0f32;
+    if tid < n_cols {
+        x = inp[base + tid];
+    };
+
+    // Pass 1 — mean.
+    smem[tid] = x;
+    syncthreads();
+    let mut s: u64 = 128u64;
+    while s > 0u64
+        invariant s <= 128u64
+        decreases s
+    {
+        if tid < s {
+            smem[tid] = smem[tid] + smem[tid + s];
+        };
+        syncthreads();
+        s = s >> 1u64;
+    };
+    let mean: f32 = smem[0] / n_f;
+
+    // Pass 2 — variance.
+    let mut d: f32 = 0.0f32;
+    if tid < n_cols {
+        d = x - mean;
+    };
+    smem[tid] = d * d;
+    syncthreads();
+    let mut s2: u64 = 128u64;
+    while s2 > 0u64
+        invariant s2 <= 128u64
+        decreases s2
+    {
+        if tid < s2 {
+            smem[tid] = smem[tid] + smem[tid + s2];
+        };
+        syncthreads();
+        s2 = s2 >> 1u64;
+    };
+    let var_: f32 = smem[0] / n_f;
+    let inv_std: f32 = rsqrtf(var_ + eps);
+
+    // Normalize + affine.
+    if tid < n_cols {
+        let g: f32 = gamma[tid];
+        let b: f32 = beta[tid];
+        out[base + tid] = (d * inv_std) * g + b;
+    };
+}
+
+fn main() -> i32 { 0i32 }

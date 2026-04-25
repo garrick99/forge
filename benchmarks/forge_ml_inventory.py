@@ -29,7 +29,7 @@ FORGE_WSL_PATH = "/mnt/c/Users/kraken/forge"
 FORGE_BIN_WSL = f"{FORGE_WSL_PATH}/_build/default/bin/main.exe"
 
 # ML arc: 1120 onward (FORGE70 first f32 demo).
-DEMO_GLOB = sorted(DEMOS_DIR.glob("11[2-3]?_forge_*.fg"))
+DEMO_GLOB = sorted(DEMOS_DIR.glob("11[2-9]?_forge_*.fg"))
 
 
 def run_forge_build(fg_path: Path) -> str:

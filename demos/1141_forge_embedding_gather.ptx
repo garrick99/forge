@@ -1,0 +1,64 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry embedding_gather(
+    .param .u64 embedding_gather_param_ids_data,
+    .param .u64 embedding_gather_param_ids_len,
+    .param .u64 embedding_gather_param_embed_data,
+    .param .u64 embedding_gather_param_embed_len,
+    .param .u64 embedding_gather_param_out_data,
+    .param .u64 embedding_gather_param_out_len,
+    .param .u64 embedding_gather_param_seq_len,
+    .param .u64 embedding_gather_param_vocab_size,
+    .param .u64 embedding_gather_param_d
+)
+{
+    .reg .u64 %rd0, %rd1, %rd12, %rd13, %rd14, %rd15, %rd17, %rd19, %rd2, %rd21, %rd22, %rd23, %rd24, %rd25, %rd27, %rd28, %rd3, %rd30, %rd31, %rd32, %rd33, %rd34, %rd4, %rd5, %rd6, %rd7, %rd8;
+    .reg .f32 %f26;
+    .reg .u32 %r10, %r11, %r16, %r18, %r20, %r29, %r35, %r9;
+
+  ld.param.u64 %rd0, [embedding_gather_param_ids_data];
+  ld.param.u64 %rd1, [embedding_gather_param_ids_len];
+  ld.param.u64 %rd2, [embedding_gather_param_embed_data];
+  ld.param.u64 %rd3, [embedding_gather_param_embed_len];
+  ld.param.u64 %rd4, [embedding_gather_param_out_data];
+  ld.param.u64 %rd5, [embedding_gather_param_out_len];
+  ld.param.u64 %rd6, [embedding_gather_param_seq_len];
+  ld.param.u64 %rd7, [embedding_gather_param_vocab_size];
+  ld.param.u64 %rd8, [embedding_gather_param_d];
+
+  mov.u32 %r9, %ctaid.x;
+  mov.u32 %r10, %tid.x;
+  mov.u32 %r11, 0; // proof/assume erased
+  cvt.u64.u32 %rd12, %r9;
+  mov.u64 %rd13, 4;
+  mul.lo.u64 %rd14, %rd12, %rd13;
+  add.u64 %rd15, %rd0, %rd14;
+  ld.global.u32 %r16, [%rd15];
+  cvt.u64.u32 %rd17, %r16;
+  mov.u32 %r18, 0; // proof/assume erased
+  mul.lo.u64 %rd19, %rd17, %rd8;
+  mov.u32 %r20, 0; // proof/assume erased
+  cvt.u64.u32 %rd21, %r10;
+  add.u64 %rd22, %rd19, %rd21;
+  mov.u64 %rd23, 4;
+  mul.lo.u64 %rd24, %rd22, %rd23;
+  add.u64 %rd25, %rd2, %rd24;
+  ld.global.f32 %f26, [%rd25];
+  cvt.u64.u32 %rd27, %r9;
+  mul.lo.u64 %rd28, %rd27, %rd8;
+  mov.u32 %r29, 0; // proof/assume erased
+  cvt.u64.u32 %rd30, %r10;
+  add.u64 %rd31, %rd28, %rd30;
+  mov.u64 %rd32, 4;
+  mul.lo.u64 %rd33, %rd31, %rd32;
+  add.u64 %rd34, %rd4, %rd33;
+  st.global.f32 [%rd34], %f26;
+  mov.u32 %r35, 0; // unit
+  ret;
+}
+

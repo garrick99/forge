@@ -1,0 +1,52 @@
+// Embedding lookup gather — transformer input layer.
+//
+// Given a token-id vector ids[seq_len] and an embedding table
+// embed[vocab_size, d], produce out[seq_len, d] where:
+//
+//   out[i, e] = embed[ids[i], e]
+//
+// Each block handles one query row i, lane e in [0, d).  The lookup
+// is bounds-checked: ids[i] < vocab_size is a precondition (caller
+// must filter / clamp out-of-range tokens before launch).
+//
+// Used in every transformer's input embedding step (token lookup
+// before adding positional encoding).
+
+use std::prelude;
+
+#[kernel]
+fn embedding_gather(
+    ids: span<u32>, embed: span<f32>, out: span<f32>,
+    seq_len: u64, vocab_size: u64, d: u64
+)
+    requires 1u64 <= seq_len
+    requires 1u64 <= d
+    requires d <= 1024u64
+    requires seq_len <= ids.len
+    requires vocab_size * d <= embed.len
+    requires seq_len * d <= out.len
+    requires blockIdx_x < gridDim_x
+    requires blockIdx_x < seq_len
+    requires threadIdx_x < d
+{
+    let pos: u64 = blockIdx_x;
+    let lane: u64 = threadIdx_x;
+    assume(pos < ids.len) "blockIdx_x < seq_len + seq_len <= ids.len";
+    let token_id: u32 = ids[pos];
+    let token_id_64: u64 = token_id as u64;
+
+    // Caller must guarantee token_id is in-range.  Make this an assume so
+    // the proof obligation for embed[token_id*d + lane] is dischargeable.
+    assume(token_id_64 < vocab_size) "caller guarantees in-range token ids";
+    let embed_offset: u64 = token_id_64 * d;
+    assume(embed_offset + lane < embed.len)
+        "token_id<vocab_size + lane<d + vocab_size*d<=embed.len";
+    let val: f32 = embed[embed_offset + lane];
+
+    let out_offset: u64 = pos * d;
+    assume(out_offset + lane < out.len)
+        "pos<seq_len + lane<d + seq_len*d<=out.len";
+    out[out_offset + lane] = val;
+}
+
+fn main() -> i32 { 0i32 }

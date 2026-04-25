@@ -1,0 +1,219 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry layernorm_affine(
+    .param .u64 layernorm_affine_param_inp_data,
+    .param .u64 layernorm_affine_param_inp_len,
+    .param .u64 layernorm_affine_param_out_data,
+    .param .u64 layernorm_affine_param_out_len,
+    .param .u64 layernorm_affine_param_gamma_data,
+    .param .u64 layernorm_affine_param_gamma_len,
+    .param .u64 layernorm_affine_param_beta_data,
+    .param .u64 layernorm_affine_param_beta_len,
+    .param .u64 layernorm_affine_param_n_cols
+)
+{
+    .shared .f32 __forge_smem_smem[256];
+
+    .reg .pred %p118, %p17, %p36, %p37, %p69, %p84, %p85;
+    .reg .u64 %rd0, %rd1, %rd100, %rd101, %rd102, %rd103, %rd107, %rd108, %rd110, %rd111, %rd112, %rd113, %rd119, %rd12, %rd121, %rd122, %rd123, %rd124, %rd126, %rd127, %rd128, %rd129, %rd13, %rd134, %rd135, %rd136, %rd137, %rd138, %rd18, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd28, %rd29, %rd3, %rd30, %rd31, %rd33, %rd35, %rd38, %rd4, %rd40, %rd41, %rd42, %rd43, %rd45, %rd46, %rd47, %rd48, %rd49, %rd5, %rd52, %rd53, %rd54, %rd55, %rd59, %rd6, %rd60, %rd62, %rd63, %rd64, %rd65, %rd7, %rd70, %rd76, %rd77, %rd78, %rd79, %rd8, %rd81, %rd83, %rd86, %rd88, %rd89, %rd9, %rd90, %rd91, %rd93, %rd94, %rd95, %rd96, %rd97;
+    .reg .f32 %f114, %f115, %f116, %f117, %f125, %f130, %f131, %f132, %f133, %f14, %f15, %f16, %f25, %f44, %f50, %f51, %f66, %f67, %f68, %f72, %f75, %f92, %f98, %f99;
+    .reg .u32 %r10, %r104, %r105, %r106, %r109, %r11, %r139, %r140, %r141, %r26, %r27, %r32, %r56, %r57, %r58, %r61, %r73, %r74, %r80;
+
+  ld.param.u64 %rd0, [layernorm_affine_param_inp_data];
+  ld.param.u64 %rd1, [layernorm_affine_param_inp_len];
+  ld.param.u64 %rd2, [layernorm_affine_param_out_data];
+  ld.param.u64 %rd3, [layernorm_affine_param_out_len];
+  ld.param.u64 %rd4, [layernorm_affine_param_gamma_data];
+  ld.param.u64 %rd5, [layernorm_affine_param_gamma_len];
+  ld.param.u64 %rd6, [layernorm_affine_param_beta_data];
+  ld.param.u64 %rd7, [layernorm_affine_param_beta_len];
+  ld.param.u64 %rd8, [layernorm_affine_param_n_cols];
+
+  mov.u64 %rd9, __forge_smem_smem;
+  mov.u32 %r10, %tid.x;
+  mov.u32 %r11, %ctaid.x;
+  cvt.u64.u32 %rd12, %r11;
+  mul.lo.u64 %rd13, %rd12, %rd8;
+  cvt.f32.u64 %f14, %rd8;
+  mov.f32 %f15, 0f3727C5AC; // 1e-05
+  mov.f32 %f16, 0f00000000; // 0
+  cvt.u64.u32 %rd18, %r10;
+  setp.lt.u64 %p17, %rd18, %rd8;
+  @%p17 bra layernorm_affine_then_19;
+  bra layernorm_affine_else_19;
+  layernorm_affine_then_19:
+  cvt.u64.u32 %rd20, %r10;
+  add.u64 %rd21, %rd13, %rd20;
+  mov.u64 %rd22, 4;
+  mul.lo.u64 %rd23, %rd21, %rd22;
+  add.u64 %rd24, %rd0, %rd23;
+  ld.global.f32 %f25, [%rd24];
+  mov.u32 %r26, 0; // unit
+  mov.u32 %r27, %r26;
+  bra layernorm_affine_end_19;
+  layernorm_affine_else_19:
+  mov.u32 %r27, 0; // no else branch
+  layernorm_affine_end_19:
+  cvt.u64.u32 %rd28, %r10;
+  mov.u64 %rd29, 4;
+  mul.lo.u64 %rd30, %rd28, %rd29;
+  add.u64 %rd31, %rd9, %rd30;
+  st.shared.f32 [%rd31], %f25;
+  bar.sync 0;
+  mov.u32 %r32, 0; // unit
+  mov.u64 %rd33, 128;
+  layernorm_affine_loop_34:
+  mov.u64 %rd35, 0;
+  setp.gt.u64 %p36, %rd33, %rd35;
+  @!%p36 bra layernorm_affine_loop_end_34;
+  cvt.u64.u32 %rd38, %r10;
+  setp.lt.u64 %p37, %rd38, %rd33;
+  @%p37 bra layernorm_affine_then_39;
+  bra layernorm_affine_else_39;
+  layernorm_affine_then_39:
+  cvt.u64.u32 %rd40, %r10;
+  mov.u64 %rd41, 4;
+  mul.lo.u64 %rd42, %rd40, %rd41;
+  add.u64 %rd43, %rd9, %rd42;
+  ld.shared.f32 %f44, [%rd43];
+  cvt.u64.u32 %rd45, %r10;
+  add.u64 %rd46, %rd45, %rd33;
+  mov.u64 %rd47, 4;
+  mul.lo.u64 %rd48, %rd46, %rd47;
+  add.u64 %rd49, %rd9, %rd48;
+  ld.shared.f32 %f50, [%rd49];
+  add.f32 %f51, %f44, %f50;
+  cvt.u64.u32 %rd52, %r10;
+  mov.u64 %rd53, 4;
+  mul.lo.u64 %rd54, %rd52, %rd53;
+  add.u64 %rd55, %rd9, %rd54;
+  st.shared.f32 [%rd55], %f51;
+  mov.u32 %r56, 0; // unit
+  mov.u32 %r57, %r56;
+  bra layernorm_affine_end_39;
+  layernorm_affine_else_39:
+  mov.u32 %r57, 0; // no else branch
+  layernorm_affine_end_39:
+  bar.sync 0;
+  mov.u32 %r58, 0; // unit
+  mov.u64 %rd59, 1;
+  shr.u64 %rd60, %rd33, %rd59;
+  mov.u64 %rd33, %rd60; // loop wb: s
+  bra layernorm_affine_loop_34;
+  layernorm_affine_loop_end_34:
+  mov.u32 %r61, 0; // unit
+  mov.u64 %rd62, 0;
+  mov.u64 %rd63, 4;
+  mul.lo.u64 %rd64, %rd62, %rd63;
+  add.u64 %rd65, %rd9, %rd64;
+  ld.shared.f32 %f66, [%rd65];
+  div.f32 %f67, %f66, %f14;
+  mov.f32 %f68, 0f00000000; // 0
+  cvt.u64.u32 %rd70, %r10;
+  setp.lt.u64 %p69, %rd70, %rd8;
+  @%p69 bra layernorm_affine_then_71;
+  bra layernorm_affine_else_71;
+  layernorm_affine_then_71:
+  sub.f32 %f72, %f25, %f67;
+  mov.u32 %r73, 0; // unit
+  mov.u32 %r74, %r73;
+  bra layernorm_affine_end_71;
+  layernorm_affine_else_71:
+  mov.u32 %r74, 0; // no else branch
+  layernorm_affine_end_71:
+  mul.f32 %f75, %f72, %f72;
+  cvt.u64.u32 %rd76, %r10;
+  mov.u64 %rd77, 4;
+  mul.lo.u64 %rd78, %rd76, %rd77;
+  add.u64 %rd79, %rd9, %rd78;
+  st.shared.f32 [%rd79], %f75;
+  bar.sync 0;
+  mov.u32 %r80, 0; // unit
+  mov.u64 %rd81, 128;
+  layernorm_affine_loop_82:
+  mov.u64 %rd83, 0;
+  setp.gt.u64 %p84, %rd81, %rd83;
+  @!%p84 bra layernorm_affine_loop_end_82;
+  cvt.u64.u32 %rd86, %r10;
+  setp.lt.u64 %p85, %rd86, %rd81;
+  @%p85 bra layernorm_affine_then_87;
+  bra layernorm_affine_else_87;
+  layernorm_affine_then_87:
+  cvt.u64.u32 %rd88, %r10;
+  mov.u64 %rd89, 4;
+  mul.lo.u64 %rd90, %rd88, %rd89;
+  add.u64 %rd91, %rd9, %rd90;
+  ld.shared.f32 %f92, [%rd91];
+  cvt.u64.u32 %rd93, %r10;
+  add.u64 %rd94, %rd93, %rd81;
+  mov.u64 %rd95, 4;
+  mul.lo.u64 %rd96, %rd94, %rd95;
+  add.u64 %rd97, %rd9, %rd96;
+  ld.shared.f32 %f98, [%rd97];
+  add.f32 %f99, %f92, %f98;
+  cvt.u64.u32 %rd100, %r10;
+  mov.u64 %rd101, 4;
+  mul.lo.u64 %rd102, %rd100, %rd101;
+  add.u64 %rd103, %rd9, %rd102;
+  st.shared.f32 [%rd103], %f99;
+  mov.u32 %r104, 0; // unit
+  mov.u32 %r105, %r104;
+  bra layernorm_affine_end_87;
+  layernorm_affine_else_87:
+  mov.u32 %r105, 0; // no else branch
+  layernorm_affine_end_87:
+  bar.sync 0;
+  mov.u32 %r106, 0; // unit
+  mov.u64 %rd107, 1;
+  shr.u64 %rd108, %rd81, %rd107;
+  mov.u64 %rd81, %rd108; // loop wb: s2
+  bra layernorm_affine_loop_82;
+  layernorm_affine_loop_end_82:
+  mov.u32 %r109, 0; // unit
+  mov.u64 %rd110, 0;
+  mov.u64 %rd111, 4;
+  mul.lo.u64 %rd112, %rd110, %rd111;
+  add.u64 %rd113, %rd9, %rd112;
+  ld.shared.f32 %f114, [%rd113];
+  div.f32 %f115, %f114, %f14;
+  add.f32 %f116, %f115, %f15;
+  rsqrt.approx.f32 %f117, %f116;
+  cvt.u64.u32 %rd119, %r10;
+  setp.lt.u64 %p118, %rd119, %rd8;
+  @%p118 bra layernorm_affine_then_120;
+  bra layernorm_affine_else_120;
+  layernorm_affine_then_120:
+  cvt.u64.u32 %rd121, %r10;
+  mov.u64 %rd122, 4;
+  mul.lo.u64 %rd123, %rd121, %rd122;
+  add.u64 %rd124, %rd4, %rd123;
+  ld.global.f32 %f125, [%rd124];
+  cvt.u64.u32 %rd126, %r10;
+  mov.u64 %rd127, 4;
+  mul.lo.u64 %rd128, %rd126, %rd127;
+  add.u64 %rd129, %rd6, %rd128;
+  ld.global.f32 %f130, [%rd129];
+  mul.f32 %f131, %f72, %f117;
+  mul.f32 %f132, %f131, %f125;
+  add.f32 %f133, %f132, %f130;
+  cvt.u64.u32 %rd134, %r10;
+  add.u64 %rd135, %rd13, %rd134;
+  mov.u64 %rd136, 4;
+  mul.lo.u64 %rd137, %rd135, %rd136;
+  add.u64 %rd138, %rd2, %rd137;
+  st.global.f32 [%rd138], %f133;
+  mov.u32 %r139, 0; // unit
+  mov.u32 %r140, %r139;
+  bra layernorm_affine_end_120;
+  layernorm_affine_else_120:
+  mov.u32 %r140, 0; // no else branch
+  layernorm_affine_end_120:
+  mov.u32 %r141, 0; // unit
+  ret;
+}
+
