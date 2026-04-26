@@ -578,6 +578,17 @@ let c_safe_name name =
 let loop_result_counter : int ref = ref 0
 let match_default_counter : int ref = ref 0
 
+(* CUDA emit flag — set by emit_program. When true, span<T> read
+   accesses (EIndex in rvalue position) are wrapped with __ldg() to
+   force the read-only / non-coherent (NC) cache path. nvcc requires
+   `const T*` or __restrict__ to infer NC-cacheability from the
+   pointer type alone; FORGE's span typedef has neither, so without
+   __ldg the loads compile to plain `ld.global.b32` instead of the
+   ~2x faster `ld.global.nc.b32`. Hand-written CUDA in VortexSTARK
+   uses `const T* __restrict__` and gets NC loads automatically;
+   FORGE matches by emitting __ldg explicitly. *)
+let is_cuda_emit : bool ref = ref false
+
 (* Iterator impl registry: (ty_name, item_ty) — populated by emit_program *)
 let iterator_impls : (string * ty) list ref = ref []
 (* Maps "TypeName__method" → "TypeName__Trait__method" for trait method dispatch *)
@@ -1055,16 +1066,50 @@ let rec emit_expr depth e =
   | EIndex (arr, idx)     ->
       let arr_s = emit_expr depth arr in
       let idx_s = emit_expr depth idx in
-      (* span<T> carries data + len; indexing goes through .data *)
+      (* span<T> carries data + len; indexing goes through .data.
+         In CUDA mode, wrap span reads with __ldg() to force the
+         read-only / non-coherent cache (~2x faster loads). EAssign
+         handles the LHS path specially so writes still emit raw
+         `arr.data[idx]` (you can't __ldg() an lvalue). *)
       (match arr.expr_ty with
-       | Some (TSpan _) | Some (TQual (_, TSpan _)) | Some TStr ->
+       | Some (TSpan elem_ty) | Some (TQual (_, TSpan elem_ty)) ->
+           (* __ldg is only defined for POD scalar/vector types in
+              sm_32_intrinsics.h (int, unsigned, long long, float,
+              double, int2, int4, etc.). Struct reads (e.g.
+              `span<span<T>>` where the inner element is a span
+              struct) must fall back to plain `.data[idx]`. *)
+           let is_ldg_safe =
+             match elem_ty with
+             | TPrim (TUint _) | TPrim (TInt _) | TPrim (TFloat _) -> true
+             | _ -> false
+           in
+           if !is_cuda_emit && is_ldg_safe then
+             Printf.sprintf "__ldg((const %s*)&%s.data[%s])"
+               (emit_ty elem_ty) arr_s idx_s
+           else
+             Printf.sprintf "%s.data[%s]" arr_s idx_s
+       | Some TStr ->
            Printf.sprintf "%s.data[%s]" arr_s idx_s
        | _ ->
            Printf.sprintf "%s[%s]" arr_s idx_s)
   | EField (s, f)         ->
       Printf.sprintf "%s.%s" (emit_expr depth s) f.name
   | EAssign (l, r)        ->
-      Printf.sprintf "%s = %s" (emit_expr depth l) (emit_expr depth r)
+      (* LHS lvalue path: span/array index writes must emit raw
+         `arr.data[idx]`, not the __ldg-wrapped read form. Detect
+         the pattern here and emit directly instead of recursing. *)
+      let l_s = match l.expr_desc with
+        | EIndex (arr, idx) ->
+            let arr_s = emit_expr depth arr in
+            let idx_s = emit_expr depth idx in
+            (match arr.expr_ty with
+             | Some (TSpan _) | Some (TQual (_, TSpan _)) | Some TStr ->
+                 Printf.sprintf "%s.data[%s]" arr_s idx_s
+             | _ ->
+                 Printf.sprintf "%s[%s]" arr_s idx_s)
+        | _ -> emit_expr depth l
+      in
+      Printf.sprintf "%s = %s" l_s (emit_expr depth r)
   | ERef e                -> Printf.sprintf "(&%s)" (emit_expr depth e)
   | ERefMut e             -> Printf.sprintf "(&%s)" (emit_expr depth e)
   | EDeref e              -> Printf.sprintf "(*%s)" (emit_expr depth e)
@@ -2505,6 +2550,7 @@ let emit_program ?(lib_mode=false) prog =
     | _ -> None
   ) prog.prog_items;
   let cuda = is_cuda_program prog in
+  is_cuda_emit := cuda;
   let buf = Buffer.create 4096 in
   (* Header comment *)
   Buffer.add_string buf
