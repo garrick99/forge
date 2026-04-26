@@ -237,18 +237,51 @@ let rec lower_expr st e : string =
                emit st (Printf.sprintf "mul.%s %s, %s, %s;" pfx dst rl_w rr_w)
            | _ ->
                emit st (Printf.sprintf "mul.lo.%s %s, %s, %s;" pfx dst rl_w rr_w))
-      | Div    -> emit st (Printf.sprintf "div.%s %s, %s, %s;" pfx dst rl_w rr_w)
+      | Div    ->
+          (* PTX div on floats requires a rounding modifier (`.rn`, `.rz`,
+             `.rm`, `.rp`) or `.approx` — the bare `div.f32` form ptxas
+             rejects.  Use `.rn` (round-to-nearest-even, IEEE-compliant)
+             for both F32 and F64.  Integers keep the un-modified form. *)
+          (match rty with
+           | F32 | F64 ->
+               emit st (Printf.sprintf "div.rn.%s %s, %s, %s;" pfx dst rl_w rr_w)
+           | _ ->
+               emit st (Printf.sprintf "div.%s %s, %s, %s;" pfx dst rl_w rr_w))
       | Mod    -> emit st (Printf.sprintf "rem.%s %s, %s, %s;" pfx dst rl_w rr_w)
       | BitAnd -> emit st (Printf.sprintf "and.b%d %s, %s, %s;" (sizeof_rty rty*8) dst rl rr)
       | BitOr  -> emit st (Printf.sprintf "or.b%d %s, %s, %s;"  (sizeof_rty rty*8) dst rl rr)
       | BitXor -> emit st (Printf.sprintf "xor.b%d %s, %s, %s;" (sizeof_rty rty*8) dst rl rr)
-      | Shl    -> emit st (Printf.sprintf "shl.b%d %s, %s, %s;" (sizeof_rty rty*8) dst rl rr)
+      | Shl    ->
+          (* PTX shift instructions take a u32 shift amount regardless of
+             the destination width — `shl.b64 dst, src, shift_u64` is a
+             type error that ptxas rejects.  Convert to u32 if the source
+             register isn't already 32-bit. *)
+          let rr_u32 =
+            let s = reg_rty st rr in
+            if s = U32 || s = S32 then rr
+            else begin
+              let r = fresh_reg st U32 in
+              emit st (Printf.sprintf "cvt.u32.%s %s, %s;" (arith_pfx s) r rr);
+              r
+            end
+          in
+          emit st (Printf.sprintf "shl.b%d %s, %s, %s;" (sizeof_rty rty*8) dst rl rr_u32)
       | Shr    ->
+          (* Same u32 shift-amount requirement as Shl. *)
+          let rr_u32 =
+            let s = reg_rty st rr in
+            if s = U32 || s = S32 then rr
+            else begin
+              let r = fresh_reg st U32 in
+              emit st (Printf.sprintf "cvt.u32.%s %s, %s;" (arith_pfx s) r rr);
+              r
+            end
+          in
           (match rty with
            | S16|S32|S64 ->
-               emit st (Printf.sprintf "shr.s%d %s, %s, %s;" (sizeof_rty rty*8) dst rl rr)
+               emit st (Printf.sprintf "shr.s%d %s, %s, %s;" (sizeof_rty rty*8) dst rl rr_u32)
            | _ ->
-               emit st (Printf.sprintf "shr.u%d %s, %s, %s;" (sizeof_rty rty*8) dst rl rr))
+               emit st (Printf.sprintf "shr.u%d %s, %s, %s;" (sizeof_rty rty*8) dst rl rr_u32))
       (* Comparisons → .pred register.
          dst is Pred-typed (rty = Pred for bool results).
          Use reg_rty (not rty_of_expr) to get the *actual* allocated type —
@@ -350,11 +383,15 @@ let rec lower_expr st e : string =
            emit st (Printf.sprintf "mov.u64 %s, 0; // field %s" r field.name);
            r)
 
-  (* if cond { then } else { else } *)
+  (* if cond { then } else { else }
+     Mut-variable mutations inside either branch must be written back to
+     the variable's pre-if register so that subsequent reads see the
+     correct value at the join.  Without this, `let mut ex = 0.0; if c
+     { ex = expr; }` produced a PTX register (%fN) that was only defined
+     in the then-branch — reads after the if returned garbage when c
+     was false.  Same write-back shape as the while-loop code below.    *)
   | EIf (cond, then_, else_opt) ->
       let rc = lower_expr st cond in
-      (* If condition is already a .pred register (from a comparison), use it directly.
-         Otherwise convert from integer (0 = false, non-zero = true). *)
       let pred =
         if reg_rty st rc = Pred then rc
         else begin
@@ -369,21 +406,60 @@ let rec lower_expr st e : string =
       let lbl_then = Printf.sprintf "%s_then_%d" st.fn_name lbl_id in
       let lbl_else = Printf.sprintf "%s_else_%d" st.fn_name lbl_id in
       let lbl_end  = Printf.sprintf "%s_end_%d"  st.fn_name lbl_id in
+      (* Snapshot reg_env mappings BEFORE either branch runs.  Each name
+         present here has a "pre-if" register that mut-assignments inside
+         a branch must update via an explicit mov, NOT by rebinding the
+         name in reg_env to a fresh register. *)
+      let pre_if_snapshot =
+        List.fold_left (fun acc (name, reg) ->
+          if List.mem_assoc name acc then acc else (name, reg) :: acc
+        ) [] st.reg_env
+      in
+      let writeback name new_reg orig_reg =
+        if new_reg <> orig_reg then begin
+          let rty = reg_rty st new_reg in
+          let pfx = match rty with
+            | Pred -> "pred"
+            | _ -> arith_pfx rty
+          in
+          emit st (Printf.sprintf "mov.%s %s, %s; // if wb: %s"
+                     pfx orig_reg new_reg name)
+        end
+      in
+      let restore_env () =
+        let snap_names = List.map fst pre_if_snapshot in
+        st.reg_env <-
+          List.filter (fun (n, _) -> not (List.mem n snap_names)) st.reg_env
+          @ pre_if_snapshot
+      in
       emit st (Printf.sprintf "@%s bra %s;" pred lbl_then);
       emit st (Printf.sprintf "bra %s;" lbl_else);
       emit st (lbl_then ^ ":");
       let rt = lower_expr st then_ in
-      (* Derive result register type from the actual then-branch result so
-         that float/pred branches don't get mis-typed as u64. *)
       let rty = reg_rty st rt in
       let dst = fresh_reg st rty in
       emit st (Printf.sprintf "mov%s %s, %s;" (ptx_rty_name rty) dst rt);
+      (* Write back any mut-var mutations from the then-branch into the
+         pre-if registers, then restore reg_env so the else-branch sees
+         the original mappings. *)
+      List.iter (fun (name, orig) ->
+        match List.assoc_opt name st.reg_env with
+        | Some cur -> writeback name cur orig
+        | None -> ()
+      ) pre_if_snapshot;
+      restore_env ();
       emit st (Printf.sprintf "bra %s;" lbl_end);
       emit st (lbl_else ^ ":");
       (match else_opt with
        | Some else_ ->
            let re = lower_expr st else_ in
-           emit st (Printf.sprintf "mov%s %s, %s;" (ptx_rty_name rty) dst re)
+           emit st (Printf.sprintf "mov%s %s, %s;" (ptx_rty_name rty) dst re);
+           List.iter (fun (name, orig) ->
+             match List.assoc_opt name st.reg_env with
+             | Some cur -> writeback name cur orig
+             | None -> ()
+           ) pre_if_snapshot;
+           restore_env ()
        | None ->
            emit st (Printf.sprintf "mov%s %s, 0; // no else branch" (ptx_rty_name rty) dst));
       emit st (lbl_end ^ ":");
