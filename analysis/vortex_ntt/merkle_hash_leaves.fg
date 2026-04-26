@@ -1,0 +1,521 @@
+// VortexSTARK Merkle leaf hash — FORGE pilot (single-column variant).
+//
+// Replaces the single-column specialization of
+// `cuda/blake2s.cu::merkle_hash_leaves_kernel`. For each leaf `leaf` in
+// [0, n_leaves), reads `column[leaf]`, runs Blake2s-256 compression
+// over a 16-word message (leaf value in m[0], m[1..15] = 0), and writes
+// the 8-word digest to `hashes[leaf*8 .. leaf*8 + 8]`.
+//
+// Output words are M31-reduced, matching the shinobi-hash build's
+// `STORE_HASH8` semantics. For the default (non-shinobi-hash) build,
+// M31-reduction is a no-op on already-canonical M31 leaves (0 ≤ leaf < P).
+//
+// Proof obligations Z3 discharges:
+//   - Per-thread bounds on `column[leaf]` read (`leaf < n_leaves <= column.len`)
+//   - Per-thread bounds on `hashes[leaf*8 + k]` writes for k in 0..7
+//   - Output invariant: each hash word < M31_P (from `reduce_word`)
+
+use std::gpu;
+use std::m31;
+
+// ── Blake2s IV (from the RFC 7693 reference) ────────────────────────────────
+// These are `#[device]` so they can be called from kernels without also
+// being emitted with host linkage.
+
+#[device]
+fn iv0() -> u32 { 0x6A09E667u32 }
+#[device]
+fn iv1() -> u32 { 0xBB67AE85u32 }
+#[device]
+fn iv2() -> u32 { 0x3C6EF372u32 }
+#[device]
+fn iv3() -> u32 { 0xA54FF53Au32 }
+#[device]
+fn iv4() -> u32 { 0x510E527Fu32 }
+#[device]
+fn iv5() -> u32 { 0x9B05688Cu32 }
+#[device]
+fn iv6() -> u32 { 0x1F83D9ABu32 }
+#[device]
+fn iv7() -> u32 { 0x5BE0CD19u32 }
+
+// ── Blake2s mixing function ─────────────────────────────────────────────────
+
+#[device]
+fn rotr32(x: u32, n: u32) -> u32
+    requires n < 32u32
+    requires n > 0u32
+{
+    (x >> n) | (x << (32u32 - n))
+}
+
+// G: a = a+b+x; d = rotr32(d^a, 16); c = c+d; b = rotr32(b^c, 12);
+//    a = a+b+y; d = rotr32(d^a, 8);  c = c+d; b = rotr32(b^c, 7)
+// Returns updated (a, b, c, d).
+#[device]
+fn g_mix(a: u32, b: u32, c: u32, d: u32, x: u32, y: u32) -> (u32, u32, u32, u32) {
+    let a1: u32 = a + b + x;
+    let d1: u32 = rotr32(d ^ a1, 16u32);
+    let c1: u32 = c + d1;
+    let b1: u32 = rotr32(b ^ c1, 12u32);
+    let a2: u32 = a1 + b1 + y;
+    let d2: u32 = rotr32(d1 ^ a2, 8u32);
+    let c2: u32 = c1 + d2;
+    let b2: u32 = rotr32(b1 ^ c2, 7u32);
+    (a2, b2, c2, d2)
+}
+
+// ── M31 reduction for output words (matches STORE_HASH8 semantics) ──────────
+
+#[device]
+fn reduce_word(v: u32) -> u32
+    ensures result < M31_P
+{
+    let lo: u32 = v & M31_P;
+    let hi: u32 = v >> 31u32;
+    let r: u32 = lo + hi;
+    if r >= M31_P { r - M31_P } else { r }
+}
+
+// ── Leaf-hash kernel (single column) ────────────────────────────────────────
+//
+// One thread per leaf. Each thread:
+//   1. Initializes state v[0..15] = h[0..7] (Blake2s init with param
+//      block 0x01010020 XOR'd into h0) || IV[0..3] || IV[4]^t || IV[5] ||
+//      IV[6]^f || IV[7] where t = 4 (1 column × 4 bytes) and f = 0xFFFFFFFF
+//      (final block).
+//   2. Loads m[0] = column[leaf], m[1..15] = 0.
+//   3. Runs 10 rounds of 8 G-calls each with the Blake2s sigma permutation.
+//   4. Finalization XOR: h[i] ^= v[i] ^ v[i+8].
+//   5. Writes reduced h[0..7] to hashes[leaf*8 .. leaf*8 + 8].
+
+#[kernel]
+fn merkle_hash_leaves_single(column: span<u32>, hashes: span<u32>, n_leaves: u64)
+    requires n_leaves <= column.len
+    requires n_leaves * 8u64 <= hashes.len
+{
+    let leaf: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if leaf < n_leaves {
+        // ── Message words ───────────────────────────────────────────────
+        // m[0] = column[leaf]; m[1..15] = 0. One 4-byte leaf value.
+        let m0: u32 = column[leaf];
+        let m1: u32 = 0u32;  let m2: u32  = 0u32;  let m3: u32  = 0u32;
+        let m4: u32 = 0u32;  let m5: u32  = 0u32;  let m6: u32  = 0u32;
+        let m7: u32 = 0u32;  let m8: u32  = 0u32;  let m9: u32  = 0u32;
+        let m10: u32 = 0u32; let m11: u32 = 0u32;
+        let m12: u32 = 0u32; let m13: u32 = 0u32;
+        let m14: u32 = 0u32; let m15: u32 = 0u32;
+
+        // ── Initial chain state ─────────────────────────────────────────
+        // h[0] = IV[0] ^ 0x01010020 (Blake2s param block: digest_len=32,
+        // key_len=0, fanout=1, depth=1). h[1..7] = IV[1..7].
+        let h0: u32 = iv0() ^ 0x01010020u32;
+        let h1: u32 = iv1();
+        let h2: u32 = iv2();
+        let h3: u32 = iv3();
+        let h4: u32 = iv4();
+        let h5: u32 = iv5();
+        let h6: u32 = iv6();
+        let h7: u32 = iv7();
+
+        // ── Working state v[0..15] ──────────────────────────────────────
+        let v0: u32 = h0;  let v1: u32 = h1;  let v2: u32 = h2;  let v3: u32 = h3;
+        let v4: u32 = h4;  let v5: u32 = h5;  let v6: u32 = h6;  let v7: u32 = h7;
+        let v8: u32  = iv0();
+        let v9: u32  = iv1();
+        let v10: u32 = iv2();
+        let v11: u32 = iv3();
+        // t = 4 (1 col × 4 bytes), f = 0xFFFFFFFF (final block)
+        let v12: u32 = iv4() ^ 4u32;
+        let v13: u32 = iv5();
+        let v14: u32 = iv6() ^ 0xFFFFFFFFu32;
+        let v15: u32 = iv7();
+
+        // ── Round 0 ─────────────────────────────────────────────────────
+        let (a0, b0, c0, d0) = g_mix(v0, v4, v8,  v12, m0,  m1);
+        let (a1, b1, c1, d1) = g_mix(v1, v5, v9,  v13, m2,  m3);
+        let (a2, b2, c2, d2) = g_mix(v2, v6, v10, v14, m4,  m5);
+        let (a3, b3, c3, d3) = g_mix(v3, v7, v11, v15, m6,  m7);
+        let (a4, b4, c4, d4) = g_mix(a0, b1, c2,  d3,  m8,  m9);
+        let (a5, b5, c5, d5) = g_mix(a1, b2, c3,  d0,  m10, m11);
+        let (a6, b6, c6, d6) = g_mix(a2, b3, c0,  d1,  m12, m13);
+        let (a7, b7, c7, d7) = g_mix(a3, b0, c1,  d2,  m14, m15);
+        // After round: v0..v3 = a4..a7, v4..v7 = b7,b4,b5,b6,
+        // v8..v11 = c6,c7,c4,c5, v12..v15 = d5,d6,d7,d4. Rename for next round.
+        let r0_0: u32 = a4; let r0_1: u32 = a5; let r0_2: u32 = a6; let r0_3: u32 = a7;
+        let r0_4: u32 = b7; let r0_5: u32 = b4; let r0_6: u32 = b5; let r0_7: u32 = b6;
+        let r0_8: u32 = c6; let r0_9: u32 = c7; let r0_10: u32 = c4; let r0_11: u32 = c5;
+        let r0_12: u32 = d5; let r0_13: u32 = d6; let r0_14: u32 = d7; let r0_15: u32 = d4;
+
+        // ── Round 1 — sigma[14,10,4,8,9,15,13,6,1,12,0,2,11,7,5,3] ──────
+        let (a0b, b0b, c0b, d0b) = g_mix(r0_0, r0_4, r0_8,  r0_12, m14, m10);
+        let (a1b, b1b, c1b, d1b) = g_mix(r0_1, r0_5, r0_9,  r0_13, m4,  m8);
+        let (a2b, b2b, c2b, d2b) = g_mix(r0_2, r0_6, r0_10, r0_14, m9,  m15);
+        let (a3b, b3b, c3b, d3b) = g_mix(r0_3, r0_7, r0_11, r0_15, m13, m6);
+        let (a4b, b4b, c4b, d4b) = g_mix(a0b, b1b, c2b, d3b, m1,  m12);
+        let (a5b, b5b, c5b, d5b) = g_mix(a1b, b2b, c3b, d0b, m0,  m2);
+        let (a6b, b6b, c6b, d6b) = g_mix(a2b, b3b, c0b, d1b, m11, m7);
+        let (a7b, b7b, c7b, d7b) = g_mix(a3b, b0b, c1b, d2b, m5,  m3);
+        let r1_0: u32 = a4b; let r1_1: u32 = a5b; let r1_2: u32 = a6b; let r1_3: u32 = a7b;
+        let r1_4: u32 = b7b; let r1_5: u32 = b4b; let r1_6: u32 = b5b; let r1_7: u32 = b6b;
+        let r1_8: u32 = c6b; let r1_9: u32 = c7b; let r1_10: u32 = c4b; let r1_11: u32 = c5b;
+        let r1_12: u32 = d5b; let r1_13: u32 = d6b; let r1_14: u32 = d7b; let r1_15: u32 = d4b;
+
+        // ── Round 2 — sigma[11,8,12,0,5,2,15,13,10,14,3,6,7,1,9,4] ──────
+        let (a0c, b0c, c0c, d0c) = g_mix(r1_0, r1_4, r1_8,  r1_12, m11, m8);
+        let (a1c, b1c, c1c, d1c) = g_mix(r1_1, r1_5, r1_9,  r1_13, m12, m0);
+        let (a2c, b2c, c2c, d2c) = g_mix(r1_2, r1_6, r1_10, r1_14, m5,  m2);
+        let (a3c, b3c, c3c, d3c) = g_mix(r1_3, r1_7, r1_11, r1_15, m15, m13);
+        let (a4c, b4c, c4c, d4c) = g_mix(a0c, b1c, c2c, d3c, m10, m14);
+        let (a5c, b5c, c5c, d5c) = g_mix(a1c, b2c, c3c, d0c, m3,  m6);
+        let (a6c, b6c, c6c, d6c) = g_mix(a2c, b3c, c0c, d1c, m7,  m1);
+        let (a7c, b7c, c7c, d7c) = g_mix(a3c, b0c, c1c, d2c, m9,  m4);
+        let r2_0: u32 = a4c; let r2_1: u32 = a5c; let r2_2: u32 = a6c; let r2_3: u32 = a7c;
+        let r2_4: u32 = b7c; let r2_5: u32 = b4c; let r2_6: u32 = b5c; let r2_7: u32 = b6c;
+        let r2_8: u32 = c6c; let r2_9: u32 = c7c; let r2_10: u32 = c4c; let r2_11: u32 = c5c;
+        let r2_12: u32 = d5c; let r2_13: u32 = d6c; let r2_14: u32 = d7c; let r2_15: u32 = d4c;
+
+        // ── Round 3 — sigma[7,9,3,1,13,12,11,14,2,6,5,10,4,0,15,8] ──────
+        let (a0d, b0d, c0d, d0d) = g_mix(r2_0, r2_4, r2_8,  r2_12, m7,  m9);
+        let (a1d, b1d, c1d, d1d) = g_mix(r2_1, r2_5, r2_9,  r2_13, m3,  m1);
+        let (a2d, b2d, c2d, d2d) = g_mix(r2_2, r2_6, r2_10, r2_14, m13, m12);
+        let (a3d, b3d, c3d, d3d) = g_mix(r2_3, r2_7, r2_11, r2_15, m11, m14);
+        let (a4d, b4d, c4d, d4d) = g_mix(a0d, b1d, c2d, d3d, m2,  m6);
+        let (a5d, b5d, c5d, d5d) = g_mix(a1d, b2d, c3d, d0d, m5,  m10);
+        let (a6d, b6d, c6d, d6d) = g_mix(a2d, b3d, c0d, d1d, m4,  m0);
+        let (a7d, b7d, c7d, d7d) = g_mix(a3d, b0d, c1d, d2d, m15, m8);
+        let r3_0: u32 = a4d; let r3_1: u32 = a5d; let r3_2: u32 = a6d; let r3_3: u32 = a7d;
+        let r3_4: u32 = b7d; let r3_5: u32 = b4d; let r3_6: u32 = b5d; let r3_7: u32 = b6d;
+        let r3_8: u32 = c6d; let r3_9: u32 = c7d; let r3_10: u32 = c4d; let r3_11: u32 = c5d;
+        let r3_12: u32 = d5d; let r3_13: u32 = d6d; let r3_14: u32 = d7d; let r3_15: u32 = d4d;
+
+        // ── Round 4 — sigma[9,0,5,7,2,4,10,15,14,1,11,12,6,8,3,13] ──────
+        let (a0e, b0e, c0e, d0e) = g_mix(r3_0, r3_4, r3_8,  r3_12, m9,  m0);
+        let (a1e, b1e, c1e, d1e) = g_mix(r3_1, r3_5, r3_9,  r3_13, m5,  m7);
+        let (a2e, b2e, c2e, d2e) = g_mix(r3_2, r3_6, r3_10, r3_14, m2,  m4);
+        let (a3e, b3e, c3e, d3e) = g_mix(r3_3, r3_7, r3_11, r3_15, m10, m15);
+        let (a4e, b4e, c4e, d4e) = g_mix(a0e, b1e, c2e, d3e, m14, m1);
+        let (a5e, b5e, c5e, d5e) = g_mix(a1e, b2e, c3e, d0e, m11, m12);
+        let (a6e, b6e, c6e, d6e) = g_mix(a2e, b3e, c0e, d1e, m6,  m8);
+        let (a7e, b7e, c7e, d7e) = g_mix(a3e, b0e, c1e, d2e, m3,  m13);
+        let r4_0: u32 = a4e; let r4_1: u32 = a5e; let r4_2: u32 = a6e; let r4_3: u32 = a7e;
+        let r4_4: u32 = b7e; let r4_5: u32 = b4e; let r4_6: u32 = b5e; let r4_7: u32 = b6e;
+        let r4_8: u32 = c6e; let r4_9: u32 = c7e; let r4_10: u32 = c4e; let r4_11: u32 = c5e;
+        let r4_12: u32 = d5e; let r4_13: u32 = d6e; let r4_14: u32 = d7e; let r4_15: u32 = d4e;
+
+        // ── Round 5 — sigma[2,12,6,10,0,11,8,3,4,13,7,5,15,14,1,9] ──────
+        let (a0f, b0f, c0f, d0f) = g_mix(r4_0, r4_4, r4_8,  r4_12, m2,  m12);
+        let (a1f, b1f, c1f, d1f) = g_mix(r4_1, r4_5, r4_9,  r4_13, m6,  m10);
+        let (a2f, b2f, c2f, d2f) = g_mix(r4_2, r4_6, r4_10, r4_14, m0,  m11);
+        let (a3f, b3f, c3f, d3f) = g_mix(r4_3, r4_7, r4_11, r4_15, m8,  m3);
+        let (a4f, b4f, c4f, d4f) = g_mix(a0f, b1f, c2f, d3f, m4,  m13);
+        let (a5f, b5f, c5f, d5f) = g_mix(a1f, b2f, c3f, d0f, m7,  m5);
+        let (a6f, b6f, c6f, d6f) = g_mix(a2f, b3f, c0f, d1f, m15, m14);
+        let (a7f, b7f, c7f, d7f) = g_mix(a3f, b0f, c1f, d2f, m1,  m9);
+        let r5_0: u32 = a4f; let r5_1: u32 = a5f; let r5_2: u32 = a6f; let r5_3: u32 = a7f;
+        let r5_4: u32 = b7f; let r5_5: u32 = b4f; let r5_6: u32 = b5f; let r5_7: u32 = b6f;
+        let r5_8: u32 = c6f; let r5_9: u32 = c7f; let r5_10: u32 = c4f; let r5_11: u32 = c5f;
+        let r5_12: u32 = d5f; let r5_13: u32 = d6f; let r5_14: u32 = d7f; let r5_15: u32 = d4f;
+
+        // ── Round 6 — sigma[12,5,1,15,14,13,4,10,0,7,6,3,9,2,8,11] ──────
+        let (a0g, b0g, c0g, d0g) = g_mix(r5_0, r5_4, r5_8,  r5_12, m12, m5);
+        let (a1g, b1g, c1g, d1g) = g_mix(r5_1, r5_5, r5_9,  r5_13, m1,  m15);
+        let (a2g, b2g, c2g, d2g) = g_mix(r5_2, r5_6, r5_10, r5_14, m14, m13);
+        let (a3g, b3g, c3g, d3g) = g_mix(r5_3, r5_7, r5_11, r5_15, m4,  m10);
+        let (a4g, b4g, c4g, d4g) = g_mix(a0g, b1g, c2g, d3g, m0,  m7);
+        let (a5g, b5g, c5g, d5g) = g_mix(a1g, b2g, c3g, d0g, m6,  m3);
+        let (a6g, b6g, c6g, d6g) = g_mix(a2g, b3g, c0g, d1g, m9,  m2);
+        let (a7g, b7g, c7g, d7g) = g_mix(a3g, b0g, c1g, d2g, m8,  m11);
+        let r6_0: u32 = a4g; let r6_1: u32 = a5g; let r6_2: u32 = a6g; let r6_3: u32 = a7g;
+        let r6_4: u32 = b7g; let r6_5: u32 = b4g; let r6_6: u32 = b5g; let r6_7: u32 = b6g;
+        let r6_8: u32 = c6g; let r6_9: u32 = c7g; let r6_10: u32 = c4g; let r6_11: u32 = c5g;
+        let r6_12: u32 = d5g; let r6_13: u32 = d6g; let r6_14: u32 = d7g; let r6_15: u32 = d4g;
+
+        // ── Round 7 — sigma[13,11,7,14,12,1,3,9,5,0,15,4,8,6,2,10] ──────
+        let (a0h, b0h, c0h, d0h) = g_mix(r6_0, r6_4, r6_8,  r6_12, m13, m11);
+        let (a1h, b1h, c1h, d1h) = g_mix(r6_1, r6_5, r6_9,  r6_13, m7,  m14);
+        let (a2h, b2h, c2h, d2h) = g_mix(r6_2, r6_6, r6_10, r6_14, m12, m1);
+        let (a3h, b3h, c3h, d3h) = g_mix(r6_3, r6_7, r6_11, r6_15, m3,  m9);
+        let (a4h, b4h, c4h, d4h) = g_mix(a0h, b1h, c2h, d3h, m5,  m0);
+        let (a5h, b5h, c5h, d5h) = g_mix(a1h, b2h, c3h, d0h, m15, m4);
+        let (a6h, b6h, c6h, d6h) = g_mix(a2h, b3h, c0h, d1h, m8,  m6);
+        let (a7h, b7h, c7h, d7h) = g_mix(a3h, b0h, c1h, d2h, m2,  m10);
+        let r7_0: u32 = a4h; let r7_1: u32 = a5h; let r7_2: u32 = a6h; let r7_3: u32 = a7h;
+        let r7_4: u32 = b7h; let r7_5: u32 = b4h; let r7_6: u32 = b5h; let r7_7: u32 = b6h;
+        let r7_8: u32 = c6h; let r7_9: u32 = c7h; let r7_10: u32 = c4h; let r7_11: u32 = c5h;
+        let r7_12: u32 = d5h; let r7_13: u32 = d6h; let r7_14: u32 = d7h; let r7_15: u32 = d4h;
+
+        // ── Round 8 — sigma[6,15,14,9,11,3,0,8,12,2,13,7,1,4,10,5] ──────
+        let (a0i, b0i, c0i, d0i) = g_mix(r7_0, r7_4, r7_8,  r7_12, m6,  m15);
+        let (a1i, b1i, c1i, d1i) = g_mix(r7_1, r7_5, r7_9,  r7_13, m14, m9);
+        let (a2i, b2i, c2i, d2i) = g_mix(r7_2, r7_6, r7_10, r7_14, m11, m3);
+        let (a3i, b3i, c3i, d3i) = g_mix(r7_3, r7_7, r7_11, r7_15, m0,  m8);
+        let (a4i, b4i, c4i, d4i) = g_mix(a0i, b1i, c2i, d3i, m12, m2);
+        let (a5i, b5i, c5i, d5i) = g_mix(a1i, b2i, c3i, d0i, m13, m7);
+        let (a6i, b6i, c6i, d6i) = g_mix(a2i, b3i, c0i, d1i, m1,  m4);
+        let (a7i, b7i, c7i, d7i) = g_mix(a3i, b0i, c1i, d2i, m10, m5);
+        let r8_0: u32 = a4i; let r8_1: u32 = a5i; let r8_2: u32 = a6i; let r8_3: u32 = a7i;
+        let r8_4: u32 = b7i; let r8_5: u32 = b4i; let r8_6: u32 = b5i; let r8_7: u32 = b6i;
+        let r8_8: u32 = c6i; let r8_9: u32 = c7i; let r8_10: u32 = c4i; let r8_11: u32 = c5i;
+        let r8_12: u32 = d5i; let r8_13: u32 = d6i; let r8_14: u32 = d7i; let r8_15: u32 = d4i;
+
+        // ── Round 9 — sigma[10,2,8,4,7,6,1,5,15,11,9,14,3,12,13,0] ──────
+        let (a0j, b0j, c0j, d0j) = g_mix(r8_0, r8_4, r8_8,  r8_12, m10, m2);
+        let (a1j, b1j, c1j, d1j) = g_mix(r8_1, r8_5, r8_9,  r8_13, m8,  m4);
+        let (a2j, b2j, c2j, d2j) = g_mix(r8_2, r8_6, r8_10, r8_14, m7,  m6);
+        let (a3j, b3j, c3j, d3j) = g_mix(r8_3, r8_7, r8_11, r8_15, m1,  m5);
+        let (a4j, b4j, c4j, d4j) = g_mix(a0j, b1j, c2j, d3j, m15, m11);
+        let (a5j, b5j, c5j, d5j) = g_mix(a1j, b2j, c3j, d0j, m9,  m14);
+        let (a6j, b6j, c6j, d6j) = g_mix(a2j, b3j, c0j, d1j, m3,  m12);
+        let (a7j, b7j, c7j, d7j) = g_mix(a3j, b0j, c1j, d2j, m13, m0);
+        // Final state after round 9.
+        let f0: u32  = a4j; let f1: u32  = a5j; let f2: u32  = a6j; let f3: u32  = a7j;
+        let f4: u32  = b7j; let f5: u32  = b4j; let f6: u32  = b5j; let f7: u32  = b6j;
+        let f8: u32  = c6j; let f9: u32  = c7j; let f10: u32 = c4j; let f11: u32 = c5j;
+        let f12: u32 = d5j; let f13: u32 = d6j; let f14: u32 = d7j; let f15: u32 = d4j;
+
+        // ── Finalization: h[i] ^= v[i] ^ v[i+8] ─────────────────────────
+        let out0: u32 = h0 ^ f0 ^ f8;
+        let out1: u32 = h1 ^ f1 ^ f9;
+        let out2: u32 = h2 ^ f2 ^ f10;
+        let out3: u32 = h3 ^ f3 ^ f11;
+        let out4: u32 = h4 ^ f4 ^ f12;
+        let out5: u32 = h5 ^ f5 ^ f13;
+        let out6: u32 = h6 ^ f6 ^ f14;
+        let out7: u32 = h7 ^ f7 ^ f15;
+
+        // ── Write with M31 reduction (matches STORE_HASH8) ──────────────
+        // Guard re-establishes (base + 7 < hashes.len). The kernel-level
+        // precondition `n_leaves * 8 <= hashes.len` combined with
+        // `leaf < n_leaves` implies it, but the bounds prover doesn't
+        // reason through the non-linear `*` so we restate it explicitly.
+        let base: u64 = leaf * 8u64;
+        if base + 7u64 < hashes.len {
+            hashes[base]        = reduce_word(out0);
+            hashes[base + 1u64] = reduce_word(out1);
+            hashes[base + 2u64] = reduce_word(out2);
+            hashes[base + 3u64] = reduce_word(out3);
+            hashes[base + 4u64] = reduce_word(out4);
+            hashes[base + 5u64] = reduce_word(out5);
+            hashes[base + 6u64] = reduce_word(out6);
+            hashes[base + 7u64] = reduce_word(out7);
+        };
+    };
+}
+#[kernel]
+fn merkle_hash_leaves_quad(c0: span<u32>, c1: span<u32>, c2: span<u32>, c3: span<u32>, hashes: span<u32>, n_leaves: u64)
+    requires n_leaves <= c0.len
+    requires n_leaves <= c1.len
+    requires n_leaves <= c2.len
+    requires n_leaves <= c3.len
+    requires n_leaves * 8u64 <= hashes.len
+{
+    let leaf: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if leaf < n_leaves {
+        // ── Message words ───────────────────────────────────────────────
+        // m[0..3] = c0..c3[leaf]; m[4..15] = 0. Four 4-byte leaf values.
+        let m0: u32 = c0[leaf]; let m1: u32 = c1[leaf]; let m2: u32 = c2[leaf]; let m3: u32 = c3[leaf];
+        let m4: u32 = 0u32;  let m5: u32  = 0u32;  let m6: u32  = 0u32;
+        let m7: u32 = 0u32;  let m8: u32  = 0u32;  let m9: u32  = 0u32;
+        let m10: u32 = 0u32; let m11: u32 = 0u32;
+        let m12: u32 = 0u32; let m13: u32 = 0u32;
+        let m14: u32 = 0u32; let m15: u32 = 0u32;
+
+        // ── Initial chain state ─────────────────────────────────────────
+        // h[0] = IV[0] ^ 0x01010020 (Blake2s param block: digest_len=32,
+        // key_len=0, fanout=1, depth=1). h[1..7] = IV[1..7].
+        let h0: u32 = iv0() ^ 0x01010020u32;
+        let h1: u32 = iv1();
+        let h2: u32 = iv2();
+        let h3: u32 = iv3();
+        let h4: u32 = iv4();
+        let h5: u32 = iv5();
+        let h6: u32 = iv6();
+        let h7: u32 = iv7();
+
+        // ── Working state v[0..15] ──────────────────────────────────────
+        let v0: u32 = h0;  let v1: u32 = h1;  let v2: u32 = h2;  let v3: u32 = h3;
+        let v4: u32 = h4;  let v5: u32 = h5;  let v6: u32 = h6;  let v7: u32 = h7;
+        let v8: u32  = iv0();
+        let v9: u32  = iv1();
+        let v10: u32 = iv2();
+        let v11: u32 = iv3();
+        // t = 16 (4 cols × 4 bytes), f = 0xFFFFFFFF (final block)
+        let v12: u32 = iv4() ^ 16u32;
+        let v13: u32 = iv5();
+        let v14: u32 = iv6() ^ 0xFFFFFFFFu32;
+        let v15: u32 = iv7();
+
+        // ── Round 0 ─────────────────────────────────────────────────────
+        let (a0, b0, c0, d0) = g_mix(v0, v4, v8,  v12, m0,  m1);
+        let (a1, b1, c1, d1) = g_mix(v1, v5, v9,  v13, m2,  m3);
+        let (a2, b2, c2, d2) = g_mix(v2, v6, v10, v14, m4,  m5);
+        let (a3, b3, c3, d3) = g_mix(v3, v7, v11, v15, m6,  m7);
+        let (a4, b4, c4, d4) = g_mix(a0, b1, c2,  d3,  m8,  m9);
+        let (a5, b5, c5, d5) = g_mix(a1, b2, c3,  d0,  m10, m11);
+        let (a6, b6, c6, d6) = g_mix(a2, b3, c0,  d1,  m12, m13);
+        let (a7, b7, c7, d7) = g_mix(a3, b0, c1,  d2,  m14, m15);
+        // After round: v0..v3 = a4..a7, v4..v7 = b7,b4,b5,b6,
+        // v8..v11 = c6,c7,c4,c5, v12..v15 = d5,d6,d7,d4. Rename for next round.
+        let r0_0: u32 = a4; let r0_1: u32 = a5; let r0_2: u32 = a6; let r0_3: u32 = a7;
+        let r0_4: u32 = b7; let r0_5: u32 = b4; let r0_6: u32 = b5; let r0_7: u32 = b6;
+        let r0_8: u32 = c6; let r0_9: u32 = c7; let r0_10: u32 = c4; let r0_11: u32 = c5;
+        let r0_12: u32 = d5; let r0_13: u32 = d6; let r0_14: u32 = d7; let r0_15: u32 = d4;
+
+        // ── Round 1 — sigma[14,10,4,8,9,15,13,6,1,12,0,2,11,7,5,3] ──────
+        let (a0b, b0b, c0b, d0b) = g_mix(r0_0, r0_4, r0_8,  r0_12, m14, m10);
+        let (a1b, b1b, c1b, d1b) = g_mix(r0_1, r0_5, r0_9,  r0_13, m4,  m8);
+        let (a2b, b2b, c2b, d2b) = g_mix(r0_2, r0_6, r0_10, r0_14, m9,  m15);
+        let (a3b, b3b, c3b, d3b) = g_mix(r0_3, r0_7, r0_11, r0_15, m13, m6);
+        let (a4b, b4b, c4b, d4b) = g_mix(a0b, b1b, c2b, d3b, m1,  m12);
+        let (a5b, b5b, c5b, d5b) = g_mix(a1b, b2b, c3b, d0b, m0,  m2);
+        let (a6b, b6b, c6b, d6b) = g_mix(a2b, b3b, c0b, d1b, m11, m7);
+        let (a7b, b7b, c7b, d7b) = g_mix(a3b, b0b, c1b, d2b, m5,  m3);
+        let r1_0: u32 = a4b; let r1_1: u32 = a5b; let r1_2: u32 = a6b; let r1_3: u32 = a7b;
+        let r1_4: u32 = b7b; let r1_5: u32 = b4b; let r1_6: u32 = b5b; let r1_7: u32 = b6b;
+        let r1_8: u32 = c6b; let r1_9: u32 = c7b; let r1_10: u32 = c4b; let r1_11: u32 = c5b;
+        let r1_12: u32 = d5b; let r1_13: u32 = d6b; let r1_14: u32 = d7b; let r1_15: u32 = d4b;
+
+        // ── Round 2 — sigma[11,8,12,0,5,2,15,13,10,14,3,6,7,1,9,4] ──────
+        let (a0c, b0c, c0c, d0c) = g_mix(r1_0, r1_4, r1_8,  r1_12, m11, m8);
+        let (a1c, b1c, c1c, d1c) = g_mix(r1_1, r1_5, r1_9,  r1_13, m12, m0);
+        let (a2c, b2c, c2c, d2c) = g_mix(r1_2, r1_6, r1_10, r1_14, m5,  m2);
+        let (a3c, b3c, c3c, d3c) = g_mix(r1_3, r1_7, r1_11, r1_15, m15, m13);
+        let (a4c, b4c, c4c, d4c) = g_mix(a0c, b1c, c2c, d3c, m10, m14);
+        let (a5c, b5c, c5c, d5c) = g_mix(a1c, b2c, c3c, d0c, m3,  m6);
+        let (a6c, b6c, c6c, d6c) = g_mix(a2c, b3c, c0c, d1c, m7,  m1);
+        let (a7c, b7c, c7c, d7c) = g_mix(a3c, b0c, c1c, d2c, m9,  m4);
+        let r2_0: u32 = a4c; let r2_1: u32 = a5c; let r2_2: u32 = a6c; let r2_3: u32 = a7c;
+        let r2_4: u32 = b7c; let r2_5: u32 = b4c; let r2_6: u32 = b5c; let r2_7: u32 = b6c;
+        let r2_8: u32 = c6c; let r2_9: u32 = c7c; let r2_10: u32 = c4c; let r2_11: u32 = c5c;
+        let r2_12: u32 = d5c; let r2_13: u32 = d6c; let r2_14: u32 = d7c; let r2_15: u32 = d4c;
+
+        // ── Round 3 — sigma[7,9,3,1,13,12,11,14,2,6,5,10,4,0,15,8] ──────
+        let (a0d, b0d, c0d, d0d) = g_mix(r2_0, r2_4, r2_8,  r2_12, m7,  m9);
+        let (a1d, b1d, c1d, d1d) = g_mix(r2_1, r2_5, r2_9,  r2_13, m3,  m1);
+        let (a2d, b2d, c2d, d2d) = g_mix(r2_2, r2_6, r2_10, r2_14, m13, m12);
+        let (a3d, b3d, c3d, d3d) = g_mix(r2_3, r2_7, r2_11, r2_15, m11, m14);
+        let (a4d, b4d, c4d, d4d) = g_mix(a0d, b1d, c2d, d3d, m2,  m6);
+        let (a5d, b5d, c5d, d5d) = g_mix(a1d, b2d, c3d, d0d, m5,  m10);
+        let (a6d, b6d, c6d, d6d) = g_mix(a2d, b3d, c0d, d1d, m4,  m0);
+        let (a7d, b7d, c7d, d7d) = g_mix(a3d, b0d, c1d, d2d, m15, m8);
+        let r3_0: u32 = a4d; let r3_1: u32 = a5d; let r3_2: u32 = a6d; let r3_3: u32 = a7d;
+        let r3_4: u32 = b7d; let r3_5: u32 = b4d; let r3_6: u32 = b5d; let r3_7: u32 = b6d;
+        let r3_8: u32 = c6d; let r3_9: u32 = c7d; let r3_10: u32 = c4d; let r3_11: u32 = c5d;
+        let r3_12: u32 = d5d; let r3_13: u32 = d6d; let r3_14: u32 = d7d; let r3_15: u32 = d4d;
+
+        // ── Round 4 — sigma[9,0,5,7,2,4,10,15,14,1,11,12,6,8,3,13] ──────
+        let (a0e, b0e, c0e, d0e) = g_mix(r3_0, r3_4, r3_8,  r3_12, m9,  m0);
+        let (a1e, b1e, c1e, d1e) = g_mix(r3_1, r3_5, r3_9,  r3_13, m5,  m7);
+        let (a2e, b2e, c2e, d2e) = g_mix(r3_2, r3_6, r3_10, r3_14, m2,  m4);
+        let (a3e, b3e, c3e, d3e) = g_mix(r3_3, r3_7, r3_11, r3_15, m10, m15);
+        let (a4e, b4e, c4e, d4e) = g_mix(a0e, b1e, c2e, d3e, m14, m1);
+        let (a5e, b5e, c5e, d5e) = g_mix(a1e, b2e, c3e, d0e, m11, m12);
+        let (a6e, b6e, c6e, d6e) = g_mix(a2e, b3e, c0e, d1e, m6,  m8);
+        let (a7e, b7e, c7e, d7e) = g_mix(a3e, b0e, c1e, d2e, m3,  m13);
+        let r4_0: u32 = a4e; let r4_1: u32 = a5e; let r4_2: u32 = a6e; let r4_3: u32 = a7e;
+        let r4_4: u32 = b7e; let r4_5: u32 = b4e; let r4_6: u32 = b5e; let r4_7: u32 = b6e;
+        let r4_8: u32 = c6e; let r4_9: u32 = c7e; let r4_10: u32 = c4e; let r4_11: u32 = c5e;
+        let r4_12: u32 = d5e; let r4_13: u32 = d6e; let r4_14: u32 = d7e; let r4_15: u32 = d4e;
+
+        // ── Round 5 — sigma[2,12,6,10,0,11,8,3,4,13,7,5,15,14,1,9] ──────
+        let (a0f, b0f, c0f, d0f) = g_mix(r4_0, r4_4, r4_8,  r4_12, m2,  m12);
+        let (a1f, b1f, c1f, d1f) = g_mix(r4_1, r4_5, r4_9,  r4_13, m6,  m10);
+        let (a2f, b2f, c2f, d2f) = g_mix(r4_2, r4_6, r4_10, r4_14, m0,  m11);
+        let (a3f, b3f, c3f, d3f) = g_mix(r4_3, r4_7, r4_11, r4_15, m8,  m3);
+        let (a4f, b4f, c4f, d4f) = g_mix(a0f, b1f, c2f, d3f, m4,  m13);
+        let (a5f, b5f, c5f, d5f) = g_mix(a1f, b2f, c3f, d0f, m7,  m5);
+        let (a6f, b6f, c6f, d6f) = g_mix(a2f, b3f, c0f, d1f, m15, m14);
+        let (a7f, b7f, c7f, d7f) = g_mix(a3f, b0f, c1f, d2f, m1,  m9);
+        let r5_0: u32 = a4f; let r5_1: u32 = a5f; let r5_2: u32 = a6f; let r5_3: u32 = a7f;
+        let r5_4: u32 = b7f; let r5_5: u32 = b4f; let r5_6: u32 = b5f; let r5_7: u32 = b6f;
+        let r5_8: u32 = c6f; let r5_9: u32 = c7f; let r5_10: u32 = c4f; let r5_11: u32 = c5f;
+        let r5_12: u32 = d5f; let r5_13: u32 = d6f; let r5_14: u32 = d7f; let r5_15: u32 = d4f;
+
+        // ── Round 6 — sigma[12,5,1,15,14,13,4,10,0,7,6,3,9,2,8,11] ──────
+        let (a0g, b0g, c0g, d0g) = g_mix(r5_0, r5_4, r5_8,  r5_12, m12, m5);
+        let (a1g, b1g, c1g, d1g) = g_mix(r5_1, r5_5, r5_9,  r5_13, m1,  m15);
+        let (a2g, b2g, c2g, d2g) = g_mix(r5_2, r5_6, r5_10, r5_14, m14, m13);
+        let (a3g, b3g, c3g, d3g) = g_mix(r5_3, r5_7, r5_11, r5_15, m4,  m10);
+        let (a4g, b4g, c4g, d4g) = g_mix(a0g, b1g, c2g, d3g, m0,  m7);
+        let (a5g, b5g, c5g, d5g) = g_mix(a1g, b2g, c3g, d0g, m6,  m3);
+        let (a6g, b6g, c6g, d6g) = g_mix(a2g, b3g, c0g, d1g, m9,  m2);
+        let (a7g, b7g, c7g, d7g) = g_mix(a3g, b0g, c1g, d2g, m8,  m11);
+        let r6_0: u32 = a4g; let r6_1: u32 = a5g; let r6_2: u32 = a6g; let r6_3: u32 = a7g;
+        let r6_4: u32 = b7g; let r6_5: u32 = b4g; let r6_6: u32 = b5g; let r6_7: u32 = b6g;
+        let r6_8: u32 = c6g; let r6_9: u32 = c7g; let r6_10: u32 = c4g; let r6_11: u32 = c5g;
+        let r6_12: u32 = d5g; let r6_13: u32 = d6g; let r6_14: u32 = d7g; let r6_15: u32 = d4g;
+
+        // ── Round 7 — sigma[13,11,7,14,12,1,3,9,5,0,15,4,8,6,2,10] ──────
+        let (a0h, b0h, c0h, d0h) = g_mix(r6_0, r6_4, r6_8,  r6_12, m13, m11);
+        let (a1h, b1h, c1h, d1h) = g_mix(r6_1, r6_5, r6_9,  r6_13, m7,  m14);
+        let (a2h, b2h, c2h, d2h) = g_mix(r6_2, r6_6, r6_10, r6_14, m12, m1);
+        let (a3h, b3h, c3h, d3h) = g_mix(r6_3, r6_7, r6_11, r6_15, m3,  m9);
+        let (a4h, b4h, c4h, d4h) = g_mix(a0h, b1h, c2h, d3h, m5,  m0);
+        let (a5h, b5h, c5h, d5h) = g_mix(a1h, b2h, c3h, d0h, m15, m4);
+        let (a6h, b6h, c6h, d6h) = g_mix(a2h, b3h, c0h, d1h, m8,  m6);
+        let (a7h, b7h, c7h, d7h) = g_mix(a3h, b0h, c1h, d2h, m2,  m10);
+        let r7_0: u32 = a4h; let r7_1: u32 = a5h; let r7_2: u32 = a6h; let r7_3: u32 = a7h;
+        let r7_4: u32 = b7h; let r7_5: u32 = b4h; let r7_6: u32 = b5h; let r7_7: u32 = b6h;
+        let r7_8: u32 = c6h; let r7_9: u32 = c7h; let r7_10: u32 = c4h; let r7_11: u32 = c5h;
+        let r7_12: u32 = d5h; let r7_13: u32 = d6h; let r7_14: u32 = d7h; let r7_15: u32 = d4h;
+
+        // ── Round 8 — sigma[6,15,14,9,11,3,0,8,12,2,13,7,1,4,10,5] ──────
+        let (a0i, b0i, c0i, d0i) = g_mix(r7_0, r7_4, r7_8,  r7_12, m6,  m15);
+        let (a1i, b1i, c1i, d1i) = g_mix(r7_1, r7_5, r7_9,  r7_13, m14, m9);
+        let (a2i, b2i, c2i, d2i) = g_mix(r7_2, r7_6, r7_10, r7_14, m11, m3);
+        let (a3i, b3i, c3i, d3i) = g_mix(r7_3, r7_7, r7_11, r7_15, m0,  m8);
+        let (a4i, b4i, c4i, d4i) = g_mix(a0i, b1i, c2i, d3i, m12, m2);
+        let (a5i, b5i, c5i, d5i) = g_mix(a1i, b2i, c3i, d0i, m13, m7);
+        let (a6i, b6i, c6i, d6i) = g_mix(a2i, b3i, c0i, d1i, m1,  m4);
+        let (a7i, b7i, c7i, d7i) = g_mix(a3i, b0i, c1i, d2i, m10, m5);
+        let r8_0: u32 = a4i; let r8_1: u32 = a5i; let r8_2: u32 = a6i; let r8_3: u32 = a7i;
+        let r8_4: u32 = b7i; let r8_5: u32 = b4i; let r8_6: u32 = b5i; let r8_7: u32 = b6i;
+        let r8_8: u32 = c6i; let r8_9: u32 = c7i; let r8_10: u32 = c4i; let r8_11: u32 = c5i;
+        let r8_12: u32 = d5i; let r8_13: u32 = d6i; let r8_14: u32 = d7i; let r8_15: u32 = d4i;
+
+        // ── Round 9 — sigma[10,2,8,4,7,6,1,5,15,11,9,14,3,12,13,0] ──────
+        let (a0j, b0j, c0j, d0j) = g_mix(r8_0, r8_4, r8_8,  r8_12, m10, m2);
+        let (a1j, b1j, c1j, d1j) = g_mix(r8_1, r8_5, r8_9,  r8_13, m8,  m4);
+        let (a2j, b2j, c2j, d2j) = g_mix(r8_2, r8_6, r8_10, r8_14, m7,  m6);
+        let (a3j, b3j, c3j, d3j) = g_mix(r8_3, r8_7, r8_11, r8_15, m1,  m5);
+        let (a4j, b4j, c4j, d4j) = g_mix(a0j, b1j, c2j, d3j, m15, m11);
+        let (a5j, b5j, c5j, d5j) = g_mix(a1j, b2j, c3j, d0j, m9,  m14);
+        let (a6j, b6j, c6j, d6j) = g_mix(a2j, b3j, c0j, d1j, m3,  m12);
+        let (a7j, b7j, c7j, d7j) = g_mix(a3j, b0j, c1j, d2j, m13, m0);
+        // Final state after round 9.
+        let f0: u32  = a4j; let f1: u32  = a5j; let f2: u32  = a6j; let f3: u32  = a7j;
+        let f4: u32  = b7j; let f5: u32  = b4j; let f6: u32  = b5j; let f7: u32  = b6j;
+        let f8: u32  = c6j; let f9: u32  = c7j; let f10: u32 = c4j; let f11: u32 = c5j;
+        let f12: u32 = d5j; let f13: u32 = d6j; let f14: u32 = d7j; let f15: u32 = d4j;
+
+        // ── Finalization: h[i] ^= v[i] ^ v[i+8] ─────────────────────────
+        let out0: u32 = h0 ^ f0 ^ f8;
+        let out1: u32 = h1 ^ f1 ^ f9;
+        let out2: u32 = h2 ^ f2 ^ f10;
+        let out3: u32 = h3 ^ f3 ^ f11;
+        let out4: u32 = h4 ^ f4 ^ f12;
+        let out5: u32 = h5 ^ f5 ^ f13;
+        let out6: u32 = h6 ^ f6 ^ f14;
+        let out7: u32 = h7 ^ f7 ^ f15;
+
+        // ── Write with M31 reduction (matches STORE_HASH8) ──────────────
+        // Guard re-establishes (base + 7 < hashes.len). The kernel-level
+        // precondition `n_leaves * 8 <= hashes.len` combined with
+        // `leaf < n_leaves` implies it, but the bounds prover doesn't
+        // reason through the non-linear `*` so we restate it explicitly.
+        let base: u64 = leaf * 8u64;
+        if base + 7u64 < hashes.len {
+            hashes[base]        = reduce_word(out0);
+            hashes[base + 1u64] = reduce_word(out1);
+            hashes[base + 2u64] = reduce_word(out2);
+            hashes[base + 3u64] = reduce_word(out3);
+            hashes[base + 4u64] = reduce_word(out4);
+            hashes[base + 5u64] = reduce_word(out5);
+            hashes[base + 6u64] = reduce_word(out6);
+            hashes[base + 7u64] = reduce_word(out7);
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }

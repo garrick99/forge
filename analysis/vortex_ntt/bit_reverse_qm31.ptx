@@ -1,0 +1,142 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry bit_reverse_qm31(
+    .param .u64 bit_reverse_qm31_param_in_buf_data,
+    .param .u64 bit_reverse_qm31_param_in_buf_len,
+    .param .u64 bit_reverse_qm31_param_out_buf_data,
+    .param .u64 bit_reverse_qm31_param_out_buf_len,
+    .param .u64 bit_reverse_qm31_param_n,
+    .param .u32 bit_reverse_qm31_param_log_n
+)
+{
+    .reg .pred %p11, %p18, %p37, %p41;
+    .reg .u64 %rd0, %rd1, %rd12, %rd2, %rd29, %rd3, %rd30, %rd31, %rd32, %rd33, %rd34, %rd35, %rd36, %rd39, %rd4, %rd40, %rd43, %rd44, %rd45, %rd47, %rd48, %rd49, %rd50, %rd51, %rd52, %rd53, %rd54, %rd56, %rd57, %rd58, %rd59, %rd60, %rd61, %rd62, %rd63, %rd64, %rd65, %rd67, %rd68, %rd69, %rd70, %rd71, %rd72, %rd73, %rd74, %rd75, %rd76, %rd78, %rd79, %rd80, %rd81, %rd82;
+    .reg .u32 %r10, %r14, %r15, %r16, %r19, %r20, %r21, %r22, %r23, %r24, %r25, %r26, %r27, %r28, %r46, %r5, %r55, %r6, %r66, %r7, %r77, %r8, %r83, %r84, %r85, %r86, %r87, %r88, %r89, %r9;
+
+  ld.param.u64 %rd0, [bit_reverse_qm31_param_in_buf_data];
+  ld.param.u64 %rd1, [bit_reverse_qm31_param_in_buf_len];
+  ld.param.u64 %rd2, [bit_reverse_qm31_param_out_buf_data];
+  ld.param.u64 %rd3, [bit_reverse_qm31_param_out_buf_len];
+  ld.param.u64 %rd4, [bit_reverse_qm31_param_n];
+  ld.param.u32 %r5, [bit_reverse_qm31_param_log_n];
+
+  mov.u32 %r6, %ctaid.x;
+  mov.u32 %r7, %ntid.x;
+  mul.lo.u32 %r8, %r6, %r7;
+  mov.u32 %r9, %tid.x;
+  add.u32 %r10, %r8, %r9;
+  cvt.u64.u32 %rd12, %r10;
+  setp.lt.u64 %p11, %rd12, %rd4;
+  @%p11 bra bit_reverse_qm31_then_13;
+  bra bit_reverse_qm31_else_13;
+  bit_reverse_qm31_then_13:
+  cvt.u32.u64 %r14, %r10;
+  mov.u32 %r15, 0;
+  mov.u32 %r16, 0;
+  bit_reverse_qm31_loop_17:
+  setp.lt.u32 %p18, %r16, %r5;
+  @!%p18 bra bit_reverse_qm31_loop_end_17;
+  mov.u32 %r19, 1;
+  shl.b32 %r20, %r15, %r19;
+  mov.u32 %r21, 1;
+  and.b32 %r22, %r14, %r21;
+  or.b32 %r23, %r20, %r22;
+  mov.u32 %r24, 1;
+  shr.u32 %r25, %r14, %r24;
+  mov.u32 %r26, 1;
+  add.u32 %r27, %r16, %r26;
+  mov.u32 %r15, %r23; // loop wb: r
+  mov.u32 %r14, %r25; // loop wb: x
+  mov.u32 %r16, %r27; // loop wb: i
+  bra bit_reverse_qm31_loop_17;
+  bit_reverse_qm31_loop_end_17:
+  mov.u32 %r28, 0; // unit
+  mov.u64 %rd29, 4;
+  cvt.u64.u32 %rd30, %r10;
+  mul.lo.u64 %rd31, %rd30, %rd29;
+  cvt.u64.u32 %rd32, %r15;
+  mov.u64 %rd33, 4;
+  mul.lo.u64 %rd34, %rd32, %rd33;
+  mov.u64 %rd35, 3;
+  add.u64 %rd36, %rd31, %rd35;
+  setp.lt.u64 %p37, %rd36, %rd1;
+  @%p37 bra bit_reverse_qm31_then_38;
+  bra bit_reverse_qm31_else_38;
+  bit_reverse_qm31_then_38:
+  mov.u64 %rd39, 3;
+  add.u64 %rd40, %rd34, %rd39;
+  setp.lt.u64 %p41, %rd40, %rd3;
+  @%p41 bra bit_reverse_qm31_then_42;
+  bra bit_reverse_qm31_else_42;
+  bit_reverse_qm31_then_42:
+  mov.u64 %rd43, 4;
+  mul.lo.u64 %rd44, %rd31, %rd43;
+  add.u64 %rd45, %rd0, %rd44;
+  ld.global.u32 %r46, [%rd45];
+  mov.u64 %rd47, 4;
+  mul.lo.u64 %rd48, %rd34, %rd47;
+  add.u64 %rd49, %rd2, %rd48;
+  st.global.u32 [%rd49], %r46;
+  mov.u64 %rd50, 1;
+  add.u64 %rd51, %rd31, %rd50;
+  mov.u64 %rd52, 4;
+  mul.lo.u64 %rd53, %rd51, %rd52;
+  add.u64 %rd54, %rd0, %rd53;
+  ld.global.u32 %r55, [%rd54];
+  mov.u64 %rd56, 1;
+  add.u64 %rd57, %rd34, %rd56;
+  mov.u64 %rd58, 4;
+  mul.lo.u64 %rd59, %rd57, %rd58;
+  add.u64 %rd60, %rd2, %rd59;
+  st.global.u32 [%rd60], %r55;
+  mov.u64 %rd61, 2;
+  add.u64 %rd62, %rd31, %rd61;
+  mov.u64 %rd63, 4;
+  mul.lo.u64 %rd64, %rd62, %rd63;
+  add.u64 %rd65, %rd0, %rd64;
+  ld.global.u32 %r66, [%rd65];
+  mov.u64 %rd67, 2;
+  add.u64 %rd68, %rd34, %rd67;
+  mov.u64 %rd69, 4;
+  mul.lo.u64 %rd70, %rd68, %rd69;
+  add.u64 %rd71, %rd2, %rd70;
+  st.global.u32 [%rd71], %r66;
+  mov.u64 %rd72, 3;
+  add.u64 %rd73, %rd31, %rd72;
+  mov.u64 %rd74, 4;
+  mul.lo.u64 %rd75, %rd73, %rd74;
+  add.u64 %rd76, %rd0, %rd75;
+  ld.global.u32 %r77, [%rd76];
+  mov.u64 %rd78, 3;
+  add.u64 %rd79, %rd34, %rd78;
+  mov.u64 %rd80, 4;
+  mul.lo.u64 %rd81, %rd79, %rd80;
+  add.u64 %rd82, %rd2, %rd81;
+  st.global.u32 [%rd82], %r77;
+  mov.u32 %r83, 0; // unit
+  mov.u32 %r84, %r83;
+  bra bit_reverse_qm31_end_42;
+  bit_reverse_qm31_else_42:
+  mov.u32 %r84, 0; // no else branch
+  bit_reverse_qm31_end_42:
+  mov.u32 %r85, 0; // unit
+  mov.u32 %r86, %r85;
+  bra bit_reverse_qm31_end_38;
+  bit_reverse_qm31_else_38:
+  mov.u32 %r86, 0; // no else branch
+  bit_reverse_qm31_end_38:
+  mov.u32 %r87, 0; // unit
+  mov.u32 %r88, %r87;
+  bra bit_reverse_qm31_end_13;
+  bit_reverse_qm31_else_13:
+  mov.u32 %r88, 0; // no else branch
+  bit_reverse_qm31_end_13:
+  mov.u32 %r89, 0; // unit
+  ret;
+}
+

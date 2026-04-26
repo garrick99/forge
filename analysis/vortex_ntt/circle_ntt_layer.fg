@@ -1,0 +1,107 @@
+// VortexSTARK Circle NTT layer kernel — FORGE pilot.
+//
+// Replaces `cuda/circle_ntt.cu::circle_ntt_layer_kernel`. Applies one
+// FFT-style butterfly layer (forward or inverse) to an M31 column.
+// Each thread processes one (idx0, idx1) pair:
+//
+//   forward:  v0' = v0 + v1*t   v1' = v0 - v1*t
+//   inverse:  v0' = v0 + v1     v1' = (v0 - v1)*t
+//
+// Index pairing (matches the hand-written kernel exactly):
+//   stride = 1 << layer_idx
+//   h = tid >> layer_idx;      l = tid & (stride - 1)
+//   idx0 = (h << (layer_idx + 1)) + l;   idx1 = idx0 + stride
+//   t = twiddles[h]
+//
+// FORGE proves bounds on data[idx0..idx1] reads/writes and guards
+// against twiddles[h] OOB. Two kernels: forward + inverse — splitting
+// avoids the runtime branch that hand-written `if (forward)` carries.
+
+use std::gpu;
+use std::m31;
+
+#[device]
+fn reduce_word(v: u32) -> u32
+    ensures result < M31_P
+{
+    let lo: u32 = v & M31_P;
+    let hi: u32 = v >> 31u32;
+    let r: u32 = lo + hi;
+    if r >= M31_P { r - M31_P } else { r }
+}
+
+#[kernel]
+fn circle_ntt_layer_forward(
+    data: span<u32>,
+    twiddles: span<u32>,
+    layer_idx: u32,
+    half_n: u64
+)
+    requires layer_idx < 31u32
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < half_n {
+        // Index decomposition. layer_idx < 31 keeps stride within u32.
+        let stride: u64 = 1u64 << (layer_idx as u64);
+        let h: u64 = tid >> (layer_idx as u64);
+        let l: u64 = tid & (stride - 1u64);
+        let idx0: u64 = (h << ((layer_idx + 1u32) as u64)) + l;
+        let idx1: u64 = idx0 + stride;
+
+        // Re-establish bounds — SMT can't follow the bit-math.
+        // Both bounds explicit — SMT can't derive idx0 < idx1 from
+        // idx1 = idx0 + stride without proving stride > 0.
+        if idx0 < data.len {
+            if idx1 < data.len {
+                if h < twiddles.len {
+                    let v0: u32 = reduce_word(data[idx0]);
+                    let v1: u32 = reduce_word(data[idx1]);
+                    let t: u32  = reduce_word(twiddles[h]);
+
+                    // forward butterfly: v0' = v0 + v1*t, v1' = v0 - v1*t
+                    let tmp: u32 = m31_mul(v1, t);
+                    data[idx0] = m31_add(v0, tmp);
+                    data[idx1] = m31_sub(v0, tmp);
+                };
+            };
+        };
+    };
+}
+
+#[kernel]
+fn circle_ntt_layer_inverse(
+    data: span<u32>,
+    twiddles: span<u32>,
+    layer_idx: u32,
+    half_n: u64
+)
+    requires layer_idx < 31u32
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if tid < half_n {
+        let stride: u64 = 1u64 << (layer_idx as u64);
+        let h: u64 = tid >> (layer_idx as u64);
+        let l: u64 = tid & (stride - 1u64);
+        let idx0: u64 = (h << ((layer_idx + 1u32) as u64)) + l;
+        let idx1: u64 = idx0 + stride;
+
+        if idx0 < data.len {
+            if idx1 < data.len {
+                if h < twiddles.len {
+                    let v0: u32 = reduce_word(data[idx0]);
+                    let v1: u32 = reduce_word(data[idx1]);
+                    let t: u32  = reduce_word(twiddles[h]);
+
+                    // inverse butterfly: v0' = v0 + v1, v1' = (v0 - v1)*t
+                    // Bind m31_sub result so SMT can track its
+                    // `ensures result < M31_P` postcondition into m31_mul.
+                    let diff: u32 = m31_sub(v0, v1);
+                    data[idx0] = m31_add(v0, v1);
+                    data[idx1] = m31_mul(diff, t);
+                };
+            };
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,67 @@
+// VortexSTARK QM31 bit-reverse kernel — FORGE pilot.
+//
+// Replaces `cuda/bit_reverse_wide.cu`. SecureField columns store QM31
+// elements as 4 consecutive u32s. This kernel permutes the elements
+// (4-u32 chunks) into bit-reversed index order:
+//   for i in [0, n): out[bit_reverse(i, log_n)*4 .. +4] = in[i*4 .. +4]
+//
+// FORGE's interesting work here is the **bounded loop with measure**:
+// `bit_reverse_u32` runs `log_n` iterations; FORGE proves termination
+// via the `decreases log_n - i` clause and proves the result type
+// (u32) doesn't overflow on each shift since log_n <= 32.
+
+use std::gpu;
+
+// Reverse the low `log_n` bits of `v`. Top bits (≥ log_n) are dropped.
+// Termination: each iteration increases `i`, and the loop exits when
+// `i == log_n`. The decreases clause gives Z3 the measure.
+#[device]
+fn bit_reverse_u32(v: u32, log_n: u32) -> u32
+    requires log_n <= 32u32
+{
+    let mut r: u32 = 0u32;
+    let mut x: u32 = v;
+    let mut i: u32 = 0u32;
+    while i < log_n
+        invariant i <= log_n
+        decreases log_n - i
+    {
+        r = (r << 1u32) | (x & 1u32);
+        x = x >> 1u32;
+        i = i + 1u32;
+    };
+    r
+}
+
+#[kernel]
+fn bit_reverse_qm31(
+    in_buf: span<u32>,
+    out_buf: span<u32>,
+    n: u64,
+    log_n: u32
+)
+    requires log_n <= 32u32
+    requires n * 4u64 <= in_buf.len
+    requires n * 4u64 <= out_buf.len
+{
+    let i: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if i < n {
+        // Compute the bit-reversed destination index.
+        let j: u32 = bit_reverse_u32(i as u32, log_n);
+        let src_off: u64 = i * 4u64;
+        let dst_off: u64 = (j as u64) * 4u64;
+        // Bounds re-establishment for SMT — same non-linear-mul issue
+        // as the merkle kernel: from `i < n` and `n*4 <= len` the prover
+        // can't auto-derive `i*4 + 3 < len`.
+        if src_off + 3u64 < in_buf.len {
+            if dst_off + 3u64 < out_buf.len {
+                out_buf[dst_off]        = in_buf[src_off];
+                out_buf[dst_off + 1u64] = in_buf[src_off + 1u64];
+                out_buf[dst_off + 2u64] = in_buf[src_off + 2u64];
+                out_buf[dst_off + 3u64] = in_buf[src_off + 3u64];
+            };
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }

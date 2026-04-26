@@ -1,0 +1,395 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry circle_ntt_layer_forward(
+    .param .u64 circle_ntt_layer_forward_param_data_data,
+    .param .u64 circle_ntt_layer_forward_param_data_len,
+    .param .u64 circle_ntt_layer_forward_param_twiddles_data,
+    .param .u64 circle_ntt_layer_forward_param_twiddles_len,
+    .param .u32 circle_ntt_layer_forward_param_layer_idx,
+    .param .u64 circle_ntt_layer_forward_param_half_n
+)
+{
+    .reg .pred %p102, %p11, %p30, %p32, %p34, %p45, %p60, %p75, %p91;
+    .reg .u64 %rd0, %rd1, %rd100, %rd101, %rd104, %rd105, %rd106, %rd107, %rd109, %rd110, %rd111, %rd12, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd26, %rd27, %rd28, %rd29, %rd3, %rd36, %rd37, %rd38, %rd46, %rd5, %rd51, %rd52, %rd53, %rd61, %rd66, %rd67, %rd68, %rd76, %rd81, %rd82, %rd83, %rd84, %rd85, %rd87, %rd88, %rd89, %rd90, %rd93, %rd94, %rd96, %rd97, %rd98, %rd99;
+    .reg .u32 %r10, %r108, %r112, %r113, %r114, %r115, %r116, %r117, %r118, %r119, %r120, %r24, %r25, %r39, %r4, %r40, %r41, %r42, %r43, %r44, %r48, %r49, %r50, %r54, %r55, %r56, %r57, %r58, %r59, %r6, %r63, %r64, %r65, %r69, %r7, %r70, %r71, %r72, %r73, %r74, %r78, %r79, %r8, %r80, %r86, %r9, %r95;
+
+  ld.param.u64 %rd0, [circle_ntt_layer_forward_param_data_data];
+  ld.param.u64 %rd1, [circle_ntt_layer_forward_param_data_len];
+  ld.param.u64 %rd2, [circle_ntt_layer_forward_param_twiddles_data];
+  ld.param.u64 %rd3, [circle_ntt_layer_forward_param_twiddles_len];
+  ld.param.u32 %r4, [circle_ntt_layer_forward_param_layer_idx];
+  ld.param.u64 %rd5, [circle_ntt_layer_forward_param_half_n];
+
+  mov.u32 %r6, %ctaid.x;
+  mov.u32 %r7, %ntid.x;
+  mul.lo.u32 %r8, %r6, %r7;
+  mov.u32 %r9, %tid.x;
+  add.u32 %r10, %r8, %r9;
+  cvt.u64.u32 %rd12, %r10;
+  setp.lt.u64 %p11, %rd12, %rd5;
+  @%p11 bra circle_ntt_layer_forward_then_13;
+  bra circle_ntt_layer_forward_else_13;
+  circle_ntt_layer_forward_then_13:
+  mov.u64 %rd14, 1;
+  cvt.u64.u32 %rd15, %r4;
+  shl.b64 %rd16, %rd14, %rd15;
+  cvt.u64.u32 %rd17, %r4;
+  cvt.u64.u32 %rd18, %r10;
+  shr.u64 %rd19, %r10, %rd17;
+  mov.u64 %rd20, 1;
+  sub.u64 %rd21, %rd16, %rd20;
+  cvt.u64.u32 %rd22, %r10;
+  and.b64 %rd23, %r10, %rd21;
+  mov.u32 %r24, 1;
+  add.u32 %r25, %r4, %r24;
+  cvt.u64.u32 %rd26, %r25;
+  shl.b64 %rd27, %rd19, %rd26;
+  add.u64 %rd28, %rd27, %rd23;
+  add.u64 %rd29, %rd28, %rd16;
+  setp.lt.u64 %p30, %rd28, %rd1;
+  @%p30 bra circle_ntt_layer_forward_then_31;
+  bra circle_ntt_layer_forward_else_31;
+  circle_ntt_layer_forward_then_31:
+  setp.lt.u64 %p32, %rd29, %rd1;
+  @%p32 bra circle_ntt_layer_forward_then_33;
+  bra circle_ntt_layer_forward_else_33;
+  circle_ntt_layer_forward_then_33:
+  setp.lt.u64 %p34, %rd19, %rd3;
+  @%p34 bra circle_ntt_layer_forward_then_35;
+  bra circle_ntt_layer_forward_else_35;
+  circle_ntt_layer_forward_then_35:
+  mov.u64 %rd36, 4;
+  mul.lo.u64 %rd37, %rd28, %rd36;
+  add.u64 %rd38, %rd0, %rd37;
+  ld.global.u32 %r39, [%rd38];
+  cvt.u32.u64 %r40, %rd_unknown_M31_P;
+  and.b32 %r41, %r39, %rd_unknown_M31_P;
+  mov.u32 %r42, 31;
+  shr.u32 %r43, %r39, %r42;
+  add.u32 %r44, %r41, %r43;
+  cvt.u64.u32 %rd46, %r44;
+  setp.ge.u64 %p45, %rd46, %rd_unknown_M31_P;
+  @%p45 bra circle_ntt_layer_forward_then_47;
+  bra circle_ntt_layer_forward_else_47;
+  circle_ntt_layer_forward_then_47:
+  cvt.u32.u64 %r48, %rd_unknown_M31_P;
+  sub.u32 %r49, %r44, %r48;
+  mov.u32 %r50, %r49;
+  bra circle_ntt_layer_forward_end_47;
+  circle_ntt_layer_forward_else_47:
+  mov.u32 %r50, %r44;
+  circle_ntt_layer_forward_end_47:
+  mov.u64 %rd51, 4;
+  mul.lo.u64 %rd52, %rd29, %rd51;
+  add.u64 %rd53, %rd0, %rd52;
+  ld.global.u32 %r54, [%rd53];
+  cvt.u32.u64 %r55, %rd_unknown_M31_P;
+  and.b32 %r56, %r54, %rd_unknown_M31_P;
+  mov.u32 %r57, 31;
+  shr.u32 %r58, %r54, %r57;
+  add.u32 %r59, %r56, %r58;
+  cvt.u64.u32 %rd61, %r59;
+  setp.ge.u64 %p60, %rd61, %rd_unknown_M31_P;
+  @%p60 bra circle_ntt_layer_forward_then_62;
+  bra circle_ntt_layer_forward_else_62;
+  circle_ntt_layer_forward_then_62:
+  cvt.u32.u64 %r63, %rd_unknown_M31_P;
+  sub.u32 %r64, %r59, %r63;
+  mov.u32 %r65, %r64;
+  bra circle_ntt_layer_forward_end_62;
+  circle_ntt_layer_forward_else_62:
+  mov.u32 %r65, %r59;
+  circle_ntt_layer_forward_end_62:
+  mov.u64 %rd66, 4;
+  mul.lo.u64 %rd67, %rd19, %rd66;
+  add.u64 %rd68, %rd2, %rd67;
+  ld.global.u32 %r69, [%rd68];
+  cvt.u32.u64 %r70, %rd_unknown_M31_P;
+  and.b32 %r71, %r69, %rd_unknown_M31_P;
+  mov.u32 %r72, 31;
+  shr.u32 %r73, %r69, %r72;
+  add.u32 %r74, %r71, %r73;
+  cvt.u64.u32 %rd76, %r74;
+  setp.ge.u64 %p75, %rd76, %rd_unknown_M31_P;
+  @%p75 bra circle_ntt_layer_forward_then_77;
+  bra circle_ntt_layer_forward_else_77;
+  circle_ntt_layer_forward_then_77:
+  cvt.u32.u64 %r78, %rd_unknown_M31_P;
+  sub.u32 %r79, %r74, %r78;
+  mov.u32 %r80, %r79;
+  bra circle_ntt_layer_forward_end_77;
+  circle_ntt_layer_forward_else_77:
+  mov.u32 %r80, %r74;
+  circle_ntt_layer_forward_end_77:
+  cvt.u64.u32 %rd81, %r65;
+  cvt.u64.u32 %rd82, %r80;
+  mul.lo.u64 %rd83, %rd81, %rd82;
+  cvt.u64.u32 %rd84, %rd_unknown_M31_P;
+  rem.u64 %rd85, %rd83, %rd84;
+  cvt.u32.u64 %r86, %rd85;
+  cvt.u64.u32 %rd87, %r50;
+  cvt.u64.u32 %rd88, %r86;
+  add.u64 %rd89, %rd87, %rd88;
+  cvt.u64.u32 %rd90, %rd_unknown_M31_P;
+  setp.ge.u64 %p91, %rd89, %rd90;
+  @%p91 bra circle_ntt_layer_forward_then_92;
+  bra circle_ntt_layer_forward_else_92;
+  circle_ntt_layer_forward_then_92:
+  sub.u64 %rd93, %rd89, %rd90;
+  mov.u64 %rd94, %rd93;
+  bra circle_ntt_layer_forward_end_92;
+  circle_ntt_layer_forward_else_92:
+  mov.u64 %rd94, %rd89;
+  circle_ntt_layer_forward_end_92:
+  cvt.u32.u64 %r95, %rd94;
+  mov.u64 %rd96, 4;
+  mul.lo.u64 %rd97, %rd28, %rd96;
+  add.u64 %rd98, %rd0, %rd97;
+  st.global.u32 [%rd98], %r95;
+  cvt.u64.u32 %rd99, %r50;
+  cvt.u64.u32 %rd100, %r86;
+  cvt.u64.u32 %rd101, %rd_unknown_M31_P;
+  setp.ge.u64 %p102, %rd99, %rd100;
+  @%p102 bra circle_ntt_layer_forward_then_103;
+  bra circle_ntt_layer_forward_else_103;
+  circle_ntt_layer_forward_then_103:
+  sub.u64 %rd104, %rd99, %rd100;
+  mov.u64 %rd105, %rd104;
+  bra circle_ntt_layer_forward_end_103;
+  circle_ntt_layer_forward_else_103:
+  add.u64 %rd106, %rd99, %rd101;
+  sub.u64 %rd107, %rd106, %rd100;
+  mov.u64 %rd105, %rd107;
+  circle_ntt_layer_forward_end_103:
+  cvt.u32.u64 %r108, %rd105;
+  mov.u64 %rd109, 4;
+  mul.lo.u64 %rd110, %rd29, %rd109;
+  add.u64 %rd111, %rd0, %rd110;
+  st.global.u32 [%rd111], %r108;
+  mov.u32 %r112, 0; // unit
+  mov.u32 %r113, %r112;
+  bra circle_ntt_layer_forward_end_35;
+  circle_ntt_layer_forward_else_35:
+  mov.u32 %r113, 0; // no else branch
+  circle_ntt_layer_forward_end_35:
+  mov.u32 %r114, 0; // unit
+  mov.u32 %r115, %r114;
+  bra circle_ntt_layer_forward_end_33;
+  circle_ntt_layer_forward_else_33:
+  mov.u32 %r115, 0; // no else branch
+  circle_ntt_layer_forward_end_33:
+  mov.u32 %r116, 0; // unit
+  mov.u32 %r117, %r116;
+  bra circle_ntt_layer_forward_end_31;
+  circle_ntt_layer_forward_else_31:
+  mov.u32 %r117, 0; // no else branch
+  circle_ntt_layer_forward_end_31:
+  mov.u32 %r118, 0; // unit
+  mov.u32 %r119, %r118;
+  bra circle_ntt_layer_forward_end_13;
+  circle_ntt_layer_forward_else_13:
+  mov.u32 %r119, 0; // no else branch
+  circle_ntt_layer_forward_end_13:
+  mov.u32 %r120, 0; // unit
+  ret;
+}
+
+.visible .entry circle_ntt_layer_inverse(
+    .param .u64 circle_ntt_layer_inverse_param_data_data,
+    .param .u64 circle_ntt_layer_inverse_param_data_len,
+    .param .u64 circle_ntt_layer_inverse_param_twiddles_data,
+    .param .u64 circle_ntt_layer_inverse_param_twiddles_len,
+    .param .u32 circle_ntt_layer_inverse_param_layer_idx,
+    .param .u64 circle_ntt_layer_inverse_param_half_n
+)
+{
+    .reg .pred %p11, %p30, %p32, %p34, %p45, %p60, %p75, %p84, %p95;
+    .reg .u64 %rd0, %rd1, %rd100, %rd101, %rd102, %rd103, %rd104, %rd105, %rd106, %rd107, %rd109, %rd110, %rd111, %rd12, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd26, %rd27, %rd28, %rd29, %rd3, %rd36, %rd37, %rd38, %rd46, %rd5, %rd51, %rd52, %rd53, %rd61, %rd66, %rd67, %rd68, %rd76, %rd81, %rd82, %rd83, %rd86, %rd87, %rd88, %rd89, %rd91, %rd92, %rd93, %rd94, %rd97, %rd98;
+    .reg .u32 %r10, %r108, %r112, %r113, %r114, %r115, %r116, %r117, %r118, %r119, %r120, %r24, %r25, %r39, %r4, %r40, %r41, %r42, %r43, %r44, %r48, %r49, %r50, %r54, %r55, %r56, %r57, %r58, %r59, %r6, %r63, %r64, %r65, %r69, %r7, %r70, %r71, %r72, %r73, %r74, %r78, %r79, %r8, %r80, %r9, %r90, %r99;
+
+  ld.param.u64 %rd0, [circle_ntt_layer_inverse_param_data_data];
+  ld.param.u64 %rd1, [circle_ntt_layer_inverse_param_data_len];
+  ld.param.u64 %rd2, [circle_ntt_layer_inverse_param_twiddles_data];
+  ld.param.u64 %rd3, [circle_ntt_layer_inverse_param_twiddles_len];
+  ld.param.u32 %r4, [circle_ntt_layer_inverse_param_layer_idx];
+  ld.param.u64 %rd5, [circle_ntt_layer_inverse_param_half_n];
+
+  mov.u32 %r6, %ctaid.x;
+  mov.u32 %r7, %ntid.x;
+  mul.lo.u32 %r8, %r6, %r7;
+  mov.u32 %r9, %tid.x;
+  add.u32 %r10, %r8, %r9;
+  cvt.u64.u32 %rd12, %r10;
+  setp.lt.u64 %p11, %rd12, %rd5;
+  @%p11 bra circle_ntt_layer_inverse_then_13;
+  bra circle_ntt_layer_inverse_else_13;
+  circle_ntt_layer_inverse_then_13:
+  mov.u64 %rd14, 1;
+  cvt.u64.u32 %rd15, %r4;
+  shl.b64 %rd16, %rd14, %rd15;
+  cvt.u64.u32 %rd17, %r4;
+  cvt.u64.u32 %rd18, %r10;
+  shr.u64 %rd19, %r10, %rd17;
+  mov.u64 %rd20, 1;
+  sub.u64 %rd21, %rd16, %rd20;
+  cvt.u64.u32 %rd22, %r10;
+  and.b64 %rd23, %r10, %rd21;
+  mov.u32 %r24, 1;
+  add.u32 %r25, %r4, %r24;
+  cvt.u64.u32 %rd26, %r25;
+  shl.b64 %rd27, %rd19, %rd26;
+  add.u64 %rd28, %rd27, %rd23;
+  add.u64 %rd29, %rd28, %rd16;
+  setp.lt.u64 %p30, %rd28, %rd1;
+  @%p30 bra circle_ntt_layer_inverse_then_31;
+  bra circle_ntt_layer_inverse_else_31;
+  circle_ntt_layer_inverse_then_31:
+  setp.lt.u64 %p32, %rd29, %rd1;
+  @%p32 bra circle_ntt_layer_inverse_then_33;
+  bra circle_ntt_layer_inverse_else_33;
+  circle_ntt_layer_inverse_then_33:
+  setp.lt.u64 %p34, %rd19, %rd3;
+  @%p34 bra circle_ntt_layer_inverse_then_35;
+  bra circle_ntt_layer_inverse_else_35;
+  circle_ntt_layer_inverse_then_35:
+  mov.u64 %rd36, 4;
+  mul.lo.u64 %rd37, %rd28, %rd36;
+  add.u64 %rd38, %rd0, %rd37;
+  ld.global.u32 %r39, [%rd38];
+  cvt.u32.u64 %r40, %rd_unknown_M31_P;
+  and.b32 %r41, %r39, %rd_unknown_M31_P;
+  mov.u32 %r42, 31;
+  shr.u32 %r43, %r39, %r42;
+  add.u32 %r44, %r41, %r43;
+  cvt.u64.u32 %rd46, %r44;
+  setp.ge.u64 %p45, %rd46, %rd_unknown_M31_P;
+  @%p45 bra circle_ntt_layer_inverse_then_47;
+  bra circle_ntt_layer_inverse_else_47;
+  circle_ntt_layer_inverse_then_47:
+  cvt.u32.u64 %r48, %rd_unknown_M31_P;
+  sub.u32 %r49, %r44, %r48;
+  mov.u32 %r50, %r49;
+  bra circle_ntt_layer_inverse_end_47;
+  circle_ntt_layer_inverse_else_47:
+  mov.u32 %r50, %r44;
+  circle_ntt_layer_inverse_end_47:
+  mov.u64 %rd51, 4;
+  mul.lo.u64 %rd52, %rd29, %rd51;
+  add.u64 %rd53, %rd0, %rd52;
+  ld.global.u32 %r54, [%rd53];
+  cvt.u32.u64 %r55, %rd_unknown_M31_P;
+  and.b32 %r56, %r54, %rd_unknown_M31_P;
+  mov.u32 %r57, 31;
+  shr.u32 %r58, %r54, %r57;
+  add.u32 %r59, %r56, %r58;
+  cvt.u64.u32 %rd61, %r59;
+  setp.ge.u64 %p60, %rd61, %rd_unknown_M31_P;
+  @%p60 bra circle_ntt_layer_inverse_then_62;
+  bra circle_ntt_layer_inverse_else_62;
+  circle_ntt_layer_inverse_then_62:
+  cvt.u32.u64 %r63, %rd_unknown_M31_P;
+  sub.u32 %r64, %r59, %r63;
+  mov.u32 %r65, %r64;
+  bra circle_ntt_layer_inverse_end_62;
+  circle_ntt_layer_inverse_else_62:
+  mov.u32 %r65, %r59;
+  circle_ntt_layer_inverse_end_62:
+  mov.u64 %rd66, 4;
+  mul.lo.u64 %rd67, %rd19, %rd66;
+  add.u64 %rd68, %rd2, %rd67;
+  ld.global.u32 %r69, [%rd68];
+  cvt.u32.u64 %r70, %rd_unknown_M31_P;
+  and.b32 %r71, %r69, %rd_unknown_M31_P;
+  mov.u32 %r72, 31;
+  shr.u32 %r73, %r69, %r72;
+  add.u32 %r74, %r71, %r73;
+  cvt.u64.u32 %rd76, %r74;
+  setp.ge.u64 %p75, %rd76, %rd_unknown_M31_P;
+  @%p75 bra circle_ntt_layer_inverse_then_77;
+  bra circle_ntt_layer_inverse_else_77;
+  circle_ntt_layer_inverse_then_77:
+  cvt.u32.u64 %r78, %rd_unknown_M31_P;
+  sub.u32 %r79, %r74, %r78;
+  mov.u32 %r80, %r79;
+  bra circle_ntt_layer_inverse_end_77;
+  circle_ntt_layer_inverse_else_77:
+  mov.u32 %r80, %r74;
+  circle_ntt_layer_inverse_end_77:
+  cvt.u64.u32 %rd81, %r50;
+  cvt.u64.u32 %rd82, %r65;
+  cvt.u64.u32 %rd83, %rd_unknown_M31_P;
+  setp.ge.u64 %p84, %rd81, %rd82;
+  @%p84 bra circle_ntt_layer_inverse_then_85;
+  bra circle_ntt_layer_inverse_else_85;
+  circle_ntt_layer_inverse_then_85:
+  sub.u64 %rd86, %rd81, %rd82;
+  mov.u64 %rd87, %rd86;
+  bra circle_ntt_layer_inverse_end_85;
+  circle_ntt_layer_inverse_else_85:
+  add.u64 %rd88, %rd81, %rd83;
+  sub.u64 %rd89, %rd88, %rd82;
+  mov.u64 %rd87, %rd89;
+  circle_ntt_layer_inverse_end_85:
+  cvt.u32.u64 %r90, %rd87;
+  cvt.u64.u32 %rd91, %r50;
+  cvt.u64.u32 %rd92, %r65;
+  add.u64 %rd93, %rd91, %rd92;
+  cvt.u64.u32 %rd94, %rd_unknown_M31_P;
+  setp.ge.u64 %p95, %rd93, %rd94;
+  @%p95 bra circle_ntt_layer_inverse_then_96;
+  bra circle_ntt_layer_inverse_else_96;
+  circle_ntt_layer_inverse_then_96:
+  sub.u64 %rd97, %rd93, %rd94;
+  mov.u64 %rd98, %rd97;
+  bra circle_ntt_layer_inverse_end_96;
+  circle_ntt_layer_inverse_else_96:
+  mov.u64 %rd98, %rd93;
+  circle_ntt_layer_inverse_end_96:
+  cvt.u32.u64 %r99, %rd98;
+  mov.u64 %rd100, 4;
+  mul.lo.u64 %rd101, %rd28, %rd100;
+  add.u64 %rd102, %rd0, %rd101;
+  st.global.u32 [%rd102], %r99;
+  cvt.u64.u32 %rd103, %r90;
+  cvt.u64.u32 %rd104, %r80;
+  mul.lo.u64 %rd105, %rd103, %rd104;
+  cvt.u64.u32 %rd106, %rd_unknown_M31_P;
+  rem.u64 %rd107, %rd105, %rd106;
+  cvt.u32.u64 %r108, %rd107;
+  mov.u64 %rd109, 4;
+  mul.lo.u64 %rd110, %rd29, %rd109;
+  add.u64 %rd111, %rd0, %rd110;
+  st.global.u32 [%rd111], %r108;
+  mov.u32 %r112, 0; // unit
+  mov.u32 %r113, %r112;
+  bra circle_ntt_layer_inverse_end_35;
+  circle_ntt_layer_inverse_else_35:
+  mov.u32 %r113, 0; // no else branch
+  circle_ntt_layer_inverse_end_35:
+  mov.u32 %r114, 0; // unit
+  mov.u32 %r115, %r114;
+  bra circle_ntt_layer_inverse_end_33;
+  circle_ntt_layer_inverse_else_33:
+  mov.u32 %r115, 0; // no else branch
+  circle_ntt_layer_inverse_end_33:
+  mov.u32 %r116, 0; // unit
+  mov.u32 %r117, %r116;
+  bra circle_ntt_layer_inverse_end_31;
+  circle_ntt_layer_inverse_else_31:
+  mov.u32 %r117, 0; // no else branch
+  circle_ntt_layer_inverse_end_31:
+  mov.u32 %r118, 0; // unit
+  mov.u32 %r119, %r118;
+  bra circle_ntt_layer_inverse_end_13;
+  circle_ntt_layer_inverse_else_13:
+  mov.u32 %r119, 0; // no else branch
+  circle_ntt_layer_inverse_end_13:
+  mov.u32 %r120, 0; // unit
+  ret;
+}
+

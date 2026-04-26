@@ -226,7 +226,7 @@ let compile ?(lib_mode=false) path emit_code =
   end else begin
     (* 4. Erase proofs and emit C / CUDA C *)
     Printf.printf "[forge] erasing proofs...\n%!";
-    let (code, is_cuda) = emit_program prog in
+    let (code, is_cuda) = emit_program ~lib_mode prog in
     let ext = if is_cuda then ".cu" else ".c" in
     Printf.printf "[forge] emitting %s...\n%!" (if is_cuda then "CUDA C" else "C99");
     let out_path = Filename.remove_extension path ^ ext in

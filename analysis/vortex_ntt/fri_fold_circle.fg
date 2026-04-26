@@ -1,0 +1,145 @@
+// VortexSTARK FRI fold_circle_into_line kernel — FORGE pilot.
+//
+// Replaces `cuda/fri.cu::fold_circle_into_line_soa_kernel`. Folds a
+// circle evaluation INTO a line evaluation, accumulating across FRI
+// rounds:
+//   f_prime = (f0 + f1) + alpha * twiddle[i] * (f0 - f1)
+//   dst[i]  = dst[i] * alpha_sq + f_prime
+//
+// Same QM31 SoA layout as fri_fold_line.fg.
+
+use std::gpu;
+use std::m31;
+
+#[device]
+fn reduce_word(v: u32) -> u32
+    ensures result < M31_P
+{
+    let lo: u32 = v & M31_P;
+    let hi: u32 = v >> 31u32;
+    let r: u32 = lo + hi;
+    if r >= M31_P { r - M31_P } else { r }
+}
+
+#[kernel]
+fn fold_circle_into_line_soa(
+    dst0: span<u32>, dst1: span<u32>, dst2: span<u32>, dst3: span<u32>,
+    src0: span<u32>, src1: span<u32>, src2: span<u32>, src3: span<u32>,
+    twiddles: span<u32>,
+    alpha_a: u32, alpha_b: u32, alpha_c: u32, alpha_d: u32,
+    alpha_sq_a: u32, alpha_sq_b: u32, alpha_sq_c: u32, alpha_sq_d: u32,
+    half_n: u64
+)
+    requires alpha_a < M31_P
+    requires alpha_b < M31_P
+    requires alpha_c < M31_P
+    requires alpha_d < M31_P
+    requires alpha_sq_a < M31_P
+    requires alpha_sq_b < M31_P
+    requires alpha_sq_c < M31_P
+    requires alpha_sq_d < M31_P
+    requires half_n * 2u64 <= src0.len
+    requires half_n * 2u64 <= src1.len
+    requires half_n * 2u64 <= src2.len
+    requires half_n * 2u64 <= src3.len
+    requires half_n <= twiddles.len
+    requires half_n <= dst0.len
+    requires half_n <= dst1.len
+    requires half_n <= dst2.len
+    requires half_n <= dst3.len
+{
+    let i: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if i < half_n {
+        let idx0: u64 = 2u64 * i;
+        let idx1: u64 = 2u64 * i + 1u64;
+
+        if idx1 < src0.len {
+            if idx1 < src1.len {
+                if idx1 < src2.len {
+                    if idx1 < src3.len {
+                        if i < twiddles.len {
+                            if i < dst0.len {
+                                if i < dst1.len {
+                                    if i < dst2.len {
+                                        if i < dst3.len {
+                                            // ── Read & canonicalize ──
+                                            let f0_a_re: u32 = reduce_word(src0[idx0]);
+                                            let f0_a_im: u32 = reduce_word(src1[idx0]);
+                                            let f0_b_re: u32 = reduce_word(src2[idx0]);
+                                            let f0_b_im: u32 = reduce_word(src3[idx0]);
+                                            let f1_a_re: u32 = reduce_word(src0[idx1]);
+                                            let f1_a_im: u32 = reduce_word(src1[idx1]);
+                                            let f1_b_re: u32 = reduce_word(src2[idx1]);
+                                            let f1_b_im: u32 = reduce_word(src3[idx1]);
+                                            let tw: u32     = reduce_word(twiddles[i]);
+                                            let p_a_re: u32 = reduce_word(dst0[i]);
+                                            let p_a_im: u32 = reduce_word(dst1[i]);
+                                            let p_b_re: u32 = reduce_word(dst2[i]);
+                                            let p_b_im: u32 = reduce_word(dst3[i]);
+
+                                            // ── sum/diff/tw_diff ──
+                                            let sum_a_re: u32 = qm31_add_re_re(f0_a_re, f1_a_re);
+                                            let sum_a_im: u32 = qm31_add_re_im(f0_a_im, f1_a_im);
+                                            let sum_b_re: u32 = qm31_add_im_re(f0_b_re, f1_b_re);
+                                            let sum_b_im: u32 = qm31_add_im_im(f0_b_im, f1_b_im);
+                                            let diff_a_re: u32 = qm31_sub_re_re(f0_a_re, f1_a_re);
+                                            let diff_a_im: u32 = qm31_sub_re_im(f0_a_im, f1_a_im);
+                                            let diff_b_re: u32 = qm31_sub_im_re(f0_b_re, f1_b_re);
+                                            let diff_b_im: u32 = qm31_sub_im_im(f0_b_im, f1_b_im);
+                                            let td_a_re: u32 = m31_mul(diff_a_re, tw);
+                                            let td_a_im: u32 = m31_mul(diff_a_im, tw);
+                                            let td_b_re: u32 = m31_mul(diff_b_re, tw);
+                                            let td_b_im: u32 = m31_mul(diff_b_im, tw);
+
+                                            // ── alpha * tw_diff ──
+                                            let at_a_re: u32 = qm31_mul_out_re_re(
+                                                alpha_a, alpha_b, alpha_c, alpha_d,
+                                                td_a_re, td_a_im, td_b_re, td_b_im);
+                                            let at_a_im: u32 = qm31_mul_out_re_im(
+                                                alpha_a, alpha_b, alpha_c, alpha_d,
+                                                td_a_re, td_a_im, td_b_re, td_b_im);
+                                            let at_b_re: u32 = qm31_mul_out_im_re(
+                                                alpha_a, alpha_b, alpha_c, alpha_d,
+                                                td_a_re, td_a_im, td_b_re, td_b_im);
+                                            let at_b_im: u32 = qm31_mul_out_im_im(
+                                                alpha_a, alpha_b, alpha_c, alpha_d,
+                                                td_a_re, td_a_im, td_b_re, td_b_im);
+
+                                            // ── f_prime = sum + alpha*tw_diff ──
+                                            let fp_a_re: u32 = qm31_add_re_re(sum_a_re, at_a_re);
+                                            let fp_a_im: u32 = qm31_add_re_im(sum_a_im, at_a_im);
+                                            let fp_b_re: u32 = qm31_add_im_re(sum_b_re, at_b_re);
+                                            let fp_b_im: u32 = qm31_add_im_im(sum_b_im, at_b_im);
+
+                                            // ── prev * alpha_sq ──
+                                            let pa_a_re: u32 = qm31_mul_out_re_re(
+                                                p_a_re, p_a_im, p_b_re, p_b_im,
+                                                alpha_sq_a, alpha_sq_b, alpha_sq_c, alpha_sq_d);
+                                            let pa_a_im: u32 = qm31_mul_out_re_im(
+                                                p_a_re, p_a_im, p_b_re, p_b_im,
+                                                alpha_sq_a, alpha_sq_b, alpha_sq_c, alpha_sq_d);
+                                            let pa_b_re: u32 = qm31_mul_out_im_re(
+                                                p_a_re, p_a_im, p_b_re, p_b_im,
+                                                alpha_sq_a, alpha_sq_b, alpha_sq_c, alpha_sq_d);
+                                            let pa_b_im: u32 = qm31_mul_out_im_im(
+                                                p_a_re, p_a_im, p_b_re, p_b_im,
+                                                alpha_sq_a, alpha_sq_b, alpha_sq_c, alpha_sq_d);
+
+                                            // ── result = prev*alpha_sq + f_prime ──
+                                            dst0[i] = qm31_add_re_re(pa_a_re, fp_a_re);
+                                            dst1[i] = qm31_add_re_im(pa_a_im, fp_a_im);
+                                            dst2[i] = qm31_add_im_re(pa_b_re, fp_b_re);
+                                            dst3[i] = qm31_add_im_im(pa_b_im, fp_b_im);
+                                        };
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }

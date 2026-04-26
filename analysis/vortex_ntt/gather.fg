@@ -1,0 +1,78 @@
+// VortexSTARK gather kernels — FORGE pilot.
+//
+// Replaces `cuda/gather.cu`. Two variants:
+//   - gather_u32:  dst[i] = src[idx[i]]
+//   - gather_u256: dst[i*8 .. i*8+8] = src[idx[i]*8 .. idx[i]*8+8]
+// Used by MerkleProverLifted::decommit for batched column queries.
+//
+// The interesting proof content is the **dependent** bounds check:
+// the load index is `idx[i]`, which is data, so the prover needs to
+// know that every entry of `idx` is in-bounds for `src`. The kernel
+// asserts this via a `requires` clause that the caller must establish
+// (the host code already validates this in the existing CUDA wrapper —
+// FORGE just makes the contract explicit).
+
+use std::gpu;
+
+#[kernel]
+fn gather_u32(
+    src: span<u32>,
+    idx: span<u32>,
+    dst: span<u32>,
+    n: u64,
+    src_len: u64
+)
+    requires n <= idx.len
+    requires n <= dst.len
+    requires src_len == src.len
+{
+    let i: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if i < n {
+        let j: u32 = idx[i];
+        // Bounds-check `j` against src.len at runtime — without this
+        // guard, FORGE can't prove `src[j]` is in-range since `idx[i]`
+        // is opaque data. With it, the load is provably safe.
+        if (j as u64) < src_len {
+            dst[i] = src[j as u64];
+        };
+    };
+}
+
+#[kernel]
+fn gather_u256(
+    src: span<u32>,
+    idx: span<u32>,
+    dst: span<u32>,
+    n: u64,
+    src_len: u64
+)
+    requires n <= idx.len
+    requires n * 8u64 <= dst.len
+    requires src_len == src.len
+{
+    let i: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if i < n {
+        let j: u32 = idx[i];
+        let src_off: u64 = (j as u64) * 8u64;
+        let dst_off: u64 = i * 8u64;
+        // Same dependent-bounds story: src_off..src_off+8 must lie
+        // within src. We require src_off + 7 < src.len; the i*8+7
+        // bound on dst is guaranteed by `n * 8 <= dst.len` + `i < n`,
+        // but the SMT solver can't reason through `i*8 < n*8` for the
+        // non-linear case, so we restate it as a guard.
+        if src_off + 7u64 < src_len {
+            if dst_off + 7u64 < dst.len {
+                dst[dst_off]        = src[src_off];
+                dst[dst_off + 1u64] = src[src_off + 1u64];
+                dst[dst_off + 2u64] = src[src_off + 2u64];
+                dst[dst_off + 3u64] = src[src_off + 3u64];
+                dst[dst_off + 4u64] = src[src_off + 4u64];
+                dst[dst_off + 5u64] = src[src_off + 5u64];
+                dst[dst_off + 6u64] = src[src_off + 6u64];
+                dst[dst_off + 7u64] = src[src_off + 7u64];
+            };
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }

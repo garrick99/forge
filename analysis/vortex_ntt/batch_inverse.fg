@@ -1,0 +1,163 @@
+// VortexSTARK M31 batch-inverse kernel — FORGE pilot.
+//
+// Replaces `cuda/batch_inverse.cu`. Each thread inverts CHUNK_SIZE=64
+// consecutive M31 elements using Montgomery's trick:
+//   1. Forward sweep: prefix products skipping zeros.
+//   2. One Fermat-inversion of the total product (no zero in product).
+//   3. Backward sweep: derive each element's inverse from the prefix
+//      product to its left and the running running-inverse to its right.
+//
+// Design constraints the FORGE port respects:
+// - Loops have explicit measure (`decreases`) — proven termination.
+// - `m31_inv` proves `acc < M31_P` by structural induction on the
+//   square-and-multiply ladder.
+// - The 64-element stack array `prefix` is allocated as `[u32; 64]`;
+//   FORGE proves every read/write is in-bounds via the loop bound.
+
+use std::gpu;
+use std::m31;
+
+// Modular inverse via Fermat's little theorem: a^(p-2) mod p.
+// p - 2 = 2^31 - 3 = 0x7FFFFFFD. Square-and-multiply ladder.
+// Termination: each iteration shifts `exp` right; loop exits when exp == 0.
+#[device]
+fn m31_inv(a: u32) -> u32
+    requires a < M31_P
+    ensures result < M31_P
+{
+    let mut acc: u32 = 1u32;
+    let mut base: u32 = a;
+    let mut exp: u32 = M31_P - 2u32;
+    while exp > 0u32
+        invariant acc < M31_P
+        invariant base < M31_P
+        decreases exp
+    {
+        // Compute both candidate products first; both have proven
+        // postcondition `result < M31_P`. Then select. Doing it in this
+        // order lets the SMT thread the ensures through both branches
+        // of the if without losing the invariant.
+        let acc_next: u32 = m31_mul(acc, base);
+        let base_next: u32 = m31_mul(base, base);
+        if (exp & 1u32) == 1u32 {
+            acc = acc_next;
+        };
+        base = base_next;
+        exp = exp >> 1u32;
+    };
+    acc
+}
+
+#[kernel]
+fn batch_inverse_m31(
+    input: span<u32>,
+    output: span<u32>,
+    n: u64
+)
+    requires input.len == output.len
+    requires n <= input.len
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    let chunk: u64 = 64u64;
+    let start: u64 = tid * chunk;
+    if start < n {
+        // Tail-handling: clip end to `n`.
+        let raw_end: u64 = start + chunk;
+        let end: u64 = if raw_end < n { raw_end } else { n };
+        let count: u64 = end - start;
+
+        // Stack array for prefix products. count <= 64 always.
+        let mut prefix: [u32; 64] = [0u32; 64u64];
+
+        // ── Forward sweep: prefix products skipping zeros ──
+        // prefix[0] = input[start] (could be 0 — we still store it;
+        // the zero handling happens in the backward sweep).
+        if start < input.len {
+            prefix[0u64] = input[start];
+        };
+        let mut i: u64 = 1u64;
+        while i < count
+            invariant i <= count
+            invariant count <= 64u64
+            decreases count - i
+        {
+            if (start + i) < input.len {
+                let val: u32 = input[start + i];
+                let prev: u32 = prefix[i - 1u64];
+                if val == 0u32 {
+                    prefix[i] = prev;
+                } else {
+                    if val < M31_P {
+                        if prev < M31_P {
+                            prefix[i] = m31_mul(prev, val);
+                        } else {
+                            prefix[i] = prev;
+                        };
+                    } else {
+                        prefix[i] = prev;
+                    };
+                };
+            };
+            i = i + 1u64;
+        };
+
+        // ── Invert the total product ──
+        // count >= 1 guaranteed: start < n implies start < end so count > 0.
+        let total: u32 = prefix[count - 1u64];
+        // Bind into a fresh let with the < M31_P invariant that the
+        // SMT can track. Initialize from a guarded conditional and
+        // re-assert the invariant afterwards by structural rebinding.
+        let inv0: u32 = if total < M31_P { m31_inv(total) } else { 0u32 };
+        // The `if` branches both produce a u32 that's < M31_P, but
+        // the SMT can't always thread this through. Add an explicit
+        // canonicalization (no-op for in-range values) that gives a
+        // tight bound the prover can track.
+        let mut inv: u32 = if inv0 < M31_P { inv0 } else { 0u32 };
+
+        // ── Backward sweep ──
+        // For i = count-1 down to 1:
+        //   if input[start+i] == 0: output = 0
+        //   else: output = inv * prefix[i-1]; inv *= input[start+i]
+        let mut k: u64 = count;
+        while k > 1u64
+            invariant k <= count
+            invariant count <= 64u64
+            invariant inv < M31_P
+            decreases k
+        {
+            let i2: u64 = k - 1u64;
+            if (start + i2) < input.len {
+                if (start + i2) < output.len {
+                    let val: u32 = input[start + i2];
+                    if val == 0u32 {
+                        output[start + i2] = 0u32;
+                    } else {
+                        let pre: u32 = prefix[i2 - 1u64];
+                        if pre < M31_P {
+                            output[start + i2] = m31_mul(inv, pre);
+                            // Same trick as m31_inv: pre-compute the
+                            // m31_mul before the conditional so the
+                            // SMT can track its `ensures result < M31_P`
+                            // across the inv update.
+                            if val < M31_P {
+                                let inv_next: u32 = m31_mul(inv, val);
+                                inv = inv_next;
+                            };
+                        } else {
+                            output[start + i2] = 0u32;
+                        };
+                    };
+                };
+            };
+            k = k - 1u64;
+        };
+
+        // ── Final element (i = 0) ──
+        if start < output.len {
+            let v0: u32 = if start < input.len { input[start] } else { 0u32 };
+            output[start] = if v0 == 0u32 { 0u32 } else { inv };
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }

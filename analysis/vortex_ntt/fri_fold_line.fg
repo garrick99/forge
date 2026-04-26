@@ -1,0 +1,134 @@
+// VortexSTARK FRI fold_line kernel — FORGE pilot.
+//
+// Replaces `cuda/fri.cu::fold_line_soa_kernel`. Halves a line evaluation
+// using a folding factor `alpha`:
+//   f_prime[i] = (f0 + f1) + alpha * twiddle[i] * (f0 - f1)
+//   where f0 = values[2i], f1 = values[2i+1]
+//
+// QM31 = a + b*u, with a, b ∈ CM31, CM31 = re + im*i. So one QM31
+// element is 4 u32s laid out across the SoA columns:
+//   in0[k] = a_re, in1[k] = a_im, in2[k] = b_re, in3[k] = b_im.
+//
+// The FORGE-emitted kernel matches the CUDA layout byte-for-byte and
+// gates every M31 helper call on a `reduce_word`-canonicalized input
+// to satisfy the stdlib's `requires < M31_P` preconditions.
+
+use std::gpu;
+use std::m31;
+
+// Canonicalize a u32 to the M31 range [0, P-1]. Mersenne reduction:
+// for v in [0, 2^32), `(v & P) + (v >> 31)` lands in [0, 2P) and a
+// single conditional subtract yields canonical form.
+#[device]
+fn reduce_word(v: u32) -> u32
+    ensures result < M31_P
+{
+    let lo: u32 = v & M31_P;
+    let hi: u32 = v >> 31u32;
+    let r: u32 = lo + hi;
+    if r >= M31_P { r - M31_P } else { r }
+}
+
+#[kernel]
+fn fold_line_soa(
+    in0: span<u32>, in1: span<u32>, in2: span<u32>, in3: span<u32>,
+    twiddles: span<u32>,
+    out0: span<u32>, out1: span<u32>, out2: span<u32>, out3: span<u32>,
+    alpha_a: u32, alpha_b: u32, alpha_c: u32, alpha_d: u32,
+    half_n: u64
+)
+    requires alpha_a < M31_P
+    requires alpha_b < M31_P
+    requires alpha_c < M31_P
+    requires alpha_d < M31_P
+    requires half_n * 2u64 <= in0.len
+    requires half_n * 2u64 <= in1.len
+    requires half_n * 2u64 <= in2.len
+    requires half_n * 2u64 <= in3.len
+    requires half_n <= twiddles.len
+    requires half_n <= out0.len
+    requires half_n <= out1.len
+    requires half_n <= out2.len
+    requires half_n <= out3.len
+{
+    let i: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if i < half_n {
+        let idx0: u64 = 2u64 * i;
+        let idx1: u64 = 2u64 * i + 1u64;
+
+        // Re-establish bounds that the SMT can't derive from `i*2 < half_n*2`.
+        if idx1 < in0.len {
+            if idx1 < in1.len {
+                if idx1 < in2.len {
+                    if idx1 < in3.len {
+                        if i < twiddles.len {
+                            if i < out0.len {
+                                if i < out1.len {
+                                    if i < out2.len {
+                                        if i < out3.len {
+                                            // ── Read both QM31s, canonicalize ──
+                                            let f0_a_re: u32 = reduce_word(in0[idx0]);
+                                            let f0_a_im: u32 = reduce_word(in1[idx0]);
+                                            let f0_b_re: u32 = reduce_word(in2[idx0]);
+                                            let f0_b_im: u32 = reduce_word(in3[idx0]);
+                                            let f1_a_re: u32 = reduce_word(in0[idx1]);
+                                            let f1_a_im: u32 = reduce_word(in1[idx1]);
+                                            let f1_b_re: u32 = reduce_word(in2[idx1]);
+                                            let f1_b_im: u32 = reduce_word(in3[idx1]);
+                                            let tw: u32     = reduce_word(twiddles[i]);
+
+                                            // ── sum = f0 + f1 ──
+                                            let sum_a_re: u32 = qm31_add_re_re(f0_a_re, f1_a_re);
+                                            let sum_a_im: u32 = qm31_add_re_im(f0_a_im, f1_a_im);
+                                            let sum_b_re: u32 = qm31_add_im_re(f0_b_re, f1_b_re);
+                                            let sum_b_im: u32 = qm31_add_im_im(f0_b_im, f1_b_im);
+
+                                            // ── diff = f0 - f1 ──
+                                            let diff_a_re: u32 = qm31_sub_re_re(f0_a_re, f1_a_re);
+                                            let diff_a_im: u32 = qm31_sub_re_im(f0_a_im, f1_a_im);
+                                            let diff_b_re: u32 = qm31_sub_im_re(f0_b_re, f1_b_re);
+                                            let diff_b_im: u32 = qm31_sub_im_im(f0_b_im, f1_b_im);
+
+                                            // ── tw_diff = diff * twiddle (component-wise M31 mul) ──
+                                            let td_a_re: u32 = m31_mul(diff_a_re, tw);
+                                            let td_a_im: u32 = m31_mul(diff_a_im, tw);
+                                            let td_b_re: u32 = m31_mul(diff_b_re, tw);
+                                            let td_b_im: u32 = m31_mul(diff_b_im, tw);
+
+                                            // ── alpha * tw_diff (full QM31 multiplication) ──
+                                            let at_a_re: u32 = qm31_mul_out_re_re(
+                                                alpha_a, alpha_b, alpha_c, alpha_d,
+                                                td_a_re, td_a_im, td_b_re, td_b_im);
+                                            let at_a_im: u32 = qm31_mul_out_re_im(
+                                                alpha_a, alpha_b, alpha_c, alpha_d,
+                                                td_a_re, td_a_im, td_b_re, td_b_im);
+                                            let at_b_re: u32 = qm31_mul_out_im_re(
+                                                alpha_a, alpha_b, alpha_c, alpha_d,
+                                                td_a_re, td_a_im, td_b_re, td_b_im);
+                                            let at_b_im: u32 = qm31_mul_out_im_im(
+                                                alpha_a, alpha_b, alpha_c, alpha_d,
+                                                td_a_re, td_a_im, td_b_re, td_b_im);
+
+                                            // ── result = sum + alpha * tw_diff ──
+                                            let r_a_re: u32 = qm31_add_re_re(sum_a_re, at_a_re);
+                                            let r_a_im: u32 = qm31_add_re_im(sum_a_im, at_a_im);
+                                            let r_b_re: u32 = qm31_add_im_re(sum_b_re, at_b_re);
+                                            let r_b_im: u32 = qm31_add_im_im(sum_b_im, at_b_im);
+
+                                            out0[i] = r_a_re;
+                                            out1[i] = r_a_im;
+                                            out2[i] = r_b_re;
+                                            out3[i] = r_b_im;
+                                        };
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }

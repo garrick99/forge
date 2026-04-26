@@ -1174,14 +1174,14 @@ let rec emit_expr depth e =
        | _ -> Printf.sprintf "{ %s /* [val;N] — remaining elements zero */ }"
                 (emit_expr depth v))
   | ETuple elems ->
-      (* Emit as C99 compound literal: (__forge_tuple_..._t){ ._0 = e0, ._1 = e1, ... } *)
+      (* Use the FORGE_AGG portability macro so the same emit works for
+         the C99 (.c) target and the CUDA C++ (.cu) target. Positional
+         init only — nvcc rejects `._N =` designators in C++ mode. *)
       let tup_ty = match e.expr_ty with Some t -> t | None ->
         TTuple (List.map (fun _ -> TPrim (TUint U64)) elems)
       in
-      let fields = List.mapi (fun i elem ->
-        Printf.sprintf "._%d = %s" i (emit_expr depth elem)
-      ) elems in
-      Printf.sprintf "(%s){ %s }" (emit_ty tup_ty) (String.concat ", " fields)
+      let fields = List.map (fun elem -> emit_expr depth elem) elems in
+      Printf.sprintf "FORGE_AGG(%s, %s)" (emit_ty tup_ty) (String.concat ", " fields)
   | EField_n (tup, idx) ->
       Printf.sprintf "(%s)._%d" (emit_expr depth tup) idx
   | ESubspan (arr, lo, hi) ->
@@ -1913,6 +1913,14 @@ and emit_stmt depth s =
    These need __device__ annotation in CUDA mode. *)
 let device_fn_names : string list ref = ref []
 
+(* Lib-mode flag — set by `emit_program ~lib_mode:true`. When true, every
+   non-__global__ function emits with `static` linkage so multiple FORGE
+   .cu files can be linked into the same library without ODR violations.
+   Default behavior (false) preserves external linkage for the standalone
+   `forge build` flow where users may call FORGE-emitted functions from
+   other C/C++ TUs. *)
+let lib_mode_static : bool ref = ref false
+
 let rec collect_called_fns_expr acc e =
   match e.expr_desc with
   | ECall ({ expr_desc = EVar id; _ }, args) ->
@@ -1980,11 +1988,27 @@ let compute_device_fns (items : item list) =
   device_fn_names := List.sort_uniq String.compare kernel_callees
 
 let gpu_qualifier attrs fn_name =
+  (* Pure-device helpers get `static __device__` so each translation
+     unit owns its own copy. Without `static`, two FORGE-emitted .cu
+     files in the same library both define e.g. `reduce_word` with
+     external linkage and the host linker rejects the duplicate. The
+     stdlib helper bodies are deterministic and proof-checked, so per-TU
+     duplication is safe (one definition wins on device, no ODR risk).
+     In lib-mode the same logic extends to non-GPU functions (e.g.
+     `m31_add` is host-callable but reachable from device too) — they
+     get plain `static` so they don't collide either. *)
   if List.exists (fun a -> a.attr_name = "kernel") attrs then "__global__ "
   else if List.exists (fun a -> a.attr_name = "host_device") attrs then "__host__ __device__ "
-  else if List.exists (fun a -> a.attr_name = "device") attrs then "__device__ "
-  (* Auto-detect: if this function is called from a kernel, add __device__ *)
-  else if List.mem fn_name !device_fn_names then "__device__ "
+  else if List.exists (fun a -> a.attr_name = "device") attrs then "static __device__ __forceinline__ "
+  (* Auto-detect: if this function is called from a kernel, mark
+     `__host__ __device__` so it stays callable from emitted host
+     helpers too. `__forceinline__` matches the hand-written stdlib
+     pattern (m31.cuh / qm31.cuh) — without it, every `m31_mul` call
+     in a fully-unrolled blake2s or batch_inverse becomes an actual
+     function call instead of an inlined arithmetic sequence,
+     measurably hurting FORGE-vs-handwritten kernel timings. *)
+  else if List.mem fn_name !device_fn_names then "static __host__ __device__ __forceinline__ "
+  else if !lib_mode_static && fn_name <> "main" then "static "
   else ""
 
 let emit_fn fn =
@@ -2385,7 +2409,8 @@ let rec collect_generic_named_item acc item =
       List.fold_left collect_generic_named_item acc im.im_items
   | _ -> acc
 
-let emit_program prog =
+let emit_program ?(lib_mode=false) prog =
+  lib_mode_static := lib_mode;
   (* Compute which functions need __device__ (called from #[kernel]) *)
   compute_device_fns prog.prog_items;
   (* Build enum constructor registry before any emission *)
@@ -2486,6 +2511,15 @@ let emit_program prog =
     Buffer.add_string buf "#  define __attribute__(x)\n";
     Buffer.add_string buf "#endif\n"
   end;
+  (* Tuple/aggregate construction macro that works in both C99 and C++.
+     C99 uses compound-literal syntax `(T){a,b}`; C++ uses uniform-init
+     `T{a,b}`. nvcc compiles host-and-device CUDA as C++, so the C99
+     form fails on tuple returns from __device__ functions. *)
+  Buffer.add_string buf "#ifdef __cplusplus\n";
+  Buffer.add_string buf "#  define FORGE_AGG(T, ...) (T{__VA_ARGS__})\n";
+  Buffer.add_string buf "#else\n";
+  Buffer.add_string buf "#  define FORGE_AGG(T, ...) ((T){__VA_ARGS__})\n";
+  Buffer.add_string buf "#endif\n";
   (* Emit system headers for externs that use <header.h> convention *)
   let sys_headers = List.rev (collect_system_headers prog.prog_items) in
   (* stdlib.h already included above — filter it out *)
