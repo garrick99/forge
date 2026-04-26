@@ -1,0 +1,93 @@
+// std/random.fg — Counter-based PRNG (Philox-2x32-10) for GPU dropout
+// and sampling.
+//
+// Include with:  use std::random;
+//
+// Philox is the standard counter-based RNG used by JAX, PyTorch, and
+// CUDA's curand_philox4x32_10.  Each "stream" is identified by a
+// (key0, key1) pair (typically: seed, kernel-id); each call produces
+// 64 random bits per (counter0, counter1) pair, with no shared
+// state between threads.  Reproducible across launches.
+//
+// This module exposes the 2x32-10 variant (10 rounds, 64-bit output
+// per call) — enough for dropout masks and uniform sampling, simpler
+// proof surface than the 4x32 variant.
+
+// No externs needed — Philox is pure u32/u64 arithmetic.
+
+// Round constants from the Philox reference implementation.
+const PHILOX_M2x32: u32 = 3528531795u32;   // 0xD256D193
+const PHILOX_W: u32     = 2654435769u32;   // 0x9E3779B9 (Weyl golden)
+
+// One Philox round: (ctr0, ctr1, key) -> (ctr0', ctr1').
+// Implementation follows Salmon et al. 2011 (Philox-2x32):
+//   hi, lo  = mulhilo(M, ctr0)
+//   ctr0'   = hi ^ key ^ ctr1
+//   ctr1'   = lo
+#[device]
+fn philox_round(ctr0: u32, ctr1: u32, key: u32) -> (u32, u32) {
+    // 32x32 -> 64 mul split.  Forge has no native u64 mulhilo; emulate
+    // by widening to u64, multiplying, and pulling the high/low halves.
+    let m64: u64 = PHILOX_M2x32 as u64;
+    let c0_64: u64 = ctr0 as u64;
+    let prod: u64 = m64 * c0_64;
+    let hi: u32 = (prod >> 32u64) as u32;
+    let lo: u32 = (prod & 4294967295u64) as u32;
+    let new_ctr0: u32 = hi ^ key ^ ctr1;
+    (new_ctr0, lo)
+}
+
+// Bump the Philox key for the next round (Weyl sequence).
+#[device]
+fn philox_bump_key(key: u32) -> u32 {
+    key + PHILOX_W
+}
+
+// Full 10-round Philox-2x32-10.  Returns 64 random bits as (u32, u32).
+//
+// Typical usage:
+//   let (r0, r1) = philox_2x32_10(seed, kernel_id, gid_lo, gid_hi);
+#[device]
+fn philox_2x32_10(key0: u32, key1: u32, ctr0: u32, ctr1: u32) -> (u32, u32) {
+    let _ = key1;  // 2x32 only consumes the first key word; reserved
+                   // for the eventual 2x32-with-extra-key variant.
+    let mut k: u32 = key0;
+    let mut c0: u32 = ctr0;
+    let mut c1: u32 = ctr1;
+    let mut i: u64 = 0u64;
+    while i < 10u64
+        invariant i <= 10u64
+        decreases 10u64 - i
+    {
+        let (n0, n1) = philox_round(c0, c1, k);
+        c0 = n0;
+        c1 = n1;
+        k = philox_bump_key(k);
+        i = i + 1u64;
+    };
+    (c0, c1)
+}
+
+// ---- Output helpers --------------------------------------------------------
+
+// Convert a Philox u32 word to a uniform f32 in [0, 1).  Drops the
+// bottom 8 bits to fit in the 24-bit f32 mantissa (matches the JAX
+// philox-uniform convention exactly).
+#[device]
+fn philox_to_uniform_f32(u: u32) -> f32 {
+    let mantissa: u32 = u >> 8u32;             // 24-bit
+    let mant_f: f32 = mantissa as f32;
+    mant_f * 0.000000059604645f32              // 1 / 2^24
+}
+
+// Bernoulli mask: 1 if uniform sample > p_threshold, else 0.
+// `p_threshold_u32` is the dropout probability re-scaled into a u32:
+//   p_threshold_u32 = floor(p * 2^32)
+// Caller pre-scales once to avoid the floating-point compare in the
+// hot loop.
+#[device]
+fn philox_bernoulli_keep_u32(u: u32, p_threshold_u32: u32) -> u32 {
+    if u < p_threshold_u32 { 0u32 } else { 1u32 }
+}
+
+fn main() -> u64 { 0u64 }

@@ -1,0 +1,141 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry ffn_swiglu_dropout(
+    .param .u64 ffn_swiglu_dropout_param_gate_data,
+    .param .u64 ffn_swiglu_dropout_param_gate_len,
+    .param .u64 ffn_swiglu_dropout_param_up_data,
+    .param .u64 ffn_swiglu_dropout_param_up_len,
+    .param .u64 ffn_swiglu_dropout_param_out_data,
+    .param .u64 ffn_swiglu_dropout_param_out_len,
+    .param .u64 ffn_swiglu_dropout_param_n,
+    .param .u32 ffn_swiglu_dropout_param_seed_lo,
+    .param .u32 ffn_swiglu_dropout_param_seed_hi,
+    .param .u32 ffn_swiglu_dropout_param_p_threshold,
+    .param .f32 ffn_swiglu_dropout_param_keep_scale
+)
+{
+    .reg .pred %p19, %p44, %p68, %p74;
+    .reg .u64 %rd0, %rd1, %rd13, %rd14, %rd15, %rd17, %rd18, %rd2, %rd21, %rd22, %rd23, %rd25, %rd26, %rd27, %rd3, %rd38, %rd39, %rd4, %rd41, %rd43, %rd45, %rd46, %rd47, %rd48, %rd49, %rd5, %rd51, %rd52, %rd56, %rd57, %rd58, %rd6, %rd61, %rd62, %rd64, %rd65, %rd66, %rd79, %rd80, %rd81;
+    .reg .f32 %f10, %f24, %f28, %f29, %f30, %f31, %f32, %f33, %f34, %f35, %f36, %f76, %f77, %f78;
+    .reg .u32 %r11, %r12, %r16, %r37, %r40, %r50, %r53, %r54, %r55, %r59, %r60, %r63, %r67, %r7, %r70, %r71, %r72, %r73, %r8, %r82, %r83, %r84, %r9;
+
+  ld.param.u64 %rd0, [ffn_swiglu_dropout_param_gate_data];
+  ld.param.u64 %rd1, [ffn_swiglu_dropout_param_gate_len];
+  ld.param.u64 %rd2, [ffn_swiglu_dropout_param_up_data];
+  ld.param.u64 %rd3, [ffn_swiglu_dropout_param_up_len];
+  ld.param.u64 %rd4, [ffn_swiglu_dropout_param_out_data];
+  ld.param.u64 %rd5, [ffn_swiglu_dropout_param_out_len];
+  ld.param.u64 %rd6, [ffn_swiglu_dropout_param_n];
+  ld.param.u32 %r7, [ffn_swiglu_dropout_param_seed_lo];
+  ld.param.u32 %r8, [ffn_swiglu_dropout_param_seed_hi];
+  ld.param.u32 %r9, [ffn_swiglu_dropout_param_p_threshold];
+  ld.param.f32 %f10, [ffn_swiglu_dropout_param_keep_scale];
+
+  mov.u32 %r11, %ctaid.x;
+  mov.u32 %r12, %ntid.x;
+  cvt.u64.u32 %rd13, %r12;
+  cvt.u64.u32 %rd14, %r11;
+  mul.lo.u64 %rd15, %rd14, %rd13;
+  mov.u32 %r16, %tid.x;
+  cvt.u64.u32 %rd17, %r16;
+  add.u64 %rd18, %rd15, %rd17;
+  setp.lt.u64 %p19, %rd18, %rd6;
+  @%p19 bra ffn_swiglu_dropout_then_20;
+  bra ffn_swiglu_dropout_else_20;
+  ffn_swiglu_dropout_then_20:
+  mov.u64 %rd21, 4;
+  mul.lo.u64 %rd22, %rd18, %rd21;
+  add.u64 %rd23, %rd0, %rd22;
+  ld.global.f32 %f24, [%rd23];
+  mov.u64 %rd25, 4;
+  mul.lo.u64 %rd26, %rd18, %rd25;
+  add.u64 %rd27, %rd2, %rd26;
+  ld.global.f32 %f28, [%rd27];
+  mov.f32 %f29, 0f00000000; // 0
+  sub.f32 %f30, %f29, %f24;
+  mul.rn.f32 %f31, %f30, 0f3FB8AA3B; // log2(e)
+  ex2.approx.f32 %f32, %f31;
+  mov.f32 %f33, 0f3F800000; // 1
+  add.f32 %f34, %f33, %f32;
+  div.f32 %f35, %f24, %f34;
+  mul.f32 %f36, %f35, %f28;
+  cvt.u32.u64 %r37, %rd18;
+  mov.u64 %rd38, 32;
+  shr.u64 %rd39, %rd18, %rd38;
+  cvt.u32.u64 %r40, %rd39;
+  mov.u64 %rd41, 0;
+  ffn_swiglu_dropout_loop_42:
+  mov.u64 %rd43, 10;
+  setp.lt.u64 %p44, %rd41, %rd43;
+  @!%p44 bra ffn_swiglu_dropout_loop_end_42;
+  cvt.u64.u32 %rd45, %rd_unknown_PHILOX_M2x32;
+  cvt.u64.u32 %rd46, %r37;
+  mul.lo.u64 %rd47, %rd45, %rd46;
+  mov.u64 %rd48, 32;
+  shr.u64 %rd49, %rd47, %rd48;
+  cvt.u32.u64 %r50, %rd49;
+  mov.u64 %rd51, 4294967295;
+  and.b64 %rd52, %rd47, %rd51;
+  cvt.u32.u64 %r53, %rd52;
+  xor.b32 %r54, %r50, %r7;
+  xor.b32 %r55, %r54, %r40;
+  mov.u64 %rd56, 0; // unhandled expr
+  mov.u64 %rd57, 0; // unhandled expr
+  mov.u64 %rd58, 0; // unhandled expr
+  cvt.u32.u64 %r59, %rd_unknown_PHILOX_W;
+  add.u32 %r60, %r7, %r59;
+  mov.u64 %rd61, 1;
+  add.u64 %rd62, %rd41, %rd61;
+  mov.u32 %r7, %r60; // loop wb: k
+  mov.u64 %r37, %rd57; // loop wb: c0
+  mov.u64 %r40, %rd58; // loop wb: c1
+  mov.u64 %rd41, %rd62; // loop wb: i
+  bra ffn_swiglu_dropout_loop_42;
+  ffn_swiglu_dropout_loop_end_42:
+  mov.u32 %r63, 0; // unit
+  mov.u64 %rd64, 0; // unhandled expr
+  mov.u64 %rd65, 0; // unhandled expr
+  mov.u64 %rd66, 0; // unhandled expr
+  cvt.u32.u64 %r67, %rd65;
+  setp.lt.u32 %p68, %r67, %r9;
+  @%p68 bra ffn_swiglu_dropout_then_69;
+  bra ffn_swiglu_dropout_else_69;
+  ffn_swiglu_dropout_then_69:
+  mov.u32 %r70, 0;
+  mov.u32 %r71, %r70;
+  bra ffn_swiglu_dropout_end_69;
+  ffn_swiglu_dropout_else_69:
+  mov.u32 %r72, 1;
+  mov.u32 %r71, %r72;
+  ffn_swiglu_dropout_end_69:
+  mov.u32 %r73, 0;
+  setp.eq.u32 %p74, %r71, %r73;
+  @%p74 bra ffn_swiglu_dropout_then_75;
+  bra ffn_swiglu_dropout_else_75;
+  ffn_swiglu_dropout_then_75:
+  mov.f32 %f76, 0f00000000; // 0
+  mov.f32 %f77, %f76;
+  bra ffn_swiglu_dropout_end_75;
+  ffn_swiglu_dropout_else_75:
+  mul.f32 %f78, %f36, %f10;
+  mov.f32 %f77, %f78;
+  ffn_swiglu_dropout_end_75:
+  mov.u64 %rd79, 4;
+  mul.lo.u64 %rd80, %rd18, %rd79;
+  add.u64 %rd81, %rd4, %rd80;
+  st.global.f32 [%rd81], %f77;
+  mov.u32 %r82, 0; // unit
+  mov.u32 %r83, %r82;
+  bra ffn_swiglu_dropout_end_20;
+  ffn_swiglu_dropout_else_20:
+  mov.u32 %r83, 0; // no else branch
+  ffn_swiglu_dropout_end_20:
+  mov.u32 %r84, 0; // unit
+  ret;
+}
+

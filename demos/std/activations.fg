@@ -1,0 +1,105 @@
+// std/activations.fg — f32 activation primitives (device-callable).
+//
+// Include with:  use std::activations;
+//
+// All functions are #[device] so they get
+//   static __device__ __forceinline__
+// in the emitted CUDA — no link-time collisions across .cu files,
+// inlined into kernel bodies, identical SASS to writing them inline.
+//
+// Used by the 1130 / 1132 / 1133 / 1145 / 1149 transformer demos as
+// a workspace; this module factors them out of inline kernel bodies
+// so future demos can import.
+
+// Math externs required by activation bodies — declared locally per
+// the stdlib convention (cf. std/mxfp4.fg).
+extern fn expf(x: f32) -> f32  = "<math.h>";
+extern fn logf(x: f32) -> f32  = "<math.h>";
+extern fn tanhf(x: f32) -> f32 = "<math.h>";
+
+// ---- Sigmoid family ---------------------------------------------------------
+
+// Logistic sigmoid: 1 / (1 + exp(-x)).
+#[device]
+fn sigmoid(x: f32) -> f32 {
+    let neg_x: f32 = 0.0f32 - x;
+    let e: f32 = expf(neg_x);
+    1.0f32 / (1.0f32 + e)
+}
+
+// Sigmoid Linear Unit (Swish): x * sigmoid(x).  LLaMA / GPT-NeoX FFN gate.
+#[device]
+fn silu(x: f32) -> f32 {
+    let neg_x: f32 = 0.0f32 - x;
+    let e: f32 = expf(neg_x);
+    x / (1.0f32 + e)
+}
+
+// SwiGLU fragment: silu(gate) * up.  Used after the parallel FFN
+// projections in modern decoder-only LLMs.
+#[device]
+fn swiglu(gate: f32, up: f32) -> f32 {
+    silu(gate) * up
+}
+
+// ---- ReLU family ------------------------------------------------------------
+
+// Rectified Linear Unit: max(0, x).
+#[device]
+fn relu(x: f32) -> f32 {
+    if x > 0.0f32 { x } else { 0.0f32 }
+}
+
+// Leaky ReLU: max(alpha * x, x).  alpha typically 0.01.
+#[device]
+fn leaky_relu(x: f32, alpha: f32) -> f32 {
+    if x > 0.0f32 { x } else { alpha * x }
+}
+
+// ---- Smoothed activations ---------------------------------------------------
+
+// Softplus: log(1 + exp(x)).  Smooth analogue of ReLU.
+#[device]
+fn softplus(x: f32) -> f32 {
+    let e: f32 = expf(x);
+    logf(1.0f32 + e)
+}
+
+// Gaussian Error Linear Unit (tanh approximation):
+//   GELU(x) = 0.5 * x * (1 + tanh( sqrt(2/pi) * (x + 0.044715 * x^3) ))
+//
+// Constants:
+//   sqrt(2/pi)         = 0.7978845608
+//   GELU cubic coeff   = 0.044715
+#[device]
+fn gelu(x: f32) -> f32 {
+    let x3: f32 = x * x * x;
+    let inner: f32 = 0.7978845608f32 * (x + 0.044715f32 * x3);
+    let t: f32 = tanhf(inner);
+    0.5f32 * x * (1.0f32 + t)
+}
+
+// Mish: x * tanh(softplus(x)).  Self-regularised, sometimes preferred
+// over GELU in vision transformers.
+#[device]
+fn mish(x: f32) -> f32 {
+    let sp: f32 = softplus(x);
+    x * tanhf(sp)
+}
+
+// ---- Hard variants (no exp) -------------------------------------------------
+
+// Hard sigmoid: clamp((x + 3) / 6, 0, 1).  Faster, lower precision.
+#[device]
+fn hard_sigmoid(x: f32) -> f32 {
+    let s: f32 = (x + 3.0f32) * 0.16666667f32;  // / 6
+    if s < 0.0f32 { 0.0f32 } else if s > 1.0f32 { 1.0f32 } else { s }
+}
+
+// Hard SiLU (h-swish): x * hard_sigmoid(x).  MobileNet-V3.
+#[device]
+fn hard_silu(x: f32) -> f32 {
+    x * hard_sigmoid(x)
+}
+
+fn main() -> i32 { 0i32 }

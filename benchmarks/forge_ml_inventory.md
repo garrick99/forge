@@ -32,4 +32,8 @@ Proof / assume / emission counts for the f32 ML kernel arc (1120-1135), Forge-na
 | `1145_forge_swiglu` | 4 | 0 | 63 | 67 |
 | `1146_forge_log_softmax` | 2 | 3 | 228 | 151 |
 | `1147_forge_scaled_add` | 3 | 0 | 58 | 64 |
-| **total** | **186** | **37** | | |
+| `1148_forge_layernorm_warp` | 6 | 3 | 233 | 126 |
+| `1149_forge_sigmoid` | 3 | 0 | 61 | 57 |
+| `1150_forge_cross_entropy` | 4 | 6 | 238 | 169 |
+| `1151_forge_activations_lib_demo` | 8 | 0 | 188 | 134 |
+| **total** | **207** | **46** | | |

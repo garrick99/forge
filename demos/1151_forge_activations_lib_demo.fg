@@ -1,0 +1,44 @@
+// Demonstrates std::activations and std::random — fused FFN-style
+// activation kernel that applies SwiGLU and an inline dropout mask
+// derived from Philox-2x32-10 in a single pass.
+//
+//   p[i]    = silu(gate[i]) * up[i]                       // SwiGLU
+//   keep[i] = (philox(seed, i) > p_threshold) ? 1 : 0     // dropout mask
+//   out[i]  = keep[i] * p[i] * keep_scale
+//
+// Two stdlib imports replace ~20 lines of inline activation/RNG code
+// each; the kernel body shrinks to the ~5-line algorithmic core.
+
+use std::prelude;
+use std::activations;
+use std::random;
+
+#[kernel]
+fn ffn_swiglu_dropout(
+    gate: span<f32>, up: span<f32>, out: span<f32>,
+    n: u64, seed_lo: u32, seed_hi: u32,
+    p_threshold: u32, keep_scale: f32
+)
+    requires n <= gate.len
+    requires n <= up.len
+    requires n <= out.len
+    requires blockIdx_x < gridDim_x
+{
+    let gid: u64 = blockIdx_x * (blockDim_x as u64) + (threadIdx_x as u64);
+    if gid < n {
+        // Activation via stdlib.
+        let gated: f32 = swiglu(gate[gid], up[gid]);
+
+        // Dropout mask: a fresh Philox stream per element with the
+        // global thread id as the counter.
+        let gid_lo: u32 = gid as u32;
+        let gid_hi: u32 = (gid >> 32u64) as u32;
+        let (rnd, _) = philox_2x32_10(seed_lo, seed_hi, gid_lo, gid_hi);
+        let keep: u32 = philox_bernoulli_keep_u32(rnd, p_threshold);
+
+        let kept: f32 = if keep == 0u32 { 0.0f32 } else { gated * keep_scale };
+        out[gid] = kept;
+    };
+}
+
+fn main() -> i32 { 0i32 }
