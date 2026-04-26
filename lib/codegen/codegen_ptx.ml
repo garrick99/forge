@@ -127,6 +127,23 @@ let reg_rty st name =
   | Some rty -> rty
   | None     -> U64
 
+(* PTX `cvt` requires a rounding modifier whenever the conversion is
+   lossy: any int→float, any float→int, or narrowing float→float.
+   Returns the modifier string ("" if no modifier needed).
+   `.rn`  = round-to-nearest-even (default for IEEE)
+   `.rzi` = round-to-zero, integer result (for float→int) *)
+let cvt_rounding src_rty tgt_rty =
+  let is_float = function F32 | F64 -> true | _ -> false in
+  let is_int = function
+    | U16 | U32 | U64 | S16 | S32 | S64 -> true
+    | _ -> false
+  in
+  match src_rty, tgt_rty with
+  | F64, F32 -> ".rn"      (* narrowing float-to-float *)
+  | s, t when is_int s && is_float t -> ".rn"   (* int → float *)
+  | s, t when is_float s && is_int t -> ".rzi"  (* float → int, truncate *)
+  | _ -> ""                (* widening or same-kind: no modifier *)
+
 (* ------------------------------------------------------------------ *)
 (* Expression lowering: returns the register holding the result        *)
 (* ------------------------------------------------------------------ *)
@@ -202,10 +219,12 @@ let rec lower_expr st e : string =
          setp uses a consistent type (e.g. u32 tid vs u64 len → widen to u64). *)
       let widen reg src_rty tgt_rty =
         if src_rty = tgt_rty then reg
-        else
+        else begin
           let r = fresh_reg st tgt_rty in
-          emit st (Printf.sprintf "cvt.%s.%s %s, %s;" (arith_pfx tgt_rty) (arith_pfx src_rty) r reg);
+          let rmod = cvt_rounding src_rty tgt_rty in
+          emit st (Printf.sprintf "cvt%s.%s.%s %s, %s;" rmod (arith_pfx tgt_rty) (arith_pfx src_rty) r reg);
           r
+        end
       in
       (* FORGE73: widen integer operands to the expression's declared type
          for arithmetic ops.  PTX is strict — `mul.lo.u64 %rd, %r32, %rd`
@@ -491,8 +510,9 @@ let rec lower_expr st e : string =
       if src = dst_rty then ri
       else begin
         let dst = fresh_reg st dst_rty in
-        emit st (Printf.sprintf "cvt%s%s %s, %s;"
-          (ptx_rty_name dst_rty) (ptx_rty_name src) dst ri);
+        let rmod = cvt_rounding src dst_rty in
+        emit st (Printf.sprintf "cvt%s%s%s %s, %s;"
+          rmod (ptx_rty_name dst_rty) (ptx_rty_name src) dst ri);
         dst
       end
 
