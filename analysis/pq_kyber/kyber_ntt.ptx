@@ -1,0 +1,293 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry kyber_ntt_layer_forward(
+    .param .u64 kyber_ntt_layer_forward_param_data_data,
+    .param .u64 kyber_ntt_layer_forward_param_data_len,
+    .param .u64 kyber_ntt_layer_forward_param_twiddles_data,
+    .param .u64 kyber_ntt_layer_forward_param_twiddles_len,
+    .param .u32 kyber_ntt_layer_forward_param_layer_idx,
+    .param .u64 kyber_ntt_layer_forward_param_half_n
+)
+{
+    .reg .pred %p11, %p30, %p32, %p34, %p59, %p71;
+    .reg .u64 %rd0, %rd1, %rd12, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd26, %rd27, %rd28, %rd29, %rd3, %rd36, %rd37, %rd38, %rd42, %rd43, %rd44, %rd48, %rd49, %rd5, %rd50, %rd64, %rd65, %rd66, %rd76, %rd77, %rd78;
+    .reg .u32 %r10, %r24, %r25, %r39, %r4, %r40, %r41, %r45, %r46, %r47, %r51, %r52, %r53, %r54, %r55, %r56, %r57, %r58, %r6, %r61, %r62, %r63, %r67, %r68, %r69, %r7, %r70, %r73, %r74, %r75, %r79, %r8, %r80, %r81, %r82, %r83, %r84, %r85, %r86, %r87, %r9;
+
+  ld.param.u64 %rd0, [kyber_ntt_layer_forward_param_data_data];
+  ld.param.u64 %rd1, [kyber_ntt_layer_forward_param_data_len];
+  ld.param.u64 %rd2, [kyber_ntt_layer_forward_param_twiddles_data];
+  ld.param.u64 %rd3, [kyber_ntt_layer_forward_param_twiddles_len];
+  ld.param.u32 %r4, [kyber_ntt_layer_forward_param_layer_idx];
+  ld.param.u64 %rd5, [kyber_ntt_layer_forward_param_half_n];
+
+  mov.u32 %r6, %ctaid.x;
+  mov.u32 %r7, %ntid.x;
+  mul.lo.u32 %r8, %r6, %r7;
+  mov.u32 %r9, %tid.x;
+  add.u32 %r10, %r8, %r9;
+  cvt.u64.u32 %rd12, %r10;
+  setp.lt.u64 %p11, %rd12, %rd5;
+  @%p11 bra kyber_ntt_layer_forward_then_13;
+  bra kyber_ntt_layer_forward_else_13;
+  kyber_ntt_layer_forward_then_13:
+  mov.u64 %rd14, 1;
+  cvt.u64.u32 %rd15, %r4;
+  shl.b64 %rd16, %rd14, %rd15;
+  cvt.u64.u32 %rd17, %r4;
+  cvt.u64.u32 %rd18, %r10;
+  shr.u64 %rd19, %r10, %rd17;
+  mov.u64 %rd20, 1;
+  sub.u64 %rd21, %rd16, %rd20;
+  cvt.u64.u32 %rd22, %r10;
+  and.b64 %rd23, %r10, %rd21;
+  mov.u32 %r24, 1;
+  add.u32 %r25, %r4, %r24;
+  cvt.u64.u32 %rd26, %r25;
+  shl.b64 %rd27, %rd19, %rd26;
+  add.u64 %rd28, %rd27, %rd23;
+  add.u64 %rd29, %rd28, %rd16;
+  setp.lt.u64 %p30, %rd28, %rd1;
+  @%p30 bra kyber_ntt_layer_forward_then_31;
+  bra kyber_ntt_layer_forward_else_31;
+  kyber_ntt_layer_forward_then_31:
+  setp.lt.u64 %p32, %rd29, %rd1;
+  @%p32 bra kyber_ntt_layer_forward_then_33;
+  bra kyber_ntt_layer_forward_else_33;
+  kyber_ntt_layer_forward_then_33:
+  setp.lt.u64 %p34, %rd19, %rd3;
+  @%p34 bra kyber_ntt_layer_forward_then_35;
+  bra kyber_ntt_layer_forward_else_35;
+  kyber_ntt_layer_forward_then_35:
+  mov.u64 %rd36, 4;
+  mul.lo.u64 %rd37, %rd28, %rd36;
+  add.u64 %rd38, %rd0, %rd37;
+  ld.global.u32 %r39, [%rd38];
+  mov.u32 %r40, 3329;
+  rem.u32 %r41, %r39, %r40;
+  mov.u64 %rd42, 4;
+  mul.lo.u64 %rd43, %rd29, %rd42;
+  add.u64 %rd44, %rd0, %rd43;
+  ld.global.u32 %r45, [%rd44];
+  mov.u32 %r46, 3329;
+  rem.u32 %r47, %r45, %r46;
+  mov.u64 %rd48, 4;
+  mul.lo.u64 %rd49, %rd19, %rd48;
+  add.u64 %rd50, %rd2, %rd49;
+  ld.global.u32 %r51, [%rd50];
+  mov.u32 %r52, 3329;
+  rem.u32 %r53, %r51, %r52;
+  mul.lo.u32 %r54, %r53, %r47;
+  mov.u32 %r55, 3329;
+  rem.u32 %r56, %r54, %r55;
+  add.u32 %r57, %r41, %r56;
+  mov.u32 %r58, 3329;
+  setp.ge.u32 %p59, %r57, %r58;
+  @%p59 bra kyber_ntt_layer_forward_then_60;
+  bra kyber_ntt_layer_forward_else_60;
+  kyber_ntt_layer_forward_then_60:
+  mov.u32 %r61, 3329;
+  sub.u32 %r62, %r57, %r61;
+  mov.u32 %r63, %r62;
+  bra kyber_ntt_layer_forward_end_60;
+  kyber_ntt_layer_forward_else_60:
+  mov.u32 %r63, %r57;
+  kyber_ntt_layer_forward_end_60:
+  mov.u64 %rd64, 4;
+  mul.lo.u64 %rd65, %rd28, %rd64;
+  add.u64 %rd66, %rd0, %rd65;
+  st.global.u32 [%rd66], %r63;
+  mov.u32 %r67, 3329;
+  add.u32 %r68, %r41, %r67;
+  sub.u32 %r69, %r68, %r56;
+  mov.u32 %r70, 3329;
+  setp.ge.u32 %p71, %r69, %r70;
+  @%p71 bra kyber_ntt_layer_forward_then_72;
+  bra kyber_ntt_layer_forward_else_72;
+  kyber_ntt_layer_forward_then_72:
+  mov.u32 %r73, 3329;
+  sub.u32 %r74, %r69, %r73;
+  mov.u32 %r75, %r74;
+  bra kyber_ntt_layer_forward_end_72;
+  kyber_ntt_layer_forward_else_72:
+  mov.u32 %r75, %r69;
+  kyber_ntt_layer_forward_end_72:
+  mov.u64 %rd76, 4;
+  mul.lo.u64 %rd77, %rd29, %rd76;
+  add.u64 %rd78, %rd0, %rd77;
+  st.global.u32 [%rd78], %r75;
+  mov.u32 %r79, 0; // unit
+  mov.u32 %r80, %r79;
+  bra kyber_ntt_layer_forward_end_35;
+  kyber_ntt_layer_forward_else_35:
+  mov.u32 %r80, 0; // no else branch
+  kyber_ntt_layer_forward_end_35:
+  mov.u32 %r81, 0; // unit
+  mov.u32 %r82, %r81;
+  bra kyber_ntt_layer_forward_end_33;
+  kyber_ntt_layer_forward_else_33:
+  mov.u32 %r82, 0; // no else branch
+  kyber_ntt_layer_forward_end_33:
+  mov.u32 %r83, 0; // unit
+  mov.u32 %r84, %r83;
+  bra kyber_ntt_layer_forward_end_31;
+  kyber_ntt_layer_forward_else_31:
+  mov.u32 %r84, 0; // no else branch
+  kyber_ntt_layer_forward_end_31:
+  mov.u32 %r85, 0; // unit
+  mov.u32 %r86, %r85;
+  bra kyber_ntt_layer_forward_end_13;
+  kyber_ntt_layer_forward_else_13:
+  mov.u32 %r86, 0; // no else branch
+  kyber_ntt_layer_forward_end_13:
+  mov.u32 %r87, 0; // unit
+  ret;
+}
+
+.visible .entry kyber_ntt_layer_inverse(
+    .param .u64 kyber_ntt_layer_inverse_param_data_data,
+    .param .u64 kyber_ntt_layer_inverse_param_data_len,
+    .param .u64 kyber_ntt_layer_inverse_param_twiddles_data,
+    .param .u64 kyber_ntt_layer_inverse_param_twiddles_len,
+    .param .u32 kyber_ntt_layer_inverse_param_layer_idx,
+    .param .u64 kyber_ntt_layer_inverse_param_half_n
+)
+{
+    .reg .pred %p11, %p30, %p32, %p34, %p58, %p65;
+    .reg .u64 %rd0, %rd1, %rd12, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd26, %rd27, %rd28, %rd29, %rd3, %rd36, %rd37, %rd38, %rd42, %rd43, %rd44, %rd48, %rd49, %rd5, %rd50, %rd70, %rd71, %rd72, %rd76, %rd77, %rd78;
+    .reg .u32 %r10, %r24, %r25, %r39, %r4, %r40, %r41, %r45, %r46, %r47, %r51, %r52, %r53, %r54, %r55, %r56, %r57, %r6, %r60, %r61, %r62, %r63, %r64, %r67, %r68, %r69, %r7, %r73, %r74, %r75, %r79, %r8, %r80, %r81, %r82, %r83, %r84, %r85, %r86, %r87, %r9;
+
+  ld.param.u64 %rd0, [kyber_ntt_layer_inverse_param_data_data];
+  ld.param.u64 %rd1, [kyber_ntt_layer_inverse_param_data_len];
+  ld.param.u64 %rd2, [kyber_ntt_layer_inverse_param_twiddles_data];
+  ld.param.u64 %rd3, [kyber_ntt_layer_inverse_param_twiddles_len];
+  ld.param.u32 %r4, [kyber_ntt_layer_inverse_param_layer_idx];
+  ld.param.u64 %rd5, [kyber_ntt_layer_inverse_param_half_n];
+
+  mov.u32 %r6, %ctaid.x;
+  mov.u32 %r7, %ntid.x;
+  mul.lo.u32 %r8, %r6, %r7;
+  mov.u32 %r9, %tid.x;
+  add.u32 %r10, %r8, %r9;
+  cvt.u64.u32 %rd12, %r10;
+  setp.lt.u64 %p11, %rd12, %rd5;
+  @%p11 bra kyber_ntt_layer_inverse_then_13;
+  bra kyber_ntt_layer_inverse_else_13;
+  kyber_ntt_layer_inverse_then_13:
+  mov.u64 %rd14, 1;
+  cvt.u64.u32 %rd15, %r4;
+  shl.b64 %rd16, %rd14, %rd15;
+  cvt.u64.u32 %rd17, %r4;
+  cvt.u64.u32 %rd18, %r10;
+  shr.u64 %rd19, %r10, %rd17;
+  mov.u64 %rd20, 1;
+  sub.u64 %rd21, %rd16, %rd20;
+  cvt.u64.u32 %rd22, %r10;
+  and.b64 %rd23, %r10, %rd21;
+  mov.u32 %r24, 1;
+  add.u32 %r25, %r4, %r24;
+  cvt.u64.u32 %rd26, %r25;
+  shl.b64 %rd27, %rd19, %rd26;
+  add.u64 %rd28, %rd27, %rd23;
+  add.u64 %rd29, %rd28, %rd16;
+  setp.lt.u64 %p30, %rd28, %rd1;
+  @%p30 bra kyber_ntt_layer_inverse_then_31;
+  bra kyber_ntt_layer_inverse_else_31;
+  kyber_ntt_layer_inverse_then_31:
+  setp.lt.u64 %p32, %rd29, %rd1;
+  @%p32 bra kyber_ntt_layer_inverse_then_33;
+  bra kyber_ntt_layer_inverse_else_33;
+  kyber_ntt_layer_inverse_then_33:
+  setp.lt.u64 %p34, %rd19, %rd3;
+  @%p34 bra kyber_ntt_layer_inverse_then_35;
+  bra kyber_ntt_layer_inverse_else_35;
+  kyber_ntt_layer_inverse_then_35:
+  mov.u64 %rd36, 4;
+  mul.lo.u64 %rd37, %rd28, %rd36;
+  add.u64 %rd38, %rd0, %rd37;
+  ld.global.u32 %r39, [%rd38];
+  mov.u32 %r40, 3329;
+  rem.u32 %r41, %r39, %r40;
+  mov.u64 %rd42, 4;
+  mul.lo.u64 %rd43, %rd29, %rd42;
+  add.u64 %rd44, %rd0, %rd43;
+  ld.global.u32 %r45, [%rd44];
+  mov.u32 %r46, 3329;
+  rem.u32 %r47, %r45, %r46;
+  mov.u64 %rd48, 4;
+  mul.lo.u64 %rd49, %rd19, %rd48;
+  add.u64 %rd50, %rd2, %rd49;
+  ld.global.u32 %r51, [%rd50];
+  mov.u32 %r52, 3329;
+  rem.u32 %r53, %r51, %r52;
+  mov.u32 %r54, 3329;
+  add.u32 %r55, %r41, %r54;
+  sub.u32 %r56, %r55, %r47;
+  mov.u32 %r57, 3329;
+  setp.ge.u32 %p58, %r56, %r57;
+  @%p58 bra kyber_ntt_layer_inverse_then_59;
+  bra kyber_ntt_layer_inverse_else_59;
+  kyber_ntt_layer_inverse_then_59:
+  mov.u32 %r60, 3329;
+  sub.u32 %r61, %r56, %r60;
+  mov.u32 %r62, %r61;
+  bra kyber_ntt_layer_inverse_end_59;
+  kyber_ntt_layer_inverse_else_59:
+  mov.u32 %r62, %r56;
+  kyber_ntt_layer_inverse_end_59:
+  add.u32 %r63, %r41, %r47;
+  mov.u32 %r64, 3329;
+  setp.ge.u32 %p65, %r63, %r64;
+  @%p65 bra kyber_ntt_layer_inverse_then_66;
+  bra kyber_ntt_layer_inverse_else_66;
+  kyber_ntt_layer_inverse_then_66:
+  mov.u32 %r67, 3329;
+  sub.u32 %r68, %r63, %r67;
+  mov.u32 %r69, %r68;
+  bra kyber_ntt_layer_inverse_end_66;
+  kyber_ntt_layer_inverse_else_66:
+  mov.u32 %r69, %r63;
+  kyber_ntt_layer_inverse_end_66:
+  mov.u64 %rd70, 4;
+  mul.lo.u64 %rd71, %rd28, %rd70;
+  add.u64 %rd72, %rd0, %rd71;
+  st.global.u32 [%rd72], %r69;
+  mul.lo.u32 %r73, %r53, %r62;
+  mov.u32 %r74, 3329;
+  rem.u32 %r75, %r73, %r74;
+  mov.u64 %rd76, 4;
+  mul.lo.u64 %rd77, %rd29, %rd76;
+  add.u64 %rd78, %rd0, %rd77;
+  st.global.u32 [%rd78], %r75;
+  mov.u32 %r79, 0; // unit
+  mov.u32 %r80, %r79;
+  bra kyber_ntt_layer_inverse_end_35;
+  kyber_ntt_layer_inverse_else_35:
+  mov.u32 %r80, 0; // no else branch
+  kyber_ntt_layer_inverse_end_35:
+  mov.u32 %r81, 0; // unit
+  mov.u32 %r82, %r81;
+  bra kyber_ntt_layer_inverse_end_33;
+  kyber_ntt_layer_inverse_else_33:
+  mov.u32 %r82, 0; // no else branch
+  kyber_ntt_layer_inverse_end_33:
+  mov.u32 %r83, 0; // unit
+  mov.u32 %r84, %r83;
+  bra kyber_ntt_layer_inverse_end_31;
+  kyber_ntt_layer_inverse_else_31:
+  mov.u32 %r84, 0; // no else branch
+  kyber_ntt_layer_inverse_end_31:
+  mov.u32 %r85, 0; // unit
+  mov.u32 %r86, %r85;
+  bra kyber_ntt_layer_inverse_end_13;
+  kyber_ntt_layer_inverse_else_13:
+  mov.u32 %r86, 0; // no else branch
+  kyber_ntt_layer_inverse_end_13:
+  mov.u32 %r87, 0; // unit
+  ret;
+}
+
