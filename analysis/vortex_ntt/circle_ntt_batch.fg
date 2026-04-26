@@ -1,0 +1,129 @@
+// Batched Circle NTT layer — exploratory pilot for span<span<u32>>.
+//
+// Tries the natural FORGE expression of "array of column pointers".
+// If parser/typechecker accepts span<span<u32>>, this is the proper
+// batched NTT port that unblocks the FORGE-NTT prover hot path.
+
+use std::gpu;
+use std::m31;
+
+#[device]
+fn reduce_word(v: u32) -> u32
+    ensures result < M31_P
+{
+    let lo: u32 = v & M31_P;
+    let hi: u32 = v >> 31u32;
+    let r: u32 = lo + hi;
+    if r >= M31_P { r - M31_P } else { r }
+}
+
+#[kernel]
+fn circle_ntt_batch_layer_forward(
+    columns: span<span<u32>>,
+    twiddles: span<u32>,
+    layer_idx: u32,
+    half_n: u64,
+    n_cols: u64
+)
+    requires layer_idx < 31u32
+    requires n_cols <= columns.len
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    let total: u64 = half_n * n_cols;
+    if tid < total {
+        let col_idx: u64 = tid / half_n;
+        let pair_idx: u64 = tid - col_idx * half_n;
+
+        let stride: u64 = 1u64 << (layer_idx as u64);
+        let h: u64 = pair_idx >> (layer_idx as u64);
+        let l: u64 = pair_idx & (stride - 1u64);
+        let idx0: u64 = (h << ((layer_idx + 1u32) as u64)) + l;
+        let idx1: u64 = idx0 + stride;
+
+        if col_idx < columns.len {
+            let col: span<u32> = columns[col_idx];
+            if idx0 < col.len {
+                if idx1 < col.len {
+                    if h < twiddles.len {
+                        let v0: u32 = reduce_word(col[idx0]);
+                        let v1: u32 = reduce_word(col[idx1]);
+                        let t: u32  = reduce_word(twiddles[h]);
+
+                        let tmp: u32 = m31_mul(v1, t);
+                        col[idx0] = m31_add(v0, tmp);
+                        col[idx1] = m31_sub(v0, tmp);
+                    };
+                };
+            };
+        };
+    };
+}
+
+#[kernel]
+fn circle_ntt_batch_layer_inverse(
+    columns: span<span<u32>>,
+    twiddles: span<u32>,
+    layer_idx: u32,
+    half_n: u64,
+    n_cols: u64
+)
+    requires layer_idx < 31u32
+    requires n_cols <= columns.len
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    let total: u64 = half_n * n_cols;
+    if tid < total {
+        let col_idx: u64 = tid / half_n;
+        let pair_idx: u64 = tid - col_idx * half_n;
+
+        let stride: u64 = 1u64 << (layer_idx as u64);
+        let h: u64 = pair_idx >> (layer_idx as u64);
+        let l: u64 = pair_idx & (stride - 1u64);
+        let idx0: u64 = (h << ((layer_idx + 1u32) as u64)) + l;
+        let idx1: u64 = idx0 + stride;
+
+        if col_idx < columns.len {
+            let col: span<u32> = columns[col_idx];
+            if idx0 < col.len {
+                if idx1 < col.len {
+                    if h < twiddles.len {
+                        let v0: u32 = reduce_word(col[idx0]);
+                        let v1: u32 = reduce_word(col[idx1]);
+                        let t: u32  = reduce_word(twiddles[h]);
+
+                        let diff: u32 = m31_sub(v0, v1);
+                        col[idx0] = m31_add(v0, v1);
+                        col[idx1] = m31_mul(diff, t);
+                    };
+                };
+            };
+        };
+    };
+}
+
+#[kernel]
+fn m31_batch_scale(
+    columns: span<span<u32>>,
+    scale: u32,
+    n: u64,
+    n_cols: u64
+)
+    requires scale < M31_P
+    requires n_cols <= columns.len
+{
+    let tid: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    let total: u64 = n * n_cols;
+    if tid < total {
+        let col_idx: u64 = tid / n;
+        let elem_idx: u64 = tid - col_idx * n;
+        if col_idx < columns.len {
+            let col: span<u32> = columns[col_idx];
+            if elem_idx < col.len {
+                let v: u32 = reduce_word(col[elem_idx]);
+                col[elem_idx] = m31_mul(v, scale);
+            };
+        };
+    };
+}
+
+fn main() -> u64 { 0u64 }
