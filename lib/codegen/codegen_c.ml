@@ -1921,6 +1921,15 @@ let device_fn_names : string list ref = ref []
    other C/C++ TUs. *)
 let lib_mode_static : bool ref = ref false
 
+(* Live-set for lib-mode dead-code elimination: kernels + transitive
+   callees. Any function not in this set is unreachable from any
+   `#[kernel]` entry point and can be elided from the emit. Populated
+   by `compute_device_fns` (kernels are added explicitly so the set
+   doubles as both roots and callees). Only consulted when
+   `lib_mode_static` is true; in standalone `forge build` mode all
+   functions are emitted because they may be linker-visible. *)
+let live_fn_names : (string, unit) Hashtbl.t = Hashtbl.create 64
+
 let rec collect_called_fns_expr acc e =
   match e.expr_desc with
   | ECall ({ expr_desc = EVar id; _ }, args) ->
@@ -1985,7 +1994,20 @@ let compute_device_fns (items : item list) =
          | None -> acc)
     | _ -> acc
   ) [] items in
-  device_fn_names := List.sort_uniq String.compare kernel_callees
+  device_fn_names := List.sort_uniq String.compare kernel_callees;
+  (* Live set for lib-mode DCE: kernels + their transitive callees.
+     A non-kernel fn that no kernel ever transitively calls is dead
+     and gets dropped from the emit. Helper functions emitted with
+     `static` linkage in lib-mode are TU-local, so dropping them is
+     safe — nothing outside this .cu can reference them. *)
+  Hashtbl.clear live_fn_names;
+  List.iter (fun n -> Hashtbl.replace live_fn_names n ()) kernel_callees;
+  List.iter (fun item ->
+    match item.item_desc with
+    | IFn fn when List.exists (fun a -> a.attr_name = "kernel") fn.fn_attrs ->
+        Hashtbl.replace live_fn_names fn.fn_name.name ()
+    | _ -> ()
+  ) items
 
 let gpu_qualifier attrs fn_name =
   (* Pure-device helpers get `static __device__` so each translation
@@ -2673,6 +2695,22 @@ let emit_program ?(lib_mode=false) prog =
           ) im.im_items
       | _ -> []
     ) prog.prog_items
+  in
+  (* Lib-mode dead-code elimination: drop functions unreachable from
+     any `#[kernel]` entry point. The standalone `forge build` flow
+     keeps everything because external C/C++ TUs may link against
+     individual functions; lib-mode emits everything as `static` so
+     unreachable fns are unobservable and dead-strippable.
+     Standard library bloat reduction: blake2s pilot dropped from
+     ~99 KB to ~10 KB by stripping unused m31/qm31 helpers. *)
+  let all_fns =
+    if !lib_mode_static then
+      List.filter (fun fn ->
+        Hashtbl.mem live_fn_names fn.fn_name.name
+        || fn.fn_name.name = "main"  (* keep just in case ABI exposed it *)
+      ) all_fns
+    else
+      all_fns
   in
   (* Pass 2: forward declarations for all functions with bodies *)
   if all_fns <> [] then begin

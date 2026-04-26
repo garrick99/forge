@@ -76,12 +76,12 @@ float shfl_xor_sync_f32(float val, uint64_t mask, uint64_t width);  /* extern: f
 float shfl_down_sync_f32(float val, uint64_t delta, uint64_t width);  /* extern: forge_gpu */
 
 /* Forward declarations */
-static __device__ uint64_t warp_reduce_sum(uint64_t val __attribute__((unused)));
-static __device__ uint64_t warp_reduce_max(uint64_t val __attribute__((unused)));
-static __device__ uint64_t warp_reduce_min(uint64_t val __attribute__((unused)));
-static __device__ float warp_reduce_sum_f32(float val __attribute__((unused)));
-static __device__ float warp_reduce_max_f32(float val __attribute__((unused)));
-static __device__ float warp_reduce_min_f32(float val __attribute__((unused)));
+static __device__ __forceinline__ uint64_t warp_reduce_sum(uint64_t val __attribute__((unused)));
+static __device__ __forceinline__ uint64_t warp_reduce_max(uint64_t val __attribute__((unused)));
+static __device__ __forceinline__ uint64_t warp_reduce_min(uint64_t val __attribute__((unused)));
+static __device__ __forceinline__ float warp_reduce_sum_f32(float val __attribute__((unused)));
+static __device__ __forceinline__ float warp_reduce_max_f32(float val __attribute__((unused)));
+static __device__ __forceinline__ float warp_reduce_min_f32(float val __attribute__((unused)));
 uint64_t grid_stride_start(uint64_t block_idx __attribute__((unused)), uint64_t block_dim __attribute__((unused)), uint64_t thread_idx __attribute__((unused)));
 uint64_t grid_stride_step(uint64_t block_dim __attribute__((unused)), uint64_t grid_dim __attribute__((unused)));
 __global__ void reduce_sum(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t* result_ptr __attribute__((unused)));
@@ -92,7 +92,7 @@ __global__ void vec_mul(forge_span_u64_t a __attribute__((unused)), forge_span_u
 __global__ void histogram(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t* bins_ptr __attribute__((unused)), uint64_t nbins __attribute__((unused)));
 int main();
 
-static __device__ uint64_t warp_reduce_sum(uint64_t val __attribute__((unused))) {
+static __device__ __forceinline__ uint64_t warp_reduce_sum(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
   v = (v + __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL));
   v = (v + __shfl_xor_sync(0xffffffff, v, 8ULL, 32ULL));
@@ -102,7 +102,7 @@ static __device__ uint64_t warp_reduce_sum(uint64_t val __attribute__((unused)))
   return v;
 }
 
-static __device__ uint64_t warp_reduce_max(uint64_t val __attribute__((unused))) {
+static __device__ __forceinline__ uint64_t warp_reduce_max(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
   uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL);
   if ((s > v)) {
@@ -132,7 +132,7 @@ static __device__ uint64_t warp_reduce_max(uint64_t val __attribute__((unused)))
   return v;
 }
 
-static __device__ uint64_t warp_reduce_min(uint64_t val __attribute__((unused))) {
+static __device__ __forceinline__ uint64_t warp_reduce_min(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
   uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL);
   if ((s < v)) {
@@ -162,7 +162,7 @@ static __device__ uint64_t warp_reduce_min(uint64_t val __attribute__((unused)))
   return v;
 }
 
-static __device__ float warp_reduce_sum_f32(float val __attribute__((unused))) {
+static __device__ __forceinline__ float warp_reduce_sum_f32(float val __attribute__((unused))) {
   float v __attribute__((unused)) = val;
   v = (v + __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL));
   v = (v + __shfl_xor_sync(0xffffffff, v, 8ULL, 32ULL));
@@ -172,7 +172,7 @@ static __device__ float warp_reduce_sum_f32(float val __attribute__((unused))) {
   return v;
 }
 
-static __device__ float warp_reduce_max_f32(float val __attribute__((unused))) {
+static __device__ __forceinline__ float warp_reduce_max_f32(float val __attribute__((unused))) {
   float v __attribute__((unused)) = val;
   float s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL);
   if ((s > v)) {
@@ -202,7 +202,7 @@ static __device__ float warp_reduce_max_f32(float val __attribute__((unused))) {
   return v;
 }
 
-static __device__ float warp_reduce_min_f32(float val __attribute__((unused))) {
+static __device__ __forceinline__ float warp_reduce_min_f32(float val __attribute__((unused))) {
   float v __attribute__((unused)) = val;
   float s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL);
   if ((s < v)) {
