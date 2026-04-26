@@ -25,6 +25,11 @@
 #define gridDim_y   ((uint32_t)(gridDim.y))
 #define gridDim_z   ((uint32_t)(gridDim.z))
 
+#ifdef __cplusplus
+#  define FORGE_AGG(T, ...) (T{__VA_ARGS__})
+#else
+#  define FORGE_AGG(T, ...) ((T){__VA_ARGS__})
+#endif
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
@@ -72,7 +77,6 @@ void mma_m16n8k32_e5m2(forge_span_u8_t a, forge_span_u8_t b, forge_span_f32_t c)
 uint64_t mma_tile_elements(uint64_t m __attribute__((unused)), uint64_t n __attribute__((unused)));
 uint64_t mma_fp16_a_frag_bytes();
 uint64_t tile_smem_bytes_fp16(uint64_t tile_m __attribute__((unused)), uint64_t tile_k __attribute__((unused)), uint64_t tile_n __attribute__((unused)));
-int main();
 __global__ void fp8_mma_tile(forge_span_u8_t A __attribute__((unused)), forge_span_u8_t B __attribute__((unused)), forge_span_f32_t C __attribute__((unused)));
 int main();
 
@@ -86,11 +90,6 @@ uint64_t mma_fp16_a_frag_bytes() {
 
 uint64_t tile_smem_bytes_fp16(uint64_t tile_m __attribute__((unused)), uint64_t tile_k __attribute__((unused)), uint64_t tile_n __attribute__((unused))) {
   return (((tile_m * tile_k) + (tile_k * tile_n)) * 2ULL);
-}
-
-int main() {
-  return (int)(0ULL);
-
 }
 
 __global__ void fp8_mma_tile(forge_span_u8_t A __attribute__((unused)), forge_span_u8_t B __attribute__((unused)), forge_span_f32_t C __attribute__((unused))) {

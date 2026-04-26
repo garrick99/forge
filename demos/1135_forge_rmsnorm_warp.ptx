@@ -13,10 +13,10 @@
     .param .u64 rmsnorm_warp_param_n_cols
 )
 {
-    .reg .pred %p12, %p37;
-    .reg .u64 %rd0, %rd1, %rd13, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd24, %rd26, %rd28, %rd3, %rd30, %rd32, %rd38, %rd4, %rd41, %rd42, %rd43, %rd44, %rd45, %rd7, %rd8;
-    .reg .f32 %f10, %f11, %f20, %f23, %f25, %f27, %f29, %f31, %f33, %f34, %f35, %f36, %f40, %f9;
-    .reg .u32 %r21, %r22, %r46, %r47, %r48, %r5, %r6;
+    .reg .pred %p12, %p36, %p43;
+    .reg .u64 %rd0, %rd1, %rd13, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd25, %rd27, %rd29, %rd3, %rd31, %rd33, %rd4, %rd44, %rd47, %rd48, %rd49, %rd50, %rd51, %rd7, %rd8;
+    .reg .f32 %f10, %f11, %f21, %f24, %f26, %f28, %f30, %f32, %f34, %f35, %f38, %f39, %f40, %f41, %f42, %f46, %f9;
+    .reg .u32 %r15, %r22, %r23, %r5, %r52, %r53, %r54, %r6;
 
   ld.param.u64 %rd0, [rmsnorm_warp_param_inp_data];
   ld.param.u64 %rd1, [rmsnorm_warp_param_inp_len];
@@ -36,51 +36,63 @@
   @%p12 bra rmsnorm_warp_then_14;
   bra rmsnorm_warp_else_14;
   rmsnorm_warp_then_14:
-  cvt.u64.u32 %rd15, %r5;
-  add.u64 %rd16, %rd8, %rd15;
-  mov.u64 %rd17, 4;
-  mul.lo.u64 %rd18, %rd16, %rd17;
-  add.u64 %rd19, %rd0, %rd18;
-  ld.global.f32 %f20, [%rd19];
-  mov.u32 %r21, 0; // unit
-  mov.u32 %r22, %r21;
+  mov.u32 %r15, 0; // proof/assume erased
+  cvt.u64.u32 %rd16, %r5;
+  add.u64 %rd17, %rd8, %rd16;
+  mov.u64 %rd18, 4;
+  mul.lo.u64 %rd19, %rd17, %rd18;
+  add.u64 %rd20, %rd0, %rd19;
+  ld.global.f32 %f21, [%rd20];
+  mov.u32 %r22, 0; // unit
+  mov.u32 %r23, %r22;
   bra rmsnorm_warp_end_14;
   rmsnorm_warp_else_14:
-  mov.u32 %r22, 0; // no else branch
+  mov.u32 %r23, 0; // no else branch
   rmsnorm_warp_end_14:
-  mul.f32 %f23, %f20, %f20;
-  mov.u64 %rd24, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
-  add.f32 %f25, %f23, %rd24;
-  mov.u64 %rd26, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
-  add.f32 %f27, %f25, %rd26;
-  mov.u64 %rd28, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
-  add.f32 %f29, %f27, %rd28;
-  mov.u64 %rd30, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
-  add.f32 %f31, %f29, %rd30;
-  mov.u64 %rd32, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
-  add.f32 %f33, %f31, %rd32;
-  div.f32 %f34, %f33, %f9;
-  add.f32 %f35, %f34, %f10;
-  rsqrt.approx.f32 %f36, %f35;
-  cvt.u64.u32 %rd38, %r5;
-  setp.lt.u64 %p37, %rd38, %rd4;
-  @%p37 bra rmsnorm_warp_then_39;
-  bra rmsnorm_warp_else_39;
-  rmsnorm_warp_then_39:
-  mul.f32 %f40, %f20, %f36;
-  cvt.u64.u32 %rd41, %r5;
-  add.u64 %rd42, %rd8, %rd41;
-  mov.u64 %rd43, 4;
-  mul.lo.u64 %rd44, %rd42, %rd43;
-  add.u64 %rd45, %rd2, %rd44;
-  st.global.f32 [%rd45], %f40;
-  mov.u32 %r46, 0; // unit
-  mov.u32 %r47, %r46;
-  bra rmsnorm_warp_end_39;
-  rmsnorm_warp_else_39:
-  mov.u32 %r47, 0; // no else branch
-  rmsnorm_warp_end_39:
-  mov.u32 %r48, 0; // unit
+  mul.f32 %f24, %f21, %f21;
+  mov.u64 %rd25, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f26, %f24, %rd25;
+  mov.u64 %rd27, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f28, %f26, %rd27;
+  mov.u64 %rd29, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f30, %f28, %rd29;
+  mov.u64 %rd31, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f32, %f30, %rd31;
+  mov.u64 %rd33, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f34, %f32, %rd33;
+  mov.f32 %f35, 0f00000000; // 0
+  setp.eq.f32 %p36, %f9, %f35;
+  @%p36 bra rmsnorm_warp_then_37;
+  bra rmsnorm_warp_else_37;
+  rmsnorm_warp_then_37:
+  mov.f32 %f38, 0f3F800000; // 1
+  mov.f32 %f39, %f38;
+  bra rmsnorm_warp_end_37;
+  rmsnorm_warp_else_37:
+  mov.f32 %f39, %f9;
+  rmsnorm_warp_end_37:
+  div.f32 %f40, %f34, %f39;
+  add.f32 %f41, %f40, %f10;
+  rsqrt.approx.f32 %f42, %f41;
+  cvt.u64.u32 %rd44, %r5;
+  setp.lt.u64 %p43, %rd44, %rd4;
+  @%p43 bra rmsnorm_warp_then_45;
+  bra rmsnorm_warp_else_45;
+  rmsnorm_warp_then_45:
+  mul.f32 %f46, %f21, %f42;
+  cvt.u64.u32 %rd47, %r5;
+  add.u64 %rd48, %rd8, %rd47;
+  mov.u64 %rd49, 4;
+  mul.lo.u64 %rd50, %rd48, %rd49;
+  add.u64 %rd51, %rd2, %rd50;
+  st.global.f32 [%rd51], %f46;
+  mov.u32 %r52, 0; // unit
+  mov.u32 %r53, %r52;
+  bra rmsnorm_warp_end_45;
+  rmsnorm_warp_else_45:
+  mov.u32 %r53, 0; // no else branch
+  rmsnorm_warp_end_45:
+  mov.u32 %r54, 0; // unit
   ret;
 }
 

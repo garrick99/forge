@@ -25,6 +25,11 @@
 #define gridDim_y   ((uint32_t)(gridDim.y))
 #define gridDim_z   ((uint32_t)(gridDim.z))
 
+#ifdef __cplusplus
+#  define FORGE_AGG(T, ...) (T{__VA_ARGS__})
+#else
+#  define FORGE_AGG(T, ...) ((T){__VA_ARGS__})
+#endif
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
@@ -104,7 +109,6 @@ static const uint16_t BF16_ONE = 16256ULL;
 /* Forward declarations */
 float fp16_dot_f32(uint16_t a __attribute__((unused)), uint16_t b __attribute__((unused)), float acc __attribute__((unused)));
 float bf16_dot_f32(uint16_t a __attribute__((unused)), uint16_t b __attribute__((unused)), float acc __attribute__((unused)));
-int main();
 __global__ void silu_bf16(forge_span_u16_t inp __attribute__((unused)), forge_span_u16_t out __attribute__((unused)), uint64_t n __attribute__((unused)));
 int main();
 
@@ -118,11 +122,6 @@ float bf16_dot_f32(uint16_t a __attribute__((unused)), uint16_t b __attribute__(
   float af __attribute__((unused)) = __bfloat162float(a);
   float bf __attribute__((unused)) = __bfloat162float(b);
   return (acc + (af * bf));
-}
-
-int main() {
-  return (int)(0ULL);
-
 }
 
 __global__ void silu_bf16(forge_span_u16_t inp __attribute__((unused)), forge_span_u16_t out __attribute__((unused)), uint64_t n __attribute__((unused))) {

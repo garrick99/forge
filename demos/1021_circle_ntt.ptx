@@ -14,9 +14,9 @@
     .param .u64 circle_ntt_layer_param_n
 )
 {
-    .reg .pred %p11;
-    .reg .u64 %rd0, %rd1, %rd12, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd3, %rd4, %rd5;
-    .reg .u32 %r10, %r28, %r29, %r30, %r6, %r7, %r8, %r9;
+    .reg .pred %p11, %p43, %p55;
+    .reg .u64 %rd0, %rd1, %rd12, %rd14, %rd15, %rd16, %rd17, %rd18, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd27, %rd28, %rd29, %rd3, %rd30, %rd31, %rd33, %rd34, %rd35, %rd36, %rd37, %rd39, %rd4, %rd40, %rd41, %rd42, %rd45, %rd46, %rd48, %rd49, %rd5, %rd50, %rd51, %rd52, %rd53, %rd54, %rd57, %rd58, %rd59, %rd60, %rd62, %rd63, %rd64, %rd65, %rd66;
+    .reg .u32 %r10, %r19, %r26, %r32, %r38, %r47, %r6, %r61, %r67, %r68, %r69, %r7, %r8, %r9;
 
   ld.param.u64 %rd0, [circle_ntt_layer_param_re_data];
   ld.param.u64 %rd1, [circle_ntt_layer_param_re_len];
@@ -35,29 +35,80 @@
   @%p11 bra circle_ntt_layer_then_13;
   bra circle_ntt_layer_else_13;
   circle_ntt_layer_then_13:
-  mov.u64 %rd14, 0; // call m31_get (device fn)
-  mov.u64 %rd15, 0; // call m31_get (device fn)
-  mov.u64 %rd16, 0; // call m31_get (device fn)
-  mov.u64 %rd17, 0; // call m31_mul (device fn)
-  mov.u64 %rd18, 0; // call m31_add (device fn)
-  cvt.u64.u32 %rd19, %r10;
-  mov.u64 %rd20, 4;
-  mul.lo.u64 %rd21, %rd19, %rd20;
-  add.u64 %rd22, %rd0, %rd21;
-  st.global.u32 [%rd22], %rd18;
-  mov.u64 %rd23, 0; // call m31_sub (device fn)
-  add.u64 %rd24, %r10, %rd4;
-  mov.u64 %rd25, 4;
-  mul.lo.u64 %rd26, %rd24, %rd25;
-  add.u64 %rd27, %rd0, %rd26;
-  st.global.u32 [%rd27], %rd23;
-  mov.u32 %r28, 0; // unit
-  mov.u32 %r29, %r28;
+  cvt.u64.u32 %rd14, %r10;
+  mov.u64 %rd15, 0; // unhandled expr
+  mov.u64 %rd16, 4;
+  mul.lo.u64 %rd17, %rd14, %rd16;
+  add.u64 %rd18, %rd0, %rd17;
+  ld.global.u32 %r19, [%rd18];
+  cvt.u64.u32 %rd20, %r10;
+  add.u64 %rd21, %rd20, %rd4;
+  mov.u64 %rd22, 0; // unhandled expr
+  mov.u64 %rd23, 4;
+  mul.lo.u64 %rd24, %rd21, %rd23;
+  add.u64 %rd25, %rd0, %rd24;
+  ld.global.u32 %r26, [%rd25];
+  cvt.u64.u32 %rd27, %r10;
+  mov.u64 %rd28, 0; // unhandled expr
+  mov.u64 %rd29, 4;
+  mul.lo.u64 %rd30, %rd27, %rd29;
+  add.u64 %rd31, %rd2, %rd30;
+  ld.global.u32 %r32, [%rd31];
+  cvt.u64.u32 %rd33, %r32;
+  cvt.u64.u32 %rd34, %r26;
+  mul.lo.u64 %rd35, %rd33, %rd34;
+  cvt.u64.u32 %rd36, %rd_unknown_M31_P;
+  rem.u64 %rd37, %rd35, %rd36;
+  cvt.u32.u64 %r38, %rd37;
+  cvt.u64.u32 %rd39, %r19;
+  cvt.u64.u32 %rd40, %r38;
+  add.u64 %rd41, %rd39, %rd40;
+  cvt.u64.u32 %rd42, %rd_unknown_M31_P;
+  setp.ge.u64 %p43, %rd41, %rd42;
+  @%p43 bra circle_ntt_layer_then_44;
+  bra circle_ntt_layer_else_44;
+  circle_ntt_layer_then_44:
+  sub.u64 %rd45, %rd41, %rd42;
+  mov.u64 %rd46, %rd45;
+  bra circle_ntt_layer_end_44;
+  circle_ntt_layer_else_44:
+  mov.u64 %rd46, %rd41;
+  circle_ntt_layer_end_44:
+  cvt.u32.u64 %r47, %rd46;
+  cvt.u64.u32 %rd48, %r10;
+  mov.u64 %rd49, 4;
+  mul.lo.u64 %rd50, %rd48, %rd49;
+  add.u64 %rd51, %rd0, %rd50;
+  st.global.u32 [%rd51], %r47;
+  cvt.u64.u32 %rd52, %r19;
+  cvt.u64.u32 %rd53, %r38;
+  cvt.u64.u32 %rd54, %rd_unknown_M31_P;
+  setp.ge.u64 %p55, %rd52, %rd53;
+  @%p55 bra circle_ntt_layer_then_56;
+  bra circle_ntt_layer_else_56;
+  circle_ntt_layer_then_56:
+  sub.u64 %rd57, %rd52, %rd53;
+  mov.u64 %rd58, %rd57;
+  bra circle_ntt_layer_end_56;
+  circle_ntt_layer_else_56:
+  add.u64 %rd59, %rd52, %rd54;
+  sub.u64 %rd60, %rd59, %rd53;
+  mov.u64 %rd58, %rd60;
+  circle_ntt_layer_end_56:
+  cvt.u32.u64 %r61, %rd58;
+  cvt.u64.u32 %rd62, %r10;
+  add.u64 %rd63, %rd62, %rd4;
+  mov.u64 %rd64, 4;
+  mul.lo.u64 %rd65, %rd63, %rd64;
+  add.u64 %rd66, %rd0, %rd65;
+  st.global.u32 [%rd66], %r61;
+  mov.u32 %r67, 0; // unit
+  mov.u32 %r68, %r67;
   bra circle_ntt_layer_end_13;
   circle_ntt_layer_else_13:
-  mov.u32 %r29, 0; // no else branch
+  mov.u32 %r68, 0; // no else branch
   circle_ntt_layer_end_13:
-  mov.u32 %r30, 0; // unit
+  mov.u32 %r69, 0; // unit
   ret;
 }
 
@@ -70,9 +121,9 @@
     .param .u64 circle_intt_layer_param_n
 )
 {
-    .reg .pred %p11;
-    .reg .u64 %rd0, %rd1, %rd12, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd3, %rd4, %rd5;
-    .reg .u32 %r10, %r29, %r30, %r31, %r6, %r7, %r8, %r9;
+    .reg .pred %p11, %p34, %p50, %p62;
+    .reg .u64 %rd0, %rd1, %rd12, %rd14, %rd15, %rd16, %rd17, %rd18, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd27, %rd28, %rd29, %rd3, %rd30, %rd31, %rd4, %rd40, %rd41, %rd42, %rd43, %rd44, %rd46, %rd47, %rd48, %rd49, %rd5, %rd52, %rd53, %rd55, %rd56, %rd57, %rd58, %rd59, %rd60, %rd61, %rd64, %rd65, %rd66, %rd67, %rd69, %rd70, %rd71, %rd72, %rd73;
+    .reg .u32 %r10, %r19, %r26, %r32, %r33, %r36, %r37, %r38, %r39, %r45, %r54, %r6, %r68, %r7, %r74, %r75, %r76, %r8, %r9;
 
   ld.param.u64 %rd0, [circle_intt_layer_param_re_data];
   ld.param.u64 %rd1, [circle_intt_layer_param_re_len];
@@ -91,30 +142,93 @@
   @%p11 bra circle_intt_layer_then_13;
   bra circle_intt_layer_else_13;
   circle_intt_layer_then_13:
-  mov.u64 %rd14, 0; // call m31_get (device fn)
-  mov.u64 %rd15, 0; // call m31_get (device fn)
-  mov.u64 %rd16, 0; // call m31_get (device fn)
-  mov.u64 %rd17, 0; // call m31_neg (device fn)
-  mov.u64 %rd18, 0; // call m31_mul (device fn)
-  mov.u64 %rd19, 0; // call m31_add (device fn)
+  cvt.u64.u32 %rd14, %r10;
+  mov.u64 %rd15, 0; // unhandled expr
+  mov.u64 %rd16, 4;
+  mul.lo.u64 %rd17, %rd14, %rd16;
+  add.u64 %rd18, %rd0, %rd17;
+  ld.global.u32 %r19, [%rd18];
   cvt.u64.u32 %rd20, %r10;
-  mov.u64 %rd21, 4;
-  mul.lo.u64 %rd22, %rd20, %rd21;
-  add.u64 %rd23, %rd0, %rd22;
-  st.global.u32 [%rd23], %rd19;
-  mov.u64 %rd24, 0; // call m31_sub (device fn)
-  add.u64 %rd25, %r10, %rd4;
-  mov.u64 %rd26, 4;
-  mul.lo.u64 %rd27, %rd25, %rd26;
-  add.u64 %rd28, %rd0, %rd27;
-  st.global.u32 [%rd28], %rd24;
-  mov.u32 %r29, 0; // unit
-  mov.u32 %r30, %r29;
+  add.u64 %rd21, %rd20, %rd4;
+  mov.u64 %rd22, 0; // unhandled expr
+  mov.u64 %rd23, 4;
+  mul.lo.u64 %rd24, %rd21, %rd23;
+  add.u64 %rd25, %rd0, %rd24;
+  ld.global.u32 %r26, [%rd25];
+  cvt.u64.u32 %rd27, %r10;
+  mov.u64 %rd28, 0; // unhandled expr
+  mov.u64 %rd29, 4;
+  mul.lo.u64 %rd30, %rd27, %rd29;
+  add.u64 %rd31, %rd2, %rd30;
+  ld.global.u32 %r32, [%rd31];
+  mov.u32 %r33, 0;
+  setp.eq.u32 %p34, %r32, %r33;
+  @%p34 bra circle_intt_layer_then_35;
+  bra circle_intt_layer_else_35;
+  circle_intt_layer_then_35:
+  mov.u32 %r36, 0;
+  mov.u32 %r37, %r36;
+  bra circle_intt_layer_end_35;
+  circle_intt_layer_else_35:
+  cvt.u32.u64 %r38, %rd_unknown_M31_P;
+  sub.u32 %r39, %r38, %r32;
+  mov.u32 %r37, %r39;
+  circle_intt_layer_end_35:
+  cvt.u64.u32 %rd40, %r37;
+  cvt.u64.u32 %rd41, %r26;
+  mul.lo.u64 %rd42, %rd40, %rd41;
+  cvt.u64.u32 %rd43, %rd_unknown_M31_P;
+  rem.u64 %rd44, %rd42, %rd43;
+  cvt.u32.u64 %r45, %rd44;
+  cvt.u64.u32 %rd46, %r19;
+  cvt.u64.u32 %rd47, %r45;
+  add.u64 %rd48, %rd46, %rd47;
+  cvt.u64.u32 %rd49, %rd_unknown_M31_P;
+  setp.ge.u64 %p50, %rd48, %rd49;
+  @%p50 bra circle_intt_layer_then_51;
+  bra circle_intt_layer_else_51;
+  circle_intt_layer_then_51:
+  sub.u64 %rd52, %rd48, %rd49;
+  mov.u64 %rd53, %rd52;
+  bra circle_intt_layer_end_51;
+  circle_intt_layer_else_51:
+  mov.u64 %rd53, %rd48;
+  circle_intt_layer_end_51:
+  cvt.u32.u64 %r54, %rd53;
+  cvt.u64.u32 %rd55, %r10;
+  mov.u64 %rd56, 4;
+  mul.lo.u64 %rd57, %rd55, %rd56;
+  add.u64 %rd58, %rd0, %rd57;
+  st.global.u32 [%rd58], %r54;
+  cvt.u64.u32 %rd59, %r19;
+  cvt.u64.u32 %rd60, %r45;
+  cvt.u64.u32 %rd61, %rd_unknown_M31_P;
+  setp.ge.u64 %p62, %rd59, %rd60;
+  @%p62 bra circle_intt_layer_then_63;
+  bra circle_intt_layer_else_63;
+  circle_intt_layer_then_63:
+  sub.u64 %rd64, %rd59, %rd60;
+  mov.u64 %rd65, %rd64;
+  bra circle_intt_layer_end_63;
+  circle_intt_layer_else_63:
+  add.u64 %rd66, %rd59, %rd61;
+  sub.u64 %rd67, %rd66, %rd60;
+  mov.u64 %rd65, %rd67;
+  circle_intt_layer_end_63:
+  cvt.u32.u64 %r68, %rd65;
+  cvt.u64.u32 %rd69, %r10;
+  add.u64 %rd70, %rd69, %rd4;
+  mov.u64 %rd71, 4;
+  mul.lo.u64 %rd72, %rd70, %rd71;
+  add.u64 %rd73, %rd0, %rd72;
+  st.global.u32 [%rd73], %r68;
+  mov.u32 %r74, 0; // unit
+  mov.u32 %r75, %r74;
   bra circle_intt_layer_end_13;
   circle_intt_layer_else_13:
-  mov.u32 %r30, 0; // no else branch
+  mov.u32 %r75, 0; // no else branch
   circle_intt_layer_end_13:
-  mov.u32 %r31, 0; // unit
+  mov.u32 %r76, 0; // unit
   ret;
 }
 
@@ -131,9 +245,9 @@
     .param .u64 circle_ntt_layer_cm31_param_n
 )
 {
-    .reg .pred %p15;
-    .reg .u64 %rd0, %rd1, %rd16, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd23, %rd24, %rd25, %rd26, %rd27, %rd28, %rd29, %rd3, %rd30, %rd31, %rd32, %rd33, %rd34, %rd35, %rd36, %rd37, %rd38, %rd39, %rd4, %rd40, %rd41, %rd42, %rd43, %rd44, %rd45, %rd5, %rd6, %rd7, %rd8, %rd9;
-    .reg .u32 %r10, %r11, %r12, %r13, %r14, %r46, %r47, %r48;
+    .reg .pred %p103, %p116, %p128, %p143, %p15, %p71, %p94;
+    .reg .u64 %rd0, %rd1, %rd100, %rd101, %rd102, %rd105, %rd106, %rd108, %rd109, %rd110, %rd111, %rd112, %rd113, %rd114, %rd115, %rd118, %rd119, %rd121, %rd122, %rd123, %rd124, %rd125, %rd126, %rd127, %rd130, %rd131, %rd132, %rd133, %rd135, %rd136, %rd137, %rd138, %rd139, %rd140, %rd141, %rd142, %rd145, %rd146, %rd147, %rd148, %rd150, %rd151, %rd152, %rd153, %rd154, %rd16, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd24, %rd25, %rd26, %rd27, %rd28, %rd3, %rd30, %rd31, %rd32, %rd33, %rd34, %rd35, %rd37, %rd38, %rd39, %rd4, %rd40, %rd41, %rd42, %rd44, %rd45, %rd46, %rd47, %rd48, %rd5, %rd50, %rd51, %rd52, %rd53, %rd54, %rd56, %rd57, %rd58, %rd59, %rd6, %rd60, %rd62, %rd63, %rd64, %rd65, %rd66, %rd68, %rd69, %rd7, %rd70, %rd73, %rd74, %rd75, %rd76, %rd78, %rd79, %rd8, %rd80, %rd81, %rd82, %rd84, %rd85, %rd86, %rd87, %rd88, %rd9, %rd90, %rd91, %rd92, %rd93, %rd96, %rd97, %rd99;
+    .reg .u32 %r10, %r107, %r11, %r12, %r120, %r13, %r134, %r14, %r149, %r155, %r156, %r157, %r23, %r29, %r36, %r43, %r49, %r55, %r61, %r67, %r77, %r83, %r89, %r98;
 
   ld.param.u64 %rd0, [circle_ntt_layer_cm31_param_re_arr_data];
   ld.param.u64 %rd1, [circle_ntt_layer_cm31_param_re_arr_len];
@@ -156,45 +270,190 @@
   @%p15 bra circle_ntt_layer_cm31_then_17;
   bra circle_ntt_layer_cm31_else_17;
   circle_ntt_layer_cm31_then_17:
-  mov.u64 %rd18, 0; // call m31_get (device fn)
-  mov.u64 %rd19, 0; // call m31_get (device fn)
-  mov.u64 %rd20, 0; // call m31_get (device fn)
-  mov.u64 %rd21, 0; // call m31_get (device fn)
-  mov.u64 %rd22, 0; // call m31_get (device fn)
-  mov.u64 %rd23, 0; // call m31_get (device fn)
-  mov.u64 %rd24, 0; // call cm31_mul_re (device fn)
-  mov.u64 %rd25, 0; // call cm31_mul_im (device fn)
-  mov.u64 %rd26, 0; // call cm31_add_re (device fn)
-  cvt.u64.u32 %rd27, %r14;
-  mov.u64 %rd28, 4;
-  mul.lo.u64 %rd29, %rd27, %rd28;
-  add.u64 %rd30, %rd0, %rd29;
-  st.global.u32 [%rd30], %rd26;
-  mov.u64 %rd31, 0; // call cm31_add_im (device fn)
-  cvt.u64.u32 %rd32, %r14;
+  cvt.u64.u32 %rd18, %r14;
+  mov.u64 %rd19, 0; // unhandled expr
+  mov.u64 %rd20, 4;
+  mul.lo.u64 %rd21, %rd18, %rd20;
+  add.u64 %rd22, %rd0, %rd21;
+  ld.global.u32 %r23, [%rd22];
+  cvt.u64.u32 %rd24, %r14;
+  mov.u64 %rd25, 0; // unhandled expr
+  mov.u64 %rd26, 4;
+  mul.lo.u64 %rd27, %rd24, %rd26;
+  add.u64 %rd28, %rd2, %rd27;
+  ld.global.u32 %r29, [%rd28];
+  cvt.u64.u32 %rd30, %r14;
+  add.u64 %rd31, %rd30, %rd8;
+  mov.u64 %rd32, 0; // unhandled expr
   mov.u64 %rd33, 4;
-  mul.lo.u64 %rd34, %rd32, %rd33;
-  add.u64 %rd35, %rd2, %rd34;
-  st.global.u32 [%rd35], %rd31;
-  mov.u64 %rd36, 0; // call cm31_sub_re (device fn)
-  add.u64 %rd37, %r14, %rd8;
-  mov.u64 %rd38, 4;
-  mul.lo.u64 %rd39, %rd37, %rd38;
-  add.u64 %rd40, %rd0, %rd39;
-  st.global.u32 [%rd40], %rd36;
-  mov.u64 %rd41, 0; // call cm31_sub_im (device fn)
-  add.u64 %rd42, %r14, %rd8;
-  mov.u64 %rd43, 4;
-  mul.lo.u64 %rd44, %rd42, %rd43;
-  add.u64 %rd45, %rd2, %rd44;
-  st.global.u32 [%rd45], %rd41;
-  mov.u32 %r46, 0; // unit
-  mov.u32 %r47, %r46;
+  mul.lo.u64 %rd34, %rd31, %rd33;
+  add.u64 %rd35, %rd0, %rd34;
+  ld.global.u32 %r36, [%rd35];
+  cvt.u64.u32 %rd37, %r14;
+  add.u64 %rd38, %rd37, %rd8;
+  mov.u64 %rd39, 0; // unhandled expr
+  mov.u64 %rd40, 4;
+  mul.lo.u64 %rd41, %rd38, %rd40;
+  add.u64 %rd42, %rd2, %rd41;
+  ld.global.u32 %r43, [%rd42];
+  cvt.u64.u32 %rd44, %r14;
+  mov.u64 %rd45, 0; // unhandled expr
+  mov.u64 %rd46, 4;
+  mul.lo.u64 %rd47, %rd44, %rd46;
+  add.u64 %rd48, %rd4, %rd47;
+  ld.global.u32 %r49, [%rd48];
+  cvt.u64.u32 %rd50, %r14;
+  mov.u64 %rd51, 0; // unhandled expr
+  mov.u64 %rd52, 4;
+  mul.lo.u64 %rd53, %rd50, %rd52;
+  add.u64 %rd54, %rd6, %rd53;
+  ld.global.u32 %r55, [%rd54];
+  cvt.u64.u32 %rd56, %r49;
+  cvt.u64.u32 %rd57, %r36;
+  mul.lo.u64 %rd58, %rd56, %rd57;
+  cvt.u64.u32 %rd59, %rd_unknown_M31_P;
+  rem.u64 %rd60, %rd58, %rd59;
+  cvt.u32.u64 %r61, %rd60;
+  cvt.u64.u32 %rd62, %r55;
+  cvt.u64.u32 %rd63, %r43;
+  mul.lo.u64 %rd64, %rd62, %rd63;
+  cvt.u64.u32 %rd65, %rd_unknown_M31_P;
+  rem.u64 %rd66, %rd64, %rd65;
+  cvt.u32.u64 %r67, %rd66;
+  cvt.u64.u32 %rd68, %r61;
+  cvt.u64.u32 %rd69, %r67;
+  cvt.u64.u32 %rd70, %rd_unknown_M31_P;
+  setp.ge.u64 %p71, %rd68, %rd69;
+  @%p71 bra circle_ntt_layer_cm31_then_72;
+  bra circle_ntt_layer_cm31_else_72;
+  circle_ntt_layer_cm31_then_72:
+  sub.u64 %rd73, %rd68, %rd69;
+  mov.u64 %rd74, %rd73;
+  bra circle_ntt_layer_cm31_end_72;
+  circle_ntt_layer_cm31_else_72:
+  add.u64 %rd75, %rd68, %rd70;
+  sub.u64 %rd76, %rd75, %rd69;
+  mov.u64 %rd74, %rd76;
+  circle_ntt_layer_cm31_end_72:
+  cvt.u32.u64 %r77, %rd74;
+  cvt.u64.u32 %rd78, %r49;
+  cvt.u64.u32 %rd79, %r43;
+  mul.lo.u64 %rd80, %rd78, %rd79;
+  cvt.u64.u32 %rd81, %rd_unknown_M31_P;
+  rem.u64 %rd82, %rd80, %rd81;
+  cvt.u32.u64 %r83, %rd82;
+  cvt.u64.u32 %rd84, %r55;
+  cvt.u64.u32 %rd85, %r36;
+  mul.lo.u64 %rd86, %rd84, %rd85;
+  cvt.u64.u32 %rd87, %rd_unknown_M31_P;
+  rem.u64 %rd88, %rd86, %rd87;
+  cvt.u32.u64 %r89, %rd88;
+  cvt.u64.u32 %rd90, %r83;
+  cvt.u64.u32 %rd91, %r89;
+  add.u64 %rd92, %rd90, %rd91;
+  cvt.u64.u32 %rd93, %rd_unknown_M31_P;
+  setp.ge.u64 %p94, %rd92, %rd93;
+  @%p94 bra circle_ntt_layer_cm31_then_95;
+  bra circle_ntt_layer_cm31_else_95;
+  circle_ntt_layer_cm31_then_95:
+  sub.u64 %rd96, %rd92, %rd93;
+  mov.u64 %rd97, %rd96;
+  bra circle_ntt_layer_cm31_end_95;
+  circle_ntt_layer_cm31_else_95:
+  mov.u64 %rd97, %rd92;
+  circle_ntt_layer_cm31_end_95:
+  cvt.u32.u64 %r98, %rd97;
+  cvt.u64.u32 %rd99, %r23;
+  cvt.u64.u32 %rd100, %r77;
+  add.u64 %rd101, %rd99, %rd100;
+  cvt.u64.u32 %rd102, %rd_unknown_M31_P;
+  setp.ge.u64 %p103, %rd101, %rd102;
+  @%p103 bra circle_ntt_layer_cm31_then_104;
+  bra circle_ntt_layer_cm31_else_104;
+  circle_ntt_layer_cm31_then_104:
+  sub.u64 %rd105, %rd101, %rd102;
+  mov.u64 %rd106, %rd105;
+  bra circle_ntt_layer_cm31_end_104;
+  circle_ntt_layer_cm31_else_104:
+  mov.u64 %rd106, %rd101;
+  circle_ntt_layer_cm31_end_104:
+  cvt.u32.u64 %r107, %rd106;
+  cvt.u64.u32 %rd108, %r14;
+  mov.u64 %rd109, 4;
+  mul.lo.u64 %rd110, %rd108, %rd109;
+  add.u64 %rd111, %rd0, %rd110;
+  st.global.u32 [%rd111], %r107;
+  cvt.u64.u32 %rd112, %r29;
+  cvt.u64.u32 %rd113, %r98;
+  add.u64 %rd114, %rd112, %rd113;
+  cvt.u64.u32 %rd115, %rd_unknown_M31_P;
+  setp.ge.u64 %p116, %rd114, %rd115;
+  @%p116 bra circle_ntt_layer_cm31_then_117;
+  bra circle_ntt_layer_cm31_else_117;
+  circle_ntt_layer_cm31_then_117:
+  sub.u64 %rd118, %rd114, %rd115;
+  mov.u64 %rd119, %rd118;
+  bra circle_ntt_layer_cm31_end_117;
+  circle_ntt_layer_cm31_else_117:
+  mov.u64 %rd119, %rd114;
+  circle_ntt_layer_cm31_end_117:
+  cvt.u32.u64 %r120, %rd119;
+  cvt.u64.u32 %rd121, %r14;
+  mov.u64 %rd122, 4;
+  mul.lo.u64 %rd123, %rd121, %rd122;
+  add.u64 %rd124, %rd2, %rd123;
+  st.global.u32 [%rd124], %r120;
+  cvt.u64.u32 %rd125, %r23;
+  cvt.u64.u32 %rd126, %r77;
+  cvt.u64.u32 %rd127, %rd_unknown_M31_P;
+  setp.ge.u64 %p128, %rd125, %rd126;
+  @%p128 bra circle_ntt_layer_cm31_then_129;
+  bra circle_ntt_layer_cm31_else_129;
+  circle_ntt_layer_cm31_then_129:
+  sub.u64 %rd130, %rd125, %rd126;
+  mov.u64 %rd131, %rd130;
+  bra circle_ntt_layer_cm31_end_129;
+  circle_ntt_layer_cm31_else_129:
+  add.u64 %rd132, %rd125, %rd127;
+  sub.u64 %rd133, %rd132, %rd126;
+  mov.u64 %rd131, %rd133;
+  circle_ntt_layer_cm31_end_129:
+  cvt.u32.u64 %r134, %rd131;
+  cvt.u64.u32 %rd135, %r14;
+  add.u64 %rd136, %rd135, %rd8;
+  mov.u64 %rd137, 4;
+  mul.lo.u64 %rd138, %rd136, %rd137;
+  add.u64 %rd139, %rd0, %rd138;
+  st.global.u32 [%rd139], %r134;
+  cvt.u64.u32 %rd140, %r29;
+  cvt.u64.u32 %rd141, %r98;
+  cvt.u64.u32 %rd142, %rd_unknown_M31_P;
+  setp.ge.u64 %p143, %rd140, %rd141;
+  @%p143 bra circle_ntt_layer_cm31_then_144;
+  bra circle_ntt_layer_cm31_else_144;
+  circle_ntt_layer_cm31_then_144:
+  sub.u64 %rd145, %rd140, %rd141;
+  mov.u64 %rd146, %rd145;
+  bra circle_ntt_layer_cm31_end_144;
+  circle_ntt_layer_cm31_else_144:
+  add.u64 %rd147, %rd140, %rd142;
+  sub.u64 %rd148, %rd147, %rd141;
+  mov.u64 %rd146, %rd148;
+  circle_ntt_layer_cm31_end_144:
+  cvt.u32.u64 %r149, %rd146;
+  cvt.u64.u32 %rd150, %r14;
+  add.u64 %rd151, %rd150, %rd8;
+  mov.u64 %rd152, 4;
+  mul.lo.u64 %rd153, %rd151, %rd152;
+  add.u64 %rd154, %rd2, %rd153;
+  st.global.u32 [%rd154], %r149;
+  mov.u32 %r155, 0; // unit
+  mov.u32 %r156, %r155;
   bra circle_ntt_layer_cm31_end_17;
   circle_ntt_layer_cm31_else_17:
-  mov.u32 %r47, 0; // no else branch
+  mov.u32 %r156, 0; // no else branch
   circle_ntt_layer_cm31_end_17:
-  mov.u32 %r48, 0; // unit
+  mov.u32 %r157, 0; // unit
   ret;
 }
 
