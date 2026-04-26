@@ -56,6 +56,7 @@ fn m31_inv(a: u32) -> u32
 // VortexSTARK always passes M31-canonical data here (the prover
 // guarantees this upstream); precondition documents and enforces it.
 #[kernel]
+#[ldg]
 fn batch_inverse_m31(
     input: span<u32>,
     output: span<u32>,

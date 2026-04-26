@@ -578,16 +578,18 @@ let c_safe_name name =
 let loop_result_counter : int ref = ref 0
 let match_default_counter : int ref = ref 0
 
-(* CUDA emit flag — set by emit_program. When true, span<T> read
-   accesses (EIndex in rvalue position) are wrapped with __ldg() to
-   force the read-only / non-coherent (NC) cache path. nvcc requires
-   `const T*` or __restrict__ to infer NC-cacheability from the
-   pointer type alone; FORGE's span typedef has neither, so without
-   __ldg the loads compile to plain `ld.global.b32` instead of the
-   ~2x faster `ld.global.nc.b32`. Hand-written CUDA in VortexSTARK
-   uses `const T* __restrict__` and gets NC loads automatically;
-   FORGE matches by emitting __ldg explicitly. *)
+(* CUDA emit flag — set by emit_program. *)
 let is_cuda_emit : bool ref = ref false
+
+(* Per-function: emit span<TPrim> reads via __ldg (NC cache path)?
+   Set by emit_fn from the function's `#[ldg]` attribute. NC cache
+   helps kernels with scattered reads (e.g. merkle: hash 4 cols per
+   leaf; batch_inverse: 64-elem prefix product chains). It HURTS
+   kernels with sequential strided patterns (NTT butterfly:
+   col[idx0], col[idx0+stride] — regular L1 already optimal) because
+   the NC cache adds latency and pressure on a separate cache path.
+   Defaulting OFF preserves existing behavior; opt in via #[ldg]. *)
+let current_kernel_uses_ldg : bool ref = ref false
 
 (* Iterator impl registry: (ty_name, item_ty) — populated by emit_program *)
 let iterator_impls : (string * ty) list ref = ref []
@@ -1073,17 +1075,19 @@ let rec emit_expr depth e =
          `arr.data[idx]` (you can't __ldg() an lvalue). *)
       (match arr.expr_ty with
        | Some (TSpan elem_ty) | Some (TQual (_, TSpan elem_ty)) ->
-           (* __ldg is only defined for POD scalar/vector types in
-              sm_32_intrinsics.h (int, unsigned, long long, float,
-              double, int2, int4, etc.). Struct reads (e.g.
-              `span<span<T>>` where the inner element is a span
-              struct) must fall back to plain `.data[idx]`. *)
+           (* Emit via __ldg() (NC cache) only when:
+              1. CUDA mode
+              2. Enclosing function has #[ldg] attribute (opt-in)
+              3. Element type is a POD scalar __ldg supports
+              The opt-in matters: NC cache helps scattered reads
+              (merkle/batch_inverse) but hurts coalesced strided
+              reads (NTT/FRI butterfly) where regular L1 wins. *)
            let is_ldg_safe =
              match elem_ty with
              | TPrim (TUint _) | TPrim (TInt _) | TPrim (TFloat _) -> true
              | _ -> false
            in
-           if !is_cuda_emit && is_ldg_safe then
+           if !is_cuda_emit && !current_kernel_uses_ldg && is_ldg_safe then
              Printf.sprintf "__ldg((const %s*)&%s.data[%s])"
                (emit_ty elem_ty) arr_s idx_s
            else
@@ -2085,6 +2089,12 @@ let emit_fn fn =
   current_type_params := List.filter_map (fun (id, k) ->
     match k with KType | KBounded _ -> Some id.name | _ -> None
   ) fn.fn_generics;
+  (* Per-fn `#[ldg]` opt-in: span<TPrim> reads emit via __ldg() in
+     CUDA mode. Saved/restored across emit_fn calls so nested or
+     adjacent functions don't pollute each other. *)
+  let saved_ldg = !current_kernel_uses_ldg in
+  current_kernel_uses_ldg :=
+    List.exists (fun a -> a.attr_name = "ldg") fn.fn_attrs;
   (* GPU qualifier prefix — erased for non-GPU builds *)
   let qual = gpu_qualifier fn.fn_attrs fn.fn_name.name in
   (* requires/ensures are fully erased — proof was discharged *)
@@ -2187,6 +2197,7 @@ let emit_fn fn =
             Buffer.add_string buf (Printf.sprintf "{ %s; }" (emit_expr 0 body))));
   Buffer.add_char buf '\n';
   current_type_params := saved_type_params;
+  current_kernel_uses_ldg := saved_ldg;
   Buffer.contents buf
 
 let emit_struct sd =

@@ -90,6 +90,7 @@ fn reduce_word(v: u32) -> u32
 //   5. Writes reduced h[0..7] to hashes[leaf*8 .. leaf*8 + 8].
 
 #[kernel]
+#[ldg]
 fn merkle_hash_leaves_single(column: span<u32>, hashes: span<u32>, n_leaves: u64)
     requires n_leaves <= column.len
     requires n_leaves * 8u64 <= hashes.len
@@ -303,6 +304,7 @@ fn merkle_hash_leaves_single(column: span<u32>, hashes: span<u32>, n_leaves: u64
     };
 }
 #[kernel]
+#[ldg]
 fn merkle_hash_leaves_quad(c0: span<u32>, c1: span<u32>, c2: span<u32>, c3: span<u32>, hashes: span<u32>, n_leaves: u64)
     requires n_leaves <= c0.len
     requires n_leaves <= c1.len
