@@ -19,17 +19,20 @@ open Ast
 
 type ptx_rty =
   | Pred          (* .pred  — boolean condition *)
+  | B16           (* .b16   — bit-pattern, used for fp16/bf16 bridge regs *)
   | U16 | U32 | U64
   | S16 | S32 | S64
   | F32 | F64
 
 let ptx_rty_name = function
-  | Pred -> ".pred" | U16 -> ".u16" | U32 -> ".u32" | U64 -> ".u64"
+  | Pred -> ".pred" | B16 -> ".b16"
+  | U16 -> ".u16" | U32 -> ".u32" | U64 -> ".u64"
   | S16  -> ".s16"  | S32 -> ".s32" | S64 -> ".s64"
   | F32  -> ".f32"  | F64 -> ".f64"
 
 let ptx_state_name = function
-  | Pred -> "p" | U16 -> "rs" | U32 -> "r" | U64 -> "rd"
+  | Pred -> "p" | B16 -> "h"
+  | U16 -> "rs" | U32 -> "r" | U64 -> "rd"
   | S16  -> "rs" | S32 -> "r" | S64 -> "rd"
   | F32  -> "f"  | F64 -> "fd"
 
@@ -48,12 +51,14 @@ let rec ptx_rty_of_ty = function
   | _ -> U64  (* pointers, spans, unknowns default to 64-bit *)
 
 let sizeof_rty = function
-  | Pred | U16 | S16 -> 2
+  | Pred | B16 | U16 | S16 -> 2
   | U32 | S32 | F32  -> 4
   | U64 | S64 | F64  -> 8
 
-(* PTX arithmetic instruction prefix *)
+(* PTX arithmetic instruction prefix.  B16 is bit-pattern (no native
+   arithmetic); fall back to b16 (used by mov.b16 / and/or/xor/.b16). *)
 let arith_pfx = function
+  | B16 -> "b16"
   | U16 -> "u16" | U32 -> "u32" | U64 -> "u64"
   | S16 -> "s16" | S32 -> "s32" | S64 -> "s64"
   | F32 -> "f32" | F64 -> "f64"
@@ -63,6 +68,7 @@ let arith_pfx = function
 let cmp_pfx rty =
   match rty with
   | F32 | F64 -> arith_pfx rty   (* IEEE float comparison *)
+  | B16 -> "u16"                 (* compare b16 as if unsigned *)
   | U16|U32|U64 -> "u" ^ string_of_int (sizeof_rty rty * 8)
   | S16|S32|S64 -> "s" ^ string_of_int (sizeof_rty rty * 8)
   | Pred -> "u32"
@@ -667,33 +673,47 @@ let rec lower_expr st e : string =
       emit st "barrier.cluster.wait;";
       emit st (Printf.sprintf "mov.u32 %s, 0;" r); r
 
-  (* FP16/BF16 conversions — emit cvt instructions *)
+  (* FP16/BF16 conversions — emit cvt instructions.
+     PTX cvt.f32.f16 / cvt.f32.bf16 require a typed source operand
+     (.f16 or .bf16), and `.b16` (bit-pattern) is the closest the
+     codegen models.  cvt.rn.f16.f32 / cvt.rn.bf16.f32 produce a
+     typed result that consumers loading via `ld.global.u16` /
+     storing via `st.global.u16` need bridged to/from `.u16`.  Use
+     `mov.b16` (no-op bit-cast) at each boundary. *)
   | ECall ({ expr_desc = EVar id; _ }, [x_e])
       when id.name = "f32_to_fp16" ->
       let rx = lower_expr st x_e in
+      let bdst = fresh_reg st B16 in
+      emit st (Printf.sprintf "cvt.rn.f16.f32 %s, %s;" bdst rx);
       let dst = fresh_reg st U16 in
-      emit st (Printf.sprintf "cvt.rn.f16.f32 %s, %s;" dst rx);
+      emit st (Printf.sprintf "mov.b16 %s, %s;" dst bdst);
       dst
 
   | ECall ({ expr_desc = EVar id; _ }, [x_e])
       when id.name = "fp16_to_f32" ->
       let rx = lower_expr st x_e in
+      let bridge = fresh_reg st B16 in
+      emit st (Printf.sprintf "mov.b16 %s, %s;" bridge rx);
       let dst = fresh_reg st F32 in
-      emit st (Printf.sprintf "cvt.f32.f16 %s, %s;" dst rx);
+      emit st (Printf.sprintf "cvt.f32.f16 %s, %s;" dst bridge);
       dst
 
   | ECall ({ expr_desc = EVar id; _ }, [x_e])
       when id.name = "f32_to_bf16" ->
       let rx = lower_expr st x_e in
+      let bdst = fresh_reg st B16 in
+      emit st (Printf.sprintf "cvt.rn.bf16.f32 %s, %s;" bdst rx);
       let dst = fresh_reg st U16 in
-      emit st (Printf.sprintf "cvt.rn.bf16.f32 %s, %s;" dst rx);
+      emit st (Printf.sprintf "mov.b16 %s, %s;" dst bdst);
       dst
 
   | ECall ({ expr_desc = EVar id; _ }, [x_e])
       when id.name = "bf16_to_f32" ->
       let rx = lower_expr st x_e in
+      let bridge = fresh_reg st B16 in
+      emit st (Printf.sprintf "mov.b16 %s, %s;" bridge rx);
       let dst = fresh_reg st F32 in
-      emit st (Printf.sprintf "cvt.f32.bf16 %s, %s;" dst rx);
+      emit st (Printf.sprintf "cvt.f32.bf16 %s, %s;" dst bridge);
       dst
 
   (* Warp vote: ballot_sync() → bitmask of active threads *)
