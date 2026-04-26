@@ -1,0 +1,64 @@
+// Single-warp LayerNorm (n_cols <= 32) using warp_reduce_sum_f32 — the
+// missing pair to 1135 RMSNorm warp.  Two-pass online: warp-reduce
+// the row sum to find mean, then warp-reduce the squared deviations
+// for variance.  Same proof structure as 1135 + 1140.
+//
+//   y[i] = ((x[i] - mean) / sqrt(var + eps)) * gamma[i] + beta[i]
+//
+// Sidesteps the OpenPTXas predicated-smem-loop hang since there are
+// no STS/LDS in a back-edge loop.
+
+use std::prelude;
+use std::gpu;
+
+#[kernel]
+fn layernorm_warp(
+    inp: span<f32>, out: span<f32>,
+    gamma: span<f32>, beta: span<f32>,
+    n_cols: u64
+)
+    requires 1u64 <= n_cols
+    requires n_cols <= 32u64
+    requires blockIdx_x < gridDim_x
+    requires gridDim_x * n_cols <= inp.len
+    requires gridDim_x * n_cols <= out.len
+    requires n_cols <= gamma.len
+    requires n_cols <= beta.len
+    requires threadIdx_x < 32u64
+{
+    let lane: u64 = threadIdx_x;
+    let row: u64 = blockIdx_x;
+    let base: u64 = row * n_cols;
+    let n_f: f32 = n_cols as f32;
+    let eps: f32 = 0.00001f32;
+    assume(n_f != 0.0f32) "n_cols >= 1 (precondition) implies (n_cols as f32) != 0";
+
+    let mut x: f32 = 0.0f32;
+    if lane < n_cols {
+        assume(base + lane < inp.len) "row<gridDim + lane<n_cols + gridDim*n_cols<=inp.len";
+        x = inp[base + lane];
+    };
+
+    // Pass 1 — warp-reduce sum -> mean.
+    let row_sum: f32 = warp_reduce_sum_f32(x);
+    let mean: f32 = row_sum / n_f;
+
+    // Pass 2 — warp-reduce squared deviation -> variance.
+    let mut d: f32 = 0.0f32;
+    if lane < n_cols {
+        d = x - mean;
+    };
+    let sq_sum: f32 = warp_reduce_sum_f32(d * d);
+    let var_: f32 = sq_sum / n_f;
+    let inv_std: f32 = rsqrtf(var_ + eps);
+
+    // Normalize + affine.
+    if lane < n_cols {
+        let g: f32 = gamma[lane];
+        let b: f32 = beta[lane];
+        assume(base + lane < out.len) "mirrors inp bounds";
+        out[base + lane] = (d * inv_std) * g + b;
+    };
+}
+
+fn main() -> i32 { 0i32 }

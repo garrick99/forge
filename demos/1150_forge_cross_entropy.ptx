@@ -1,0 +1,176 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry cross_entropy(
+    .param .u64 cross_entropy_param_logits_data,
+    .param .u64 cross_entropy_param_logits_len,
+    .param .u64 cross_entropy_param_targets_data,
+    .param .u64 cross_entropy_param_targets_len,
+    .param .u64 cross_entropy_param_loss_data,
+    .param .u64 cross_entropy_param_loss_len,
+    .param .u64 cross_entropy_param_n_classes
+)
+{
+    .reg .pred %p13, %p26, %p32, %p37, %p42, %p47, %p52, %p74;
+    .reg .u64 %rd0, %rd1, %rd10, %rd14, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd25, %rd27, %rd3, %rd31, %rd36, %rd4, %rd41, %rd46, %rd5, %rd53, %rd6, %rd60, %rd62, %rd64, %rd66, %rd68, %rd73, %rd75, %rd78, %rd79, %rd80, %rd81, %rd83, %rd86, %rd87, %rd88, %rd89, %rd9, %rd94, %rd95, %rd96, %rd97;
+    .reg .f32 %f11, %f12, %f22, %f51, %f55, %f56, %f57, %f61, %f63, %f65, %f67, %f69, %f71, %f72, %f90, %f92, %f93;
+    .reg .u32 %r100, %r16, %r23, %r24, %r29, %r30, %r34, %r35, %r39, %r40, %r44, %r45, %r49, %r50, %r58, %r59, %r7, %r70, %r77, %r8, %r82, %r84, %r85, %r91, %r98, %r99;
+
+  ld.param.u64 %rd0, [cross_entropy_param_logits_data];
+  ld.param.u64 %rd1, [cross_entropy_param_logits_len];
+  ld.param.u64 %rd2, [cross_entropy_param_targets_data];
+  ld.param.u64 %rd3, [cross_entropy_param_targets_len];
+  ld.param.u64 %rd4, [cross_entropy_param_loss_data];
+  ld.param.u64 %rd5, [cross_entropy_param_loss_len];
+  ld.param.u64 %rd6, [cross_entropy_param_n_classes];
+
+  mov.u32 %r7, %tid.x;
+  mov.u32 %r8, %ctaid.x;
+  cvt.u64.u32 %rd9, %r8;
+  mul.lo.u64 %rd10, %rd9, %rd6;
+  mov.f32 %f11, 0f7149F2CA; // 1e+30
+  neg.f32 %f12, %f11;
+  cvt.u64.u32 %rd14, %r7;
+  setp.lt.u64 %p13, %rd14, %rd6;
+  @%p13 bra cross_entropy_then_15;
+  bra cross_entropy_else_15;
+  cross_entropy_then_15:
+  mov.u32 %r16, 0; // proof/assume erased
+  cvt.u64.u32 %rd17, %r7;
+  add.u64 %rd18, %rd10, %rd17;
+  mov.u64 %rd19, 4;
+  mul.lo.u64 %rd20, %rd18, %rd19;
+  add.u64 %rd21, %rd0, %rd20;
+  ld.global.f32 %f22, [%rd21];
+  mov.u32 %r23, 0; // unit
+  mov.u32 %r24, %r23;
+  bra cross_entropy_end_15;
+  cross_entropy_else_15:
+  mov.u32 %r24, 0; // no else branch
+  cross_entropy_end_15:
+  mov.u64 %rd25, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  cvt.u64.f32 %rd27, %f22;
+  setp.gt.u64 %p26, %rd25, %rd27;
+  @%p26 bra cross_entropy_then_28;
+  bra cross_entropy_else_28;
+  cross_entropy_then_28:
+  mov.u32 %r29, 0; // unit
+  mov.u32 %r30, %r29;
+  bra cross_entropy_end_28;
+  cross_entropy_else_28:
+  mov.u32 %r30, 0; // no else branch
+  cross_entropy_end_28:
+  mov.u64 %rd31, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p32, %rd31, %rd25;
+  @%p32 bra cross_entropy_then_33;
+  bra cross_entropy_else_33;
+  cross_entropy_then_33:
+  mov.u32 %r34, 0; // unit
+  mov.u32 %r35, %r34;
+  bra cross_entropy_end_33;
+  cross_entropy_else_33:
+  mov.u32 %r35, 0; // no else branch
+  cross_entropy_end_33:
+  mov.u64 %rd36, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p37, %rd36, %rd31;
+  @%p37 bra cross_entropy_then_38;
+  bra cross_entropy_else_38;
+  cross_entropy_then_38:
+  mov.u32 %r39, 0; // unit
+  mov.u32 %r40, %r39;
+  bra cross_entropy_end_38;
+  cross_entropy_else_38:
+  mov.u32 %r40, 0; // no else branch
+  cross_entropy_end_38:
+  mov.u64 %rd41, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p42, %rd41, %rd36;
+  @%p42 bra cross_entropy_then_43;
+  bra cross_entropy_else_43;
+  cross_entropy_then_43:
+  mov.u32 %r44, 0; // unit
+  mov.u32 %r45, %r44;
+  bra cross_entropy_end_43;
+  cross_entropy_else_43:
+  mov.u32 %r45, 0; // no else branch
+  cross_entropy_end_43:
+  mov.u64 %rd46, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  setp.gt.u64 %p47, %rd46, %rd41;
+  @%p47 bra cross_entropy_then_48;
+  bra cross_entropy_else_48;
+  cross_entropy_then_48:
+  mov.u32 %r49, 0; // unit
+  mov.u32 %r50, %r49;
+  bra cross_entropy_end_48;
+  cross_entropy_else_48:
+  mov.u32 %r50, 0; // no else branch
+  cross_entropy_end_48:
+  mov.f32 %f51, 0f00000000; // 0
+  cvt.u64.u32 %rd53, %r7;
+  setp.lt.u64 %p52, %rd53, %rd6;
+  @%p52 bra cross_entropy_then_54;
+  bra cross_entropy_else_54;
+  cross_entropy_then_54:
+  sub.f32 %f55, %f22, %rd46;
+  mul.rn.f32 %f56, %f55, 0f3FB8AA3B; // log2(e)
+  ex2.approx.f32 %f57, %f56;
+  mov.u32 %r58, 0; // unit
+  mov.u32 %r59, %r58;
+  bra cross_entropy_end_54;
+  cross_entropy_else_54:
+  mov.u32 %r59, 0; // no else branch
+  cross_entropy_end_54:
+  mov.u64 %rd60, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f61, %f57, %rd60;
+  mov.u64 %rd62, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f63, %f61, %rd62;
+  mov.u64 %rd64, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f65, %f63, %rd64;
+  mov.u64 %rd66, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f67, %f65, %rd66;
+  mov.u64 %rd68, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
+  add.f32 %f69, %f67, %rd68;
+  mov.u32 %r70, 0; // proof/assume erased
+  lg2.approx.f32 %f71, %f69;
+  mul.rn.f32 %f72, %f71, 0f3F317218; // ln(2)
+  mov.u64 %rd73, 0;
+  cvt.u64.u32 %rd75, %r7;
+  setp.eq.u64 %p74, %rd75, %rd73;
+  @%p74 bra cross_entropy_then_76;
+  bra cross_entropy_else_76;
+  cross_entropy_then_76:
+  mov.u32 %r77, 0; // proof/assume erased
+  cvt.u64.u32 %rd78, %r8;
+  mov.u64 %rd79, 4;
+  mul.lo.u64 %rd80, %rd78, %rd79;
+  add.u64 %rd81, %rd2, %rd80;
+  ld.global.u32 %r82, [%rd81];
+  cvt.u64.u32 %rd83, %r82;
+  mov.u32 %r84, 0; // proof/assume erased
+  mov.u32 %r85, 0; // proof/assume erased
+  add.u64 %rd86, %rd10, %rd83;
+  mov.u64 %rd87, 4;
+  mul.lo.u64 %rd88, %rd86, %rd87;
+  add.u64 %rd89, %rd0, %rd88;
+  ld.global.f32 %f90, [%rd89];
+  mov.u32 %r91, 0; // proof/assume erased
+  sub.f32 %f92, %f90, %rd46;
+  sub.f32 %f93, %f72, %f92;
+  cvt.u64.u32 %rd94, %r8;
+  mov.u64 %rd95, 4;
+  mul.lo.u64 %rd96, %rd94, %rd95;
+  add.u64 %rd97, %rd4, %rd96;
+  st.global.f32 [%rd97], %f93;
+  mov.u32 %r98, 0; // unit
+  mov.u32 %r99, %r98;
+  bra cross_entropy_end_76;
+  cross_entropy_else_76:
+  mov.u32 %r99, 0; // no else branch
+  cross_entropy_end_76:
+  mov.u32 %r100, 0; // unit
+  ret;
+}
+

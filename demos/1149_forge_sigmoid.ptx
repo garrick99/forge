@@ -1,0 +1,64 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry sigmoid_kernel(
+    .param .u64 sigmoid_kernel_param_inp_data,
+    .param .u64 sigmoid_kernel_param_inp_len,
+    .param .u64 sigmoid_kernel_param_out_data,
+    .param .u64 sigmoid_kernel_param_out_len,
+    .param .u64 sigmoid_kernel_param_n
+)
+{
+    .reg .pred %p13;
+    .reg .u64 %rd0, %rd1, %rd11, %rd12, %rd15, %rd16, %rd17, %rd2, %rd27, %rd28, %rd29, %rd3, %rd4, %rd7, %rd8, %rd9;
+    .reg .f32 %f18, %f19, %f20, %f21, %f22, %f23, %f24, %f25, %f26;
+    .reg .u32 %r10, %r30, %r31, %r32, %r5, %r6;
+
+  ld.param.u64 %rd0, [sigmoid_kernel_param_inp_data];
+  ld.param.u64 %rd1, [sigmoid_kernel_param_inp_len];
+  ld.param.u64 %rd2, [sigmoid_kernel_param_out_data];
+  ld.param.u64 %rd3, [sigmoid_kernel_param_out_len];
+  ld.param.u64 %rd4, [sigmoid_kernel_param_n];
+
+  mov.u32 %r5, %ctaid.x;
+  mov.u32 %r6, %ntid.x;
+  cvt.u64.u32 %rd7, %r6;
+  cvt.u64.u32 %rd8, %r5;
+  mul.lo.u64 %rd9, %rd8, %rd7;
+  mov.u32 %r10, %tid.x;
+  cvt.u64.u32 %rd11, %r10;
+  add.u64 %rd12, %rd9, %rd11;
+  setp.lt.u64 %p13, %rd12, %rd4;
+  @%p13 bra sigmoid_kernel_then_14;
+  bra sigmoid_kernel_else_14;
+  sigmoid_kernel_then_14:
+  mov.u64 %rd15, 4;
+  mul.lo.u64 %rd16, %rd12, %rd15;
+  add.u64 %rd17, %rd0, %rd16;
+  ld.global.f32 %f18, [%rd17];
+  mov.f32 %f19, 0f00000000; // 0
+  sub.f32 %f20, %f19, %f18;
+  mul.rn.f32 %f21, %f20, 0f3FB8AA3B; // log2(e)
+  ex2.approx.f32 %f22, %f21;
+  mov.f32 %f23, 0f3F800000; // 1
+  mov.f32 %f24, 0f3F800000; // 1
+  add.f32 %f25, %f24, %f22;
+  div.f32 %f26, %f23, %f25;
+  mov.u64 %rd27, 4;
+  mul.lo.u64 %rd28, %rd12, %rd27;
+  add.u64 %rd29, %rd2, %rd28;
+  st.global.f32 [%rd29], %f26;
+  mov.u32 %r30, 0; // unit
+  mov.u32 %r31, %r30;
+  bra sigmoid_kernel_end_14;
+  sigmoid_kernel_else_14:
+  mov.u32 %r31, 0; // no else branch
+  sigmoid_kernel_end_14:
+  mov.u32 %r32, 0; // unit
+  ret;
+}
+

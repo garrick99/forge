@@ -1,0 +1,25 @@
+// Elementwise sigmoid:  y = 1 / (1 + exp(-x)).
+//
+// Used as the gating function in classic LSTM / GRU cells, in BERT
+// classification heads, in binary cross-entropy losses, and as the
+// inner step of SiLU (1130).  Standalone primitive for the cases
+// where users want sigmoid without the silu multiply.
+
+use std::prelude;
+
+#[kernel]
+fn sigmoid_kernel(inp: span<f32>, out: span<f32>, n: u64)
+    requires n <= inp.len
+    requires n <= out.len
+    requires blockIdx_x < gridDim_x
+{
+    let gid: u64 = blockIdx_x * (blockDim_x as u64) + (threadIdx_x as u64);
+    if gid < n {
+        let x: f32 = inp[gid];
+        let neg_x: f32 = 0.0f32 - x;
+        let e: f32 = expf(neg_x);
+        out[gid] = 1.0f32 / (1.0f32 + e);
+    };
+}
+
+fn main() -> i32 { 0i32 }

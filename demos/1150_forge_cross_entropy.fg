@@ -1,0 +1,66 @@
+// Cross-entropy loss (forward) — fuses log_softmax with the NLL gather
+// to produce a per-row loss in one pass.
+//
+// For each row i with logits x[i, :] and target class id t[i]:
+//
+//   loss[i] = -log_softmax(x[i, :])[t[i]]
+//           = -(x[i, t[i]] - m_i) + log(sum_k exp(x[i, k] - m_i))
+//
+// where m_i = max_k x[i, k].
+//
+// Single-warp; n_classes <= 32.  Caller guarantees t[i] < n_classes.
+// Used during LLM training and classifier head training.
+
+use std::prelude;
+use std::gpu;
+
+#[kernel]
+fn cross_entropy(
+    logits: span<f32>, targets: span<u32>, loss: span<f32>,
+    n_classes: u64
+)
+    requires 1u64 <= n_classes
+    requires n_classes <= 32u64
+    requires blockIdx_x < gridDim_x
+    requires gridDim_x * n_classes <= logits.len
+    requires gridDim_x <= targets.len
+    requires gridDim_x <= loss.len
+    requires threadIdx_x < 32u64
+{
+    let lane: u64 = threadIdx_x;
+    let row: u64 = blockIdx_x;
+    let base: u64 = row * n_classes;
+    let neg_inf: f32 = -1.0e30f32;
+
+    // Load this lane's logit (or -inf padding if past n_classes).
+    let mut x: f32 = neg_inf;
+    if lane < n_classes {
+        assume(base + lane < logits.len) "row<gridDim + lane<n_classes + gridDim*n_classes<=logits.len";
+        x = logits[base + lane];
+    };
+
+    let m: f32 = warp_reduce_max_f32(x);
+    let mut ex: f32 = 0.0f32;
+    if lane < n_classes {
+        ex = expf(x - m);
+    };
+    let denom: f32 = warp_reduce_sum_f32(ex);
+    assume(denom > 0.0f32) "argmax lane contributes p=exp(0)=1, sum>=1";
+    let log_denom: f32 = logf(denom);
+
+    // Lane 0 picks the target's logit and writes the loss.  The target
+    // value must be in-range; assume it as a caller precondition since
+    // a u32 index can't be statically bounded.
+    if lane == 0u64 {
+        assume(row < targets.len) "row=blockIdx_x < gridDim_x <= targets.len";
+        let t: u32 = targets[row];
+        let t64: u64 = t as u64;
+        assume(t64 < n_classes) "caller guarantees target is in-range class id";
+        assume(base + t64 < logits.len) "row<gridDim + t<n_classes + gridDim*n_classes<=logits.len";
+        let target_logit: f32 = logits[base + t64];
+        assume(row < loss.len) "row<gridDim_x<=loss.len";
+        loss[row] = log_denom - (target_logit - m);
+    };
+}
+
+fn main() -> i32 { 0i32 }
