@@ -511,7 +511,12 @@ let rec lower_expr st e : string =
   (* Cast *)
   | ECast (inner, ty) ->
       let ri  = lower_expr st inner in
-      let src = rty_of_expr inner in
+      (* Use the actual register's type, not the AST expression type.
+         Built-ins like `tid.x` allocate `.u32` regardless of how they
+         appear in the source expression's type — picking up the AST
+         u64 here and emitting `cvt.f32.u64 %f, %r32_reg` is the
+         "Arguments mismatch for instruction 'cvt'" rejection class. *)
+      let src = reg_rty st ri in
       let dst_rty = ptx_rty_of_ty ty in
       if src = dst_rty then ri
       else begin
@@ -533,12 +538,62 @@ let rec lower_expr st e : string =
       emit st (Printf.sprintf "shfl.sync.down.b32 %s, %s, %s, 31, 0xffffffff;" dst rv rl);
       dst
 
+  (* Helper for shfl intrinsics: PTX requires the lane / mask operand
+     to be `.u32`, but FORGE source typically passes `16u64`-style
+     literals.  Coerce to u32 if needed. *)
+
   | ECall ({ expr_desc = EVar id; _ }, [val_e; lane_e; _width_e])
       when id.name = "shfl_xor_sync" ->
       let rv = lower_expr st val_e in
-      let rl = lower_expr st lane_e in
+      let rl_raw = lower_expr st lane_e in
+      let rl = let s = reg_rty st rl_raw in
+        if s = U32 || s = S32 then rl_raw
+        else begin
+          let r = fresh_reg st U32 in
+          emit st (Printf.sprintf "cvt.u32.%s %s, %s;" (arith_pfx s) r rl_raw);
+          r
+        end
+      in
       let dst = fresh_reg st U32 in
       emit st (Printf.sprintf "shfl.sync.bfly.b32 %s, %s, %s, 31, 0xffffffff;" dst rv rl);
+      dst
+
+  (* F32 variants of warp-shuffle intrinsics.  PTX `shfl.sync` operates
+     on `.b32` registers; f32 fits in 32 bits so the same instruction
+     works — only the typed declaration of the destination changes.
+     Without these handlers, the calls in `warp_reduce_*_f32` fall
+     through to the UNRESOLVED-stub path and produce a u64 zero, which
+     downstream type-checks treat as garbage. *)
+  | ECall ({ expr_desc = EVar id; _ }, [val_e; lane_e; _width_e])
+      when id.name = "shfl_xor_sync_f32" ->
+      let rv = lower_expr st val_e in
+      let rl_raw = lower_expr st lane_e in
+      let rl = let s = reg_rty st rl_raw in
+        if s = U32 || s = S32 then rl_raw
+        else begin
+          let r = fresh_reg st U32 in
+          emit st (Printf.sprintf "cvt.u32.%s %s, %s;" (arith_pfx s) r rl_raw);
+          r
+        end
+      in
+      let dst = fresh_reg st F32 in
+      emit st (Printf.sprintf "shfl.sync.bfly.b32 %s, %s, %s, 31, 0xffffffff;" dst rv rl);
+      dst
+
+  | ECall ({ expr_desc = EVar id; _ }, [val_e; lane_e; _width_e])
+      when id.name = "shfl_down_sync_f32" ->
+      let rv = lower_expr st val_e in
+      let rl_raw = lower_expr st lane_e in
+      let rl = let s = reg_rty st rl_raw in
+        if s = U32 || s = S32 then rl_raw
+        else begin
+          let r = fresh_reg st U32 in
+          emit st (Printf.sprintf "cvt.u32.%s %s, %s;" (arith_pfx s) r rl_raw);
+          r
+        end
+      in
+      let dst = fresh_reg st F32 in
+      emit st (Printf.sprintf "shfl.sync.down.b32 %s, %s, %s, 31, 0xffffffff;" dst rv rl);
       dst
 
   (* Atomic add: atom_add(ptr, val) → old value *)
