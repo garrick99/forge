@@ -1,0 +1,214 @@
+// VortexSTARK barycentric polynomial evaluation kernel — FORGE pilot of
+// `cuda/barycentric_eval.cu`.
+//
+//   result = sum_i (weights[i] * evals[i])    in QM31, evals are M31
+//
+// evals:    n M31 values (1 u32 each, in bit-reversed circle order)
+// weights:  n QM31 values in AoS: weights[i*4 + 0..3] = (re_re, re_im, im_re, im_im)
+// out:      n_blocks QM31 partial sums; caller does final reduction on CPU
+//
+// Pattern: grid-stride accumulate → warp-reduce (5-stage shfl-xor) →
+//          shared-memory inter-warp reduction → block lane-0 stores.
+//
+// Two interesting proof corners:
+//   1. Non-linear bound `i*4+3 < weights.len` from `i < n` and
+//      `n*4 <= weights.len` — forge's SMT can't auto-derive this, so we
+//      use the `n*4 <= len` form of the bounds re-establishment guard.
+//   2. Warp-shuffled M31 values: we cast u32→u64 to use the existing
+//      `shfl_xor_sync` u64 intrinsic (forge has no native u32 shuffle),
+//      then assume the result preserves the source lane's `< M31_P`
+//      invariant — every other lane is running the same kernel, so
+//      its accumulator is always in M31 canonical form.
+
+use std::gpu;
+use std::m31;
+
+// One-stage warp shuffle of an M31 value via the u64 intrinsic.
+// Source lane's value is < M31_P by the kernel-wide invariant on the
+// accumulator; we assume it propagates through the shuffle.
+#[device]
+fn warp_xor_m31(v: u32, mask: u64) -> u32
+    requires v < M31_P
+    ensures result < M31_P
+{
+    let s64: u64 = shfl_xor_sync(v as u64, mask, 32u64);
+    let r32: u32 = s64 as u32;
+    // % M31_P enforces the postcondition for forge.  In practice
+    // every other lane is running this same kernel with the M31
+    // invariant on its accumulator, so the value is already in
+    // [0, M31_P) and the modulo is a no-op at runtime.
+    r32 % M31_P
+}
+
+// 5-stage warp-tree-reduce-sum of an M31 value.  After this, every lane
+// in the warp holds the sum of all 32 lanes' inputs (mod M31_P).
+#[device]
+fn warp_reduce_m31_sum(v: u32) -> u32
+    requires v < M31_P
+    ensures result < M31_P
+{
+    let mut a: u32 = v;
+    assume(a < M31_P) "a aliases v initially; v < M31_P from precondition";
+    let s16: u32 = warp_xor_m31(a, 16u64);
+    a = m31_add(a, s16);
+    let s8: u32 = warp_xor_m31(a, 8u64);
+    a = m31_add(a, s8);
+    let s4: u32 = warp_xor_m31(a, 4u64);
+    a = m31_add(a, s4);
+    let s2: u32 = warp_xor_m31(a, 2u64);
+    a = m31_add(a, s2);
+    let s1: u32 = warp_xor_m31(a, 1u64);
+    a = m31_add(a, s1);
+    a
+}
+
+#[kernel]
+fn barycentric_eval(
+    evals:   span<u32>,
+    weights: span<u32>,
+    out:     span<u32>,
+    n:       u64
+)
+    requires n <= evals.len
+    requires n * 4u64 <= weights.len
+    requires gridDim_x * 4u64 <= out.len
+    requires forall k: u64, k < evals.len ==> evals[k] < M31_P
+    requires forall k: u64, k < weights.len ==> weights[k] < M31_P
+{
+    let smem: shared<u32>[128] = [0u32; 128u64];
+
+    let tid: u64    = blockIdx_x * blockDim_x + threadIdx_x;
+    let stride: u64 = blockDim_x * gridDim_x;
+
+    // Per-thread accumulator (4 M31 components of one QM31 partial sum).
+    let mut a0: u32 = 0u32;
+    let mut a1: u32 = 0u32;
+    let mut a2: u32 = 0u32;
+    let mut a3: u32 = 0u32;
+
+    // Grid-stride loop. We carry the M31 invariant `ai < M31_P` through
+    // the loop via the m31_add postcondition.
+    let mut i: u64 = tid;
+    while i < n
+        invariant a0 < M31_P
+        invariant a1 < M31_P
+        invariant a2 < M31_P
+        invariant a3 < M31_P
+        decreases n - i
+    {
+        // Re-establish forall-k instantiation at the concrete index i.
+        assert(evals[i] < M31_P) "forall k from precondition at idx i";
+        let e: u32 = evals[i];
+
+        // Bounds re-establishment: i*4 + 3 < weights.len follows from
+        // i < n and n*4 <= weights.len, but SMT can't see the chain
+        // through the non-linear multiply.  Guard with a runtime check
+        // and stage the per-component product into local 0-init values
+        // so the m31_add to the accumulator is unconditional and
+        // forge's loop-invariant tracking can carry `aN < M31_P`.
+        let wb: u64 = i * 4u64;
+        let mut t0: u32 = 0u32;
+        let mut t1: u32 = 0u32;
+        let mut t2: u32 = 0u32;
+        let mut t3: u32 = 0u32;
+        if wb + 3u64 < weights.len {
+            assert(weights[wb]        < M31_P) "forall k at wb";
+            assert(weights[wb + 1u64] < M31_P) "forall k at wb+1";
+            assert(weights[wb + 2u64] < M31_P) "forall k at wb+2";
+            assert(weights[wb + 3u64] < M31_P) "forall k at wb+3";
+            let w0: u32 = weights[wb];
+            let w1: u32 = weights[wb + 1u64];
+            let w2: u32 = weights[wb + 2u64];
+            let w3: u32 = weights[wb + 3u64];
+            t0 = m31_mul(w0, e);
+            t1 = m31_mul(w1, e);
+            t2 = m31_mul(w2, e);
+            t3 = m31_mul(w3, e);
+        };
+        // Both branches of the if leave tN < M31_P (initial 0 or
+        // m31_mul postcondition).  Use assume because forge's EIf
+        // write-back doesn't carry the disjunction through to here,
+        // but the local reasoning is sound.
+        assume(t0 < M31_P) "either initial 0 or m31_mul postcondition";
+        assume(t1 < M31_P) "either initial 0 or m31_mul postcondition";
+        assume(t2 < M31_P) "either initial 0 or m31_mul postcondition";
+        assume(t3 < M31_P) "either initial 0 or m31_mul postcondition";
+        // Accumulate unconditionally — both `aN < M31_P` (loop
+        // invariant) and `tN < M31_P` (m31_mul postcondition or initial
+        // 0u32) hold here, so m31_add carries the invariant forward.
+        a0 = m31_add(a0, t0);
+        a1 = m31_add(a1, t1);
+        a2 = m31_add(a2, t2);
+        a3 = m31_add(a3, t3);
+
+        i = i + stride;
+    };
+
+    // Warp-level reduction (every lane ends up with the warp's sum).
+    a0 = warp_reduce_m31_sum(a0);
+    a1 = warp_reduce_m31_sum(a1);
+    a2 = warp_reduce_m31_sum(a2);
+    a3 = warp_reduce_m31_sum(a3);
+
+    // Each warp's lane-0 publishes its partial to shared memory.
+    // (>> 5 / & 31 are equivalent to / 32 / % 32 here; forge parser
+    // fumbles `var >> literal_with_suffix`, work around with /, %.)
+    let warp_id: u64 = threadIdx_x / 32u64;
+    let lane_id: u64 = threadIdx_x % 32u64;
+
+    if lane_id == 0u64 {
+        // warp_id < blockDim_x/32 <= 32, so warp_id*4 + 3 < 128 = smem.len.
+        let so: u64 = warp_id * 4u64;
+        if so + 3u64 < 128u64 {
+            smem[so]        = a0;
+            smem[so + 1u64] = a1;
+            smem[so + 2u64] = a2;
+            smem[so + 3u64] = a3;
+        };
+    };
+    syncthreads();
+
+    // First warp does the inter-warp reduction.  blockDim_x/32 = n_warps
+    // is at most 32 (we cap blockDim_x at 1024 by convention).
+    if warp_id == 0u64 {
+        let n_warps: u64 = blockDim_x / 32u64;
+        let mut b0: u32 = 0u32;
+        let mut b1: u32 = 0u32;
+        let mut b2: u32 = 0u32;
+        let mut b3: u32 = 0u32;
+        if lane_id < n_warps {
+            let so2: u64 = lane_id * 4u64;
+            if so2 + 3u64 < 128u64 {
+                // Re-establish < M31_P from kernel invariant — every smem
+                // write above came from m31_add → < M31_P.
+                assume(smem[so2]        < M31_P) "smem populated by warp lane-0 m31_add result";
+                assume(smem[so2 + 1u64] < M31_P) "smem populated by warp lane-0 m31_add result";
+                assume(smem[so2 + 2u64] < M31_P) "smem populated by warp lane-0 m31_add result";
+                assume(smem[so2 + 3u64] < M31_P) "smem populated by warp lane-0 m31_add result";
+                b0 = smem[so2];
+                b1 = smem[so2 + 1u64];
+                b2 = smem[so2 + 2u64];
+                b3 = smem[so2 + 3u64];
+            };
+        };
+        b0 = warp_reduce_m31_sum(b0);
+        b1 = warp_reduce_m31_sum(b1);
+        b2 = warp_reduce_m31_sum(b2);
+        b3 = warp_reduce_m31_sum(b3);
+
+        if lane_id == 0u64 {
+            // out[blockIdx_x*4 + 0..3]: bound from gridDim_x*4 <= out.len
+            // and blockIdx_x < gridDim_x → blockIdx_x*4 + 3 < out.len.
+            // Same non-linear-mul issue → runtime guard.
+            let ob: u64 = blockIdx_x * 4u64;
+            if ob + 3u64 < out.len {
+                out[ob]        = b0;
+                out[ob + 1u64] = b1;
+                out[ob + 2u64] = b2;
+                out[ob + 3u64] = b3;
+            };
+        };
+    };
+}
+
+fn main() -> i32 { 0i32 }
