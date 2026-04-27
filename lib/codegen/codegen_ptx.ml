@@ -1160,13 +1160,29 @@ let rec lower_expr st e : string =
                end
              ) callee.fn_params arg_regs
            in
-           (* 2. Bind callee parameter names to the coerced argument
-                 registers.  Save the current reg_env so we can
-                 restore it after the inlined body and avoid leaking
-                 the binding. *)
+           (* 2. Bind callee parameter names to FRESH registers,
+                 copying from the caller's argument register.  This
+                 isolates the caller from any mutation the callee
+                 performs on its parameter (e.g., `let mut v: f32 =
+                 val; v = ...`) — without the copy, mutating v also
+                 mutates the caller's val.  Surfaced by warp-reduce
+                 device fns: `let m = warp_reduce_max_f32(x)` would
+                 alias m and x to the same register, causing later
+                 `(x - m)` to compute zero.  Save the current reg_env
+                 so we can restore it after the inlined body and
+                 avoid leaking the binding. *)
            let saved_env = st.reg_env in
            let new_bindings =
-             List.map2 (fun (pname, _pty) areg -> (pname.name, areg))
+             List.map2 (fun (pname, _pty) areg ->
+               let prty = reg_rty st areg in
+               let pr = fresh_reg st prty in
+               let mov_op = match prty with
+                 | Pred -> "mov.pred"
+                 | _ -> Printf.sprintf "mov.b%d" (sizeof_rty prty * 8)
+               in
+               emit st (Printf.sprintf "%s %s, %s; // param: %s"
+                          mov_op pr areg pname.name);
+               (pname.name, pr))
                callee.fn_params coerced_regs
            in
            st.reg_env <- new_bindings @ saved_env;

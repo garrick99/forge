@@ -15,10 +15,10 @@
     .param .u64 masked_softmax_param_n_cols
 )
 {
-    .reg .pred %p14, %p25, %p39, %p45, %p50, %p55, %p60, %p65, %p69, %p89;
-    .reg .u64 %rd0, %rd1, %rd10, %rd15, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd28, %rd29, %rd3, %rd30, %rd31, %rd32, %rd38, %rd4, %rd40, %rd44, %rd49, %rd5, %rd54, %rd59, %rd6, %rd66, %rd78, %rd80, %rd82, %rd84, %rd86, %rd9, %rd90, %rd94, %rd95, %rd96, %rd97, %rd98;
-    .reg .f32 %f11, %f12, %f33, %f64, %f71, %f72, %f73, %f79, %f81, %f83, %f85, %f87, %f93;
-    .reg .u32 %r100, %r101, %r13, %r17, %r23, %r24, %r27, %r34, %r35, %r36, %r37, %r42, %r43, %r47, %r48, %r52, %r53, %r57, %r58, %r62, %r63, %r68, %r7, %r74, %r75, %r76, %r77, %r8, %r88, %r92, %r99;
+    .reg .pred %p107, %p15, %p24, %p40, %p47, %p54, %p61, %p68, %p73, %p76;
+    .reg .f32 %f100, %f101, %f104, %f105, %f110, %f12, %f13, %f31, %f36, %f39, %f46, %f53, %f60, %f67, %f72, %f78, %f79, %f80, %f85, %f88, %f89, %f92, %f93, %f96, %f97;
+    .reg .u32 %r103, %r106, %r109, %r115, %r116, %r117, %r14, %r17, %r22, %r23, %r26, %r32, %r33, %r34, %r35, %r38, %r42, %r43, %r45, %r49, %r50, %r52, %r56, %r57, %r59, %r63, %r64, %r66, %r7, %r70, %r71, %r75, %r81, %r82, %r83, %r84, %r87, %r9, %r91, %r95, %r99;
+    .reg .u64 %rd0, %rd1, %rd10, %rd102, %rd11, %rd111, %rd112, %rd113, %rd114, %rd18, %rd19, %rd2, %rd20, %rd21, %rd27, %rd28, %rd29, %rd3, %rd30, %rd37, %rd4, %rd44, %rd5, %rd51, %rd58, %rd6, %rd65, %rd8, %rd86, %rd90, %rd94, %rd98;
 
   ld.param.u64 %rd0, [masked_softmax_param_scores_data];
   ld.param.u64 %rd1, [masked_softmax_param_scores_len];
@@ -29,161 +29,185 @@
   ld.param.u64 %rd6, [masked_softmax_param_n_cols];
 
   mov.u32 %r7, %tid.x;
-  mov.u32 %r8, %ctaid.x;
-  cvt.u64.u32 %rd9, %r8;
-  mul.lo.u64 %rd10, %rd9, %rd6;
-  mov.f32 %f11, 0f7149F2CA; // 1e+30
-  neg.f32 %f12, %f11;
-  mov.u32 %r13, 0;
-  cvt.u64.u32 %rd15, %r7;
-  setp.lt.u64 %p14, %rd15, %rd6;
-  @%p14 bra masked_softmax_then_16;
+  cvt.u64.u32 %rd8, %r7;
+  mov.u32 %r9, %ctaid.x;
+  cvt.u64.u32 %rd10, %r9;
+  mul.lo.u64 %rd11, %rd10, %rd6;
+  mov.f32 %f12, 0f7149F2CA; // 1e+30
+  neg.f32 %f13, %f12;
+  mov.u32 %r14, 0;
+  setp.lt.u64 %p15, %rd8, %rd6;
+  @%p15 bra masked_softmax_then_16;
   bra masked_softmax_else_16;
   masked_softmax_then_16:
   mov.u32 %r17, 0; // proof/assume erased
-  cvt.u64.u32 %rd18, %r7;
-  add.u64 %rd19, %rd10, %rd18;
-  mov.u64 %rd20, 4;
-  mul.lo.u64 %rd21, %rd19, %rd20;
-  add.u64 %rd22, %rd2, %rd21;
-  ld.global.u32 %r23, [%rd22];
-  mov.u32 %r24, 0;
-  setp.ne.u32 %p25, %r23, %r24;
-  @%p25 bra masked_softmax_then_26;
-  bra masked_softmax_else_26;
-  masked_softmax_then_26:
-  mov.u32 %r27, 0; // proof/assume erased
-  cvt.u64.u32 %rd28, %r7;
-  add.u64 %rd29, %rd10, %rd28;
-  mov.u64 %rd30, 4;
-  mul.lo.u64 %rd31, %rd29, %rd30;
-  add.u64 %rd32, %rd0, %rd31;
-  ld.global.f32 %f33, [%rd32];
+  add.u64 %rd18, %rd11, %rd8;
+  mov.u64 %rd19, 4;
+  mul.lo.u64 %rd20, %rd18, %rd19;
+  add.u64 %rd21, %rd2, %rd20;
+  ld.global.u32 %r22, [%rd21];
+  mov.u32 %r23, 0;
+  setp.ne.u32 %p24, %r22, %r23;
+  @%p24 bra masked_softmax_then_25;
+  bra masked_softmax_else_25;
+  masked_softmax_then_25:
+  mov.u32 %r26, 0; // proof/assume erased
+  add.u64 %rd27, %rd11, %rd8;
+  mov.u64 %rd28, 4;
+  mul.lo.u64 %rd29, %rd27, %rd28;
+  add.u64 %rd30, %rd0, %rd29;
+  ld.global.f32 %f31, [%rd30];
+  mov.u32 %r32, 0; // unit
+  mov.u32 %r33, %r32;
+  mov.f32 %f13, %f31; // if wb: s
+  bra masked_softmax_end_25;
+  masked_softmax_else_25:
+  mov.u32 %r33, 0; // no else branch
+  masked_softmax_end_25:
   mov.u32 %r34, 0; // unit
   mov.u32 %r35, %r34;
-  bra masked_softmax_end_26;
-  masked_softmax_else_26:
-  mov.u32 %r35, 0; // no else branch
-  masked_softmax_end_26:
-  mov.u32 %r36, 0; // unit
-  mov.u32 %r37, %r36;
+  mov.u32 %r14, %r22; // if wb: m_keep
   bra masked_softmax_end_16;
   masked_softmax_else_16:
-  mov.u32 %r37, 0; // no else branch
+  mov.u32 %r35, 0; // no else branch
   masked_softmax_end_16:
-  mov.u64 %rd38, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
-  cvt.u64.f32 %rd40, %f33;
-  setp.gt.u64 %p39, %rd38, %rd40;
-  @%p39 bra masked_softmax_then_41;
+  mov.b32 %f36, %f13; // param: val
+  mov.u64 %rd37, 16;
+  cvt.u32.u64 %r38, %rd37;
+  shfl.sync.bfly.b32 %f39, %f36, %r38, 31, 0xffffffff;
+  setp.gt.f32 %p40, %f39, %f36;
+  @%p40 bra masked_softmax_then_41;
   bra masked_softmax_else_41;
   masked_softmax_then_41:
   mov.u32 %r42, 0; // unit
   mov.u32 %r43, %r42;
+  mov.f32 %f36, %f39; // if wb: v
   bra masked_softmax_end_41;
   masked_softmax_else_41:
   mov.u32 %r43, 0; // no else branch
   masked_softmax_end_41:
-  mov.u64 %rd44, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
-  setp.gt.u64 %p45, %rd44, %rd38;
-  @%p45 bra masked_softmax_then_46;
-  bra masked_softmax_else_46;
-  masked_softmax_then_46:
-  mov.u32 %r47, 0; // unit
-  mov.u32 %r48, %r47;
-  bra masked_softmax_end_46;
-  masked_softmax_else_46:
-  mov.u32 %r48, 0; // no else branch
-  masked_softmax_end_46:
-  mov.u64 %rd49, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
-  setp.gt.u64 %p50, %rd49, %rd44;
-  @%p50 bra masked_softmax_then_51;
-  bra masked_softmax_else_51;
-  masked_softmax_then_51:
-  mov.u32 %r52, 0; // unit
-  mov.u32 %r53, %r52;
-  bra masked_softmax_end_51;
-  masked_softmax_else_51:
-  mov.u32 %r53, 0; // no else branch
-  masked_softmax_end_51:
-  mov.u64 %rd54, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
-  setp.gt.u64 %p55, %rd54, %rd49;
-  @%p55 bra masked_softmax_then_56;
-  bra masked_softmax_else_56;
-  masked_softmax_then_56:
-  mov.u32 %r57, 0; // unit
-  mov.u32 %r58, %r57;
-  bra masked_softmax_end_56;
-  masked_softmax_else_56:
-  mov.u32 %r58, 0; // no else branch
-  masked_softmax_end_56:
-  mov.u64 %rd59, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
-  setp.gt.u64 %p60, %rd59, %rd54;
-  @%p60 bra masked_softmax_then_61;
-  bra masked_softmax_else_61;
-  masked_softmax_then_61:
-  mov.u32 %r62, 0; // unit
-  mov.u32 %r63, %r62;
-  bra masked_softmax_end_61;
-  masked_softmax_else_61:
-  mov.u32 %r63, 0; // no else branch
-  masked_softmax_end_61:
-  mov.f32 %f64, 0f00000000; // 0
-  cvt.u64.u32 %rd66, %r7;
-  setp.lt.u64 %p65, %rd66, %rd6;
-  @%p65 bra masked_softmax_then_67;
-  bra masked_softmax_else_67;
-  masked_softmax_then_67:
-  mov.u32 %r68, 0;
-  setp.ne.u32 %p69, %r23, %r68;
-  @%p69 bra masked_softmax_then_70;
-  bra masked_softmax_else_70;
-  masked_softmax_then_70:
-  sub.f32 %f71, %f33, %rd59;
-  mul.rn.f32 %f72, %f71, 0f3FB8AA3B; // log2(e)
-  ex2.approx.f32 %f73, %f72;
-  mov.u32 %r74, 0; // unit
-  mov.u32 %r75, %r74;
-  bra masked_softmax_end_70;
-  masked_softmax_else_70:
-  mov.u32 %r75, 0; // no else branch
-  masked_softmax_end_70:
-  mov.u32 %r76, 0; // unit
-  mov.u32 %r77, %r76;
-  bra masked_softmax_end_67;
-  masked_softmax_else_67:
-  mov.u32 %r77, 0; // no else branch
-  masked_softmax_end_67:
-  mov.u64 %rd78, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
-  add.f32 %f79, %f73, %rd78;
-  mov.u64 %rd80, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
-  add.f32 %f81, %f79, %rd80;
-  mov.u64 %rd82, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
-  add.f32 %f83, %f81, %rd82;
-  mov.u64 %rd84, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
-  add.f32 %f85, %f83, %rd84;
-  mov.u64 %rd86, 0; // FG-2.6: UNRESOLVED device fn shfl_xor_sync_f32 (stub)
-  add.f32 %f87, %f85, %rd86;
-  mov.u32 %r88, 0; // proof/assume erased
-  cvt.u64.u32 %rd90, %r7;
-  setp.lt.u64 %p89, %rd90, %rd6;
-  @%p89 bra masked_softmax_then_91;
-  bra masked_softmax_else_91;
-  masked_softmax_then_91:
-  mov.u32 %r92, 0; // proof/assume erased
-  div.f32 %f93, %f73, %f87;
-  cvt.u64.u32 %rd94, %r7;
-  add.u64 %rd95, %rd10, %rd94;
-  mov.u64 %rd96, 4;
-  mul.lo.u64 %rd97, %rd95, %rd96;
-  add.u64 %rd98, %rd4, %rd97;
-  st.global.f32 [%rd98], %f93;
-  mov.u32 %r99, 0; // unit
-  mov.u32 %r100, %r99;
-  bra masked_softmax_end_91;
-  masked_softmax_else_91:
-  mov.u32 %r100, 0; // no else branch
-  masked_softmax_end_91:
-  mov.u32 %r101, 0; // unit
+  mov.u64 %rd44, 8;
+  cvt.u32.u64 %r45, %rd44;
+  shfl.sync.bfly.b32 %f46, %f36, %r45, 31, 0xffffffff;
+  setp.gt.f32 %p47, %f46, %f36;
+  @%p47 bra masked_softmax_then_48;
+  bra masked_softmax_else_48;
+  masked_softmax_then_48:
+  mov.u32 %r49, 0; // unit
+  mov.u32 %r50, %r49;
+  mov.f32 %f36, %f46; // if wb: v
+  bra masked_softmax_end_48;
+  masked_softmax_else_48:
+  mov.u32 %r50, 0; // no else branch
+  masked_softmax_end_48:
+  mov.u64 %rd51, 4;
+  cvt.u32.u64 %r52, %rd51;
+  shfl.sync.bfly.b32 %f53, %f36, %r52, 31, 0xffffffff;
+  setp.gt.f32 %p54, %f53, %f36;
+  @%p54 bra masked_softmax_then_55;
+  bra masked_softmax_else_55;
+  masked_softmax_then_55:
+  mov.u32 %r56, 0; // unit
+  mov.u32 %r57, %r56;
+  mov.f32 %f36, %f53; // if wb: v
+  bra masked_softmax_end_55;
+  masked_softmax_else_55:
+  mov.u32 %r57, 0; // no else branch
+  masked_softmax_end_55:
+  mov.u64 %rd58, 2;
+  cvt.u32.u64 %r59, %rd58;
+  shfl.sync.bfly.b32 %f60, %f36, %r59, 31, 0xffffffff;
+  setp.gt.f32 %p61, %f60, %f36;
+  @%p61 bra masked_softmax_then_62;
+  bra masked_softmax_else_62;
+  masked_softmax_then_62:
+  mov.u32 %r63, 0; // unit
+  mov.u32 %r64, %r63;
+  mov.f32 %f36, %f60; // if wb: v
+  bra masked_softmax_end_62;
+  masked_softmax_else_62:
+  mov.u32 %r64, 0; // no else branch
+  masked_softmax_end_62:
+  mov.u64 %rd65, 1;
+  cvt.u32.u64 %r66, %rd65;
+  shfl.sync.bfly.b32 %f67, %f36, %r66, 31, 0xffffffff;
+  setp.gt.f32 %p68, %f67, %f36;
+  @%p68 bra masked_softmax_then_69;
+  bra masked_softmax_else_69;
+  masked_softmax_then_69:
+  mov.u32 %r70, 0; // unit
+  mov.u32 %r71, %r70;
+  mov.f32 %f36, %f67; // if wb: v
+  bra masked_softmax_end_69;
+  masked_softmax_else_69:
+  mov.u32 %r71, 0; // no else branch
+  masked_softmax_end_69:
+  mov.f32 %f72, 0f00000000; // 0
+  setp.lt.u64 %p73, %rd8, %rd6;
+  @%p73 bra masked_softmax_then_74;
+  bra masked_softmax_else_74;
+  masked_softmax_then_74:
+  mov.u32 %r75, 0;
+  setp.ne.u32 %p76, %r14, %r75;
+  @%p76 bra masked_softmax_then_77;
+  bra masked_softmax_else_77;
+  masked_softmax_then_77:
+  sub.f32 %f78, %f13, %f36;
+  mul.rn.f32 %f79, %f78, 0f3FB8AA3B; // log2(e)
+  ex2.approx.f32 %f80, %f79;
+  mov.u32 %r81, 0; // unit
+  mov.u32 %r82, %r81;
+  mov.f32 %f72, %f80; // if wb: ex
+  bra masked_softmax_end_77;
+  masked_softmax_else_77:
+  mov.u32 %r82, 0; // no else branch
+  masked_softmax_end_77:
+  mov.u32 %r83, 0; // unit
+  mov.u32 %r84, %r83;
+  bra masked_softmax_end_74;
+  masked_softmax_else_74:
+  mov.u32 %r84, 0; // no else branch
+  masked_softmax_end_74:
+  mov.b32 %f85, %f72; // param: val
+  mov.u64 %rd86, 16;
+  cvt.u32.u64 %r87, %rd86;
+  shfl.sync.bfly.b32 %f88, %f85, %r87, 31, 0xffffffff;
+  add.f32 %f89, %f85, %f88;
+  mov.u64 %rd90, 8;
+  cvt.u32.u64 %r91, %rd90;
+  shfl.sync.bfly.b32 %f92, %f89, %r91, 31, 0xffffffff;
+  add.f32 %f93, %f89, %f92;
+  mov.u64 %rd94, 4;
+  cvt.u32.u64 %r95, %rd94;
+  shfl.sync.bfly.b32 %f96, %f93, %r95, 31, 0xffffffff;
+  add.f32 %f97, %f93, %f96;
+  mov.u64 %rd98, 2;
+  cvt.u32.u64 %r99, %rd98;
+  shfl.sync.bfly.b32 %f100, %f97, %r99, 31, 0xffffffff;
+  add.f32 %f101, %f97, %f100;
+  mov.u64 %rd102, 1;
+  cvt.u32.u64 %r103, %rd102;
+  shfl.sync.bfly.b32 %f104, %f101, %r103, 31, 0xffffffff;
+  add.f32 %f105, %f101, %f104;
+  mov.u32 %r106, 0; // proof/assume erased
+  setp.lt.u64 %p107, %rd8, %rd6;
+  @%p107 bra masked_softmax_then_108;
+  bra masked_softmax_else_108;
+  masked_softmax_then_108:
+  mov.u32 %r109, 0; // proof/assume erased
+  div.rn.f32 %f110, %f72, %f105;
+  add.u64 %rd111, %rd11, %rd8;
+  mov.u64 %rd112, 4;
+  mul.lo.u64 %rd113, %rd111, %rd112;
+  add.u64 %rd114, %rd4, %rd113;
+  st.global.f32 [%rd114], %f110;
+  mov.u32 %r115, 0; // unit
+  mov.u32 %r116, %r115;
+  bra masked_softmax_end_108;
+  masked_softmax_else_108:
+  mov.u32 %r116, 0; // no else branch
+  masked_softmax_end_108:
+  mov.u32 %r117, 0; // unit
   ret;
 }
 
