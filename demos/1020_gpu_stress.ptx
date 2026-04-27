@@ -14,9 +14,9 @@
     .param .u64 gpu_stress_param_lcg_add
 )
 {
-    .reg .pred %p11, %p24, %p30;
-    .reg .u64 %rd0, %rd1, %rd12, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd22, %rd25, %rd26, %rd27, %rd28, %rd29, %rd3, %rd32, %rd33, %rd34, %rd35, %rd38, %rd39, %rd4, %rd41, %rd42, %rd43, %rd44, %rd5;
-    .reg .u32 %r10, %r36, %r37, %r40, %r45, %r46, %r47, %r6, %r7, %r8, %r9;
+    .reg .pred %p12, %p23, %p29;
+    .reg .u32 %r10, %r35, %r36, %r39, %r43, %r44, %r45, %r6, %r7, %r8, %r9;
+    .reg .u64 %rd0, %rd1, %rd11, %rd14, %rd15, %rd16, %rd17, %rd18, %rd19, %rd2, %rd20, %rd21, %rd24, %rd25, %rd26, %rd27, %rd28, %rd3, %rd31, %rd32, %rd33, %rd34, %rd37, %rd38, %rd4, %rd40, %rd41, %rd42, %rd5;
 
   ld.param.u64 %rd0, [gpu_stress_param_data_data];
   ld.param.u64 %rd1, [gpu_stress_param_data_len];
@@ -30,62 +30,60 @@
   mul.lo.u32 %r8, %r6, %r7;
   mov.u32 %r9, %tid.x;
   add.u32 %r10, %r8, %r9;
-  cvt.u64.u32 %rd12, %r10;
-  setp.lt.u64 %p11, %rd12, %rd2;
-  @%p11 bra gpu_stress_then_13;
+  cvt.u64.u32 %rd11, %r10;
+  setp.lt.u64 %p12, %rd11, %rd2;
+  @%p12 bra gpu_stress_then_13;
   bra gpu_stress_else_13;
   gpu_stress_then_13:
-  cvt.u64.u32 %rd14, %r10;
-  mov.u64 %rd15, 8;
-  mul.lo.u64 %rd16, %rd14, %rd15;
-  add.u64 %rd17, %rd0, %rd16;
-  ld.global.u64 %rd18, [%rd17];
-  add.u64 %rd19, %rd18, %r10;
-  mov.u64 %rd20, 1;
-  add.u64 %rd21, %rd19, %rd20;
-  mov.u64 %rd22, 0;
-  gpu_stress_loop_23:
-  setp.lt.u64 %p24, %rd22, %rd3;
-  @!%p24 bra gpu_stress_loop_end_23;
-  mul.lo.u64 %rd25, %rd21, %rd4;
-  add.u64 %rd26, %rd25, %rd5;
-  mov.u64 %rd27, 1024;
-  rem.u64 %rd28, %rd22, %rd27;
-  mov.u64 %rd29, 0;
-  setp.eq.u64 %p30, %rd28, %rd29;
-  @%p30 bra gpu_stress_then_31;
-  bra gpu_stress_else_31;
-  gpu_stress_then_31:
-  rem.u64 %rd32, %rd26, %rd2;
-  mov.u64 %rd33, 8;
-  mul.lo.u64 %rd34, %rd32, %rd33;
-  add.u64 %rd35, %rd0, %rd34;
-  st.global.u64 [%rd35], %rd26;
-  mov.u32 %r36, 0; // unit
-  mov.u32 %r37, %r36;
-  bra gpu_stress_end_31;
-  gpu_stress_else_31:
-  mov.u32 %r37, 0; // no else branch
-  gpu_stress_end_31:
-  mov.u64 %rd38, 1;
-  add.u64 %rd39, %rd22, %rd38;
-  mov.u64 %rd21, %rd26; // loop wb: acc
-  mov.u64 %rd22, %rd39; // loop wb: k
-  bra gpu_stress_loop_23;
-  gpu_stress_loop_end_23:
-  mov.u32 %r40, 0; // unit
-  cvt.u64.u32 %rd41, %r10;
-  mov.u64 %rd42, 8;
-  mul.lo.u64 %rd43, %rd41, %rd42;
-  add.u64 %rd44, %rd0, %rd43;
-  st.global.u64 [%rd44], %rd21;
-  mov.u32 %r45, 0; // unit
-  mov.u32 %r46, %r45;
+  mov.u64 %rd14, 8;
+  mul.lo.u64 %rd15, %rd11, %rd14;
+  add.u64 %rd16, %rd0, %rd15;
+  ld.global.u64 %rd17, [%rd16];
+  add.u64 %rd18, %rd17, %rd11;
+  mov.u64 %rd19, 1;
+  add.u64 %rd20, %rd18, %rd19;
+  mov.u64 %rd21, 0;
+  gpu_stress_loop_22:
+  setp.lt.u64 %p23, %rd21, %rd3;
+  @!%p23 bra gpu_stress_loop_end_22;
+  mul.lo.u64 %rd24, %rd20, %rd4;
+  add.u64 %rd25, %rd24, %rd5;
+  mov.u64 %rd26, 1024;
+  rem.u64 %rd27, %rd21, %rd26;
+  mov.u64 %rd28, 0;
+  setp.eq.u64 %p29, %rd27, %rd28;
+  @%p29 bra gpu_stress_then_30;
+  bra gpu_stress_else_30;
+  gpu_stress_then_30:
+  rem.u64 %rd31, %rd25, %rd2;
+  mov.u64 %rd32, 8;
+  mul.lo.u64 %rd33, %rd31, %rd32;
+  add.u64 %rd34, %rd0, %rd33;
+  st.global.u64 [%rd34], %rd25;
+  mov.u32 %r35, 0; // unit
+  mov.u32 %r36, %r35;
+  bra gpu_stress_end_30;
+  gpu_stress_else_30:
+  mov.u32 %r36, 0; // no else branch
+  gpu_stress_end_30:
+  mov.u64 %rd37, 1;
+  add.u64 %rd38, %rd21, %rd37;
+  mov.u64 %rd20, %rd25; // loop wb: acc
+  mov.u64 %rd21, %rd38; // loop wb: k
+  bra gpu_stress_loop_22;
+  gpu_stress_loop_end_22:
+  mov.u32 %r39, 0; // unit
+  mov.u64 %rd40, 8;
+  mul.lo.u64 %rd41, %rd11, %rd40;
+  add.u64 %rd42, %rd0, %rd41;
+  st.global.u64 [%rd42], %rd20;
+  mov.u32 %r43, 0; // unit
+  mov.u32 %r44, %r43;
   bra gpu_stress_end_13;
   gpu_stress_else_13:
-  mov.u32 %r46, 0; // no else branch
+  mov.u32 %r44, 0; // no else branch
   gpu_stress_end_13:
-  mov.u32 %r47, 0; // unit
+  mov.u32 %r45, 0; // unit
   ret;
 }
 

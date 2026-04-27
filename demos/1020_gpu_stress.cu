@@ -25,6 +25,11 @@
 #define gridDim_y   ((uint32_t)(gridDim.y))
 #define gridDim_z   ((uint32_t)(gridDim.z))
 
+#ifdef __cplusplus
+#  define FORGE_AGG(T, ...) (T{__VA_ARGS__})
+#else
+#  define FORGE_AGG(T, ...) ((T){__VA_ARGS__})
+#endif
 
 /* span<T> typedefs — fat pointers with proven bounds */
 typedef struct { uint64_t* data; uintptr_t len; } forge_span_u64_t;
@@ -34,6 +39,7 @@ typedef uint64_t (*forge_fn_u64_u64_u64_ret_u64_t)(uint64_t, uint64_t, uint64_t)
 typedef uint64_t (*forge_fn_ptr_u64_u64_ret_u64_t)(uint64_t*, uint64_t);
 typedef uint64_t (*forge_fn_u64_ret_u64_t)(uint64_t);
 typedef uint64_t (*forge_fn__ret_u64_t)(void);
+typedef float (*forge_fn_f32_u64_u64_ret_f32_t)(float, uint64_t, uint64_t);
 
 uint64_t shfl_down_sync(uint64_t val, uint64_t delta, uint64_t width);  /* extern: forge_gpu */
 
@@ -65,17 +71,23 @@ uint64_t lane_id(void);  /* extern: forge_gpu */
 
 uint64_t warp_id(void);  /* extern: forge_gpu */
 
+float shfl_xor_sync_f32(float val, uint64_t mask, uint64_t width);  /* extern: forge_gpu */
+
+float shfl_down_sync_f32(float val, uint64_t delta, uint64_t width);  /* extern: forge_gpu */
+
 /* Forward declarations */
-uint64_t warp_reduce_sum(uint64_t val __attribute__((unused)));
-uint64_t warp_reduce_max(uint64_t val __attribute__((unused)));
-uint64_t warp_reduce_min(uint64_t val __attribute__((unused)));
+static __device__ __forceinline__ uint64_t warp_reduce_sum(uint64_t val __attribute__((unused)));
+static __device__ __forceinline__ uint64_t warp_reduce_max(uint64_t val __attribute__((unused)));
+static __device__ __forceinline__ uint64_t warp_reduce_min(uint64_t val __attribute__((unused)));
+static __device__ __forceinline__ float warp_reduce_sum_f32(float val __attribute__((unused)));
+static __device__ __forceinline__ float warp_reduce_max_f32(float val __attribute__((unused)));
+static __device__ __forceinline__ float warp_reduce_min_f32(float val __attribute__((unused)));
 uint64_t grid_stride_start(uint64_t block_idx __attribute__((unused)), uint64_t block_dim __attribute__((unused)), uint64_t thread_idx __attribute__((unused)));
 uint64_t grid_stride_step(uint64_t block_dim __attribute__((unused)), uint64_t grid_dim __attribute__((unused)));
-int main();
 __global__ void gpu_stress(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t iters __attribute__((unused)), uint64_t lcg_mul __attribute__((unused)), uint64_t lcg_add __attribute__((unused)));
 int main();
 
-uint64_t warp_reduce_sum(uint64_t val __attribute__((unused))) {
+static __device__ __forceinline__ uint64_t warp_reduce_sum(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
   v = (v + __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL));
   v = (v + __shfl_xor_sync(0xffffffff, v, 8ULL, 32ULL));
@@ -85,7 +97,7 @@ uint64_t warp_reduce_sum(uint64_t val __attribute__((unused))) {
   return v;
 }
 
-uint64_t warp_reduce_max(uint64_t val __attribute__((unused))) {
+static __device__ __forceinline__ uint64_t warp_reduce_max(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
   uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL);
   if ((s > v)) {
@@ -115,9 +127,79 @@ uint64_t warp_reduce_max(uint64_t val __attribute__((unused))) {
   return v;
 }
 
-uint64_t warp_reduce_min(uint64_t val __attribute__((unused))) {
+static __device__ __forceinline__ uint64_t warp_reduce_min(uint64_t val __attribute__((unused))) {
   uint64_t v __attribute__((unused)) = val;
   uint64_t s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL);
+  if ((s < v)) {
+    v = s;
+
+  }
+  s = __shfl_xor_sync(0xffffffff, v, 8ULL, 32ULL);
+  if ((s < v)) {
+    v = s;
+
+  }
+  s = __shfl_xor_sync(0xffffffff, v, 4ULL, 32ULL);
+  if ((s < v)) {
+    v = s;
+
+  }
+  s = __shfl_xor_sync(0xffffffff, v, 2ULL, 32ULL);
+  if ((s < v)) {
+    v = s;
+
+  }
+  s = __shfl_xor_sync(0xffffffff, v, 1ULL, 32ULL);
+  if ((s < v)) {
+    v = s;
+
+  }
+  return v;
+}
+
+static __device__ __forceinline__ float warp_reduce_sum_f32(float val __attribute__((unused))) {
+  float v __attribute__((unused)) = val;
+  v = (v + __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 8ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 4ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 2ULL, 32ULL));
+  v = (v + __shfl_xor_sync(0xffffffff, v, 1ULL, 32ULL));
+  return v;
+}
+
+static __device__ __forceinline__ float warp_reduce_max_f32(float val __attribute__((unused))) {
+  float v __attribute__((unused)) = val;
+  float s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL);
+  if ((s > v)) {
+    v = s;
+
+  }
+  s = __shfl_xor_sync(0xffffffff, v, 8ULL, 32ULL);
+  if ((s > v)) {
+    v = s;
+
+  }
+  s = __shfl_xor_sync(0xffffffff, v, 4ULL, 32ULL);
+  if ((s > v)) {
+    v = s;
+
+  }
+  s = __shfl_xor_sync(0xffffffff, v, 2ULL, 32ULL);
+  if ((s > v)) {
+    v = s;
+
+  }
+  s = __shfl_xor_sync(0xffffffff, v, 1ULL, 32ULL);
+  if ((s > v)) {
+    v = s;
+
+  }
+  return v;
+}
+
+static __device__ __forceinline__ float warp_reduce_min_f32(float val __attribute__((unused))) {
+  float v __attribute__((unused)) = val;
+  float s __attribute__((unused)) = __shfl_xor_sync(0xffffffff, v, 16ULL, 32ULL);
   if ((s < v)) {
     v = s;
 
@@ -151,11 +233,6 @@ uint64_t grid_stride_start(uint64_t block_idx __attribute__((unused)), uint64_t 
 
 uint64_t grid_stride_step(uint64_t block_dim __attribute__((unused)), uint64_t grid_dim __attribute__((unused))) {
   return (block_dim * grid_dim);
-}
-
-int main() {
-  return (int)(0ULL);
-
 }
 
 __global__ void gpu_stress(forge_span_u64_t data __attribute__((unused)), uint64_t n __attribute__((unused)), uint64_t iters __attribute__((unused)), uint64_t lcg_mul __attribute__((unused)), uint64_t lcg_add __attribute__((unused))) {

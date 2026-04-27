@@ -1284,9 +1284,32 @@ and lower_stmt st s =
       st.shared_regs <- r :: st.shared_regs;
       st.reg_env <- (id.name, r) :: st.reg_env
 
-  | SLet (id, _ty, e, _lin) ->
+  | SLet (id, ty_opt, e, _lin) ->
       let r = lower_expr st e in
-      st.reg_env <- (id.name, r) :: st.reg_env
+      (* Honor the type annotation: if the binding's declared type is
+         wider than the register holding the initializer, insert a
+         widening cvt so subsequent uses see a register of the right
+         width.  Without this, `let gid: u64 = blockIdx_x * blockDim_x
+         + threadIdx_x` binds gid to a u32 register, and downstream
+         `acc + gid` (with acc u64) emits `add.u64 dst, acc, %r10_u32`
+         that ptxas rejects as type-mismatched. *)
+      let r' = match ty_opt with
+        | Some ty ->
+            let want = ptx_rty_of_ty ty in
+            let have = reg_rty st r in
+            let is_int = function
+              | U16 | U32 | U64 | S16 | S32 | S64 -> true | _ -> false in
+            if want <> have && is_int want && is_int have
+               && sizeof_rty want > sizeof_rty have
+            then begin
+              let nr = fresh_reg st want in
+              emit st (Printf.sprintf "cvt.%s.%s %s, %s;"
+                         (arith_pfx want) (arith_pfx have) nr r);
+              nr
+            end else r
+        | None -> r
+      in
+      st.reg_env <- (id.name, r') :: st.reg_env
 
   | SExpr { expr_desc = EAssign (lhs, rhs); _ } ->
       let rv = lower_expr st rhs in
