@@ -1,0 +1,215 @@
+// FORGE-generated PTX — SM_120
+// Proofs discharged before emission. Correct by construction.
+
+.version 8.8
+.target sm_120
+.address_size 64
+
+.visible .entry permute_hc_to_canonic_brt(
+    .param .u64 permute_hc_to_canonic_brt_param_src_data,
+    .param .u64 permute_hc_to_canonic_brt_param_src_len,
+    .param .u64 permute_hc_to_canonic_brt_param_dst_data,
+    .param .u64 permute_hc_to_canonic_brt_param_dst_len,
+    .param .u64 permute_hc_to_canonic_brt_param_n,
+    .param .u32 permute_hc_to_canonic_brt_param_log_n
+)
+{
+    .reg .pred %p12, %p18, %p36, %p48;
+    .reg .u32 %r10, %r14, %r15, %r16, %r17, %r20, %r21, %r22, %r23, %r24, %r25, %r26, %r27, %r28, %r29, %r30, %r31, %r32, %r33, %r34, %r37, %r38, %r39, %r40, %r41, %r42, %r43, %r44, %r45, %r46, %r5, %r53, %r57, %r58, %r59, %r6, %r60, %r61, %r7, %r8, %r9;
+    .reg .u64 %rd0, %rd1, %rd11, %rd2, %rd3, %rd4, %rd47, %rd50, %rd51, %rd52, %rd54, %rd55, %rd56;
+
+  ld.param.u64 %rd0, [permute_hc_to_canonic_brt_param_src_data];
+  ld.param.u64 %rd1, [permute_hc_to_canonic_brt_param_src_len];
+  ld.param.u64 %rd2, [permute_hc_to_canonic_brt_param_dst_data];
+  ld.param.u64 %rd3, [permute_hc_to_canonic_brt_param_dst_len];
+  ld.param.u64 %rd4, [permute_hc_to_canonic_brt_param_n];
+  ld.param.u32 %r5, [permute_hc_to_canonic_brt_param_log_n];
+
+  mov.u32 %r6, %ctaid.x;
+  mov.u32 %r7, %ntid.x;
+  mul.lo.u32 %r8, %r6, %r7;
+  mov.u32 %r9, %tid.x;
+  add.u32 %r10, %r8, %r9;
+  cvt.u64.u32 %rd11, %r10;
+  setp.lt.u64 %p12, %rd11, %rd4;
+  @%p12 bra permute_hc_to_canonic_brt_then_13;
+  bra permute_hc_to_canonic_brt_else_13;
+  permute_hc_to_canonic_brt_then_13:
+  cvt.u32.u64 %r14, %rd11;
+  mov.u32 %r15, 1;
+  and.b32 %r16, %r14, %r15;
+  mov.u32 %r17, 0;
+  setp.ne.u32 %p18, %r16, %r17;
+  @%p18 bra permute_hc_to_canonic_brt_then_19;
+  bra permute_hc_to_canonic_brt_else_19;
+  permute_hc_to_canonic_brt_then_19:
+  cvt.u32.u64 %r20, %rd4;
+  mov.u32 %r21, 1;
+  sub.u32 %r22, %r20, %r21;
+  cvt.u32.u64 %r23, %rd11;
+  mov.u32 %r24, 1;
+  shr.u32 %r25, %r23, %r24;
+  sub.u32 %r26, %r22, %r25;
+  mov.u32 %r27, %r26;
+  bra permute_hc_to_canonic_brt_end_19;
+  permute_hc_to_canonic_brt_else_19:
+  cvt.u32.u64 %r28, %rd11;
+  mov.u32 %r29, 1;
+  shr.u32 %r30, %r28, %r29;
+  mov.u32 %r27, %r30;
+  permute_hc_to_canonic_brt_end_19:
+  mov.b32 %r31, %r27; // param: v
+  mov.b32 %r32, %r5; // param: log_n
+  mov.u32 %r33, 0;
+  mov.u32 %r34, 0;
+  permute_hc_to_canonic_brt_loop_35:
+  setp.lt.u32 %p36, %r34, %r32;
+  @!%p36 bra permute_hc_to_canonic_brt_loop_end_35;
+  mov.u32 %r37, 1;
+  shl.b32 %r38, %r33, %r37;
+  mov.u32 %r39, 1;
+  and.b32 %r40, %r31, %r39;
+  or.b32 %r41, %r38, %r40;
+  mov.u32 %r42, 1;
+  shr.u32 %r43, %r31, %r42;
+  mov.u32 %r44, 1;
+  add.u32 %r45, %r34, %r44;
+  mov.u32 %r33, %r41; // loop wb: r
+  mov.u32 %r31, %r43; // loop wb: x
+  mov.u32 %r34, %r45; // loop wb: i
+  bra permute_hc_to_canonic_brt_loop_35;
+  permute_hc_to_canonic_brt_loop_end_35:
+  mov.u32 %r46, 0; // unit
+  cvt.u64.u32 %rd47, %r33;
+  setp.lt.u64 %p48, %rd47, %rd3;
+  @%p48 bra permute_hc_to_canonic_brt_then_49;
+  bra permute_hc_to_canonic_brt_else_49;
+  permute_hc_to_canonic_brt_then_49:
+  mov.u64 %rd50, 4;
+  mul.lo.u64 %rd51, %rd11, %rd50;
+  add.u64 %rd52, %rd0, %rd51;
+  ld.global.u32 %r53, [%rd52];
+  mov.u64 %rd54, 4;
+  mul.lo.u64 %rd55, %rd47, %rd54;
+  add.u64 %rd56, %rd2, %rd55;
+  st.global.u32 [%rd56], %r53;
+  mov.u32 %r57, 0; // unit
+  mov.u32 %r58, %r57;
+  bra permute_hc_to_canonic_brt_end_49;
+  permute_hc_to_canonic_brt_else_49:
+  mov.u32 %r58, 0; // no else branch
+  permute_hc_to_canonic_brt_end_49:
+  mov.u32 %r59, 0; // unit
+  mov.u32 %r60, %r59;
+  bra permute_hc_to_canonic_brt_end_13;
+  permute_hc_to_canonic_brt_else_13:
+  mov.u32 %r60, 0; // no else branch
+  permute_hc_to_canonic_brt_end_13:
+  mov.u32 %r61, 0; // unit
+  ret;
+}
+
+.visible .entry permute_canonic_brt_to_hc_natural(
+    .param .u64 permute_canonic_brt_to_hc_natural_param_src_data,
+    .param .u64 permute_canonic_brt_to_hc_natural_param_src_len,
+    .param .u64 permute_canonic_brt_to_hc_natural_param_dst_data,
+    .param .u64 permute_canonic_brt_to_hc_natural_param_dst_len,
+    .param .u64 permute_canonic_brt_to_hc_natural_param_n,
+    .param .u32 permute_canonic_brt_to_hc_natural_param_log_n
+)
+{
+    .reg .pred %p12, %p18, %p36, %p48;
+    .reg .u32 %r10, %r14, %r15, %r16, %r17, %r20, %r21, %r22, %r23, %r24, %r25, %r26, %r27, %r28, %r29, %r30, %r31, %r32, %r33, %r34, %r37, %r38, %r39, %r40, %r41, %r42, %r43, %r44, %r45, %r46, %r5, %r53, %r57, %r58, %r59, %r6, %r60, %r61, %r7, %r8, %r9;
+    .reg .u64 %rd0, %rd1, %rd11, %rd2, %rd3, %rd4, %rd47, %rd50, %rd51, %rd52, %rd54, %rd55, %rd56;
+
+  ld.param.u64 %rd0, [permute_canonic_brt_to_hc_natural_param_src_data];
+  ld.param.u64 %rd1, [permute_canonic_brt_to_hc_natural_param_src_len];
+  ld.param.u64 %rd2, [permute_canonic_brt_to_hc_natural_param_dst_data];
+  ld.param.u64 %rd3, [permute_canonic_brt_to_hc_natural_param_dst_len];
+  ld.param.u64 %rd4, [permute_canonic_brt_to_hc_natural_param_n];
+  ld.param.u32 %r5, [permute_canonic_brt_to_hc_natural_param_log_n];
+
+  mov.u32 %r6, %ctaid.x;
+  mov.u32 %r7, %ntid.x;
+  mul.lo.u32 %r8, %r6, %r7;
+  mov.u32 %r9, %tid.x;
+  add.u32 %r10, %r8, %r9;
+  cvt.u64.u32 %rd11, %r10;
+  setp.lt.u64 %p12, %rd11, %rd4;
+  @%p12 bra permute_canonic_brt_to_hc_natural_then_13;
+  bra permute_canonic_brt_to_hc_natural_else_13;
+  permute_canonic_brt_to_hc_natural_then_13:
+  cvt.u32.u64 %r14, %rd11;
+  mov.u32 %r15, 1;
+  and.b32 %r16, %r14, %r15;
+  mov.u32 %r17, 0;
+  setp.ne.u32 %p18, %r16, %r17;
+  @%p18 bra permute_canonic_brt_to_hc_natural_then_19;
+  bra permute_canonic_brt_to_hc_natural_else_19;
+  permute_canonic_brt_to_hc_natural_then_19:
+  cvt.u32.u64 %r20, %rd4;
+  mov.u32 %r21, 1;
+  sub.u32 %r22, %r20, %r21;
+  cvt.u32.u64 %r23, %rd11;
+  mov.u32 %r24, 1;
+  shr.u32 %r25, %r23, %r24;
+  sub.u32 %r26, %r22, %r25;
+  mov.u32 %r27, %r26;
+  bra permute_canonic_brt_to_hc_natural_end_19;
+  permute_canonic_brt_to_hc_natural_else_19:
+  cvt.u32.u64 %r28, %rd11;
+  mov.u32 %r29, 1;
+  shr.u32 %r30, %r28, %r29;
+  mov.u32 %r27, %r30;
+  permute_canonic_brt_to_hc_natural_end_19:
+  mov.b32 %r31, %r27; // param: v
+  mov.b32 %r32, %r5; // param: log_n
+  mov.u32 %r33, 0;
+  mov.u32 %r34, 0;
+  permute_canonic_brt_to_hc_natural_loop_35:
+  setp.lt.u32 %p36, %r34, %r32;
+  @!%p36 bra permute_canonic_brt_to_hc_natural_loop_end_35;
+  mov.u32 %r37, 1;
+  shl.b32 %r38, %r33, %r37;
+  mov.u32 %r39, 1;
+  and.b32 %r40, %r31, %r39;
+  or.b32 %r41, %r38, %r40;
+  mov.u32 %r42, 1;
+  shr.u32 %r43, %r31, %r42;
+  mov.u32 %r44, 1;
+  add.u32 %r45, %r34, %r44;
+  mov.u32 %r33, %r41; // loop wb: r
+  mov.u32 %r31, %r43; // loop wb: x
+  mov.u32 %r34, %r45; // loop wb: i
+  bra permute_canonic_brt_to_hc_natural_loop_35;
+  permute_canonic_brt_to_hc_natural_loop_end_35:
+  mov.u32 %r46, 0; // unit
+  cvt.u64.u32 %rd47, %r33;
+  setp.lt.u64 %p48, %rd47, %rd1;
+  @%p48 bra permute_canonic_brt_to_hc_natural_then_49;
+  bra permute_canonic_brt_to_hc_natural_else_49;
+  permute_canonic_brt_to_hc_natural_then_49:
+  mov.u64 %rd50, 4;
+  mul.lo.u64 %rd51, %rd47, %rd50;
+  add.u64 %rd52, %rd0, %rd51;
+  ld.global.u32 %r53, [%rd52];
+  mov.u64 %rd54, 4;
+  mul.lo.u64 %rd55, %rd11, %rd54;
+  add.u64 %rd56, %rd2, %rd55;
+  st.global.u32 [%rd56], %r53;
+  mov.u32 %r57, 0; // unit
+  mov.u32 %r58, %r57;
+  bra permute_canonic_brt_to_hc_natural_end_49;
+  permute_canonic_brt_to_hc_natural_else_49:
+  mov.u32 %r58, 0; // no else branch
+  permute_canonic_brt_to_hc_natural_end_49:
+  mov.u32 %r59, 0; // unit
+  mov.u32 %r60, %r59;
+  bra permute_canonic_brt_to_hc_natural_end_13;
+  permute_canonic_brt_to_hc_natural_else_13:
+  mov.u32 %r60, 0; // no else branch
+  permute_canonic_brt_to_hc_natural_end_13:
+  mov.u32 %r61, 0; // unit
+  ret;
+}
+

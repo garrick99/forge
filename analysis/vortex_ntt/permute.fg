@@ -1,0 +1,99 @@
+// VortexSTARK permute kernels for circle-domain index reorderings —
+// FORGE pilot of `cuda/permute.cu`.
+//
+// hc-natural → canonic-BRT scatter:
+//   for k in [0, n):
+//     cn = if k & 1 { n - 1 - k/2 } else { k/2 }
+//     j  = bit_reverse(cn, log_n)
+//     dst[j] = src[k]
+//
+// canonic-BRT → hc-natural is the inverse mapping:
+//   dst[k] = src[j]
+//
+// Both kernels: one thread per source index, scatter write. Caller must
+// guarantee `2^log_n == n` so the bit-reversed destination index lies
+// in [0, n) — FORGE proves the per-thread bound `j < n` only via the
+// runtime guard `(j as u64) < dst.len` (the tighter `j < n` follows
+// algebraically from `n = 2^log_n` but isn't reachable without
+// non-linear reasoning the SMT layer doesn't carry).
+
+use std::gpu;
+
+// Reverse the low `log_n` bits of `v`. Top bits (≥ log_n) are dropped.
+// Bounded loop with `decreases log_n - i` measure for SMT termination.
+// Same helper as `bit_reverse_qm31.fg`; duplicated here to keep this
+// pilot self-contained.
+#[device]
+fn bit_reverse_u32(v: u32, log_n: u32) -> u32
+    requires log_n <= 32u32
+{
+    let mut r: u32 = 0u32;
+    let mut x: u32 = v;
+    let mut i: u32 = 0u32;
+    while i < log_n
+        invariant i <= log_n
+        decreases log_n - i
+    {
+        r = (r << 1u32) | (x & 1u32);
+        x = x >> 1u32;
+        i = i + 1u32;
+    };
+    r
+}
+
+#[kernel]
+fn permute_hc_to_canonic_brt(
+    src: span<u32>,
+    dst: span<u32>,
+    n: u64,
+    log_n: u32
+)
+    requires log_n <= 32u32
+    requires n <= src.len
+    requires n <= dst.len
+{
+    let k: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if k < n {
+        let cn: u32 = if ((k as u32) & 1u32) != 0u32 {
+            ((n as u32) - 1u32) - ((k as u32) >> 1u32)
+        } else {
+            (k as u32) >> 1u32
+        };
+        let j: u32 = bit_reverse_u32(cn, log_n);
+        let j64: u64 = j as u64;
+        // Bounds re-establishment for SMT: `j < 2^log_n = n` is true
+        // by construction but not derivable here without non-linear
+        // multiplication, so use a runtime guard against dst.len.
+        if j64 < dst.len {
+            dst[j64] = src[k];
+        };
+    };
+}
+
+#[kernel]
+fn permute_canonic_brt_to_hc_natural(
+    src: span<u32>,
+    dst: span<u32>,
+    n: u64,
+    log_n: u32
+)
+    requires log_n <= 32u32
+    requires n <= src.len
+    requires n <= dst.len
+{
+    let k: u64 = blockIdx_x * blockDim_x + threadIdx_x;
+    if k < n {
+        let cn: u32 = if ((k as u32) & 1u32) != 0u32 {
+            ((n as u32) - 1u32) - ((k as u32) >> 1u32)
+        } else {
+            (k as u32) >> 1u32
+        };
+        let j: u32 = bit_reverse_u32(cn, log_n);
+        let j64: u64 = j as u64;
+        if j64 < src.len {
+            dst[k] = src[j64];
+        };
+    };
+}
+
+fn main() -> i32 { 0i32 }
