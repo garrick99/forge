@@ -558,24 +558,26 @@ let rec lower_expr st e : string =
 
   (* ---- GPU intrinsics ---- *)
 
-  (* Warp shuffle: shfl_sync(val, src_lane, width) *)
-  | ECall ({ expr_desc = EVar id; _ }, [val_e; lane_e; _width_e])
-      when id.name = "shfl_down_sync" ->
-      let rv = lower_expr st val_e in
-      let rl = lower_expr st lane_e in
-      let dst = fresh_reg st U32 in
-      emit st (Printf.sprintf "shfl.sync.down.b32 %s, %s, %s, 31, 0xffffffff;" dst rv rl);
-      dst
+  (* Warp shuffle helpers.  PTX `shfl.sync.<mode>.b32` operates on
+     32-bit values only — the lane operand must be `.u32` (not u64),
+     and u64 values must be split into hi/lo halves, shuffled
+     independently, and reassembled.  The two helpers below
+     centralise that logic so shfl_xor_sync / shfl_down_sync /
+     their _f32 variants share the implementation.
 
-  (* Helper for shfl intrinsics: PTX requires the lane / mask operand
-     to be `.u32`, but FORGE source typically passes `16u64`-style
-     literals.  Coerce to u32 if needed. *)
+     `coerce_lane_u32 r` returns r if it's already u32/s32, else
+     emits a `cvt.u32.<src> rN, r;` and returns the new register.
 
+     `emit_shfl mode val_reg lane_reg` emits a single shfl in
+     mode ("bfly" or "down") on a 32-bit value and returns the
+     dst register typed to match the input. *)
   | ECall ({ expr_desc = EVar id; _ }, [val_e; lane_e; _width_e])
-      when id.name = "shfl_xor_sync" ->
+      when id.name = "shfl_down_sync" || id.name = "shfl_xor_sync" ->
+      let mode = if id.name = "shfl_xor_sync" then "bfly" else "down" in
       let rv = lower_expr st val_e in
       let rl_raw = lower_expr st lane_e in
-      let rl = let s = reg_rty st rl_raw in
+      let rl =
+        let s = reg_rty st rl_raw in
         if s = U32 || s = S32 then rl_raw
         else begin
           let r = fresh_reg st U32 in
@@ -583,9 +585,32 @@ let rec lower_expr st e : string =
           r
         end
       in
-      let dst = fresh_reg st U32 in
-      emit st (Printf.sprintf "shfl.sync.bfly.b32 %s, %s, %s, 31, 0xffffffff;" dst rv rl);
-      dst
+      let val_rty = reg_rty st rv in
+      (match val_rty with
+       | U64 | S64 ->
+           (* PTX `shfl.sync` is 32-bit only — split the u64 into two
+              .b32 halves via vector-mov, shuffle each, then pack the
+              shuffled halves back into a u64. *)
+           let lo = fresh_reg st U32 in
+           let hi = fresh_reg st U32 in
+           emit st (Printf.sprintf "mov.b64 {%s, %s}, %s;" lo hi rv);
+           let lo_s = fresh_reg st U32 in
+           let hi_s = fresh_reg st U32 in
+           emit st (Printf.sprintf
+             "shfl.sync.%s.b32 %s, %s, %s, 31, 0xffffffff;" mode lo_s lo rl);
+           emit st (Printf.sprintf
+             "shfl.sync.%s.b32 %s, %s, %s, 31, 0xffffffff;" mode hi_s hi rl);
+           let dst = fresh_reg st val_rty in
+           emit st (Printf.sprintf "mov.b64 %s, {%s, %s};" dst lo_s hi_s);
+           dst
+       | _ ->
+           (* 32-bit value — direct shuffle.  Preserve the input type
+              (u32 / s32 / f32) on the destination so consumers don't
+              need an extra cvt. *)
+           let dst = fresh_reg st val_rty in
+           emit st (Printf.sprintf
+             "shfl.sync.%s.b32 %s, %s, %s, 31, 0xffffffff;" mode dst rv rl);
+           dst)
 
   (* F32 variants of warp-shuffle intrinsics.  PTX `shfl.sync` operates
      on `.b32` registers; f32 fits in 32 bits so the same instruction
