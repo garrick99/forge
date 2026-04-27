@@ -92,6 +92,12 @@ type emit_state = {
      definition.  The generic ECall branch consults this table to
      inline the body when the callee is a known device function. *)
   fn_defs : (string, fn_def) Hashtbl.t;
+  (* Module-level `const NAME: T = init;` declarations.  Looked up by
+     EVar when reg_env miss, lowered on first use, then cached in
+     reg_env so subsequent uses reuse the same register.  Without this,
+     references like `M31_P` (defined in std/m31.fg) fall through to
+     the `%rd_unknown_M31_P` placeholder and ptxas rejects the PTX. *)
+  consts : (string, expr) Hashtbl.t;
   (* FORGE73: shared-memory declarations for this kernel.
      Each entry is (symbol, elem_rty, num_elements).  Emitted as
      `.shared .<rty> <sym>[<N>];` in the kernel header. *)
@@ -217,7 +223,20 @@ let rec lower_expr st e : string =
            let r = fresh_reg st U32 in
            emit st (Printf.sprintf "mov.u32 %s, %%nctaid.x;" r); r
        | name ->
-           reg_of_var st name)
+           (* reg_env hit → return cached register.
+              reg_env miss + consts hit → lower the const initializer
+                                          on first use, cache in reg_env.
+              Otherwise → fall through to reg_of_var (placeholder). *)
+           (match List.assoc_opt name st.reg_env with
+            | Some r -> r
+            | None ->
+                (match Hashtbl.find_opt st.consts name with
+                 | Some init_expr ->
+                     let r = lower_expr st init_expr in
+                     st.reg_env <- (name, r) :: st.reg_env;
+                     r
+                 | None ->
+                     reg_of_var st name)))
 
   (* Binary operations *)
   | EBinop (op, l, r_e) ->
@@ -1395,7 +1414,9 @@ let emit_param st (id, ty) =
 (* Kernel function emission                                             *)
 (* ------------------------------------------------------------------ *)
 
-let emit_kernel ?(fn_defs = Hashtbl.create 0) (fn : fn_def) : string =
+let emit_kernel ?(fn_defs = Hashtbl.create 0)
+    ?(consts = Hashtbl.create 0)
+    (fn : fn_def) : string =
   let st = {
     counter       = 0;
     instrs        = [];
@@ -1403,6 +1424,7 @@ let emit_kernel ?(fn_defs = Hashtbl.create 0) (fn : fn_def) : string =
     fn_name       = fn.fn_name.name;
     reg_env       = [];
     fn_defs;
+    consts;
     shared_decls  = [];
     shared_regs   = [];
   } in
@@ -1473,10 +1495,13 @@ let emit_ptx_program (items : item list) (sm : int) : string =
      ECall lowering in lower_expr to inline user-defined device
      functions at the call site. *)
   let fn_defs : (string, fn_def) Hashtbl.t = Hashtbl.create 16 in
+  let consts : (string, expr) Hashtbl.t = Hashtbl.create 16 in
   List.iter (fun item ->
     match item.item_desc with
     | IFn fn when not (List.exists (fun a -> a.attr_name = "kernel") fn.fn_attrs) ->
         Hashtbl.replace fn_defs fn.fn_name.name fn
+    | IConst (id, _ty, init_expr) ->
+        Hashtbl.replace consts id.name init_expr
     | _ -> ()
   ) items;
   if kernels = [] then ""
@@ -1489,7 +1514,7 @@ let emit_ptx_program (items : item list) (sm : int) : string =
     let ptx_ver = if sm >= 120 then "8.8" else "8.5" in
     Buffer.add_string buf (Printf.sprintf ".version %s\n.target sm_%d\n.address_size 64\n\n" ptx_ver sm);
     List.iter (fun fn ->
-      Buffer.add_string buf (emit_kernel ~fn_defs fn);
+      Buffer.add_string buf (emit_kernel ~fn_defs ~consts fn);
       Buffer.add_char buf '\n'
     ) kernels;
     Buffer.contents buf
