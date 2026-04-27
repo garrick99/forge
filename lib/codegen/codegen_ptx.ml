@@ -20,18 +20,19 @@ open Ast
 type ptx_rty =
   | Pred          (* .pred  — boolean condition *)
   | B16           (* .b16   — bit-pattern, used for fp16/bf16 bridge regs *)
+  | B32           (* .b32   — bit-pattern, used for tensor-core fragment regs *)
   | U16 | U32 | U64
   | S16 | S32 | S64
   | F32 | F64
 
 let ptx_rty_name = function
-  | Pred -> ".pred" | B16 -> ".b16"
+  | Pred -> ".pred" | B16 -> ".b16" | B32 -> ".b32"
   | U16 -> ".u16" | U32 -> ".u32" | U64 -> ".u64"
   | S16  -> ".s16"  | S32 -> ".s32" | S64 -> ".s64"
   | F32  -> ".f32"  | F64 -> ".f64"
 
 let ptx_state_name = function
-  | Pred -> "p" | B16 -> "h"
+  | Pred -> "p" | B16 -> "h" | B32 -> "rb"
   | U16 -> "rs" | U32 -> "r" | U64 -> "rd"
   | S16  -> "rs" | S32 -> "r" | S64 -> "rd"
   | F32  -> "f"  | F64 -> "fd"
@@ -52,13 +53,14 @@ let rec ptx_rty_of_ty = function
 
 let sizeof_rty = function
   | Pred | B16 | U16 | S16 -> 2
-  | U32 | S32 | F32  -> 4
+  | B32 | U32 | S32 | F32  -> 4
   | U64 | S64 | F64  -> 8
 
-(* PTX arithmetic instruction prefix.  B16 is bit-pattern (no native
-   arithmetic); fall back to b16 (used by mov.b16 / and/or/xor/.b16). *)
+(* PTX arithmetic instruction prefix.  B16/B32 are bit-pattern (no
+   native arithmetic); fall back to b16/b32 (used by mov.bN / and /
+   or / xor / .bN). *)
 let arith_pfx = function
-  | B16 -> "b16"
+  | B16 -> "b16" | B32 -> "b32"
   | U16 -> "u16" | U32 -> "u32" | U64 -> "u64"
   | S16 -> "s16" | S32 -> "s32" | S64 -> "s64"
   | F32 -> "f32" | F64 -> "f64"
@@ -69,6 +71,7 @@ let cmp_pfx rty =
   match rty with
   | F32 | F64 -> arith_pfx rty   (* IEEE float comparison *)
   | B16 -> "u16"                 (* compare b16 as if unsigned *)
+  | B32 -> "u32"                 (* compare b32 as if unsigned *)
   | U16|U32|U64 -> "u" ^ string_of_int (sizeof_rty rty * 8)
   | S16|S32|S64 -> "s" ^ string_of_int (sizeof_rty rty * 8)
   | Pred -> "u32"
@@ -326,7 +329,14 @@ let rec lower_expr st e : string =
           emit st (Printf.sprintf "setp.%s.%s %s, %s, %s;" op_s (cmp_pfx cmp_rty) dst rl' rr')
       | And | Or ->
           let op2 = match op with And -> "and" | _ -> "or" in
-          emit st (Printf.sprintf "%s.b%d %s, %s, %s;" op2 (sizeof_rty rty*8) dst rl rr)
+          (* PTX uses `.pred` (not `.b16`) for predicate-typed and/or.
+             `and.b16 %p, %p, %p` is rejected by ptxas — both operands
+             and result must use the .pred suffix. *)
+          (match rty with
+           | Pred ->
+               emit st (Printf.sprintf "%s.pred %s, %s, %s;" op2 dst rl rr)
+           | _ ->
+               emit st (Printf.sprintf "%s.b%d %s, %s, %s;" op2 (sizeof_rty rty*8) dst rl rr))
       | Implies | Iff ->
           emit st (Printf.sprintf "mov.u32 %s, 1; // logical stub" dst));
       dst
@@ -841,20 +851,22 @@ let rec lower_expr st e : string =
       emit st (Printf.sprintf "mul.lo.u64 %s, %s, %s;" c_ofs tid64 ofs16);
       let c_ptr = fresh_reg st U64 in
       emit st (Printf.sprintf "add.u64 %s, %s, %s;" c_ptr c_base c_ofs);
-      (* Load A fragment: 4 .b32 registers *)
-      let ra0 = fresh_reg st U32 in
-      let ra1 = fresh_reg st U32 in
-      let ra2 = fresh_reg st U32 in
-      let ra3 = fresh_reg st U32 in
-      emit st (Printf.sprintf "ld.global.u32 %s, [%s+0];"  ra0 a_ptr);
-      emit st (Printf.sprintf "ld.global.u32 %s, [%s+4];"  ra1 a_ptr);
-      emit st (Printf.sprintf "ld.global.u32 %s, [%s+8];"  ra2 a_ptr);
-      emit st (Printf.sprintf "ld.global.u32 %s, [%s+12];" ra3 a_ptr);
-      (* Load B fragment: 2 .b32 registers *)
-      let rb0 = fresh_reg st U32 in
-      let rb1 = fresh_reg st U32 in
-      emit st (Printf.sprintf "ld.global.u32 %s, [%s+0];" rb0 b_ptr);
-      emit st (Printf.sprintf "ld.global.u32 %s, [%s+4];" rb1 b_ptr);
+      (* Load A fragment: 4 .b32 registers (PTX mma requires .b32-typed
+         operands for the f16/bf16 packed input fragments — using .u32
+         would be "Arguments mismatch for instruction 'mma'"). *)
+      let ra0 = fresh_reg st B32 in
+      let ra1 = fresh_reg st B32 in
+      let ra2 = fresh_reg st B32 in
+      let ra3 = fresh_reg st B32 in
+      emit st (Printf.sprintf "ld.global.b32 %s, [%s+0];"  ra0 a_ptr);
+      emit st (Printf.sprintf "ld.global.b32 %s, [%s+4];"  ra1 a_ptr);
+      emit st (Printf.sprintf "ld.global.b32 %s, [%s+8];"  ra2 a_ptr);
+      emit st (Printf.sprintf "ld.global.b32 %s, [%s+12];" ra3 a_ptr);
+      (* Load B fragment: 2 .b32 registers (same .b32 requirement). *)
+      let rb0 = fresh_reg st B32 in
+      let rb1 = fresh_reg st B32 in
+      emit st (Printf.sprintf "ld.global.b32 %s, [%s+0];" rb0 b_ptr);
+      emit st (Printf.sprintf "ld.global.b32 %s, [%s+4];" rb1 b_ptr);
       (* Load C fragment: 4 f32 registers — used as input accumulator *)
       let fc0 = fresh_reg st F32 in
       let fc1 = fresh_reg st F32 in
